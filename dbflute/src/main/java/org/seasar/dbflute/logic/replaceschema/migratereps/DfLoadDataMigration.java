@@ -85,6 +85,6 @@ public class DfLoadDataMigration {
 
     protected String getCurrentTypeDataDirectoryPath() {
         // output as firstXls
-        return getReplaceSchemaProperties().getCurrentTypeDataDirectoryPath(DfLoadedDataInfo.FIRSTXLS_FILE_TYPE);
+        return getReplaceSchemaProperties().getMainCurrentEnvDataDir(DfLoadedDataInfo.FIRSTXLS_FILE_TYPE);
     }
 }

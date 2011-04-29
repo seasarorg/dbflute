@@ -149,18 +149,48 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                         Schema Data
     //                                                                         ===========
-    public String getCommonDataDirectoryPath(String dir, String typeName) {
+    public String getCommonDataDir(String dir, String typeName) {
         return dir + "/data/common/" + typeName;
     }
 
-    public String getLoadingTypeDataDirectoryPath(String dir, String envType, String typeName) {
+    public String getLoadingTypeDataDir(String dir, String envType, String typeName) {
         return dir + "/data/" + envType + "/" + typeName;
     }
 
-    public String getCurrentTypeDataDirectoryPath(String typeName) {
+    // non-ApplicationPlaySql below
+
+    protected String getMainCurrentEnvDataDir() {
         final String playSqlDirectory = getReplaceSchemaPlaySqlDirectory();
         final String dataLoadingType = getDataLoadingType();
-        return playSqlDirectory + "/data/" + dataLoadingType + "/" + typeName;
+        return playSqlDirectory + "/data/" + dataLoadingType;
+    }
+
+    public String getMainCurrentEnvDataDir(String typeName) {
+        return getMainCurrentEnvDataDir() + "/" + typeName;
+    }
+
+    public String getMainCurrentEnvFirstXlsDataDir() {
+        return getMainCurrentEnvDataDir() + "/firstxls";
+    }
+
+    public String getMainCurrentEnvTsvDataDir() {
+        return getMainCurrentEnvDataDir() + "/tsv";
+    }
+
+    public String getMainCurrentEnvTsvUTF8DataDir() {
+        return getMainCurrentEnvTsvDataDir() + "/UTF-8";
+    }
+
+    public String getMainCurrentEnvCsvDataDir() {
+        return getMainCurrentEnvDataDir() + "/csv";
+    }
+
+    public String getMainCurrentEnvCsvUTF8DataDir() {
+        return getMainCurrentEnvCsvDataDir() + "/csv/UTF-8";
+    }
+
+    public String getMainCurrentEnvXlsDataDir() {
+        return getMainCurrentEnvDataDir() + "/xls";
     }
 
     // ===================================================================================

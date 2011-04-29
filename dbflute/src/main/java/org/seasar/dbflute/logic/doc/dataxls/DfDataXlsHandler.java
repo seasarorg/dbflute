@@ -53,7 +53,7 @@ public class DfDataXlsHandler {
     protected boolean _containsCommonColumn;
 
     // option for large data
-    protected File _delimiterDataOutputDir;
+    protected String _delimiterDataOutputDir;
     protected boolean _delimiterDataTypeCsv; // default is TSV
 
     // ===================================================================================
@@ -191,10 +191,10 @@ public class DfDataXlsHandler {
     //                                                                      Delimiter Data
     //                                                                      ==============
     protected void outputDataDelimiterTemplate(Table table, DfTemplateDataResult templateDataResult, final int limit) {
-        final File delimiterDir = _delimiterDataOutputDir;
-        if (delimiterDir == null) { // no output delimiter data
+        if (_delimiterDataOutputDir == null) {
             return;
         }
+        final File delimiterDir = new File(_delimiterDataOutputDir);
         final String ext;
         final FileMakingOption option = new FileMakingOption().encodeAsUTF8().separateLf();
         if (_delimiterDataTypeCsv) {
@@ -273,11 +273,11 @@ public class DfDataXlsHandler {
         _containsCommonColumn = containsCommonColumn;
     }
 
-    public void setDelimiterDataOutputDir(File delimiterDataOutputDir) {
-        this._delimiterDataOutputDir = delimiterDataOutputDir;
+    public void setDelimiterDataOutputDir(String delimiterDataOutputDir) {
+        _delimiterDataOutputDir = delimiterDataOutputDir;
     }
 
     public void setDelimiterDataTypeCsv(boolean delimiterDataTypeCsv) {
-        this._delimiterDataTypeCsv = delimiterDataTypeCsv;
+        _delimiterDataTypeCsv = delimiterDataTypeCsv;
     }
 }

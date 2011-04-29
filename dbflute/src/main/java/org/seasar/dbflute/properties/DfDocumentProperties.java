@@ -1,6 +1,5 @@
 package org.seasar.dbflute.properties;
 
-import java.io.File;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Properties;
@@ -305,20 +304,35 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty(newKey, defaultValue, getDataXlsTemplateMap());
     }
 
-    public boolean isDataXlsTemplateLoadDataMigration() {
-        final String key = "isLoadDataMigration";
-        return isProperty(key, false, getDataXlsTemplateMap());
-    }
-
     public String getDataXlsTemplateDir() {
-        final String outputDirectory = getDocumentOutputDirectory();
-        return outputDirectory + "/data";
+        if (isDataXlsTemplateLoadDataReverse()) {
+            return getReplaceSchemaProperties().getMainCurrentEnvXlsDataDir();
+        } else {
+            final String outputDirectory = getDocumentOutputDirectory();
+            return outputDirectory + "/data";
+        }
     }
 
-    public File getDataDelimiterTemplateDir() { // for large data
-        final String templateDir = getDataXlsTemplateDir();
-        final File xlsFile = new File(templateDir + "/largedata");
-        return xlsFile;
+    public String getDataDelimiterTemplateDir() { // for large data
+        if (isDataXlsTemplateLoadDataReverse()) {
+            return getReplaceSchemaProperties().getMainCurrentEnvTsvUTF8DataDir();
+        } else {
+            final String templateDir = getDataXlsTemplateDir();
+            return templateDir + "/large-data";
+        }
+    }
+
+    public String getDataXlsTemplateFileTitle() {
+        if (isDataXlsTemplateLoadDataReverse()) {
+            return "reverse-data";
+        } else {
+            return "dataxls";
+        }
+    }
+
+    public boolean isDataXlsTemplateLoadDataReverse() {
+        final String key = "isLoadDataReverse";
+        return isProperty(key, false, getDataXlsTemplateMap());
     }
 
     // ===================================================================================

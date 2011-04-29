@@ -54,8 +54,6 @@ package org.apache.torque.task;
  * <http://www.apache.org/>.
  */
 
-import java.io.File;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
@@ -130,7 +128,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         final Database database = _schemaData.getDatabase();
-        _log.info("...Outputting data xls template: tables=" + database.getTableList().size());
+        _log.info("...Outputting DataXlsTemplate: tables=" + database.getTableList().size());
         outputDataXlsTemplate(database);
         _log.info("");
     }
@@ -142,7 +140,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
         //handler.setDelimiterDataTypeCsv(true);
         final String templateDir = getDataXlsTemplateDir();
-        final String fileTitle = "data-xls";
+        final String fileTitle = getDataXlsTemplateFileTitle();
         final int limit = getDataXlsTemplateRecordLimit();
         final DfDataXlsGenerator generator = new DfDataXlsGenerator(handler, templateDir, fileTitle, limit);
         generator.outputData(database);
@@ -159,10 +157,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().isDataXlsTemplateRecordLimitValid();
     }
 
-    protected File getDataDelimiterTemplateDir() {
-        return getDocumentProperties().getDataDelimiterTemplateDir();
-    }
-
     protected int getDataXlsTemplateRecordLimit() {
         return getDocumentProperties().getDataXlsTemplateRecordLimit();
     }
@@ -173,6 +167,18 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected String getDataXlsTemplateDir() {
         return getDocumentProperties().getDataXlsTemplateDir();
+    }
+
+    protected String getDataDelimiterTemplateDir() {
+        return getDocumentProperties().getDataDelimiterTemplateDir();
+    }
+
+    protected String getDataXlsTemplateFileTitle() {
+        return getDocumentProperties().getDataXlsTemplateFileTitle();
+    }
+
+    protected boolean isDataXlsTemplateLoadDataMigration() {
+        return getDocumentProperties().isDataXlsTemplateLoadDataReverse();
     }
 
     // ===================================================================================

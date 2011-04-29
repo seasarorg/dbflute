@@ -331,11 +331,11 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     //                                    Directory
     //                                    ---------
     protected String doGetCommonDataDirectoryPath(String dir, String typeName) {
-        return getMyProperties().getCommonDataDirectoryPath(dir, typeName);
+        return getMyProperties().getCommonDataDir(dir, typeName);
     }
 
     protected String doGetLoadingTypeDataDirectoryPath(String dir, String envType, String typeName) {
-        return getMyProperties().getLoadingTypeDataDirectoryPath(dir, envType, typeName);
+        return getMyProperties().getLoadingTypeDataDir(dir, envType, typeName);
     }
 
     // ===================================================================================

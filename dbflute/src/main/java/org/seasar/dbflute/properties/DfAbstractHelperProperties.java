@@ -522,6 +522,10 @@ public abstract class DfAbstractHelperProperties {
         return handler().getLittleAdjustmentProperties(getProperties());
     }
 
+    protected DfReplaceSchemaProperties getReplaceSchemaProperties() {
+        return handler().getReplaceSchemaProperties(getProperties());
+    }
+
     // ===============================================================================
     //                                                                   Assist Helper
     //                                                                   =============
