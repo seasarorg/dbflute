@@ -33,6 +33,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _lazyConnection = false;
+    protected boolean _alterSchema = false;
     protected DfCreateSchemaFinalInfo _createSchemaFinalInfo;
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
@@ -77,10 +78,79 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
+        if (_alterSchema) {
+            backupPreviousResource();
+            reflectNextResource();
+        }
+        try {
+            executeCoreProcess();
+        } catch (RuntimeException e) {
+            if (_alterSchema) {
+                rollbackSchema();
+            }
+            throw e;
+        }
+        if (_alterSchema) {
+            if (diffSchema()) {
+                rollbackSchema();
+                handleAlterFailure();
+            }
+        }
+        handleSchemaFailure();
+    }
+
+    protected void alterSchema() {
+        if (_lazyConnection) {
+            String msg = "AlterSchema should be executed when schema exists";
+            throw new IllegalStateException(msg);
+        }
+        _alterSchema = true;
+        // TODO
+    }
+
+    protected void serializeAlteredSchema() {
+        // TODO
+    }
+
+    protected void serializeReplacedSchema() {
+        // TODO
+    }
+
+    protected boolean diffSchema() {
+        // TODO
+        return false;
+    }
+
+    protected void reflectNextResource() {
+        // TODO
+    }
+
+    protected void backupPreviousResource() {
+        // TODO
+    }
+
+    protected void rollbackSchema() {
+        try {
+            reflectPreviousResource();
+            executeCoreProcess();
+        } catch (RuntimeException e) {
+            String msg = "Failed to rollback to previous schema";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void reflectPreviousResource() {
+        // TODO
+    }
+
+    protected void handleAlterFailure() {
+        // TODO
+    }
+
+    protected void executeCoreProcess() {
         createSchema();
         loadData();
         takeFinally();
-        handleSchemaFailure();
     }
 
     protected void createSchema() {
