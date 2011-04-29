@@ -65,10 +65,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
-import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsTemplateHandler;
+import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -96,11 +96,11 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     // ===================================================================================
-    //                                                                        Table Filter
-    //                                                                        ============
+    //                                                                          Schema XML
+    //                                                                          ==========
     @Override
-    protected XmlReadingTableFilter createXmlReadingTableFilter() {
-        return null; // no need to filter at this task
+    protected DfSchemaXmlReader createSchemaXmlReader() {
+        return createSchemaXmlReaderAsCoreToManage();
     }
 
     // ===================================================================================

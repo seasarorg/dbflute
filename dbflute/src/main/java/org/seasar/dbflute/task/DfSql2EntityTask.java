@@ -29,8 +29,6 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
-import org.apache.torque.task.TorqueDataModelTask.GenetateXmlReadingTableFilter;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
@@ -184,21 +182,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected void setupSchemaInformation() {
         final DfSchemaXmlReader schemaFileReader = createSchemaFileReader();
-        try {
-            schemaFileReader.read();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        _schemaData = schemaFileReader.getSchemaData();
+        _schemaData = schemaFileReader.read();
     }
 
     protected DfSchemaXmlReader createSchemaFileReader() {
-        final XmlReadingTableFilter tableFilter = createXmlReadingTableFilter();
-        return DfSchemaXmlReader.createAsMain(getTargetDatabase(), tableFilter);
-    }
-
-    protected XmlReadingTableFilter createXmlReadingTableFilter() { // same as Generate task's one
-        return new GenetateXmlReadingTableFilter(getDatabaseProperties());
+        return DfSchemaXmlReader.createAsCoreToGenerate(); // same as Generate task's one
     }
 
     // ===================================================================================

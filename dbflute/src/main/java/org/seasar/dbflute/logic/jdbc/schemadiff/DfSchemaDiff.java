@@ -1,7 +1,5 @@
 package org.seasar.dbflute.logic.jdbc.schemadiff;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -175,11 +173,24 @@ public class DfSchemaDiff extends DfAbstractDiff {
         _nextReader = nextReader;
     }
 
-    public static DfSchemaDiff createAsMain() {
+    public static DfSchemaDiff createAsCore() {
+        // no need to filter when reading here
+        final DfSchemaXmlReader reader = DfSchemaXmlReader.createAsCoreToManage();
+        return new DfSchemaDiff(reader, reader);
+    }
+
+    public static DfSchemaDiff createAsFlexible(String schemaXml) {
+        // no need to filter when reading here
+        final DfSchemaXmlReader reader = DfSchemaXmlReader.createAsFlexibleToManage(schemaXml);
+        return new DfSchemaDiff(reader, reader);
+    }
+
+    public static DfSchemaDiff createAsFlexible(String previousXml, String nextXml) {
         final XmlReadingTableFilter tableFilter = null; // no need to filter when reading here
         final String databaseType = getDatabaseType();
-        final DfSchemaXmlReader previousReader = DfSchemaXmlReader.createAsMain(databaseType, tableFilter);
-        final DfSchemaXmlReader nextReader = DfSchemaXmlReader.createAsMain(databaseType, tableFilter);
+        final DfSchemaXmlReader previousReader = DfSchemaXmlReader
+                .createAsPlain(previousXml, databaseType, tableFilter);
+        final DfSchemaXmlReader nextReader = DfSchemaXmlReader.createAsPlain(nextXml, databaseType, tableFilter);
         return new DfSchemaDiff(previousReader, nextReader);
     }
 
@@ -193,16 +204,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public void loadPreviousSchema() { // before loading next schema
         final DfSchemaXmlReader reader = _previousReader;
         try {
-            reader.read();
-        } catch (FileNotFoundException normal) {
-            _firstTime = true;
-            return;
-        } catch (IOException e) {
-            _loadingFailure = true;
-            handleReadingException(e, reader);
-        }
-        try {
-            _previousDb = reader.getSchemaData().getDatabase();
+            _previousDb = reader.read().getDatabase();
         } catch (RuntimeException e) {
             _loadingFailure = true;
             handleReadingException(e, reader);
@@ -221,12 +223,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
         final DfSchemaXmlReader reader = _nextReader;
         try {
-            reader.read();
-        } catch (IOException e) {
-            handleReadingException(e, reader);
-        }
-        try {
-            _nextDb = reader.getSchemaData().getDatabase();
+            _nextDb = reader.read().getDatabase();
         } catch (RuntimeException e) {
             handleReadingException(e, reader);
         }

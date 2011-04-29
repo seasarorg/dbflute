@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.apache.tools.ant.types.FileSet;
 import org.apache.torque.engine.database.model.AppData;
-import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
@@ -49,19 +48,21 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     //                                                                 ===================
     @Override
     public Context initControlContext() throws Exception {
-        final DfSchemaXmlReader schemaFileReader = createSchemaFileReader();
-        schemaFileReader.read();
-        _schemaData = schemaFileReader.getSchemaData();
+        final DfSchemaXmlReader schemaXmlReader = createSchemaXmlReader();
+        _schemaData = schemaXmlReader.read();
         _context = createVelocityContext(_schemaData);
         return _context;
     }
 
-    protected DfSchemaXmlReader createSchemaFileReader() {
-        final XmlReadingTableFilter tableFilter = createXmlReadingTableFilter();
-        return DfSchemaXmlReader.createAsMain(getTargetDatabase(), tableFilter);
+    protected abstract DfSchemaXmlReader createSchemaXmlReader();
+
+    protected DfSchemaXmlReader createSchemaXmlReaderAsCoreToGenerate() {
+        return DfSchemaXmlReader.createAsCoreToGenerate();
     }
 
-    protected abstract XmlReadingTableFilter createXmlReadingTableFilter();
+    protected DfSchemaXmlReader createSchemaXmlReaderAsCoreToManage() {
+        return DfSchemaXmlReader.createAsCoreToManage();
+    }
 
     protected VelocityContext createVelocityContext(final AppData appData) {
         final DfVelocityContextFactory factory = new DfVelocityContextFactory();

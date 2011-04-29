@@ -15,6 +15,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
+import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 
 /**
  * Basic properties.
@@ -306,6 +307,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                           SchemaXML
     //                                                                           =========
+    protected DfSchemaXmlFacadeProp _schemaXmlFacadeProp;
+
+    public DfSchemaXmlFacadeProp getSchemaXmlFacadeProp() {
+        if (_schemaXmlFacadeProp != null) {
+            return _schemaXmlFacadeProp;
+        }
+        _schemaXmlFacadeProp = new DfSchemaXmlFacadeProp(this);
+        return _schemaXmlFacadeProp;
+    }
+
     public String getProejctSchemaXMLFilePath() {
         final StringBuilder sb = new StringBuilder();
         final String projectName = getBasicProperties().getProjectName();

@@ -54,21 +54,14 @@ package org.apache.torque.task;
  * <http://www.apache.org/>.
  */
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
-import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
  * The DBFlute task generating classes from schema meta data.
@@ -90,35 +83,11 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     }
 
     // ===================================================================================
-    //                                                                        Table Filter
-    //                                                                        ============
+    //                                                                          Schema XML
+    //                                                                          ==========
     @Override
-    protected XmlReadingTableFilter createXmlReadingTableFilter() {
-        return new GenetateXmlReadingTableFilter(getDatabaseProperties());
-    }
-
-    public static class GenetateXmlReadingTableFilter implements XmlReadingTableFilter {
-        protected DfDatabaseProperties _databaseProp;
-
-        public GenetateXmlReadingTableFilter(DfDatabaseProperties databaseProp) {
-            _databaseProp = databaseProp;
-        }
-
-        public boolean isExcept(UnifiedSchema unifiedSchema, String tableName) {
-            final DfAdditionalSchemaInfo additional = _databaseProp.getAdditionalSchemaInfo(unifiedSchema);
-            final List<String> tableExceptGenOnlyList;
-            if (additional != null) {
-                tableExceptGenOnlyList = additional.getTableExceptGenOnlyList();
-            } else {
-                tableExceptGenOnlyList = _databaseProp.getTableExceptGenOnlyList();
-            }
-            final List<String> targetEmptyList = DfCollectionUtil.emptyList();
-            return !isTargetByHint(tableName, targetEmptyList, tableExceptGenOnlyList);
-        }
-
-        protected boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
-            return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
-        }
+    protected DfSchemaXmlReader createSchemaXmlReader() {
+        return createSchemaXmlReaderAsCoreToGenerate();
     }
 
     // ===================================================================================

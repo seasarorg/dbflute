@@ -2147,9 +2147,9 @@ public class Database {
     // ===================================================================================
     //                                                                      Schema History
     //                                                                      ==============
-    public void loadSchemaHistory() {
+    public void loadSchemaHistory() { // for HiostoryHtml
         _log.info("...Loading schema history");
-        _schemaHistory = new DfSchemaHistory();
+        _schemaHistory = DfSchemaHistory.createAsCore();
         _schemaHistory.loadHistory();
         if (existsSchemaHistory()) {
             _log.info("  -> found history: count=" + getSchemaDiffList().size());

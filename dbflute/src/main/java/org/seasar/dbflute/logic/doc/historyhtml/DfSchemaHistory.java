@@ -15,6 +15,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.infra.diffmap.DiffMapFile;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -27,16 +28,38 @@ public class DfSchemaHistory {
     //                                                                           Attribute
     //                                                                           =========
     // -----------------------------------------------------
+    //                                        Basic Resource
+    //                                        --------------
+    protected final String _historyFile;
+
+    // -----------------------------------------------------
     //                                          Load History
     //                                          ------------
     protected final List<DfSchemaDiff> _schemaDiffList = DfCollectionUtil.newArrayList();
     protected boolean _existsSchemaDiff;
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfSchemaHistory(String historyFile) {
+        _historyFile = historyFile;
+    }
+
+    public static DfSchemaHistory createAsCore() {
+        final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
+        final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
+        return new DfSchemaHistory(facadeProp.getProjectSchemaHistoryFilePath());
+    }
+
+    public static DfSchemaHistory createAsPlain(String historyFile) {
+        return new DfSchemaHistory(historyFile);
+    }
+
+    // ===================================================================================
     //                                                                           Serialize
     //                                                                           =========
     public void serializeSchemaDiff(DfSchemaDiff schemaDiff) throws IOException {
-        final String path = getSchemaHistoryFilePath();
+        final String path = _historyFile;
         final DiffMapFile diffMapFile = createDiffMapFile();
         final File file = new File(path);
 
@@ -89,8 +112,7 @@ public class DfSchemaHistory {
     //                                                                        Load History
     //                                                                        ============
     public void loadHistory() {
-        final String filePath = getSchemaHistoryFilePath();
-        final File file = new File(getSchemaHistoryFilePath());
+        final File file = new File(_historyFile);
         if (!file.exists()) {
             _existsSchemaDiff = false;
             return;
@@ -118,7 +140,7 @@ public class DfSchemaHistory {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Failed to accept diff-map.");
             br.addItem("File Path");
-            br.addElement(filePath);
+            br.addElement(_historyFile);
             br.addItem("Exception");
             br.addElement(e.getClass().getName());
             br.addElement(e.getMessage());
@@ -137,7 +159,7 @@ public class DfSchemaHistory {
             assertDiffElementMap(key, value);
             @SuppressWarnings("unchecked")
             final Map<String, Object> schemaDiffMap = (Map<String, Object>) value;
-            final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsMain();
+            final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsCore();
             schemaDiff.acceptSchemaDiffMap(schemaDiffMap);
             if (index == 0) {
                 schemaDiff.setLatest(true);
@@ -169,20 +191,13 @@ public class DfSchemaHistory {
         return new DiffMapFile();
     }
 
-    public String getSchemaHistoryFilePath() {
-        return getBasicProperties().getProjectSchemaHistoryFilePath();
-    }
-
-    // ===================================================================================
-    //                                                                          Properties
-    //                                                                          ==========
-    protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
-    }
-
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public String getHistoryFile() {
+        return _historyFile;
+    }
+
     public List<DfSchemaDiff> getSchemaDiffList() {
         return _schemaDiffList;
     }
