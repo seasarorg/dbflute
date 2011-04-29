@@ -114,8 +114,20 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
                 executeCoreProcess();
             }
         });
-        _alterSchemaFinalInfo = process.execute();
-        throwAlterCheckAlterSqlFailureException(_alterSchemaFinalInfo);
+        try {
+            _alterSchemaFinalInfo = process.execute();
+            if (_alterSchemaFinalInfo.isFailure()) {
+                throwAlterCheckAlterSqlFailureException(_alterSchemaFinalInfo);
+            }
+        } finally {
+            // because the alter check process
+            // may output alter NG mark file
+            try {
+                refreshResources();
+            } catch (RuntimeException continued) {
+                _log.warn("*Failed to refresh resources: " + continued.getMessage());
+            }
+        }
     }
 
     protected void throwAlterCheckAlterSqlFailureException(DfAlterSchemaFinalInfo finalInfo) {

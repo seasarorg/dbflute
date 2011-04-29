@@ -53,7 +53,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                          Renamed File
     //                                          ------------
     protected final Map<File, File> _backupPreviousFileMap = new LinkedHashMap<File, File>();
-    protected final Map<File, File> _deployedPreviousFileMap = new LinkedHashMap<File, File>();
+    protected final Map<File, File> _deployedNextFileMap = new LinkedHashMap<File, File>();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -167,6 +167,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             final File previousFile = previousSqlFileMap.get(migrationSqlFile.getName());
             if (previousFile != null) { // found overridden previous SQL file
                 final File backupFile = new File(previousDir + "/" + previousFile.getName());
+                _log.info("...Moving the previous file to backup: " + backupFile.getName());
                 if (previousFile.renameTo(backupFile)) {
                     _backupPreviousFileMap.put(previousFile, backupFile);
                 } else {
@@ -182,8 +183,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final List<File> migrationSqlFileList = getMigrationCreateSchemaSqlFileList();
         for (File migrationSqlFile : migrationSqlFileList) {
             final File deployTo = new File(playSqlDir + "/" + migrationSqlFile.getName());
+            _log.info("...Moving the next file to deployment: " + deployTo.getName());
             if (migrationSqlFile.renameTo(deployTo)) {
-                _deployedPreviousFileMap.put(migrationSqlFile, deployTo);
+                _deployedNextFileMap.put(migrationSqlFile, deployTo);
             } else {
                 String msg = "Failed to rename (for deployment) to " + deployTo;
                 throw new IllegalStateException(msg);
@@ -228,6 +230,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                      Roll-back Schema
     //                                      ----------------
     protected void rollbackSchema() {
+        _log.info("");
+        _log.info("* * * * * * * * * *");
+        _log.info("*                 *");
+        _log.info("* Rollback Schema *");
+        _log.info("*                 *");
+        _log.info("* * * * * * * * * *");
         try {
             revertToPreviousResource();
             _coreProcessPlayer.play();
@@ -237,19 +245,21 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void revertToPreviousResource() {
-        for (Entry<File, File> entry : _deployedPreviousFileMap.entrySet()) {
+        for (Entry<File, File> entry : _deployedNextFileMap.entrySet()) {
             final File migration = entry.getKey();
-            final File deployed = entry.getValue();
-            if (!deployed.renameTo(migration)) {
+            final File deployment = entry.getValue();
+            _log.info("...Moving the next file back to migration: " + migration.getName());
+            if (!deployment.renameTo(migration)) {
                 String msg = "Failed to rename (for reversion) to " + migration;
                 throw new IllegalStateException(msg);
             }
         }
         for (Entry<File, File> entry : _backupPreviousFileMap.entrySet()) {
-            final File main = entry.getKey();
+            final File deployment = entry.getKey();
             final File backup = entry.getValue();
-            if (!backup.renameTo(main)) {
-                String msg = "Failed to rename (for reversion) to " + main;
+            _log.info("...Moving the previous file back to deployment: " + deployment.getName());
+            if (!backup.renameTo(deployment)) {
+                String msg = "Failed to rename (for reversion) to " + deployment;
                 throw new IllegalStateException(msg);
             }
         }

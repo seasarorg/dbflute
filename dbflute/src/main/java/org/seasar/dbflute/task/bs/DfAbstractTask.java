@@ -32,6 +32,7 @@ import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
+import org.seasar.dbflute.logic.generate.refresh.DfRefreshResourceProcess;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
@@ -395,6 +396,13 @@ public abstract class DfAbstractTask extends Task {
     protected DfOutsideSqlPack collectSqlFileList() {
         final DfOutsideSqlCollector sqlFileCollector = new DfOutsideSqlCollector();
         return sqlFileCollector.collectOutsideSql();
+    }
+
+    // ===================================================================================
+    //                                                                    Refresh Resource
+    //                                                                    ================
+    protected void refreshResources() {
+        new DfRefreshResourceProcess().refreshResources();
     }
 
     // ===================================================================================

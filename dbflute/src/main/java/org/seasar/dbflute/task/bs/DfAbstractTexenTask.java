@@ -18,10 +18,6 @@ package org.seasar.dbflute.task.bs;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -53,6 +49,7 @@ import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
+import org.seasar.dbflute.logic.generate.refresh.DfRefreshResourceProcess;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
@@ -77,7 +74,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    public static final Log _log = LogFactory.getLog(DfAbstractTexenTask.class);
+    private static final Log _log = LogFactory.getLog(DfAbstractTexenTask.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -619,81 +616,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                    Refresh Resource
     //                                                                    ================
     protected void refreshResources() {
-        if (!isRefresh()) {
-            return;
-        }
-        final List<String> projectNameList = getRefreshProjectNameList();
-        for (String projectName : projectNameList) {
-            doRefreshResources(projectName);
-        }
-    }
-
-    protected void doRefreshResources(String projectName) {
-        final StringBuilder sb = new StringBuilder().append("refresh?");
-        sb.append(projectName).append("=INFINITE");
-
-        final URL url = getRefreshRequestURL(sb.toString());
-        if (url == null) {
-            return;
-        }
-
-        InputStream is = null;
-        try {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("...Refreshing the project: " + projectName);
-            URLConnection connection = url.openConnection();
-            connection.setReadTimeout(getRefreshRequestReadTimeout());
-            connection.connect();
-            is = connection.getInputStream();
-            _log.info("");
-            _log.info("    --> OK, Look at the refreshed project!");
-            _log.info("- - - - - - - - - -/");
-            _log.info("");
-        } catch (IOException ignored) {
-            _log.info("");
-            _log.info("    --> Oh, no! " + ignored.getMessage() + ": " + url);
-            _log.info("- - - - - - - - - -/");
-            _log.info("");
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
-
-    protected boolean isRefresh() {
-        final DfRefreshProperties prop = getProperties().getRefreshProperties();
-        return prop.hasRefreshDefinition();
-    }
-
-    protected int getRefreshRequestReadTimeout() {
-        return 3 * 1000;
-    }
-
-    protected List<String> getRefreshProjectNameList() {
-        final DfRefreshProperties prop = getProperties().getRefreshProperties();
-        return prop.getProjectNameList();
-    }
-
-    protected URL getRefreshRequestURL(String path) {
-        final DfRefreshProperties prop = getProperties().getRefreshProperties();
-        String requestUrl = prop.getRequestUrl();
-        if (requestUrl.length() > 0) {
-            if (!requestUrl.endsWith("/")) {
-                requestUrl = requestUrl + "/";
-            }
-            try {
-                return new URL(requestUrl + path);
-            } catch (MalformedURLException e) {
-                _log.warn("The URL was invalid: " + requestUrl, e);
-                return null;
-            }
-        } else {
-            return null;
-        }
+        new DfRefreshResourceProcess().refreshResources();
     }
 
     // ===================================================================================

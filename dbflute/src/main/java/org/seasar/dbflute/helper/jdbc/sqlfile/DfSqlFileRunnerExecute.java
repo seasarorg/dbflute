@@ -88,11 +88,8 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     protected void showContinueWarnLog(SQLException e, String sql) {
         final StringBuilder sb = new StringBuilder();
         sb.append("*Failure: ").append(e.getClass().getName()).append(ln());
-        sb.append("/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
-        sb.append("nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
+        sb.append("/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
         sb.append(ln());
-        sb.append(sql).append(ln());
-        sb.append("- - - - - - - - - -").append(ln());
         sb.append(extractMessage(e)).append(ln());
         buildAdditionalErrorInfo(sb, e).append(ln());
         SQLException nextEx = e.getNextException();
