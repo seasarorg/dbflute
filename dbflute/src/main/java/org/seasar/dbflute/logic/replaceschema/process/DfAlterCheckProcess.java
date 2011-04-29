@@ -2,11 +2,11 @@ package org.seasar.dbflute.logic.replaceschema.process;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -26,6 +26,7 @@ import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -77,6 +78,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                             Execute
     //                                                                             =======
     public void execute() {
+        clearTemporary();
         alterSchema();
         deployNextResource();
         try {
@@ -92,7 +94,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             handleAlterFailure(schemaDiff);
         } else { // success
             removeAlterNG();
+            saveHistory();
         }
+        clearTemporary();
     }
 
     // -----------------------------------------------------
@@ -244,8 +248,15 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void revertToPreviousResource() {
-        Set<Entry<File, File>> entrySet = _backupPreviousFileMap.entrySet();
-        for (Entry<File, File> entry : entrySet) {
+        for (Entry<File, File> entry : _deployedPreviousFileMap.entrySet()) {
+            final File migration = entry.getKey();
+            final File deployed = entry.getValue();
+            if (!deployed.renameTo(migration)) {
+                String msg = "Failed to rename (for reversion) to " + migration;
+                throw new IllegalStateException(msg);
+            }
+        }
+        for (Entry<File, File> entry : _backupPreviousFileMap.entrySet()) {
             final File main = entry.getKey();
             final File backup = entry.getValue();
             if (!backup.renameTo(main)) {
@@ -290,6 +301,54 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         }
         final String msg = br.buildExceptionMessage();
         throw new DfAlterCheckDifferenceFoundException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                          Save History
+    //                                          ------------
+    protected void saveHistory() {
+        final String currentDir = getHistoryCurrentDir();
+        final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
+        for (File sqlFile : alterSqlFileList) {
+            final File historyTo = new File(currentDir + "/" + sqlFile.getName());
+            sqlFile.renameTo(historyTo);
+        }
+    }
+
+    protected String getHistoryCurrentDir() {
+        final String historyDir = getMigrationHistoryDirectory();
+        final Date currentDate = new Date();
+        final String yyyyMMdd = DfTypeUtil.toString(currentDate, "yyyy-MM-dd");
+        final File yyyyMMddDir = new File(historyDir + "/" + yyyyMMdd);
+        final String currentDir;
+        if (yyyyMMddDir.exists()) {
+            // e.g.
+            // .../2011-04-29/...
+            // .../2011-04-29-18-09-23/...
+            final String yyyyMMddHHmmss = DfTypeUtil.toString(currentDate, "yyyy-MM-dd-HH-mm-ss");
+            final File yyyyMMddHHmmssDir = new File(historyDir + "/" + yyyyMMddHHmmss);
+            if (yyyyMMddHHmmssDir.exists()) { // basically no way
+                String msg = "The directory has already been exist: " + yyyyMMddHHmmssDir;
+                throw new IllegalStateException(msg);
+            }
+            yyyyMMddHHmmssDir.mkdirs();
+            currentDir = yyyyMMddHHmmss;
+        } else {
+            // e.g. .../2011-04-29/...
+            yyyyMMddDir.mkdirs();
+            currentDir = yyyyMMdd;
+        }
+        return historyDir + "/" + currentDir;
+    }
+
+    // -----------------------------------------------------
+    //                                         Temporary Dir
+    //                                         -------------
+    protected void clearTemporary() {
+        final File tmpDir = new File(getMigrationTemporaryDirectory());
+        if (!tmpDir.exists()) {
+            tmpDir.delete();
+        }
     }
 
     // ===================================================================================
@@ -355,8 +414,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().getMigrationHistoryFile();
     }
 
-    public List<File> getReplaceSchemaSqlFileList() { // without Application's
-        return getReplaceSchemaProperties().getReplaceSchemaSqlFileList();
+    protected String getMigrationHistoryDirectory() {
+        return getReplaceSchemaProperties().getMigrationHistoryDirectory();
+    }
+
+    public String getMigrationTemporaryDirectory() {
+        return getReplaceSchemaProperties().getMigrationTemporaryDirectory();
     }
 
     public String getMigrationTemporaryPreviousDirectory() {
