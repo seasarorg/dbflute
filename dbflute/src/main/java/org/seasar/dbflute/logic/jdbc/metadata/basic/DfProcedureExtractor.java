@@ -58,12 +58,12 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.7.5 (2008/06/28 Saturday)
  */
-public class DfProcedureHandler extends DfAbstractMetaDataBasicExtractor {
+public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfProcedureHandler.class);
+    private static final Log _log = LogFactory.getLog(DfProcedureExtractor.class);
 
     // ===================================================================================
     //                                                                           Attribute

@@ -15,8 +15,8 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.states.DfDtsRowStates;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -164,7 +164,7 @@ public class DfDataTable {
     //                                                                       =============
     protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
-        final List<DfColumnMetaInfo> metaList = new DfColumnHandler().getColumnList(metaData, unifiedSchema,
+        final List<DfColumnMetaInfo> metaList = new DfColumnExtractor().getColumnList(metaData, unifiedSchema,
                 _tableDbName);
         final Map<String, DfColumnMetaInfo> metaMap = new HashMap<String, DfColumnMetaInfo>();
         for (DfColumnMetaInfo metaInfo : metaList) {
@@ -175,7 +175,7 @@ public class DfDataTable {
 
     protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) {
         try {
-            final DfPrimaryKeyMetaInfo pkInfo = new DfUniqueKeyHandler().getPrimaryKey(metaData, unifiedSchema,
+            final DfPrimaryKeyMetaInfo pkInfo = new DfUniqueKeyExtractor().getPrimaryKey(metaData, unifiedSchema,
                     _tableDbName);
             final List<String> list = pkInfo.getPrimaryKeyList();
             return new HashSet<String>(list);

@@ -37,11 +37,11 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfForeignKeyHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfIndexHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfIndexExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
@@ -73,10 +73,10 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     // -----------------------------------------------------
     //                                     Meta Data Handler
     //                                     -----------------
-    protected DfTableHandler _tableHandler = new DfTableHandler();
-    protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
-    protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
-    protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler() {
+    protected DfTableExtractor _tableHandler = new DfTableExtractor();
+    protected DfUniqueKeyExtractor _uniqueKeyHandler = new DfUniqueKeyExtractor();
+    protected DfAutoIncrementExtractor _autoIncrementHandler = new DfAutoIncrementExtractor();
+    protected DfForeignKeyExtractor _foreignKeyHandler = new DfForeignKeyExtractor() {
         @Override
         public boolean isTableExcept(UnifiedSchema unifiedSchema, String tableName) {
             // All foreign tables are target if the foreign table is except.
@@ -84,7 +84,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             return false;
         }
     };
-    protected DfIndexHandler _indexHandler = new DfIndexHandler();
+    protected DfIndexExtractor _indexHandler = new DfIndexExtractor();
 
     // ===================================================================================
     //                                                                             Extract

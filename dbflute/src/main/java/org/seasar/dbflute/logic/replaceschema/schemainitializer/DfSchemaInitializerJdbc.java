@@ -33,9 +33,9 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfForeignKeyHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
@@ -85,7 +85,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             final List<DfTableMetaInfo> tableMetaInfoList;
             try {
                 final DatabaseMetaData metaData = conn.getMetaData();
-                final DfTableHandler tableNameHandler = new DfTableHandler() {
+                final DfTableExtractor tableNameHandler = new DfTableExtractor() {
                     @Override
                     protected String[] getRealObjectTypeTargetArray(UnifiedSchema unifiedSchema) {
                         if (_dropObjectTypeList != null) {
@@ -264,7 +264,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 if (isSkipDropForeignKey(tableMetaInfo)) {
                     continue;
                 }
-                final DfForeignKeyHandler handler = new DfForeignKeyHandler() {
+                final DfForeignKeyExtractor handler = new DfForeignKeyExtractor() {
 
                     @Override
                     protected List<String> getRealTableExceptList(UnifiedSchema unifiedSchema) {
@@ -409,7 +409,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                      Drop Procedure
     //                                                                      ==============
     protected void dropProcedure(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        final DfProcedureHandler handler = new DfProcedureHandler();
+        final DfProcedureExtractor handler = new DfProcedureExtractor();
         handler.suppressAdditionalSchema();
         handler.suppressLogging();
         DatabaseMetaData metaData;

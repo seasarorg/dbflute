@@ -34,12 +34,12 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfForeignKeyHandler extends DfAbstractMetaDataBasicExtractor {
+public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfForeignKeyHandler.class);
+    private static final Log _log = LogFactory.getLog(DfForeignKeyExtractor.class);
 
     // ===================================================================================
     //                                                                           Attribute

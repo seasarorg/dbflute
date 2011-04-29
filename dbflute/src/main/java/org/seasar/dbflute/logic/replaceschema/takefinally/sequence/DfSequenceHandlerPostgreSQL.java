@@ -31,8 +31,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
@@ -79,8 +79,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
             conn = _dataSource.getConnection();
             st = conn.createStatement();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final DfColumnHandler columnHandler = new DfColumnHandler();
-            final DfAutoIncrementHandler autoIncrementHandler = new DfAutoIncrementHandler();
+            final DfColumnExtractor columnHandler = new DfColumnExtractor();
+            final DfAutoIncrementExtractor autoIncrementHandler = new DfAutoIncrementExtractor();
             _log.info("...Incrementing serial type sequence");
             final Set<Entry<String, DfTableMetaInfo>> entrySet = _tableMap.entrySet();
             for (Entry<String, DfTableMetaInfo> entry : entrySet) {

@@ -36,12 +36,12 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public class DfColumnHandler extends DfAbstractMetaDataBasicExtractor {
+public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfColumnHandler.class);
+    private static final Log _log = LogFactory.getLog(DfColumnExtractor.class);
 
     // ===================================================================================
     //                                                                           Attribute

@@ -43,7 +43,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
@@ -82,7 +82,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final DfSql2EntityMeta _sql2entityMeta = new DfSql2EntityMeta(); // has all meta data
 
     // helper
-    protected final DfColumnHandler _columnHandler = new DfColumnHandler();
+    protected final DfColumnExtractor _columnHandler = new DfColumnExtractor();
     protected final DfSql2EntityMarkAnalyzer _markAnalyzer = new DfSql2EntityMarkAnalyzer();
 
     // for getting schema

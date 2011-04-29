@@ -23,7 +23,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 
 public class DfCustomizeEntityMetaExtractor {
@@ -80,7 +80,7 @@ public class DfCustomizeEntityMetaExtractor {
             metaInfo.setDbTypeName(columnTypeName);
 
             int columnSize = md.getPrecision(i);
-            if (!DfColumnHandler.isColumnSizeValid(columnSize)) {
+            if (!DfColumnExtractor.isColumnSizeValid(columnSize)) {
                 // ex) sum(COLUMN)
                 columnSize = md.getColumnDisplaySize(i);
             }

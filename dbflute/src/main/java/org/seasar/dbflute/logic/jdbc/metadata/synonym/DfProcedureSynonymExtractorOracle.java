@@ -34,7 +34,7 @@ import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
@@ -72,7 +72,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
             final DatabaseMetaData metaData = conn.getMetaData();
             final Map<String, DfProcedureMetaInfo> procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
             final List<DfProcedureMetaInfo> procedureList = new ArrayList<DfProcedureMetaInfo>();
-            final DfProcedureHandler procedureHandler = new DfProcedureHandler();
+            final DfProcedureExtractor procedureHandler = new DfProcedureExtractor();
             procedureHandler.suppressLogging();
             for (UnifiedSchema unifiedSchema : _targetSchemaList) {
                 // get new procedure list because different instances is needed at this process

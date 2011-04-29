@@ -29,8 +29,8 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
@@ -65,8 +65,8 @@ public class DfProcedurePmbSetupper {
     protected final Map<String, DfCustomizeEntityInfo> _entityInfoMap;
     protected final Map<String, DfPmbMetaData> _pmbMetaDataMap;
     protected final Database _database;
-    protected final DfColumnHandler _columnHandler = new DfColumnHandler();
-    protected final DfProcedureHandler _procedureHandler = new DfProcedureHandler();
+    protected final DfColumnExtractor _columnHandler = new DfColumnExtractor();
+    protected final DfProcedureExtractor _procedureHandler = new DfProcedureExtractor();
     protected final Map<String, String> _continuedFailureMessageMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================

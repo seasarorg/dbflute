@@ -67,7 +67,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -90,7 +90,7 @@ public class Column {
     //                                                                          Definition
     //                                                                          ==========
     private static Log _log = LogFactory.getLog(Column.class);
-    private static DfColumnHandler _columnHandler = new DfColumnHandler();
+    private static DfColumnExtractor _columnHandler = new DfColumnExtractor();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -371,8 +371,8 @@ public class Column {
     }
 
     public void setupColumnSize(int columnSize, int decimalDigits) {
-        if (DfColumnHandler.isColumnSizeValid(columnSize)) {
-            if (DfColumnHandler.isDecimalDigitsValid(decimalDigits)) {
+        if (DfColumnExtractor.isColumnSizeValid(columnSize)) {
+            if (DfColumnExtractor.isDecimalDigitsValid(decimalDigits)) {
                 setColumnSize(columnSize + ", " + decimalDigits);
             } else {
                 setColumnSize(String.valueOf(columnSize));

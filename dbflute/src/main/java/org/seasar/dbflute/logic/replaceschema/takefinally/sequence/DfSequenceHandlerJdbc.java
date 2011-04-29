@@ -32,8 +32,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfPropertySettingTableNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -55,7 +55,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     //                                                                           =========
     protected DataSource _dataSource;
     protected List<UnifiedSchema> _unifiedSchemaList;
-    protected final DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
+    protected final DfUniqueKeyExtractor _uniqueKeyHandler = new DfUniqueKeyExtractor();
     protected Map<String, DfTableMetaInfo> _tableMap;
 
     protected void initializeTableInfo(Connection conn) throws SQLException {
@@ -63,7 +63,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
             return;
         }
         _tableMap = StringKeyMap.createAsFlexible();
-        final DfTableHandler tableHandler = new DfTableHandler();
+        final DfTableExtractor tableHandler = new DfTableExtractor();
         final DatabaseMetaData metaData = conn.getMetaData();
         final List<UnifiedSchema> unifiedSchemaList = _unifiedSchemaList;
         for (UnifiedSchema unifiedSchema : unifiedSchemaList) {

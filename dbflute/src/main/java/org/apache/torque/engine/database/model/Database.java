@@ -85,7 +85,7 @@ import org.seasar.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.seasar.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
@@ -2137,7 +2137,7 @@ public class Database {
         }
         _log.info(" ");
         _log.info("...Setting up procedures for documents");
-        final DfProcedureHandler handler = new DfProcedureHandler();
+        final DfProcedureExtractor handler = new DfProcedureExtractor();
         handler.includeProcedureSynonym(getDataSource());
         final DataSource dataSource = getDataSource();
         _procedureMetaInfoList = handler.getAvailableProcedureList(dataSource);

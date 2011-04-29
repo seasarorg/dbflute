@@ -37,12 +37,12 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public class DfUniqueKeyHandler extends DfAbstractMetaDataBasicExtractor {
+public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfUniqueKeyHandler.class);
+    private static final Log _log = LogFactory.getLog(DfUniqueKeyExtractor.class);
 
     // ===================================================================================
     //                                                                         Primary Key
@@ -302,7 +302,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataBasicExtractor {
             String tableName, boolean retry) throws SQLException {
         final boolean uniqueKeyOnly = true;
         final DfDatabaseTypeFacadeProp prop = getDatabaseTypeFacadeProp();
-        return DfIndexHandler.delegateExtractIndexInfoMetaData(metaData, unifiedSchema, tableName, uniqueKeyOnly,
+        return DfIndexExtractor.delegateExtractIndexInfoMetaData(metaData, unifiedSchema, tableName, uniqueKeyOnly,
                 retry, prop);
     }
 

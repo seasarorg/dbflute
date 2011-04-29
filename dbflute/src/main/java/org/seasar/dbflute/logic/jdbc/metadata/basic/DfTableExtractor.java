@@ -36,12 +36,12 @@ import org.seasar.dbflute.util.Srl;
  * This class generates an XML schema of an existing database from JDBC meta data.
  * @author jflute
  */
-public class DfTableHandler extends DfAbstractMetaDataBasicExtractor {
+public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfTableHandler.class);
+    private static final Log _log = LogFactory.getLog(DfTableExtractor.class);
 
     // ===================================================================================
     //                                                                        Meta Getting

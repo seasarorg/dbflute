@@ -3,7 +3,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 import java.util.Map;
 
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
@@ -28,7 +28,7 @@ public class DfProcedureColumnMetaInfo {
     protected DfTypeArrayInfo _typeArrayInfo; // when ARRAY type 
     protected DfTypeStructInfo _typeStructInfo; // when STRUCT type
 
-    protected final DfColumnHandler _columnHandler = new DfColumnHandler(); // for type determination
+    protected final DfColumnExtractor _columnHandler = new DfColumnExtractor(); // for type determination
 
     // ===================================================================================
     //                                                                Status Determination
@@ -106,9 +106,9 @@ public class DfProcedureColumnMetaInfo {
 
     public String getColumnSizeDisp() {
         final StringBuilder sb = new StringBuilder();
-        if (DfColumnHandler.isColumnSizeValid(_columnSize)) {
+        if (DfColumnExtractor.isColumnSizeValid(_columnSize)) {
             sb.append("(").append(_columnSize);
-            if (DfColumnHandler.isDecimalDigitsValid(_decimalDigits)) {
+            if (DfColumnExtractor.isDecimalDigitsValid(_decimalDigits)) {
                 sb.append(", ").append(_decimalDigits);
             }
             sb.append(")");
@@ -119,9 +119,9 @@ public class DfProcedureColumnMetaInfo {
     public String getColumnDefinitionLineDisp() {
         final StringBuilder sb = new StringBuilder();
         sb.append(_dbTypeName);
-        if (DfColumnHandler.isColumnSizeValid(_columnSize)) {
+        if (DfColumnExtractor.isColumnSizeValid(_columnSize)) {
             sb.append("(").append(_columnSize);
-            if (DfColumnHandler.isDecimalDigitsValid(_decimalDigits)) {
+            if (DfColumnExtractor.isDecimalDigitsValid(_decimalDigits)) {
                 sb.append(", ").append(_decimalDigits);
             }
             sb.append(")");

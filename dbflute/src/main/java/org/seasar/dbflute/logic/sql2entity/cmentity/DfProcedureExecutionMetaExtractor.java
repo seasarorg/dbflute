@@ -34,7 +34,7 @@ import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfProcedureExecutionMetaGettingFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
@@ -62,7 +62,7 @@ public class DfProcedureExecutionMetaExtractor {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfCustomizeEntityMetaExtractor _extractor = new DfCustomizeEntityMetaExtractor();
-    protected final DfColumnHandler _columnHandler = new DfColumnHandler();
+    protected final DfColumnExtractor _columnHandler = new DfColumnExtractor();
     protected final ValueType _stringType = TnValueTypes.STRING;
     protected final ValueType _stringClobType = TnValueTypes.STRING_CLOB;
     protected final ValueType _bytesOidType = TnValueTypes.BYTES_OID;

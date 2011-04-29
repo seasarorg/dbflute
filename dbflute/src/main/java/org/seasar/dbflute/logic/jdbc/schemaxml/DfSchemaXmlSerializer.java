@@ -33,12 +33,12 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfForeignKeyHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfIndexHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableHandler;
-import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfIndexExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
@@ -93,12 +93,12 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                               Handler
     //                                               -------
-    protected DfTableHandler _tableHandler = new DfTableHandler();
-    protected DfColumnHandler _columnHandler = new DfColumnHandler();
-    protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
-    protected DfIndexHandler _indexHandler = new DfIndexHandler();
-    protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler();
-    protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
+    protected DfTableExtractor _tableHandler = new DfTableExtractor();
+    protected DfColumnExtractor _columnHandler = new DfColumnExtractor();
+    protected DfUniqueKeyExtractor _uniqueKeyHandler = new DfUniqueKeyExtractor();
+    protected DfIndexExtractor _indexHandler = new DfIndexExtractor();
+    protected DfForeignKeyExtractor _foreignKeyHandler = new DfForeignKeyExtractor();
+    protected DfAutoIncrementExtractor _autoIncrementHandler = new DfAutoIncrementExtractor();
 
     // -----------------------------------------------------
     //                                        Column Comment
@@ -334,8 +334,8 @@ public class DfSchemaXmlSerializer {
     protected void processColumnSize(DfColumnMetaInfo columnInfo, Element columnElement) {
         final int columnSize = columnInfo.getColumnSize();
         final int decimalDigits = columnInfo.getDecimalDigits();
-        if (DfColumnHandler.isColumnSizeValid(columnSize)) {
-            if (DfColumnHandler.isDecimalDigitsValid(decimalDigits)) {
+        if (DfColumnExtractor.isColumnSizeValid(columnSize)) {
+            if (DfColumnExtractor.isDecimalDigitsValid(decimalDigits)) {
                 columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
             } else {
                 columnElement.setAttribute("size", String.valueOf(columnSize));
