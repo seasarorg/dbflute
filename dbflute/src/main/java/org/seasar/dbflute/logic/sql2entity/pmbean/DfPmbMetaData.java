@@ -25,7 +25,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;

@@ -42,7 +42,7 @@ import org.seasar.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.DfBasicProperties;

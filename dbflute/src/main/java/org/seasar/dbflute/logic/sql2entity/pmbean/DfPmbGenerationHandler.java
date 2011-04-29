@@ -27,7 +27,7 @@ import org.apache.torque.engine.database.model.AppData;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.cbean.SimplePagingBean;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;

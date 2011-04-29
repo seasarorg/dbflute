@@ -3,7 +3,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 import java.util.Map;
 
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;

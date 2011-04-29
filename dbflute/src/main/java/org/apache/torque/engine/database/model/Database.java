@@ -85,7 +85,7 @@ import org.seasar.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.seasar.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
-import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
