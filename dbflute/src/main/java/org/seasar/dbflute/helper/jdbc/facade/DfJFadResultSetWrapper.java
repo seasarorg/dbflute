@@ -10,14 +10,14 @@ import org.seasar.dbflute.jdbc.ValueType;
  * @author jflute
  * @since 0.9.8.3 (2011/04/25 Monday)
  */
-public class DfJFacResultSetWrapper {
+public class DfJFadResultSetWrapper {
 
     protected final ResultSet _rs;
     protected final Map<String, ValueType> _columnValueTypeMap;
-    protected final DfJFacStringConverter _stringConverter;
+    protected final DfJFadStringConverter _stringConverter;
 
-    public DfJFacResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap,
-            DfJFacStringConverter stringConverter) {
+    public DfJFadResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap,
+            DfJFadStringConverter stringConverter) {
         _rs = rs;
         _columnValueTypeMap = columnValueTypeMap;
         _stringConverter = stringConverter;

@@ -43,7 +43,7 @@ public class DfDataXlsHandler {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfDataXlsHandler.class);
 
-    public static final int XLS_LIMIT = 65000; // about
+    protected static final int XLS_LIMIT = 65000; // about
 
     // ===================================================================================
     //                                                                           Attribute

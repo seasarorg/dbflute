@@ -133,12 +133,14 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         br.addNotice("Failed to execute the alter SQL statements.");
         br.addItem("Advice");
         br.addElement("Fix the mistakes of the alter SQL.");
-        br.addItem("Result");
+        br.addItem("Message");
         br.addElement(finalInfo.getResultMessage());
-        br.addItem("Detail");
         final List<String> detailMessageList = finalInfo.getDetailMessageList();
-        for (String detailMessage : detailMessageList) {
-            br.addElement(detailMessage);
+        if (!detailMessageList.isEmpty()) {
+            br.addItem("Detail");
+            for (String detailMessage : detailMessageList) {
+                br.addElement(detailMessage);
+            }
         }
         String msg = br.buildExceptionMessage();
         throw new DfAlterCheckAlterSqlFailureException(msg);
@@ -318,27 +320,19 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected String getHistoryCurrentDir() {
         final String historyDir = getMigrationHistoryDirectory();
         final Date currentDate = new Date();
-        final String yyyyMMdd = DfTypeUtil.toString(currentDate, "yyyy-MM-dd");
-        final File yyyyMMddDir = new File(historyDir + "/" + yyyyMMdd);
-        final String currentDir;
-        if (yyyyMMddDir.exists()) {
-            // e.g.
-            // .../2011-04-29/...
-            // .../2011-04-29-18-09-23/...
-            final String yyyyMMddHHmmss = DfTypeUtil.toString(currentDate, "yyyy-MM-dd-HH-mm-ss");
-            final File yyyyMMddHHmmssDir = new File(historyDir + "/" + yyyyMMddHHmmss);
-            if (yyyyMMddHHmmssDir.exists()) { // basically no way
-                String msg = "The directory has already been exist: " + yyyyMMddHHmmssDir;
-                throw new IllegalStateException(msg);
-            }
-            yyyyMMddHHmmssDir.mkdirs();
-            currentDir = yyyyMMddHHmmss;
-        } else {
-            // e.g. .../2011-04-29/...
-            yyyyMMddDir.mkdirs();
-            currentDir = yyyyMMdd;
+        final String yyyy = DfTypeUtil.toString(currentDate, "yyyy");
+        mkdirsIfNotExists(new File(historyDir + "/" + yyyy));
+        // e.g. history/2011/20110429_2247
+        final String yyyyMMddHHmm = DfTypeUtil.toString(currentDate, "yyyyMMdd_HHmm");
+        final String currentDir = historyDir + "/" + yyyy + "/" + yyyyMMddHHmm;
+        mkdirsIfNotExists(new File(currentDir));
+        return currentDir;
+    }
+
+    protected void mkdirsIfNotExists(File dir) {
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
-        return historyDir + "/" + currentDir;
     }
 
     // -----------------------------------------------------

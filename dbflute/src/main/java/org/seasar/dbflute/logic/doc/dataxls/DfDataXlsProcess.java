@@ -14,13 +14,13 @@ import org.apache.torque.engine.database.model.Table;
  * @author jflute
  * @since 0.9.8.3 (2011/04/23 Saturday)
  */
-public class DfDataXlsGenerator {
+public class DfDataXlsProcess {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfDataXlsGenerator.class);
+    private static final Log _log = LogFactory.getLog(DfDataXlsProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -33,7 +33,7 @@ public class DfDataXlsGenerator {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataXlsGenerator(DfDataXlsHandler templatehandler, String outputDir, String fileTitle, int limit) {
+    public DfDataXlsProcess(DfDataXlsHandler templatehandler, String outputDir, String fileTitle, int limit) {
         _templatehandler = templatehandler;
         _outputDir = outputDir;
         _fileTitle = fileTitle;
@@ -41,9 +41,9 @@ public class DfDataXlsGenerator {
     }
 
     // ===================================================================================
-    //                                                                          Output Xls
-    //                                                                          ==========
-    public void outputData(Database database) {
+    //                                                                             Execute
+    //                                                                             =======
+    public void execute(Database database) {
         final List<List<Table>> orderedList = analyzeOrder(database);
         int sectionNo = 1;
         for (List<Table> tableList : orderedList) {

@@ -306,7 +306,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public String getDataXlsTemplateDir() {
         if (isDataXlsTemplateLoadDataReverse()) {
-            return getReplaceSchemaProperties().getMainCurrentEnvXlsDataDir();
+            return getReplaceSchemaProperties().getMainCurrentEnvFirstXlsDataDir();
         } else {
             final String outputDirectory = getDocumentOutputDirectory();
             return outputDirectory + "/data";

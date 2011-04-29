@@ -59,7 +59,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsGenerator;
+import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsProcess;
 import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsHandler;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -132,7 +132,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         final Database database = _schemaData.getDatabase();
-        _log.info("...Outputting template files: tables=" + database.getTableList().size());
+        _log.info("...Outputting dataxls: tables=" + database.getTableList().size());
         outputDataXlsTemplate(database);
         _log.info("");
     }
@@ -146,8 +146,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final String templateDir = getDataXlsTemplateDir();
         final String fileTitle = getDataXlsTemplateFileTitle();
         final int limit = getDataXlsTemplateRecordLimit();
-        final DfDataXlsGenerator generator = new DfDataXlsGenerator(handler, templateDir, fileTitle, limit);
-        generator.outputData(database);
+        final DfDataXlsProcess generator = new DfDataXlsProcess(handler, templateDir, fileTitle, limit);
+        generator.execute(database);
     }
 
     // ===================================================================================

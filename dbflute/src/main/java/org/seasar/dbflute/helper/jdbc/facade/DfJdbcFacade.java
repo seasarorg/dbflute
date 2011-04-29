@@ -77,7 +77,7 @@ public class DfJdbcFacade {
             conn = getConnection();
             st = conn.createStatement();
             rs = st.executeQuery(sql);
-            final DfJFacResultSetWrapper wrapper = new DfJFacResultSetWrapper(rs, columnValueTypeMap, null);
+            final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, null);
             int count = 0;
             while (wrapper.next()) {
                 if (isOverLimit(limit, count)) {
@@ -142,7 +142,7 @@ public class DfJdbcFacade {
      * @return The list for result. (NotNull)
      */
     public List<Map<String, String>> selectStringList(String sql, Map<String, ValueType> columnValueTypeMap,
-            DfJFacStringConverter converter) {
+            DfJFadStringConverter converter) {
         return selectStringList(sql, columnValueTypeMap, converter, -1);
     }
 
@@ -155,7 +155,7 @@ public class DfJdbcFacade {
      * @return The list for result. (NotNull)
      */
     public List<Map<String, String>> selectStringList(String sql, Map<String, ValueType> columnValueTypeMap,
-            DfJFacStringConverter converter, int limit) {
+            DfJFadStringConverter converter, int limit) {
         // [ATTENTION]: no use bind variables
         final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
         Connection conn = null;
@@ -165,7 +165,7 @@ public class DfJdbcFacade {
             conn = getConnection();
             st = conn.createStatement();
             rs = st.executeQuery(sql);
-            final DfJFacResultSetWrapper wrapper = new DfJFacResultSetWrapper(rs, columnValueTypeMap, converter);
+            final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, converter);
             int count = 0;
             while (wrapper.next()) {
                 if (isOverLimit(limit, count)) {
@@ -205,10 +205,10 @@ public class DfJdbcFacade {
     // -----------------------------------------------------
     //                                                Cursor
     //                                                ------
-    public DfJFacCursorCallback selectCursor(final String sql, final Map<String, ValueType> columnValueTypeMap,
-            final DfJFacStringConverter stringConverter) {
-        return new DfJFacCursorCallback() {
-            public void select(DfJFacCursorHandler handler) {
+    public DfJFadCursorCallback selectCursor(final String sql, final Map<String, ValueType> columnValueTypeMap,
+            final DfJFadStringConverter stringConverter) {
+        return new DfJFadCursorCallback() {
+            public void select(DfJFadCursorHandler handler) {
                 Connection conn = null;
                 Statement st = null;
                 ResultSet rs = null;
@@ -216,7 +216,7 @@ public class DfJdbcFacade {
                     conn = _dataSource.getConnection();
                     st = conn.createStatement();
                     rs = st.executeQuery(sql);
-                    handler.handle(new DfJFacResultSetWrapper(rs, columnValueTypeMap, stringConverter));
+                    handler.handle(new DfJFadResultSetWrapper(rs, columnValueTypeMap, stringConverter));
                 } catch (SQLException e) {
                     handleSQLException(sql, e);
                 } finally {
