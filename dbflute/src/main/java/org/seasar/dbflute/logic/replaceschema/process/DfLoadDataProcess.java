@@ -28,13 +28,13 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.util.Srl;
 
-public class DfLoadDataMain extends DfAbstractReplaceSchemaMain {
+public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfLoadDataMain.class);
+    private static final Log _log = LogFactory.getLog(DfLoadDataProcess.class);
 
     public static final String LOG_PATH = "./log/load-data.log";
     protected static final String COMMON_ENV_TYPE = DfLoadedDataInfo.COMMON_ENV_TYPE;
@@ -68,20 +68,20 @@ public class DfLoadDataMain extends DfAbstractReplaceSchemaMain {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfLoadDataMain(DataSource dataSource, UnifiedSchema mainSchema, boolean utility) {
+    protected DfLoadDataProcess(DataSource dataSource, UnifiedSchema mainSchema, boolean utility) {
         _dataSource = dataSource;
         _mainSchema = mainSchema;
         _utility = utility;
     }
 
-    public static DfLoadDataMain createAsCore(DataSource dataSource) {
+    public static DfLoadDataProcess createAsCore(DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfLoadDataMain(dataSource, mainSchema, false);
+        return new DfLoadDataProcess(dataSource, mainSchema, false);
     }
 
-    public static DfLoadDataMain createAsUtility(DataSource dataSource) {
+    public static DfLoadDataProcess createAsUtility(DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfLoadDataMain(dataSource, mainSchema, true);
+        return new DfLoadDataProcess(dataSource, mainSchema, true);
     }
 
     // ===================================================================================

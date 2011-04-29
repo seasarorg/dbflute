@@ -39,13 +39,13 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
-public class DfTakeFinallyMain extends DfAbstractReplaceSchemaMain {
+public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfTakeFinallyMain.class);
+    private static final Log _log = LogFactory.getLog(DfTakeFinallyProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -63,20 +63,20 @@ public class DfTakeFinallyMain extends DfAbstractReplaceSchemaMain {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfTakeFinallyMain(DataSource dataSource, UnifiedSchema mainSchema, boolean utility) {
+    protected DfTakeFinallyProcess(DataSource dataSource, UnifiedSchema mainSchema, boolean utility) {
         _dataSource = dataSource;
         _mainSchema = mainSchema;
         _utility = utility;
     }
 
-    public static DfTakeFinallyMain createAsCore(DataSource dataSource) {
+    public static DfTakeFinallyProcess createAsCore(DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfTakeFinallyMain(dataSource, mainSchema, false);
+        return new DfTakeFinallyProcess(dataSource, mainSchema, false);
     }
 
-    public static DfTakeFinallyMain createAsUtility(DataSource dataSource) {
+    public static DfTakeFinallyProcess createAsUtility(DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfTakeFinallyMain(dataSource, mainSchema, true);
+        return new DfTakeFinallyProcess(dataSource, mainSchema, true);
     }
 
     // ===================================================================================

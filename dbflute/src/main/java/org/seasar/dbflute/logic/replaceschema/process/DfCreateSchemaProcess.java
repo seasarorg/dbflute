@@ -36,13 +36,13 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
 
-public class DfCreateSchemaMain extends DfAbstractReplaceSchemaMain {
+public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfCreateSchemaMain.class);
+    private static final Log _log = LogFactory.getLog(DfCreateSchemaProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -64,17 +64,17 @@ public class DfCreateSchemaMain extends DfAbstractReplaceSchemaMain {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfCreateSchemaMain(CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
+    protected DfCreateSchemaProcess(CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
         _dataSourcePlayer = dataSourcePlayer;
         _lazyConnection = lazyConnection;
     }
 
-    public static DfCreateSchemaMain createAsCore(CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
-        return new DfCreateSchemaMain(dataSourcePlayer, lazyConnection);
+    public static DfCreateSchemaProcess createAsCore(CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
+        return new DfCreateSchemaProcess(dataSourcePlayer, lazyConnection);
     }
 
-    public static DfCreateSchemaMain createAsUtility(CreatingDataSourcePlayer dataSourcePlayer) {
-        return new DfCreateSchemaMain(dataSourcePlayer, false);
+    public static DfCreateSchemaProcess createAsUtility(CreatingDataSourcePlayer dataSourcePlayer) {
+        return new DfCreateSchemaProcess(dataSourcePlayer, false);
     }
 
     public static interface CreatingDataSourcePlayer {

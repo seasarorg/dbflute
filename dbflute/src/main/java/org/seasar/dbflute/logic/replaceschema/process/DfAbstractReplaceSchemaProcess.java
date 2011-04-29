@@ -18,7 +18,7 @@ import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
  * @author jflute
  * @since 0.9.8.3 (2011/04/29 Friday)
  */
-public class DfAbstractReplaceSchemaMain {
+public class DfAbstractReplaceSchemaProcess {
 
     // ===================================================================================
     //                                                                      Various Common

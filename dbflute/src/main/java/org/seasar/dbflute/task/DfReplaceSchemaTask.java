@@ -15,10 +15,10 @@ import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
-import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaMain;
-import org.seasar.dbflute.logic.replaceschema.process.DfLoadDataMain;
-import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyMain;
-import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaMain.CreatingDataSourcePlayer;
+import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaProcess;
+import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.CreatingDataSourcePlayer;
+import org.seasar.dbflute.logic.replaceschema.process.DfLoadDataProcess;
+import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
 public class DfReplaceSchemaTask extends DfAbstractTask {
@@ -84,7 +84,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected void createSchema() {
-        final DfCreateSchemaMain main = DfCreateSchemaMain.createAsCore(new CreatingDataSourcePlayer() {
+        final DfCreateSchemaProcess process = DfCreateSchemaProcess.createAsCore(new CreatingDataSourcePlayer() {
             public DataSource callbackGetDataSource() {
                 return getDataSource();
             }
@@ -93,12 +93,12 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
                 setupDataSource();
             }
         }, _lazyConnection);
-        _createSchemaFinalInfo = main.execute();
+        _createSchemaFinalInfo = process.execute();
     }
 
     protected void loadData() {
-        final DfLoadDataMain main = DfLoadDataMain.createAsCore(getDataSource());
-        _loadDataFinalInfo = main.execute();
+        final DfLoadDataProcess process = DfLoadDataProcess.createAsCore(getDataSource());
+        _loadDataFinalInfo = process.execute();
         final RuntimeException loadEx = _loadDataFinalInfo.getLoadEx();
         if (loadEx != null) { // high priority exception
             throw loadEx;
@@ -106,8 +106,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected void takeFinally() {
-        final DfTakeFinallyMain main = DfTakeFinallyMain.createAsCore(getDataSource());
-        _takeFinallyFinalInfo = main.execute();
+        final DfTakeFinallyProcess process = DfTakeFinallyProcess.createAsCore(getDataSource());
+        _takeFinallyFinalInfo = process.execute();
         final DfTakeFinallyAssertionFailureException assertionEx = _takeFinallyFinalInfo.getAssertionEx();
         if (assertionEx != null) { // high priority exception
             throw assertionEx;
