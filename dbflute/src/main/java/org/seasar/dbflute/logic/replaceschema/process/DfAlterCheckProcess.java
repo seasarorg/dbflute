@@ -284,9 +284,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         br.addNotice("Failed to rollback to previous schema.");
         br.addItem("Advice");
         br.addElement("The function AlterCheck requires that previous schema is valid.");
-        br.addElement("So you should fix the mistakes of the previous schema.");
-        br.addElement("And you should move alter SQL files anywhere temporarily");
-        br.addElement("when you execute ReplaceSchema task for the previous schema.");
+        br.addElement("So you should fix the mistakes of the previous schema");
+        br.addElement("and replace the schema to previous status by executing ReplaceSchema again.");
+        br.addElement("And also delete the previous-NG mark file, which supresses AlterCheck process.");
+        br.addElement("In doing so, you can execute AlterCheck again.");
         br.addItem("Exception");
         br.addElement(e.getClass().getName());
         br.addElement(e.getMessage());
@@ -298,8 +299,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the differences between alter SQL and create SQL.");
         br.addItem("Advice");
-        br.addElement("Make sure your alter SQL are correct");
-        br.addElement("and delete the '" + getMigrationAlterNGMark() + "' file.");
+        setupFixedAdviceMessage(br);
         br.addElement("");
         br.addElement("You can confirm them at '" + getMigrationHistoryFile() + "'.");
         br.addElement("The first history is difference between previous schema and altered schema.");
@@ -313,6 +313,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         }
         final String msg = br.buildExceptionMessage();
         throw new DfAlterCheckDifferenceFoundException(msg);
+    }
+    
+    public static void setupFixedAdviceMessage(ExceptionMessageBuilder br) {
+        br.addElement("Make sure your alter SQL are correct");
+        br.addElement("and delete the alter-NG mark file.");
+        br.addElement("In doing so, you can execute AlterCheck again.");
     }
 
     // -----------------------------------------------------

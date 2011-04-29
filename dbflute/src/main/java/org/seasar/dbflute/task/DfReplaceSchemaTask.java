@@ -147,9 +147,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the alter-NG mark of AlterCheck.");
         br.addItem("Advice");
-        br.addElement("Fix the mistakes of the alter SQL");
-        br.addElement("and you remove the file after that.");
-        br.addElement("In doing so, you can execute AlterCheck again.");
+        DfAlterCheckProcess.setupFixedAdviceMessage(br);
         String msg = br.buildExceptionMessage();
         throw new DfAlterCheckAlterNGMarkFoundException(msg);
     }
@@ -158,7 +156,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to execute the alter SQL statements.");
         br.addItem("Advice");
-        br.addElement("Fix the mistakes of the alter SQL.");
+        DfAlterCheckProcess.setupFixedAdviceMessage(br);
         br.addElement("Look at the final info in the log for DBFlute task.");
         br.addItem("Message");
         br.addElement(finalInfo.getResultMessage());
