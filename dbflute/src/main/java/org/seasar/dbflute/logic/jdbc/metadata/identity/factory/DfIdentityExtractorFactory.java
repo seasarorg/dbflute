@@ -4,7 +4,7 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.logic.jdbc.metadata.identity.DfIdentityExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.identity.DfIdentityExtractorDB2;
-import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
  * @author jflute
@@ -12,15 +12,15 @@ import org.seasar.dbflute.properties.DfBasicProperties;
  */
 public class DfIdentityExtractorFactory {
 
-    protected DfBasicProperties _basicProperties;
-    protected DataSource _dataSource;
+    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
+    protected final DataSource _dataSource;
 
     /**
-     * @param basicProperties The basic properties. (NotNull)
+     * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      * @param dataSource The data source. (NotNull)
      */
-    public DfIdentityExtractorFactory(DfBasicProperties basicProperties, DataSource dataSource) {
-        _basicProperties = basicProperties;
+    public DfIdentityExtractorFactory(DfDatabaseTypeFacadeProp databaseTypeFacadeProp, DataSource dataSource) {
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _dataSource = dataSource;
     }
 
@@ -28,7 +28,7 @@ public class DfIdentityExtractorFactory {
      * @return The extractor of DB comments. (NullAllowed)
      */
     public DfIdentityExtractor createIdentityExtractor() {
-        if (_basicProperties.isDatabaseDB2()) {
+        if (_databaseTypeFacadeProp.isDatabaseDB2()) {
             final DfIdentityExtractorDB2 extractor = new DfIdentityExtractorDB2();
             extractor.setDataSource(_dataSource);
             return extractor;

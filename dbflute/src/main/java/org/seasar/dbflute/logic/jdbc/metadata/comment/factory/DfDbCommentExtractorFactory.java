@@ -7,7 +7,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorMySQL;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorSQLServer;
-import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
  * @author jflute
@@ -18,21 +18,21 @@ public class DfDbCommentExtractorFactory {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DfBasicProperties _basicProperties;
-    protected DataSource _dataSource;
-    protected UnifiedSchema _unifiedSchema;
+    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
+    protected final DataSource _dataSource;
+    protected final UnifiedSchema _unifiedSchema;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * @param basicProperties The basic properties. (NotNull)
+     * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      * @param dataSource The data source. (NotNull)
      * @param unifiedSchema The unified schema to extract. (NullAllowed)
      */
-    public DfDbCommentExtractorFactory(DfBasicProperties basicProperties, DataSource dataSource,
+    public DfDbCommentExtractorFactory(DfDatabaseTypeFacadeProp databaseTypeFacadeProp, DataSource dataSource,
             UnifiedSchema unifiedSchema) {
-        _basicProperties = basicProperties;
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _dataSource = dataSource;
         _unifiedSchema = unifiedSchema;
     }
@@ -44,17 +44,17 @@ public class DfDbCommentExtractorFactory {
      * @return The extractor of DB comments. (NullAllowed)
      */
     public DfDbCommentExtractor createDbCommentExtractor() {
-        if (_basicProperties.isDatabaseMySQL()) {
+        if (_databaseTypeFacadeProp.isDatabaseMySQL()) {
             final DfDbCommentExtractorMySQL extractor = new DfDbCommentExtractorMySQL();
             extractor.setDataSource(_dataSource);
             extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;
-        } else if (_basicProperties.isDatabaseOracle()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseOracle()) {
             final DfDbCommentExtractorOracle extractor = new DfDbCommentExtractorOracle();
             extractor.setDataSource(_dataSource);
             extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;
-        } else if (_basicProperties.isDatabaseSQLServer()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseSQLServer()) {
             final DfDbCommentExtractorSQLServer extractor = new DfDbCommentExtractorSQLServer();
             extractor.setDataSource(_dataSource);
             extractor.setUnifiedSchema(_unifiedSchema);
