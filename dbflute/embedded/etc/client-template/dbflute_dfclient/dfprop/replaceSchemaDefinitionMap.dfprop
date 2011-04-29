@@ -132,7 +132,8 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o applicationPlaySqlDirectory: (NotRequired - Default '')
-    #  This property is relative path to Application PlaySql directory.
+    #  This property is relative path to Application PlaySql directory,
+    #  which is basically used with ApplicationBehavior.
     #
     #; applicationPlaySqlDirectory = ../../foo-project/dbflute_apbranch/playsql
     # - - - - - - - - - -/

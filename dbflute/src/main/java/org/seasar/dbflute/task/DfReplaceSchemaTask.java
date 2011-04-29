@@ -105,12 +105,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected void processAlterCheck() {
-        final DfAlterCheckProcess process = DfAlterCheckProcess.create(getDataSource(), _mainSchema,
-                new CoreProcessPlayer() {
-                    public void play() {
-                        executeCoreProcess();
-                    }
-                });
+        final DfAlterCheckProcess process = DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
+            public void play() {
+                executeCoreProcess();
+            }
+        });
         process.execute();
     }
 

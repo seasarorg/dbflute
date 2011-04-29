@@ -65,8 +65,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         _coreProcessPlayer = coreProcessPlayer;
     }
 
-    public static DfAlterCheckProcess create(DataSource dataSource, UnifiedSchema mainSchema,
-            CoreProcessPlayer coreProcessPlayer) {
+    public static DfAlterCheckProcess createAsMain(DataSource dataSource, CoreProcessPlayer coreProcessPlayer) {
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         return new DfAlterCheckProcess(dataSource, mainSchema, coreProcessPlayer);
     }
 

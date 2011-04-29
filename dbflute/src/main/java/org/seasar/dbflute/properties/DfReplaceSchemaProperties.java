@@ -514,11 +514,17 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public List<File> getApplicationReplaceSchemaSqlFileList() {
         final String directoryPath = getApplicationPlaySqlDirectory();
+        if (directoryPath == null) {
+            return DfCollectionUtil.emptyList();
+        }
         return doGetSchemaSqlFileList(directoryPath, getReplaceSchemaSqlTitle());
     }
 
     public List<File> getAppcalitionTakeFinallySqlFileList() {
         final String directoryPath = getApplicationPlaySqlDirectory();
+        if (directoryPath == null) {
+            return DfCollectionUtil.emptyList();
+        }
         return doGetSchemaSqlFileList(directoryPath, getTakeFinallySqlTitle());
     }
 

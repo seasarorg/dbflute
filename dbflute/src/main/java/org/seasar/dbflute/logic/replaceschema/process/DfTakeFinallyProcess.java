@@ -53,7 +53,6 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     //                                        --------------
     protected final DataSource _dataSource;
     protected final UnifiedSchema _mainSchema;
-    protected final boolean _utility; // unused but for future
 
     protected Timestamp _beforeTimestamp; // is set through its property
     protected DfSqlFileFireResult _takeFinallyFireResult;
@@ -61,20 +60,14 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfTakeFinallyProcess(DataSource dataSource, UnifiedSchema mainSchema, boolean utility) {
+    protected DfTakeFinallyProcess(DataSource dataSource, UnifiedSchema mainSchema) {
         _dataSource = dataSource;
         _mainSchema = mainSchema;
-        _utility = utility;
     }
 
     public static DfTakeFinallyProcess createAsCore(DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfTakeFinallyProcess(dataSource, mainSchema, false);
-    }
-
-    public static DfTakeFinallyProcess createAsUtility(DataSource dataSource) {
-        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfTakeFinallyProcess(dataSource, mainSchema, true);
+        return new DfTakeFinallyProcess(dataSource, mainSchema);
     }
 
     // ===================================================================================

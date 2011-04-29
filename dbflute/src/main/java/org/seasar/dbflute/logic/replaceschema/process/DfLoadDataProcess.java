@@ -1,5 +1,6 @@
 package org.seasar.dbflute.logic.replaceschema.process;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,7 +37,6 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfLoadDataProcess.class);
 
-    public static final String LOG_PATH = "./log/load-data.log";
     protected static final String COMMON_ENV_TYPE = DfLoadedDataInfo.COMMON_ENV_TYPE;
     protected static final String TSV_FILE_TYPE = DfLoadedDataInfo.TSV_FILE_TYPE;
     protected static final String CSV_FILE_TYPE = DfLoadedDataInfo.CSV_FILE_TYPE;
@@ -53,7 +53,6 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     //                                        --------------
     protected final DataSource _dataSource;
     protected final UnifiedSchema _mainSchema;
-    protected final boolean _utility; // unused but for future
 
     // -----------------------------------------------------
     //                                             Load Data
@@ -68,20 +67,14 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfLoadDataProcess(DataSource dataSource, UnifiedSchema mainSchema, boolean utility) {
+    protected DfLoadDataProcess(DataSource dataSource, UnifiedSchema mainSchema) {
         _dataSource = dataSource;
         _mainSchema = mainSchema;
-        _utility = utility;
     }
 
     public static DfLoadDataProcess createAsCore(DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfLoadDataProcess(dataSource, mainSchema, false);
-    }
-
-    public static DfLoadDataProcess createAsUtility(DataSource dataSource) {
-        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfLoadDataProcess(dataSource, mainSchema, true);
+        return new DfLoadDataProcess(dataSource, mainSchema);
     }
 
     // ===================================================================================
@@ -348,61 +341,59 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         final String title = "{Load Data}";
         final String resultMessage = title + ": loaded-files=" + loadedFileCount;
         final boolean failure;
-        final String detailMessage;
+        final List<String> detailMessageList = new ArrayList<String>();
         if (_success) {
             failure = false;
             if (loadedFileCount > 0) {
-                final StringBuilder detailMessageSb = new StringBuilder();
-                setupDetailMessage(detailMessageSb); // has the last line separator
-                detailMessage = Srl.rtrim(detailMessageSb.toString()); // with removing the last line separator
+                setupDetailMessage(detailMessageList); // has the last line separator
             } else {
-                detailMessage = "- (no data file)";
+                detailMessageList.add("- (no data file)");
             }
         } else {
             // it is the precondition that LoadData stops at the first failure
             failure = true;
-            final StringBuilder detailMessageSb = new StringBuilder();
             if (loadedFileCount > 0) {
-                setupDetailMessage(detailMessageSb); // has the last line separator
+                setupDetailMessage(detailMessageList); // has the last line separator
             }
-            detailMessageSb.append("x (failed: Look at the exception message)");
-            detailMessage = detailMessageSb.toString();
+            detailMessageList.add("x (failed: Look at the exception message)");
         }
         finalInfo.setResultMessage(resultMessage);
-        finalInfo.addDetailMessage(detailMessage);
+        for (String detailMessage : detailMessageList) {
+            finalInfo.addDetailMessage(detailMessage);
+        }
         finalInfo.setFailure(failure);
         finalInfo.setLoadEx(loadEx);
         return finalInfo;
     }
 
-    protected void setupDetailMessage(StringBuilder detailMessageSb) {
+    protected void setupDetailMessage(List<String> detailMessageList) {
         final Map<String, Map<String, List<DfLoadedFile>>> hierarchyMap = _loadedDataInfo
                 .getLoadedFileListHierarchyMap();
 
         // order according to registration
-        doSetupDetailMessageEnvType(detailMessageSb, COMMON_ENV_TYPE, hierarchyMap.get(COMMON_ENV_TYPE));
+        doSetupDetailMessageEnvType(detailMessageList, COMMON_ENV_TYPE, hierarchyMap.get(COMMON_ENV_TYPE));
         for (Entry<String, Map<String, List<DfLoadedFile>>> entry : hierarchyMap.entrySet()) {
             final String envType = entry.getKey();
             if (COMMON_ENV_TYPE.equals(envType)) {
                 continue; // already processed
             }
-            doSetupDetailMessageEnvType(detailMessageSb, envType, entry.getValue());
+            doSetupDetailMessageEnvType(detailMessageList, envType, entry.getValue());
         }
     }
 
-    protected void doSetupDetailMessageEnvType(StringBuilder detailMessageSb, String envType,
+    protected void doSetupDetailMessageEnvType(List<String> detailMessageList, String envType,
             Map<String, List<DfLoadedFile>> fileTypeKeyListMap) {
         if (fileTypeKeyListMap == null || fileTypeKeyListMap.isEmpty()) {
             return;
         }
-        detailMessageSb.append("(").append(envType).append(")").append(ln());
-        doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(FIRSTXLS_FILE_TYPE), 10);
-        doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(TSV_FILE_TYPE), 3);
-        doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(CSV_FILE_TYPE), 3);
-        doSetupDetailMessageFileType(detailMessageSb, fileTypeKeyListMap.get(XLS_FILE_TYPE), 10);
+        detailMessageList.add("(" + envType + ")");
+        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(FIRSTXLS_FILE_TYPE), 10);
+        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(TSV_FILE_TYPE), 3);
+        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(CSV_FILE_TYPE), 3);
+        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(XLS_FILE_TYPE), 10);
     }
 
-    protected void doSetupDetailMessageFileType(StringBuilder detailMessageSb, List<DfLoadedFile> loadedFileList,
+    protected void doSetupDetailMessageFileType(List<String> detailMessageList, List<DfLoadedFile> loadedFileList,
             int limit) {
         if (loadedFileList == null || loadedFileList.isEmpty()) {
             return; // means no files for the file type
@@ -434,13 +425,12 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
             }
             final String fileName = loadedFile.getFileName();
             final String mark = loadedFile.isWarned() ? "v " : "o ";
-            detailMessageSb.append(mark).append(fileName).append(ln());
+            detailMessageList.add(mark + fileName);
             ++index;
         }
         if (etcExists) {
             final String mark = etcWarned ? "v " : "o ";
-            detailMessageSb.append(mark).append("(and other ");
-            detailMessageSb.append(fileType4Etc).append(" files...)").append(ln());
+            detailMessageList.add(mark + "(and other " + fileType4Etc + " files...)");
         }
     }
 }

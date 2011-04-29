@@ -103,7 +103,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final String dataDirectory = resource.getDataDirectory();
         final List<File> xlsList = getXlsList(resource);
         for (File file : xlsList) {
-            _log.info("");
             _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
             _log.info("writeData(" + file + ")");
             _log.info("= = = = = = =/");
@@ -250,8 +249,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMeta> columnInfoMap, List<String> columnNameList, Connection conn,
-            PreparedStatement ps) throws SQLException {
+            Map<String, DfColumnMeta> columnInfoMap, List<String> columnNameList, Connection conn, PreparedStatement ps)
+            throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);

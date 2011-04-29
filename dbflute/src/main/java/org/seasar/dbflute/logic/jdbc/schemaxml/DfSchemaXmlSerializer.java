@@ -470,7 +470,7 @@ public class DfSchemaXmlSerializer {
 
     protected void throwSchemaEmptyException() {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The schema was empty (does not have a table).");
+        br.addNotice("The schema was empty, which had no table.");
         br.addItem("Advice");
         br.addElement("Please confirm the database connection settings.");
         br.addElement("If you've not created the schema yet, please create it.");

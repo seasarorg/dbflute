@@ -67,10 +67,8 @@
     classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
   <taskdef name="df-outside-sql-test" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.DfOutsideSqlTestTask"/>
-  <taskdef name="df-create-schema" classpathref="torque-classpath"
+  <taskdef name="df-replace-schema" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.DfReplaceSchemaTask"/>
-  <taskdef name="df-migrate-reps" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.replaceschema.migrate.DfMigrateRepsTask"/>
 
   <!--
     for Ant-Contrib
@@ -210,39 +208,10 @@
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
 
-    <tstamp>
-      <format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
-    </tstamp>
-
-    <df-create-schema
-        contextProperties="${torque.contextProperties}"
-  	    validTaskEndInformation="false"
-        environmentType="${dfenv}">
-    </df-create-schema>
-    <df-load-data
-        contextProperties="${torque.contextProperties}"
-        validTaskEndInformation="false"
-        environmentType="${dfenv}">
-    </df-load-data>
-    <df-take-finally
-        contextProperties="${torque.contextProperties}"
-        beforeTimestamp="${now.date}"
-        environmentType="${dfenv}">
-    </df-take-finally>
-  </target>
-
-  <target name="migrate-reps" description="==> replace-schema">
-
-    <echo message="+-----------------------------------------------+"/>
-    <echo message="|                                               |"/>
-    <echo message="| Migrate from DB to Replace-Schema !           |"/>
-    <echo message="|                                               |"/>
-    <echo message="+-----------------------------------------------+"/>
-
-    <df-migrate-reps
+    <df-replace-schema
         contextProperties="${torque.contextProperties}"
         environmentType="${dfenv}">
-    </df-migrate-reps>
+    </df-replace-schema>
   </target>
 
   <target name="outside-sql-test" description="==> outside-sql-test">

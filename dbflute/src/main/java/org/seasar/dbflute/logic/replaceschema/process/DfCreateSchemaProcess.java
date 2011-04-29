@@ -71,10 +71,6 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         return new DfCreateSchemaProcess(dataSourcePlayer, lazyConnection);
     }
 
-    public static DfCreateSchemaProcess createAsUtility(CreatingDataSourcePlayer dataSourcePlayer) {
-        return new DfCreateSchemaProcess(dataSourcePlayer, false);
-    }
-
     public static interface CreatingDataSourcePlayer {
         DataSource callbackGetDataSource();
 

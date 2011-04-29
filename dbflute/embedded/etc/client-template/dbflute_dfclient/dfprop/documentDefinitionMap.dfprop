@@ -9,8 +9,7 @@
 # o schemaHtmlFileName (NotRequired - Default 'schema-[project-name].html')
 # o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)
 # o historyHtmlFileName (NotRequired - Default 'history-[project-name].html')
-# o dataXlsTemplateRecordLimit (NotRequired - Default '')
-# o isDataXlsTemplateContainsCommonColumn (NotRequired - Default false)
+# o dataXlsTemplateMap (NotRequired - Default map:{})
 # 
 # Example:
 # map:{
@@ -22,8 +21,11 @@
 #     ; schemaHtmlFileName = xxx.html
 #     ; isSuppressSchemaHtmlOutsideSql = false
 #     ; historyHtmlFileName = xxx.html
-#     ; dataXlsTemplateRecordLimit = 10
-#     ; isDataXlsTemplateContainsCommonColumn = false
+#     ; dataXlsTemplateMap = map:{
+#         ; recordLimit = 10
+#         ; isContainsCommonColumn = false
+#         ; isLoadDataReverse = false
+#     }
 # }
 #
 # *The line that starts with '#' means comment-out.
@@ -101,21 +103,19 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dataXlsTemplateRecordLimit (NotRequired - Default '')
-    #  Does it output Data Excel Template (DataXlsTemplate)?
-    #  If it's yes, you should specify the limit of output records.
-    #  If this property is minus value, it outputs all records.
-    # 
-    #; dataXlsTemplateRecordLimit = 10
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isDataXlsTemplateContainsCommonColumn (NotRequired - Default false)
-    #  Does the data excel template contain common columns?
-    #  Basically you don't need this
-    #  because common columns are resolved on replace-schema.
-    # 
-    #; isDataXlsTemplateContainsCommonColumn = false
+    # o dataXlsTemplateMap: (NotRequired - Default map:{})
+    #  You can set DataXlsTemplate settings.
+    #  This property is valid when the property 'recordLimit' is set.
+    #  Elements of this map are as below:
+    #   o recordLimit: The limit of records to output. Minus means no limit. (NotRequired - Default '')
+    #   o isContainsCommonColumn: Does the data contain common columns? (NotRequired - Default false)
+    #   o isLoadDataReverse: Is the mode LoadDataReverse? (NotRequired - Default false)
+    #
+    #; dataXlsTemplateMap = map:{
+    #    ; recordLimit = 10
+    #    ; isContainsCommonColumn = false
+    #    ; isLoadDataReverse = false
+    #}
     # - - - - - - - - - -/
 }
 # ----------------/
