@@ -18,23 +18,23 @@ public class DfDbCommentExtractorFactory {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected final DataSource _dataSource;
     protected final UnifiedSchema _unifiedSchema;
+    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      * @param dataSource The data source. (NotNull)
      * @param unifiedSchema The unified schema to extract. (NullAllowed)
+     * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      */
-    public DfDbCommentExtractorFactory(DfDatabaseTypeFacadeProp databaseTypeFacadeProp, DataSource dataSource,
-            UnifiedSchema unifiedSchema) {
-        _databaseTypeFacadeProp = databaseTypeFacadeProp;
+    public DfDbCommentExtractorFactory(DataSource dataSource, UnifiedSchema unifiedSchema,
+            DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
         _dataSource = dataSource;
         _unifiedSchema = unifiedSchema;
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
     }
 
     // ===================================================================================

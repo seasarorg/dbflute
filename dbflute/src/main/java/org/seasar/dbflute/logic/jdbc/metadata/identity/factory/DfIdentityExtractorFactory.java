@@ -12,16 +12,16 @@ import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
  */
 public class DfIdentityExtractorFactory {
 
-    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected final DataSource _dataSource;
+    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
 
     /**
-     * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      * @param dataSource The data source. (NotNull)
+     * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      */
-    public DfIdentityExtractorFactory(DfDatabaseTypeFacadeProp databaseTypeFacadeProp, DataSource dataSource) {
-        _databaseTypeFacadeProp = databaseTypeFacadeProp;
+    public DfIdentityExtractorFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
         _dataSource = dataSource;
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
     }
 
     /**

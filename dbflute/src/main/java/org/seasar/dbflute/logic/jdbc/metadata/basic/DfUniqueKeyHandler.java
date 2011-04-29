@@ -21,8 +21,8 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,7 +31,7 @@ import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -301,7 +301,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataBasicExtractor {
     protected ResultSet extractUniqueKeyMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, boolean retry) throws SQLException {
         final boolean uniqueKeyOnly = true;
-        final DfBasicProperties prop = getBasicProperties();
+        final DfDatabaseTypeFacadeProp prop = getDatabaseTypeFacadeProp();
         return DfIndexHandler.delegateExtractIndexInfoMetaData(metaData, unifiedSchema, tableName, uniqueKeyOnly,
                 retry, prop);
     }

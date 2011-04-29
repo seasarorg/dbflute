@@ -37,35 +37,7 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The list for except table on main schema. (Lazy) */
-    private List<String> _tableExceptList;
-
-    /** The list for target table on main schema. (Lazy) */
-    private List<String> _tableTargetList;
-
-    /** The map for except column on main schema. (Lazy) */
-    private Map<String, List<String>> _columnExceptMap;
-
-    protected final List<String> getTableExceptList() { // for main schema
-        if (_tableExceptList == null) {
-            _tableExceptList = getProperties().getDatabaseProperties().getTableExceptList();
-        }
-        return _tableExceptList;
-    }
-
-    protected final List<String> getTableTargetList() { // for main schema
-        if (_tableTargetList == null) {
-            _tableTargetList = getProperties().getDatabaseProperties().getTableTargetList();
-        }
-        return _tableTargetList;
-    }
-
-    protected final Map<String, List<String>> getColumnExceptMap() { // for main schema
-        if (_columnExceptMap == null) {
-            _columnExceptMap = getProperties().getDatabaseProperties().getColumnExceptMap();
-        }
-        return _columnExceptMap;
-    }
+    protected boolean _suppressExceptTarget;
 
     // ===================================================================================
     //                                                                Except Determination
@@ -80,6 +52,9 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
         if (tableName == null) {
             throw new IllegalArgumentException("The argument 'tableName' should not be null.");
         }
+        if (_suppressExceptTarget) {
+            return false;
+        }
         final List<String> tableTargetList = getRealTableTargetList(unifiedSchema);
         final List<String> tableExceptList = getRealTableExceptList(unifiedSchema);
         return !isTargetByHint(tableName, tableTargetList, tableExceptList);
@@ -92,7 +67,7 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
                 return schemaInfo.getTableExceptList();
             }
         }
-        return getTableExceptList();
+        return getProperties().getDatabaseProperties().getTableExceptList();
     }
 
     protected List<String> getRealTableTargetList(UnifiedSchema unifiedSchema) { // extension point
@@ -102,7 +77,7 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
                 return schemaInfo.getTableTargetList();
             }
         }
-        return getTableTargetList();
+        return getProperties().getDatabaseProperties().getTableTargetList();
     }
 
     /**
@@ -119,6 +94,9 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
         if (columnName == null) {
             throw new IllegalArgumentException("The argument 'columnName' should not be null.");
         }
+        if (_suppressExceptTarget) {
+            return false;
+        }
         final Map<String, List<String>> columnExceptMap = getRealColumnExceptMap(unifiedSchema);
         final List<String> columnExceptList = columnExceptMap.get(tableName);
         if (columnExceptList == null) { // no definition about the table
@@ -132,7 +110,7 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
         if (schemaInfo != null) {
             return schemaInfo.getColumnExceptMap();
         }
-        return getColumnExceptMap();
+        return getProperties().getDatabaseProperties().getColumnExceptMap();
     }
 
     protected boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
@@ -155,5 +133,12 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
             return false;
         }
         return true;
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void suppressExceptTarget() {
+        _suppressExceptTarget = true;
     }
 }

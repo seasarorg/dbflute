@@ -246,7 +246,7 @@ public class DfColumnHandler extends DfAbstractMetaDataBasicExtractor {
         final Map<String, String> nameToJdbcTypeMap = typeMappingProperties.getNameToJdbcTypeMap();
         final DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToJdbcTypeMap, new Resource() {
             public boolean isLangJava() {
-                return getBasicProperties().isTargetLanguageJava();
+                return getLanguageTypeFacadeProp().isTargetLanguageJava();
             }
 
             public boolean isDbmsPostgreSQL() {

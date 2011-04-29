@@ -19,8 +19,8 @@ import java.util.LinkedHashMap;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -45,65 +45,62 @@ public abstract class DfAbstractMetaDataExtractor {
     }
 
     // ===================================================================================
-    //                                                        Database Dependency Resolver
-    //                                                        ============================
-    protected boolean isPrimaryKeyExtractingUnsupported() {
-        return getBasicProperties().isDatabaseAsPrimaryKeyExtractingUnsupported();
-    }
-
-    protected boolean isForeignKeyExtractingUnsupported() {
-        return getBasicProperties().isDatabaseAsForeignKeyExtractingUnsupported();
-    }
-
-    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
 
-    protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
-    }
-
-    protected DfDatabaseProperties getDatabaseProperties() {
-        return DfBuildProperties.getInstance().getDatabaseProperties();
+    protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
+        return DfBuildProperties.getInstance().getBasicProperties().getDatabaseTypeFacadeProp();
     }
 
     protected boolean isDatabaseMySQL() {
-        return getBasicProperties().isDatabaseMySQL();
+        return getDatabaseTypeFacadeProp().isDatabaseMySQL();
     }
 
     protected boolean isDatabasePostgreSQL() {
-        return getBasicProperties().isDatabasePostgreSQL();
+        return getDatabaseTypeFacadeProp().isDatabasePostgreSQL();
     }
 
     protected boolean isDatabaseOracle() {
-        return getBasicProperties().isDatabaseOracle();
+        return getDatabaseTypeFacadeProp().isDatabaseOracle();
     }
 
     protected boolean isDatabaseDB2() {
-        return getBasicProperties().isDatabaseDB2();
+        return getDatabaseTypeFacadeProp().isDatabaseDB2();
     }
 
     protected boolean isDatabaseSQLServer() {
-        return getBasicProperties().isDatabaseSQLServer();
+        return getDatabaseTypeFacadeProp().isDatabaseSQLServer();
     }
 
     protected boolean isDatabaseSQLite() {
-        return getBasicProperties().isDatabaseSQLite();
+        return getDatabaseTypeFacadeProp().isDatabaseSQLite();
     }
 
     protected boolean isDatabaseMsAccess() {
-        return getBasicProperties().isDatabaseMSAccess();
+        return getDatabaseTypeFacadeProp().isDatabaseMSAccess();
     }
 
     protected boolean isDatabaseFirebird() {
-        return getBasicProperties().isDatabaseFirebird();
+        return getDatabaseTypeFacadeProp().isDatabaseFirebird();
     }
 
     protected boolean isDatabaseSybase() {
-        return getBasicProperties().isDatabaseSybase();
+        return getDatabaseTypeFacadeProp().isDatabaseSybase();
+    }
+
+    protected boolean isPrimaryKeyExtractingUnsupported() {
+        return getDatabaseTypeFacadeProp().isDatabaseAsPrimaryKeyExtractingUnsupported();
+    }
+
+    protected boolean isForeignKeyExtractingUnsupported() {
+        return getDatabaseTypeFacadeProp().isDatabaseAsForeignKeyExtractingUnsupported();
+    }
+
+    protected DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
+        return DfBuildProperties.getInstance().getBasicProperties().getLanguageTypeFacadeProp();
     }
 
     protected boolean checkMetaTableDiffIfNeeds(String tableName, String metaTableName) {

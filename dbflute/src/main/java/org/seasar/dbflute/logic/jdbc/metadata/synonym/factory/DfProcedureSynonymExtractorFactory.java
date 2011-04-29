@@ -7,8 +7,8 @@ import javax.sql.DataSource;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractorOracle;
-import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
  * @author jflute
@@ -17,18 +17,18 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 public class DfProcedureSynonymExtractorFactory {
 
     protected DataSource _dataSource;
-    protected DfBasicProperties _basicProperties;
+    protected DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected DfDatabaseProperties _databaseProperties;
 
     /**
      * @param dataSource The data source. (NotNull)
-     * @param basicProperties The basic properties. (NotNull)
+     * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      * @param databaseProperties The database properties. (NotNull)
      */
-    public DfProcedureSynonymExtractorFactory(DataSource dataSource, DfBasicProperties basicProperties,
+    public DfProcedureSynonymExtractorFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
             DfDatabaseProperties databaseProperties) {
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _dataSource = dataSource;
-        _basicProperties = basicProperties;
         _databaseProperties = databaseProperties;
     }
 
@@ -36,7 +36,7 @@ public class DfProcedureSynonymExtractorFactory {
      * @return The extractor of DB comments. (NullAllowed)
      */
     public DfProcedureSynonymExtractor createSynonymExtractor() {
-        if (_basicProperties.isDatabaseOracle()) {
+        if (_databaseTypeFacadeProp.isDatabaseOracle()) {
             final DfProcedureSynonymExtractorOracle extractor = new DfProcedureSynonymExtractorOracle();
             extractor.setDataSource(_dataSource);
             extractor.setTargetSchemaList(createTargetSchemaList());

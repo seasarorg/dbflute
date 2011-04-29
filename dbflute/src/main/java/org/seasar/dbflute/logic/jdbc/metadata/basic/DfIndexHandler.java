@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -153,13 +153,13 @@ public class DfIndexHandler extends DfAbstractMetaDataBasicExtractor {
     protected ResultSet extractIndexMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName,
             boolean retry) throws SQLException {
         final boolean uniqueKeyOnly = false;
-        final DfBasicProperties prop = getBasicProperties();
+        final DfDatabaseTypeFacadeProp prop = getDatabaseTypeFacadeProp();
         return delegateExtractIndexInfoMetaData(metaData, unifiedSchema, tableName, uniqueKeyOnly, retry, prop);
     }
 
     // public static for recycle
     public static ResultSet delegateExtractIndexInfoMetaData(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
-            String tableName, boolean uniqueKeyOnly, boolean retry, DfBasicProperties prop) throws SQLException {
+            String tableName, boolean uniqueKeyOnly, boolean retry, DfDatabaseTypeFacadeProp prop) throws SQLException {
         final String catalogName = unifiedSchema.getPureCatalog();
         final String schemaName = unifiedSchema.getPureSchema();
         try {

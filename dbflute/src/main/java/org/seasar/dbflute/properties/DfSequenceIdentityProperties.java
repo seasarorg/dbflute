@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -20,6 +20,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -253,7 +254,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     protected DfSequenceExtractorFactory createSequenceExtractorFactory(DataSource dataSource) {
-        return new DfSequenceExtractorFactory(dataSource, getBasicProperties(), getDatabaseProperties());
+        final DfDatabaseTypeFacadeProp facadeProp = getBasicProperties().getDatabaseTypeFacadeProp();
+        return new DfSequenceExtractorFactory(dataSource, facadeProp, getDatabaseProperties());
     }
 
     protected DfSequenceMetaInfo getSequenceElement(UnifiedSchema unifiedSchema, String sequenceName,

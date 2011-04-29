@@ -895,7 +895,7 @@ public class DfSchemaXmlSerializer {
     }
 
     protected DfDbCommentExtractorFactory createDbCommentExtractorFactory(UnifiedSchema unifiedSchema) {
-        return new DfDbCommentExtractorFactory(getDatabaseTypeFacadeProp(), _dataSource, unifiedSchema);
+        return new DfDbCommentExtractorFactory(_dataSource, unifiedSchema, getDatabaseTypeFacadeProp());
     }
 
     protected DfIdentityExtractor createIdentityExtractor() {
@@ -904,7 +904,7 @@ public class DfSchemaXmlSerializer {
     }
 
     protected DfIdentityExtractorFactory createIdentityExtractorFactory() {
-        return new DfIdentityExtractorFactory(getDatabaseTypeFacadeProp(), _dataSource);
+        return new DfIdentityExtractorFactory(_dataSource, getDatabaseTypeFacadeProp());
     }
 
     protected DfSynonymExtractor createSynonymExtractor() {

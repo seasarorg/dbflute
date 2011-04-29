@@ -10,34 +10,34 @@ import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractorDB2;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractorH2;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractorPostgreSQL;
-import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
  * @author jflute
  */
 public class DfSequenceExtractorFactory {
 
-    protected DataSource _dataSource;
-    protected DfBasicProperties _basicProperties;
-    protected DfDatabaseProperties _databaseProperties;
+    protected final DataSource _dataSource;
+    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
+    protected final DfDatabaseProperties _databaseProperties;
 
-    public DfSequenceExtractorFactory(DataSource dataSource, DfBasicProperties basicProperties,
+    public DfSequenceExtractorFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
             DfDatabaseProperties databaseProperties) {
         _dataSource = dataSource;
-        _basicProperties = basicProperties;
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _databaseProperties = databaseProperties;
     }
 
     public DfSequenceExtractor createSequenceExtractor() {
         final List<UnifiedSchema> targetSchemaList = createTargetSchemaList();
-        if (_basicProperties.isDatabasePostgreSQL()) {
+        if (_databaseTypeFacadeProp.isDatabasePostgreSQL()) {
             return new DfSequenceExtractorPostgreSQL(_dataSource, targetSchemaList);
-        } else if (_basicProperties.isDatabaseOracle()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseOracle()) {
             return new DfSequenceExtractorOracle(_dataSource, targetSchemaList);
-        } else if (_basicProperties.isDatabaseDB2()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseDB2()) {
             return new DfSequenceExtractorDB2(_dataSource, targetSchemaList);
-        } else if (_basicProperties.isDatabaseH2()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseH2()) {
             return new DfSequenceExtractorH2(_dataSource, targetSchemaList);
         }
         return null;
