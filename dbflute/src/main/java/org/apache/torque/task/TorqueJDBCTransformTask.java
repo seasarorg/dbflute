@@ -53,7 +53,7 @@
  */
 package org.apache.torque.task;
 
-import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlWriter;
+import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
 /**
@@ -73,7 +73,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        final DfSchemaXmlWriter writer = DfSchemaXmlWriter.createAsCore(getDataSource(), _mainSchema);
+        final DfSchemaXmlSerializer writer = DfSchemaXmlSerializer.createAsCore(getDataSource(), _mainSchema);
         writer.serialize();
     }
 }

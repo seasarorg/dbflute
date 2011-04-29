@@ -61,12 +61,12 @@ import org.seasar.dbflute.util.Srl;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 
-public class DfSchemaXmlWriter {
+public class DfSchemaXmlSerializer {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSchemaXmlWriter.class);
+    private static final Log _log = LogFactory.getLog(DfSchemaXmlSerializer.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -118,7 +118,7 @@ public class DfSchemaXmlWriter {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfSchemaXmlWriter(DataSource dataSource, UnifiedSchema mainSchema, String schemaXml, String historyFile) {
+    protected DfSchemaXmlSerializer(DataSource dataSource, UnifiedSchema mainSchema, String schemaXml, String historyFile) {
         _dataSource = dataSource;
         _mainSchema = mainSchema;
         _schemaXml = schemaXml;
@@ -126,17 +126,17 @@ public class DfSchemaXmlWriter {
         _schemaDiff = DfSchemaDiff.createAsFlexible(schemaXml);
     }
 
-    public static DfSchemaXmlWriter createAsCore(DataSource dataSource, UnifiedSchema mainSchema) {
+    public static DfSchemaXmlSerializer createAsCore(DataSource dataSource, UnifiedSchema mainSchema) {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
         final String schemaXml = facadeProp.getProejctSchemaXMLFilePath();
         final String historyFile = facadeProp.getProjectSchemaHistoryFilePath();
-        return new DfSchemaXmlWriter(dataSource, mainSchema, schemaXml, historyFile);
+        return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
     }
 
-    public static DfSchemaXmlWriter createAsPlain(DataSource dataSource, UnifiedSchema mainSchema, String schemaXml,
+    public static DfSchemaXmlSerializer createAsPlain(DataSource dataSource, UnifiedSchema mainSchema, String schemaXml,
             String historyFile) {
-        return new DfSchemaXmlWriter(dataSource, mainSchema, schemaXml, historyFile);
+        return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
     }
 
     // ===================================================================================
