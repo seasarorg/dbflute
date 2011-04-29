@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,10 +83,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();
-            final List<DfTableMeta> tableMetaInfoList;
+            final List<DfTableMeta> tableMetaList;
             try {
                 final DatabaseMetaData metaData = conn.getMetaData();
-                final DfTableExtractor tableNameHandler = new DfTableExtractor() {
+                final DfTableExtractor tableExtractor = new DfTableExtractor() {
                     @Override
                     protected String[] getRealObjectTypeTargetArray(UnifiedSchema unifiedSchema) {
                         if (_dropObjectTypeList != null) {
@@ -121,11 +122,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                         }
                     }
                 };
-                tableMetaInfoList = tableNameHandler.getTableList(metaData, _unifiedSchema);
+                tableMetaList = tableExtractor.getTableList(metaData, _unifiedSchema);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            executeObject(conn, tableMetaInfoList);
+            executeObject(conn, tableMetaList);
         } catch (SQLException e) {
             String msg = "Failed to the initialize schema: " + _unifiedSchema;
             throw new SQLFailureException(msg, e);
@@ -140,36 +141,36 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected void executeObject(Connection conn, List<DfTableMeta> tableMetaInfoList) {
+    protected void executeObject(Connection conn, List<DfTableMeta> tableMetaList) {
         final boolean procedureBeforeTable = isDropProcedureBeforeTable();
         if (procedureBeforeTable) {
-            executeProcedureProcess(conn, tableMetaInfoList);
+            executeProcedureProcess(conn, tableMetaList);
         }
-        executeTableProcess(conn, tableMetaInfoList);
+        executeTableProcess(conn, tableMetaList);
         if (!procedureBeforeTable) { // basically here
-            executeProcedureProcess(conn, tableMetaInfoList);
+            executeProcedureProcess(conn, tableMetaList);
         }
-        executeVariousProcess(conn, tableMetaInfoList);
+        executeVariousProcess(conn, tableMetaList);
     }
 
-    protected void executeTableProcess(Connection conn, List<DfTableMeta> tableMetaInfoList) {
+    protected void executeTableProcess(Connection conn, List<DfTableMeta> tableMetaList) {
         if (!_suppressTruncateTable) {
-            truncateTableIfPossible(conn, tableMetaInfoList);
+            truncateTableIfPossible(conn, tableMetaList);
         } else {
             _log.info("*Suppress truncating tables");
         }
         if (!_suppressDropForeignKey) {
-            dropForeignKey(conn, tableMetaInfoList);
+            dropForeignKey(conn, tableMetaList);
         } else {
             _log.info("*Suppress dropping foreign keys");
         }
         if (!_suppressDropTable) {
-            dropTable(conn, tableMetaInfoList);
+            dropTable(conn, tableMetaList);
         } else {
             _log.info("*Suppress dropping tables");
         }
         if (!_suppressDropSequence) {
-            dropSequence(conn, tableMetaInfoList);
+            dropSequence(conn, tableMetaList);
         } else {
             _log.info("*Suppress dropping sequences");
         }
@@ -238,7 +239,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     // ===================================================================================
     //                                                                    Drop Foreign Key
     //                                                                    ================
-    protected void dropForeignKey(Connection connection, List<DfTableMeta> tableMetaInfoList) {
+    protected void dropForeignKey(Connection conn, List<DfTableMeta> tableMetaList) {
         final DfDropForeignKeyByJdbcCallback callback = new DfDropForeignKeyByJdbcCallback() {
             public String buildDropForeignKeySql(DfForeignKeyMeta metaInfo) {
                 final String foreignKeyName = metaInfo.getForeignKeyName();
@@ -248,53 +249,32 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 return sb.toString();
             }
         };
-        callbackDropForeignKeyByJdbc(connection, tableMetaInfoList, callback);
+        callbackDropForeignKeyByJdbc(conn, tableMetaList, callback);
     }
 
     protected static interface DfDropForeignKeyByJdbcCallback {
         public String buildDropForeignKeySql(DfForeignKeyMeta metaInfo);
     }
 
-    protected void callbackDropForeignKeyByJdbc(Connection conn, List<DfTableMeta> tableMetaInfoList,
+    protected void callbackDropForeignKeyByJdbc(Connection conn, List<DfTableMeta> tableMetaList,
             DfDropForeignKeyByJdbcCallback callback) {
         Statement st = null;
         try {
+            final Map<String, DfTableMeta> generatedTableMap = new HashMap<String, DfTableMeta>();
+            for (DfTableMeta tableMeta : tableMetaList) {
+                generatedTableMap.put(tableMeta.getTableName(), tableMeta);
+            }
             st = conn.createStatement();
-            for (DfTableMeta tableMetaInfo : tableMetaInfoList) {
-                if (isSkipDropForeignKey(tableMetaInfo)) {
+            for (DfTableMeta tableMeta : tableMetaList) {
+                if (isSkipDropForeignKey(tableMeta)) {
                     continue;
                 }
-                final DfForeignKeyExtractor handler = new DfForeignKeyExtractor() {
+                final DfForeignKeyExtractor handler = new DfForeignKeyExtractor();
+                handler.exceptForeignTableNotGenerated(generatedTableMap);
 
-                    @Override
-                    protected List<String> getRealTableExceptList(UnifiedSchema unifiedSchema) {
-                        if (_dropTableExceptList != null) {
-                            return _dropTableExceptList;
-                        } else {
-                            if (_dropGenerateTableOnly) {
-                                return super.getRealTableExceptList(unifiedSchema);
-                            } else {
-                                return new ArrayList<String>();
-                            }
-                        }
-                    }
-
-                    @Override
-                    protected List<String> getRealTableTargetList(UnifiedSchema unifiedSchema) {
-                        if (_dropTableTargetList != null) {
-                            return _dropTableTargetList;
-                        } else {
-                            if (_dropGenerateTableOnly) {
-                                return super.getRealTableTargetList(unifiedSchema);
-                            } else {
-                                return new ArrayList<String>();
-                            }
-                        }
-                    }
-                };
                 final DatabaseMetaData dbMetaData = conn.getMetaData();
                 final Map<String, DfForeignKeyMeta> foreignKeyMetaInfoMap = handler.getForeignKeyMap(dbMetaData,
-                        tableMetaInfo);
+                        tableMeta);
                 final Set<String> keySet = foreignKeyMetaInfoMap.keySet();
                 for (String foreignKeyName : keySet) {
                     final DfForeignKeyMeta foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);

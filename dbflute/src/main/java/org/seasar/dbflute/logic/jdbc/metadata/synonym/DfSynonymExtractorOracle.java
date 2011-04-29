@@ -42,9 +42,9 @@ import org.seasar.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfIndexExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
@@ -73,18 +73,16 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     // -----------------------------------------------------
     //                                     Meta Data Handler
     //                                     -----------------
-    protected DfTableExtractor _tableHandler = new DfTableExtractor();
-    protected DfUniqueKeyExtractor _uniqueKeyHandler = new DfUniqueKeyExtractor();
-    protected DfAutoIncrementExtractor _autoIncrementHandler = new DfAutoIncrementExtractor();
-    protected DfForeignKeyExtractor _foreignKeyHandler = new DfForeignKeyExtractor() {
-        @Override
-        public boolean isTableExcept(UnifiedSchema unifiedSchema, String tableName) {
-            // All foreign tables are target if the foreign table is except.
-            // Because the filtering is executed when translating foreign keys.
-            return false;
-        }
-    };
-    protected DfIndexExtractor _indexHandler = new DfIndexExtractor();
+    protected DfTableExtractor _tableExtractor = new DfTableExtractor();
+    protected DfUniqueKeyExtractor _uniqueKeyExtractor = new DfUniqueKeyExtractor();
+    protected DfAutoIncrementExtractor _autoIncrementExtractor = new DfAutoIncrementExtractor();
+    protected DfForeignKeyExtractor _foreignKeyExtractor = new DfForeignKeyExtractor();
+    {
+        // All foreign tables are target if the foreign table is except.
+        // Because the filtering is executed when translating foreign keys.
+        _foreignKeyExtractor.suppressExceptTarget();
+    }
+    protected DfIndexExtractor _indexExtractor = new DfIndexExtractor();
 
     // ===================================================================================
     //                                                                             Extract
@@ -107,7 +105,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 final String tableName = rs.getString("TABLE_NAME");
                 final String dbLinkName = rs.getString("DB_LINK");
 
-                if (_tableHandler.isTableExcept(synonymOwner, synonymName)) {
+                if (_tableExtractor.isTableExcept(synonymOwner, synonymName)) {
                     // because it is not necessary to handle excepted tables 
                     continue;
                 }
@@ -271,7 +269,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     //                                    ------------------
     protected DfPrimaryKeyMeta getPKList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName) {
         try {
-            return _uniqueKeyHandler.getPrimaryKey(metaData, unifiedSchema, tableName);
+            return _uniqueKeyExtractor.getPrimaryKey(metaData, unifiedSchema, tableName);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -280,7 +278,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     protected Map<String, Map<Integer, String>> getUQMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, List<String> primaryKeyNameList) {
         try {
-            return _uniqueKeyHandler.getUniqueKeyMap(metaData, unifiedSchema, tableName, primaryKeyNameList);
+            return _uniqueKeyExtractor.getUniqueKeyMap(metaData, unifiedSchema, tableName, primaryKeyNameList);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -289,7 +287,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     protected Map<String, DfForeignKeyMeta> getFKMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName) {
         try {
-            return _foreignKeyHandler.getForeignKeyMap(metaData, unifiedSchema, tableName);
+            return _foreignKeyExtractor.getForeignKeyMap(metaData, unifiedSchema, tableName);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -298,9 +296,10 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) {
         try {
-            return _indexHandler.getIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap);
+            return _indexExtractor.getIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            String msg = "Failed to extract indexes: " + tableName;
+            throw new IllegalStateException(msg, e);
         }
     }
 
@@ -350,7 +349,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 final String orignalForeignTableName = fk.getForeignTableName();
                 final List<String> foreignSynonymList = tableForeignSynonymListMap.get(orignalForeignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
-                    if (_tableHandler.isTableExcept(synonym.getTableOwner(), orignalForeignTableName)) {
+                    if (_tableExtractor.isTableExcept(synonym.getTableOwner(), orignalForeignTableName)) {
                         removedFKMap.put(fkName, orignalForeignTableName);
                     } else if (!isForeignTableGenerated(orignalForeignTableName)) {
                         removedFKMap.put(fkName, orignalForeignTableName);
@@ -477,8 +476,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     // -----------------------------------------------------
     //                                   For DB Link Synonym
     //                                   -------------------
-    protected List<DfColumnMeta> getDBLinkSynonymColumns(Connection conn, UnifiedSchema synonymOwner,
-            String synonymName) throws SQLException {
+    protected List<DfColumnMeta> getDBLinkSynonymColumns(Connection conn, UnifiedSchema synonymOwner, String synonymName)
+            throws SQLException {
         final List<DfColumnMeta> columnList = new ArrayList<DfColumnMeta>();
         Statement st = null;
         ResultSet rs = null;

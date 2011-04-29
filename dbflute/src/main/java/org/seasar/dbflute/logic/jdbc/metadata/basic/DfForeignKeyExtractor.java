@@ -19,8 +19,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -85,8 +85,8 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
         return map;
     }
 
-    protected Map<String, DfForeignKeyMeta> doGetForeignKeyMap(DatabaseMetaData metaData,
-            UnifiedSchema unifiedSchema, String tableName, boolean retry) throws SQLException {
+    protected Map<String, DfForeignKeyMeta> doGetForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
+            String tableName, boolean retry) throws SQLException {
         final Map<String, DfForeignKeyMeta> fkMap = newLinkedHashMap();
         if (isForeignKeyExtractingUnsupported()) {
             return fkMap;
@@ -222,9 +222,9 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     protected boolean judgeSameNameForeignKey(String localName, String firstName, String secondName) {
-        final DfTableMeta localInfo = getTableInfo(localName);
-        final DfTableMeta firstInfo = getTableInfo(firstName);
-        final DfTableMeta secondInfo = getTableInfo(secondName);
+        final DfTableMeta localInfo = getTableMeta(localName);
+        final DfTableMeta firstInfo = getTableMeta(firstName);
+        final DfTableMeta secondInfo = getTableMeta(secondName);
         if (localInfo != null && firstInfo != null && secondInfo != null) {
             final String localType = localInfo.getTableType();
             if (localType.equals(firstInfo.getTableType())) {
@@ -290,17 +290,17 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             // means no check of generation
             return true;
         }
-        final DfTableMeta info = _generatedTableMap.get(foreignTableName);
-        if (info == null) {
+        final DfTableMeta meta = _generatedTableMap.get(foreignTableName);
+        if (meta == null) {
             return false;
         }
-        if (info.isOutOfGenerateTarget()) {
+        if (meta.isOutOfGenerateTarget()) {
             return false;
         }
         return true;
     }
 
-    protected DfTableMeta getTableInfo(String tableName) {
+    protected DfTableMeta getTableMeta(String tableName) {
         if (_generatedTableMap == null) {
             return null;
         }

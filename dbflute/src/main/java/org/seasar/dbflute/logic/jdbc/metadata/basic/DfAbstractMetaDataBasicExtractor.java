@@ -40,46 +40,8 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
     protected boolean _suppressExceptTarget;
 
     // ===================================================================================
-    //                                                                Except Determination
-    //                                                                ====================
-    /**
-     * Is the table name out of sight?
-     * @param unifiedSchema The unified schema that can contain catalog name and no-name schema. (NullAllowed)
-     * @param tableName The name of table. (NotNull)
-     * @return Determination.
-     */
-    public boolean isTableExcept(UnifiedSchema unifiedSchema, final String tableName) {
-        if (tableName == null) {
-            throw new IllegalArgumentException("The argument 'tableName' should not be null.");
-        }
-        if (_suppressExceptTarget) {
-            return false;
-        }
-        final List<String> tableTargetList = getRealTableTargetList(unifiedSchema);
-        final List<String> tableExceptList = getRealTableExceptList(unifiedSchema);
-        return !isTargetByHint(tableName, tableTargetList, tableExceptList);
-    }
-
-    protected List<String> getRealTableExceptList(UnifiedSchema unifiedSchema) { // extension point
-        if (unifiedSchema != null) {
-            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(unifiedSchema);
-            if (schemaInfo != null) {
-                return schemaInfo.getTableExceptList();
-            }
-        }
-        return getProperties().getDatabaseProperties().getTableExceptList();
-    }
-
-    protected List<String> getRealTableTargetList(UnifiedSchema unifiedSchema) { // extension point
-        if (unifiedSchema != null) {
-            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(unifiedSchema);
-            if (schemaInfo != null) {
-                return schemaInfo.getTableTargetList();
-            }
-        }
-        return getProperties().getDatabaseProperties().getTableTargetList();
-    }
-
+    //                                                                        Table Except
+    //                                                                        ============
     /**
      * Is the column of the table out of sight?
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)

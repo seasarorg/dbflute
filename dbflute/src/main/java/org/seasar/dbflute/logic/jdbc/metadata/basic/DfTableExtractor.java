@@ -54,8 +54,7 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The list of all the table meta info in a database.
      * @throws SQLException
      */
-    public List<DfTableMeta> getTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
-            throws SQLException {
+    public List<DfTableMeta> getTableList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
         return doGetTableList(metaData, unifiedSchema);
     }
 
@@ -168,5 +167,46 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
             map.put(tableInfo.getTableName(), tableInfo);
         }
         return map;
+    }
+
+    // ===================================================================================
+    //                                                                        Table Except
+    //                                                                        ============
+    /**
+     * Is the table name out of sight?
+     * @param unifiedSchema The unified schema that can contain catalog name and no-name schema. (NullAllowed)
+     * @param tableName The name of table. (NotNull)
+     * @return Determination.
+     */
+    public boolean isTableExcept(UnifiedSchema unifiedSchema, final String tableName) {
+        if (tableName == null) {
+            throw new IllegalArgumentException("The argument 'tableName' should not be null.");
+        }
+        if (_suppressExceptTarget) {
+            return false;
+        }
+        final List<String> tableTargetList = getRealTableTargetList(unifiedSchema);
+        final List<String> tableExceptList = getRealTableExceptList(unifiedSchema);
+        return !isTargetByHint(tableName, tableTargetList, tableExceptList);
+    }
+
+    protected List<String> getRealTableExceptList(UnifiedSchema unifiedSchema) { // extension point
+        if (unifiedSchema != null) {
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(unifiedSchema);
+            if (schemaInfo != null) {
+                return schemaInfo.getTableExceptList();
+            }
+        }
+        return getProperties().getDatabaseProperties().getTableExceptList();
+    }
+
+    protected List<String> getRealTableTargetList(UnifiedSchema unifiedSchema) { // extension point
+        if (unifiedSchema != null) {
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(unifiedSchema);
+            if (schemaInfo != null) {
+                return schemaInfo.getTableTargetList();
+            }
+        }
+        return getProperties().getDatabaseProperties().getTableTargetList();
     }
 }

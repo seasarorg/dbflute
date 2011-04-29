@@ -52,18 +52,18 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
     //                                                                      Various Common
     //                                                                      ==============
     protected String resolveTerminater4Tool() {
-        return getBasicProperties().isDatabaseOracle() ? "/" : null;
+        return getDatabaseTypeFacadeProp().isDatabaseOracle() ? "/" : null;
     }
 
     protected boolean isDbCommentLineForIrregularPattern(String line) {
         // for irregular pattern
         line = line.trim().toLowerCase();
-        if (getBasicProperties().isDatabaseMySQL()) {
+        if (getDatabaseTypeFacadeProp().isDatabaseMySQL()) {
             if (line.contains("comment='") || line.contains("comment = '") || line.contains(" comment '")) {
                 return true;
             }
         }
-        if (getBasicProperties().isDatabaseSQLServer()) {
+        if (getDatabaseTypeFacadeProp().isDatabaseSQLServer()) {
             if (line.startsWith("exec sys.sp_addextendedproperty @name=n'ms_description'")) {
                 return true;
             }

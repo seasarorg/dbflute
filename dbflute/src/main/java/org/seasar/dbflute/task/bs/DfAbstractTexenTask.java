@@ -62,6 +62,8 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
@@ -194,7 +196,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
         final DfConnectionMetaInfo metaInfo = getConnectionMetaInfo();
         final String productDisp = metaInfo != null ? " (" + metaInfo.getProductDisp() + ")" : "";
-        final String databaseType = getBasicProperties().getTargetDatabase() + productDisp;
+        final String databaseType = getDatabaseTypeFacadeProp().getTargetDatabase() + productDisp;
         sb.append(ln).append("  DBFLUTE_CLIENT: {" + getBasicProperties().getProjectName() + "}");
         sb.append(ln).append("    database  = " + databaseType);
         sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
@@ -305,7 +307,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     protected void initializeVariousEnvironment() {
-        if (getBasicProperties().isDatabaseOracle()) {
+        if (getDatabaseTypeFacadeProp().isDatabaseOracle()) {
             // basically for data loading of ReplaceSchema
             final DBDef currentDBDef = ResourceContext.currentDBDef();
             TnValueTypes.registerBasicValueType(currentDBDef, java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP);
@@ -552,7 +554,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected void destroyDataSource() throws SQLException {
         _dataSourceHandler.destroy();
 
-        if (getBasicProperties().isDatabaseDerby()) {
+        if (getDatabaseTypeFacadeProp().isDatabaseDerby()) {
             // Derby(Embedded) needs an original shutdown for destroying a connection
             DfDBFluteTaskUtil.shutdownIfDerbyEmbedded(_driver);
         }
@@ -563,7 +565,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     protected void connectSchema() throws SQLException {
-        final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(_mainSchema, getBasicProperties());
+        final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(_mainSchema,
+                getDatabaseTypeFacadeProp());
         connector.connectSchema(getDataSource());
     }
 
@@ -770,8 +773,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return getProperties().getBasicProperties();
     }
 
-    public String getTargetDatabase() {
-        return getBasicProperties().getTargetDatabase();
+    protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
+        return getBasicProperties().getDatabaseTypeFacadeProp();
+    }
+
+    protected DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
+        return getBasicProperties().getLanguageTypeFacadeProp();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {

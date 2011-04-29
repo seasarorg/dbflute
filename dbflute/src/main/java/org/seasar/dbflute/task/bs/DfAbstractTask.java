@@ -40,6 +40,8 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
@@ -359,7 +361,8 @@ public abstract class DfAbstractTask extends Task {
     }
 
     protected void connectSchema() throws SQLException {
-        final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(_mainSchema, getBasicProperties());
+        final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(_mainSchema,
+                getDatabaseTypeFacadeProp());
         connector.connectSchema(getDataSource());
     }
 
@@ -405,8 +408,12 @@ public abstract class DfAbstractTask extends Task {
         return getProperties().getBasicProperties();
     }
 
-    public String getTargetDatabase() {
-        return getBasicProperties().getTargetDatabase();
+    protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
+        return getBasicProperties().getDatabaseTypeFacadeProp();
+    }
+
+    protected DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
+        return getBasicProperties().getLanguageTypeFacadeProp();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {

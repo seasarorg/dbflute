@@ -147,8 +147,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             setControlTemplate(control);
             return;
         }
-        if (getBasicProperties().isTargetLanguageMain()) {
-            if (getBasicProperties().isTargetLanguageJava()) {
+        if (getLanguageTypeFacadeProp().isTargetLanguageMain()) {
+            if (getLanguageTypeFacadeProp().isTargetLanguageJava()) {
                 _log.info("");
                 _log.info("* * * * * * * * *");
                 _log.info("* Process Java  *");
@@ -156,7 +156,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 final String control = "om/ControlSql2EntityJava.vm";
                 _log.info("...Using Java control: " + control);
                 setControlTemplate(control);
-            } else if (getBasicProperties().isTargetLanguageCSharp()) {
+            } else if (getLanguageTypeFacadeProp().isTargetLanguageCSharp()) {
                 _log.info("");
                 _log.info("* * * * * * * * * *");
                 _log.info("* Process CSharp  *");
@@ -165,11 +165,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 _log.info("...Using CSharp control: " + control);
                 setControlTemplate(control);
             } else {
-                String msg = "Unknown Main Language: " + getBasicProperties().getTargetLanguage();
+                String msg = "Unknown Main Language: " + getLanguageTypeFacadeProp().getTargetLanguage();
                 throw new IllegalStateException(msg);
             }
         } else {
-            final String language = getBasicProperties().getTargetLanguage();
+            final String language = getLanguageTypeFacadeProp().getTargetLanguage();
             _log.info("");
             _log.info("* * * * * * * * * *");
             _log.info("* Process " + language + "    *");
@@ -383,7 +383,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
             logSb.append(ln());
         }
-        final String databaseType = getBasicProperties().getTargetDatabase();
+        final String databaseType = getDatabaseTypeFacadeProp().getTargetDatabase();
         final AppData appData = new AppData(databaseType);
         appData.addDatabase(database);
 

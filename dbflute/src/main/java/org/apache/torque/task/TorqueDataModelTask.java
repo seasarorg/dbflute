@@ -108,8 +108,8 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
             setupControlAlternate(littleProp);
             return;
         }
-        if (getBasicProperties().isTargetLanguageMain()) {
-            if (getBasicProperties().isTargetLanguageJava()) {
+        if (getLanguageTypeFacadeProp().isTargetLanguageMain()) {
+            if (getLanguageTypeFacadeProp().isTargetLanguageJava()) {
                 if (getBasicProperties().isApplicationBehaviorProject()) {
                     setupControlApplicationBehaviorJava(littleProp);
                     return;
@@ -121,7 +121,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
                 final String control = "om/ControlGenerateJava.vm";
                 _log.info("...Using Java control: " + control);
                 setControlTemplate(control);
-            } else if (getBasicProperties().isTargetLanguageCSharp()) {
+            } else if (getLanguageTypeFacadeProp().isTargetLanguageCSharp()) {
                 if (getBasicProperties().isApplicationBehaviorProject()) {
                     setupControlApplicationBehaviorCSharp(littleProp);
                     return;
@@ -134,7 +134,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
                 _log.info("...Using CSharp control: " + control);
                 setControlTemplate(control);
             } else {
-                String msg = "Unknown main language: " + getBasicProperties().getTargetLanguage();
+                String msg = "Unknown main language: " + getLanguageTypeFacadeProp().getTargetLanguage();
                 throw new IllegalStateException(msg);
             }
         } else {
@@ -173,7 +173,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void setupControlSubLanguage() {
-        final String language = getBasicProperties().getTargetLanguage();
+        final String language = getLanguageTypeFacadeProp().getTargetLanguage();
         _log.info("");
         _log.info("* * * * * * * * * *");
         _log.info("* Process " + language + "    *");

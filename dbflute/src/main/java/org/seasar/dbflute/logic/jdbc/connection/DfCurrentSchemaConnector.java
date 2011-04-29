@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -28,14 +28,14 @@ public class DfCurrentSchemaConnector {
     //                                                                           Attribute
     //                                                                           =========
     protected UnifiedSchema _unifiedSchema;
-    protected DfBasicProperties _basicProperties;
+    protected DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCurrentSchemaConnector(UnifiedSchema unifiedSchema, DfBasicProperties basicProperties) {
+    public DfCurrentSchemaConnector(UnifiedSchema unifiedSchema, DfDatabaseTypeFacadeProp databaseTypeFacadeProp) {
         _unifiedSchema = unifiedSchema;
-        _basicProperties = basicProperties;
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
     }
 
     // ===================================================================================
@@ -61,13 +61,13 @@ public class DfCurrentSchemaConnector {
             return;
         }
         final String pureSchema = _unifiedSchema.getPureSchema();
-        if (_basicProperties.isDatabaseDB2()) {
+        if (_databaseTypeFacadeProp.isDatabaseDB2()) {
             final String sql = "SET CURRENT SCHEMA = " + pureSchema;
             executeCurrentSchemaSql(conn, sql);
-        } else if (_basicProperties.isDatabaseOracle()) {
+        } else if (_databaseTypeFacadeProp.isDatabaseOracle()) {
             final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + pureSchema;
             executeCurrentSchemaSql(conn, sql);
-        } else if (_basicProperties.isDatabasePostgreSQL()) {
+        } else if (_databaseTypeFacadeProp.isDatabasePostgreSQL()) {
             final String sql = "set search_path to " + pureSchema;
             executeCurrentSchemaSql(conn, sql);
         }

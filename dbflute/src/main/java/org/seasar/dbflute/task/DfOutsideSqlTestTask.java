@@ -78,7 +78,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
     @Override
     protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
-        final DBDef currentDBDef = getBasicProperties().getCurrentDBDef();
+        final DBDef currentDBDef = getDatabaseTypeFacadeProp().getCurrentDBDef();
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
             @Override
             protected String filterSql(String sql) {
@@ -172,7 +172,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         final DfOutsideSqlChecker checker = new DfOutsideSqlChecker();
 
         // the IfCommentExpression check is for Java only
-        if (getBasicProperties().isTargetLanguageJava()) {
+        if (getLanguageTypeFacadeProp().isTargetLanguageJava()) {
             checker.enableIfCommentExpressionCheck();
         }
 

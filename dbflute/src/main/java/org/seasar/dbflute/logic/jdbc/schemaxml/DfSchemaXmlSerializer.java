@@ -93,12 +93,12 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                               Handler
     //                                               -------
-    protected DfTableExtractor _tableHandler = new DfTableExtractor();
-    protected DfColumnExtractor _columnHandler = new DfColumnExtractor();
-    protected DfUniqueKeyExtractor _uniqueKeyHandler = new DfUniqueKeyExtractor();
-    protected DfIndexExtractor _indexHandler = new DfIndexExtractor();
-    protected DfForeignKeyExtractor _foreignKeyHandler = new DfForeignKeyExtractor();
-    protected DfAutoIncrementExtractor _autoIncrementHandler = new DfAutoIncrementExtractor();
+    protected DfTableExtractor _tableExtractor = new DfTableExtractor();
+    protected DfColumnExtractor _columnExtractor = new DfColumnExtractor();
+    protected DfUniqueKeyExtractor _uniqueKeyExtractor = new DfUniqueKeyExtractor();
+    protected DfIndexExtractor _indexExtractor = new DfIndexExtractor();
+    protected DfForeignKeyExtractor _foreignKeyExtractor = new DfForeignKeyExtractor();
+    protected DfAutoIncrementExtractor _autoIncrementExtractor = new DfAutoIncrementExtractor();
 
     // -----------------------------------------------------
     //                                        Column Comment
@@ -223,7 +223,7 @@ public class DfSchemaXmlSerializer {
 
         // The handler of foreign keys for generating.
         // It needs to check whether a reference table is generate-target or not.
-        _foreignKeyHandler.exceptForeignTableNotGenerated(_generatedTableMap);
+        _foreignKeyExtractor.exceptForeignTableNotGenerated(_generatedTableMap);
 
         // Create database node. (The beginning of schema XML!)
         _databaseNode = _doc.createElement("database");
@@ -328,7 +328,7 @@ public class DfSchemaXmlSerializer {
     }
 
     protected String getColumnJdbcType(DfColumnMeta columnInfo) {
-        return _columnHandler.getColumnJdbcType(columnInfo);
+        return _columnExtractor.getColumnJdbcType(columnInfo);
     }
 
     protected void processColumnSize(DfColumnMeta columnInfo, Element columnElement) {
@@ -384,8 +384,8 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void processAutoIncrement(DfTableMeta tableInfo, DfColumnMeta columnInfo,
-            DfPrimaryKeyMeta pkInfo, Connection conn, Element columnElement) throws SQLException {
+    protected void processAutoIncrement(DfTableMeta tableInfo, DfColumnMeta columnInfo, DfPrimaryKeyMeta pkInfo,
+            Connection conn, Element columnElement) throws SQLException {
         final String columnName = columnInfo.getColumnName();
         if (pkInfo.containsColumn(columnName)) {
             if (isAutoIncrementColumn(conn, tableInfo, columnInfo)) {
@@ -495,7 +495,7 @@ public class DfSchemaXmlSerializer {
      * @throws SQLException
      */
     public List<DfTableMeta> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
-        final List<DfTableMeta> tableList = _tableHandler.getTableList(dbMeta, _mainSchema);
+        final List<DfTableMeta> tableList = _tableExtractor.getTableList(dbMeta, _mainSchema);
         helpTableComments(tableList, _mainSchema);
         resolveAdditionalSchema(dbMeta, tableList);
         assertDuplicateTable(tableList);
@@ -528,11 +528,10 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMeta> tableList)
-            throws SQLException {
+    protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMeta> tableList) throws SQLException {
         final List<UnifiedSchema> schemaList = getDatabaseProperties().getAdditionalSchemaList();
         for (UnifiedSchema additionalSchema : schemaList) {
-            final List<DfTableMeta> additionalTableList = _tableHandler.getTableList(dbMeta, additionalSchema);
+            final List<DfTableMeta> additionalTableList = _tableExtractor.getTableList(dbMeta, additionalSchema);
             helpTableComments(additionalTableList, additionalSchema);
             tableList.addAll(additionalTableList);
         }
@@ -616,7 +615,7 @@ public class DfSchemaXmlSerializer {
      * @throws SQLException
      */
     public List<DfColumnMeta> getColumns(DatabaseMetaData dbMeta, DfTableMeta tableInfo) throws SQLException {
-        List<DfColumnMeta> columnList = _columnHandler.getColumnList(dbMeta, tableInfo);
+        List<DfColumnMeta> columnList = _columnExtractor.getColumnList(dbMeta, tableInfo);
         if (canHandleSynonym(tableInfo) && columnList.isEmpty()) {
             DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
             if (synonym != null && synonym.isDBLink()) {
@@ -665,7 +664,7 @@ public class DfSchemaXmlSerializer {
      */
     protected DfPrimaryKeyMeta getPrimaryColumnMetaInfo(DatabaseMetaData metaData, DfTableMeta tableInfo)
             throws SQLException {
-        final DfPrimaryKeyMeta pkInfo = _uniqueKeyHandler.getPrimaryKey(metaData, tableInfo);
+        final DfPrimaryKeyMeta pkInfo = _uniqueKeyExtractor.getPrimaryKey(metaData, tableInfo);
         final List<String> pkList = pkInfo.getPrimaryKeyList();
         if (!canHandleSynonym(tableInfo) || !pkList.isEmpty()) {
             return pkInfo;
@@ -690,7 +689,7 @@ public class DfSchemaXmlSerializer {
      */
     protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo)
             throws SQLException {
-        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyHandler.getUniqueKeyMap(metaData, tableInfo);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyExtractor.getUniqueKeyMap(metaData, tableInfo);
         if (!canHandleSynonym(tableInfo) || !uniqueKeyMap.isEmpty()) {
             return uniqueKeyMap;
         }
@@ -709,9 +708,9 @@ public class DfSchemaXmlSerializer {
      * @return Auto-increment column name. (NullAllowed)
      * @throws SQLException
      */
-    protected boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo,
-            DfColumnMeta primaryKeyColumnInfo) throws SQLException {
-        if (_autoIncrementHandler.isAutoIncrementColumn(conn, tableInfo, primaryKeyColumnInfo)) {
+    protected boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo, DfColumnMeta primaryKeyColumnInfo)
+            throws SQLException {
+        if (_autoIncrementExtractor.isAutoIncrementColumn(conn, tableInfo, primaryKeyColumnInfo)) {
             return true;
         }
         if (canHandleSynonym(tableInfo)) {
@@ -754,8 +753,7 @@ public class DfSchemaXmlSerializer {
      */
     protected Map<String, DfForeignKeyMeta> getForeignKeys(DatabaseMetaData metaData, DfTableMeta tableInfo)
             throws SQLException {
-        final Map<String, DfForeignKeyMeta> foreignKeyMap = _foreignKeyHandler
-                .getForeignKeyMap(metaData, tableInfo);
+        final Map<String, DfForeignKeyMeta> foreignKeyMap = _foreignKeyExtractor.getForeignKeyMap(metaData, tableInfo);
         if (!canHandleSynonym(tableInfo) || !foreignKeyMap.isEmpty()) {
             return foreignKeyMap;
         }
@@ -776,7 +774,8 @@ public class DfSchemaXmlSerializer {
      */
     protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, DfTableMeta tableInfo,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
-        final Map<String, Map<Integer, String>> indexMap = _indexHandler.getIndexMap(metaData, tableInfo, uniqueKeyMap);
+        final Map<String, Map<Integer, String>> indexMap = _indexExtractor.getIndexMap(metaData, tableInfo,
+                uniqueKeyMap);
         if (!canHandleSynonym(tableInfo) || !indexMap.isEmpty()) {
             return indexMap;
         }
