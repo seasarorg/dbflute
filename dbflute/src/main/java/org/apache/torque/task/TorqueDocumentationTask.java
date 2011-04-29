@@ -124,11 +124,15 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     protected void processDataXlsTemplate() {
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
-        _log.info("* Data Xls Template *");
+        if (isDataXlsTemplateLoadDataReverse()) {
+            _log.info("* Load Data Reverse *");
+        } else {
+            _log.info("* Data Xls Template *");
+        }
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         final Database database = _schemaData.getDatabase();
-        _log.info("...Outputting DataXlsTemplate: tables=" + database.getTableList().size());
+        _log.info("...Outputting template files: tables=" + database.getTableList().size());
         outputDataXlsTemplate(database);
         _log.info("");
     }
@@ -177,7 +181,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().getDataXlsTemplateFileTitle();
     }
 
-    protected boolean isDataXlsTemplateLoadDataMigration() {
+    protected boolean isDataXlsTemplateLoadDataReverse() {
         return getDocumentProperties().isDataXlsTemplateLoadDataReverse();
     }
 
