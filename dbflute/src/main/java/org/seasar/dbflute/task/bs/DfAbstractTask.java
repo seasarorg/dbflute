@@ -168,7 +168,7 @@ public abstract class DfAbstractTask extends Task {
 
         final DfConnectionMetaInfo metaInfo = getConnectionMetaInfo();
         final String productDisp = metaInfo != null ? " (" + metaInfo.getProductDisp() + ")" : "";
-        final String databaseType = getBasicProperties().getDatabaseType() + productDisp;
+        final String databaseType = getBasicProperties().getTargetDatabase() + productDisp;
         sb.append(ln).append("  DBFLUTE_CLIENT: {" + getBasicProperties().getProjectName() + "}");
         sb.append(ln).append("    database  = " + databaseType);
         sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
@@ -406,7 +406,7 @@ public abstract class DfAbstractTask extends Task {
     }
 
     public String getTargetDatabase() {
-        return getBasicProperties().getDatabaseType();
+        return getBasicProperties().getTargetDatabase();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {

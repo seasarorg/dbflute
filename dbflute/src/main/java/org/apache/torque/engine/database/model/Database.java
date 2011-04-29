@@ -862,7 +862,7 @@ public class Database {
     //                                              Database
     //                                              --------
     public String getDatabaseName() {
-        return getBasicProperties().getDatabaseType();
+        return getBasicProperties().getTargetDatabase();
     }
 
     public boolean isDatabaseMySQL() {

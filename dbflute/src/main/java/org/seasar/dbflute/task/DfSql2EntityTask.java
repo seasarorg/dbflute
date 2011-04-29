@@ -395,7 +395,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
             logSb.append(ln());
         }
-        final String databaseType = getBasicProperties().getDatabaseType();
+        final String databaseType = getBasicProperties().getTargetDatabase();
         final AppData appData = new AppData(databaseType);
         appData.addDatabase(database);
 

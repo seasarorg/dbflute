@@ -13,6 +13,8 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 
 /**
  * Basic properties.
@@ -59,7 +61,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public void checkBasicInfo() {
-        final String databaseName = getDatabaseType();
+        final String databaseName = getTargetDatabase();
         if (databaseName == null || databaseName.trim().length() == 0) {
             String msg = "Not found the property 'database' in basicInfoMap.dfprop: " + databaseName;
             throw new DfRequiredPropertyNotFoundException(msg);
@@ -76,7 +78,17 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                            Database
     //                                                                            ========
-    public String getDatabaseType() {
+    protected DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
+
+    public DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
+        if (_databaseTypeFacadeProp != null) {
+            return _databaseTypeFacadeProp;
+        }
+        _databaseTypeFacadeProp = new DfDatabaseTypeFacadeProp(this);
+        return _databaseTypeFacadeProp;
+    }
+
+    public String getTargetDatabase() {
         final String databaseType = getProperty("database", null);
         if (databaseType == null || databaseType.trim().length() == 0) {
             String msg = "Not found the property 'database' in basicInfoMap.dfprop: " + databaseType;
@@ -92,52 +104,52 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             return _currentDBDef;
         }
         final DfDatabaseNameMapping databaseNameMapping = DfDatabaseNameMapping.getInstance();
-        _currentDBDef = databaseNameMapping.findDBDef(getDatabaseType());
+        _currentDBDef = databaseNameMapping.findDBDef(getTargetDatabase());
         return _currentDBDef;
     }
 
     public boolean isDatabaseMySQL() {
-        return getDatabaseType().equalsIgnoreCase("mysql");
+        return getTargetDatabase().equalsIgnoreCase("mysql");
     }
 
     public boolean isDatabasePostgreSQL() {
-        return getDatabaseType().equalsIgnoreCase("postgresql");
+        return getTargetDatabase().equalsIgnoreCase("postgresql");
     }
 
     public boolean isDatabaseOracle() {
-        return getDatabaseType().equalsIgnoreCase("oracle");
+        return getTargetDatabase().equalsIgnoreCase("oracle");
     }
 
     public boolean isDatabaseDB2() {
-        return getDatabaseType().equalsIgnoreCase("db2");
+        return getTargetDatabase().equalsIgnoreCase("db2");
     }
 
     public boolean isDatabaseSQLServer() {
-        return getDatabaseType().equalsIgnoreCase("mssql");
+        return getTargetDatabase().equalsIgnoreCase("mssql");
     }
 
     public boolean isDatabaseH2() {
-        return getDatabaseType().equalsIgnoreCase("h2");
+        return getTargetDatabase().equalsIgnoreCase("h2");
     }
 
     public boolean isDatabaseDerby() {
-        return getDatabaseType().equalsIgnoreCase("derby");
+        return getTargetDatabase().equalsIgnoreCase("derby");
     }
 
     public boolean isDatabaseSQLite() { // sub supported
-        return getDatabaseType().equalsIgnoreCase("sqlite");
+        return getTargetDatabase().equalsIgnoreCase("sqlite");
     }
 
     public boolean isDatabaseMSAccess() { // sub supported
-        return getDatabaseType().equalsIgnoreCase("msaccess");
+        return getTargetDatabase().equalsIgnoreCase("msaccess");
     }
 
     public boolean isDatabaseFirebird() { // a-little-bit supported
-        return getDatabaseType().equalsIgnoreCase("firebird");
+        return getTargetDatabase().equalsIgnoreCase("firebird");
     }
 
     public boolean isDatabaseSybase() { // a-little-bit supported
-        return getDatabaseType().equalsIgnoreCase("sybase");
+        return getTargetDatabase().equalsIgnoreCase("sybase");
     }
 
     public boolean isDatabase_Supported() {
@@ -184,6 +196,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                            Language
     //                                                                            ========
+    protected DfLanguageTypeFacadeProp _languageTypeFacadeProp;
+
+    public DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
+        if (_languageTypeFacadeProp != null) {
+            return _languageTypeFacadeProp;
+        }
+        _languageTypeFacadeProp = new DfLanguageTypeFacadeProp(this);
+        return _languageTypeFacadeProp;
+    }
+
     public String getTargetLanguage() {
         return getProperty("targetLanguage", DEFAULT_targetLanguage);
     }

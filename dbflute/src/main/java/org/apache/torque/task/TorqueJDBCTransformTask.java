@@ -64,8 +64,8 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -167,7 +167,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // -----------------------------------------------------
     //                                           Schema Diff
     //                                           -----------
-    protected final DfSchemaDiff _schemaDiff = new DfSchemaDiff();
+    protected final DfSchemaDiff _schemaDiff = DfSchemaDiff.createAsMain();
 
     // ===================================================================================
     //                                                                             Execute

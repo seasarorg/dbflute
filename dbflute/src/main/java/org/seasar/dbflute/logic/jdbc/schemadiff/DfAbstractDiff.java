@@ -2,11 +2,11 @@ package org.seasar.dbflute.logic.jdbc.schemadiff;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 
 /**
  * @author jflute
@@ -132,36 +132,40 @@ public abstract class DfAbstractDiff {
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
-    protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
+    protected static DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
+        return DfBuildProperties.getInstance().getBasicProperties().getDatabaseTypeFacadeProp();
+    }
+
+    protected static String getDatabaseType() {
+        return getDatabaseTypeFacadeProp().getTargetDatabase();
     }
 
     protected boolean isDatabaseMySQL() {
-        return getBasicProperties().isDatabaseMySQL();
+        return getDatabaseTypeFacadeProp().isDatabaseMySQL();
     }
 
     protected boolean isDatabasePostgreSQL() {
-        return getBasicProperties().isDatabasePostgreSQL();
+        return getDatabaseTypeFacadeProp().isDatabasePostgreSQL();
     }
 
     protected boolean isDatabaseOracle() {
-        return getBasicProperties().isDatabaseOracle();
+        return getDatabaseTypeFacadeProp().isDatabaseOracle();
     }
 
     protected boolean isDatabaseDB2() {
-        return getBasicProperties().isDatabaseDB2();
+        return getDatabaseTypeFacadeProp().isDatabaseDB2();
     }
 
     protected boolean isDatabaseSQLServer() {
-        return getBasicProperties().isDatabaseSQLServer();
+        return getDatabaseTypeFacadeProp().isDatabaseSQLServer();
     }
 
     protected boolean isDatabaseH2() {
-        return getBasicProperties().isDatabaseH2();
+        return getDatabaseTypeFacadeProp().isDatabaseH2();
     }
 
     protected boolean isDatabaseDerby() {
-        return getBasicProperties().isDatabaseDerby();
+        return getDatabaseTypeFacadeProp().isDatabaseDerby();
     }
 
     // ===================================================================================

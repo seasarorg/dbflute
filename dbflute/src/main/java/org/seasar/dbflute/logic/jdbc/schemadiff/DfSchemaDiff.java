@@ -15,6 +15,7 @@ import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Index;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.Unique;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -121,6 +122,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                           Load Schema
     //                                           -----------
+    protected final DfSchemaXmlReader _nextReader;
+    protected final DfSchemaXmlReader _previousReader;
     protected Database _nextDb; // not null after next loading
     protected Database _previousDb; // not null after previous loading
     protected Integer _previousTableCount; // not null after previous loading
@@ -165,10 +168,30 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected boolean _latest;
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    protected DfSchemaDiff(DfSchemaXmlReader previousReader, DfSchemaXmlReader nextReader) {
+        _previousReader = previousReader;
+        _nextReader = nextReader;
+    }
+
+    public static DfSchemaDiff createAsMain() {
+        final XmlReadingTableFilter tableFilter = null; // no need to filter when reading here
+        final String databaseType = getDatabaseType();
+        final DfSchemaXmlReader previousReader = DfSchemaXmlReader.createAsMain(databaseType, tableFilter);
+        final DfSchemaXmlReader nextReader = DfSchemaXmlReader.createAsMain(databaseType, tableFilter);
+        return new DfSchemaDiff(previousReader, nextReader);
+    }
+
+    public static DfSchemaDiff createAsPlain(DfSchemaXmlReader previousReader, DfSchemaXmlReader nextReader) {
+        return new DfSchemaDiff(previousReader, nextReader);
+    }
+
+    // ===================================================================================
     //                                                                         Load Schema
     //                                                                         ===========
     public void loadPreviousSchema() { // before loading next schema
-        final DfSchemaXmlReader reader = createSchemaXmlReader();
+        final DfSchemaXmlReader reader = _previousReader;
         try {
             reader.read();
         } catch (FileNotFoundException normal) {
@@ -196,7 +219,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             String msg = "You should not call this because of previous not loaded.";
             throw new IllegalStateException(msg);
         }
-        final DfSchemaXmlReader reader = createSchemaXmlReader();
+        final DfSchemaXmlReader reader = _nextReader;
         try {
             reader.read();
         } catch (IOException e) {
@@ -366,7 +389,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                         return true;
                     }
                     final boolean bothValid = next != null && previous != null;
-                    if (bothValid && getBasicProperties().isDatabaseH2()) {
+                    if (bothValid && isDatabaseH2()) {
                         if (Srl.hasKeywordAllIgnoreCase("SYSTEM_SEQUENCE", next, previous)) {
                             return true;
                         }
@@ -949,18 +972,6 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     public boolean isLoadingFailure() {
         return _loadingFailure;
-    }
-
-    // ===================================================================================
-    //                                                                       Schema Reader
-    //                                                                       =============
-    protected DfSchemaXmlReader createSchemaXmlReader() {
-        // no need to filter when reading here
-        return DfSchemaXmlReader.createAsMain(getDatabaseType(), null);
-    }
-
-    protected String getDatabaseType() {
-        return getBasicProperties().getDatabaseType();
     }
 
     // ===================================================================================

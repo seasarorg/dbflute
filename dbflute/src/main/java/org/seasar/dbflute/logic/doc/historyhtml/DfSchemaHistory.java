@@ -7,8 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -137,7 +137,7 @@ public class DfSchemaHistory {
             assertDiffElementMap(key, value);
             @SuppressWarnings("unchecked")
             final Map<String, Object> schemaDiffMap = (Map<String, Object>) value;
-            final DfSchemaDiff schemaDiff = new DfSchemaDiff();
+            final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsMain();
             schemaDiff.acceptSchemaDiffMap(schemaDiffMap);
             if (index == 0) {
                 schemaDiff.setLatest(true);
