@@ -226,6 +226,19 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         }
     }
 
+    protected void markPreviousNG() {
+        final String ngMark = getMigrationPreviousNGMark();
+        try {
+            final File markFile = new File(ngMark);
+            if (!markFile.exists()) {
+                markFile.createNewFile();
+            }
+        } catch (IOException e) {
+            String msg = "Failed to create a file for previous-NG mark: " + ngMark;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
     // -----------------------------------------------------
     //                                      Roll-back Schema
     //                                      ----------------
@@ -240,6 +253,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             revertToPreviousResource();
             _coreProcessPlayer.play();
         } catch (RuntimeException e) {
+            markPreviousNG();
             throwAlterCheckRollbackSchemaFailureException(e);
         }
     }
@@ -284,9 +298,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the differences between alter SQL and create SQL.");
         br.addItem("Advice");
-        br.addElement("Make sure your alter SQL are correct.");
-        br.addElement("And delete the '" + getMigrationAlterNGMark() + "' file");
-        br.addElement("after you fix them all. (it supresses AlterCheck if it remains)");
+        br.addElement("Make sure your alter SQL are correct");
+        br.addElement("and delete the '" + getMigrationAlterNGMark() + "' file.");
         br.addElement("");
         br.addElement("You can confirm them at '" + getMigrationHistoryFile() + "'.");
         br.addElement("The first history is difference between previous schema and altered schema.");

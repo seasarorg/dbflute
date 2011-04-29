@@ -99,7 +99,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected boolean isAlterCheck() {
         if (hasPreviousNGMark()) {
-            _log.info("*Found previous NG mark, which supresses AlterCheck process");
+            _log.info("*Found previous-NG mark, which supresses AlterCheck process");
             return false;
         } else {
             return hasAlterSqlResource();
@@ -145,7 +145,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected void throwAlterCheckAlterNGMarkFoundException() {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Found the alter NG mark of AlterCheck.");
+        br.addNotice("Found the alter-NG mark of AlterCheck.");
         br.addItem("Advice");
         br.addElement("Fix the mistakes of the alter SQL");
         br.addElement("and you should remove the file after that.");
