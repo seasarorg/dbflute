@@ -148,8 +148,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         br.addNotice("Found the alter-NG mark of AlterCheck.");
         br.addItem("Advice");
         br.addElement("Fix the mistakes of the alter SQL");
-        br.addElement("and you should remove the file after that.");
-        br.addElement("If you do this, you can execute AlterCheck again.");
+        br.addElement("and you remove the file after that.");
+        br.addElement("In doing so, you can execute AlterCheck again.");
         String msg = br.buildExceptionMessage();
         throw new DfAlterCheckAlterNGMarkFoundException(msg);
     }
