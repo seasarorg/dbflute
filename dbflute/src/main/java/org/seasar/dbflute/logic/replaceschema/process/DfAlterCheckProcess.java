@@ -385,6 +385,14 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().hasMigrationAlterNGMark();
     }
 
+    public String getMigrationPreviousNGMark() {
+        return getReplaceSchemaProperties().getMigrationPreviousNGMark();
+    }
+
+    public boolean hasMigrationPreviousNGMark() {
+        return getReplaceSchemaProperties().hasMigrationPreviousNGMark();
+    }
+
     public List<File> getMigrationAlterSqlFileList() {
         return getReplaceSchemaProperties().getMigrationAlterSqlFileList();
     }

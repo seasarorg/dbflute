@@ -1,5 +1,6 @@
 package org.seasar.dbflute.task;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfAlterCheckAlterNGMarkFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckAlterSqlFailureException;
 import org.seasar.dbflute.exception.DfCreateSchemaFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
@@ -96,8 +98,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected boolean isAlterCheck() {
-        if (hasAlterNGMark()) {
-            _log.info("...Ignoring AlterCheck by alter NG mark");
+        if (hasPreviousNGMark()) {
+            _log.info("*Found previous NG mark, which supresses AlterCheck process");
             return false;
         } else {
             return hasAlterSqlResource();
@@ -106,9 +108,20 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected void processMain() {
         executeCoreProcess();
+
+        // executed correctly
+        if (hasPreviousNGMark()) {
+            final File previousNGMark = new File(getPreviousNGMark());
+            if (previousNGMark.exists()) {
+                previousNGMark.delete();
+            }
+        }
     }
 
     protected void processAlterCheck() {
+        if (hasAlterNGMark()) {
+            throwAlterCheckAlterNGMarkFoundException();
+        }
         final DfAlterCheckProcess process = DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
             public void play() {
                 executeCoreProcess();
@@ -128,6 +141,17 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
                 _log.warn("*Failed to refresh resources: " + continued.getMessage());
             }
         }
+    }
+
+    protected void throwAlterCheckAlterNGMarkFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found the alter NG mark of AlterCheck.");
+        br.addItem("Advice");
+        br.addElement("Fix the mistakes of the alter SQL");
+        br.addElement("and you should remove the file after that.");
+        br.addElement("If you do this, you can execute AlterCheck again.");
+        String msg = br.buildExceptionMessage();
+        throw new DfAlterCheckAlterNGMarkFoundException(msg);
     }
 
     protected void throwAlterCheckAlterSqlFailureException(DfAlterSchemaFinalInfo finalInfo) {
@@ -305,6 +329,14 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     public boolean hasAlterNGMark() {
         return getReplaceSchemaProperties().hasMigrationAlterNGMark();
+    }
+
+    public String getPreviousNGMark() {
+        return getReplaceSchemaProperties().getMigrationPreviousNGMark();
+    }
+
+    public boolean hasPreviousNGMark() {
+        return getReplaceSchemaProperties().hasMigrationPreviousNGMark();
     }
 
     public boolean hasAlterSqlResource() {

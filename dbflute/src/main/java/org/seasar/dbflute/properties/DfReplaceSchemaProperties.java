@@ -573,6 +573,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return alterDir.exists();
     }
 
+    public String getMigrationPreviousNGMark() {
+        final String alterDir = getMigrationAlterDirectory();
+        return alterDir + "/previous-NG.dfmark";
+    }
+
+    public boolean hasMigrationPreviousNGMark() {
+        final File alterDir = new File(getMigrationPreviousNGMark());
+        return alterDir.exists();
+    }
+
     // -----------------------------------------------------
     //                                        Alter Resource
     //                                        --------------
