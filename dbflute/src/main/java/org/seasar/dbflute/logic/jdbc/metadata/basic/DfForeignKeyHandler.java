@@ -34,7 +34,7 @@ import org.seasar.dbflute.util.Srl;
 /**
  * @author jflute
  */
-public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
+public class DfForeignKeyHandler extends DfAbstractMetaDataBasicExtractor {
 
     // ===================================================================================
     //                                                                          Definition

@@ -27,7 +27,7 @@ import org.seasar.dbflute.util.DfNameHintUtil;
 /**
  * @author jflute
  */
-public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
+public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtractor {
 
     // ===================================================================================
     //                                                                          Definition

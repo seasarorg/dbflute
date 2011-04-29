@@ -57,7 +57,7 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.7.5 (2008/06/28 Saturday)
  */
-public class DfProcedureHandler extends DfAbstractMetaDataHandler {
+public class DfProcedureHandler extends DfAbstractMetaDataBasicExtractor {
 
     // ===================================================================================
     //                                                                          Definition

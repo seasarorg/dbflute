@@ -30,7 +30,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
  * The handler of auto increment. 
  * @author jflute
  */
-public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
+public class DfAutoIncrementHandler extends DfAbstractMetaDataBasicExtractor {
 
     /**
      * Is the column auto-increment?

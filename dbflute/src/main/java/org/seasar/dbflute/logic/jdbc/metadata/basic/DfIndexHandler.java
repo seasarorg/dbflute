@@ -33,7 +33,7 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.8.2 (2008/10/18 Saturday)
  */
-public class DfIndexHandler extends DfAbstractMetaDataHandler {
+public class DfIndexHandler extends DfAbstractMetaDataBasicExtractor {
 
     // ===================================================================================
     //                                                                          Definition

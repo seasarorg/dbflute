@@ -36,7 +36,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public class DfColumnHandler extends DfAbstractMetaDataHandler {
+public class DfColumnHandler extends DfAbstractMetaDataBasicExtractor {
 
     // ===================================================================================
     //                                                                          Definition
