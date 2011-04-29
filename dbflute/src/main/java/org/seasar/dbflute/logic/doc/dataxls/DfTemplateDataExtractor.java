@@ -18,8 +18,8 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.facade.DfJFacCursorCallback;
-import org.seasar.dbflute.helper.jdbc.facade.DfJFacStringConverter;
+import org.seasar.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
+import org.seasar.dbflute.helper.jdbc.facade.DfJFadStringConverter;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -112,7 +112,7 @@ public class DfTemplateDataExtractor {
     protected DfTemplateDataResult processNormalData(Table table, String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
-        final DfJFacStringConverter converter = createStringConverter();
+        final DfJFadStringConverter converter = createStringConverter();
         final Integer limit = _extractingLimit;
         final List<Map<String, String>> resultList = facade.selectStringList(sql, valueTypeMap, converter, limit);
         return new DfTemplateDataResult(resultList);
@@ -124,8 +124,8 @@ public class DfTemplateDataExtractor {
     protected DfTemplateDataResult processLargeData(Table table, final String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
-        final DfJFacStringConverter converter = createStringConverter();
-        final DfJFacCursorCallback callback = facade.selectCursor(sql, valueTypeMap, converter);
+        final DfJFadStringConverter converter = createStringConverter();
+        final DfJFadCursorCallback callback = facade.selectCursor(sql, valueTypeMap, converter);
         return new DfTemplateDataResult(callback);
     }
 
@@ -276,8 +276,8 @@ public class DfTemplateDataExtractor {
     // ===================================================================================
     //                                                                          Conversion
     //                                                                          ==========
-    protected DfJFacStringConverter createStringConverter() {
-        return new DfJFacStringConverter() {
+    protected DfJFadStringConverter createStringConverter() {
+        return new DfJFadStringConverter() {
             public String convert(Object value) {
                 return convertToStringValue(value);
             }

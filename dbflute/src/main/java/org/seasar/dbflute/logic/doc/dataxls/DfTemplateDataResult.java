@@ -3,7 +3,7 @@ package org.seasar.dbflute.logic.doc.dataxls;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.helper.jdbc.facade.DfJFacCursorCallback;
+import org.seasar.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
 
 /**
  * @author jflute
@@ -15,7 +15,7 @@ public class DfTemplateDataResult {
     //                                                                           Attribute
     //                                                                           =========
     protected final List<Map<String, String>> _resultList;
-    protected final DfJFacCursorCallback _cursorCallback;
+    protected final DfJFadCursorCallback _cursorCallback;
 
     // ===================================================================================
     //                                                                         Easy-to-Use
@@ -32,7 +32,7 @@ public class DfTemplateDataResult {
         _cursorCallback = null;
     }
 
-    public DfTemplateDataResult(DfJFacCursorCallback cursorCallback) {
+    public DfTemplateDataResult(DfJFadCursorCallback cursorCallback) {
         _resultList = null;
         _cursorCallback = cursorCallback;
     }
@@ -44,7 +44,7 @@ public class DfTemplateDataResult {
         return _resultList;
     }
 
-    public DfJFacCursorCallback getCursorCallback() {
+    public DfJFadCursorCallback getCursorCallback() {
         return _cursorCallback;
     }
 }

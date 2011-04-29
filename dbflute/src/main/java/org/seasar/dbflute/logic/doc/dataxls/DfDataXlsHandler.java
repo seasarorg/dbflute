@@ -21,15 +21,14 @@ import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsWriter;
-import org.seasar.dbflute.helper.jdbc.facade.DfJFacCursorCallback;
-import org.seasar.dbflute.helper.jdbc.facade.DfJFacCursorHandler;
-import org.seasar.dbflute.helper.jdbc.facade.DfJFacResultSetWrapper;
+import org.seasar.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
+import org.seasar.dbflute.helper.jdbc.facade.DfJFadCursorHandler;
+import org.seasar.dbflute.helper.jdbc.facade.DfJFadResultSetWrapper;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
-import org.seasar.dbflute.logic.replaceschema.migratereps.DfLoadDataMigration;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 
 /**
@@ -42,7 +41,7 @@ public class DfDataXlsHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfLoadDataMigration.class);
+    private static final Log _log = LogFactory.getLog(DfDataXlsHandler.class);
 
     public static final int XLS_LIMIT = 65000; // about
 
@@ -203,23 +202,25 @@ public class DfDataXlsHandler {
             ext = "tsv";
         }
         final String tableDbName = table.getName();
-        _log.info("...Outputting delimiter data (over xls limit): " + tableDbName);
+        _log.info("...Outputting the over-xls-limit table: " + tableDbName);
         if (!delimiterDir.exists()) {
             delimiterDir.mkdirs();
         }
         final FileToken fileToken = new FileTokenImpl();
         final String delimiterFilePath = delimiterDir.getPath() + "/" + tableDbName + "." + ext;
-        final List<Column> columnList = table.getColumnList();
         final List<String> columnNameList = new ArrayList<String>();
-        for (Column column : columnList) {
+        for (Column column : table.getColumnList()) {
+            if (!_containsCommonColumn && column.isCommonColumn()) {
+                continue;
+            }
             columnNameList.add(column.getName());
         }
         option.headerInfo(columnNameList);
-        final DfJFacCursorCallback cursorCallback = templateDataResult.getCursorCallback();
-        cursorCallback.select(new DfJFacCursorHandler() {
+        final DfJFadCursorCallback cursorCallback = templateDataResult.getCursorCallback();
+        cursorCallback.select(new DfJFadCursorHandler() {
             int count = 0;
 
-            public void handle(final DfJFacResultSetWrapper wrapper) {
+            public void handle(final DfJFadResultSetWrapper wrapper) {
                 try {
                     fileToken.make(delimiterFilePath, new FileMakingCallback() {
                         public FileMakingRowResource getRowResource() {
