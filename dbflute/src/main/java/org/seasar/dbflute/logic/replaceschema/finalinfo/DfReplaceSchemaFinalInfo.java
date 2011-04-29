@@ -8,16 +8,19 @@ public class DfReplaceSchemaFinalInfo {
     protected DfCreateSchemaFinalInfo _createSchemaFinalInfo;
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
+    protected DfAlterSchemaFinalInfo _alterSchemaFinalInfo;
 
     public DfReplaceSchemaFinalInfo(DfCreateSchemaFinalInfo createSchemaFinalInfo,
-            DfLoadDataFinalInfo loadDataFinalInfo, DfTakeFinallyFinalInfo takeFinallyFinalInfo) {
+            DfLoadDataFinalInfo loadDataFinalInfo, DfTakeFinallyFinalInfo takeFinallyFinalInfo,
+            DfAlterSchemaFinalInfo alterSchemaFinalInfo) {
         _createSchemaFinalInfo = createSchemaFinalInfo;
         _loadDataFinalInfo = loadDataFinalInfo;
         _takeFinallyFinalInfo = takeFinallyFinalInfo;
+        _alterSchemaFinalInfo = alterSchemaFinalInfo;
     }
 
     public boolean hasFailure() {
-        return isCreateSchemaFailure() || isLoadDataFailure() || isTakeFinallyFailure();
+        return isCreateSchemaFailure() || isLoadDataFailure() || isTakeFinallyFailure() || isAlterSchemaFailure();
     }
 
     public boolean isCreateSchemaFailure() {
@@ -41,6 +44,13 @@ public class DfReplaceSchemaFinalInfo {
         return false;
     }
 
+    public boolean isAlterSchemaFailure() {
+        if (_alterSchemaFinalInfo != null && _alterSchemaFinalInfo.isFailure()) {
+            return true;
+        }
+        return false;
+    }
+
     public DfCreateSchemaFinalInfo getCreateSchemaFinalInfo() {
         return _createSchemaFinalInfo;
     }
@@ -51,5 +61,9 @@ public class DfReplaceSchemaFinalInfo {
 
     public DfTakeFinallyFinalInfo getTakeFinallyFinalInfo() {
         return _takeFinallyFinalInfo;
+    }
+
+    public DfAlterSchemaFinalInfo getAlterSchemaFinalInfo() {
+        return _alterSchemaFinalInfo;
     }
 }

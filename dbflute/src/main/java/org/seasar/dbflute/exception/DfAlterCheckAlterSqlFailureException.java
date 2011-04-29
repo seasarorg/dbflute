@@ -10,8 +10,4 @@ public class DfAlterCheckAlterSqlFailureException extends RuntimeException {
     public DfAlterCheckAlterSqlFailureException(String msg) {
         super(msg);
     }
-
-    public DfAlterCheckAlterSqlFailureException(String msg, Throwable e) {
-        super(msg, e);
-    }
 }

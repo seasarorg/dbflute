@@ -7,10 +7,13 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfAlterCheckAlterSqlFailureException;
 import org.seasar.dbflute.exception.DfCreateSchemaFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAbstractSchemaTaskFinalInfo;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
@@ -40,10 +43,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _lazyConnection = false;
+    protected DfReplaceSchemaFinalInfo _replaceSchemaFinalInfo;
     protected DfCreateSchemaFinalInfo _createSchemaFinalInfo;
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
-    protected DfReplaceSchemaFinalInfo _replaceSchemaFinalInfo;
+    protected DfAlterSchemaFinalInfo _alterSchemaFinalInfo;
 
     // ===================================================================================
     //                                                                          DataSource
@@ -110,7 +114,20 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
                 executeCoreProcess();
             }
         });
-        process.execute();
+        _alterSchemaFinalInfo = process.execute();
+        throwAlterCheckAlterSqlFailureException(_alterSchemaFinalInfo);
+    }
+
+    protected void throwAlterCheckAlterSqlFailureException(DfAlterSchemaFinalInfo finalInfo) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to execute the alter SQL statements.");
+        br.addItem("Advice");
+        br.addElement("Fix the mistakes of the alter SQL.");
+        br.addElement("Look at the final info in the log for DBFlute task.");
+        br.addItem("Message");
+        br.addElement(finalInfo.getResultMessage());
+        String msg = br.buildExceptionMessage();
+        throw new DfAlterCheckAlterSqlFailureException(msg);
     }
 
     // ===================================================================================
@@ -184,7 +201,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected DfReplaceSchemaFinalInfo createReplaceSchemaFinalInfo() {
-        return new DfReplaceSchemaFinalInfo(_createSchemaFinalInfo, _loadDataFinalInfo, _takeFinallyFinalInfo);
+        return new DfReplaceSchemaFinalInfo(_createSchemaFinalInfo, _loadDataFinalInfo, _takeFinallyFinalInfo,
+                _alterSchemaFinalInfo);
     }
 
     protected String buildReplaceSchemaFinalMessage(DfReplaceSchemaFinalInfo replaceSchemaFinalInfo) {
@@ -194,15 +212,31 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final StringBuilder sb = new StringBuilder();
         boolean firstDone = false;
 
-        // Create Schema
+        // Alter Schema
+        boolean alterFailure = false;
         {
-            final DfCreateSchemaFinalInfo createSchemaFinalInfo = replaceSchemaFinalInfo.getCreateSchemaFinalInfo();
-            if (createSchemaFinalInfo != null && createSchemaFinalInfo.isValidInfo()) {
+            final DfAlterSchemaFinalInfo alterSchemaFinalInfo = replaceSchemaFinalInfo.getAlterSchemaFinalInfo();
+            if (alterSchemaFinalInfo != null && alterSchemaFinalInfo.isValidInfo()) {
                 if (firstDone) {
                     sb.append(ln()).append(ln());
                 }
                 firstDone = true;
-                buildSchemaTaskContents(sb, createSchemaFinalInfo);
+                buildSchemaTaskContents(sb, alterSchemaFinalInfo);
+                alterFailure = alterSchemaFinalInfo.isFailure();
+            }
+        }
+
+        // Create Schema
+        {
+            final DfCreateSchemaFinalInfo createSchemaFinalInfo = replaceSchemaFinalInfo.getCreateSchemaFinalInfo();
+            if (createSchemaFinalInfo != null && createSchemaFinalInfo.isValidInfo()) {
+                if (!alterFailure || createSchemaFinalInfo.isFailure()) {
+                    if (firstDone) {
+                        sb.append(ln()).append(ln());
+                    }
+                    firstDone = true;
+                    buildSchemaTaskContents(sb, createSchemaFinalInfo);
+                }
             }
         }
 
@@ -210,11 +244,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         {
             final DfLoadDataFinalInfo loadDataFinalInfo = replaceSchemaFinalInfo.getLoadDataFinalInfo();
             if (loadDataFinalInfo != null && loadDataFinalInfo.isValidInfo()) {
-                if (firstDone) {
-                    sb.append(ln()).append(ln());
+                if (!alterFailure || loadDataFinalInfo.isFailure()) {
+                    if (firstDone) {
+                        sb.append(ln()).append(ln());
+                    }
+                    firstDone = true;
+                    buildSchemaTaskContents(sb, loadDataFinalInfo);
                 }
-                firstDone = true;
-                buildSchemaTaskContents(sb, loadDataFinalInfo);
             }
         }
 
@@ -222,11 +258,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         {
             final DfTakeFinallyFinalInfo takeFinallyFinalInfo = replaceSchemaFinalInfo.getTakeFinallyFinalInfo();
             if (takeFinallyFinalInfo != null && takeFinallyFinalInfo.isValidInfo()) {
-                if (firstDone) {
-                    sb.append(ln()).append(ln());
+                if (!alterFailure || takeFinallyFinalInfo.isFailure()) {
+                    if (firstDone) {
+                        sb.append(ln()).append(ln());
+                    }
+                    firstDone = true;
+                    buildSchemaTaskContents(sb, takeFinallyFinalInfo);
                 }
-                firstDone = true;
-                buildSchemaTaskContents(sb, takeFinallyFinalInfo);
             }
         }
 

@@ -646,7 +646,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             connection.connect();
             is = connection.getInputStream();
             _log.info("");
-            _log.info("    --> OK, Look the refreshed project!");
+            _log.info("    --> OK, Look at the refreshed project!");
             _log.info("- - - - - - - - - -/");
             _log.info("");
         } catch (IOException ignored) {

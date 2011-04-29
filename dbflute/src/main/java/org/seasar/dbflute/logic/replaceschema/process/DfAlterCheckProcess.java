@@ -13,7 +13,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.exception.DfAlterCheckAlterSqlFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckDifferenceFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckRollbackSchemaFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -24,7 +23,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
-import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterSchemaFinalInfo;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -77,9 +76,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public void execute() {
+    public DfAlterSchemaFinalInfo execute() {
         clearTemporary();
-        alterSchema();
+        final DfAlterSchemaFinalInfo finalInfo = alterSchema();
+        if (finalInfo.isFailure()) {
+            return finalInfo;
+        }
         deployNextResource();
         try {
             _coreProcessPlayer.play();
@@ -97,53 +99,38 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             saveHistory();
         }
         clearTemporary();
+        return finalInfo;
     }
 
     // -----------------------------------------------------
     //                                          Alter Schema
     //                                          ------------
-    protected void alterSchema() {
+    protected DfAlterSchemaFinalInfo alterSchema() {
         _log.info("");
         _log.info("* * * * * * * * *");
         _log.info("*               *");
         _log.info("* Alter Schema  *");
         _log.info("*               *");
         _log.info("* * * * * * * * *");
-        executeAlterSql();
+        final DfAlterSchemaFinalInfo finalInfo = executeAlterSql();
+        if (finalInfo.isFailure()) {
+            markAlterNG();
+            rollbackSchema();
+        } else {
+            serializeAlteredSchema();
+        }
         _log.info(""); // for space line
-        serializeAlteredSchema();
+        return finalInfo;
     }
 
-    protected void executeAlterSql() {
+    protected DfAlterSchemaFinalInfo executeAlterSql() {
         final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Alter Schema");
         final DfSqlFileRunnerExecute runner = new DfSqlFileRunnerExecute(runInfo, _dataSource);
         final DfSqlFileFireResult result = fireMan.fire(runner, alterSqlFileList);
-
-        final DfAlterCheckFinalInfo finalInfo = createFinalInfo(result);
-        if (finalInfo.isFailure()) {
-            throwAlterCheckAlterSqlFailureException(finalInfo);
-        }
-    }
-
-    protected void throwAlterCheckAlterSqlFailureException(DfAlterCheckFinalInfo finalInfo) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to execute the alter SQL statements.");
-        br.addItem("Advice");
-        br.addElement("Fix the mistakes of the alter SQL.");
-        br.addItem("Message");
-        br.addElement(finalInfo.getResultMessage());
-        final List<String> detailMessageList = finalInfo.getDetailMessageList();
-        if (!detailMessageList.isEmpty()) {
-            br.addItem("Detail");
-            for (String detailMessage : detailMessageList) {
-                br.addElement(detailMessage);
-            }
-        }
-        String msg = br.buildExceptionMessage();
-        throw new DfAlterCheckAlterSqlFailureException(msg);
+        return createFinalInfo(result);
     }
 
     protected void serializeAlteredSchema() {
@@ -348,8 +335,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
-    protected DfAlterCheckFinalInfo createFinalInfo(DfSqlFileFireResult fireResult) {
-        final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
+    protected DfAlterSchemaFinalInfo createFinalInfo(DfSqlFileFireResult fireResult) {
+        final DfAlterSchemaFinalInfo finalInfo = new DfAlterSchemaFinalInfo();
         finalInfo.setResultMessage(fireResult.getResultMessage());
         final List<String> detailMessageList = extractDetailMessageList(fireResult);
         for (String detailMessage : detailMessageList) {
