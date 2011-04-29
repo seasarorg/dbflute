@@ -1,17 +1,14 @@
 package org.seasar.dbflute.logic.replaceschema.process;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
@@ -30,12 +27,13 @@ import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory.InitializeType;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
 
+/**
+ * @author jflute
+ * @since 0.9.8.3 (2011/04/29 Friday)
+ */
 public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
 
     // ===================================================================================
@@ -195,24 +193,6 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                       Create Schema
     //                                                                       =============
-    protected DfRunnerInformation createRunnerInformation() {
-        final DfRunnerInformation runInfo = new DfRunnerInformation();
-        final DfDatabaseProperties prop = getDatabaseProperties();
-        runInfo.setDriver(prop.getDatabaseDriver());
-        runInfo.setUrl(prop.getDatabaseUrl());
-        runInfo.setUser(prop.getDatabaseUser());
-        runInfo.setPassword(prop.getDatabasePassword());
-        runInfo.setEncoding(getReplaceSchemaSqlFileEncoding());
-        runInfo.setAutoCommit(true);
-        runInfo.setErrorContinue(getReplaceSchemaProperties().isErrorContinue());
-        runInfo.setRollbackOnly(false);
-        return runInfo;
-    }
-
-    protected String getReplaceSchemaSqlFileEncoding() {
-        return getReplaceSchemaProperties().getSqlFileEncoding();
-    }
-
     protected DfSqlFileFireResult createSchema(DfRunnerInformation runInfo) {
         _log.info("");
         _log.info("* * * * * * * * *");
@@ -426,64 +406,9 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
 
     protected List<File> getReplaceSchemaSqlFileList() {
         final List<File> fileList = new ArrayList<File>();
-        fileList.addAll(getReplaceSchemaNextSqlFileList());
-        fileList.addAll(getReplaceSchemaNextSqlFileListAdditional());
+        fileList.addAll(getReplaceSchemaProperties().getReplaceSchemaSqlFileList());
+        fileList.addAll(getReplaceSchemaProperties().getApplicationReplaceSchemaSqlFileList());
         return fileList;
-    }
-
-    protected List<File> getReplaceSchemaNextSqlFileList() {
-        final String path = getReplaceSchemaProperties().getReplaceSchemaPlaySqlDirectory();
-        return doGetReplaceSchemaSqlFileList(path);
-    }
-
-    protected List<File> getReplaceSchemaNextSqlFileListAdditional() {
-        final List<File> fileList = new ArrayList<File>();
-        final String path = getReplaceSchemaProperties().getApplicationPlaySqlDirectory();
-        if (Srl.is_Null_or_TrimmedEmpty(path)) {
-            return DfCollectionUtil.emptyList();
-        }
-        fileList.addAll(doGetReplaceSchemaSqlFileList(path));
-        return fileList;
-    }
-
-    protected List<File> doGetReplaceSchemaSqlFileList(String directoryPath) {
-        final File baseDir = new File(directoryPath);
-        final String fileNameWithoutExt = getReplaceSchemaSqlFileNameWithoutExt();
-        final String sqlFileExt = getReplaceSchemaSqlFileExt();
-        final FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                if (name.startsWith(fileNameWithoutExt) && name.endsWith("." + sqlFileExt)) {
-                    return true;
-                }
-                return false;
-            }
-        };
-
-        // order by FileName asc
-        final Comparator<File> fileNameAscComparator = new Comparator<File>() {
-            public int compare(File o1, File o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        };
-        final TreeSet<File> treeSet = new TreeSet<File>(fileNameAscComparator);
-
-        final String[] targetList = baseDir.list(filter);
-        if (targetList == null) {
-            return DfCollectionUtil.emptyList();
-        }
-        for (String targetFileName : targetList) {
-            final String targetFilePath = directoryPath + "/" + targetFileName;
-            treeSet.add(new File(targetFilePath));
-        }
-        return new ArrayList<File>(treeSet);
-    }
-
-    protected String getReplaceSchemaSqlFileNameWithoutExt() {
-        return getReplaceSchemaProperties().getReplaceSchemaSqlFileNameWithoutExt();
-    }
-
-    protected String getReplaceSchemaSqlFileExt() {
-        return getReplaceSchemaProperties().getReplaceSchemaSqlFileExt();
     }
 
     protected void destroyChangeUserConnection() {

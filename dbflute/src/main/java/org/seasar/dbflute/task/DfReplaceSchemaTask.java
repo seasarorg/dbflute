@@ -15,12 +15,19 @@ import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
+import org.seasar.dbflute.logic.replaceschema.process.DfAlterCheckProcess;
+import org.seasar.dbflute.logic.replaceschema.process.DfAlterCheckProcess.CoreProcessPlayer;
 import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaProcess;
 import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.CreatingDataSourcePlayer;
 import org.seasar.dbflute.logic.replaceschema.process.DfLoadDataProcess;
 import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
+import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
+/**
+ * @author jflute
+ * @since 0.9.8.3 (2011/04/29 Friday)
+ */
 public class DfReplaceSchemaTask extends DfAbstractTask {
 
     // ===================================================================================
@@ -33,7 +40,6 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _lazyConnection = false;
-    protected boolean _alterSchema = false;
     protected DfCreateSchemaFinalInfo _createSchemaFinalInfo;
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
@@ -78,75 +84,39 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        if (_alterSchema) {
-            backupPreviousResource();
-            reflectNextResource();
-        }
-        try {
-            executeCoreProcess();
-        } catch (RuntimeException e) {
-            if (_alterSchema) {
-                rollbackSchema();
-            }
-            throw e;
-        }
-        if (_alterSchema) {
-            if (diffSchema()) {
-                rollbackSchema();
-                handleAlterFailure();
-            }
-        }
-        handleSchemaFailure();
-    }
-
-    protected void alterSchema() {
-        if (_lazyConnection) {
-            String msg = "AlterSchema should be executed when schema exists";
-            throw new IllegalStateException(msg);
-        }
-        _alterSchema = true;
-        // TODO
-    }
-
-    protected void serializeAlteredSchema() {
-        // TODO
-    }
-
-    protected void serializeReplacedSchema() {
-        // TODO
-    }
-
-    protected boolean diffSchema() {
-        // TODO
-        return false;
-    }
-
-    protected void reflectNextResource() {
-        // TODO
-    }
-
-    protected void backupPreviousResource() {
-        // TODO
-    }
-
-    protected void rollbackSchema() {
-        try {
-            reflectPreviousResource();
-            executeCoreProcess();
-        } catch (RuntimeException e) {
-            String msg = "Failed to rollback to previous schema";
-            throw new IllegalStateException(msg);
+        if (isAlterCheck()) {
+            processAlterCheck();
+        } else {
+            processMain();
         }
     }
 
-    protected void reflectPreviousResource() {
-        // TODO
+    protected boolean isAlterCheck() {
+        if (hasAlterNGMark()) {
+            _log.info("...Ignoring AlterCheck by alter NG mark");
+            return false;
+        } else {
+            return hasAlterSqlResource();
+        }
     }
 
-    protected void handleAlterFailure() {
-        // TODO
+    protected void processMain() {
+        executeCoreProcess();
     }
 
+    protected void processAlterCheck() {
+        final DfAlterCheckProcess process = DfAlterCheckProcess.create(getDataSource(), _mainSchema,
+                new CoreProcessPlayer() {
+                    public void play() {
+                        executeCoreProcess();
+                    }
+                });
+        process.execute();
+    }
+
+    // ===================================================================================
+    //                                                                        Core Process
+    //                                                                        ============
     protected void executeCoreProcess() {
         createSchema();
         loadData();
@@ -275,5 +245,20 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         for (String detailMessage : detailMessageList) {
             sb.append(ln()).append("  ").append(detailMessage);
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfReplaceSchemaProperties getReplaceSchemaProperties() {
+        return getProperties().getReplaceSchemaProperties();
+    }
+
+    public boolean hasAlterNGMark() {
+        return getReplaceSchemaProperties().hasMigrationAlterNGMark();
+    }
+
+    public boolean hasAlterSqlResource() {
+        return getReplaceSchemaProperties().hasMigrationAlterSqlResource();
     }
 }

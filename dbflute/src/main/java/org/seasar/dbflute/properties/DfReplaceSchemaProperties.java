@@ -1,12 +1,18 @@
 package org.seasar.dbflute.properties;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,42 +58,97 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                           Directory
-    //                                                                           =========
+    //                                                                      Base Directory
+    //                                                                      ==============
     public String getReplaceSchemaPlaySqlDirectory() {
         return "./playsql";
     }
 
-    protected String getReplaceSchemaSqlFile() {
-        return getReplaceSchemaPlaySqlDirectory() + "/replace-schema.sql";
+    // ===================================================================================
+    //                                                                          Schema SQL
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                         Create Schema
+    //                                         -------------
+    public String getReplaceSchemaSqlTitle() {
+        return "replace-schema";
     }
 
-    public String getReplaceSchemaSqlFileNameWithoutExt() {
-        final String sqlFileName = getReplaceSchemaSqlFile();
-        final String tmp = sqlFileName.substring(sqlFileName.lastIndexOf("/") + 1);
-        return tmp.substring(0, tmp.lastIndexOf("."));
+    public List<File> getReplaceSchemaSqlFileList() {
+        final String directoryPath = getReplaceSchemaPlaySqlDirectory();
+        return doGetSchemaSqlFileList(directoryPath, getReplaceSchemaSqlTitle());
     }
 
-    public String getReplaceSchemaSqlFileExt() {
-        final String sqlFileName = getReplaceSchemaSqlFile();
-        return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
+    public Map<String, File> getReplaceSchemaSqlFileMap() {
+        final Map<String, File> resultMap = new LinkedHashMap<String, File>();
+        final List<File> sqlFileList = getReplaceSchemaSqlFileList();
+        for (File sqlFile : sqlFileList) {
+            resultMap.put(sqlFile.getName(), sqlFile);
+        }
+        return resultMap;
     }
 
+    protected List<File> doGetSchemaSqlFileList(String directoryPath, final String fileNamePrefix) {
+        final File baseDir = new File(directoryPath);
+        final FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                if (name.startsWith(fileNamePrefix) && name.endsWith(".sql")) {
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        // order by FileName asc
+        final Comparator<File> fileNameAscComparator = new Comparator<File>() {
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        };
+        final TreeSet<File> treeSet = new TreeSet<File>(fileNameAscComparator);
+
+        final List<File> schemaSqlFileList;
+        final String[] targetList = baseDir.list(filter);
+        if (targetList != null) {
+            for (String targetFileName : targetList) {
+                final String targetFilePath = directoryPath + "/" + targetFileName;
+                treeSet.add(new File(targetFilePath));
+            }
+            schemaSqlFileList = new ArrayList<File>(treeSet);
+        } else {
+            schemaSqlFileList = DfCollectionUtil.emptyList();
+        }
+        return schemaSqlFileList;
+    }
+
+    // -----------------------------------------------------
+    //                                          Take Finally
+    //                                          ------------
     protected String getTakeFinallySqlFile() {
         return getReplaceSchemaPlaySqlDirectory() + "/take-finally.sql";
     }
 
-    public String getTakeFinallySqlFileNameWithoutExt() {
-        final String sqlFileName = getTakeFinallySqlFile();
-        final String tmp = sqlFileName.substring(sqlFileName.lastIndexOf("/") + 1);
-        return tmp.substring(0, tmp.lastIndexOf("."));
+    public String getTakeFinallySqlTitle() {
+        return "take-finally";
     }
 
-    public String getTakeFinallySqlFileExt() {
-        final String sqlFileName = getTakeFinallySqlFile();
-        return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
+    public List<File> getTakeFinallySqlFileList() {
+        final String directoryPath = getReplaceSchemaPlaySqlDirectory();
+        return doGetSchemaSqlFileList(directoryPath, getTakeFinallySqlTitle());
     }
 
+    public Map<String, File> getTakeFinallySqlFileMap() {
+        final Map<String, File> resultMap = new LinkedHashMap<String, File>();
+        final List<File> sqlFileList = getTakeFinallySqlFileList();
+        for (File sqlFile : sqlFileList) {
+            resultMap.put(sqlFile.getName(), sqlFile);
+        }
+        return resultMap;
+    }
+
+    // ===================================================================================
+    //                                                                         Schema Data
+    //                                                                         ===========
     public String getCommonDataDirectoryPath(String dir, String typeName) {
         return dir + "/data/common/" + typeName;
     }
@@ -421,6 +482,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return getProperty("applicationPlaySqlDirectory", null, getReplaceSchemaDefinitionMap());
     }
 
+    public List<File> getApplicationReplaceSchemaSqlFileList() {
+        final String directoryPath = getApplicationPlaySqlDirectory();
+        return doGetSchemaSqlFileList(directoryPath, getReplaceSchemaSqlTitle());
+    }
+
+    public List<File> getAppcalitionTakeFinallySqlFileList() {
+        final String directoryPath = getApplicationPlaySqlDirectory();
+        return doGetSchemaSqlFileList(directoryPath, getTakeFinallySqlTitle());
+    }
+
     // ===================================================================================
     //                                                        Suppress Initializing Schema
     //                                                        ============================
@@ -446,6 +517,123 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public boolean isSuppressDropDBLink() {
         return isProperty("isSuppressDropDBLink", false, getReplaceSchemaDefinitionMap());
+    }
+
+    // ===================================================================================
+    //                                                                           Migration
+    //                                                                           =========
+    protected String getMigrationDirectory() {
+        final String playSqlDirectory = getReplaceSchemaPlaySqlDirectory();
+        return playSqlDirectory + "/migration";
+    }
+
+    public String getMigrationAlterNGMark() {
+        final String alterDir = getMigrationAlterDirectory();
+        return alterDir + "/alter-NG.dfmark";
+    }
+
+    public boolean hasMigrationAlterNGMark() {
+        final File alterDir = new File(getMigrationAlterNGMark());
+        return alterDir.exists();
+    }
+
+    // -----------------------------------------------------
+    //                                        Alter Resource
+    //                                        --------------
+    public String getMigrationAlterDirectory() {
+        final String baseDirectory = getMigrationDirectory();
+        return baseDirectory + "/alter";
+    }
+
+    protected List<File> _migrationAlterSqlFileList;
+
+    public List<File> getMigrationAlterSqlFileList() {
+        if (_migrationAlterSqlFileList != null) {
+            return _migrationAlterSqlFileList;
+        }
+        final File alterDir = new File(getMigrationAlterDirectory());
+        if (alterDir.exists()) {
+            final File[] sqlFiles = alterDir.listFiles(new FileFilter() {
+                public boolean accept(File file) {
+                    final String pureName = file.getName();
+                    return pureName.startsWith("alter") && pureName.endsWith(".sql");
+                }
+            });
+            _migrationAlterSqlFileList = DfCollectionUtil.newArrayList(sqlFiles);
+        } else {
+            _migrationAlterSqlFileList = DfCollectionUtil.emptyList();
+        }
+        return _migrationAlterSqlFileList;
+    }
+
+    public boolean hasMigrationAlterSqlResource() {
+        return !getMigrationAlterSqlFileList().isEmpty();
+    }
+
+    // -----------------------------------------------------
+    //                                       Create Resource
+    //                                       ---------------
+    public String getMigrationCreateDirectory() {
+        final String baseDirectory = getMigrationDirectory();
+        return baseDirectory + "/create";
+    }
+
+    protected List<File> _migrationCreateSchemaSqlFileList;
+
+    public List<File> getMigrationCreateSchemaSqlFileList() {
+        if (_migrationCreateSchemaSqlFileList != null) {
+            return _migrationCreateSchemaSqlFileList;
+        }
+        final String directoryPath = getMigrationCreateDirectory();
+        final String sqlTitle = getReplaceSchemaSqlTitle();
+        _migrationCreateSchemaSqlFileList = doGetSchemaSqlFileList(directoryPath, sqlTitle);
+        return _migrationCreateSchemaSqlFileList;
+    }
+
+    protected List<File> _migrationTakeFinallySqlFileList;
+
+    public List<File> getMigrationTakeFinallySqlFileList() {
+        if (_migrationTakeFinallySqlFileList != null) {
+            return _migrationTakeFinallySqlFileList;
+        }
+        final String directoryPath = getMigrationCreateDirectory();
+        final String sqlTitle = getTakeFinallySqlTitle();
+        _migrationTakeFinallySqlFileList = doGetSchemaSqlFileList(directoryPath, sqlTitle);
+        return _migrationTakeFinallySqlFileList;
+    }
+
+    // -----------------------------------------------------
+    //                                      History Resource
+    //                                      ----------------
+    public String getMigrationHistoryDirectory() {
+        final String baseDirectory = getMigrationDirectory();
+        return baseDirectory + "/history";
+    }
+
+    // -----------------------------------------------------
+    //                                       Schema Resource
+    //                                       ---------------
+    public String getMigrationSchemaXml() {
+        final String baseDirectory = getMigrationDirectory();
+        return baseDirectory + "/schema/migration-schema.xml";
+    }
+
+    public String getMigrationHistoryFile() {
+        final String baseDirectory = getMigrationDirectory();
+        return baseDirectory + "/schema/migration-history.diffmap";
+    }
+
+    // -----------------------------------------------------
+    //                                    Temporary Resource
+    //                                    ------------------
+    public String getMigrationTemporaryDirectory() {
+        final String baseDirectory = getMigrationDirectory();
+        return baseDirectory + "/tmp";
+    }
+
+    public String getMigrationTemporaryPreviousDirectory() {
+        final String baseDirectory = getMigrationTemporaryDirectory();
+        return baseDirectory + "/previous";
     }
 
     // ===================================================================================

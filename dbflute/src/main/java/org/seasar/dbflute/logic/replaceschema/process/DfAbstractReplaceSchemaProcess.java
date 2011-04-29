@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
@@ -21,8 +22,22 @@ import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 public class DfAbstractReplaceSchemaProcess {
 
     // ===================================================================================
-    //                                                                      Various Common
-    //                                                                      ==============
+    //                                                                     SQL File Runner
+    //                                                                     ===============
+    protected DfRunnerInformation createRunnerInformation() {
+        final DfRunnerInformation runInfo = new DfRunnerInformation();
+        final DfDatabaseProperties prop = getDatabaseProperties();
+        runInfo.setDriver(prop.getDatabaseDriver());
+        runInfo.setUrl(prop.getDatabaseUrl());
+        runInfo.setUser(prop.getDatabaseUser());
+        runInfo.setPassword(prop.getDatabasePassword());
+        runInfo.setEncoding(getReplaceSchemaProperties().getSqlFileEncoding());
+        runInfo.setAutoCommit(true); // fixed as no transaction
+        runInfo.setErrorContinue(getReplaceSchemaProperties().isErrorContinue());
+        runInfo.setRollbackOnly(false);
+        return runInfo;
+    }
+
     protected String resolveTerminater4Tool() {
         return getDatabaseTypeFacadeProp().isDatabaseOracle() ? "/" : null;
     }
@@ -43,6 +58,9 @@ public class DfAbstractReplaceSchemaProcess {
         return false;
     }
 
+    // ===================================================================================
+    //                                                                          Final Info
+    //                                                                          ==========
     protected List<String> extractDetailMessageList(DfSqlFileFireResult fireResult) {
         final List<String> detailMessageList = new ArrayList<String>();
         final String detailMessage = fireResult.getDetailMessage();

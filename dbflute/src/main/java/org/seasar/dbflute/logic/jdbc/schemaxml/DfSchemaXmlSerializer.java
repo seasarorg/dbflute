@@ -93,12 +93,12 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                               Handler
     //                                               -------
-    protected DfTableExtractor _tableExtractor = new DfTableExtractor();
-    protected DfColumnExtractor _columnExtractor = new DfColumnExtractor();
-    protected DfUniqueKeyExtractor _uniqueKeyExtractor = new DfUniqueKeyExtractor();
-    protected DfIndexExtractor _indexExtractor = new DfIndexExtractor();
-    protected DfForeignKeyExtractor _foreignKeyExtractor = new DfForeignKeyExtractor();
-    protected DfAutoIncrementExtractor _autoIncrementExtractor = new DfAutoIncrementExtractor();
+    protected final DfTableExtractor _tableExtractor = new DfTableExtractor();
+    protected final DfColumnExtractor _columnExtractor = new DfColumnExtractor();
+    protected final DfUniqueKeyExtractor _uniqueKeyExtractor = new DfUniqueKeyExtractor();
+    protected final DfIndexExtractor _indexExtractor = new DfIndexExtractor();
+    protected final DfForeignKeyExtractor _foreignKeyExtractor = new DfForeignKeyExtractor();
+    protected final DfAutoIncrementExtractor _autoIncrementExtractor = new DfAutoIncrementExtractor();
 
     // -----------------------------------------------------
     //                                        Column Comment
@@ -1002,5 +1002,9 @@ public class DfSchemaXmlSerializer {
     //                                                                            ========
     public String getSchemaXml() {
         return _schemaXml;
+    }
+
+    public DfSchemaDiff getSchemaDiff() { // not null after comparison process
+        return _schemaDiff;
     }
 }
