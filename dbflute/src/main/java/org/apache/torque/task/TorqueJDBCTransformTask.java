@@ -73,7 +73,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        final DfSchemaXmlSerializer writer = DfSchemaXmlSerializer.createAsCore(getDataSource(), _mainSchema);
-        writer.serialize();
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsCore(getDataSource(), _mainSchema);
+        serializer.serialize();
     }
 }
