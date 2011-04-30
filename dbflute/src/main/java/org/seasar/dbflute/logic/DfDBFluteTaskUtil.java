@@ -145,7 +145,7 @@ public final class DfDBFluteTaskUtil {
     // ===================================================================================
     //                                                                             Logging
     //                                                                             =======
-    public static void logFinalInfo(String msg) {
+    public static void logFinalMessage(String msg) {
         _log.info(msg);
     }
 

@@ -42,7 +42,6 @@ import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
-import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.friends.velocity.DfFlutistLog4JLogSystem;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
@@ -185,7 +184,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         final StringBuilder sb = new StringBuilder();
         final String ln = ln();
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-        sb.append(ln).append("[Task End]: ").append(getPerformanceView(after - before));
+        sb.append(ln).append("[Final Message]: ").append(getPerformanceView(after - before));
         if (abort) {
             sb.append(" *Abort");
         }
@@ -220,7 +219,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             sb.append(finalInformation);
         }
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
-        DfDBFluteTaskUtil.logFinalInfo(sb.toString());
+        DfDBFluteTaskUtil.logFinalMessage(sb.toString());
     }
 
     private String buildAdditionalSchemaDisp() {
@@ -623,66 +622,54 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                SQL File Information
     //                                                                ====================
     protected void showTargetSqlFileInformation(DfOutsideSqlPack outsideSqlPack) {
-        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Target SQL files: " + outsideSqlPack.size());
-        _log.info(" ");
+        final StringBuilder sb = new StringBuilder();
+        sb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
+        sb.append(ln()).append("Target SQL files: ").append(outsideSqlPack.size());
+        sb.append(ln());
         for (DfOutsideSqlFile sqlFile : outsideSqlPack.getOutsideSqlFileList()) {
-            _log.info("  " + sqlFile.getPhysicalFile().getName());
+            sb.append(ln()).append("  ").append(sqlFile.getPhysicalFile().getName());
         }
-        _log.info("- - - - - - - - - -/");
-        _log.info(" ");
-
-        final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
-        if (specifiedSqlFile != null) {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("Specified SQL file: " + specifiedSqlFile);
-            _log.info("- - - - - - - - - -/");
-            _log.info(" ");
-        }
+        sb.append(ln()).append("- - - - - - - - - -/");
+        _log.info(sb);
     }
 
     // ===================================================================================
     //                                                                    Skip Information
     //                                                                    ================
     protected void showSkippedFileInformation() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
         final boolean skipGenerateIfSameFile = getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
         if (!skipGenerateIfSameFile) {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("All class files have been generated. (overrided)");
-            _log.info("- - - - - - - - - -/");
-            _log.info("");
+            sb.append(ln()).append("All class files have been generated. (overrided)");
+            sb.append(ln()).append("- - - - - - - - - -/");
+            _log.info(sb);
             return;
         }
         final List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();
         final int parseSize = parseFileNameList.size();
         if (parseSize == 0) {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("No class file has been parsed.");
-            _log.info("- - - - - - - - - -/");
-            _log.info("");
+            sb.append(ln()).append("No class file has been parsed.");
+            sb.append(ln()).append("- - - - - - - - - -/");
             return;
         }
         final List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
         final int skipSize = skipFileNameList.size();
         if (skipSize == 0) {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("All class files have been generated. (overrided)");
-            _log.info("- - - - - - - - - -/");
-            _log.info("");
+            sb.append(ln()).append("All class files have been generated. (overrided)");
+            sb.append(ln()).append("- - - - - - - - - -/");
             return;
         }
-        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
         if (skipSize == parseSize) {
-            _log.info("All class files have been skipped generating");
-            _log.info("                because they have no change.");
+            sb.append(ln()).append("All class files have been skipped generating");
+            sb.append(ln()).append("                because they have no change.");
         } else {
-            _log.info("Several class files have been skipped generating");
-            _log.info("                    because they have no change.");
+            sb.append(ln()).append("Several class files have been skipped generating");
+            sb.append(ln()).append("                    because they have no change.");
         }
-        _log.info("");
-        _log.info("    --> " + skipSize + " skipped (in " + parseSize + " files)");
-        _log.info("- - - - - - - - - -/");
-        _log.info("");
+        sb.append(ln());
+        sb.append(ln()).append("    -> ").append(skipSize).append(" skipped (in ").append(parseSize).append(" files)");
+        sb.append(ln()).append("- - - - - - - - - -/");
     }
 
     // ===================================================================================

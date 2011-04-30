@@ -163,7 +163,7 @@ public abstract class DfAbstractTask extends Task {
         final StringBuilder sb = new StringBuilder();
         final String ln = ln();
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-        sb.append(ln).append("[Task End]: ").append(getPerformanceView(after - before));
+        sb.append(ln).append("[Final Message]: ").append(getPerformanceView(after - before));
         if (abort) {
             sb.append(" *Abort");
         }
@@ -198,7 +198,7 @@ public abstract class DfAbstractTask extends Task {
             sb.append(finalInformation);
         }
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
-        DfDBFluteTaskUtil.logFinalInfo(sb.toString());
+        DfDBFluteTaskUtil.logFinalMessage(sb.toString());
     }
 
     private String buildAdditionalSchemaDisp() {

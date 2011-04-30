@@ -255,11 +255,15 @@ public class DfTemplateDataExtractor {
         if (selfReferenceFK != null && selfReferenceFK.isSimpleKeyFK()) {
             final Column firstColumn = table.getColumn(selfReferenceFK.getFirstLocalColumnName());
             final String firstName = firstColumn.getColumnSqlNameDirectUse();
-            orderBy = " order by " + firstName + " is not null asc, " + firstName + " asc";
+            orderBy = buildOrderByNullsFirst(firstName);
         } else {
             orderBy = "";
         }
         return orderBy;
+    }
+
+    protected String buildOrderByNullsFirst(String name) {
+        return " order by case when " + name + " is null then 0 else 1 end asc, " + name + " asc";
     }
 
     protected String buildSqlSuffix(Table table) {
