@@ -132,9 +132,24 @@ public class DfSchemaXmlSerializer {
     public static DfSchemaXmlSerializer createAsCore(DataSource dataSource, UnifiedSchema mainSchema) {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
-        final String schemaXml = facadeProp.getProejctSchemaXMLFilePath();
-        final String historyFile = facadeProp.getProjectSchemaHistoryFilePath();
+        final String schemaXml = facadeProp.getProejctSchemaXMLFile();
+        final String historyFile = facadeProp.getProjectSchemaHistoryFile();
         return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
+    }
+
+    public static DfSchemaXmlSerializer createAsManage(DataSource dataSource, UnifiedSchema mainSchema,
+            String schemaXml, String historyFile) {
+        return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile).suppressExceptTarget();
+    }
+
+    protected DfSchemaXmlSerializer suppressExceptTarget() {
+        _tableExtractor.suppressExceptTarget();
+        _columnExtractor.suppressExceptTarget();
+        _uniqueKeyExtractor.suppressExceptTarget();
+        _indexExtractor.suppressExceptTarget();
+        _foreignKeyExtractor.suppressExceptTarget();
+        _autoIncrementExtractor.suppressExceptTarget();
+        return this;
     }
 
     public static DfSchemaXmlSerializer createAsPlain(DataSource dataSource, UnifiedSchema mainSchema,

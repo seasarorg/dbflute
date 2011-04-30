@@ -55,7 +55,7 @@ public class DfSchemaXmlReader {
     public static DfSchemaXmlReader doCreateAsCoreTo(DfGenetateXmlReadingTableFilter tableFilter) {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
-        final String schemaXml = facadeProp.getProejctSchemaXMLFilePath();
+        final String schemaXml = facadeProp.getProejctSchemaXMLFile();
         return doCreateAs(schemaXml, tableFilter);
     }
 

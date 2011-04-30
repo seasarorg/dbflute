@@ -18,11 +18,11 @@ public class DfSchemaXmlFacadeProp {
         return _basicProp.getProejctSchemaXMLEncoding();
     }
 
-    public String getProejctSchemaXMLFilePath() {
-        return _basicProp.getProejctSchemaXMLFilePath();
+    public String getProejctSchemaXMLFile() {
+        return _basicProp.getProejctSchemaXMLFile();
     }
 
-    public String getProjectSchemaHistoryFilePath() {
-        return _basicProp.getProjectSchemaHistoryFilePath();
+    public String getProjectSchemaHistoryFile() {
+        return _basicProp.getProjectSchemaHistoryFile();
     }
 }

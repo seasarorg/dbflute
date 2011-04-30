@@ -48,7 +48,7 @@ public class DfSchemaHistory {
     public static DfSchemaHistory createAsCore() {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
-        return new DfSchemaHistory(facadeProp.getProjectSchemaHistoryFilePath());
+        return new DfSchemaHistory(facadeProp.getProjectSchemaHistoryFile());
     }
 
     public static DfSchemaHistory createAsPlain(String historyFile) {

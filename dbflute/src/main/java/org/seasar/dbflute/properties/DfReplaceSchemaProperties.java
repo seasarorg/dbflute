@@ -664,9 +664,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return baseDirectory + "/schema/migration-schema.xml";
     }
 
-    public String getMigrationHistoryFile() {
+    public String getMigrationDiffResult() {
         final String baseDirectory = getMigrationDirectory();
-        return baseDirectory + "/schema/migration-history.diffmap";
+        return baseDirectory + "/schema/migration-diff-result.diffmap";
     }
 
     // -----------------------------------------------------
