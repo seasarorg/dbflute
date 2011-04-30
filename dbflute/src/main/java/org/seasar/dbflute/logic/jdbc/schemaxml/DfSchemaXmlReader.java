@@ -1,5 +1,6 @@
 package org.seasar.dbflute.logic.jdbc.schemaxml;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -121,6 +122,10 @@ public class DfSchemaXmlReader {
         }
         schemaData.setName(grokName(_schemaXml));
         return schemaData;
+    }
+
+    public boolean exists() {
+        return new File(_schemaXml).exists();
     }
 
     protected String grokName(String xmlFile) {

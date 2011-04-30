@@ -37,32 +37,31 @@ public class DfRefreshResourceProcess {
     }
 
     protected void doRefreshResources(String projectName) {
-        final StringBuilder sb = new StringBuilder().append("refresh?");
-        sb.append(projectName).append("=INFINITE");
+        final StringBuilder sb = new StringBuilder();
+        sb.append("refresh?").append(projectName).append("=INFINITE");
 
         final URL url = getRefreshRequestURL(sb.toString());
         if (url == null) {
             return;
         }
 
+        final StringBuilder logSb = new StringBuilder();
         InputStream is = null;
         try {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("...Refreshing the project: " + projectName);
-            URLConnection connection = url.openConnection();
-            connection.setReadTimeout(getRefreshRequestReadTimeout());
-            connection.connect();
-            is = connection.getInputStream();
-            _log.info("");
-            _log.info("    --> OK, Look at the refreshed project!");
-            _log.info("- - - - - - - - - -/");
-            _log.info("");
-        } catch (IOException ignored) {
-            _log.info("");
-            _log.info("    --> Oh, no! " + ignored.getMessage() + ": " + url);
-            _log.info("- - - - - - - - - -/");
-            _log.info("");
+            logSb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            logSb.append(ln()).append("...Refreshing the project: ").append(projectName);
+            logSb.append(ln());
+            final URLConnection conn = url.openConnection();
+            conn.setReadTimeout(getRefreshRequestReadTimeout());
+            conn.connect();
+            is = conn.getInputStream();
+            logSb.append(ln()).append("    --> OK, Look at the refreshed project!");
+            logSb.append(ln()).append("- - - - - - - - - -/");
+        } catch (IOException continued) {
+            logSb.append(ln()).append("    --> Oh, no! ").append(continued.getMessage()).append(": ").append(url);
+            logSb.append(ln()).append("- - - - - - - - - -/");
         } finally {
+            _log.info(logSb);
             if (is != null) {
                 try {
                     is.close();
@@ -106,5 +105,12 @@ public class DfRefreshResourceProcess {
 
     protected DfRefreshProperties getRefreshProperties() {
         return DfBuildProperties.getInstance().getRefreshProperties();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return "\n";
     }
 }

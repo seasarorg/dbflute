@@ -108,12 +108,17 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected void processMain() {
         executeCoreProcess();
+        closePreviousNGIfExists(); // executed correctly
+    }
 
-        // executed correctly
+    protected void closePreviousNGIfExists() {
         if (hasPreviousNGMark()) {
-            final File previousNGMark = new File(getPreviousNGMark());
+            final String ngMark = getPreviousNGMark();
+            final File previousNGMark = new File(ngMark);
             if (previousNGMark.exists()) {
+                _log.info("...Deleting previous-NG mark: " + ngMark);
                 previousNGMark.delete();
+                refreshResources();
             }
         }
     }
@@ -135,11 +140,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         } finally {
             // because the alter check process
             // may output alter NG mark file
-            try {
-                refreshResources();
-            } catch (RuntimeException continued) {
-                _log.warn("*Failed to refresh resources: " + continued.getMessage());
-            }
+            refreshResources();
         }
     }
 

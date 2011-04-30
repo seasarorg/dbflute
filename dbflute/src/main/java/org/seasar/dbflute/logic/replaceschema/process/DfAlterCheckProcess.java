@@ -90,13 +90,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             throw e;
         }
         final DfSchemaDiff schemaDiff = serializeReplacedSchema();
-        if (schemaDiff.hasDiff()) { // wrong alter
-            markAlterNG();
-            rollbackSchema();
-            handleAlterFailure(schemaDiff);
-        } else { // success
-            removeAlterNG();
-            saveHistory();
+        if (schemaDiff.hasDiff()) {
+            processFailure(schemaDiff);
+        } else {
+            processSuccess();
         }
         clearTemporary();
         return finalInfo;
@@ -203,13 +200,27 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // -----------------------------------------------------
-    //                                               NG Mark
-    //                                               -------
+    //                                         Failure Story
+    //                                         -------------
+
+    protected void processFailure(DfSchemaDiff schemaDiff) {
+        _log.info("");
+        _log.info("* * * * * * * * * *");
+        _log.info("*                 *");
+        _log.info("* Rollback Schema *");
+        _log.info("*                 *");
+        _log.info("* * * * * * * * * *");
+        markAlterNG();
+        rollbackSchema();
+        handleAlterFailure(schemaDiff);
+    }
+
     protected void markAlterNG() {
         final String ngMark = getMigrationAlterNGMark();
         try {
             final File markFile = new File(ngMark);
             if (!markFile.exists()) {
+                _log.info("...Marking alter-NG: " + ngMark);
                 markFile.createNewFile();
             }
         } catch (IOException e) {
@@ -218,37 +229,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         }
     }
 
-    protected void removeAlterNG() {
-        final String ngMark = getMigrationAlterNGMark();
-        final File markFile = new File(ngMark);
-        if (markFile.exists()) {
-            markFile.delete();
-        }
-    }
-
-    protected void markPreviousNG() {
-        final String ngMark = getMigrationPreviousNGMark();
-        try {
-            final File markFile = new File(ngMark);
-            if (!markFile.exists()) {
-                markFile.createNewFile();
-            }
-        } catch (IOException e) {
-            String msg = "Failed to create a file for previous-NG mark: " + ngMark;
-            throw new IllegalStateException(msg, e);
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                      Roll-back Schema
-    //                                      ----------------
     protected void rollbackSchema() {
-        _log.info("");
-        _log.info("* * * * * * * * * *");
-        _log.info("*                 *");
-        _log.info("* Rollback Schema *");
-        _log.info("*                 *");
-        _log.info("* * * * * * * * * *");
         try {
             revertToPreviousResource();
             _coreProcessPlayer.play();
@@ -276,6 +257,20 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                 String msg = "Failed to rename (for reversion) to " + deployment;
                 throw new IllegalStateException(msg);
             }
+        }
+    }
+
+    protected void markPreviousNG() {
+        final String ngMark = getMigrationPreviousNGMark();
+        try {
+            final File markFile = new File(ngMark);
+            if (!markFile.exists()) {
+                _log.info("...Marking previous-NG: " + ngMark);
+                markFile.createNewFile();
+            }
+        } catch (IOException e) {
+            String msg = "Failed to create a file for previous-NG mark: " + ngMark;
+            throw new IllegalStateException(msg, e);
         }
     }
 
@@ -314,7 +309,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final String msg = br.buildExceptionMessage();
         throw new DfAlterCheckDifferenceFoundException(msg);
     }
-    
+
     public static void setupFixedAdviceMessage(ExceptionMessageBuilder br) {
         br.addElement("Make sure your alter SQL are correct");
         br.addElement("and delete the alter-NG mark file.");
@@ -322,14 +317,36 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // -----------------------------------------------------
-    //                                          Save History
-    //                                          ------------
+    //                                         Success Story
+    //                                         -------------
+    protected void processSuccess() {
+        _log.info("");
+        _log.info("* * * * * * * * *");
+        _log.info("*               *");
+        _log.info("* Success Story *");
+        _log.info("*               *");
+        _log.info("* * * * * * * * *");
+        deleteAlterNG();
+        saveHistory();
+    }
+
+    protected void deleteAlterNG() {
+        final String ngMark = getMigrationAlterNGMark();
+        final File markFile = new File(ngMark);
+        if (markFile.exists()) {
+            _log.info("...Deleting alter-NG mark: " + ngMark);
+            markFile.delete();
+        }
+    }
+
     protected void saveHistory() {
         final String currentDir = getHistoryCurrentDir();
         final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
+        _log.info("...Saving history to " + currentDir);
         for (File sqlFile : alterSqlFileList) {
             final File historyTo = new File(currentDir + "/" + sqlFile.getName());
-            sqlFile.renameTo(historyTo);
+            _log.info(" " + historyTo.getName());
+            sqlFile.renameTo(historyTo); // no check here
         }
     }
 
@@ -357,6 +374,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected void clearTemporary() {
         final File tmpDir = new File(getMigrationTemporaryDirectory());
         if (!tmpDir.exists()) {
+            _log.info("...Clearing the temporary directory: " + tmpDir);
             tmpDir.delete();
         }
     }

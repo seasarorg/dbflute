@@ -200,6 +200,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                         ===========
     public void loadPreviousSchema() { // before loading next schema
         final DfSchemaXmlReader reader = _previousReader;
+        if (!reader.exists()) {
+            _firstTime = true;
+            return;
+        }
         try {
             _previousDb = reader.read().getDatabase();
         } catch (RuntimeException e) {
@@ -956,6 +960,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
         }
         return false;
+    }
+
+    public boolean canReadNext() {
+        return !isFirstTime() && !isLoadingFailure();
     }
 
     public boolean isFirstTime() {

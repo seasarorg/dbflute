@@ -1,5 +1,6 @@
 package org.seasar.dbflute.logic.jdbc.schemaxml;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -164,6 +165,7 @@ public class DfSchemaXmlSerializer {
             _log.info("  encoding = " + encoding);
             final XMLSerializer xmlSerializer;
             {
+                mkdirIfNotExists(filePath);
                 final FileOutputStream fis = new FileOutputStream(filePath);
                 final OutputStreamWriter writer = new OutputStreamWriter(fis, encoding);
                 final OutputFormat outputFormar = new OutputFormat(Method.XML, encoding, true);
@@ -191,6 +193,16 @@ public class DfSchemaXmlSerializer {
 
     protected DocumentType createDocumentType() {
         return new DocumentTypeImpl(null, "database", null, DTDResolver.WEB_SITE_DTD);
+    }
+
+    protected void mkdirIfNotExists(String filePath) {
+        if (Srl.contains(filePath, "/")) {
+            final String baseDirStr = Srl.substringLastFront(filePath, "/");
+            final File baseDir = new File(baseDirStr);
+            if (!baseDir.exists()) {
+                baseDir.mkdirs();
+            }
+        }
     }
 
     /**
@@ -945,7 +957,7 @@ public class DfSchemaXmlSerializer {
     }
 
     protected void doLoadNextSchema() {
-        if (_schemaDiff.isFirstTime() || _schemaDiff.isLoadingFailure()) {
+        if (!_schemaDiff.canReadNext()) {
             return;
         }
         _log.info("...Loading next schema (schema diff process)");
