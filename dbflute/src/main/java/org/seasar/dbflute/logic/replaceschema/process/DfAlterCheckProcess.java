@@ -203,8 +203,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void backupPreviousResource() {
-        final List<File> migrationSqlFileList = getMigrationCreateSchemaSqlFileList();
-        final Map<String, File> previousSqlFileMap = getReplaceSchemaSqlFileMap();
+        doBackupPreviousResource(getMigrationReplaceSchemaSqlFileList(), getReplaceSchemaSqlFileMap());
+        doBackupPreviousResource(getMigrationTakeFinallySqlFileList(), getTakeFinallySqlFileMap());
+    }
+
+    protected void doBackupPreviousResource(List<File> migrationSqlFileList, Map<String, File> previousSqlFileMap) {
         final String previousDir = getMigrationTemporaryPreviousDirectory();
         new File(previousDir).mkdirs();
         for (File migrationSqlFile : migrationSqlFileList) {
@@ -223,8 +226,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void deployNextResource() {
+        doDeployNextResource(getMigrationReplaceSchemaSqlFileList());
+        doDeployNextResource(getMigrationTakeFinallySqlFileList());
+    }
+
+    protected void doDeployNextResource(List<File> migrationSqlFileList) {
         final String playSqlDir = getReplaceSchemaPlaySqlDirectory();
-        final List<File> migrationSqlFileList = getMigrationCreateSchemaSqlFileList();
         for (File migrationSqlFile : migrationSqlFileList) {
             final File deployTo = new File(playSqlDir + "/" + migrationSqlFile.getName());
             _log.info("...Moving the next file to deployment: " + deployTo.getName());
@@ -504,8 +511,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().getReplaceSchemaSqlFileMap();
     }
 
-    public List<File> getTakeFinallySqlFileList() { // without Application's
-        return getReplaceSchemaProperties().getTakeFinallySqlFileList();
+    public Map<String, File> getTakeFinallySqlFileMap() { // without Application's
+        return getReplaceSchemaProperties().getTakeFinallySqlFileMap();
     }
 
     // -----------------------------------------------------
@@ -535,8 +542,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().getMigrationAlterSqlFileList();
     }
 
-    public List<File> getMigrationCreateSchemaSqlFileList() {
-        return getReplaceSchemaProperties().getMigrationCreateSchemaSqlFileList();
+    public List<File> getMigrationReplaceSchemaSqlFileList() {
+        return getReplaceSchemaProperties().getMigrationReplaceSchemaSqlFileList();
+    }
+
+    public List<File> getMigrationTakeFinallySqlFileList() {
+        return getReplaceSchemaProperties().getMigrationTakeFinallySqlFileList();
     }
 
     public boolean hasMigrationAlterSqlResource() {

@@ -624,16 +624,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return baseDirectory + "/create";
     }
 
-    protected List<File> _migrationCreateSchemaSqlFileList;
+    protected List<File> _migrationReplaceSchemaSqlFileList;
 
-    public List<File> getMigrationCreateSchemaSqlFileList() {
-        if (_migrationCreateSchemaSqlFileList != null) {
-            return _migrationCreateSchemaSqlFileList;
+    public List<File> getMigrationReplaceSchemaSqlFileList() {
+        if (_migrationReplaceSchemaSqlFileList != null) {
+            return _migrationReplaceSchemaSqlFileList;
         }
         final String directoryPath = getMigrationCreateDirectory();
         final String sqlTitle = getReplaceSchemaSqlTitle();
-        _migrationCreateSchemaSqlFileList = doGetSchemaSqlFileList(directoryPath, sqlTitle);
-        return _migrationCreateSchemaSqlFileList;
+        _migrationReplaceSchemaSqlFileList = doGetSchemaSqlFileList(directoryPath, sqlTitle);
+        return _migrationReplaceSchemaSqlFileList;
     }
 
     protected List<File> _migrationTakeFinallySqlFileList;
