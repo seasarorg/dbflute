@@ -59,7 +59,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsHandler;
+import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsGenerator;
 import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsProcess;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -139,8 +139,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void outputDataXlsTemplate(Database database) {
-        final DfDataXlsHandler handler = new DfDataXlsHandler(getDataSource());
+        final DfDataXlsGenerator handler = new DfDataXlsGenerator(getDataSource());
         handler.setContainsCommonColumn(isDataXlsTemplateContainsCommonColumn());
+        handler.setManagedTableOnly(isDataXlsTemplateManagedTableOnly());
         handler.setDelimiterDataOutputDir(getDataDelimiterTemplateDir());
         // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
         //handler.setDelimiterDataTypeCsv(true);
@@ -168,6 +169,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected boolean isDataXlsTemplateContainsCommonColumn() {
         return getDocumentProperties().isDataXlsTemplateContainsCommonColumn();
+    }
+
+    protected boolean isDataXlsTemplateManagedTableOnly() {
+        return getDocumentProperties().isDataXlsTemplateManagedTableOnly();
     }
 
     protected String getDataXlsTemplateDir() {

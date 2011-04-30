@@ -1,14 +1,20 @@
 package org.seasar.dbflute.logic.doc.dataxls;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 
 /**
  * @author jflute
@@ -25,7 +31,7 @@ public class DfDataXlsProcess {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfDataXlsHandler _templatehandler;
+    protected final DfDataXlsGenerator _templateGenerator;
     protected final String _outputDir;
     protected final String _fileTitle;
     protected final int _limit;
@@ -33,8 +39,8 @@ public class DfDataXlsProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataXlsProcess(DfDataXlsHandler templatehandler, String outputDir, String fileTitle, int limit) {
-        _templatehandler = templatehandler;
+    public DfDataXlsProcess(DfDataXlsGenerator templateGenerator, String outputDir, String fileTitle, int limit) {
+        _templateGenerator = templateGenerator;
         _outputDir = outputDir;
         _fileTitle = fileTitle;
         _limit = limit;
@@ -58,13 +64,50 @@ public class DfDataXlsProcess {
                 baseDir.mkdirs();
             }
             final File xlsFile = new File(_outputDir + "/" + _fileTitle + "-section" + number + ".xls");
-            _templatehandler.outputData(tableInfoMap, _limit, xlsFile);
+            _templateGenerator.outputData(tableInfoMap, _limit, xlsFile);
             ++sectionNo;
+        }
+        final Map<String, Table> tableNameMap = _templateGenerator.getTableNameMap();
+        if (!tableNameMap.isEmpty()) {
+            outputTableNameMap(tableNameMap);
         }
     }
 
+    // ===================================================================================
+    //                                                                       Analyze Order
+    //                                                                       =============
     protected List<List<Table>> analyzeOrder(Database database) {
         final DfTableOrderAnalyzer analyzer = new DfTableOrderAnalyzer();
         return analyzer.analyzeOrder(database);
+    }
+
+    // ===================================================================================
+    //                                                                      Table Name Map
+    //                                                                      ==============
+    protected void outputTableNameMap(Map<String, Table> tableNameMap) {
+        final Map<String, String> map = new LinkedHashMap<String, String>();
+        for (Entry<String, Table> entry : tableNameMap.entrySet()) {
+            final String sheetName = entry.getKey();
+            final Table table = entry.getValue();
+            map.put(sheetName, table.getTableSqlName());
+        }
+        final String mapString = new MapListStringImpl().buildMapString(map);
+        final File dataPropFile = new File(_outputDir + "/tableNameMap.dataprop");
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataPropFile), "UTF-8"));
+            bw.write(mapString);
+            bw.flush();
+        } catch (IOException e) {
+            String msg = "Failed to write tableNameMap.dataprop: " + dataPropFile;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 }

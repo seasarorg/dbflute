@@ -23,7 +23,7 @@ public class DfDelimiterDataResource {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _envType;
+    protected String _loadType;
     protected String _basePath;
     protected String _fileType;
     protected String _delimiter;
@@ -31,12 +31,12 @@ public class DfDelimiterDataResource {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getEnvType() {
-        return _envType;
+    public String getLoadType() {
+        return _loadType;
     }
 
-    public void setEnvType(String envType) {
-        this._envType = envType;
+    public void setLoadType(String loadType) {
+        this._loadType = loadType;
     }
 
     public String getBasePath() {

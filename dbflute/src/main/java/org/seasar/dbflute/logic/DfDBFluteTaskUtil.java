@@ -218,11 +218,13 @@ public final class DfDBFluteTaskUtil {
             return "Sql2Entity";
         } else if (taskName.equals("df-outside-sql-test")) {
             return "OutsideSqlTest";
-        } else if (taskName.equals("df-create-schema")) {
+        } else if (taskName.equals("df-replace-schema")) {
             return "ReplaceSchema";
-        } else if (taskName.equals("df-load-data")) {
+        } else if (taskName.equals("df-create-schema")) { // old style
             return "ReplaceSchema";
-        } else if (taskName.equals("df-take-finally")) {
+        } else if (taskName.equals("df-load-data")) { // old style
+            return "ReplaceSchema";
+        } else if (taskName.equals("df-take-finally")) { // old style
             return "ReplaceSchema";
         } else {
             return taskName;

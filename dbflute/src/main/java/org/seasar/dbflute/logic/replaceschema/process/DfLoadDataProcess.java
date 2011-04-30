@@ -37,11 +37,11 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfLoadDataProcess.class);
 
-    protected static final String COMMON_ENV_TYPE = DfLoadedDataInfo.COMMON_ENV_TYPE;
+    protected static final String COMMON_LOAD_TYPE = DfLoadedDataInfo.COMMON_LOAD_TYPE;
+    protected static final String FIRSTXLS_FILE_TYPE = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;
     protected static final String TSV_FILE_TYPE = DfLoadedDataInfo.TSV_FILE_TYPE;
     protected static final String CSV_FILE_TYPE = DfLoadedDataInfo.CSV_FILE_TYPE;
     protected static final String XLS_FILE_TYPE = DfLoadedDataInfo.XLS_FILE_TYPE;
-    protected static final String FIRSTXLS_FILE_TYPE = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;
     protected static final String TSV_DELIMITER = DfLoadedDataInfo.TSV_DELIMITER;
     protected static final String CSV_DELIMITER = DfLoadedDataInfo.CSV_DELIMITER;
 
@@ -134,21 +134,21 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     //                               Delimiter Data
     //                               --------------
     protected void writeDbFromDelimiterFileAsCommonData(String fileType, String delimter) {
-        final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        final String dir = getMyProperties().getPlaySqlDirectory();
         final String path = doGetCommonDataDirectoryPath(dir, fileType);
-        writeDbFromDelimiterFile(COMMON_ENV_TYPE, path, fileType, delimter);
+        writeDbFromDelimiterFile(COMMON_LOAD_TYPE, path, fileType, delimter);
     }
 
     protected void writeDbFromDelimiterFileAsLoadingTypeData(String fileType, String delimter) {
-        final String dir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        final String dir = getMyProperties().getPlaySqlDirectory();
         final String envType = getDataLoadingType();
         final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, fileType);
         writeDbFromDelimiterFile(getDataLoadingType(), path, fileType, delimter);
     }
 
-    protected void writeDbFromDelimiterFile(String envType, String directoryPath, String fileType, String delimiter) {
+    protected void writeDbFromDelimiterFile(String loadType, String directoryPath, String fileType, String delimiter) {
         final DfDelimiterDataResource resource = new DfDelimiterDataResource();
-        resource.setEnvType(envType);
+        resource.setLoadType(loadType);
         resource.setBasePath(directoryPath);
         resource.setFileType(fileType);
         resource.setDelimiter(delimiter);
@@ -272,13 +272,13 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void writeDbFromXls(XlsWritingResource res) {
-        final String repPlaySqlDir = getMyProperties().getReplaceSchemaPlaySqlDirectory();
+        final String repPlaySqlDir = getMyProperties().getPlaySqlDirectory();
         final String appPlaySqlDir = getMyProperties().getApplicationPlaySqlDirectory();
         final String dir = res.isApplication() ? appPlaySqlDir : repPlaySqlDir;
         if (Srl.is_Null_or_TrimmedEmpty(dir)) {
             return;
         }
-        final String envType = res.isCommonType() ? COMMON_ENV_TYPE : getDataLoadingType();
+        final String envType = res.isCommonType() ? COMMON_LOAD_TYPE : getDataLoadingType();
         final String typeName = res.isFirstXls() ? FIRSTXLS_FILE_TYPE : XLS_FILE_TYPE;
         final String dataDirectory = doGetLoadingTypeDataDirectoryPath(dir, envType, typeName);
         writeDbFromXls(envType, dataDirectory);
@@ -328,7 +328,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected String doGetLoadingTypeDataDirectoryPath(String dir, String envType, String typeName) {
-        return getMyProperties().getLoadingTypeDataDir(dir, envType, typeName);
+        return getMyProperties().getLoadTypeDataDir(dir, envType, typeName);
     }
 
     // ===================================================================================
@@ -371,10 +371,10 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
                 .getLoadedFileListHierarchyMap();
 
         // order according to registration
-        doSetupDetailMessageEnvType(detailMessageList, COMMON_ENV_TYPE, hierarchyMap.get(COMMON_ENV_TYPE));
+        doSetupDetailMessageEnvType(detailMessageList, COMMON_LOAD_TYPE, hierarchyMap.get(COMMON_LOAD_TYPE));
         for (Entry<String, Map<String, List<DfLoadedFile>>> entry : hierarchyMap.entrySet()) {
             final String envType = entry.getKey();
-            if (COMMON_ENV_TYPE.equals(envType)) {
+            if (COMMON_LOAD_TYPE.equals(envType)) {
                 continue; // already processed
             }
             doSetupDetailMessageEnvType(detailMessageList, envType, entry.getValue());

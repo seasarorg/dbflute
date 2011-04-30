@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -30,18 +31,19 @@ import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfDataXlsHandler {
+public class DfDataXlsGenerator {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfDataXlsHandler.class);
+    private static final Log _log = LogFactory.getLog(DfDataXlsGenerator.class);
 
     protected static final int XLS_LIMIT = 65000; // about
 
@@ -50,15 +52,18 @@ public class DfDataXlsHandler {
     //                                                                           =========
     protected final DataSource _dataSource;
     protected boolean _containsCommonColumn;
+    protected boolean _managedTableOnly;
 
     // option for large data
     protected String _delimiterDataOutputDir;
     protected boolean _delimiterDataTypeCsv; // default is TSV
 
+    protected final Map<String, Table> _tableNameMap = new LinkedHashMap<String, Table>();
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataXlsHandler(DataSource dataSource) {
+    public DfDataXlsGenerator(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
@@ -101,16 +106,21 @@ public class DfDataXlsHandler {
      */
     protected void transferToXls(Map<String, Table> tableMap, Map<String, DfTemplateDataResult> templateDataMap,
             int limit, File xlsFile) {
-        final Set<String> tableDbNameSet = templateDataMap.keySet();
         final DfDataSet dataSet = new DfDataSet();
-        for (String tableDbName : tableDbNameSet) {
-            final Table table = tableMap.get(tableDbName);
+        int index = 0;
+        for (Entry<String, Table> entry : tableMap.entrySet()) {
+            ++index;
+            final String tableDbName = entry.getKey();
+            final Table table = entry.getValue();
+            if (_managedTableOnly && (table.isAdditionalSchema() || table.isTypeView())) {
+                continue;
+            }
             final DfTemplateDataResult templateDataResult = templateDataMap.get(tableDbName);
             if (templateDataResult.isLargeData()) {
                 outputDataDelimiterTemplate(table, templateDataResult, limit);
             } else {
                 final List<Map<String, String>> extractedList = templateDataResult.getResultList();
-                setupXlsDataTable(dataSet, table, extractedList);
+                setupXlsDataTable(dataSet, table, extractedList, index);
             }
         }
         if (dataSet.getTableSize() > 0) {
@@ -121,7 +131,7 @@ public class DfDataXlsHandler {
     // ===================================================================================
     //                                                                            Xls Data
     //                                                                            ========
-    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList) {
+    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList, int index) {
         final String tableDbName = table.getName();
         final int xlsLimit = XLS_LIMIT;
         final List<Map<String, String>> recordList;
@@ -133,14 +143,7 @@ public class DfDataXlsHandler {
                 recordList = extractedList;
             }
         }
-        final int dotIndex = tableDbName.indexOf(".");
-        final DfDataTable dataTable;
-        if (dotIndex >= 0) {
-            // for the table of additional schema
-            dataTable = new DfDataTable(tableDbName.substring(dotIndex + ".".length()));
-        } else {
-            dataTable = new DfDataTable(tableDbName);
-        }
+        final DfDataTable dataTable = new DfDataTable(resolveSheetName(table, index));
         final List<Column> columnList = table.getColumnList();
         int columnIndex = 0;
         for (Column column : columnList) {
@@ -162,6 +165,35 @@ public class DfDataXlsHandler {
             }
         }
         dataSet.addTable(dataTable);
+    }
+
+    protected String resolveSheetName(Table table, int index) {
+        final String tableDbName = table.getName();
+        String sheetName = Srl.substringLastRear(tableDbName, "."); // just in case
+        if (sheetName.length() > 30) { // restriction of excel
+            final String middleParts = sheetName.substring(0, 25);
+            boolean resolved = false;
+            int basePoint = 0;
+            while (true) {
+                final String suffixParts = middleParts.substring(basePoint, basePoint + 3);
+                sheetName = "$" + middleParts + "_" + suffixParts;
+                if (!_tableNameMap.containsKey(sheetName)) {
+                    resolved = true;
+                    break;
+                }
+                if (basePoint > 20) {
+                    break;
+                }
+                ++basePoint;
+                continue;
+            }
+            if (!resolved) {
+                final String indexExp = (index < 10 ? "0" + index : String.valueOf(index));
+                sheetName = "$" + middleParts + "_" + indexExp;
+            }
+            _tableNameMap.put(sheetName, table);
+        }
+        return sheetName;
     }
 
     protected boolean isExceptCommonColumn(Column column) {
@@ -272,11 +304,19 @@ public class DfDataXlsHandler {
         _containsCommonColumn = containsCommonColumn;
     }
 
+    public void setManagedTableOnly(boolean managedTableOnly) {
+        _managedTableOnly = managedTableOnly;
+    }
+
     public void setDelimiterDataOutputDir(String delimiterDataOutputDir) {
         _delimiterDataOutputDir = delimiterDataOutputDir;
     }
 
     public void setDelimiterDataTypeCsv(boolean delimiterDataTypeCsv) {
         _delimiterDataTypeCsv = delimiterDataTypeCsv;
+    }
+
+    public Map<String, Table> getTableNameMap() {
+        return _tableNameMap;
     }
 }

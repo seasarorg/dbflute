@@ -304,9 +304,13 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty(newKey, defaultValue, getDataXlsTemplateMap());
     }
 
+    public boolean isDataXlsTemplateManagedTableOnly() {
+        return isDataXlsTemplateLoadDataReverse();
+    }
+
     public String getDataXlsTemplateDir() {
         if (isDataXlsTemplateLoadDataReverse()) {
-            return getReplaceSchemaProperties().getMainCurrentEnvFirstXlsDataDir();
+            return getReplaceSchemaProperties().getMainCurrentLoadTypeFirstXlsDataDir();
         } else {
             final String outputDirectory = getDocumentOutputDirectory();
             return outputDirectory + "/data";
@@ -315,7 +319,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public String getDataDelimiterTemplateDir() { // for large data
         if (isDataXlsTemplateLoadDataReverse()) {
-            return getReplaceSchemaProperties().getMainCurrentEnvTsvUTF8DataDir();
+            return getReplaceSchemaProperties().getMainCurrentLoadTypeTsvUTF8DataDir();
         } else {
             final String templateDir = getDataXlsTemplateDir();
             return templateDir + "/large-data";

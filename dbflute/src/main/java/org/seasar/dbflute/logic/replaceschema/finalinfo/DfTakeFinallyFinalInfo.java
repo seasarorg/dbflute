@@ -9,6 +9,10 @@ public class DfTakeFinallyFinalInfo extends DfAbstractSchemaTaskFinalInfo {
 
     protected DfTakeFinallyAssertionFailureException _assertionEx;
 
+    public boolean hasAssertionFailure() {
+        return _assertionEx != null;
+    }
+
     public DfTakeFinallyAssertionFailureException getAssertionEx() {
         return _assertionEx;
     }

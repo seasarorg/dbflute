@@ -284,12 +284,14 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     protected DfTakeFinallyFinalInfo createFinalInfo(DfSqlFileFireResult fireResult,
             DfTakeFinallyAssertionFailureException assertionEx) {
         final DfTakeFinallyFinalInfo finalInfo = new DfTakeFinallyFinalInfo();
-        finalInfo.setResultMessage(fireResult.getResultMessage());
-        final List<String> detailMessageList = extractDetailMessageList(fireResult);
-        for (String detailMessage : detailMessageList) {
-            finalInfo.addDetailMessage(detailMessage);
+        if (fireResult != null) {
+            finalInfo.setResultMessage(fireResult.getResultMessage());
+            final List<String> detailMessageList = extractDetailMessageList(fireResult);
+            for (String detailMessage : detailMessageList) {
+                finalInfo.addDetailMessage(detailMessage);
+            }
+            finalInfo.setFailure(fireResult.existsError());
         }
-        finalInfo.setFailure(fireResult.existsError());
         finalInfo.setAssertionEx(assertionEx);
         return finalInfo;
     }

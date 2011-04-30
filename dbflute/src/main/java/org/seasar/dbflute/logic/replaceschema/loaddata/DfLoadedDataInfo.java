@@ -28,11 +28,11 @@ public class DfLoadedDataInfo {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String COMMON_ENV_TYPE = "common";
+    public static final String COMMON_LOAD_TYPE = "common";
+    public static final String FIRSTXLS_FILE_TYPE = "firstxls";
     public static final String TSV_FILE_TYPE = "tsv";
     public static final String CSV_FILE_TYPE = "csv";
     public static final String XLS_FILE_TYPE = "xls";
-    public static final String FIRSTXLS_FILE_TYPE = "firstxls";
     public static final String TSV_DELIMITER = "\t";
     public static final String CSV_DELIMITER = ",";
 
@@ -40,7 +40,7 @@ public class DfLoadedDataInfo {
     //                                                                           Attribute
     //                                                                           =========
     protected final List<DfLoadedFile> _loadedFileList = new ArrayList<DfLoadedFile>();
-    protected final Map<String, List<DfLoadedFile>> _envTypeListMap = new LinkedHashMap<String, List<DfLoadedFile>>();
+    protected final Map<String, List<DfLoadedFile>> _loadTypeListMap = new LinkedHashMap<String, List<DfLoadedFile>>();
     protected final Map<String, List<DfLoadedFile>> _fileTypeListMap = new LinkedHashMap<String, List<DfLoadedFile>>();
     protected final Map<String, Map<String, List<DfLoadedFile>>> _hierarchyListMap = new LinkedHashMap<String, Map<String, List<DfLoadedFile>>>();
 
@@ -53,8 +53,8 @@ public class DfLoadedDataInfo {
     // ===================================================================================
     //                                                                            Sub List
     //                                                                            ========
-    public List<DfLoadedFile> findLoadedFileListByEnvType(String envType) {
-        return _envTypeListMap.get(envType);
+    public List<DfLoadedFile> findLoadedFileListByLoadType(String loadType) {
+        return _loadTypeListMap.get(loadType);
     }
 
     public List<DfLoadedFile> findLoadedFileListByFileType(String fileType) {
@@ -72,14 +72,14 @@ public class DfLoadedDataInfo {
         return _hierarchyListMap;
     }
 
-    public void addLoadedFile(String envType, String fileType, String encoding, String fileName, boolean warned) {
-        final DfLoadedFile loadedFile = new DfLoadedFile(envType, fileType, encoding, fileName, warned);
+    public void addLoadedFile(String loadType, String fileType, String encoding, String fileName, boolean warned) {
+        final DfLoadedFile loadedFile = new DfLoadedFile(loadType, fileType, encoding, fileName, warned);
         _loadedFileList.add(loadedFile);
 
-        Map<String, List<DfLoadedFile>> fileTypeKeyListMap = _hierarchyListMap.get(envType);
+        Map<String, List<DfLoadedFile>> fileTypeKeyListMap = _hierarchyListMap.get(loadType);
         if (fileTypeKeyListMap == null) {
-            _hierarchyListMap.put(envType, new LinkedHashMap<String, List<DfLoadedFile>>());
-            fileTypeKeyListMap = _hierarchyListMap.get(envType);
+            _hierarchyListMap.put(loadType, new LinkedHashMap<String, List<DfLoadedFile>>());
+            fileTypeKeyListMap = _hierarchyListMap.get(loadType);
         }
         List<DfLoadedFile> elementList = fileTypeKeyListMap.get(fileType);
         if (elementList == null) {
@@ -89,11 +89,11 @@ public class DfLoadedDataInfo {
         elementList.add(loadedFile);
     }
 
-    protected void addToEnvTypeList(DfLoadedFile loadedFile, String envType) {
-        List<DfLoadedFile> elementList = _envTypeListMap.get(envType);
+    protected void addToLoadTypeList(DfLoadedFile loadedFile, String loadType) {
+        List<DfLoadedFile> elementList = _loadTypeListMap.get(loadType);
         if (elementList == null) {
-            _envTypeListMap.put(envType, new ArrayList<DfLoadedFile>());
-            elementList = _envTypeListMap.get(envType);
+            _loadTypeListMap.put(loadType, new ArrayList<DfLoadedFile>());
+            elementList = _loadTypeListMap.get(loadType);
         }
         elementList.add(loadedFile);
     }

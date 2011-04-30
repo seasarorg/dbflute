@@ -43,6 +43,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                           =========
     protected boolean _lazyConnection = false;
     protected DfReplaceSchemaFinalInfo _replaceSchemaFinalInfo;
+    protected DfReplaceSchemaFinalInfo _rollbackSchemaFinalInfo;
     protected DfCreateSchemaFinalInfo _createSchemaFinalInfo;
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
@@ -125,6 +126,10 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             public void play() {
                 executeCoreProcess();
             }
+
+            public void rollback() {
+                executeRollbackProcess();
+            }
         });
         try {
             _alterSchemaFinalInfo = process.execute();
@@ -140,9 +145,22 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                        Core Process
     //                                                                        ============
     protected void executeCoreProcess() {
-        createSchema();
-        loadData();
-        takeFinally();
+        doExecuteCoreProcess(false);
+    }
+
+    protected void executeRollbackProcess() {
+        doExecuteCoreProcess(true);
+    }
+
+    protected void doExecuteCoreProcess(boolean rollback) {
+        try {
+            createSchema();
+            loadData();
+            takeFinally();
+        } finally {
+            setupReplaceSchemaFinalInfo(rollback);
+        }
+        handleSchemaContinuedFailure(rollback);
     }
 
     protected void createSchema() {
@@ -176,11 +194,25 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         }
     }
 
-    // ===================================================================================
-    //                                                                      Schema Failure
-    //                                                                      ==============
-    protected void handleSchemaFailure() { // means continued errors
-        final DfReplaceSchemaFinalInfo finalInfo = getReplaceSchemaFinalInfo();
+    protected void setupReplaceSchemaFinalInfo(boolean rollback) {
+        if (rollback) {
+            _rollbackSchemaFinalInfo = createReplaceSchemaFinalInfo();
+        } else { // main
+            _replaceSchemaFinalInfo = createReplaceSchemaFinalInfo();
+        }
+    }
+
+    protected DfReplaceSchemaFinalInfo createReplaceSchemaFinalInfo() {
+        return new DfReplaceSchemaFinalInfo(_createSchemaFinalInfo, _loadDataFinalInfo, _takeFinallyFinalInfo);
+    }
+
+    protected void handleSchemaContinuedFailure(boolean rollback) { // means continued errors
+        final DfReplaceSchemaFinalInfo finalInfo;
+        if (rollback) {
+            finalInfo = _rollbackSchemaFinalInfo;
+        } else {
+            finalInfo = _replaceSchemaFinalInfo;
+        }
         if (finalInfo.isCreateSchemaFailure()) {
             String msg = "Failed to create schema (Look at the final info)";
             throw new DfCreateSchemaFailureException(msg);
@@ -194,34 +226,29 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
+    @Override
     public String getFinalInformation() {
-        return buildReplaceSchemaFinalMessage(getReplaceSchemaFinalInfo()); // The argument cannot be null!
+        return buildReplaceSchemaFinalMessage();
     }
 
-    protected DfReplaceSchemaFinalInfo getReplaceSchemaFinalInfo() {
-        if (_replaceSchemaFinalInfo != null) {
-            return _replaceSchemaFinalInfo;
-        }
-        _replaceSchemaFinalInfo = createReplaceSchemaFinalInfo();
-        return _replaceSchemaFinalInfo;
-    }
-
-    protected DfReplaceSchemaFinalInfo createReplaceSchemaFinalInfo() {
-        return new DfReplaceSchemaFinalInfo(_createSchemaFinalInfo, _loadDataFinalInfo, _takeFinallyFinalInfo,
-                _alterSchemaFinalInfo);
-    }
-
-    protected String buildReplaceSchemaFinalMessage(DfReplaceSchemaFinalInfo replaceSchemaFinalInfo) {
-        if (replaceSchemaFinalInfo == null) {
-            return null;
+    protected String buildReplaceSchemaFinalMessage() {
+        final DfReplaceSchemaFinalInfo finalInfo; // null allowed
+        final boolean rollbackFailure;
+        if (_rollbackSchemaFinalInfo != null && _rollbackSchemaFinalInfo.hasFailure()) {
+            // failures of roll-back are prior here (means previous-NG exists)
+            finalInfo = _rollbackSchemaFinalInfo;
+            rollbackFailure = true;
+        } else {
+            finalInfo = _replaceSchemaFinalInfo;
+            rollbackFailure = false;
         }
         final StringBuilder sb = new StringBuilder();
         boolean firstDone = false;
 
-        // Alter Schema
+        // AlterSchema
         boolean alterFailure = false;
         {
-            final DfAlterSchemaFinalInfo alterSchemaFinalInfo = replaceSchemaFinalInfo.getAlterSchemaFinalInfo();
+            final DfAlterSchemaFinalInfo alterSchemaFinalInfo = _alterSchemaFinalInfo;
             if (alterSchemaFinalInfo != null && alterSchemaFinalInfo.isValidInfo()) {
                 if (firstDone) {
                     sb.append(ln()).append(ln());
@@ -232,9 +259,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             }
         }
 
-        // Create Schema
-        {
-            final DfCreateSchemaFinalInfo createSchemaFinalInfo = replaceSchemaFinalInfo.getCreateSchemaFinalInfo();
+        // CreateSchema
+        if (finalInfo != null) {
+            final DfCreateSchemaFinalInfo createSchemaFinalInfo = finalInfo.getCreateSchemaFinalInfo();
             if (createSchemaFinalInfo != null && createSchemaFinalInfo.isValidInfo()) {
                 if (!alterFailure || createSchemaFinalInfo.isFailure()) {
                     if (firstDone) {
@@ -246,9 +273,9 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             }
         }
 
-        // Load Data
-        {
-            final DfLoadDataFinalInfo loadDataFinalInfo = replaceSchemaFinalInfo.getLoadDataFinalInfo();
+        // LoadData
+        if (finalInfo != null) {
+            final DfLoadDataFinalInfo loadDataFinalInfo = finalInfo.getLoadDataFinalInfo();
             if (loadDataFinalInfo != null && loadDataFinalInfo.isValidInfo()) {
                 if (!alterFailure || loadDataFinalInfo.isFailure()) {
                     if (firstDone) {
@@ -260,21 +287,37 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             }
         }
 
-        // Take Finally
-        {
-            final DfTakeFinallyFinalInfo takeFinallyFinalInfo = replaceSchemaFinalInfo.getTakeFinallyFinalInfo();
-            if (takeFinallyFinalInfo != null && takeFinallyFinalInfo.isValidInfo()) {
-                if (!alterFailure || takeFinallyFinalInfo.isFailure()) {
-                    if (firstDone) {
-                        sb.append(ln()).append(ln());
+        // TakeFinally
+        boolean assertionFailure = false;
+        if (finalInfo != null) {
+            final DfTakeFinallyFinalInfo takeFinallyFinalInfo = finalInfo.getTakeFinallyFinalInfo();
+            if (takeFinallyFinalInfo != null) {
+                assertionFailure = takeFinallyFinalInfo.hasAssertionFailure();
+                if (takeFinallyFinalInfo.isValidInfo()) {
+                    if (!alterFailure || takeFinallyFinalInfo.isFailure()) {
+                        if (firstDone) {
+                            sb.append(ln()).append(ln());
+                        }
+                        firstDone = true;
+                        buildSchemaTaskContents(sb, takeFinallyFinalInfo);
                     }
-                    firstDone = true;
-                    buildSchemaTaskContents(sb, takeFinallyFinalInfo);
                 }
             }
         }
 
-        if (replaceSchemaFinalInfo.hasFailure()) {
+        if (rollbackFailure) { // roll-back in AlterCheck
+            sb.append(ln()).append("    * * * * * * * * * * *");
+            sb.append(ln()).append("    * Rollback Failure  *");
+            sb.append(ln()).append("    * * * * * * * * * * *");
+        } else if (alterFailure) { // alter or create in AlterCheck
+            sb.append(ln()).append("    * * * * * * * * * * *");
+            sb.append(ln()).append("    * Migration Failure *");
+            sb.append(ln()).append("    * * * * * * * * * * *");
+        } else if (assertionFailure) { // assertion in normal time
+            sb.append(ln()).append("    * * * * * * * * * * *");
+            sb.append(ln()).append("    * Assertion Failure *");
+            sb.append(ln()).append("    * * * * * * * * * * *");
+        } else if (finalInfo != null && finalInfo.hasFailure()) { // as default
             sb.append(ln()).append("    * * * * * *");
             sb.append(ln()).append("    * Failure *");
             sb.append(ln()).append("    * * * * * *");

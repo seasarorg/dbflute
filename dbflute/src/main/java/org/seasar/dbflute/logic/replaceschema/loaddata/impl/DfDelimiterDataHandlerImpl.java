@@ -114,10 +114,10 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     writer.setDataWritingInterceptor(_dataWritingInterceptor);
                     writer.writeData(resultInfo);
 
-                    final String envType = resource.getEnvType();
+                    final String loadType = resource.getLoadType();
                     final String fileType = resource.getFileType();
                     final boolean warned = resultInfo.getWarningFileMap().containsKey(fileNamePath);
-                    loadedDataInfo.addLoadedFile(envType, fileType, encoding, fileName, warned);
+                    loadedDataInfo.addLoadedFile(loadType, fileType, encoding, fileName, warned);
                 }
             }
         } catch (IOException e) {
