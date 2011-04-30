@@ -91,14 +91,14 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
     //                                                                SQL File Information
     //                                                                ====================
     protected void showTargetSqlFileInformation(List<File> sqlFileList) {
-        _log.info(" ");
-        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Target SQL files: " + sqlFileList.size());
-        _log.info(" ");
+        final StringBuilder sb = new StringBuilder();
+        sb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
+        sb.append(ln()).append("Target SQL files: ").append(sqlFileList.size());
+        sb.append(ln());
         for (File sqlFile : sqlFileList) {
-            _log.info("  " + sqlFile.getName());
+            sb.append(ln()).append("  ").append(sqlFile.getName());
         }
-        _log.info("- - - - - - - - - -/");
-        _log.info(" ");
+        sb.append(ln()).append("- - - - - - - - - -/");
+        _log.info(sb);
     }
 }
