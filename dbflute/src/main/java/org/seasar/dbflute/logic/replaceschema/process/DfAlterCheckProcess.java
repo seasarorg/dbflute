@@ -2,6 +2,7 @@ package org.seasar.dbflute.logic.replaceschema.process;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,11 +23,14 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterSchemaFinalInfo;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -108,6 +112,25 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return finalInfo;
     }
 
+    public DfAlterSchemaFinalInfo outputChange() { // sub-process
+        processReady();
+        final DfAlterSchemaFinalInfo finalInfo = new DfAlterSchemaFinalInfo();
+        final String resultDiff = getMigrationChangeOutputResultDiff();
+        final DfSchemaXmlSerializer previousSerializer = createSchemaXmlSerializer(resultDiff);
+        previousSerializer.serialize();
+        try {
+            replaceSchema(finalInfo);
+            if (!finalInfo.isFailure()) {
+                final DfSchemaXmlSerializer replacedSerializer = createSchemaXmlSerializer(resultDiff);
+                replacedSerializer.serialize();
+            }
+        } finally {
+            rollbackSchema();
+        }
+        processClose();
+        return finalInfo;
+    }
+
     // ===================================================================================
     //                                                                               Ready
     //                                                                               =====
@@ -157,11 +180,51 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected DfAlterSchemaFinalInfo executeAlterSql() {
         final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
         final DfRunnerInformation runInfo = createRunnerInformation();
-        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
+        final DfSqlFileFireMan fireMan = createSqlFileFireMan();
         fireMan.setExecutorName("Alter Schema");
-        final DfSqlFileRunnerExecute runner = new DfSqlFileRunnerExecute(runInfo, _dataSource);
+        final DfSqlFileRunner runner = new DfSqlFileRunnerExecute(runInfo, _dataSource);
         final DfSqlFileFireResult result = fireMan.fire(runner, alterSqlFileList);
         return createFinalInfo(result);
+    }
+
+    protected DfSqlFileFireMan createSqlFileFireMan() {
+        return new DfSqlFileFireMan() {
+            @Override
+            protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
+                final String path = sqlFile.getPath();
+                if (Srl.endsWith(path, ".bat", ".sh")) {
+                    final String resolvedPath = Srl.replace(path, "\\", "/");
+                    final String baseDir = Srl.substringLastFront(resolvedPath, "/");
+                    final String scriptName = Srl.substringLastFront(Srl.substringLastRear(resolvedPath, "/"), ".");
+                    Integer exitValue = null;
+                    Exception scriptEx = null;
+                    try {
+                        exitValue = DBFluteSystem.executeSystemScript(new File(baseDir), scriptName);
+                    } catch (Exception e) {
+                        scriptEx = e;
+                    }
+                    final DfSqlFileRunnerResult result = new DfSqlFileRunnerResult(sqlFile);
+                    result.setTotalSqlCount(1);
+                    if ((exitValue != null && exitValue != 0) || scriptEx != null) {
+                        final String topMsg;
+                        if (scriptEx != null) {
+                            topMsg = scriptEx.getMessage();
+                        } else {
+                            topMsg = "Failed to execute the script: " + scriptName + " exit(" + exitValue + ")";
+                        }
+                        final SQLException sqlEx = new SQLException(topMsg);
+                        sqlEx.initCause(scriptEx);
+                        result.addErrorContinuedSql(scriptName, sqlEx);
+                        return result;
+                    } else {
+                        result.setGoodSqlCount(1);
+                        return result;
+                    }
+                } else {
+                    return super.processSqlFile(runner, sqlFile);
+                }
+            }
+        };
     }
 
     protected void serializeAlteredSchema() {
@@ -171,8 +234,13 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer() {
         final String schemaXml = getMigrationSchemaXml();
-        final String diffResult = getMigrationDiffResult();
-        return DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema, schemaXml, diffResult);
+        final String diffFile = getMigrationAlterCheckResultDiff();
+        return DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema, schemaXml, diffFile);
+    }
+
+    protected DfSchemaXmlSerializer createSchemaXmlSerializer(String diffFile) {
+        final String schemaXml = getMigrationSchemaXml();
+        return DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema, schemaXml, diffFile);
     }
 
     protected void setupAlterCheckAlterSqlFailureException(DfAlterSchemaFinalInfo finalInfo) {
@@ -409,7 +477,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         br.addItem("Advice");
         setupFixedAdviceMessage(br);
         br.addElement("");
-        br.addElement("You can confirm them at '" + getMigrationDiffResult() + "'.");
+        br.addElement("You can confirm them at '" + getMigrationAlterCheckResultDiff() + "'.");
         br.addElement("The latest item is difference between previous schema and altered schema.");
         br.addItem("Diff Date");
         br.addElement(schemaDiff.getDiffDate());
@@ -489,7 +557,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void deleteDiffResult() {
-        final String diffResult = getMigrationDiffResult();
+        final String diffResult = getMigrationAlterCheckResultDiff();
         _log.info("...Deleting the diff result file: " + diffResult);
         deleteFile(new File(diffResult));
     }
@@ -632,8 +700,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().getMigrationSchemaXml();
     }
 
-    protected String getMigrationDiffResult() {
-        return getReplaceSchemaProperties().getMigrationDiffResult();
+    protected String getMigrationAlterCheckResultDiff() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckResultDiff();
+    }
+
+    protected String getMigrationChangeOutputResultDiff() {
+        return getReplaceSchemaProperties().getMigrationChangeOutputResultDiff();
     }
 
     protected String getMigrationHistoryDirectory() {

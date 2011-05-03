@@ -88,10 +88,21 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        if (isAlterCheck()) {
+        if (isChangeOutput()) {
+            processChangeOutput();
+        } else if (isAlterCheck()) {
             processAlterCheck();
         } else {
             processMain();
+        }
+    }
+
+    protected boolean isChangeOutput() {
+        if (hasPreviousNGMark()) {
+            _log.info("*Found previous-NG mark, which supresses ChangeOutput process");
+            return false;
+        } else {
+            return hasChangeOutputMark();
         }
     }
 
@@ -122,7 +133,31 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected void processAlterCheck() {
-        final DfAlterCheckProcess process = DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
+        doProcessAlterCheck(false);
+    }
+
+    protected void processChangeOutput() {
+        doProcessAlterCheck(true);
+    }
+
+    protected void doProcessAlterCheck(boolean changeOutput) {
+        final DfAlterCheckProcess process = createAlterCheckProcess();
+        try {
+            if (changeOutput) {
+                _alterSchemaFinalInfo = process.outputChange();
+            } else {
+                _alterSchemaFinalInfo = process.execute();
+            }
+            _alterSchemaFinalInfo.throwAlterCheckExceptionIfExists();
+        } finally {
+            // because the alter check process
+            // may output alter NG mark file
+            refreshResources();
+        }
+    }
+
+    protected DfAlterCheckProcess createAlterCheckProcess() {
+        return DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
             public void play() {
                 executeCoreProcess();
             }
@@ -131,14 +166,6 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
                 executeRollbackProcess();
             }
         });
-        try {
-            _alterSchemaFinalInfo = process.execute();
-            _alterSchemaFinalInfo.throwAlterCheckExceptionIfExists();
-        } finally {
-            // because the alter check process
-            // may output alter NG mark file
-            refreshResources();
-        }
     }
 
     // ===================================================================================
@@ -346,6 +373,10 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     public boolean hasPreviousNGMark() {
         return getReplaceSchemaProperties().hasMigrationPreviousNGMark();
+    }
+
+    public boolean hasChangeOutputMark() {
+        return getReplaceSchemaProperties().hasMigrationChangeOutputMark();
     }
 
     public boolean hasAlterSqlResource() {

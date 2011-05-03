@@ -55,11 +55,14 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfRunnerInformation _runInfo;
-    protected DataSource _dataSource;
+    protected DataSource _dataSource; // may be switched (e.g. LazyConnection)
+
     protected File _sqlFile;
-    protected DfSqlFileRunnerResult _result = new DfSqlFileRunnerResult(); // is an empty result as default
+    protected DfSqlFileRunnerResult _result;
+
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
+
     protected Connection _currentConnection;
     protected Statement _currentStatement;
 
@@ -73,8 +76,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
     public void prepare(File sqlFile) {
         _sqlFile = sqlFile;
-        _result = new DfSqlFileRunnerResult();
-        _result.setSrcFile(sqlFile);
+        _result = new DfSqlFileRunnerResult(sqlFile);
     }
 
     // ===================================================================================
@@ -245,7 +247,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     //                                                                         ===========
     protected List<String> extractSqlList(Reader reader) {
         final List<String> sqlList = new ArrayList<String>();
-        final BufferedReader in = new BufferedReader(reader);
+        final BufferedReader br = new BufferedReader(reader);
         final DelimiterChanger delimiterChanger = newDelimterChanger();
         try {
             String sql = "";
@@ -253,7 +255,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             boolean inGroup = false;
             boolean alwaysNeedsLineSeparator = false;
             boolean isAlreadyProcessUTF8Bom = false;
-            while ((line = in.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 if (!isAlreadyProcessUTF8Bom) {
                     line = removeUTF8BomIfNeeds(line);
                     isAlreadyProcessUTF8Bom = true;
@@ -366,9 +368,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             String msg = "The method 'extractSqlList()' threw the IOException!";
             throw new IllegalStateException(msg, e);
         } finally {
-            if (in != null) {
+            if (br != null) {
                 try {
-                    in.close();
+                    br.close();
                 } catch (IOException ignore) {
                     ignore.printStackTrace();
                 }

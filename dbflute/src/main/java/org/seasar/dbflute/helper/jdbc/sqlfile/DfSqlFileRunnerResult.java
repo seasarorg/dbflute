@@ -29,45 +29,16 @@ public class DfSqlFileRunnerResult {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected File _srcFile;
-    protected List<ErrorContinuedSql> _errorContinuedSqlList = new ArrayList<ErrorContinuedSql>();
+    protected final File _sqlFile;
+    protected final List<ErrorContinuedSql> _errorContinuedSqlList = new ArrayList<ErrorContinuedSql>();
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSqlFileRunnerResult() {
-    }
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public void clear() {
-        _srcFile = null;
-        _errorContinuedSqlList.clear();
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public File getSrcFile() {
-        return _srcFile;
-    }
-
-    public void setSrcFile(File srcFile) {
-        _srcFile = srcFile;
-    }
-
-    public List<ErrorContinuedSql> getErrorContinuedSqlList() {
-        return _errorContinuedSqlList;
-    }
-
-    public void addErrorContinuedSql(SQLException e, String sql) {
-        final ErrorContinuedSql errorContinuedSql = new ErrorContinuedSql();
-        errorContinuedSql.setSql(sql);
-        errorContinuedSql.setSqlEx(e);
-        _errorContinuedSqlList.add(errorContinuedSql);
+    public DfSqlFileRunnerResult(File sqlFile) {
+        _sqlFile = sqlFile;
     }
 
     public static class ErrorContinuedSql {
@@ -89,6 +60,24 @@ public class DfSqlFileRunnerResult {
         public void setSqlEx(SQLException ex) {
             _sqlEx = ex;
         }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public File getSqlFile() {
+        return _sqlFile;
+    }
+
+    public List<ErrorContinuedSql> getErrorContinuedSqlList() {
+        return _errorContinuedSqlList;
+    }
+
+    public void addErrorContinuedSql(String sql, SQLException sqlEx) {
+        final ErrorContinuedSql errorContinuedSql = new ErrorContinuedSql();
+        errorContinuedSql.setSql(sql);
+        errorContinuedSql.setSqlEx(sqlEx);
+        _errorContinuedSqlList.add(errorContinuedSql);
     }
 
     public int getGoodSqlCount() {

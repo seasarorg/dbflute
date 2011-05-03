@@ -1,7 +1,6 @@
 package org.seasar.dbflute.properties;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,8 +81,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public List<File> getReplaceSchemaSqlFileList() {
-        final String directoryPath = getPlaySqlDirectory();
-        return doGetSchemaSqlFileList(directoryPath, getReplaceSchemaSqlTitle());
+        return doGetSchemaSqlFileList(getPlaySqlDirectory(), getReplaceSchemaSqlTitle());
     }
 
     public Map<String, File> getReplaceSchemaSqlFileMap() {
@@ -100,15 +98,17 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return resultMap;
     }
 
-    protected List<File> doGetSchemaSqlFileList(String directoryPath, String title) {
-        return doGetResourceFileList(directoryPath, title, ".sql");
+    protected List<File> doGetSchemaSqlFileList(String targetDir, String title) {
+        return doGetResourceFileList(targetDir, title, ".sql");
     }
 
-    protected List<File> doGetResourceFileList(String directoryPath, String prefix, String suffix) {
+    protected List<File> doGetResourceFileList(String targetDir, String prefix, String... suffixes) {
         final DfReplaceSchemaResourceFinder finder = new DfReplaceSchemaResourceFinder();
         finder.addPrefix(prefix);
-        finder.addSuffix(suffix);
-        return finder.findResourceFileList(directoryPath);
+        for (String suffix : suffixes) {
+            finder.addSuffix(suffix);
+        }
+        return finder.findResourceFileList(targetDir);
     }
 
     // -----------------------------------------------------
@@ -123,8 +123,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public List<File> getTakeFinallySqlFileList() {
-        final String directoryPath = getPlaySqlDirectory();
-        return doGetSchemaSqlFileList(directoryPath, getTakeFinallySqlTitle());
+        final String targetDir = getPlaySqlDirectory();
+        return doGetSchemaSqlFileList(targetDir, getTakeFinallySqlTitle());
     }
 
     public Map<String, File> getTakeFinallySqlFileMap() {
@@ -151,25 +151,25 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     protected List<File> doGetAnyTypeDataFileList(String baseDir, String loadType, String typeName) { // contains data-prop
-        final String directoryPath = getLoadTypeDataDir(baseDir, loadType, typeName);
+        final String targetDir = getLoadTypeDataDir(baseDir, loadType, typeName);
         final String firstxlsFileType = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;
         final String xlsFileType = DfLoadedDataInfo.XLS_FILE_TYPE;
         final String suffix = "." + (typeName.equals(firstxlsFileType) ? xlsFileType : typeName);
         if (Srl.equalsPlain(typeName, firstxlsFileType, xlsFileType)) {
-            return doGetDataFileList(directoryPath, suffix, false);
+            return doGetDataFileList(targetDir, suffix, false);
         } else { // delimiter data (contains one level nested)
-            return doGetDataFileList(directoryPath, suffix, true);
+            return doGetDataFileList(targetDir, suffix, true);
         }
     }
 
-    protected List<File> doGetDataFileList(String directoryPath, String suffix, boolean oneLevelNested) {
+    protected List<File> doGetDataFileList(String targetDir, String suffix, boolean oneLevelNested) {
         final DfReplaceSchemaResourceFinder finder = new DfReplaceSchemaResourceFinder();
         finder.addSuffix(suffix);
         finder.addSuffix(".dataprop"); // contains data-prop
         if (oneLevelNested) {
             finder.containsOneLevelNested();
         }
-        return finder.findResourceFileList(directoryPath);
+        return finder.findResourceFileList(targetDir);
     }
 
     // non-ApplicationPlaySql below
@@ -589,19 +589,19 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public List<File> getApplicationReplaceSchemaSqlFileList() {
-        final String directoryPath = getApplicationPlaySqlDirectory();
-        if (directoryPath == null) {
+        final String targetDir = getApplicationPlaySqlDirectory();
+        if (targetDir == null) {
             return DfCollectionUtil.emptyList();
         }
-        return doGetSchemaSqlFileList(directoryPath, getReplaceSchemaSqlTitle());
+        return doGetSchemaSqlFileList(targetDir, getReplaceSchemaSqlTitle());
     }
 
     public List<File> getAppcalitionTakeFinallySqlFileList() {
-        final String directoryPath = getApplicationPlaySqlDirectory();
-        if (directoryPath == null) {
+        final String targetDir = getApplicationPlaySqlDirectory();
+        if (targetDir == null) {
             return DfCollectionUtil.emptyList();
         }
-        return doGetSchemaSqlFileList(directoryPath, getTakeFinallySqlTitle());
+        return doGetSchemaSqlFileList(targetDir, getTakeFinallySqlTitle());
     }
 
     // ===================================================================================
@@ -649,8 +649,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public boolean hasMigrationAlterNGMark() {
-        final File alterDir = new File(getMigrationAlterNGMark());
-        return alterDir.exists();
+        final File markFile = new File(getMigrationAlterNGMark());
+        return markFile.exists();
     }
 
     public String getMigrationPreviousNGMark() {
@@ -659,8 +659,18 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public boolean hasMigrationPreviousNGMark() {
-        final File alterDir = new File(getMigrationPreviousNGMark());
-        return alterDir.exists();
+        final File markFile = new File(getMigrationPreviousNGMark());
+        return markFile.exists();
+    }
+
+    public String getMigrationChangeOutputMark() {
+        final String alterDir = getMigrationCreateDirectory();
+        return alterDir + "/change-output.dfmark";
+    }
+
+    public boolean hasMigrationChangeOutputMark() {
+        final File markFile = new File(getMigrationChangeOutputMark());
+        return markFile.exists();
     }
 
     // -----------------------------------------------------
@@ -673,23 +683,18 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     protected List<File> _migrationAlterSqlFileList;
 
-    public List<File> getMigrationAlterSqlFileList() {
+    public List<File> getMigrationAlterSqlFileList() { // contains script files
         if (_migrationAlterSqlFileList != null) {
             return _migrationAlterSqlFileList;
         }
-        final File alterDir = new File(getMigrationAlterDirectory());
-        if (alterDir.exists()) {
-            final File[] sqlFiles = alterDir.listFiles(new FileFilter() {
-                public boolean accept(File file) {
-                    final String pureName = file.getName();
-                    return pureName.startsWith("alter") && pureName.endsWith(".sql");
-                }
-            });
-            _migrationAlterSqlFileList = DfCollectionUtil.newArrayList(sqlFiles);
-        } else {
-            _migrationAlterSqlFileList = DfCollectionUtil.emptyList();
-        }
+        final String targetDir = getMigrationCreateDirectory();
+        final String sqlTitle = getReplaceSchemaSqlTitle();
+        _migrationAlterSqlFileList = doGetResourceFileList(targetDir, sqlTitle, ".sql", ".bat", ".sh");
         return _migrationAlterSqlFileList;
+    }
+
+    public String getAlterSchemaSqlTitle() {
+        return "alter-schema";
     }
 
     public boolean hasMigrationAlterSqlResource() {
@@ -718,9 +723,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_migrationReplaceSchemaSqlFileList != null) {
             return _migrationReplaceSchemaSqlFileList;
         }
-        final String directoryPath = getMigrationCreateDirectory();
+        final String targetDir = getMigrationCreateDirectory();
         final String sqlTitle = getReplaceSchemaSqlTitle();
-        _migrationReplaceSchemaSqlFileList = doGetSchemaSqlFileList(directoryPath, sqlTitle);
+        _migrationReplaceSchemaSqlFileList = doGetSchemaSqlFileList(targetDir, sqlTitle);
         return _migrationReplaceSchemaSqlFileList;
     }
 
@@ -734,9 +739,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_migrationTakeFinallySqlFileList != null) {
             return _migrationTakeFinallySqlFileList;
         }
-        final String directoryPath = getMigrationCreateDirectory();
+        final String targetDir = getMigrationCreateDirectory();
         final String sqlTitle = getTakeFinallySqlTitle();
-        _migrationTakeFinallySqlFileList = doGetSchemaSqlFileList(directoryPath, sqlTitle);
+        _migrationTakeFinallySqlFileList = doGetSchemaSqlFileList(targetDir, sqlTitle);
         return _migrationTakeFinallySqlFileList;
     }
 
@@ -813,9 +818,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return baseDirectory + "/schema/migration-schema.xml";
     }
 
-    public String getMigrationDiffResult() {
+    public String getMigrationAlterCheckResultDiff() {
         final String baseDirectory = getMigrationDirectory();
-        return baseDirectory + "/schema/migration-diff-result.diffmap";
+        return baseDirectory + "/schema/alter-check-result.diffmap";
+    }
+
+    public String getMigrationChangeOutputResultDiff() {
+        final String baseDirectory = getMigrationDirectory();
+        return baseDirectory + "/schema/change-output-result.diffmap";
     }
 
     // -----------------------------------------------------

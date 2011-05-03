@@ -22,8 +22,8 @@ public class DfReplaceSchemaResourceFinder {
     protected final Set<String> _suffixSet = new LinkedHashSet<String>();
     protected boolean _oneLevelNested;
 
-    public List<File> findResourceFileList(String directoryPath) {
-        final File baseDir = new File(directoryPath);
+    public List<File> findResourceFileList(String targetDir) {
+        final File baseDir = new File(targetDir);
         final FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 if (matchName(name, _prefixSet, false) && matchName(name, _suffixSet, true)) {
@@ -33,7 +33,7 @@ public class DfReplaceSchemaResourceFinder {
             }
         };
 
-        // order by FileName ascend
+        // order by file name ascend
         final Comparator<File> fileNameAscComparator = new Comparator<File>() {
             public int compare(File o1, File o2) {
                 return o1.getName().compareTo(o2.getName());
@@ -45,7 +45,7 @@ public class DfReplaceSchemaResourceFinder {
         final String[] targetList = baseDir.list(filter);
         if (targetList != null) {
             for (String targetFileName : targetList) {
-                final String targetFilePath = directoryPath + "/" + targetFileName;
+                final String targetFilePath = targetDir + "/" + targetFileName;
                 treeSet.add(new File(targetFilePath));
             }
             resourceFileList = new ArrayList<File>(treeSet);
@@ -59,7 +59,7 @@ public class DfReplaceSchemaResourceFinder {
                 });
                 if (listDirs != null) {
                     for (File dir : listDirs) {
-                        final String nestedDir = directoryPath + "/" + dir.getName();
+                        final String nestedDir = targetDir + "/" + dir.getName();
                         final List<File> nestedFileList = findResourceFileList(nestedDir);
                         resourceFileList.addAll(nestedFileList);
                     }

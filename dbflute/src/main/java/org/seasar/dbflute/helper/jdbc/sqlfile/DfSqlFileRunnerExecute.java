@@ -69,8 +69,8 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             _goodSqlCount++;
         } catch (SQLException e) {
             if (!lazyConnectFailed && _runInfo.isErrorContinue()) {
-                showContinueWarnLog(e, sql);
-                _result.addErrorContinuedSql(e, sql);
+                showContinueWarnLog(sql, e);
+                _result.addErrorContinuedSql(sql, e);
                 return;
             }
             throwSQLFailureException(sql, e);
@@ -85,19 +85,19 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         // override if it needs
     }
 
-    protected void showContinueWarnLog(SQLException e, String sql) {
+    protected void showContinueWarnLog(String sql, SQLException e) {
         final StringBuilder sb = new StringBuilder();
         sb.append("*Failure: ").append(e.getClass().getName()).append(ln());
         sb.append("/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
         sb.append(ln());
         sb.append(extractMessage(e)).append(ln());
         buildAdditionalErrorInfo(sb, e).append(ln());
-        SQLException nextEx = e.getNextException();
+        final SQLException nextEx = e.getNextException();
         if (nextEx != null) {
             sb.append("- - - - - - - - - -").append(ln());
             sb.append(extractMessage(nextEx)).append(ln());
             buildAdditionalErrorInfo(sb, nextEx).append(ln());
-            SQLException nextNextEx = nextEx.getNextException();
+            final SQLException nextNextEx = nextEx.getNextException();
             if (nextNextEx != null) {
                 sb.append("- - - - - - - - - -").append(ln());
                 sb.append(extractMessage(nextNextEx)).append(ln());
@@ -109,7 +109,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     }
 
     protected String extractMessage(SQLException e) {
-        String message = e.getMessage();
+        final String message = e.getMessage();
 
         // Because a message of Oracle contains a line separator.
         return message != null ? message.trim() : message;

@@ -39,7 +39,7 @@ public class DfSqlFileFireMan {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String _executorName;
+    protected String _executorName;
 
     // ===================================================================================
     //                                                                             Execute
@@ -48,24 +48,22 @@ public class DfSqlFileFireMan {
      * Load the SQL files and then fire them.
      * @return The result about firing SQL. (NotNull)
      */
-    public DfSqlFileFireResult fire(DfSqlFileRunner runner, List<File> fileList) {
+    public DfSqlFileFireResult fire(DfSqlFileRunner runner, List<File> sqlFileList) {
         final DfSqlFileFireResult fireResult = new DfSqlFileFireResult();
         int goodSqlCount = 0;
         int totalSqlCount = 0;
-        for (final File file : fileList) {
-            if (!file.exists()) {
-                String msg = "The file was not found: " + file;
+        for (final File sqlFile : sqlFileList) {
+            if (!sqlFile.exists()) {
+                String msg = "The file was not found: " + sqlFile;
                 throw new IllegalStateException(msg);
             }
 
             if (_log.isInfoEnabled()) {
-                _log.info("...Firing: " + file.getName());
+                _log.info("...Firing: " + sqlFile.getName());
             }
 
-            runner.prepare(file);
-            final DfSqlFileRunnerResult runnerResult = runner.runTransaction();
+            final DfSqlFileRunnerResult runnerResult = processSqlFile(runner, sqlFile);
             fireResult.addRunnerResult(runnerResult);
-
             goodSqlCount = goodSqlCount + runnerResult.getGoodSqlCount();
             totalSqlCount = totalSqlCount + runnerResult.getTotalSqlCount();
         }
@@ -74,7 +72,7 @@ public class DfSqlFileFireMan {
         // Result Message
         final StringBuilder resultSb = new StringBuilder();
         resultSb.append("{").append(title).append("}: success=").append(goodSqlCount).append(" failure=")
-                .append((totalSqlCount - goodSqlCount)).append(" (in ").append(fileList.size()).append(" files)");
+                .append((totalSqlCount - goodSqlCount)).append(" (in ").append(sqlFileList.size()).append(" files)");
         _log.info(resultSb.toString());
         fireResult.setResultMessage(resultSb.toString());
 
@@ -86,7 +84,7 @@ public class DfSqlFileFireMan {
         final List<DfSqlFileRunnerResult> runnerResultList = fireResult.getRunnerResultList();
         for (DfSqlFileRunnerResult currentResult : runnerResultList) {
             final List<ErrorContinuedSql> errorContinuedSqlList = currentResult.getErrorContinuedSqlList();
-            final String fileName = currentResult.getSrcFile().getName();
+            final String fileName = currentResult.getSqlFile().getName();
             if (detailSb.length() > 0) {
                 detailSb.append(ln());
             }
@@ -119,6 +117,11 @@ public class DfSqlFileFireMan {
         }
         fireResult.setDetailMessage(detailSb.toString());
         return fireResult;
+    }
+
+    protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
+        runner.prepare(sqlFile);
+        return runner.runTransaction();
     }
 
     // ===================================================================================
