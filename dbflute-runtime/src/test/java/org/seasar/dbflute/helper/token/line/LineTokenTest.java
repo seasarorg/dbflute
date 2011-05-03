@@ -3,8 +3,6 @@ package org.seasar.dbflute.helper.token.line;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.helper.token.line.LineMakingOption;
-import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**

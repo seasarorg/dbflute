@@ -65,14 +65,14 @@ public class TnValueTypesTest extends PlainTestCase {
 
     public void test_DBMS_switch_Oracle_date() throws Exception {
         assertEquals(TnValueTypes.UTILDATE_AS_SQLDATE, TnValueTypes.getValueType(java.util.Date.class));
-        assertEquals(TnValueTypes.UTILDATE_AS_TIMESTAMP, TnValueTypes.findValueTypes(DBDef.Oracle).getValueType(
-                java.util.Date.class));
+        assertEquals(TnValueTypes.UTILDATE_AS_TIMESTAMP,
+                TnValueTypes.findValueTypes(DBDef.Oracle).getValueType(java.util.Date.class));
     }
 
     public void test_DBMS_switch_SQLServer_uuid() throws Exception {
         assertEquals(TnValueTypes.UUID_AS_DIRECT, TnValueTypes.getValueType(java.util.UUID.class));
-        assertEquals(TnValueTypes.UUID_AS_STRING, TnValueTypes.findValueTypes(DBDef.SQLServer).getValueType(
-                java.util.UUID.class));
+        assertEquals(TnValueTypes.UUID_AS_STRING,
+                TnValueTypes.findValueTypes(DBDef.SQLServer).getValueType(java.util.UUID.class));
     }
 
     // ===================================================================================

@@ -58,7 +58,7 @@ public class LineToken {
     // ===================================================================================
     //                                                                           Make Line
     //                                                                           =========
-    public String make(java.util.List<String> valueList, LineMakingOption lineMakingOption) {
+    public String make(List<String> valueList, LineMakingOption lineMakingOption) {
         assertObjectNotNull("valueList", valueList);
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();

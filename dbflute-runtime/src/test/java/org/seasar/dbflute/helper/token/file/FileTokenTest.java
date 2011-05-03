@@ -7,13 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.token.file.FileMakingCallback;
-import org.seasar.dbflute.helper.token.file.FileMakingOption;
-import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
-import org.seasar.dbflute.helper.token.file.FileToken;
-import org.seasar.dbflute.helper.token.file.FileTokenizingCallback;
-import org.seasar.dbflute.helper.token.file.FileTokenizingOption;
-import org.seasar.dbflute.helper.token.file.FileTokenizingRowResource;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
