@@ -115,7 +115,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     public DfAlterSchemaFinalInfo outputChange() { // sub-process
         processReady();
         final DfAlterSchemaFinalInfo finalInfo = new DfAlterSchemaFinalInfo();
+        finalInfo.setResultMessage("{Change Output}");
         final String resultDiff = getMigrationChangeOutputResultDiff();
+        deleteFile(new File(resultDiff)); // delete the file for previous times
         final DfSchemaXmlSerializer previousSerializer = createSchemaXmlSerializer(resultDiff);
         previousSerializer.serialize();
         try {
@@ -124,11 +126,24 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                 final DfSchemaXmlSerializer replacedSerializer = createSchemaXmlSerializer(resultDiff);
                 replacedSerializer.serialize();
             }
+            finalInfo.addDetailMessage("o (success)");
+        } catch (RuntimeException e) {
+            finalInfo.addDetailMessage("x (failure)");
+            throw e;
         } finally {
             rollbackSchema();
         }
         processClose();
+        closeChangeOutputMark();
         return finalInfo;
+    }
+
+    protected void closeChangeOutputMark() {
+        final File outputMark = new File(getChangeOutputMark());
+        if (outputMark.exists()) {
+            _log.info("...Deleting change-output mark: " + outputMark);
+            outputMark.delete();
+        }
     }
 
     // ===================================================================================
@@ -669,6 +684,14 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     public boolean hasMigrationPreviousNGMark() {
+        return getReplaceSchemaProperties().hasMigrationPreviousNGMark();
+    }
+
+    public String getChangeOutputMark() {
+        return getReplaceSchemaProperties().getMigrationChangeOutputMark();
+    }
+
+    public boolean hasChangeOutputMark() {
         return getReplaceSchemaProperties().hasMigrationPreviousNGMark();
     }
 
