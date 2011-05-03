@@ -1,20 +1,21 @@
-package org.seasar.dbflute.helper.token.line.impl;
+package org.seasar.dbflute.helper.token.line;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.helper.token.line.LineMakingOption;
+import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute
  * @since 0.9.4 (2009/03/14 Saturday)
  */
-public class LineTokenImplTest extends PlainTestCase {
+public class LineTokenTest extends PlainTestCase {
 
     public void test_make_quoteAll_basic() {
         // ## Arrange ##
-        LineTokenImpl impl = new LineTokenImpl();
+        LineToken impl = new LineToken();
         LineMakingOption option = new LineMakingOption();
         option.delimitateByComma();
         option.quoteAll();
@@ -35,7 +36,7 @@ public class LineTokenImplTest extends PlainTestCase {
 
     public void test_make_quoteAll_escape() {
         // ## Arrange ##
-        LineTokenImpl impl = new LineTokenImpl();
+        LineToken impl = new LineToken();
         LineMakingOption option = new LineMakingOption();
         option.delimitateByComma();
         option.quoteAll();
@@ -56,7 +57,7 @@ public class LineTokenImplTest extends PlainTestCase {
 
     public void test_make_quoteMinimally_escape() {
         // ## Arrange ##
-        LineTokenImpl impl = new LineTokenImpl();
+        LineToken impl = new LineToken();
         LineMakingOption option = new LineMakingOption();
         option.delimitateByComma();
         option.quoteMinimally();

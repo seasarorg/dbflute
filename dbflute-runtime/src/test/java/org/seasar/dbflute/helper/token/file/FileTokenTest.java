@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.token.file.impl;
+package org.seasar.dbflute.helper.token.file;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,6 +10,7 @@ import java.util.Set;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
+import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.FileTokenizingCallback;
 import org.seasar.dbflute.helper.token.file.FileTokenizingOption;
 import org.seasar.dbflute.helper.token.file.FileTokenizingRowResource;
@@ -19,11 +20,11 @@ import org.seasar.dbflute.unit.PlainTestCase;
  * @author jflute
  * @since 0.9.4 (2009/03/14 Saturday)
  */
-public class FileTokenImplTest extends PlainTestCase {
+public class FileTokenTest extends PlainTestCase {
 
     public void test_tokenize() throws Exception {
         // ## Arrange ##
-        FileTokenImpl impl = new FileTokenImpl();
+        FileToken impl = new FileToken();
         String first = "\"a\",\"b,\",\"cc\",\"\"\"\",\"e\n,\n,\n\"\",,\"";
         String second = "\"a\",\"\",\"c\"\"c\",\"d\"\"\",\"e\"";
         String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
@@ -67,7 +68,7 @@ public class FileTokenImplTest extends PlainTestCase {
 
     public void test_tokenize_plus() throws Exception {
         // ## Arrange ##
-        FileTokenImpl impl = new FileTokenImpl();
+        FileToken impl = new FileToken();
         String first = "1001\t1\tabc";
         String second = "1002\t\t\"abc\"";
         String third = "1003\t3\t\"a\"\"bc\"";
@@ -105,7 +106,7 @@ public class FileTokenImplTest extends PlainTestCase {
 
     public void test_make() throws Exception {
         // ## Arrange ##
-        FileTokenImpl impl = new FileTokenImpl();
+        FileToken impl = new FileToken();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         // ## Act ##
@@ -155,7 +156,7 @@ public class FileTokenImplTest extends PlainTestCase {
 
     public void test_make_quoteMinimally() throws Exception {
         // ## Arrange ##
-        FileTokenImpl impl = new FileTokenImpl();
+        FileToken impl = new FileToken();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         // ## Act ##
@@ -205,7 +206,7 @@ public class FileTokenImplTest extends PlainTestCase {
 
     public void test_isOddNumber() {
         // ## Arrange ##
-        FileTokenImpl impl = new FileTokenImpl();
+        FileToken impl = new FileToken();
 
         // ## Act & Assert ##
         assertFalse(impl.isOddNumber(0));

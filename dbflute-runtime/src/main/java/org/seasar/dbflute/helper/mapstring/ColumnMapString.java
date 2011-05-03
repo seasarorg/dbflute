@@ -21,7 +21,6 @@ import java.util.List;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
-import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -79,7 +78,7 @@ public class ColumnMapString {
     }
 
     protected List<String> tokenize(String value, String delimiter) {
-        final LineToken lineToken = new LineTokenImpl();
+        final LineToken lineToken = new LineToken();
         final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
         lineTokenizingOption.setDelimiter(delimiter);
         return lineToken.tokenize(value, lineTokenizingOption);

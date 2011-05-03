@@ -22,7 +22,6 @@ import java.util.List;
 import org.seasar.dbflute.helper.token.line.LineMakingOption;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
-import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -35,7 +34,7 @@ public class FileToken {
     //                                                                           Attribute
     //                                                                           =========
     /** Line-token for help. */
-    protected final LineToken _lineToken = new LineTokenImpl();
+    protected final LineToken _lineToken = new LineToken();
 
     // ===================================================================================
     //                                                                            Tokenize
