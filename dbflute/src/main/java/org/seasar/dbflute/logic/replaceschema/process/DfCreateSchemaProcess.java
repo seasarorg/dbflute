@@ -89,12 +89,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                             Execute
     //                                                                             =======
     public DfCreateSchemaFinalInfo execute() {
-        _log.info("");
-        _log.info("{ReplaceSchema Properties}");
-        _log.info("errorContinue     = " + getReplaceSchemaProperties().isErrorContinue());
-        _log.info("sqlFileEncoding   = " + getReplaceSchemaProperties().getSqlFileEncoding());
         initializeSchema();
-
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireResult fireResult = createSchema(runInfo);
         return createFinalInfo(fireResult);

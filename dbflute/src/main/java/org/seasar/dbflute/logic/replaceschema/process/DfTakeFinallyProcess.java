@@ -1,10 +1,6 @@
 package org.seasar.dbflute.logic.replaceschema.process;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -75,8 +71,6 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                             =======
     public DfTakeFinallyFinalInfo execute() {
         final DfRunnerInformation runInfo = createRunnerInformation();
-
-        beforeTakeFinally();
         DfSqlFileFireResult fireResult = null;
         DfTakeFinallyAssertionFailureException assertionEx = null;
         try {
@@ -94,17 +88,6 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         final DfTakeFinallyFinalInfo finalInfo = createFinalInfo(fireResult, assertionEx);
         incrementSequenceToDataMax();
         return finalInfo;
-    }
-
-    // --------------------------------------------
-    //                          Before Take Finally
-    //                          -------------------
-    protected void beforeTakeFinally() {
-        String processCommand = getReplaceSchemaProperties().getBeforeTakeFinally();
-        if (processCommand == null) {
-            return;
-        }
-        callbackProcess("beforeTakeFinally", processCommand);
     }
 
     // --------------------------------------------
@@ -203,79 +186,6 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
             throw new UnsupportedOperationException(msg);
         }
         sequenceHandler.incrementSequenceToDataMax(tableSequenceMap);
-    }
-
-    // --------------------------------------------
-    //                              Callback Helper
-    //                              ---------------
-    protected void callbackProcess(String timing, String processCommand) {
-        _log.info("");
-        _log.info("* * * * * * * * * **");
-        _log.info("*                  *");
-        _log.info("* Process Callback *");
-        _log.info("*                  *");
-        _log.info("* * * * * * * * * **");
-        _log.info("[" + timing + "]: begin --> " + processCommand);
-        final ProcessBuilder processBuilder = new ProcessBuilder(processCommand);
-        final Process process;
-        InputStream stdIn = null;
-        InputStream errIn = null;
-        try {
-            process = processBuilder.start();
-            stdIn = process.getInputStream();
-            errIn = process.getErrorStream();
-            showConsole(stdIn);
-            showConsole(errIn);
-            int ret = process.waitFor();
-            _log.info("[" + timing + "]: end(" + ret + ") --> " + processCommand);
-            _log.info("");
-        } catch (IOException e) {
-            String msg = "Process Callback failed to execute: process=" + processCommand;
-            _log.warn(msg + " e.getMessage()=" + e.getMessage());
-            // Because of continue.
-            // throw new DfReplaceSchemaProcessCallbackException(msg, e);
-        } catch (InterruptedException e) {
-            String msg = "Process Callback failed to execute: process=" + processCommand;
-            _log.warn(msg + " e.getMessage()=" + e.getMessage());
-            // Because of continue.
-            // throw new DfReplaceSchemaProcessCallbackException(msg, e);
-        } finally {
-            try {
-                if (stdIn != null) {
-                    stdIn.close();
-                }
-                if (errIn != null) {
-                    errIn.close();
-                }
-            } catch (IOException ignored) {
-            }
-        }
-    }
-
-    protected void showConsole(InputStream ins) throws IOException {
-        if (ins == null) {
-            return;
-        }
-        // Use default encoding of the environment because of the console!
-        final BufferedReader br = new BufferedReader(new InputStreamReader(ins));
-        final StringBuilder sb = new StringBuilder();
-        String line = null;
-        while (true) {
-            line = br.readLine();
-            if (line == null) {
-                break;
-            }
-            sb.append(line + ln());
-        }
-        _log.info(sb.toString().trim());
-    }
-
-    public static class DfReplaceSchemaProcessCallbackException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public DfReplaceSchemaProcessCallbackException(String msg, Throwable t) {
-            super(msg, t);
-        }
     }
 
     // ===================================================================================

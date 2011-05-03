@@ -842,20 +842,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                        Other Closet
-    //                                                                        ============
-    public boolean isErrorContinue() { // It's closet!
-        return isProperty("isErrorContinue", true, getReplaceSchemaDefinitionMap());
-    }
-
-    /**
-     * @return The process command of call-back for before-take-finally. (NullAllowed)
-     */
-    public String getBeforeTakeFinally() { // It's closet!
-        return (String) getReplaceSchemaDefinitionMap().get("beforeTakeFinally");
-    }
-
-    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String replaceString(String text, String fromText, String toText) {
