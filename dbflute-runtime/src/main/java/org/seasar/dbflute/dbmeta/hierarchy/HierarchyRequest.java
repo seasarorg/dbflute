@@ -24,7 +24,7 @@ import org.seasar.dbflute.dbmeta.hierarchy.basic.HierarchySourceEntityColumn;
 import org.seasar.dbflute.dbmeta.hierarchy.basic.HierarchySourceEntityListIterator;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
  * The request of hierarchy.
@@ -316,6 +316,6 @@ public class HierarchyRequest<LOCAL_ENTITY extends Entity> {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 }

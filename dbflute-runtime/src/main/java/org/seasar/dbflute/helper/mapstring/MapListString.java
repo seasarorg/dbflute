@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
  * The string for map and list.
@@ -976,7 +976,7 @@ public class MapListString {
     }
 
     protected final String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

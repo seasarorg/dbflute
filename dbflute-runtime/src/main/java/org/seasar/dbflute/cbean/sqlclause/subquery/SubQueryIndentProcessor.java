@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean.sqlclause.subquery;
 import java.io.Serializable;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -224,6 +224,6 @@ public class SubQueryIndentProcessor implements Serializable {
     }
 
     protected static String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 }

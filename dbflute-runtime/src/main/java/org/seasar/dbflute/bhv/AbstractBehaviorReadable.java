@@ -56,7 +56,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -1087,7 +1087,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

@@ -332,7 +332,7 @@ public class DfStringUtilTest extends PlainTestCase {
     //                                                                               Split
     //                                                                               =====
     public void test_splitList() {
-        String ln = DfSystemUtil.getBasicLn();
+        String ln = "\n";
         List<String> splitList = splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
@@ -340,7 +340,7 @@ public class DfStringUtilTest extends PlainTestCase {
     }
 
     public void test_splitList_notTrim() {
-        String ln = DfSystemUtil.getBasicLn();
+        String ln = "\n";
         List<String> splitList = DfStringUtil.splitList("aaa " + ln + "bbb" + ln + " ccc", ln);
         assertEquals("aaa ", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
@@ -348,7 +348,7 @@ public class DfStringUtilTest extends PlainTestCase {
     }
 
     public void test_splitListTrimmed_trim() {
-        String ln = DfSystemUtil.getBasicLn();
+        String ln = "\n";
         List<String> splitList = splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));

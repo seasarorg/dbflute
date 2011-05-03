@@ -34,7 +34,7 @@ import org.seasar.dbflute.exception.PagingCountSelectNotCountException;
 import org.seasar.dbflute.exception.SelectEntityConditionNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.FetchBean;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -281,7 +281,7 @@ public class BehaviorExceptionThrower {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     protected String initCap(String str) {

@@ -18,6 +18,7 @@ package org.seasar.dbflute.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -167,5 +168,109 @@ public class DfCollectionUtil {
     @SuppressWarnings("unchecked")
     public static <ELEMENT> Set<ELEMENT> emptySet() {
         return (Set<ELEMENT>) EMPTY_SET;
+    }
+
+    /**
+     * Order the unordered list according to specified resources.
+     * @param unorderedList The unordered list. (NotNull)
+     * @param resource The resource of according-to-order. (NotNull)
+     * @param <ELEMENT_TYPE> The type of element.
+     * @param <ID_TYPE> The type of ID.
+     */
+    public static <ELEMENT_TYPE, ID_TYPE> void orderAccordingTo(List<ELEMENT_TYPE> unorderedList,
+            AccordingToOrderResource<ELEMENT_TYPE, ID_TYPE> resource) {
+        assertObjectNotNull("unorderedList", unorderedList);
+        if (unorderedList.isEmpty()) {
+            return;
+        }
+        assertObjectNotNull("resource", resource);
+        final List<ID_TYPE> orderedUniqueIdList = resource.getOrderedUniqueIdList();
+        assertObjectNotNull("resource.getOrderedUniqueIdList()", orderedUniqueIdList);
+        if (orderedUniqueIdList.isEmpty()) {
+            return;
+        }
+        final AccordingToOrderIdExtractor<ELEMENT_TYPE, ID_TYPE> idExtractor = resource.getIdExtractor();
+        assertObjectNotNull("resource.getIdExtractor()", idExtractor);
+
+        final Map<ID_TYPE, Integer> idIndexMap = new LinkedHashMap<ID_TYPE, Integer>();
+        int index = 0;
+        for (ID_TYPE id : orderedUniqueIdList) {
+            if (idIndexMap.containsKey(id)) {
+                String msg = "The id was duplicated: id=" + id + " orderedUniqueIdList=" + orderedUniqueIdList;
+                throw new IllegalStateException(msg);
+            }
+            idIndexMap.put(id, index);
+            ++index;
+        }
+        final Comparator<ELEMENT_TYPE> comp = new Comparator<ELEMENT_TYPE>() {
+            public int compare(ELEMENT_TYPE o1, ELEMENT_TYPE o2) {
+                final ID_TYPE id1 = idExtractor.extractId(o1);
+                final ID_TYPE id2 = idExtractor.extractId(o2);
+                assertObjectNotNull("id1 of " + o1, id1);
+                assertObjectNotNull("id2 of " + o2, id2);
+                final Integer index1 = idIndexMap.get(id1);
+                final Integer index2 = idIndexMap.get(id2);
+                if (index1 != null && index2 != null) {
+                    return index1.compareTo(index2);
+                }
+                if (index1 == null && index2 == null) {
+                    return 0;
+                }
+                return index1 == null ? 1 : -1;
+            }
+        };
+        Collections.sort(unorderedList, comp);
+    }
+
+    public static interface AccordingToOrderIdExtractor<ELEMENT_TYPE, ID_TYPE> {
+
+        /**
+         * Extract ID from the element instance.
+         * @param element Element instance. (NotNull)
+         * @return Extracted ID. (NotNull)
+         */
+        ID_TYPE extractId(ELEMENT_TYPE element);
+    }
+
+    public static class AccordingToOrderResource<ELEMENT_TYPE, ID_TYPE> {
+        protected List<ID_TYPE> _orderedUniqueIdList;
+        protected AccordingToOrderIdExtractor<ELEMENT_TYPE, ID_TYPE> _idExtractor;
+
+        public AccordingToOrderResource<ELEMENT_TYPE, ID_TYPE> setupResource(List<ID_TYPE> orderedUniqueIdList,
+                AccordingToOrderIdExtractor<ELEMENT_TYPE, ID_TYPE> idExtractor) {
+            setOrderedUniqueIdList(orderedUniqueIdList);
+            setIdExtractor(idExtractor);
+            return this;
+        }
+
+        public List<ID_TYPE> getOrderedUniqueIdList() {
+            return _orderedUniqueIdList;
+        }
+
+        public void setOrderedUniqueIdList(List<ID_TYPE> orderedUniqueIdList) {
+            _orderedUniqueIdList = orderedUniqueIdList;
+        }
+
+        public AccordingToOrderIdExtractor<ELEMENT_TYPE, ID_TYPE> getIdExtractor() {
+            return _idExtractor;
+        }
+
+        public void setIdExtractor(AccordingToOrderIdExtractor<ELEMENT_TYPE, ID_TYPE> idExtractor) {
+            _idExtractor = idExtractor;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected static void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

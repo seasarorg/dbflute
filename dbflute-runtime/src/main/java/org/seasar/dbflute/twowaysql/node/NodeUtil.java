@@ -16,6 +16,7 @@
 package org.seasar.dbflute.twowaysql.node;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentInScopeNotListException;
@@ -26,7 +27,6 @@ import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNu
 import org.seasar.dbflute.twowaysql.exception.InLoopOptionOutOfLoopException;
 import org.seasar.dbflute.twowaysql.exception.LoopCurrentVariableOutOfForCommentException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -241,6 +241,6 @@ public class NodeUtil {
     }
 
     protected static String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 }

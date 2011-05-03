@@ -17,7 +17,7 @@ package org.seasar.dbflute.twowaysql;
 
 import org.seasar.dbflute.exception.CommentTerminatorNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
  * @author jflute
@@ -325,7 +325,7 @@ public class SqlTokenizer {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

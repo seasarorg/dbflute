@@ -28,6 +28,7 @@ import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.exception.IfCommentDifferentTypeComparisonException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentEmptyExpressionException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentIllegalParameterBeanSpecificationException;
@@ -44,7 +45,6 @@ import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedTypeComparison
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
 import org.seasar.dbflute.util.Srl;
@@ -810,7 +810,7 @@ public class IfCommentEvaluator {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     protected List<String> splitList(String str, String delimiter) {

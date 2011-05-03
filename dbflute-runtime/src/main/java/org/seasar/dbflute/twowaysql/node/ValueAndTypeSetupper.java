@@ -25,6 +25,7 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexNotNumberException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentNotFoundPropertyException;
@@ -39,7 +40,6 @@ import org.seasar.dbflute.twowaysql.exception.ForCommentNotFoundPropertyExceptio
 import org.seasar.dbflute.twowaysql.exception.ForCommentPropertyReadFailureException;
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -359,6 +359,6 @@ public class ValueAndTypeSetupper {
     }
 
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 }

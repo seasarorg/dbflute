@@ -32,12 +32,12 @@ import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The basic handler to execute SQL. <br />
@@ -379,7 +379,7 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

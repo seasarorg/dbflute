@@ -7,7 +7,7 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -146,7 +146,7 @@ public abstract class AbstractSubQuery {
     }
 
     protected final String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

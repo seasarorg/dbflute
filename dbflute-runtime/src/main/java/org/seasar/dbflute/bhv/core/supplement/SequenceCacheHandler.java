@@ -25,8 +25,8 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.exception.SequenceCacheIllegalStateException;
 import org.seasar.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -267,7 +267,7 @@ public class SequenceCacheHandler {
     }
 
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

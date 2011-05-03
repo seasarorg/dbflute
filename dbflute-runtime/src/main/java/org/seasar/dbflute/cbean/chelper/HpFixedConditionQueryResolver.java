@@ -19,7 +19,7 @@ import org.seasar.dbflute.dbmeta.name.TableSqlName;
 import org.seasar.dbflute.exception.DBMetaNotFoundException;
 import org.seasar.dbflute.exception.IllegalFixedConditionOverRelationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.IndexOfInfo;
 
@@ -372,6 +372,6 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     }
 
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 }

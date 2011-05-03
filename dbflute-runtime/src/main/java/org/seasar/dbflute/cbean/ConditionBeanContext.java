@@ -18,9 +18,9 @@ package org.seasar.dbflute.cbean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The context of condition-bean.
@@ -189,6 +189,6 @@ public class ConditionBeanContext {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 }

@@ -44,9 +44,9 @@ import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTraceViewUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -229,7 +229,7 @@ public class BehaviorCommandInvoker {
     }
 
     protected long systemTime() {
-        return DfSystemUtil.currentTimeMillis(); // for calculating performance
+        return DBFluteSystem.currentTimeMillis(); // for calculating performance
     }
 
     protected void handleExecutionException(RuntimeException cause) {
@@ -944,7 +944,7 @@ public class BehaviorCommandInvoker {
     }
 
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

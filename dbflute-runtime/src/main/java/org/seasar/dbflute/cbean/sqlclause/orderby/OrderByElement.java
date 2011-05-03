@@ -23,7 +23,7 @@ import org.seasar.dbflute.cbean.ManualOrderBean;
 import org.seasar.dbflute.cbean.ManualOrderBean.CaseWhenElement;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
  * @author jflute
@@ -240,7 +240,7 @@ public class OrderByElement implements Serializable {
     }
 
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

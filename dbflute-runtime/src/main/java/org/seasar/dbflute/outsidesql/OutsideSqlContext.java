@@ -30,8 +30,8 @@ import org.seasar.dbflute.exception.OutsideSqlReadFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.CursorHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfResourceUtil;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -448,7 +448,7 @@ public class OutsideSqlContext {
     }
 
     protected static String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

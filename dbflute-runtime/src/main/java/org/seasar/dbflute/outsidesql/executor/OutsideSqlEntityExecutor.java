@@ -26,7 +26,7 @@ import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.outsidesql.typed.EntityHandlingPmb;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -321,6 +321,6 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * @return The value of line separator. (NotNull)
      */
     protected static String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 }

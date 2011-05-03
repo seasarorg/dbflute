@@ -29,11 +29,11 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -223,6 +223,6 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
     }
 
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 }

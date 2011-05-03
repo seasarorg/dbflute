@@ -28,11 +28,11 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.MappingClassCastException;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -293,7 +293,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

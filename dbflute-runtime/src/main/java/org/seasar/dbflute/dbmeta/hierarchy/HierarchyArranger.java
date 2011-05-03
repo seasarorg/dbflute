@@ -29,7 +29,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -665,7 +665,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         try {
             return method.invoke(target, args);
         } catch (RuntimeException e) {
-            final String ln = DfSystemUtil.getBasicLn();
+            final String ln = DBFluteSystem.getBasicLn();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             String msg = "Invoking method threw the exception:" + ln;
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;

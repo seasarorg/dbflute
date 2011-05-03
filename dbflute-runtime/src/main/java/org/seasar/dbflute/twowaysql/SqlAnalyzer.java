@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
@@ -42,7 +43,6 @@ import org.seasar.dbflute.twowaysql.node.RootNode;
 import org.seasar.dbflute.twowaysql.node.SqlConnectorAdjustable;
 import org.seasar.dbflute.twowaysql.node.SqlConnectorNode;
 import org.seasar.dbflute.twowaysql.node.SqlPartsNode;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -526,7 +526,7 @@ public class SqlAnalyzer {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     protected final String replaceString(String text, String fromText, String toText) {

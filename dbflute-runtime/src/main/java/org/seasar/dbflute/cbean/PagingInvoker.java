@@ -21,7 +21,7 @@ import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.PagingStatusInvalidException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
  * The invoker of paging.
@@ -221,7 +221,7 @@ public class PagingInvoker<ENTITY> {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

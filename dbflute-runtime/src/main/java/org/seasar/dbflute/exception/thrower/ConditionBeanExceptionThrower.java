@@ -48,7 +48,7 @@ import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeExc
 import org.seasar.dbflute.exception.SpecifyIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifyRelationIllegalPurposeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -936,7 +936,7 @@ public class ConditionBeanExceptionThrower {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     protected String initCap(String str) {

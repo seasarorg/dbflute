@@ -23,8 +23,8 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseDefault;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The simple implementation of paging-bean.
@@ -383,7 +383,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object>, S
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

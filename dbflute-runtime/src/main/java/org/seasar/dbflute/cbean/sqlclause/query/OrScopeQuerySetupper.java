@@ -17,7 +17,7 @@ package org.seasar.dbflute.cbean.sqlclause.query;
 
 import java.util.List;
 
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -131,6 +131,6 @@ public class OrScopeQuerySetupper {
     }
 
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 }

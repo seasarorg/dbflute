@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.exception.AccessContextNoValueException;
 import org.seasar.dbflute.exception.AccessContextNotFoundException;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
  * The context of DB access. (basically for CommonColumnAutoSetup)
@@ -109,7 +109,7 @@ public class AccessContext {
                 return userContextOnThread.getAccessTimestampProvider().getAccessTimestamp();
             }
         }
-        return new Timestamp(DfSystemUtil.currentTimeMillis());
+        return DBFluteSystem.currentTimestamp();
     }
 
     /**
@@ -246,7 +246,7 @@ public class AccessContext {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

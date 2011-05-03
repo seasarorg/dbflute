@@ -19,8 +19,8 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * {Created with reference to S2Container's utility and extended for DBFlute}
@@ -46,7 +46,7 @@ public abstract class TnAbstractEntityDynamicCommand extends TnAbstractBasicSqlC
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getBasicLn();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================
