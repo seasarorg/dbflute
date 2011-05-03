@@ -17,9 +17,12 @@ package org.seasar.dbflute.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -85,6 +88,7 @@ public final class DfTypeUtil {
     /**
      * Convert the object to the instance that is string. <br />
      * If the object is a byte array, encode as base64.
+     * And if the object is a exception (throw-able), convert to stack-trace.
      * @param obj The parsed object. (NullAllowed)
      * @return The instance of string. (NullAllowed)
      */
@@ -95,6 +99,7 @@ public final class DfTypeUtil {
     /**
      * Convert the object to the instance that is string. <br />
      * If the object is a byte array, encode as base64.
+     * And if the object is a exception (throw-able), convert to stack-trace.
      * @param obj The parsed object. (NullAllowed)
      * @param pattern The pattern format to parse. (NullAllowed)
      * @return The instance of string. (NullAllowed)
@@ -112,6 +117,8 @@ public final class DfTypeUtil {
             return toStringFromDate(((Calendar) obj).getTime(), pattern);
         } else if (obj instanceof byte[]) {
             return encodeAsBase64((byte[]) obj);
+        } else if (obj instanceof Throwable) {
+            return toStringStackTrace((Throwable) obj);
         } else {
             return obj.toString();
         }
@@ -135,6 +142,22 @@ public final class DfTypeUtil {
             return value.toString();
         }
         return null;
+    }
+
+    protected static String toStringStackTrace(Throwable t) {
+        StringWriter sw = null;
+        try {
+            sw = new StringWriter();
+            t.printStackTrace(new PrintWriter(sw));
+            return sw.toString();
+        } finally {
+            if (sw != null) {
+                try {
+                    sw.close();
+                } catch (IOException e) {
+                }
+            }
+        }
     }
 
     public static byte[] toStringBytes(String str, String encoding) {

@@ -18,7 +18,6 @@ package org.seasar.dbflute.helper.stacktrace;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * @author jflute
  */

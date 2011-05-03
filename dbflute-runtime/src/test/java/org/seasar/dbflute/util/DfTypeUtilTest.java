@@ -33,14 +33,19 @@ public class DfTypeUtilTest extends PlainTestCase {
     // -----------------------------------------------------
     //                                                String
     //                                                ------
-    public void test_toString_basic() throws UnsupportedEncodingException {
-        // ## Arrange & Act & Assert ##
+    public void test_toString_basic() {
         assertNull(DfTypeUtil.toString(null));
         assertEquals("", DfTypeUtil.toString(""));
         assertEquals("foo", DfTypeUtil.toString("foo"));
         assertEquals("3", DfTypeUtil.toString(3));
         assertEquals("3", DfTypeUtil.toString(3L));
         assertEquals("3.7", DfTypeUtil.toString(new BigDecimal("3.7")));
+    }
+
+    public void test_toString_Exception() {
+        String stackTrace = DfTypeUtil.toString(new Exception("foo"));
+        log(stackTrace);
+        assertTrue(stackTrace.contains("foo"));
     }
 
     public void test_toClassTitle_basic() {
@@ -72,7 +77,6 @@ public class DfTypeUtilTest extends PlainTestCase {
     //                                               Integer
     //                                               -------
     public void test_toInteger_basic() {
-        // ## Arrange & Act & Assert ##
         assertNull(DfTypeUtil.toInteger(null));
         assertNull(DfTypeUtil.toInteger(""));
         assertEquals(Integer.valueOf(3), DfTypeUtil.toInteger("3"));
@@ -146,6 +150,7 @@ public class DfTypeUtilTest extends PlainTestCase {
     }
 
     public void test_toDate_string_AD() {
+        // ## Arrange ##
         DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
         DateFormat dfmil = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         DateFormat gdf = DfTypeUtil.createDateFormat("Gyyyy/MM/dd HH:mm:ss.SSS");
