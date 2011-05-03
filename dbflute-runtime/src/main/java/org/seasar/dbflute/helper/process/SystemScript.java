@@ -78,13 +78,6 @@ public class SystemScript {
         } catch (InterruptedException e) {
             String msg = "The execution was interrupted: " + scriptName;
             throw new IllegalStateException(msg, e);
-        } finally {
-            if (stdin != null) {
-                try {
-                    stdin.close();
-                } catch (IOException ignored) {
-                }
-            }
         }
     }
 
