@@ -35,8 +35,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
+import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractor;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
-import org.seasar.dbflute.helper.stacktrace.impl.InvokeNameExtractorImpl;
 import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
@@ -669,8 +669,7 @@ public class BehaviorCommandInvoker {
      */
     protected List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource,
             StackTraceElement[] stackTrace) {
-        final InvokeNameExtractorImpl extractor = new InvokeNameExtractorImpl();
-        extractor.setStackTrace(stackTrace);
+        final InvokeNameExtractor extractor = new InvokeNameExtractor(stackTrace);
         return extractor.extractInvokeName(resource);
     }
 
