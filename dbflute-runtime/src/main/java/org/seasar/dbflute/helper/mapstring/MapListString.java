@@ -101,8 +101,8 @@ public class MapListString {
     }
 
     // ===================================================================================
-    //                                                                               Build
-    //                                                                               =====
+    //                                                                        Build String
+    //                                                                        ============
     /**
      * Build map-string from map.
      * @param map The instance of map. (NotNull)
@@ -182,8 +182,8 @@ public class MapListString {
     }
 
     // ===================================================================================
-    //                                                                            Generate
-    //                                                                            ========
+    //                                                                     Generate Object
+    //                                                                     ===============
     /**
      * Generate map from map-string.
      * @param mapString Map-string (NotNull)

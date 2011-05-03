@@ -41,8 +41,8 @@ public class ColumnMapString {
     protected List<String> _columnNameList;
 
     // ===================================================================================
-    //                                                                               Build
-    //                                                                               =====
+    //                                                                     Build MapString
+    //                                                                     ===============
     public String buildMapString(String values, String delimiter) {
         if (values == null) {
             String msg = "The argument[values] should not be null.";
