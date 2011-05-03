@@ -82,30 +82,30 @@ public class DBFluteSystem {
         return osName != null && osName.toLowerCase().contains("windows");
     }
 
-    public static int executeSystemScript(File baseDir, String commandName) {
-        return executeSystemScript(baseDir, commandName, null, "UTF-8");
+    public static int executeSystemScript(File baseDir, String scriptName) { // simply (using default encoding)
+        return executeSystemScript(baseDir, scriptName, null, "UTF-8");
     }
 
-    public static int executeSystemScript(File baseDir, String commandName, Map<String, String> environmentMap,
+    protected static int executeSystemScript(File baseDir, String scriptName, Map<String, String> envMap,
             String encoding) {
         final List<String> cmdList = new ArrayList<String>();
         if (isSystemWindowsOS()) {
             cmdList.add("cmd.exe");
             cmdList.add("/c");
-            cmdList.add(commandName + ".bat");
+            cmdList.add(scriptName + ".bat");
         } else {
             cmdList.add("sh");
-            cmdList.add(commandName + ".sh");
+            cmdList.add(scriptName + ".sh");
         }
         final ProcessBuilder builder = new ProcessBuilder(cmdList);
-        if (environmentMap != null && !environmentMap.isEmpty()) {
-            builder.environment().putAll(environmentMap);
+        if (envMap != null && !envMap.isEmpty()) {
+            builder.environment().putAll(envMap);
         }
         final Process process;
         try {
             process = builder.directory(baseDir).redirectErrorStream(true).start();
         } catch (IOException e) {
-            String msg = "Failed to execute the command: " + commandName;
+            String msg = "Failed to execute the command: " + scriptName;
             throw new IllegalStateException(msg, e);
         }
 
@@ -118,7 +118,7 @@ public class DBFluteSystem {
             reader.join();
             return exitValue;
         } catch (InterruptedException e) {
-            String msg = "The execution was interrupted: " + commandName;
+            String msg = "The execution was interrupted: " + scriptName;
             throw new IllegalStateException(msg, e);
         } finally {
             if (stdin != null) {

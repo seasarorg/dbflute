@@ -170,6 +170,9 @@ public class DfCollectionUtil {
         return (Set<ELEMENT>) EMPTY_SET;
     }
 
+    // ===================================================================================
+    //                                                                               Order
+    //                                                                               =====
     /**
      * Order the unordered list according to specified resources.
      * @param unorderedList The unordered list. (NotNull)
