@@ -10,7 +10,7 @@ import java.io.StringWriter;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -171,6 +171,6 @@ public class DfFlutistEmergencyLog4JLogger implements Log {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DBFluteSystem.getBasicLn();
     }
 }

@@ -498,8 +498,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMeta metaInfo)
-            throws SQLException {
+    protected ResultSet doGetProcedureColumns(DatabaseMetaData metaData, DfProcedureMeta metaInfo) throws SQLException {
         final String catalogName = metaInfo.getProcedureCatalog();
         final String schemaName = metaInfo.getProcedureSchema().getPureSchema();
         final String procedurePureName = metaInfo.buildProcedurePureName();

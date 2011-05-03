@@ -14,7 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
+import org.seasar.dbflute.helper.mapstring.MapListString;
 
 /**
  * @author jflute
@@ -91,7 +91,7 @@ public class DfDataXlsProcess {
             final Table table = entry.getValue();
             map.put(sheetName, table.getTableSqlName());
         }
-        final String mapString = new MapListStringImpl().buildMapString(map);
+        final String mapString = new MapListString().buildMapString(map);
         final File dataPropFile = new File(_outputDir + "/tableNameMap.dataprop");
         BufferedWriter bw = null;
         try {

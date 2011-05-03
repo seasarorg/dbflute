@@ -175,8 +175,8 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         // ARRAY element
         final DfTypeArrayInfo foundInfo = flatArrayInfoMap.get(arrayInfo.getElementType());
         if (foundInfo != null) {
-            final DfTypeArrayInfo nestedInfo = new DfTypeArrayInfo(foundInfo.getUnifiedSchema(), foundInfo
-                    .getTypeName());
+            final DfTypeArrayInfo nestedInfo = new DfTypeArrayInfo(foundInfo.getUnifiedSchema(),
+                    foundInfo.getTypeName());
             nestedInfo.setElementType(foundInfo.getElementType());
             arrayInfo.setNestedArrayInfo(nestedInfo);
             processArrayNestedElement(unifiedSchema, flatArrayInfoMap, nestedInfo); // recursive call

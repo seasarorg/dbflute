@@ -15,8 +15,8 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.Unique;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -228,7 +228,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         } catch (RuntimeException e) {
             handleReadingException(e, reader);
         }
-        _diffDate = new Date(DfSystemUtil.currentTimeMillis());
+        _diffDate = new Date(DBFluteSystem.currentTimeMillis());
         final int nextTableCount = _nextDb.getTableList().size();
         _tableCountDiff = createNextPreviousDiff(nextTableCount, _previousTableCount);
     }

@@ -22,13 +22,13 @@ import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfStringFileReader;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -623,7 +623,7 @@ public abstract class DfAbstractHelperProperties {
     //                                                                  General Helper
     //                                                                  ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DBFluteSystem.getBasicLn();
     }
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {

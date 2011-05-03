@@ -38,8 +38,8 @@ import org.seasar.dbflute.friends.log4j.DfFlutistEmergencyLog4JLogger;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * Utilities for DBFlute task.
@@ -285,6 +285,6 @@ public final class DfDBFluteTaskUtil {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DBFluteSystem.getBasicLn();
     }
 }

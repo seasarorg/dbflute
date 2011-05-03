@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
-import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 
 /**
  * @author jflute
@@ -99,7 +98,7 @@ public class DfSqlFileFireMan {
                 String message = sqlEx.getMessage();
                 if (sqlEx != null && message != null) {
                     message = message.trim();
-                    final LineToken lineToken = new LineTokenImpl();
+                    final LineToken lineToken = new LineToken();
                     final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
                     lineTokenizingOption.setDelimiter(ln());
                     final List<String> tokenizedList = lineToken.tokenize(message, lineTokenizingOption);

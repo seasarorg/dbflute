@@ -33,12 +33,12 @@ import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta.DfProcedureType;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfProcedureExecutionMetaExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -95,8 +95,7 @@ public class DfProcedurePmbSetupper {
             final Map<String, String> propertyNameTypeMap = DfCollectionUtil.newLinkedHashMap();
             final Map<String, String> propertyNameOptionMap = DfCollectionUtil.newLinkedHashMap();
             final Map<String, String> propertyNameColumnNameMap = DfCollectionUtil.newLinkedHashMap();
-            final Map<String, DfProcedureColumnMeta> propertyNameColumnInfoMap = DfCollectionUtil
-                    .newLinkedHashMap();
+            final Map<String, DfProcedureColumnMeta> propertyNameColumnInfoMap = DfCollectionUtil.newLinkedHashMap();
             final List<DfProcedureColumnMeta> procedureColumnList = procedure.getProcedureColumnList();
             final List<DfProcedureNotParamResultMeta> notParamResultList = procedure.getNotParamResultList();
 

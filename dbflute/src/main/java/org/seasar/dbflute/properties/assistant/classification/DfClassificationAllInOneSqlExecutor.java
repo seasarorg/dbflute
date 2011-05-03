@@ -12,7 +12,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
  * @author jflute
@@ -79,6 +79,6 @@ public class DfClassificationAllInOneSqlExecutor {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DBFluteSystem.getBasicLn();
     }
 }

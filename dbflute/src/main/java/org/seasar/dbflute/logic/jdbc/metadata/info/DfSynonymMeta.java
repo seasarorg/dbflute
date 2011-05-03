@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
  * @author jflute
@@ -86,7 +86,7 @@ public class DfSynonymMeta {
     public String toString() {
         String comment = "";
         if (_tableComment != null) {
-            final String ln = DfSystemUtil.getLineSeparator();
+            final String ln = DBFluteSystem.getBasicLn();
             final int indexOf = _tableComment.indexOf(ln);
             if (indexOf > 0) { // not contain 0 because ignore first line separator
                 comment = _tableComment.substring(0, indexOf) + "...";

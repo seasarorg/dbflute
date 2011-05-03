@@ -24,7 +24,7 @@ import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.DfParameterBeanReferenceColumnNotFoundException;
 import org.seasar.dbflute.exception.DfParameterBeanReferenceTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
 
@@ -183,6 +183,6 @@ public class DfPmbPropertyOptionReference {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DBFluteSystem.getBasicLn();
     }
 }

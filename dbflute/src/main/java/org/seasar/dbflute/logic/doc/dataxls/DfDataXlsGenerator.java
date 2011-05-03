@@ -29,7 +29,6 @@ import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
-import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.util.Srl;
 
@@ -238,7 +237,7 @@ public class DfDataXlsGenerator {
         if (!delimiterDir.exists()) {
             delimiterDir.mkdirs();
         }
-        final FileToken fileToken = new FileTokenImpl();
+        final FileToken fileToken = new FileToken();
         final String delimiterFilePath = delimiterDir.getPath() + "/" + tableDbName + "." + ext;
         final List<String> columnNameList = new ArrayList<String>();
         for (Column column : table.getColumnList()) {

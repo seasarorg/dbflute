@@ -54,8 +54,8 @@ public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
             sb.append("sequence_catalog = '").append(catalog).append("'").append(" and ");
         }
         sb.append("sequence_schema = '").append(schema).append("'");
-        final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(), Arrays
-                .asList(sequenceColumnName));
+        final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(),
+                Arrays.asList(sequenceColumnName));
         for (Map<String, String> recordMap : resultList) {
             sequenceNameList.add(recordMap.get(sequenceColumnName));
         }

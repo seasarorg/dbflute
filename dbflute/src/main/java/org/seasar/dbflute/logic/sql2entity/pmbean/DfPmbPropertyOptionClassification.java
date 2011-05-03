@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
  * @author jflute
@@ -168,6 +168,6 @@ public class DfPmbPropertyOptionClassification {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DBFluteSystem.getBasicLn();
     }
 }

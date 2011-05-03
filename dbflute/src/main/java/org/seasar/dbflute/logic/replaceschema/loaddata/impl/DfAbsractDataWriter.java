@@ -46,9 +46,9 @@ import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.DfTypeUtil.ParseBooleanException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimeException;
@@ -83,8 +83,7 @@ public abstract class DfAbsractDataWriter {
     protected final DfColumnExtractor _columnHandler = new DfColumnExtractor();
 
     /** The cache map of meta info. The key is table name. (ordered for display) */
-    protected final Map<String, Map<String, DfColumnMeta>> _columnInfoCacheMap = StringKeyMap
-            .createAsFlexibleOrdered();
+    protected final Map<String, Map<String, DfColumnMeta>> _columnInfoCacheMap = StringKeyMap.createAsFlexibleOrdered();
 
     /** The cache map of bind type. The key is table name. (ordered for display) */
     protected final Map<String, Map<String, Class<?>>> _bindTypeCacheMap = StringKeyMap.createAsFlexibleOrdered();
@@ -889,7 +888,7 @@ public abstract class DfAbsractDataWriter {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

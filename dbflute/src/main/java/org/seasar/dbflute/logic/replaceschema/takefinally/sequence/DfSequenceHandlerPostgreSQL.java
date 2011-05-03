@@ -22,8 +22,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -161,9 +161,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
         }
     }
 
-    protected void throwSerialTypeSequenceHandlingFailureException(DfTableMeta tableInfo,
-            DfPrimaryKeyMeta pkInfo, String sequenceName, String tableSqlName, Integer actualValue,
-            String sequenceSqlName, SQLException e) {
+    protected void throwSerialTypeSequenceHandlingFailureException(DfTableMeta tableInfo, DfPrimaryKeyMeta pkInfo,
+            String sequenceName, String tableSqlName, Integer actualValue, String sequenceSqlName, SQLException e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "Failed to handle serial type sequence!" + ln();

@@ -32,8 +32,7 @@ public class DfDataWritingInterceptorSybase extends DfDataWritingInterceptorSQLS
     }
 
     @Override
-    protected boolean hasIdentityColumn(DataSource dataSource, String tableSqlName,
-            Map<String, DfColumnMeta> columnMap) {
+    protected boolean hasIdentityColumn(DataSource dataSource, String tableSqlName, Map<String, DfColumnMeta> columnMap) {
         for (DfColumnMeta info : columnMap.values()) {
             if (info.isSybaseAutoIncrement()) {
                 return true;

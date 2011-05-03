@@ -57,8 +57,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param tableInfo The meta information of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, DfTableMeta tableInfo)
-            throws SQLException {
+    public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
         return getColumnList(metaData, unifiedSchema, tableName);
@@ -182,8 +181,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    public Map<String, DfColumnMeta> getColumnMap(DatabaseMetaData metaData, DfTableMeta tableInfo)
-            throws SQLException {
+    public Map<String, DfColumnMeta> getColumnMap(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
         final List<DfColumnMeta> columnList = getColumnList(metaData, tableInfo);
         final Map<String, DfColumnMeta> map = new LinkedHashMap<String, DfColumnMeta>();
         for (DfColumnMeta columnInfo : columnList) {

@@ -73,8 +73,8 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
@@ -1227,7 +1227,7 @@ public class ForeignKey {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

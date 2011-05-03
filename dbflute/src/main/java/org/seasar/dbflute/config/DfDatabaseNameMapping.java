@@ -17,12 +17,11 @@ package org.seasar.dbflute.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 
 /**
  * @author jflute
@@ -69,7 +68,7 @@ public class DfDatabaseNameMapping {
     //                                                                       Analyzing
     //                                                                       =========
     protected Map<String, Map<String, String>> analyze() {
-        final MapListString mapListString = new MapListStringImpl();
+        final MapListString mapListString = new MapListString();
         final Map<String, Object> map = mapListString.generateMap(_databaseNameMappingString);
         final Map<String, Map<String, String>> realMap = new LinkedHashMap<String, Map<String, String>>();
         final Set<Entry<String, Object>> entrySet = map.entrySet();

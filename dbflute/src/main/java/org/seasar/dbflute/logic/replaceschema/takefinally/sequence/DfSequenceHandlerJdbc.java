@@ -22,8 +22,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -264,8 +264,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     protected abstract Integer selectNextVal(Statement statement, String sequenceName) throws SQLException;
 
     protected void throwIncrementSequenceToDataMaxFailureException(String tableName, String sequenceName,
-            DfTableMeta tableInfo, DfPrimaryKeyMeta pkInfo, String tableSqlName, Integer actualValue,
-            SQLException e) {
+            DfTableMeta tableInfo, DfPrimaryKeyMeta pkInfo, String tableSqlName, Integer actualValue, SQLException e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "Failed to handle serial type sequence!" + ln();

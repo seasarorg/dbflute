@@ -25,9 +25,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -57,8 +57,8 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
             sb.append("sequence_catalog = '").append(catalog).append("'").append(" and ");
         }
         sb.append("sequence_schema = '").append(schema).append("'");
-        final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(), Arrays
-                .asList(sequenceColumnName));
+        final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(),
+                Arrays.asList(sequenceColumnName));
         for (Map<String, String> recordMap : resultList) {
             sequenceNameList.add(recordMap.get(sequenceColumnName));
         }

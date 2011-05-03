@@ -8,7 +8,6 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
-import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -65,7 +64,7 @@ public class DfAbstractReplaceSchemaProcess {
         final List<String> detailMessageList = new ArrayList<String>();
         final String detailMessage = fireResult.getDetailMessage();
         if (detailMessage != null && detailMessage.trim().length() > 0) {
-            final LineToken lineToken = new LineTokenImpl();
+            final LineToken lineToken = new LineToken();
             final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
             lineTokenizingOption.setDelimiter(ln());
             final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
