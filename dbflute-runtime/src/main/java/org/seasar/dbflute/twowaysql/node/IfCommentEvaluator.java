@@ -810,7 +810,7 @@ public class IfCommentEvaluator {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     protected List<String> splitList(String str, String delimiter) {

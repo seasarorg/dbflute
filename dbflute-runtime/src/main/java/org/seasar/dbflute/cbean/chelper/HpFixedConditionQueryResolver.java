@@ -372,6 +372,6 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 }

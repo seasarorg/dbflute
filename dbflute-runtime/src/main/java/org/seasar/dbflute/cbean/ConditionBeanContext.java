@@ -189,6 +189,6 @@ public class ConditionBeanContext {
     //                                                                      General Helper
     //                                                                      ==============
     protected static String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 }

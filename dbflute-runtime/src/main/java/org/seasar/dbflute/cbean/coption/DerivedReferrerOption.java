@@ -278,7 +278,7 @@ public class DerivedReferrerOption implements ParameterOption {
     //                                                                      General Helper
     //                                                                      ==============
     protected final String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

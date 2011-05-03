@@ -9,7 +9,7 @@ import org.seasar.dbflute.unit.PlainTestCase;
 public class DfSystemUtilTest extends PlainTestCase {
 
     public void test_getLineSeparator() {
-        assertEquals("\n", DfSystemUtil.getLineSeparator());
+        assertEquals("\n", DfSystemUtil.getBasicLn());
     }
 
     public void test_currentTimeMillis() {

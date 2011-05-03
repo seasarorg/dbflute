@@ -267,7 +267,7 @@ public class SequenceCacheHandler {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

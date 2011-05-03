@@ -293,7 +293,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

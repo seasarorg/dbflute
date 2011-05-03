@@ -131,6 +131,6 @@ public class OrScopeQuerySetupper {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 }

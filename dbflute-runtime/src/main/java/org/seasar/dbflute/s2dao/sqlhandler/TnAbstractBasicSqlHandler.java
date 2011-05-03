@@ -379,7 +379,7 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

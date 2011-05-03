@@ -316,6 +316,6 @@ public class HierarchyRequest<LOCAL_ENTITY extends Entity> {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 }

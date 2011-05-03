@@ -146,7 +146,7 @@ public abstract class AbstractSubQuery {
     }
 
     protected final String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

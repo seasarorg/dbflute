@@ -224,6 +224,6 @@ public class SubQueryIndentProcessor implements Serializable {
     }
 
     protected static String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 }

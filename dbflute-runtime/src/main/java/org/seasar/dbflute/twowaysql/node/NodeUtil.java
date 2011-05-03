@@ -241,6 +241,6 @@ public class NodeUtil {
     }
 
     protected static String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 }

@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -322,7 +321,7 @@ public class MapListFile {
     //                                                                     Map List String
     //                                                                     ===============
     protected MapListString createMapListString() {
-        return new MapListStringImpl();
+        return new MapListString();
     }
 
     // ===================================================================================
@@ -339,7 +338,7 @@ public class MapListFile {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {

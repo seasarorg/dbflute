@@ -1087,7 +1087,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

@@ -665,7 +665,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         try {
             return method.invoke(target, args);
         } catch (RuntimeException e) {
-            final String ln = DfSystemUtil.getLineSeparator();
+            final String ln = DfSystemUtil.getBasicLn();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             String msg = "Invoking method threw the exception:" + ln;
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;

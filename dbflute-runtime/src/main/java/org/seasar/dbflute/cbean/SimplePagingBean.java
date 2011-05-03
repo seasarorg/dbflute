@@ -383,7 +383,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object>, S
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

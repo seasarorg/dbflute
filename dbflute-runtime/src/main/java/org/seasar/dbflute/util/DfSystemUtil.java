@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.util;
 
+import java.util.Date;
+
 /**
  * @author jflute
  */
@@ -23,7 +25,7 @@ public class DfSystemUtil {
     // ===================================================================================
     //                                                                      Line Separator
     //                                                                      ==============
-    public static String getLineSeparator() {
+    public static String getBasicLn() {
         return "\n";
         // /- - - - - - - - - - - - - - - - - - - - - -
         // Because 'CR + LF' caused many trouble!
@@ -36,6 +38,10 @@ public class DfSystemUtil {
     // ===================================================================================
     //                                                                        Current Time
     //                                                                        ============
+    public static Date currentDateTime() {
+        return new Date(System.currentTimeMillis());
+    }
+
     public static long currentTimeMillis() {
         return System.currentTimeMillis();
     }

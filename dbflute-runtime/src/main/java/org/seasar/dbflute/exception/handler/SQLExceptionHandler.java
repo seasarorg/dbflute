@@ -311,6 +311,6 @@ public class SQLExceptionHandler {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 }

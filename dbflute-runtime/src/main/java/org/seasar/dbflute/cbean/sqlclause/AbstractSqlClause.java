@@ -2399,7 +2399,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // -----------------------------------------------------

@@ -1802,7 +1802,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // -----------------------------------------------------

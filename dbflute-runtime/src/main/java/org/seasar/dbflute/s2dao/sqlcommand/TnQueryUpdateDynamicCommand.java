@@ -213,7 +213,7 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

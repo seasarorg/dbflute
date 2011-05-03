@@ -1091,7 +1091,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

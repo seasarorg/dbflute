@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.mapstring.impl;
+package org.seasar.dbflute.helper.mapstring;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,14 +12,14 @@ import org.seasar.dbflute.unit.PlainTestCase;
  * @author jflute
  * @since 0.6.0 (2008/01/17 Thursday)
  */
-public class MapListStringImplTest extends PlainTestCase {
+public class MapListStringTest extends PlainTestCase {
 
     // ===================================================================================
     //                                                                               Build
     //                                                                               =====
     public void test_buildMapString_basic() {
         // ## Arrange ##
-        final MapListStringImpl maplist = new MapListStringImpl();
+        final MapListString maplist = new MapListString();
         Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("key1", "value1");
         map.put("key2", "value2");
@@ -63,7 +63,7 @@ public class MapListStringImplTest extends PlainTestCase {
     //                                                                            ========
     public void test_generateMap_contains_List() throws Exception {
         // ## Arrange ##
-        final MapListStringImpl maplist = new MapListStringImpl();
+        final MapListString maplist = new MapListString();
         final String mapString = "map:{key1=value1;key2=list:{value2-1;value2-2;value2-3};key3=value3}";
 
         // ## Act ##
@@ -78,7 +78,7 @@ public class MapListStringImplTest extends PlainTestCase {
 
     public void test_generateMap_contains_EmptyString_and_Null() throws Exception {
         // ## Arrange ##
-        final MapListStringImpl maplist = new MapListStringImpl();
+        final MapListString maplist = new MapListString();
         final String mapString = "map:{key1=value1;key2=;key3=list:{null;value3-2;null;null};key4=null}";
 
         // ## Act ##
@@ -94,7 +94,7 @@ public class MapListStringImplTest extends PlainTestCase {
 
     public void test_generateMap_contains_LineSeparator() throws Exception {
         // ## Arrange ##
-        final MapListStringImpl maplist = new MapListStringImpl();
+        final MapListString maplist = new MapListString();
         final String mapString = "map:{key1=value1;key2=value2;key3=val\nue3;key4=value4}";
 
         // ## Act ##
@@ -110,7 +110,7 @@ public class MapListStringImplTest extends PlainTestCase {
 
     public void test_generateMap_contains_DoubleByte() throws Exception {
         // ## Arrange ##
-        final MapListStringImpl maplist = new MapListStringImpl();
+        final MapListString maplist = new MapListString();
         final String mapString = "map:{key1=value1;key2=値２;キー３=このあと改行\nした;key4=あと全角セミコロン；とかね}";
 
         // ## Act ##

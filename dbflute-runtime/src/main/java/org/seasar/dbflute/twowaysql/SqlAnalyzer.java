@@ -526,7 +526,7 @@ public class SqlAnalyzer {
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     protected final String replaceString(String text, String fromText, String toText) {

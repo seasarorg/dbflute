@@ -977,7 +977,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected final String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // -----------------------------------------------------

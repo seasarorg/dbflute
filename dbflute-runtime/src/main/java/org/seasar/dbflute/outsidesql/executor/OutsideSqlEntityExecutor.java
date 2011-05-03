@@ -321,6 +321,6 @@ public class OutsideSqlEntityExecutor<BEHAVIOR> {
      * @return The value of line separator. (NotNull)
      */
     protected static String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 }

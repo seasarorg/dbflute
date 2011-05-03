@@ -281,7 +281,7 @@ public class BehaviorExceptionThrower {
      * @return The value of line separator. (NotNull)
      */
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     protected String initCap(String str) {

@@ -46,7 +46,7 @@ public abstract class TnAbstractEntityDynamicCommand extends TnAbstractBasicSqlC
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================

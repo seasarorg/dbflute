@@ -240,7 +240,7 @@ public class OrderByElement implements Serializable {
     }
 
     protected String ln() {
-        return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getBasicLn();
     }
 
     // ===================================================================================
