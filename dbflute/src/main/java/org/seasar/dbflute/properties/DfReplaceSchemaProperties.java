@@ -16,6 +16,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.seasar.dbflute.helper.process.SystemScript;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
@@ -687,9 +688,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_migrationAlterSqlFileList != null) {
             return _migrationAlterSqlFileList;
         }
-        final String targetDir = getMigrationCreateDirectory();
-        final String sqlTitle = getReplaceSchemaSqlTitle();
-        _migrationAlterSqlFileList = doGetResourceFileList(targetDir, sqlTitle, ".sql", ".bat", ".sh");
+        final String targetDir = getMigrationAlterDirectory();
+        final String sqlTitle = getAlterSchemaSqlTitle();
+        final List<String> suffixList = new ArrayList<String>();
+        suffixList.add(".sql");
+        suffixList.addAll(SystemScript.getSupportedExtList());
+        _migrationAlterSqlFileList = doGetResourceFileList(targetDir, sqlTitle, suffixList.toArray(new String[] {}));
         return _migrationAlterSqlFileList;
     }
 

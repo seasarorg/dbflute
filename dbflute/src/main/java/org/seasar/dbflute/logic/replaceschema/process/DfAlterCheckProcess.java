@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfAlterCheckAlterNGMarkFoundException;
+import org.seasar.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.seasar.dbflute.exception.DfAlterCheckAlterSqlFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckDifferenceFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
@@ -26,11 +27,12 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
+import org.seasar.dbflute.helper.process.ProcessResult;
+import org.seasar.dbflute.helper.process.SystemScript;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterSchemaFinalInfo;
-import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -203,40 +205,40 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected DfSqlFileFireMan createSqlFileFireMan() {
+        final String[] scriptExtAry = SystemScript.getSupportedExtList().toArray(new String[] {});
+        final SystemScript script = new SystemScript();
         return new DfSqlFileFireMan() {
             @Override
             protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
                 final String path = sqlFile.getPath();
-                if (Srl.endsWith(path, ".bat", ".sh")) {
-                    final String resolvedPath = Srl.replace(path, "\\", "/");
-                    final String baseDir = Srl.substringLastFront(resolvedPath, "/");
-                    final String scriptName = Srl.substringLastFront(Srl.substringLastRear(resolvedPath, "/"), ".");
-                    Integer exitValue = null;
-                    Exception scriptEx = null;
-                    try {
-                        exitValue = DBFluteSystem.executeSystemScript(new File(baseDir), scriptName);
-                    } catch (Exception e) {
-                        scriptEx = e;
-                    }
-                    final DfSqlFileRunnerResult result = new DfSqlFileRunnerResult(sqlFile);
-                    result.setTotalSqlCount(1);
-                    if ((exitValue != null && exitValue != 0) || scriptEx != null) {
-                        final String topMsg;
-                        if (scriptEx != null) {
-                            topMsg = scriptEx.getMessage();
-                        } else {
-                            topMsg = "Failed to execute the script: " + scriptName + " exit(" + exitValue + ")";
-                        }
-                        final SQLException sqlEx = new SQLException(topMsg);
-                        sqlEx.initCause(scriptEx);
-                        result.addErrorContinuedSql(scriptName, sqlEx);
-                        return result;
-                    } else {
-                        result.setGoodSqlCount(1);
-                        return result;
-                    }
-                } else {
+                if (!Srl.endsWith(path, scriptExtAry)) { // SQL file
                     return super.processSqlFile(runner, sqlFile);
+                }
+                // script file
+                final String resolvedPath = Srl.replace(path, "\\", "/");
+                final String baseDir = Srl.substringLastFront(resolvedPath, "/");
+                final String scriptName = Srl.substringLastRear(resolvedPath, "/");
+                final ProcessResult processResult = script.execute(new File(baseDir), scriptName);
+                if (processResult.isSystemMismatch()) {
+                    _log.info("...Skipping the script for system mismatch: " + scriptName);
+                    return null;
+                }
+                final String console = processResult.getConsole();
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(console)) {
+                    _log.info("...Reading console for " + scriptName + ":" + ln() + console);
+                }
+                final DfSqlFileRunnerResult runnerResult = new DfSqlFileRunnerResult(sqlFile);
+                runnerResult.setTotalSqlCount(1);
+                final int exitCode = processResult.getExitCode();
+                if (exitCode != 0) {
+                    final String msg = "The script failed: " + scriptName + " exitCode=" + exitCode;
+                    final SQLException sqlEx = new DfAlterCheckAlterScriptSQLException(msg);
+                    final String sqlExp = "(commands on the script)";
+                    runnerResult.addErrorContinuedSql(sqlExp, sqlEx);
+                    return runnerResult;
+                } else {
+                    runnerResult.setGoodSqlCount(1);
+                    return runnerResult;
                 }
             }
         };
@@ -548,9 +550,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected String getHistoryCurrentDir() {
         final String historyDir = getMigrationHistoryDirectory();
         final Date currentDate = new Date();
-        final String middleDir = DfTypeUtil.toString(currentDate, "yyyy");
+        final String middleDir = DfTypeUtil.toString(currentDate, "yyyyMM");
         mkdirsDirIfNotExists(historyDir + "/" + middleDir);
-        // e.g. history/2011/20110429_2247
+        // e.g. history/201104/20110429_2247
         final String yyyyMMddHHmm = DfTypeUtil.toString(currentDate, "yyyyMMdd_HHmm");
         final String currentDir = historyDir + "/" + middleDir + "/" + yyyyMMddHHmm;
         mkdirsDirIfNotExists(currentDir);

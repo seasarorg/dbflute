@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
@@ -63,9 +64,11 @@ public class DfSqlFileFireMan {
             }
 
             final DfSqlFileRunnerResult runnerResult = processSqlFile(runner, sqlFile);
-            fireResult.addRunnerResult(runnerResult);
-            goodSqlCount = goodSqlCount + runnerResult.getGoodSqlCount();
-            totalSqlCount = totalSqlCount + runnerResult.getTotalSqlCount();
+            if (runnerResult != null) {
+                fireResult.addRunnerResult(runnerResult);
+                goodSqlCount = goodSqlCount + runnerResult.getGoodSqlCount();
+                totalSqlCount = totalSqlCount + runnerResult.getTotalSqlCount();
+            }
         }
         final String title = _executorName != null ? _executorName : "Fired SQL";
 
@@ -109,9 +112,11 @@ public class DfSqlFileFireMan {
                         }
                         ++elementIndex;
                     }
-                    detailSb.append(ln());
-                    detailSb.append("    (SQLState=").append(sqlEx.getSQLState()).append(" ErrorCode=")
-                            .append(sqlEx.getErrorCode()).append(")");
+                    if (isShowSQLState(sqlEx)) {
+                        detailSb.append(ln());
+                        detailSb.append("    (SQLState=").append(sqlEx.getSQLState()).append(" ErrorCode=")
+                                .append(sqlEx.getErrorCode()).append(")");
+                    }
                 }
             }
         }
@@ -119,9 +124,21 @@ public class DfSqlFileFireMan {
         return fireResult;
     }
 
+    /**
+     * @param runner The instance of runner. (NotNull)
+     * @param sqlFile The SQL file. (NotNull)
+     * @return The result of the running. (NullAllowed: means skipped)
+     */
     protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
         runner.prepare(sqlFile);
         return runner.runTransaction();
+    }
+
+    protected boolean isShowSQLState(SQLException sqlEx) {
+        if (sqlEx instanceof DfAlterCheckAlterScriptSQLException) {
+            return false;
+        }
+        return true;
     }
 
     // ===================================================================================
