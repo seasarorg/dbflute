@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -22,7 +23,9 @@ import java.util.List;
 /**
  * @author jflute
  */
-public interface FileMakingSimpleFacade {
+public class FileMakingSimpleFacade {
+
+    protected final FileToken _fileToken = new FileToken();
 
     /**
      * Make token-file from row-list.
@@ -32,8 +35,24 @@ public interface FileMakingSimpleFacade {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void makeFromRowList(final String filename, final java.util.List<java.util.List<String>> rowList,
-            final FileMakingOption fileMakingOption) throws FileNotFoundException, IOException;
+    public void makeFromRowList(final String filename, final List<List<String>> rowList,
+            final FileMakingOption fileMakingOption) throws FileNotFoundException, IOException {
+        final FileMakingCallback fileMakingCallback = new FileMakingCallback() {
+            protected int rowCount = 0;
+
+            public FileMakingRowResource getRowResource() {
+                ++rowCount;
+                if (rowList.size() < rowCount) {
+                    return null;// The End!
+                }
+                final List<String> valueList = (List<String>) rowList.get(rowCount - 1);
+                final FileMakingRowResource fileMakingRowResource = new FileMakingRowResource();
+                fileMakingRowResource.setValueList(valueList);
+                return fileMakingRowResource;
+            }
+        };
+        _fileToken.make(filename, fileMakingCallback, fileMakingOption);
+    }
 
     /**
      * Make bytes from row-list.
@@ -44,5 +63,23 @@ public interface FileMakingSimpleFacade {
      * @throws java.io.IOException
      */
     public byte[] makeFromRowList(final List<List<String>> rowList, final FileMakingOption fileMakingOption)
-            throws FileNotFoundException, IOException;
+            throws FileNotFoundException, IOException {
+        final FileMakingCallback fileMakingCallback = new FileMakingCallback() {
+            protected int rowCount = 0;
+
+            public FileMakingRowResource getRowResource() {
+                ++rowCount;
+                if (rowList.size() < rowCount) {
+                    return null;// The End!
+                }
+                final List<String> valueList = (List<String>) rowList.get(rowCount - 1);
+                final FileMakingRowResource fileMakingRowResource = new FileMakingRowResource();
+                fileMakingRowResource.setValueList(valueList);
+                return fileMakingRowResource;
+            }
+        };
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        _fileToken.make(baos, fileMakingCallback, fileMakingOption);
+        return baos.toByteArray();
+    }
 }
