@@ -1,16 +1,7 @@
 package org.seasar.dbflute.resource;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,94 +63,6 @@ public class DBFluteSystem {
 
     public static interface DBFluteCurrentProvider {
         long currentTimeMillis();
-    }
-
-    // ===================================================================================
-    //                                                                    Operating System
-    //                                                                    ================
-    public static boolean isSystemWindowsOS() {
-        final String osName = System.getProperty("os.name");
-        return osName != null && osName.toLowerCase().contains("windows");
-    }
-
-    public static int executeSystemScript(File baseDir, String scriptName) { // simply (using default encoding)
-        return executeSystemScript(baseDir, scriptName, null, "UTF-8");
-    }
-
-    protected static int executeSystemScript(File baseDir, String scriptName, Map<String, String> envMap,
-            String encoding) {
-        final List<String> cmdList = new ArrayList<String>();
-        if (isSystemWindowsOS()) {
-            cmdList.add("cmd.exe");
-            cmdList.add("/c");
-            cmdList.add(scriptName + ".bat");
-        } else {
-            cmdList.add("sh");
-            cmdList.add(scriptName + ".sh");
-        }
-        final ProcessBuilder builder = new ProcessBuilder(cmdList);
-        if (envMap != null && !envMap.isEmpty()) {
-            builder.environment().putAll(envMap);
-        }
-        final Process process;
-        try {
-            process = builder.directory(baseDir).redirectErrorStream(true).start();
-        } catch (IOException e) {
-            String msg = "Failed to execute the command: " + scriptName;
-            throw new IllegalStateException(msg, e);
-        }
-
-        InputStream stdin = null;
-        try {
-            stdin = process.getInputStream();
-            final CommandConsoleReader reader = new CommandConsoleReader(stdin, encoding);
-            reader.start();
-            final int exitValue = process.waitFor();
-            reader.join();
-            return exitValue;
-        } catch (InterruptedException e) {
-            String msg = "The execution was interrupted: " + scriptName;
-            throw new IllegalStateException(msg, e);
-        } finally {
-            if (stdin != null) {
-                try {
-                    stdin.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
-
-    protected static class CommandConsoleReader extends Thread {
-        private BufferedReader _reader;
-
-        public CommandConsoleReader(InputStream in, String encoding) {
-            try {
-                _reader = new BufferedReader(new InputStreamReader(in, encoding));
-            } catch (UnsupportedEncodingException e) {
-                String msg = "Failed to create a reader by encoding: " + encoding;
-                throw new IllegalStateException(msg);
-            }
-        }
-
-        @Override
-        public void run() {
-            final StringBuilder sb = new StringBuilder();
-            try {
-                while (true) {
-                    final String line = _reader.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    sb.append(getBasicLn()).append(line);
-                }
-            } catch (IOException e) {
-                String msg = "Failed to read the stream: " + _reader;
-                throw new IllegalStateException(msg, e);
-            } finally {
-                _log.info(sb.toString().trim());
-            }
-        }
     }
 
     // ===================================================================================
