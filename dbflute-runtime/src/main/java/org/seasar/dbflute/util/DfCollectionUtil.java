@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -106,6 +107,148 @@ public class DfCollectionUtil {
         return valueList;
     }
 
+    // -----------------------------------------------------
+    //                                               Advance
+    //                                               -------
+    public static <ELEMENT> OrderDiff<ELEMENT> analyzeOrderDiff(List<ELEMENT> beforeUniqueList,
+            List<ELEMENT> afterUniqueList) {
+        final LinkedHashSet<ELEMENT> linkedBeforeSet = newLinkedHashSet(beforeUniqueList);
+        if (beforeUniqueList.size() != linkedBeforeSet.size()) {
+            String msg = "The argument 'beforeList' should be unique: " + beforeUniqueList;
+            throw new IllegalArgumentException(msg);
+        }
+        final LinkedHashSet<ELEMENT> linkedAfterSet = newLinkedHashSet(afterUniqueList);
+        if (afterUniqueList.size() != linkedAfterSet.size()) {
+            String msg = "The argument 'afterList' should be unique: " + afterUniqueList;
+            throw new IllegalArgumentException(msg);
+        }
+        final ElementDiff<ELEMENT> elementDiff = analyzeElementDiff(linkedBeforeSet, linkedAfterSet);
+        final Set<ELEMENT> addedSet = elementDiff.getAddedSet();
+        final Set<ELEMENT> deletedSet = elementDiff.getDeletedSet();
+        final List<ELEMENT> beforeRemainingList = newArrayList(beforeUniqueList);
+        beforeRemainingList.removeAll(deletedSet);
+        final List<ELEMENT> afterRemainingList = newArrayList(afterUniqueList);
+        afterRemainingList.removeAll(addedSet);
+        if (beforeRemainingList.size() != afterRemainingList.size()) {
+            String msg = "The beforeRemainingList.size() should be the same as the afterRemainingList's:";
+            msg = msg + " beforeRemainingList.size()=" + beforeRemainingList.size();
+            msg = msg + " afterRemainingList.size()=" + afterRemainingList.size();
+            throw new IllegalStateException(msg);
+        }
+        final Map<ELEMENT, OrderDiffDetail<ELEMENT>> movedMap = newLinkedHashMap();
+        doAnalyzeOrderChange(beforeRemainingList, afterRemainingList, movedMap);
+        for (Entry<ELEMENT, OrderDiffDetail<ELEMENT>> entry : movedMap.entrySet()) {
+            final ELEMENT movedElement = entry.getKey();
+            final ELEMENT previousElement = entry.getValue().getPreviousElement();
+            final int movedIndex = afterUniqueList.indexOf(movedElement);
+            final ELEMENT realPrevious = afterUniqueList.get(movedIndex - 1);
+            if (!previousElement.equals(realPrevious)) {
+                entry.getValue().setPreviousElement(realPrevious);
+            }
+        }
+        final OrderDiff<ELEMENT> orderDiff = new OrderDiff<ELEMENT>();
+        orderDiff.setMovedMap(movedMap);
+        return orderDiff;
+    }
+
+    protected static <ELEMENT> void doAnalyzeOrderChange(List<ELEMENT> beforeRemainingList,
+            List<ELEMENT> afterRemainingList, Map<ELEMENT, OrderDiffDetail<ELEMENT>> movedMap) {
+        ELEMENT movedElement = null;
+        ELEMENT previousElement = null;
+        for (int i = 0; i < beforeRemainingList.size(); i++) {
+            final ELEMENT beforeElement = beforeRemainingList.get(i);
+            final int afterIndex = afterRemainingList.indexOf(beforeElement);
+            if (i == afterIndex) { // no change
+                continue;
+            }
+            // changed
+            movedElement = beforeElement;
+            previousElement = afterRemainingList.get(afterIndex - 1);
+            break;
+        }
+        if (movedElement != null) {
+            final OrderDiffDetail<ELEMENT> diffResult = new OrderDiffDetail<ELEMENT>();
+            diffResult.setMovedElement(movedElement);
+            diffResult.setPreviousElement(previousElement);
+            movedMap.put(movedElement, diffResult);
+            final List<ELEMENT> movedList = moveElementToIndex(beforeRemainingList, movedElement, previousElement);
+            doAnalyzeOrderChange(movedList, afterRemainingList, movedMap); // recursive call
+        }
+    }
+
+    public static class OrderDiff<ELEMENT> {
+        protected Map<ELEMENT, OrderDiffDetail<ELEMENT>> _movedMap;
+
+        public Map<ELEMENT, OrderDiffDetail<ELEMENT>> getMovedMap() {
+            return _movedMap;
+        }
+
+        public void setMovedMap(Map<ELEMENT, OrderDiffDetail<ELEMENT>> movedMap) {
+            this._movedMap = movedMap;
+        }
+    }
+
+    public static class OrderDiffDetail<ELEMENT> {
+        protected ELEMENT _movedElement;
+        protected ELEMENT _previousElement;
+
+        public ELEMENT getMovedElement() {
+            return _movedElement;
+        }
+
+        public void setMovedElement(ELEMENT movedElement) {
+            this._movedElement = movedElement;
+        }
+
+        public ELEMENT getPreviousElement() {
+            return _previousElement;
+        }
+
+        public void setPreviousElement(ELEMENT previousElement) {
+            this._previousElement = previousElement;
+        }
+    }
+
+    public static <ELEMENT> List<ELEMENT> moveElementToIndex(List<ELEMENT> list, ELEMENT fromElement, ELEMENT toElement) {
+        assertObjectNotNull("list", list);
+        final int fromIndex = list.indexOf(fromElement);
+        final int toIndex = list.indexOf(toElement);
+        return moveElementToIndex(list, fromIndex, toIndex);
+    }
+
+    public static <ELEMENT> List<ELEMENT> moveElementToIndex(List<ELEMENT> list, int fromIndex, int toIndex) {
+        assertObjectNotNull("list", list);
+        if (fromIndex == toIndex) {
+            String msg = "The argument 'fromIndex' and 'toIndex' should not be same:";
+            msg = msg + " fromIndex=" + fromIndex + " toIndex" + toIndex;
+            throw new IllegalArgumentException(msg);
+        }
+        if (fromIndex < 0 || toIndex < 0) {
+            String msg = "The argument 'fromIndex' and 'toIndex' should not be minus:";
+            msg = msg + " fromIndex=" + fromIndex + " toIndex" + toIndex;
+            throw new IllegalArgumentException(msg);
+        }
+        final boolean fromLess = fromIndex < toIndex;
+        final List<ELEMENT> movedList = new ArrayList<ELEMENT>();
+        final int firstIndex = fromLess ? fromIndex : toIndex;
+        final int secondIndex = !fromLess ? fromIndex : toIndex;
+        final List<ELEMENT> first = list.subList(0, firstIndex);
+        final ELEMENT element = list.get(fromIndex);
+        final int adjustmentIndex = fromLess ? 1 : 0;
+        final List<ELEMENT> middle = list.subList(firstIndex + adjustmentIndex, secondIndex + adjustmentIndex);
+        final List<ELEMENT> last = list.subList(secondIndex + 1, list.size());
+        movedList.addAll(first);
+        if (!fromLess) {
+            movedList.add(element);
+        }
+        movedList.addAll(middle);
+        if (fromLess) {
+            movedList.add(element);
+        }
+        movedList.addAll(last);
+        return movedList;
+    }
+
     // ===================================================================================
     //                                                                                 Map
     //                                                                                 ===
@@ -168,6 +311,62 @@ public class DfCollectionUtil {
     @SuppressWarnings("unchecked")
     public static <ELEMENT> Set<ELEMENT> emptySet() {
         return (Set<ELEMENT>) EMPTY_SET;
+    }
+
+    // -----------------------------------------------------
+    //                                               Advance
+    //                                               -------
+    public static <ELEMENT> ElementDiff<ELEMENT> analyzeElementDiff(Set<ELEMENT> beforeCol, Set<ELEMENT> afterCol) {
+        final Set<ELEMENT> addedSet = newLinkedHashSet();
+        final Set<ELEMENT> deletedSet = newLinkedHashSet();
+        final Set<ELEMENT> remainingSet = newLinkedHashSet();
+        for (ELEMENT beforeElement : beforeCol) {
+            if (afterCol.contains(beforeElement)) {
+                remainingSet.add(beforeElement);
+            } else {
+                deletedSet.add(beforeElement);
+            }
+        }
+        for (ELEMENT afterElement : afterCol) {
+            if (!beforeCol.contains(afterElement)) {
+                addedSet.add(afterElement);
+            }
+        }
+        final ElementDiff<ELEMENT> elementDiff = new ElementDiff<ELEMENT>();
+        elementDiff.setAddedSet(addedSet);
+        elementDiff.setDeletedSet(deletedSet);
+        elementDiff.setRemainingSet(remainingSet);
+        return elementDiff;
+    }
+
+    public static class ElementDiff<ELEMENT> {
+        protected Set<ELEMENT> _addedSet;
+        protected Set<ELEMENT> _deletedSet;
+        protected Set<ELEMENT> _remainingSet;
+
+        public Set<ELEMENT> getAddedSet() {
+            return _addedSet;
+        }
+
+        public void setAddedSet(Set<ELEMENT> addedSet) {
+            this._addedSet = addedSet;
+        }
+
+        public Set<ELEMENT> getDeletedSet() {
+            return _deletedSet;
+        }
+
+        public void setDeletedSet(Set<ELEMENT> deletedSet) {
+            this._deletedSet = deletedSet;
+        }
+
+        public Set<ELEMENT> getRemainingSet() {
+            return _remainingSet;
+        }
+
+        public void setRemainingSet(Set<ELEMENT> remainingSet) {
+            this._remainingSet = remainingSet;
+        }
     }
 
     // ===================================================================================

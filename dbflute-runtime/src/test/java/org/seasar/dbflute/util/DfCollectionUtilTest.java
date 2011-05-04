@@ -2,8 +2,12 @@ package org.seasar.dbflute.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.DfCollectionUtil.OrderDiff;
+import org.seasar.dbflute.util.DfCollectionUtil.OrderDiffDetail;
 
 /**
  * @author jflute
@@ -189,5 +193,158 @@ public class DfCollectionUtilTest extends PlainTestCase {
         assertEquals("10", actual.get(2).get(1));
         assertEquals("11", actual.get(2).get(2));
         assertEquals("12", actual.get(2).get(3));
+    }
+
+    // -----------------------------------------------------
+    //                                               Advance
+    //                                               -------
+    public void test_analyzeOrderChange_basic() throws Exception {
+        // ## Arrange ##
+        List<String> beforeUniqueList = DfCollectionUtil.newArrayList("foo", "bar", "baz", "qux", "quux");
+        List<String> afterUniqueList = DfCollectionUtil.newArrayList("foo", "qux", "baz", "bar", "quux");
+
+        // ## Act ##
+        OrderDiff<String> orderDiff = DfCollectionUtil.analyzeOrderDiff(beforeUniqueList, afterUniqueList);
+
+        // ## Assert ##
+        final Map<String, OrderDiffDetail<String>> movedMap = orderDiff.getMovedMap();
+        for (Entry<String, OrderDiffDetail<String>> entry : movedMap.entrySet()) {
+            String element = entry.getKey();
+            String previous = entry.getValue().getPreviousElement();
+            log(element + " after " + previous);
+        }
+        assertEquals("baz", movedMap.get("bar").getPreviousElement());
+        assertEquals("qux", movedMap.get("baz").getPreviousElement());
+        assertEquals(2, movedMap.size());
+    }
+
+    public void test_analyzeOrderChange_reverse() throws Exception {
+        // ## Arrange ##
+        List<String> beforeUniqueList = DfCollectionUtil.newArrayList("foo", "qux", "baz", "bar", "quux");
+        List<String> afterUniqueList = DfCollectionUtil.newArrayList("foo", "bar", "baz", "qux", "quux");
+
+        // ## Act ##
+        OrderDiff<String> orderDiff = DfCollectionUtil.analyzeOrderDiff(beforeUniqueList, afterUniqueList);
+
+        // ## Assert ##
+        final Map<String, OrderDiffDetail<String>> movedMap = orderDiff.getMovedMap();
+        for (Entry<String, OrderDiffDetail<String>> entry : movedMap.entrySet()) {
+            String element = entry.getKey();
+            String previous = entry.getValue().getPreviousElement();
+            log(element + " after " + previous);
+        }
+        assertEquals("baz", movedMap.get("qux").getPreviousElement());
+        assertEquals("bar", movedMap.get("baz").getPreviousElement());
+        assertEquals(2, movedMap.size());
+    }
+
+    public void test_analyzeOrderChange_guchagucha() throws Exception {
+        // ## Arrange ##
+        List<String> beforeUniqueList = DfCollectionUtil.newArrayList("foo", "bar", "baz", "qux", "quux");
+        List<String> afterUniqueList = DfCollectionUtil.newArrayList("bar", "qux", "quux", "foo", "baz");
+
+        // ## Act ##
+        OrderDiff<String> orderDiff = DfCollectionUtil.analyzeOrderDiff(beforeUniqueList, afterUniqueList);
+
+        // ## Assert ##
+        final Map<String, OrderDiffDetail<String>> movedMap = orderDiff.getMovedMap();
+        for (Entry<String, OrderDiffDetail<String>> entry : movedMap.entrySet()) {
+            String element = entry.getKey();
+            String previous = entry.getValue().getPreviousElement();
+            log(element + " after " + previous);
+        }
+        assertEquals("quux", movedMap.get("foo").getPreviousElement());
+        assertEquals("foo", movedMap.get("baz").getPreviousElement());
+        assertEquals(2, movedMap.size());
+    }
+
+    public void test_analyzeOrderChange_various() throws Exception {
+        // ## Arrange ##
+        List<String> beforeUniqueList = DfCollectionUtil.newArrayList("foo", "bar", "baz", "qux", "deleted", "quux");
+        List<String> afterUniqueList = DfCollectionUtil.newArrayList("qux", "corge", "bar", "grault", "quux", "foo",
+                "baz", "garply", "waldo", "fred");
+
+        // ## Act ##
+        OrderDiff<String> orderDiff = DfCollectionUtil.analyzeOrderDiff(beforeUniqueList, afterUniqueList);
+
+        // ## Assert ##
+        final Map<String, OrderDiffDetail<String>> movedMap = orderDiff.getMovedMap();
+        for (Entry<String, OrderDiffDetail<String>> entry : movedMap.entrySet()) {
+            String element = entry.getKey();
+            String previous = entry.getValue().getPreviousElement();
+            log(element + " after " + previous);
+        }
+        assertEquals("quux", movedMap.get("foo").getPreviousElement());
+        assertEquals("corge", movedMap.get("bar").getPreviousElement());
+        assertEquals("foo", movedMap.get("baz").getPreviousElement());
+        assertEquals(3, movedMap.size());
+    }
+
+    public void test_moveElementToIndex_basic() throws Exception {
+        // ## Arrange ##
+        List<String> list = DfCollectionUtil.newArrayList("foo", "bar", "baz", "qux", "quux");
+
+        // ## Act ##
+        List<String> movedList = DfCollectionUtil.moveElementToIndex(list, 1, 3);
+
+        // ## Assert ##
+        log("movedList: " + movedList);
+        assertEquals("foo", movedList.get(0));
+        assertEquals("baz", movedList.get(1));
+        assertEquals("qux", movedList.get(2));
+        assertEquals("bar", movedList.get(3));
+        assertEquals("quux", movedList.get(4));
+        assertEquals(list.size(), movedList.size());
+    }
+
+    public void test_moveElementToIndex_first() throws Exception {
+        // ## Arrange ##
+        List<String> list = DfCollectionUtil.newArrayList("foo", "bar", "baz", "qux", "quux");
+
+        // ## Act ##
+        List<String> movedList = DfCollectionUtil.moveElementToIndex(list, 0, 3);
+
+        // ## Assert ##
+        log("movedList: " + movedList);
+        assertEquals("bar", movedList.get(0));
+        assertEquals("baz", movedList.get(1));
+        assertEquals("qux", movedList.get(2));
+        assertEquals("foo", movedList.get(3));
+        assertEquals("quux", movedList.get(4));
+        assertEquals(list.size(), movedList.size());
+    }
+
+    public void test_moveElementToIndex_last() throws Exception {
+        // ## Arrange ##
+        List<String> list = DfCollectionUtil.newArrayList("foo", "bar", "baz", "qux", "quux");
+
+        // ## Act ##
+        List<String> movedList = DfCollectionUtil.moveElementToIndex(list, 1, 4);
+
+        // ## Assert ##
+        log("movedList: " + movedList);
+        assertEquals("foo", movedList.get(0));
+        assertEquals("baz", movedList.get(1));
+        assertEquals("qux", movedList.get(2));
+        assertEquals("quux", movedList.get(3));
+        assertEquals("bar", movedList.get(4));
+        assertEquals(list.size(), movedList.size());
+    }
+
+    public void test_moveElementToIndex_reverse() throws Exception {
+        // ## Arrange ##
+        List<String> list = DfCollectionUtil.newArrayList("foo", "bar", "baz", "qux", "quux");
+
+        // ## Act ##
+        List<String> movedList = DfCollectionUtil.moveElementToIndex(list, 3, 1);
+
+        // ## Assert ##
+        log("movedList: " + movedList);
+        assertEquals("foo", movedList.get(0));
+        assertEquals("qux", movedList.get(1));
+        assertEquals("bar", movedList.get(2));
+        assertEquals("baz", movedList.get(3));
+        assertEquals("quux", movedList.get(4));
+        assertEquals(list.size(), movedList.size());
     }
 }
