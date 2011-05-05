@@ -295,6 +295,18 @@ public class Database {
         }
     }
 
+    // -----------------------------------------------------
+    //                                         Determination
+    //                                         -------------
+    public boolean hasTableComment() { // means resolved comment (not plain) 
+        for (Table table : getTableList()) {
+            if (table.hasComment()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                      Parameter Bean
     //                                                                      ==============

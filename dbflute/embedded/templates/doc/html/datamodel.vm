@@ -12,7 +12,7 @@
 	}
 	body {
 		font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
-		font-size: 90%;
+		font-size: 80%;
 		margin: 10px 5px 5px 15px;
 		background-color: #ffffe0;
 	}
@@ -96,18 +96,21 @@
 	.flgplus {
 		font-size: 0.7em;
 	}
+	.typecell {
+		font-size: 0.6em;
+	}
 	.numcell {
 		text-align: center;
 		font-size: 0.8em;
 	}
-	.linkcell {
-		font-size: 0.8em;
+	.relcell {
+		font-size: 0.6em;
 	}
 	.commentcell {
-		font-size: 0.7em;
+		font-size: 0.5em;
 	}
 	.subcell {
-		font-size: 0.8em;
+		font-size: 0.6em;
 	}
 	.comcolcell {
 		color: #666;
@@ -220,22 +223,27 @@
 <p class="sublink"><a href="#outsidesql">OutsideSql List</a></p>
 #end
 
+#set ($hasAdditionalSchema = $database.hasAdditionalSchema())
+#set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
+#set ($hasTableComment = $database.hasTableComment())
 <h2>Table List</h2>
 <table summary="Tables in the Schema">
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
-#if ($database.hasAdditionalSchema())
+#if ($hasAdditionalSchema)
 		<th>Schema</th>
 #end
-#if ($database.isAliasDelimiterInDbCommentValid())
+#if ($isAliasDelimiterInDbCommentValid)
 		<th>Alias</th>
 #end
 		<th>Name</th>
 		<th>Type</th>
 		<th>ForeignTable</th>
 		<th>ReferrerTable</th>
-		<th>Comment</th>
+#if ($hasTableComment)
+		<th>TableComment</th>
+#end
 		<th>EntityName</th>
 	</tr>
 	</thead>
@@ -244,17 +252,19 @@
 #foreach ($table in $database.tableDisplaySortedList)
 	<tr>
 		<td class="rownumcell">${rownum}</td>
-#if ($database.hasAdditionalSchema())
+#if ($hasAdditionalSchema)
 		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>
 #end
-#if ($database.isAliasDelimiterInDbCommentValid())
+#if ($isAliasDelimiterInDbCommentValid)
 		<td class="aliascell">${table.alias}</td>
 #end
 		<td><a href="#${table.name}"${table.titleForSchemaHtml}>${table.name}</a></td>
-		<td class="subcell">${table.type}</td>
-		<td class="subcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
-		<td class="subcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
+		<td class="typecell">${table.type}</td>
+		<td class="relcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
+		<td class="relcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
+#if ($hasTableComment)
 		<td class="commentcell">#if ($table.hasComment()) ${table.commentForSchemaHtml}#else &nbsp;#end</td>
+#end
 		<td class="subcell">${table.javaName}</td>
 	</tr>
 #set ($rownum = $rownum + 1)

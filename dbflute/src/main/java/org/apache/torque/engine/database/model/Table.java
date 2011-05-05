@@ -385,7 +385,7 @@ public class Table {
         return _plainComment;
     }
 
-    public boolean hasComment() {
+    public boolean hasComment() { // means resolved comment (not plain)
         final String comment = getComment();
         return comment != null && comment.trim().length() > 0;
     }
@@ -570,6 +570,24 @@ public class Table {
     public boolean hasByteArrayColumnInEqualsHashcode() {
         for (Column column : getEqualsHashcodeColumnList()) {
             if (column.isJavaNativeByteArray()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasDefaultValueExceptAutoIncrement() {
+        for (Column column : getColumnList()) {
+            if (column.hasDefaultValueExceptAutoIncrement()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasColumnComment() { // means resolved comment (not plain)
+        for (Column column : getColumnList()) {
+            if (column.hasComment()) {
                 return true;
             }
         }

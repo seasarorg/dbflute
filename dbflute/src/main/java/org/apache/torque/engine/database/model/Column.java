@@ -479,6 +479,10 @@ public class Column {
         return _defaultValue != null && _defaultValue.trim().length() > 0;
     }
 
+    public boolean hasDefaultValueExceptAutoIncrement() {
+        return !isIdentityOrSequence() && hasDefaultValue();
+    }
+
     public String getDefaultValue() {
         return _defaultValue;
     }
@@ -494,7 +498,7 @@ public class Column {
         this._plainComment = plainComment;
     }
 
-    public boolean hasComment() {
+    public boolean hasComment() { // means resolved comment (not plain)
         final String comment = getComment();
         return comment != null && comment.trim().length() > 0;
     }
