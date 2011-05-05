@@ -52,9 +52,9 @@ ${table.aliasExpression}${table.name}
 #end
 		<td#if ($col.hasSchemaHtmlColumnNameCssClass()) class="${col.schemaHtmlColumnNameCssClass}"#end id="${table.name}${col.name}">${col.name}</td>
 		<td class="typecell">${col.dbTypeExpression}</td>
-		<td class="numcell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
+		<td class="sizecell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
 #if ($hasDefaultValue)
-		<td class="subcell">#if ($col.hasDefaultValueExceptAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
+		<td class="defvalcell">#if ($col.hasDefaultValueExceptAutoIncrement()) ${col.defaultValue}#else &nbsp;#end</td>
 #end
 		<td class="relcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
 		<td class="relcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>

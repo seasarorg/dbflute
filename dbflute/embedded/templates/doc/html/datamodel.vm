@@ -99,9 +99,13 @@
 	.typecell {
 		font-size: 0.6em;
 	}
-	.numcell {
+	.sizecell {
 		text-align: center;
 		font-size: 0.8em;
+	}
+	.defvalcell {
+		text-align: center;
+		font-size: 0.6em;
 	}
 	.relcell {
 		font-size: 0.6em;
