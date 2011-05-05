@@ -226,7 +226,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             }
         }
         final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
-        if (bindTypeCacheMap != null) {
+        if (stringProcessorCacheMap != null) {
             br.addItem("String Processor");
             final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
             for (Entry<String, StringProcessor> entry : entrySet) {
