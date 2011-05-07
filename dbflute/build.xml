@@ -9,7 +9,7 @@
 	<property name="build.version" value="${version}-10-SNAPSHOT"/>
 	<property name="pre.version" value="0.9.8.2"/>
 	<property name="runtime.version" value="0.9.8.3"/>
-	<property name="runtime.build.version" value="${runtime.version}-RC3"/>
+	<property name="runtime.build.version" value="${runtime.version}-RC2"/>
 	<property name="runtime.pre.version" value="0.9.8.2"/>
 
 	<!-- Resource Directories -->
