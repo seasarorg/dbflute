@@ -16,6 +16,7 @@ import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefa
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * Basic properties.
@@ -294,14 +295,18 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getTargetContainerName().trim().equalsIgnoreCase("slim3");
     }
 
+    public boolean isTargetContainerJavaEE() {
+        return getTargetContainerName().trim().equalsIgnoreCase("javaee");
+    }
+
     protected void checkContainer(String containerName) {
         containerName = containerName.toLowerCase();
-        if (!containerName.equals("seasar") && !containerName.equals("spring") && !containerName.equals("lucy")
-                && !containerName.equals("guice") && !containerName.equals("slim3")) {
-            String msg = "The targetContainer should be 'seasar' or 'spring' or 'lucy' or 'guice' or 'slim3':";
-            msg = msg + " targetContainer=" + containerName;
-            throw new IllegalStateException(msg);
+        if (Srl.equalsPlain(containerName, "seasar", "spring", "lucy", "guice", "slim3", "javaee")) {
+            return;
         }
+        String msg = "The targetContainer is unknown:";
+        msg = msg + " targetContainer=" + containerName;
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================

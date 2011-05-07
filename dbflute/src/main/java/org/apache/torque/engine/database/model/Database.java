@@ -972,6 +972,10 @@ public class Database {
         return getBasicProperties().isTargetContainerSlim3();
     }
 
+    public boolean isTargetContainerJavaEE() {
+        return getBasicProperties().isTargetContainerJavaEE();
+    }
+
     // -----------------------------------------------------
     //                                             Extension
     //                                             ---------
