@@ -972,8 +972,8 @@ public class Database {
         return getBasicProperties().isTargetContainerSlim3();
     }
 
-    public boolean isTargetContainerJavaEE6() {
-        return getBasicProperties().isTargetContainerJavaEE6();
+    public boolean isTargetContainerCDI() {
+        return getBasicProperties().isTargetContainerCDI();
     }
 
     // -----------------------------------------------------

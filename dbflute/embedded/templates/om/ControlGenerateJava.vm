@@ -285,10 +285,10 @@ $database.info("public void parseContainerConfig() {")
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/slim3/Slim3DBFluteModule.${glTemplateFileExtension}", $path, "", "")
 #end
-#if ($database.isTargetContainerJavaEE6())
+#if ($database.isTargetContainerCDI())
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
   $database.info("    parse('${path}')")
-  $generator.parse("om/${glResourceDirectory}/allcommon/container/javaee6/JavaEE6DBFluteModule.${glTemplateFileExtension}", $path, "", "")
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/cdi/CDIDBFluteModule.${glTemplateFileExtension}", $path, "", "")
 #end
 $database.info("}")
 

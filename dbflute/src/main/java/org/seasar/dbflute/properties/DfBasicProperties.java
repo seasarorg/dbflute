@@ -295,13 +295,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getTargetContainerName().trim().equalsIgnoreCase("slim3");
     }
 
-    public boolean isTargetContainerJavaEE6() {
-        return getTargetContainerName().trim().equalsIgnoreCase("javaee6");
+    public boolean isTargetContainerCDI() {
+        return getTargetContainerName().trim().equalsIgnoreCase("cdi");
     }
 
     protected void checkContainer(String containerName) {
         containerName = containerName.toLowerCase();
-        if (Srl.equalsPlain(containerName, "seasar", "spring", "lucy", "guice", "slim3", "javaee6")) {
+        if (Srl.equalsPlain(containerName, "seasar", "spring", "lucy", "guice", "slim3", "cdi")) {
             return;
         }
         String msg = "The targetContainer is unknown:";
