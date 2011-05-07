@@ -6,10 +6,10 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.8.3"/>
-	<property name="build.version" value="${version}-RC2"/>
+	<property name="build.version" value="${version}-RC3"/>
 	<property name="pre.version" value="0.9.8.2"/>
 	<property name="runtime.version" value="0.9.8.3"/>
-	<property name="runtime.build.version" value="${runtime.version}-RC2"/>
+	<property name="runtime.build.version" value="${runtime.version}-RC3"/>
 	<property name="runtime.pre.version" value="0.9.8.2"/>
 
 	<!-- Resource Directories -->
@@ -68,6 +68,7 @@
 	<property name="bhvap.guice.example.dir" value="${workspace.base}/dbflute-bhvap-guice-example"/>
 	<property name="tricky.example.dir" value="${workspace.base}/dbflute-tricky-example"/>
 	<property name="javatest.dir" value="${workspace.base}/javatest"/>
+	<property name="hands.on.dblib.dir" value="${workspace.base}/dfhands-on-dblib"/>
 
 	<!-- ============================================================================= -->
 	<!--                                                        C O M P I L E  T A S K -->
@@ -462,6 +463,14 @@
 	<target name="reflect-to-javatest" depends="prepare-reflection" description="==> reflect to java test">
 		<copy file="${dist}/${runtime.jar}" tofile="${javatest.dir}/lib/${runtime.nonversion.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${javatest.dir}/lib/sources/${runtime.sources.nonversion.jar}" overwrite="true"/>
+	</target>
+
+	<target name="reflect-to-hands-on" depends="prepare-reflection" description="==> reflect to hands-on example">
+	  	<copy todir="${hands.on.dblib.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${hands.on.dblib.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${hands.on.dblib.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${hands.on.dblib.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<!-- = = = = = = = = = = -->

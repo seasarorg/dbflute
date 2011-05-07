@@ -65,6 +65,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected final Map<File, File> _backupPreviousFileMap = new LinkedHashMap<File, File>();
     protected final Map<File, File> _deployedNextFileMap = new LinkedHashMap<File, File>();
 
+    // -----------------------------------------------------
+    //                                                Status
+    //                                                ------
+    protected boolean _rolledBack;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -122,16 +127,14 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         deleteFile(new File(resultDiff)); // delete the file for previous times
         final DfSchemaXmlSerializer previousSerializer = createSchemaXmlSerializer(resultDiff);
         previousSerializer.serialize();
+        replaceSchema(finalInfo);
+        if (finalInfo.isFailure()) {
+            return finalInfo;
+        }
         try {
-            replaceSchema(finalInfo);
-            if (!finalInfo.isFailure()) {
-                final DfSchemaXmlSerializer replacedSerializer = createSchemaXmlSerializer(resultDiff);
-                replacedSerializer.serialize();
-            }
+            final DfSchemaXmlSerializer replacedSerializer = createSchemaXmlSerializer(resultDiff);
+            replacedSerializer.serialize();
             finalInfo.addDetailMessage("o (success)");
-        } catch (RuntimeException e) {
-            finalInfo.addDetailMessage("x (failure)");
-            throw e;
         } finally {
             rollbackSchema();
         }
@@ -420,12 +423,17 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                      Roll-back Schema
     //                                      ----------------
     protected void rollbackSchema() {
+        if (_rolledBack) { // duplication check
+            String msg = "Already rolled-back!";
+            throw new IllegalStateException(msg);
+        }
+        _rolledBack = true;
         _log.info("");
-        _log.info("* * * * * * * * * *");
-        _log.info("*                 *");
-        _log.info("* Rollback Schema *");
-        _log.info("*                 *");
-        _log.info("* * * * * * * * * *");
+        _log.info("* * * * * * * * * * *");
+        _log.info("*                   *");
+        _log.info("* Roll-back Schema  *");
+        _log.info("*                   *");
+        _log.info("* * * * * * * * * * *");
         try {
             revertToPreviousResource();
             _coreProcessPlayer.rollback();
