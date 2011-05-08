@@ -398,7 +398,8 @@ public abstract class DfAbsractDataWriter {
     }
 
     protected String buildProcessorToString(StringProcessor processor) {
-        return DfTypeUtil.toClassTitle(processor);
+        // e.g. com.example...FooWriter$RealStringProcessor -> RealStringProcessor
+        return Srl.substringLastRear(DfTypeUtil.toClassTitle(processor), "$");
     }
 
     // -----------------------------------------------------

@@ -399,7 +399,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             }
             return false;
         }
-        _log.info("The SQL is line comment only so skip it:" + ln() + sql);
+        _log.info("The SQL has line comments only so skip it:" + ln() + sql);
         return true;
     }
 
