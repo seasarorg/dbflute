@@ -122,7 +122,7 @@ public interface InvokerAssistant {
 
     /**
      * To be disposable.
-     * @param callerProcess The disposable process for the caller. (NullAllowed: means no caller process)
+     * @param callerProcess The disposable process for the caller. (NotNull)
      */
     void toBeDisposable(DisposableProcess callerProcess);
 
