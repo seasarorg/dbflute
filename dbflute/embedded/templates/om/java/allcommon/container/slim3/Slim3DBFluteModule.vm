@@ -34,7 +34,7 @@ public class ${glDBFluteModule} {
         ${glImplementedBehaviorSelector} behaviorSelector = new ${glImplementedBehaviorSelector}();
         behaviorSelector.setContainer(S3ContainerFactory.getInstance().getContainer());
         BehaviorCommandInvoker behaviorCommandInvoker = new BehaviorCommandInvoker();
-        ${glImplementedInvokerAssistant} invokerAssistant = createImplementedInvokerAssistant(behaviorCommandInvoker);
+        ${glImplementedInvokerAssistant} invokerAssistant = createImplementedInvokerAssistant();
         behaviorCommandInvoker.setInvokerAssistant(invokerAssistant);
         ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = createImplementedCommonColumnAutoSetupper();
         
@@ -60,13 +60,12 @@ public class ${glDBFluteModule} {
 #end
     }
 
-    protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant(BehaviorCommandInvoker behaviorCommandInvoker) {
+    protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant() {
 #if ($database.hasExtendedImplementedInvokerAssistantClass())
         ${glImplementedInvokerAssistant} invokerAssistant = new ${database.extendedImplementedInvokerAssistantClass}();
 #else
         ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
 #end
-        invokerAssistant.setBehaviorCommandInvoker(behaviorCommandInvoker);
         invokerAssistant.setDataSource(dataSource);
         return invokerAssistant;
     }

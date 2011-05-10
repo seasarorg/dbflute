@@ -18,13 +18,14 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.exception.DfClassificationIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationAllInOneSqlExecutor;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationIllegalPropertyTypeException;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
@@ -130,19 +131,13 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             // - - - - - - - - - - - - - - - -
             final Object value = plainClassificationDefinitionMap.get(classificationName);
             if (!(value instanceof List<?>)) {
-                String msg = "A value of map for classification definition should be list for classification:";
-                msg = msg + " classificationName=" + classificationName;
-                msg = msg + " type=" + value.getClass() + " value=" + value;
-                throw new DfClassificationIllegalPropertyTypeException(msg);
+                throwClassificationMapValueIllegalListTypeException(value);
             }
             final List<?> plainList = (List<?>) value;
             final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();
             for (Object element : plainList) {
                 if (!(element instanceof Map<?, ?>)) {
-                    String msg = "An element of list for classification should be map for classification element:";
-                    msg = msg + " classificationName=" + classificationName;
-                    msg = msg + " type=" + element.getClass() + " element=" + element;
-                    throw new DfClassificationIllegalPropertyTypeException(msg);
+                    throwClassificationListElementIllegalMapTypeException(element);
                 }
                 @SuppressWarnings("unchecked")
                 final Map<String, String> elementMap = (Map<String, String>) element;
@@ -184,6 +179,42 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public boolean isTableClassification(String classificationName) {
         return _tableClassificationMap.containsKey(classificationName);
+    }
+
+    protected void throwClassificationMapValueIllegalListTypeException(Object value) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The value of map for classification definition was not map type.");
+        br.addItem("Advice");
+        br.addElement("A value of map for classification definition should be list");
+        br.addElement("for classification on classificationDefinitionMap.dfprop.");
+        br.addElement("See the document for the DBFlute property.");
+        br.addItem("Illegal Element");
+        if (value != null) {
+            br.addElement(value.getClass());
+            br.addElement(value);
+        } else {
+            br.addElement(null);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfClassificationIllegalPropertyTypeException(msg);
+    }
+
+    protected void throwClassificationListElementIllegalMapTypeException(Object element) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The element of list for classification was not map type.");
+        br.addItem("Advice");
+        br.addElement("An element of list for classification should be map");
+        br.addElement("for classification elements on classificationDefinitionMap.dfprop.");
+        br.addElement("See the document for the DBFlute property.");
+        br.addItem("Illegal Element");
+        if (element != null) {
+            br.addElement(element.getClass());
+            br.addElement(element);
+        } else {
+            br.addElement(null);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfClassificationIllegalPropertyTypeException(msg);
     }
 
     // -----------------------------------------------------
@@ -550,26 +581,42 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final Set<String> deploymentMapkeySet = map.keySet();
         for (String tableName : deploymentMapkeySet) {
             final Object value = map.get(tableName);
-            if (value instanceof Map<?, ?>) {
-                @SuppressWarnings("unchecked")
-                final Map<String, String> tmpMap = (Map<String, String>) value;
-                final Set<String> tmpMapKeySet = tmpMap.keySet();
-
-                // It's normal map because this column name key contains hint.
-                final Map<String, String> columnClassificationMap = new LinkedHashMap<String, String>();
-                for (Object columnNameObj : tmpMapKeySet) {
-                    final String columnName = (String) columnNameObj;
-                    final String classificationName = (String) tmpMap.get(columnName);
-                    columnClassificationMap.put(columnName, classificationName);
-                }
-                _classificationDeploymentMap.put(tableName, columnClassificationMap);
-            } else {
-                String msg = "The value should be columnClassificationMap: ";
-                throw new IllegalStateException(msg + "type=" + value.getClass() + " value=" + value);
+            if (!(value instanceof Map<?, ?>)) {
+                throwClassificationDeploymentIllegalMapTypeException(value);
             }
+            @SuppressWarnings("unchecked")
+            final Map<String, String> tmpMap = (Map<String, String>) value;
+            final Set<String> tmpMapKeySet = tmpMap.keySet();
+
+            // It's normal map because this column name key contains hint.
+            final Map<String, String> columnClassificationMap = new LinkedHashMap<String, String>();
+            for (Object columnNameObj : tmpMapKeySet) {
+                final String columnName = (String) columnNameObj;
+                final String classificationName = (String) tmpMap.get(columnName);
+                columnClassificationMap.put(columnName, classificationName);
+            }
+            _classificationDeploymentMap.put(tableName, columnClassificationMap);
         }
         reflectClassificationResourceToDeployment(); // *Classification Resource Point!
         return _classificationDeploymentMap;
+    }
+
+    protected void throwClassificationDeploymentIllegalMapTypeException(Object value) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The column-classification map was not map type.");
+        br.addItem("Advice");
+        br.addElement("The value should be column-classification map");
+        br.addElement("on classificationDeploymentMap.dfprop.");
+        br.addElement("See the document for the DBFlute property.");
+        br.addItem("Illegal Value");
+        if (value != null) {
+            br.addElement(value.getClass());
+            br.addElement(value);
+        } else {
+            br.addElement(null);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfClassificationIllegalPropertyTypeException(msg);
     }
 
     // --------------------------------------
@@ -589,17 +636,13 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             final List<Table> tableList = database.getTableList();
             for (Table table : tableList) {
                 final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, table.getName());
-                final Set<String> columnNameKeySet = allColumnClassificationMap.keySet();
-                for (String columnName : columnNameKeySet) {
-                    final String classificationName = allColumnClassificationMap.get(columnName);
-                    columnClsMap.put(columnName, classificationName);
+                for (Entry<String, String> entry : allColumnClassificationMap.entrySet()) {
+                    columnClsMap.put(entry.getKey(), entry.getValue());
                 }
             }
         }
         initializeClassificationDefinition();
-        final Set<Entry<String, DfClassificationElement>> tableClassificationEntrySet = _tableClassificationMap
-                .entrySet();
-        for (Entry<String, DfClassificationElement> entry : tableClassificationEntrySet) {
+        for (Entry<String, DfClassificationElement> entry : _tableClassificationMap.entrySet()) {
             final DfClassificationElement element = entry.getValue();
             final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, element.getTable());
             final String classificationName = element.getClassificationName();
@@ -672,21 +715,30 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return true;
     }
 
+    protected final Map<String, StringKeyMap<String>> _fkeyColumnClassificationMap = StringKeyMap.createAsFlexible();
+
     public String getClassificationName(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        if (!deploymentMap.containsKey(tableName)) {
+        final Map<String, String> plainMap = deploymentMap.get(tableName);
+        if (plainMap == null) {
             return null;
         }
-        final Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
-
-        // Because columnClassificationMap is not flexible map.
-        final String classificationName = getByFlexibleKey(columnClassificationMap, columnName);
+        final String classificationName;
+        {
+            // Because columnClassificationMap is not flexible map.
+            StringKeyMap<String> columnClassificationMap = _fkeyColumnClassificationMap.get(tableName);
+            if (columnClassificationMap == null) {
+                columnClassificationMap = StringKeyMap.createAsFlexible();
+                columnClassificationMap.putAll(plainMap);
+                _fkeyColumnClassificationMap.put(tableName, columnClassificationMap);
+            }
+            classificationName = columnClassificationMap.get(columnName);
+        }
 
         if (classificationName == null) {
-            final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
-            for (String columnNameHint : columnClassificationMapKeySet) {
+            for (String columnNameHint : plainMap.keySet()) {
                 if (isHitByTheHint(columnName, columnNameHint)) {
-                    return columnClassificationMap.get(columnNameHint);
+                    return plainMap.get(columnNameHint);
                 }
             }
             return null;
@@ -735,26 +787,32 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return getAllClassificationName(columnName) != null;
     }
 
+    protected Map<String, String> _fkeyAllColumnClassificationMap;
+
     /**
      * Get the name of classification for all column.
      * @param columnName The name of column. (NotNull)
      * @return The name of classification for all column. (NullAllowed: If NotFound)
      */
     public String getAllClassificationName(String columnName) {
-        final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
-        if (allColumnClassificationMap == null) {
+        final Map<String, String> plainMap = getAllColumnClassificationMap();
+        if (plainMap == null) {
             return null;
         }
-
-        // Because allColumnClassificationMap is not flexible map.
-        final String classificationName = getByFlexibleKey(allColumnClassificationMap, columnName);
+        final String classificationName;
+        {
+            if (_fkeyAllColumnClassificationMap == null) {
+                _fkeyAllColumnClassificationMap = StringKeyMap.createAsFlexible();
+                _fkeyAllColumnClassificationMap.putAll(plainMap);
+            }
+            classificationName = _fkeyAllColumnClassificationMap.get(columnName);
+        }
         if (classificationName != null) {
             return classificationName;
         }
-        final Set<String> columnNameHintSet = allColumnClassificationMap.keySet();
-        for (String columnNameHint : columnNameHintSet) {
+        for (String columnNameHint : plainMap.keySet()) {
             if (isHitByTheHint(columnName, columnNameHint)) {
-                return allColumnClassificationMap.get(columnNameHint);
+                return plainMap.get(columnNameHint);
             }
         }
         return null;

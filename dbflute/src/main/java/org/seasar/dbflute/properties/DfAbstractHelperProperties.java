@@ -15,7 +15,6 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfJDBCException;
-import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
@@ -529,12 +528,6 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                   Assist Helper
     //                                                                   =============
-    protected <VALUE> VALUE getByFlexibleKey(Map<String, VALUE> map, String key) {
-        final Map<String, VALUE> stringKeyMap = StringKeyMap.createAsFlexible();
-        stringKeyMap.putAll(map);
-        return stringKeyMap.get(key);
-    }
-
     protected boolean isHitByTheHint(final String name, final String hint) {
         return DfNameHintUtil.isHitByTheHint(name, hint);
     }

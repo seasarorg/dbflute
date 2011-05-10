@@ -3,7 +3,6 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
@@ -21,7 +20,6 @@ import org.seasar.dbflute.outsidesql.factory.DefaultOutsideSqlExecutorFactory;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
 #if ($database.isTargetContainerSeasar())
-import org.seasar.extension.jdbc.types.ValueTypes;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 #end
 import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
@@ -46,7 +44,6 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // -----------------------------------------------------
     //                                          DI Component
     //                                          ------------
-    protected BehaviorCommandInvoker _behaviorCommandInvoker;
     protected DataSource _dataSource;
 
     // -----------------------------------------------------
@@ -325,7 +322,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // ===================================================================================
     //                                                                             Dispose
     //                                                                             =======
-    public void toBeDisposable() { // for HotDeploy
+    public void toBeDisposable(final DisposableProcess callerProcess) { // for HotDeploy
 #if ($database.isTargetContainerSeasar())
         if (_disposable) {
             return;
@@ -334,29 +331,21 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
             if (_disposable) {
                 return;
             }
-            // Register for BehaviorCommandInvoker
             DisposableUtil.add(new Disposable() {
                 public void dispose() {
-                    if (_behaviorCommandInvoker != null) {
-                        _behaviorCommandInvoker.clearExecutionCache();
-                    }
+                    callerProcess.dispose();
                     _disposable = false;
                 }
             });
-            // Register for BeanDescFactory
             DisposableUtil.add(new Disposable() {
                 public void dispose() {
                     DfBeanDescFactory.clear();
                 }
             });
-            // Register for ValueTypes
-            DisposableUtil.add(new Disposable() {
-                public void dispose() {
-                    ValueTypes.clear();
-                }
-            });
             _disposable = true;
         }
+#else
+        // do nothing: unsupported at this DI container
 #end
     }
 
@@ -365,22 +354,8 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 
     // ===================================================================================
-    //                                                                       Assert Helper
-    //                                                                       =============
-    protected void assertBehaviorCommandInvoker() {
-        if (_behaviorCommandInvoker == null) {
-            String msg = "The attribute 'behaviorCommandInvoker' should not be null!";
-            throw new IllegalStateException(msg);
-        }
-    }
-
-    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
-        _behaviorCommandInvoker = behaviorCommandInvoker;
-    }
-
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
     }

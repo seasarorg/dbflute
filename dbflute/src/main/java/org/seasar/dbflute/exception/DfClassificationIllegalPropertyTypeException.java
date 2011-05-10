@@ -1,6 +1,5 @@
-package org.seasar.dbflute.properties.assistant.classification;
+package org.seasar.dbflute.exception;
 
-import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 
 /**
  * @author jflute

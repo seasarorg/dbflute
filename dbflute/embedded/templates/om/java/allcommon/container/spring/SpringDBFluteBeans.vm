@@ -14,7 +14,6 @@
     <bean id="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}" autowire="byType">
 #end
         <property name="dataSource"><ref bean="${database.DBFluteBeansDataSourceName}"/></property>
-        <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
     </bean>
 #if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
     <bean id="${database.commonColumnAutoSetupperComponentName}" class="${database.extendedImplementedCommonColumnAutoSetupperClass}" autowire="byType"/>

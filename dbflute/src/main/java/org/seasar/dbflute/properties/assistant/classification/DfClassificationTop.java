@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -45,8 +47,7 @@ public class DfClassificationTop {
         // topComment
         final String topComment = (String) elementMap.get(commentKey);
         if (topComment == null) {
-            String msg = "The elementMap should have " + commentKey + ".";
-            throw new IllegalStateException(msg);
+            throwClassificationLiteralCommentNotFoundException(_classificationName, elementMap);
         }
         this._topComment = topComment;
 
@@ -61,6 +62,20 @@ public class DfClassificationTop {
             codeType = tmpType;
         }
         this._codeType = codeType;
+    }
+
+    protected void throwClassificationLiteralCommentNotFoundException(String classificationName, Map<?, ?> elementMap) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The comment attribute of the classification was not found.");
+        br.addItem("Advice");
+        br.addElement("The classification should have the comment attribute.");
+        br.addElement("See the document for the DBFlute property.");
+        br.addItem("Classification");
+        br.addElement(classificationName);
+        br.addItem("Element Map");
+        br.addElement(elementMap);
+        final String msg = br.buildExceptionMessage();
+        throw new DfClassificationRequiredAttributeNotFoundException(msg);
     }
 
     // ===================================================================================

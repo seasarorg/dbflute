@@ -61,9 +61,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
@@ -89,8 +88,7 @@ public class Column {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static Log _log = LogFactory.getLog(Column.class);
-    private static DfColumnExtractor _columnHandler = new DfColumnExtractor();
+    private static final DfColumnExtractor _columnHandler = new DfColumnExtractor();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -1970,21 +1968,31 @@ public class Column {
     }
 
     public List<Map<String, String>> getClassificationMapList() {
-        try {
-            final Map<String, List<Map<String, String>>> definitionMap = getClassificationDefinitionMap();
-            final String classificationName = getClassificationName();
-            final List<Map<String, String>> classificationMapList = definitionMap.get(classificationName);
-            if (classificationMapList == null) {
-                String msg = "The definitionMap did not contain the classificationName:";
-                msg = msg + " classificationName=" + classificationName;
-                msg = msg + " definitionMap=" + definitionMap;
-                throw new IllegalStateException(msg);
-            }
-            return classificationMapList;
-        } catch (RuntimeException e) {
-            _log.warn("getClassificationMapList() threw the exception: ", e);
-            throw e;
+        final Map<String, List<Map<String, String>>> definitionMap = getClassificationDefinitionMap();
+        final String classificationName = getClassificationName();
+        final List<Map<String, String>> classificationMapList = definitionMap.get(classificationName);
+        if (classificationMapList == null) {
+            throwClassificationDeploymentClassificationNotFoundException(classificationName);
         }
+        return classificationMapList;
+    }
+
+    protected void throwClassificationDeploymentClassificationNotFoundException(String classificationName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The classification of the column was not found in the DBFlute property.");
+        br.addItem("Advice");
+        br.addElement("Make sure classificationDefinitionMap.dfprop and");
+        br.addElement("classificationDeploymentMap.dfprop are correct each other.");
+        br.addElement("For example, a classification name is case sensitive.");
+        br.addElement("See the document for the DBFlute properties.");
+        br.addItem("Column");
+        br.addElement(getName());
+        br.addItem("Related Classification");
+        br.addElement(classificationName);
+        br.addItem("Defined Classification List");
+        br.addElement(getClassificationDefinitionMap().keySet());
+        final String msg = br.buildExceptionMessage();
+        throw new DfClassificationDeploymentClassificationNotFoundException(msg);
     }
 
     protected boolean hasSql2EntityRelatedTableClassification() {
