@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
@@ -38,9 +36,6 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                      Definition
     //                                                                      ==========
-    /** Log-instance */
-    private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
-
     // -----------------------------------------------------
     //                                         Default Value
     //                                         -------------
@@ -208,16 +203,11 @@ public abstract class DfAbstractHelperProperties {
      * @return Property as string. (NotNull)
      */
     final protected String stringProp(String key) {
-        try {
-            final String outsidePropString = getOutsidePropString(key);
-            if (outsidePropString != null && outsidePropString.trim().length() > 0) {
-                return outsidePropString;
-            }
-            return DfPropertyUtil.stringProp(_buildProperties, key);
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
-            throw e;
+        final String outsidePropString = getOutsidePropString(key);
+        if (outsidePropString != null && outsidePropString.trim().length() > 0) {
+            return outsidePropString;
         }
+        return DfPropertyUtil.stringProp(_buildProperties, key);
     }
 
     /**
@@ -235,9 +225,6 @@ public abstract class DfAbstractHelperProperties {
             return DfPropertyUtil.stringProp(_buildProperties, key);
         } catch (PropertyNotFoundException e) {
             return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
-            throw e;
         }
     }
 
@@ -260,9 +247,6 @@ public abstract class DfAbstractHelperProperties {
             return defaultValue;
         } catch (PropertyNotFoundException e) {
             return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#stringProp() threw the exception with The key[" + key + "]", e);
-            throw e;
         }
     }
 
@@ -275,12 +259,7 @@ public abstract class DfAbstractHelperProperties {
      * @return Property as boolean.
      */
     final protected boolean booleanProp(String key) {
-        try {
-            return DfPropertyUtil.booleanProp(_buildProperties, key);
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#booleanProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
+        return DfPropertyUtil.booleanProp(_buildProperties, key);
     }
 
     /**
@@ -296,9 +275,6 @@ public abstract class DfAbstractHelperProperties {
             return defaultValue;
         } catch (PropertyBooleanFormatException e) {
             return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
-            throw e;
         }
     }
 
@@ -311,12 +287,7 @@ public abstract class DfAbstractHelperProperties {
      * @return Property as integer.
      */
     final protected int intProp(String key) {
-        try {
-            return DfPropertyUtil.intProp(_buildProperties, key);
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
-            throw e;
-        }
+        return DfPropertyUtil.intProp(_buildProperties, key);
     }
 
     /**
@@ -332,9 +303,6 @@ public abstract class DfAbstractHelperProperties {
             return defaultValue;
         } catch (PropertyIntegerFormatException e) {
             return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("FlPropertyUtil#intProp() threw the exception with The key[" + key + "]", e);
-            throw e;
         }
     }
 
@@ -347,16 +315,11 @@ public abstract class DfAbstractHelperProperties {
      * @return Property as list. (NotNull)
      */
     final protected List<Object> listProp(String key) {
-        try {
-            final List<Object> outsidePropList = getOutsidePropList(key);
-            if (!outsidePropList.isEmpty()) {
-                return outsidePropList;
-            }
-            return DfPropertyUtil.listProp(_buildProperties, key, ";");
-        } catch (RuntimeException e) {
-            _log.warn("DfPropertyUtil#listProp() threw the exception with The key[" + key + "]", e);
-            throw e;
+        final List<Object> outsidePropList = getOutsidePropList(key);
+        if (!outsidePropList.isEmpty()) {
+            return outsidePropList;
         }
+        return DfPropertyUtil.listProp(_buildProperties, key, ";");
     }
 
     /**
@@ -379,9 +342,6 @@ public abstract class DfAbstractHelperProperties {
             }
         } catch (PropertyNotFoundException e) {
             return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("DfPropertyUtil#listProp() threw the exception with The key[" + key + "]", e);
-            throw e;
         }
     }
 
@@ -394,16 +354,11 @@ public abstract class DfAbstractHelperProperties {
      * @return Property as map. (NotNull)
      */
     final protected Map<String, Object> mapProp(String key) {
-        try {
-            final Map<String, Object> outsidePropMap = getOutsidePropMap(key);
-            if (!outsidePropMap.isEmpty()) {
-                return outsidePropMap;
-            }
-            return DfPropertyUtil.mapProp(_buildProperties, key, ";");
-        } catch (RuntimeException e) {
-            _log.warn("DfPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
-            throw e;
+        final Map<String, Object> outsidePropMap = getOutsidePropMap(key);
+        if (!outsidePropMap.isEmpty()) {
+            return outsidePropMap;
         }
+        return DfPropertyUtil.mapProp(_buildProperties, key, ";");
     }
 
     /**
@@ -426,9 +381,6 @@ public abstract class DfAbstractHelperProperties {
             }
         } catch (PropertyNotFoundException e) {
             return defaultValue;
-        } catch (RuntimeException e) {
-            _log.warn("DfPropertyUtil#mapProp() threw the exception with The key[" + key + "]", e);
-            throw e;
         }
     }
 
