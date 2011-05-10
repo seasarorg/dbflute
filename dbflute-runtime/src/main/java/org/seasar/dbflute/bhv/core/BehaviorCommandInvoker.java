@@ -27,6 +27,7 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.BehaviorReadable;
 import org.seasar.dbflute.bhv.BehaviorWritable;
+import org.seasar.dbflute.bhv.core.InvokerAssistant.DisposableProcess;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
@@ -80,6 +81,15 @@ public class BehaviorCommandInvoker {
     //                                       ---------------
     /** The map of SQL execution. (dispose target, synchronized manually) */
     protected final Map<String, SqlExecution> _executionMap = newHashMap();
+
+    // -----------------------------------------------------
+    //                                    Disposable Process
+    //                                    ------------------
+    protected final DisposableProcess _disposableProcess = new DisposableProcess() {
+        public void dispose() {
+            clearExecutionCache();
+        }
+    };
 
     // ===================================================================================
     //                                                                         Constructor
@@ -850,7 +860,7 @@ public class BehaviorCommandInvoker {
     //                                                                             =======
     protected void toBeDisposable() {
         assertInvokerAssistant();
-        _invokerAssistant.toBeDisposable();
+        _invokerAssistant.toBeDisposable(_disposableProcess);
     }
 
     // ===================================================================================
