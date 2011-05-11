@@ -29,6 +29,12 @@ import com.google.inject.Injector;
 #if ($database.isTargetContainerSlim3())
 import org.slim3.container.S3Container;
 #end
+#if ($database.isTargetContainerCDI())
+import javax.inject.Inject;
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+#end
 
 /**
  * The implementation of behavior selector.
@@ -67,6 +73,10 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #if ($database.isTargetContainerSlim3())
     /** The container of Slim3. */
     protected S3Container _container;
+#end
+#if ($database.isTargetContainerCDI())
+    /** The container of CDI. */
+    protected BeanManager _container;
 #end
 
     // ===================================================================================
@@ -157,7 +167,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     // ===================================================================================
     //                                                                           Component
     //                                                                           =========
-#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerLucy())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerLucy() || $database.isTargetContainerCDI())
     @SuppressWarnings("unchecked")
 #end
     protected <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) { // only for behavior
@@ -189,6 +199,17 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerSlim3())
 		return _container.lookup(toClassTitle(componentType));
+#end
+#if ($database.isTargetContainerCDI())
+        COMPONENT result = null;
+        Bean<COMPONENT> bean = (Bean<COMPONENT>) _container.resolve(_container.getBeans(componentType));
+        if (bean != null) {
+            CreationalContext<COMPONENT> context = _container.createCreationalContext(bean);
+            if (context != null) {
+                result = (COMPONENT) _container.getReference(bean, componentType, context);
+            }
+        }
+        return result;
 #end
     }
 
@@ -273,6 +294,12 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerSlim3())
     public void setContainer(S3Container container) {
+        this._container = container;
+    }
+#end
+#if ($database.isTargetContainerCDI())
+    @Inject
+    public void setContainer(BeanManager container) {
         this._container = container;
     }
 #end

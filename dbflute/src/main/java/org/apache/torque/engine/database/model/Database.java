@@ -1315,6 +1315,17 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().getQuillDataSourceName();
     }
 
+    // -----------------------------------------------------
+    //                                                   CDI
+    //                                                   ---
+    public String getMetaInfOutputDirectory() {
+        String resourceOutputDirectory = getBasicProperties().getResourceOutputDirectory();
+        if (resourceOutputDirectory == null) {
+            resourceOutputDirectory = getBasicProperties().getDefaultResourceOutputDirectory();
+        }
+        return resourceOutputDirectory + "/META-INF";
+    }
+
     // ===================================================================================
     //                                                        Sequence/Identity Properties
     //                                                        ============================

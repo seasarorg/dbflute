@@ -6,10 +6,10 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.8.3"/>
-	<property name="build.version" value="${version}-12-SNAPSHOT"/>
+	<property name="build.version" value="${version}-RC3"/>
 	<property name="pre.version" value="0.9.8.2"/>
 	<property name="runtime.version" value="0.9.8.3"/>
-	<property name="runtime.build.version" value="${runtime.version}-12-SNAPSHOT"/>
+	<property name="runtime.build.version" value="${runtime.version}-RC3"/>
 	<property name="runtime.pre.version" value="0.9.8.2"/>
 
 	<!-- Resource Directories -->
@@ -40,6 +40,7 @@
 	<property name="spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
 	<property name="guice.example.dir" value="${workspace.base}/dbflute-guice-example"/>
 	<property name="lucy.example.dir" value="${workspace.base}/dbflute-lucy-example"/>
+	<property name="cdi.example.dir" value="${workspace.base}/dbflute-cdi-example"/>
 
 	<!-- Database Examples -->
 	<property name="mysql.example.dir" value="${workspace.base}/dbflute-mysql-example"/>
@@ -276,6 +277,18 @@
 		<replace file="${lucy.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${lucy.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${lucy.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
+	</target>
+
+	<target name="reflect-to-cdi" depends="prepare-reflection" description="==> reflect to cdi example">
+	  	<copy todir="${cdi.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<delete file="${cdi.example.dir}/lib/${runtime.pre.jar}"/>
+		<delete file="${cdi.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${cdi.example.dir}/lib/${runtime.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${cdi.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<replace file="${cdi.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${cdi.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${cdi.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 

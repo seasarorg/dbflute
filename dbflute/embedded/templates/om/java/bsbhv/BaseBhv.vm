@@ -2,9 +2,18 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 #set ($myClassName = "${myBaseBhvClassName}")
 
 import java.util.List;
+#if ($database.isTargetContainerCDI())
+import javax.inject.Inject;
+#end
 
 import org.seasar.dbflute.*;
 import org.seasar.dbflute.bhv.*;
+#if ($database.isTargetContainerCDI())
+import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+#if ($table.isWritable())
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+#end
+#end
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
@@ -1968,6 +1977,37 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     @SuppressWarnings("unchecked")
     protected QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> downcast(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> option) {
         return (QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}>)option;
+    }
+#end
+#if ($database.isTargetContainerCDI())
+#if ($table.isWritable())
+
+    /**
+     * Set the auto set-upper of common column.
+     * @param commonColumnAutoSetupper The auto set-upper of common column. (NotNull)
+     */
+    @Override @Inject
+    public void setCommonColumnAutoSetupper(CommonColumnAutoSetupper commonColumnAutoSetupper) {
+        this._commonColumnAutoSetupper = commonColumnAutoSetupper;
+    }
+#end
+
+    /**
+     * Set the selector of behavior.
+     * @param behaviorSelector The selector of behavior. (NotNull)
+     */
+    @Override @Inject
+    public void setBehaviorSelector(BehaviorSelector behaviorSelector) {
+        this._behaviorSelector = behaviorSelector;
+    }
+
+    /**
+     * Set the invoker of behavior command.
+     * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
+     */
+    @Override @Inject
+    public void setBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
+        this._behaviorCommandInvoker = behaviorCommandInvoker;
     }
 #end
 }

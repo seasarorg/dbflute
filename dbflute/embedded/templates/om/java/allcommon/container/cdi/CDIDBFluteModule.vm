@@ -1,89 +1,152 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import javax.sql.DataSource;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.seasar.dbflute.BehaviorSelector;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Default;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.AnnotatedType;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.spi.InjectionPoint;
+import javax.enterprise.inject.spi.InjectionTarget;
+import javax.enterprise.util.AnnotationLiteral;
+
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
-import ${glPackageExtendedBhv}.*;
 
 /**
  * @author ${database.classAuthor}
  */
-public class ${glDBFluteModule} {
+public class ${glDBFluteModule} implements Extension {
 
-    protected DataSource dataSource;
+    /**
+     * Register {@link BehaviorCommandInvoker} to container.
+     * @param event event
+     * @param beanManager bean manager
+     */
+    public void afterBeanDiscovery(@Observes final AfterBeanDiscovery event, final BeanManager beanManager) {
+        event.addBean(new DBFluteBean<BehaviorCommandInvoker>(BehaviorCommandInvoker.class, beanManager) {
+            @Override
+            @SuppressWarnings("serial")
+            protected void postInject(final BehaviorCommandInvoker instance) {
+                final Bean<?> iaBean = beanManager.resolve(beanManager.getBeans(InvokerAssistant.class,
+                        new AnnotationLiteral<Default>() {}));
+                instance.setInvokerAssistant((InvokerAssistant) beanManager.getReference(
+                        iaBean, iaBean.getBeanClass(), beanManager.createCreationalContext(iaBean)));
+            }
+        });
+    }
 
-    public ${glDBFluteModule}(DataSource dataSource) {
-        if (dataSource == null) {
-            String msg = "The argument 'dataSource' should not be null!";
-            throw new IllegalArgumentException(msg);
+    /**
+     * Simple implementation of {@link Bean}.
+     *
+     * @param <T>
+     */
+    public class DBFluteBean<T> implements Bean<T> {
+        private final Class<T> beanClass;
+        private final AnnotatedType<T> at;
+        private final InjectionTarget<T> it;
+
+        public DBFluteBean(final Class<T> beanClass, final BeanManager beanManager) {
+            this.beanClass = beanClass;
+            this.at = beanManager.createAnnotatedType(beanClass);
+            this.it = beanManager.createInjectionTarget(this.at);
         }
-        this.dataSource = dataSource;
-    }
 
-    public void configure() {
-        createDBFluteInitializer(); // initialized by only a creation
-
-        // The components of DBFlute Runtime.
-        ${glImplementedBehaviorSelector} behaviorSelector = createImplementedBehaviorSelector();
-        BehaviorCommandInvoker behaviorCommandInvoker = createBehaviorCommandInvoker();
-        ${glImplementedInvokerAssistant} invokerAssistant = createImplementedInvokerAssistant(behaviorCommandInvoker);
-        behaviorCommandInvoker.setInvokerAssistant(invokerAssistant);
-        ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = createImplementedCommonColumnAutoSetupper();
-
-        bind(BehaviorSelector.class).toInstance(behaviorSelector);
-        bind(BehaviorCommandInvoker.class).toInstance(behaviorCommandInvoker);
-        bind(InvokerAssistant.class).toInstance(invokerAssistant);
-        bind(CommonColumnAutoSetupper.class).toInstance(commonColumnAutoSetupper);
-
-        // The components of Behavior.
-        setupBehavior(behaviorCommandInvoker, behaviorSelector, commonColumnAutoSetupper);
-    }
-
-    protected ${glDBFluteInitializer} createDBFluteInitializer() {
-        return new ${glDBFluteInitializer}();
-    }
-
-    protected ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
-        return new ${glImplementedBehaviorSelector}();
-    }
-
-    protected BehaviorCommandInvoker createBehaviorCommandInvoker() {
-        return new BehaviorCommandInvoker();
-    }
-
-    protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant(BehaviorCommandInvoker behaviorCommandInvoker) {
-#if ($database.hasExtendedImplementedInvokerAssistantClass())
-        ${glImplementedInvokerAssistant} invokerAssistant = new ${database.extendedImplementedInvokerAssistantClass}();
-#else
-        ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
-#end
-        invokerAssistant.setBehaviorCommandInvoker(behaviorCommandInvoker);
-        invokerAssistant.setDataSource(dataSource);
-        return invokerAssistant;
-    }
-
-    protected ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
-#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
-        return new ${database.extendedImplementedCommonColumnAutoSetupperClass}();
-#else
-        return new ${glImplementedCommonColumnAutoSetupper}();
-#end
-    }
-
-    protected void setupBehavior(BehaviorCommandInvoker ker, BehaviorSelector tor, CommonColumnAutoSetupper per) {
-#foreach ($table in $database.tables)
-        {
-            ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
-#if ($table.isWritable())
-            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor); bhv.setCommonColumnAutoSetupper(per);
-#else
-            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor);
-#end
-            bind(${table.extendedBehaviorClassName}.class).toInstance(bhv);
+        @Override
+        public T create(final CreationalContext<T> cc) {
+            final T instance = this.it.produce(cc);
+            this.it.inject(instance, cc);
+            this.postInject(instance);
+            this.it.postConstruct(instance);
+            return instance;
         }
-#end
+
+        /**
+         * Bean customization point.
+         * @param instance
+         */
+        protected void postInject(final T instance) {
+        }
+
+        @Override
+        public void destroy(final T instance, final CreationalContext<T> cc) {
+            this.it.preDestroy(instance);
+            this.it.dispose(instance);
+            cc.release();
+        };
+
+        @Override
+        public Class<?> getBeanClass() {
+            return this.beanClass;
+        }
+
+        @Override
+        public Set<InjectionPoint> getInjectionPoints() {
+            return this.it.getInjectionPoints();
+        }
+
+        @Override
+        public String getName() {
+            String className = this.beanClass.getName();
+            final int index = className.lastIndexOf('.');
+            if (0 < index) {
+                className = className.substring(index + 1);
+            }
+            final char[] chars = className.toCharArray();
+            if (Character.isUpperCase(chars[0])) {
+                chars[0] = Character.toLowerCase(chars[0]);
+            }
+            return new String(chars);
+        }
+
+        @Override
+        @SuppressWarnings("serial")
+        public Set<Annotation> getQualifiers() {
+            final Set<Annotation> qualifiers = new HashSet<Annotation>();
+            qualifiers.add(new AnnotationLiteral<Default>() {
+            });
+            qualifiers.add(new AnnotationLiteral<Any>() {
+            });
+            return qualifiers;
+        }
+
+        @Override
+        public Class<? extends Annotation> getScope() {
+            return ApplicationScoped.class;
+        }
+
+        @Override
+        public Set<Class<? extends Annotation>> getStereotypes() {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public Set<Type> getTypes() {
+            final Set<Type> types = new HashSet<Type>();
+            types.add(this.beanClass);
+            types.add(Object.class);
+            return types;
+        }
+
+        @Override
+        public boolean isAlternative() {
+            return false;
+        }
+
+        @Override
+        public boolean isNullable() {
+            return false;
+        }
+
     }
 }

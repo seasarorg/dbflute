@@ -1,5 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+#if ($database.isTargetContainerCDI())
+import javax.inject.Inject;
+#end
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.DBDef;
@@ -356,6 +359,9 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+#if ($database.isTargetContainerCDI())
+    @Inject
+#end
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
     }
