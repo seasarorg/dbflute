@@ -282,10 +282,6 @@
 
 	<target name="reflect-to-cdi" depends="prepare-reflection" description="==> reflect to cdi example">
 	  	<copy todir="${cdi.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
-		<delete file="${cdi.example.dir}/lib/${runtime.pre.jar}"/>
-		<delete file="${cdi.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
-		<copy file="${dist}/${runtime.jar}" tofile="${cdi.example.dir}/lib/${runtime.jar}" overwrite="true"/>
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${cdi.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
 		<replace file="${cdi.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${cdi.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${cdi.example.dir}/mydbflute/dbflute-${pre.version}"/>
