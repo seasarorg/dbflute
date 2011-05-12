@@ -67,8 +67,10 @@ public class WayOfMySQL implements DBWay {
     //                                                                     ENUM Definition
     //                                                                     ===============
     public enum FullTextSearchModifier {
-        InBooleanMode("IN BOOLEAN MODE"), InNaturalLanguageMode("IN NATURAL LANGUAGE MODE"), InNaturalLanguageModeWithQueryExpansion(
-                "IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION"), WithQueryExpansion("WITH QUERY EXPANSION");
+        InBooleanMode("in boolean mode") //
+        , InNaturalLanguageMode("in natural language mode") //
+        , InNaturalLanguageModeWithQueryExpansion("in natural language mode with query expansion") //
+        , WithQueryExpansion("with query expansion");
         private static final Map<String, FullTextSearchModifier> _codeValueMap = new HashMap<String, FullTextSearchModifier>();
         static {
             for (FullTextSearchModifier value : values()) {

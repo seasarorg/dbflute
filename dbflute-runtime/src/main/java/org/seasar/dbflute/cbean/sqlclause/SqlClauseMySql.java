@@ -153,41 +153,16 @@ public class SqlClauseMySql extends AbstractSqlClause {
      */
     public String buildMatchCondition(List<ColumnInfo> textColumnList, String conditionValue,
             FullTextSearchModifier modifier, String tableDbName, String aliasName) {
-        if (textColumnList == null) {
-            throw new IllegalArgumentException("The argument 'textColumnList' should not be null!");
-        }
-        if (textColumnList.isEmpty()) {
-            throw new IllegalArgumentException("The argument 'textColumnList' should not be empty list!");
-        }
-        if (conditionValue == null || conditionValue.length() == 0) {
-            throw new IllegalArgumentException("The argument 'conditionValue' should not be null or empty: "
-                    + conditionValue);
-        }
-        if (tableDbName == null || tableDbName.trim().length() == 0) {
-            throw new IllegalArgumentException("The argument 'tableDbName' should not be null or trimmed-empty: "
-                    + tableDbName);
-        }
-        if (aliasName == null || aliasName.trim().length() == 0) {
-            throw new IllegalArgumentException("The argument 'aliasName' should not be null or trimmed-empty: "
-                    + aliasName);
-        }
+        assertTextColumnList(textColumnList);
+        assertVariousTextSearchResource(conditionValue, modifier, tableDbName, aliasName);
         final StringBuilder sb = new StringBuilder();
         int index = 0;
         for (ColumnInfo columnInfo : textColumnList) {
             if (columnInfo == null) {
                 continue;
             }
-            final String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
-            if (!tableOfColumn.equalsIgnoreCase(tableDbName)) {
-                String msg = "The table of the text column should be '" + tableDbName + "'";
-                msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
-                throw new IllegalArgumentException(msg);
-            }
-            if (!columnInfo.isPropertyTypeString()) {
-                String msg = "The text column should be String type:";
-                msg = msg + " column=" + columnInfo;
-                throw new IllegalArgumentException(msg);
-            }
+            assertTextColumnTable(tableDbName, columnInfo);
+            assertTextColumnType(tableDbName, columnInfo);
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
             if (index > 0) {
                 sb.append(",");
@@ -201,5 +176,49 @@ public class SqlClauseMySql extends AbstractSqlClause {
         }
         sb.append(")");
         return sb.toString();
+    }
+
+    protected void assertTextColumnList(List<ColumnInfo> textColumnList) {
+        if (textColumnList == null) {
+            String msg = "The argument 'textColumnList' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (textColumnList.isEmpty()) {
+            String msg = "The argument 'textColumnList' should not be empty list.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertVariousTextSearchResource(String conditionValue, FullTextSearchModifier modifier,
+            String tableDbName, String aliasName) {
+        if (conditionValue == null || conditionValue.length() == 0) {
+            String msg = "The argument 'conditionValue' should not be null or empty: " + conditionValue;
+            throw new IllegalArgumentException(msg);
+        }
+        if (tableDbName == null || tableDbName.trim().length() == 0) {
+            String msg = "The argument 'tableDbName' should not be null or trimmed-empty: " + tableDbName;
+            throw new IllegalArgumentException(msg);
+        }
+        if (aliasName == null || aliasName.trim().length() == 0) {
+            String msg = "The argument 'aliasName' should not be null or trimmed-empty: " + aliasName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertTextColumnTable(String tableDbName, ColumnInfo columnInfo) {
+        final String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
+        if (!tableOfColumn.equalsIgnoreCase(tableDbName)) {
+            String msg = "The table of the text column should be '" + tableDbName + "'";
+            msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertTextColumnType(String tableDbName, ColumnInfo columnInfo) {
+        if (!columnInfo.isPropertyTypeString()) {
+            String msg = "The text column should be String type:";
+            msg = msg + " column=" + columnInfo;
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

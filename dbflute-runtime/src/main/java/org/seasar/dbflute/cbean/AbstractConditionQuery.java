@@ -1650,7 +1650,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void xdoMatchForMySQL(List<ColumnInfo> textColumnList, String conditionValue,
             WayOfMySQL.FullTextSearchModifier modifier) {
         if (conditionValue == null || conditionValue.length() == 0) {
-            return;
+            return; // ignored according to condition-bean rule
         }
         final String clause = ((SqlClauseMySql) xgetSqlClause()).buildMatchCondition(textColumnList, conditionValue,
                 modifier, getTableDbName(), xgetAliasName());
