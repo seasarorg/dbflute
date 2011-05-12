@@ -59,4 +59,11 @@ public class WayOfMSAccess implements DBWay {
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return false; // unknown
     }
+
+    // ===================================================================================
+    //                                                                       Escape Clause
+    //                                                                       =============
+    public String escapeLiteralValue(String literalValue) {
+        return literalValue; // unknown
+    }
 }

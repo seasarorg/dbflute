@@ -57,6 +57,13 @@ public class WayOfFirebird implements DBWay {
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        return false; // Unknown
+        return false; // unknown
+    }
+
+    // ===================================================================================
+    //                                                                       Escape Clause
+    //                                                                       =============
+    public String escapeLiteralValue(String literalValue) {
+        return literalValue; // unknown
     }
 }

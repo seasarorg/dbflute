@@ -18,6 +18,8 @@ package org.seasar.dbflute.dbway;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * The DB way of MySQL.
  * @author jflute
@@ -61,6 +63,15 @@ public class WayOfMySQL implements DBWay {
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return errorCode != null && errorCode == 1062;
+    }
+
+    // ===================================================================================
+    //                                                                       Escape Clause
+    //                                                                       =============
+    public String escapeLiteralValue(String literalValue) {
+        literalValue = Srl.replace(literalValue, "\\", "\\\\");
+        literalValue = Srl.replace(literalValue, "'", "\'");
+        return literalValue;
     }
 
     // ===================================================================================

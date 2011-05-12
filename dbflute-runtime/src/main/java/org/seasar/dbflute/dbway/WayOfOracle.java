@@ -59,4 +59,11 @@ public class WayOfOracle implements DBWay {
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return errorCode != null && errorCode == 1;
     }
+
+    // ===================================================================================
+    //                                                                       Escape Clause
+    //                                                                       =============
+    public String escapeLiteralValue(String literalValue) {
+        return literalValue; // unknown
+    }
 }

@@ -17,6 +17,7 @@ package org.seasar.dbflute.cbean.sqlclause;
 
 import java.util.List;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -145,7 +146,7 @@ public class SqlClauseMySql extends AbstractSqlClause {
      * Build a condition string of match statement for full-text search. <br />
      * Bind variable is unused because the condition value should be literal in MySQL.
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
-     * @param conditionValue The condition value embedded without binding (by MySQL restriction). (NotNull)
+     * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NotNull)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, No modifier specified)
      * @param tableDbName The DB name of the target table. (NotNull)
      * @param aliasName The alias name of the target table. (NotNull)
@@ -170,12 +171,17 @@ public class SqlClauseMySql extends AbstractSqlClause {
             sb.append(aliasName).append(".").append(columnSqlName);
             ++index;
         }
-        sb.insert(0, "match(").append(") against ('").append(conditionValue).append("'");
+        sb.insert(0, "match(").append(") against ('");
+        sb.append(escapeMatchConditionValue(conditionValue)).append("'");
         if (modifier != null) {
             sb.append(" ").append(modifier.code());
         }
         sb.append(")");
         return sb.toString();
+    }
+
+    protected String escapeMatchConditionValue(String conditionValue) {
+        return DBDef.MySQL.dbway().escapeLiteralValue(conditionValue);
     }
 
     protected void assertTextColumnList(List<ColumnInfo> textColumnList) {

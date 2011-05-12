@@ -62,4 +62,9 @@ public interface DBWay {
      * @return Is the SQLException from unique constraint?
      */
     boolean isUniqueConstraintException(String sqlState, Integer errorCode);
+
+    // ===================================================================================
+    //                                                                       Escape Clause
+    //                                                                       =============
+    String escapeLiteralValue(String literalValue);
 }
