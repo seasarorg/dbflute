@@ -1268,7 +1268,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Match for full-text search. <br />
      * Bind variable is unused because the condition value should be literal in MySQL.
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
-     * @param conditionValue The condition value. (NullAllowed: If the value is null or empty, it does not make condition!)
+     * @param conditionValue The condition value embedded without binding (by MySQL restriction). (NullAllowed: if null or empty, no condition)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, No modifier specified)
      */
     public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn
@@ -1282,8 +1282,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Match for full-text search. <br />
      * Bind variable is unused because the condition value should be literal in MySQL.
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
-     * @param conditionValue The condition value. (NullAllowed: If the value is null or empty, it does not make condition!)
-     * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, No modifier specified)
+     * @param conditionValue The condition value embedded without binding (by MySQL restriction). (NullAllowed: if null or empty, no condition)
+     * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, no modifier specified)
      */
     public void match(java.util.List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList
                     , String conditionValue
@@ -1299,7 +1299,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Match for full-text search. <br />
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
-     * @param conditionValue The condition value. (NullAllowed: If the value is null or empty, it does not make condition!)
+     * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
     public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
         assertObjectNotNull("textColumn", textColumn);
@@ -1309,7 +1309,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Match for full-text search. <br />
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
-     * @param conditionValue The condition value. (NullAllowed: If the value is null or empty, it does not make condition!)
+     * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
     public void match(java.util.List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
         xdoMatchByLikeSearch(textColumnList, conditionValue);
@@ -1338,7 +1338,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Match for full-text search. <br />
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
-     * @param conditionValue The condition value. (NullAllowed: If the value is null or empty, it does not make condition!)
+     * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
     public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn, String conditionValue) {
         assertObjectNotNull("textColumn", textColumn);
@@ -1349,7 +1349,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Match for full-text search. <br />
      * The specified condition value is escaped in this method automatically.
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
-     * @param conditionValue The condition value. (NullAllowed: If the value is null or empty, it does not make condition!)
+     * @param conditionValue The condition value. (NullAllowed: if null or empty, no condition)
      */
     public void match(java.util.List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
         xdoMatchByLikeSearch(textColumnList, conditionValue);

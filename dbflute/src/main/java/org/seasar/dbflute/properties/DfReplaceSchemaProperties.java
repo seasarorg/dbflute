@@ -3,10 +3,10 @@ package org.seasar.dbflute.properties;
 import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -301,9 +301,18 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         _filterVariablesMap = (Map<String, String>) getReplaceSchemaDefinitionMap().get("filterVariablesMap");
         if (_filterVariablesMap == null) {
-            _filterVariablesMap = new HashMap<String, String>();
+            _filterVariablesMap = new LinkedHashMap<String, String>();
         }
+        setupDefaultFilterVariables(_filterVariablesMap);
         return _filterVariablesMap;
+    }
+
+    protected void setupDefaultFilterVariables(Map<String, String> filterVariablesMap) {
+        final DfDatabaseProperties prop = getDatabaseProperties();
+        filterVariablesMap.put("dfprop.mainCatalog", prop.getDatabaseCatalog());
+        filterVariablesMap.put("dfprop.mainSchema", prop.getDatabaseSchema().getPureSchema());
+        filterVariablesMap.put("dfprop.mainUser", prop.getDatabaseUser());
+        filterVariablesMap.put("dfprop.mainPassword", prop.getDatabasePassword());
     }
 
     protected String getFilterVariablesBeginMark() {
@@ -319,12 +328,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final String endMark = getFilterVariablesEndMark();
         final Map<String, String> filterVariablesMap = getFilterVariablesMap();
         if (!filterVariablesMap.isEmpty() && sql.contains(beginMark) && sql.contains(endMark)) {
-            final Set<String> keySet = filterVariablesMap.keySet();
-            for (String key : keySet) {
-                final String variableMark = beginMark + key + endMark;
+            final Set<Entry<String, String>> entrySet = filterVariablesMap.entrySet();
+            for (Entry<String, String> entry : entrySet) {
+                final String variableMark = beginMark + entry.getKey() + endMark;
                 if (sql.contains(variableMark)) {
-                    final String value = filterVariablesMap.get(key);
-                    sql = replaceString(sql, variableMark, value);
+                    sql = replaceString(sql, variableMark, entry.getValue());
                 }
             }
         }
