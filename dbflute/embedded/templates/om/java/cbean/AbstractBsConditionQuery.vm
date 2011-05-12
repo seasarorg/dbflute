@@ -1268,7 +1268,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Match for full-text search. <br />
      * Bind variable is unused because the condition value should be literal in MySQL.
      * @param textColumn The text column. (NotNull, StringColumn, TargetTableColumn)
-     * @param conditionValue The condition value embedded without binding (by MySQL restriction). (NullAllowed: if null or empty, no condition)
+     * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, No modifier specified)
      */
     public void match(org.seasar.dbflute.dbmeta.info.ColumnInfo textColumn
@@ -1282,7 +1282,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Match for full-text search. <br />
      * Bind variable is unused because the condition value should be literal in MySQL.
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
-     * @param conditionValue The condition value embedded without binding (by MySQL restriction). (NullAllowed: if null or empty, no condition)
+     * @param conditionValue The condition value embedded without binding (by MySQL restriction) but escaped. (NullAllowed: if null or empty, no condition)
      * @param modifier The modifier of full-text search. (NullAllowed: If the value is null, no modifier specified)
      */
     public void match(java.util.List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList
