@@ -123,7 +123,6 @@ public class SQLExceptionHandler {
         setupBehaviorElement(br);
         setupConditionBeanElement(br);
         setupOutsideSqlElement(br);
-        setupStatementElement(br, st);
         setupTargetSqlElement(br, executedSql, displaySql);
     }
 
@@ -176,12 +175,13 @@ public class SQLExceptionHandler {
     //    }
     //}
 
-    protected void setupStatementElement(ExceptionMessageBuilder br, Statement st) {
-        if (st != null) {
-            br.addItem("Statement");
-            br.addElement(st.getClass().getName());
-        }
-    }
+    // *because it's not an important thing
+    //protected void setupStatementElement(ExceptionMessageBuilder br, Statement st) {
+    //    if (st != null) {
+    //        br.addItem("Statement");
+    //        br.addElement(st.getClass().getName());
+    //    }
+    //}
 
     /**
      * Set up the element of target SQL. <br />
