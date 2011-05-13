@@ -17,6 +17,8 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfAlterCheckAlterNGMarkFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.seasar.dbflute.exception.DfAlterCheckAlterSqlFailureException;
+import org.seasar.dbflute.exception.DfAlterCheckCreateNGMarkFoundException;
+import org.seasar.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckDifferenceFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckRollbackSchemaFailureException;
@@ -74,9 +76,22 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                         Constructor
     //                                                                         ===========
     protected DfAlterCheckProcess(DataSource dataSource, UnifiedSchema mainSchema, CoreProcessPlayer coreProcessPlayer) {
+        if (dataSource == null) {
+            throwAlterCheckDataSourceNotFoundException();
+        }
         _dataSource = dataSource;
         _mainSchema = mainSchema;
         _coreProcessPlayer = coreProcessPlayer;
+    }
+
+    protected void throwAlterCheckDataSourceNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found data source for AlterCheck (or ChangeOutput).");
+        br.addItem("Advice");
+        br.addElement("Make sure your database instance works");
+        br.addElement("or your connection settings are correct.");
+        String msg = br.buildExceptionMessage();
+        throw new DfAlterCheckDataSourceNotFoundException(msg);
     }
 
     public static DfAlterCheckProcess createAsMain(DataSource dataSource, CoreProcessPlayer coreProcessPlayer) {
@@ -93,7 +108,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public DfAlterSchemaFinalInfo execute() {
+    public DfAlterSchemaFinalInfo checkAlter() {
         processReady();
 
         final DfAlterSchemaFinalInfo finalInfo = alterSchema();
@@ -112,15 +127,15 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             processSuccess();
         }
 
-        // allowed not to be executed when processes before abort
+        // not allowed to be executed when processes before abort
         // for unanticipated accidents (not to delete previous files)
-        processClose();
-
+        deleteTemporaryResource();
         return finalInfo;
     }
 
     public DfAlterSchemaFinalInfo outputChange() { // sub-process
         processReady();
+
         final DfAlterSchemaFinalInfo finalInfo = new DfAlterSchemaFinalInfo();
         finalInfo.setResultMessage("{Change Output}");
         final String resultDiff = getMigrationChangeOutputResultDiff();
@@ -131,6 +146,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         if (finalInfo.isFailure()) {
             return finalInfo;
         }
+
+        // success here
+        deleteCreateNGMark();
         try {
             final DfSchemaXmlSerializer replacedSerializer = createSchemaXmlSerializer(resultDiff);
             replacedSerializer.serialize();
@@ -138,17 +156,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         } finally {
             rollbackSchema();
         }
-        processClose();
-        closeChangeOutputMark();
-        return finalInfo;
-    }
 
-    protected void closeChangeOutputMark() {
-        final File outputMark = new File(getChangeOutputMark());
-        if (outputMark.exists()) {
-            _log.info("...Deleting change-output mark: " + outputMark);
-            outputMark.delete();
-        }
+        deleteTemporaryResource();
+        return finalInfo;
     }
 
     // ===================================================================================
@@ -158,12 +168,15 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         verifyPremise();
 
         // resources may remain if previous execution aborts
-        clearTemporaryResource();
+        deleteTemporaryResource();
     }
 
     protected void verifyPremise() {
-        if (hasAlterNGMark()) {
+        if (hasMigrationAlterNGMark()) {
             throwAlterCheckAlterNGMarkFoundException();
+        }
+        if (hasMigrationCreateNGMark()) {
+            throwAlterCheckCreateNGMarkFoundException();
         }
     }
 
@@ -171,9 +184,18 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the alter-NG mark of AlterCheck.");
         br.addItem("Advice");
-        setupFixedAdviceMessage(br);
+        setupFixedAlterAdviceMessage(br);
         String msg = br.buildExceptionMessage();
         throw new DfAlterCheckAlterNGMarkFoundException(msg);
+    }
+
+    protected void throwAlterCheckCreateNGMarkFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found the create-NG mark of AlterCheck (or ChangeOutput).");
+        br.addItem("Advice");
+        setupFixedCreateAdviceMessage(br);
+        String msg = br.buildExceptionMessage();
+        throw new DfAlterCheckCreateNGMarkFoundException(msg);
     }
 
     // ===================================================================================
@@ -267,7 +289,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to execute the alter SQL statements.");
         br.addItem("Advice");
-        setupFixedAdviceMessage(br);
+        setupFixedAlterAdviceMessage(br);
         br.addElement("Look at the final info in the log for DBFlute task.");
         br.addItem("Message");
         br.addElement(finalInfo.getResultMessage());
@@ -291,6 +313,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             deployNextResource();
             _coreProcessPlayer.play();
         } catch (RuntimeException threwLater) {
+            markCreateNG();
             rollbackSchema();
             setupAlterCheckReplaceSchemaFailureException(finalInfo, threwLater);
         }
@@ -361,6 +384,20 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         // playsql/replace-schema.sql
         // playsql/data/common/xls/10-master.xls
         return destBaseDir + "/" + relativePath;
+    }
+
+    protected void markCreateNG() {
+        final String ngMark = getMigrationCreateNGMark();
+        try {
+            final File markFile = new File(ngMark);
+            if (!markFile.exists()) {
+                _log.info("...Marking create-NG: " + ngMark);
+                markFile.createNewFile();
+            }
+        } catch (IOException e) {
+            String msg = "Failed to create a file for create-NG mark: " + ngMark;
+            throw new IllegalStateException(msg, e);
+        }
     }
 
     protected void setupAlterCheckReplaceSchemaFailureException(DfAlterSchemaFinalInfo finalInfo, RuntimeException e) {
@@ -500,7 +537,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the differences between alter SQL and create SQL.");
         br.addItem("Advice");
-        setupFixedAdviceMessage(br);
+        setupFixedAlterAdviceMessage(br);
         br.addElement("");
         br.addElement("You can confirm them at '" + getMigrationAlterCheckResultDiff() + "'.");
         br.addElement("The latest item is difference between previous schema and altered schema.");
@@ -517,10 +554,16 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         finalInfo.addDetailMessage("x (found diff)");
     }
 
-    public static void setupFixedAdviceMessage(ExceptionMessageBuilder br) {
+    public static void setupFixedAlterAdviceMessage(ExceptionMessageBuilder br) {
         br.addElement("Make sure your alter SQL are correct");
         br.addElement("and delete the alter-NG mark file.");
         br.addElement("In doing so, you can execute AlterCheck again.");
+    }
+
+    public static void setupFixedCreateAdviceMessage(ExceptionMessageBuilder br) {
+        br.addElement("Make sure your create SQL are correct");
+        br.addElement("and delete the create-NG mark file.");
+        br.addElement("In doing so, you can execute AlterCheck (or ChangeOutput) again.");
     }
 
     // ===================================================================================
@@ -533,15 +576,26 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("* Success Story *");
         _log.info("*               *");
         _log.info("* * * * * * * * *");
-        deleteAlterNG();
+        deleteAllNGMark();
         saveHistory();
         deleteDiffResult();
     }
 
-    protected void deleteAlterNG() {
-        final String ngMark = getMigrationAlterNGMark();
-        _log.info("...Deleting the alter-NG mark: " + ngMark);
-        deleteFile(new File(ngMark));
+    protected void deleteAllNGMark() {
+        deleteAlterNGMark();
+        deleteCreateNGMark();
+    }
+
+    protected void deleteAlterNGMark() {
+        final String alterNGMark = getMigrationAlterNGMark();
+        _log.info("...Deleting the alter-NG mark: " + alterNGMark);
+        deleteFile(new File(alterNGMark));
+    }
+
+    protected void deleteCreateNGMark() {
+        final String createNGMark = getMigrationCreateNGMark();
+        _log.info("...Deleting the create-NG mark: " + createNGMark);
+        deleteFile(new File(createNGMark));
     }
 
     protected void saveHistory() {
@@ -582,19 +636,26 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void deleteDiffResult() {
-        final String diffResult = getMigrationAlterCheckResultDiff();
-        _log.info("...Deleting the diff result file: " + diffResult);
-        deleteFile(new File(diffResult));
+        deleteAlterCheckResultDiff();
+        deleteChangeOutputResultDiff();
+    }
+
+    protected void deleteAlterCheckResultDiff() {
+        final String diff = getMigrationAlterCheckResultDiff();
+        _log.info("...Deleting the AlterCheck result diff: " + diff);
+        deleteFile(new File(diff));
+    }
+
+    protected void deleteChangeOutputResultDiff() {
+        final String diff = getMigrationChangeOutputResultDiff();
+        _log.info("...Deleting the ChangeOutput result diff: " + diff);
+        deleteFile(new File(diff));
     }
 
     // ===================================================================================
     //                                                                             Closing
     //                                                                             =======
-    protected void processClose() {
-        clearTemporaryResource();
-    }
-
-    protected void clearTemporaryResource() {
+    protected void deleteTemporaryResource() {
         deleteSchemaXml();
         deleteTmpDir();
     }
@@ -675,18 +736,22 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // -----------------------------------------------------
-    //                                             Migration
-    //                                             ---------
-    public boolean hasAlterNGMark() {
-        return getReplaceSchemaProperties().hasMigrationAlterNGMark();
-    }
-
+    //                                     Migration NG Mark
+    //                                     -----------------
     public String getMigrationAlterNGMark() {
         return getReplaceSchemaProperties().getMigrationAlterNGMark();
     }
 
     public boolean hasMigrationAlterNGMark() {
         return getReplaceSchemaProperties().hasMigrationAlterNGMark();
+    }
+
+    public String getMigrationCreateNGMark() {
+        return getReplaceSchemaProperties().getMigrationCreateNGMark();
+    }
+
+    public boolean hasMigrationCreateNGMark() {
+        return getReplaceSchemaProperties().hasMigrationCreateNGMark();
     }
 
     public String getMigrationPreviousNGMark() {
@@ -697,14 +762,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().hasMigrationPreviousNGMark();
     }
 
-    public String getChangeOutputMark() {
-        return getReplaceSchemaProperties().getMigrationChangeOutputMark();
-    }
-
-    public boolean hasChangeOutputMark() {
-        return getReplaceSchemaProperties().hasMigrationPreviousNGMark();
-    }
-
+    // -----------------------------------------------------
+    //                                      Migration Detail
+    //                                      ----------------
     public List<File> getMigrationAlterSqlFileList() {
         return getReplaceSchemaProperties().getMigrationAlterSqlFileList();
     }
@@ -723,10 +783,6 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected Map<String, File> getMigrationSchemaDataAllMap() {
         return getReplaceSchemaProperties().getMigrationSchemaDataAllMap();
-    }
-
-    public boolean hasMigrationAlterSqlResource() {
-        return getReplaceSchemaProperties().hasMigrationAlterSqlResource();
     }
 
     protected String getMigrationSchemaXml() {

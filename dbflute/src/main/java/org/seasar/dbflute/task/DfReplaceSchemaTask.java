@@ -88,30 +88,30 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        if (isChangeOutput()) {
-            processChangeOutput();
-        } else if (isAlterCheck()) {
+        if (isAlterCheck()) {
             processAlterCheck();
+        } else if (isChangeOutput()) {
+            processChangeOutput();
         } else {
             processMain();
         }
     }
 
-    protected boolean isChangeOutput() {
-        if (hasPreviousNGMark()) {
-            _log.info("*Found previous-NG mark, which supresses ChangeOutput process");
-            return false;
-        } else {
-            return hasChangeOutputMark();
-        }
-    }
-
     protected boolean isAlterCheck() {
-        if (hasPreviousNGMark()) {
+        if (hasMigrationPreviousNGMark()) {
             _log.info("*Found previous-NG mark, which supresses AlterCheck process");
             return false;
         } else {
-            return hasAlterSqlResource();
+            return hasMigrationAlterSqlResource();
+        }
+    }
+
+    protected boolean isChangeOutput() {
+        if (hasMigrationPreviousNGMark()) {
+            _log.info("*Found previous-NG mark, which supresses ChangeOutput process");
+            return false;
+        } else {
+            return hasMigrationCreateSqlResource();
         }
     }
 
@@ -121,8 +121,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected void closePreviousNGIfExists() {
-        if (hasPreviousNGMark()) {
-            final String ngMark = getPreviousNGMark();
+        if (hasMigrationPreviousNGMark()) {
+            final String ngMark = getMigrationPreviousNGMark();
             final File previousNGMark = new File(ngMark);
             if (previousNGMark.exists()) {
                 _log.info("...Deleting previous-NG mark: " + ngMark);
@@ -146,7 +146,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             if (changeOutput) {
                 _alterSchemaFinalInfo = process.outputChange();
             } else {
-                _alterSchemaFinalInfo = process.execute();
+                _alterSchemaFinalInfo = process.checkAlter();
             }
             _alterSchemaFinalInfo.throwAlterCheckExceptionIfExists();
         } finally {
@@ -367,19 +367,19 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         return getProperties().getReplaceSchemaProperties();
     }
 
-    public String getPreviousNGMark() {
+    public String getMigrationPreviousNGMark() {
         return getReplaceSchemaProperties().getMigrationPreviousNGMark();
     }
 
-    public boolean hasPreviousNGMark() {
+    public boolean hasMigrationPreviousNGMark() {
         return getReplaceSchemaProperties().hasMigrationPreviousNGMark();
     }
 
-    public boolean hasChangeOutputMark() {
-        return getReplaceSchemaProperties().hasMigrationChangeOutputMark();
+    public boolean hasMigrationAlterSqlResource() {
+        return getReplaceSchemaProperties().hasMigrationAlterSqlResource();
     }
 
-    public boolean hasAlterSqlResource() {
-        return getReplaceSchemaProperties().hasMigrationAlterSqlResource();
+    public boolean hasMigrationCreateSqlResource() {
+        return getReplaceSchemaProperties().hasMigrationCreateSqlResource();
     }
 }

@@ -662,6 +662,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return markFile.exists();
     }
 
+    public String getMigrationCreateNGMark() {
+        final String alterDir = getMigrationCreateDirectory();
+        return alterDir + "/create-NG.dfmark";
+    }
+
+    public boolean hasMigrationCreateNGMark() {
+        final File markFile = new File(getMigrationCreateNGMark());
+        return markFile.exists();
+    }
+
     public String getMigrationPreviousNGMark() {
         final String alterDir = getMigrationAlterDirectory();
         return alterDir + "/previous-NG.dfmark";
@@ -669,16 +679,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public boolean hasMigrationPreviousNGMark() {
         final File markFile = new File(getMigrationPreviousNGMark());
-        return markFile.exists();
-    }
-
-    public String getMigrationChangeOutputMark() {
-        final String alterDir = getMigrationCreateDirectory();
-        return alterDir + "/change-output.dfmark";
-    }
-
-    public boolean hasMigrationChangeOutputMark() {
-        final File markFile = new File(getMigrationChangeOutputMark());
         return markFile.exists();
     }
 
@@ -723,6 +723,19 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public String getMigrationCreateDirPureName() {
         return "create";
+    }
+
+    public boolean hasMigrationCreateSqlResource() {
+        if (!getMigrationReplaceSchemaSqlFileList().isEmpty()) {
+            return true;
+        }
+        if (!getMigrationTakeFinallySqlFileList().isEmpty()) {
+            return true;
+        }
+        if (!getMigrationSchemaDataAllMap().isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     public String getMigrationCreateDirSymbol() {
