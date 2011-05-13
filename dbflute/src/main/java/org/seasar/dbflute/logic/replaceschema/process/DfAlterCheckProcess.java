@@ -86,7 +86,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected void throwAlterCheckDataSourceNotFoundException() {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found data source for AlterCheck (or ChangeOutput).");
+        br.addNotice("Not found the data source for AlterCheck (or ChangeOutput).");
         br.addItem("Advice");
         br.addElement("Make sure your database instance works");
         br.addElement("or your connection settings are correct.");
