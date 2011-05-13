@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.dbway;
 
-
 /**
  * The DB way of DB2.
  * @author jflute
