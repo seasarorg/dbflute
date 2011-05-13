@@ -76,7 +76,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                         Constructor
     //                                                                         ===========
     protected DfAlterCheckProcess(DataSource dataSource, UnifiedSchema mainSchema, CoreProcessPlayer coreProcessPlayer) {
-        if (dataSource == null) {
+        if (dataSource == null) { // for example, ReplaceSchema may have lazy connection
             throwAlterCheckDataSourceNotFoundException();
         }
         _dataSource = dataSource;
