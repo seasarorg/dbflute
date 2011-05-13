@@ -653,41 +653,34 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public String getMigrationAlterNGMark() {
-        final String alterDir = getMigrationAlterDirectory();
-        return alterDir + "/alter-NG.dfmark";
+        return getMigrationAlterDirectory() + "/alter-NG.dfmark";
     }
 
     public boolean hasMigrationAlterNGMark() {
-        final File markFile = new File(getMigrationAlterNGMark());
-        return markFile.exists();
+        return new File(getMigrationAlterNGMark()).exists();
     }
 
     public String getMigrationCreateNGMark() {
-        final String alterDir = getMigrationCreateDirectory();
-        return alterDir + "/create-NG.dfmark";
+        return getMigrationCreateDirectory() + "/create-NG.dfmark";
     }
 
     public boolean hasMigrationCreateNGMark() {
-        final File markFile = new File(getMigrationCreateNGMark());
-        return markFile.exists();
+        return new File(getMigrationCreateNGMark()).exists();
     }
 
     public String getMigrationPreviousNGMark() {
-        final String alterDir = getMigrationAlterDirectory();
-        return alterDir + "/previous-NG.dfmark";
+        return getMigrationDirectory() + "/previous-NG.dfmark";
     }
 
     public boolean hasMigrationPreviousNGMark() {
-        final File markFile = new File(getMigrationPreviousNGMark());
-        return markFile.exists();
+        return new File(getMigrationPreviousNGMark()).exists();
     }
 
     // -----------------------------------------------------
     //                                        Alter Resource
     //                                        --------------
     public String getMigrationAlterDirectory() {
-        final String baseDirectory = getMigrationDirectory();
-        return baseDirectory + "/alter";
+        return getMigrationDirectory() + "/alter";
     }
 
     protected List<File> _migrationAlterSqlFileList;
@@ -717,8 +710,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                       Create Resource
     //                                       ---------------
     public String getMigrationCreateDirectory() {
-        final String baseDirectory = getMigrationDirectory();
-        return baseDirectory + "/" + getMigrationCreateDirPureName();
+        return getMigrationDirectory() + "/" + getMigrationCreateDirPureName();
     }
 
     public String getMigrationCreateDirPureName() {
