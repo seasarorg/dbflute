@@ -59,11 +59,4 @@ public class WayOfUnknown implements DBWay {
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return false;
     }
-
-    // ===================================================================================
-    //                                                                       Escape Clause
-    //                                                                       =============
-    public String escapeLiteralValue(String literalValue) {
-        return literalValue;
-    }
 }

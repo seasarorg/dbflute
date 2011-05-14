@@ -59,11 +59,4 @@ public class WayOfDerby implements DBWay {
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return "23505".equals(sqlState);
     }
-
-    // ===================================================================================
-    //                                                                       Escape Clause
-    //                                                                       =============
-    public String escapeLiteralValue(String literalValue) {
-        return literalValue; // unknown
-    }
 }

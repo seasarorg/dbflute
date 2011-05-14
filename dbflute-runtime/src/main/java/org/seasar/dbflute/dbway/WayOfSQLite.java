@@ -59,11 +59,4 @@ public class WayOfSQLite implements DBWay {
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return false; // sqlState is null and errorCode is 0 always...
     }
-
-    // ===================================================================================
-    //                                                                       Escape Clause
-    //                                                                       =============
-    public String escapeLiteralValue(String literalValue) {
-        return literalValue; // unknown
-    }
 }

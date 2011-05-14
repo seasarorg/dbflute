@@ -71,11 +71,4 @@ public class WayOfSQLServer implements DBWay {
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return errorCode != null && errorCode == 2627;
     }
-
-    // ===================================================================================
-    //                                                                       Escape Clause
-    //                                                                       =============
-    public String escapeLiteralValue(String literalValue) {
-        return literalValue; // unknown
-    }
 }

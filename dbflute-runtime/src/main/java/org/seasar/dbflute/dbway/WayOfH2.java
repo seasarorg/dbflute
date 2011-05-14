@@ -60,11 +60,4 @@ public class WayOfH2 implements DBWay {
         // changed to latter after about 1.3.154
         return "23001".equals(sqlState) || "23505".equals(sqlState);
     }
-
-    // ===================================================================================
-    //                                                                       Escape Clause
-    //                                                                       =============
-    public String escapeLiteralValue(String literalValue) {
-        return literalValue; // unknown
-    }
 }

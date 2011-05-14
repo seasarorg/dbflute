@@ -72,11 +72,4 @@ public class WayOfSybase implements DBWay {
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return "QGA03".equals(sqlState);
     }
-
-    // ===================================================================================
-    //                                                                       Escape Clause
-    //                                                                       =============
-    public String escapeLiteralValue(String literalValue) {
-        return literalValue; // unknown
-    }
 }

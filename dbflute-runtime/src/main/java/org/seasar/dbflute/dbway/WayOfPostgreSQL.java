@@ -64,13 +64,6 @@ public class WayOfPostgreSQL implements DBWay {
     }
 
     // ===================================================================================
-    //                                                                       Escape Clause
-    //                                                                       =============
-    public String escapeLiteralValue(String literalValue) {
-        return literalValue; // unknown
-    }
-
-    // ===================================================================================
     //                                                                Extension Definition
     //                                                                ====================
     public enum OperandOfLikeSearch implements ExtensionOperand {

@@ -17,11 +17,11 @@ package org.seasar.dbflute.cbean.sqlclause;
 
 import java.util.List;
 
-import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * SqlClause for MySQL.
@@ -181,7 +181,9 @@ public class SqlClauseMySql extends AbstractSqlClause {
     }
 
     protected String escapeMatchConditionValue(String conditionValue) {
-        return DBDef.MySQL.dbway().escapeLiteralValue(conditionValue);
+        conditionValue = Srl.replace(conditionValue, "\\", "\\\\");
+        conditionValue = Srl.replace(conditionValue, "'", "''");
+        return conditionValue;
     }
 
     protected void assertTextColumnList(List<ColumnInfo> textColumnList) {
