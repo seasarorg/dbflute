@@ -44,7 +44,6 @@ public class DfTypeUtilTest extends PlainTestCase {
 
     public void test_toString_Exception() {
         String stackTrace = DfTypeUtil.toString(new Exception("foo"));
-        log(stackTrace);
         assertTrue(stackTrace.contains("foo"));
     }
 
