@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,7 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -20,30 +22,71 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.util.AnnotationLiteral;
 
+import org.seasar.dbflute.BehaviorSelector;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
+
+import ${glPackageExtendedBhv}.*;
 
 /**
+ * {@link Extension} for DBFlute.
  * @author ${database.classAuthor}
  */
 public class ${glDBFluteModule} implements Extension {
 
     /**
-     * Register {@link BehaviorCommandInvoker} to container.
+     * Register DBFlute beans to container.
      * @param event event
      * @param beanManager bean manager
      */
     public void afterBeanDiscovery(@Observes final AfterBeanDiscovery event, final BeanManager beanManager) {
-        event.addBean(new DBFluteBean<BehaviorCommandInvoker>(BehaviorCommandInvoker.class, beanManager) {
-            @Override
+        this.setupDfComponents(event, beanManager);
+        this.setupBehaviors(event, beanManager);
+    }
+
+    /**
+     * Register environment dependent implementations to container.
+     * @param event
+     * @param beanManager
+     */
+    @SuppressWarnings("unchecked")
+    protected void setupDfComponents(final AfterBeanDiscovery event, final BeanManager beanManager) {
+        event.addBean(new DBFluteBean<ImplementedInvokerAssistant>(beanManager, ImplementedInvokerAssistant.class, InvokerAssistant.class));
+        event.addBean(new DBFluteBean<ImplementedCommonColumnAutoSetupper>(beanManager, ImplementedCommonColumnAutoSetupper.class, CommonColumnAutoSetupper.class));
+        event.addBean(new DBFluteBean<ImplementedBehaviorSelector>(beanManager, ImplementedBehaviorSelector.class, BehaviorSelector.class));
+        event.addBean(new DBFluteBean<ImplementedSqlClauseCreator>(beanManager, ImplementedSqlClauseCreator.class, SqlClauseCreator.class));
+
+        event.addBean(new DBFluteBean<BehaviorCommandInvoker>(beanManager, BehaviorCommandInvoker.class) {
             @SuppressWarnings("serial")
+            @Override
             protected void postInject(final BehaviorCommandInvoker instance) {
-                final Bean<?> iaBean = beanManager.resolve(beanManager.getBeans(InvokerAssistant.class,
-                        new AnnotationLiteral<Default>() {}));
+                final Bean<?> iaBean = beanManager.resolve(beanManager.getBeans(
+                        InvokerAssistant.class, new AnnotationLiteral<Default>() {}));
                 instance.setInvokerAssistant((InvokerAssistant) beanManager.getReference(
                         iaBean, iaBean.getBeanClass(), beanManager.createCreationalContext(iaBean)));
             }
         });
+    }
+
+    /**
+     * Register behaviors to container.
+     * @param event
+     * @param beanManager
+     */
+    protected void setupBehaviors(final AfterBeanDiscovery event, final BeanManager beanManager) {
+#foreach ($table in $database.tables)
+        event.addBean(new DBFluteBean<${table.extendedBehaviorClassName}>(beanManager, ${table.extendedBehaviorClassName}.class));
+#end
+    }
+
+    /**
+     * Initialize DBFlute.
+     * @param event
+     */
+    public void afterDeploymentValidation(@Observes final AfterDeploymentValidation event) {
+        new DBFluteInitializer();
     }
 
     /**
@@ -53,11 +96,13 @@ public class ${glDBFluteModule} implements Extension {
      */
     public class DBFluteBean<T> implements Bean<T> {
         private final Class<T> beanClass;
+        private final Class<? super T>[] superTypes;
         private final AnnotatedType<T> at;
         private final InjectionTarget<T> it;
 
-        public DBFluteBean(final Class<T> beanClass, final BeanManager beanManager) {
+        public DBFluteBean(final BeanManager beanManager, final Class<T> beanClass, final Class<? super T>... superTypes) {
             this.beanClass = beanClass;
+            this.superTypes = superTypes;
             this.at = beanManager.createAnnotatedType(beanClass);
             this.it = beanManager.createInjectionTarget(this.at);
         }
@@ -113,10 +158,8 @@ public class ${glDBFluteModule} implements Extension {
         @SuppressWarnings("serial")
         public Set<Annotation> getQualifiers() {
             final Set<Annotation> qualifiers = new HashSet<Annotation>();
-            qualifiers.add(new AnnotationLiteral<Default>() {
-            });
-            qualifiers.add(new AnnotationLiteral<Any>() {
-            });
+            qualifiers.add(new AnnotationLiteral<Default>() {});
+            qualifiers.add(new AnnotationLiteral<Any>() {});
             return qualifiers;
         }
 
@@ -135,6 +178,9 @@ public class ${glDBFluteModule} implements Extension {
             final Set<Type> types = new HashSet<Type>();
             types.add(this.beanClass);
             types.add(Object.class);
+            if (this.superTypes != null) {
+                types.addAll(Arrays.asList(this.superTypes));
+            }
             return types;
         }
 
@@ -147,6 +193,5 @@ public class ${glDBFluteModule} implements Extension {
         public boolean isNullable() {
             return false;
         }
-
     }
 }

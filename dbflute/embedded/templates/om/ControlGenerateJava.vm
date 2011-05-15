@@ -290,12 +290,6 @@ $database.info("public void parseContainerConfig() {")
   $database.info("    parse('${path}')")
   $generator.parse("om/${glResourceDirectory}/allcommon/container/cdi/CDIDBFluteModule.${glTemplateFileExtension}", $path, "", "")
 
-  #set ( $path = "${database.getMetaInfOutputDirectory()}" )
-  $database.makeDirectory($path)
-  #set ( $path = "${database.getMetaInfOutputDirectory()}/beans.xml" )
-  $database.info("    parse('${path}')")
-  $generator.parse("om/${glResourceDirectory}/allcommon/container/cdi/BeansXml.${glTemplateFileExtension}", $path, "", "")
-
   #set ( $path = "${database.getMetaInfOutputDirectory()}/services" )
   $database.makeDirectory($path)
   #set ( $path = "${database.getMetaInfOutputDirectory()}/services/javax.enterprise.inject.spi.Extension" )
