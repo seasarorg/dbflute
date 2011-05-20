@@ -53,10 +53,10 @@ public class ${glDBFluteModule} implements Extension {
      */
     @SuppressWarnings("unchecked")
     protected void setupDfComponents(final AfterBeanDiscovery event, final BeanManager beanManager) {
-        event.addBean(new DBFluteBean<ImplementedInvokerAssistant>(beanManager, ImplementedInvokerAssistant.class, InvokerAssistant.class));
-        event.addBean(new DBFluteBean<ImplementedCommonColumnAutoSetupper>(beanManager, ImplementedCommonColumnAutoSetupper.class, CommonColumnAutoSetupper.class));
-        event.addBean(new DBFluteBean<ImplementedBehaviorSelector>(beanManager, ImplementedBehaviorSelector.class, BehaviorSelector.class));
-        event.addBean(new DBFluteBean<ImplementedSqlClauseCreator>(beanManager, ImplementedSqlClauseCreator.class, SqlClauseCreator.class));
+        event.addBean(new DBFluteBean<${database.implementedInvokerAssistantClass}>(beanManager, ${database.implementedInvokerAssistantClass}.class, InvokerAssistant.class));
+        event.addBean(new DBFluteBean<${database.implementedCommonColumnAutoSetupperClass}>(beanManager, ${database.implementedCommonColumnAutoSetupperClass}.class, CommonColumnAutoSetupper.class));
+        event.addBean(new DBFluteBean<${glImplementedBehaviorSelector}>(beanManager, ${glImplementedBehaviorSelector}.class, BehaviorSelector.class));
+        event.addBean(new DBFluteBean<${glImplementedSqlClauseCreator}>(beanManager, ${glImplementedSqlClauseCreator}.class, SqlClauseCreator.class));
 
         event.addBean(new DBFluteBean<BehaviorCommandInvoker>(beanManager, BehaviorCommandInvoker.class) {
             @SuppressWarnings("serial")
@@ -86,7 +86,7 @@ public class ${glDBFluteModule} implements Extension {
      * @param event
      */
     public void afterDeploymentValidation(@Observes final AfterDeploymentValidation event) {
-        new DBFluteInitializer();
+        new ${database.DBFluteInitializerClass}();
     }
 
     /**

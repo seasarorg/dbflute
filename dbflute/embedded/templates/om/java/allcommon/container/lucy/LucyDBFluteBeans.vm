@@ -2,19 +2,12 @@
 <!DOCTYPE lucy-config PUBLIC "-//LUCY//DTD LUCY//EN" "http://www.lucy.org/dtd/lucy-config.dtd">
 <lucy-config>
     <!-- The components of DBFlute Runtime. -->
-    <component name="${database.DBFluteInitializerComponentName}" class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
-#if ($database.hasExtendedImplementedInvokerAssistantClass())
-    <component name="${database.invokerAssistantComponentName}" class="${database.extendedImplementedInvokerAssistantClass}">
-#else
-    <component name="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}">
-#end
+    <component name="${database.DBFluteInitializerComponentName}" class="${database.DBFluteInitializerClass}"/>
+    <component name="${database.invokerAssistantComponentName}" class="${database.implementedInvokerAssistantClass}">
         <inject method="setDataSource">${database.DBFluteBeansDataSourceName}</inject>
+        <inject method="setIntroduction">${database.DBFluteInitializerComponentName}</inject>
     </component>
-#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
-    <component name="${database.commonColumnAutoSetupperComponentName}" class="${database.extendedImplementedCommonColumnAutoSetupperClass}"/>
-#else
-    <component name="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}"/>
-#end
+    <component name="${database.commonColumnAutoSetupperComponentName}" class="${database.implementedCommonColumnAutoSetupperClass}"/>
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}">
         <inject method="setContainer">lucy</inject>
     </component>

@@ -141,31 +141,39 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                  Extended Component
     //                                                                  ==================
-    public boolean hasExtendedImplementedInvokerAssistantClass() {
-        String str = getExtendedImplementedInvokerAssistantClass();
+    public String getDBFluteInitializerClass() { // Java only
+        return getExtensionClass("DBFluteInitializer");
+    }
+
+    public String getImplementedInvokerAssistantClass() { // Java only
+        return getExtensionClass("ImplementedInvokerAssistant");
+    }
+
+    public String getImplementedCommonColumnAutoSetupperClass() { // Java only
+        return getExtensionClass("ImplementedCommonColumnAutoSetupper");
+    }
+
+    public String getS2DaoSettingClass() { // CSharp only
+        return getExtensionClass("S2DaoSetting");
+    }
+
+    protected String getExtensionClass(String className) {
+        if (hasExtensionClass(className)) {
+            return getExtendedExtensionClass(className);
+        } else {
+            final String commonPackage = getBasicProperties().getBaseCommonPackage();
+            final String projectPrefix = getBasicProperties().getProjectPrefix();
+            return commonPackage + "." + projectPrefix + className;
+        }
+    }
+
+    protected boolean hasExtensionClass(String className) {
+        String str = getExtendedExtensionClass(className);
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    public String getExtendedImplementedInvokerAssistantClass() { // Java Only
-        return getProperty("extendedImplementedInvokerAssistantClass", null);
-    }
-
-    public boolean hasExtendedImplementedCommonColumnAutoSetupperClass() {
-        String str = getExtendedImplementedCommonColumnAutoSetupperClass();
-        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
-    }
-
-    public String getExtendedImplementedCommonColumnAutoSetupperClass() { // Java Only
-        return getProperty("extendedImplementedCommonColumnAutoSetupperClass", null);
-    }
-
-    public boolean hasExtendedS2DaoSettingClassValid() {
-        String str = getExtendedS2DaoSettingClass();
-        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
-    }
-
-    public String getExtendedS2DaoSettingClass() { // CSharp Only
-        return getProperty("extendedS2DaoSettingClass", null);
+    protected String getExtendedExtensionClass(String className) { // Java Only
+        return getProperty("extended" + className + "Class", null);
     }
 
     // ===================================================================================

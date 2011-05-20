@@ -1562,28 +1562,20 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isMakeRecentlyDeprecated();
     }
 
-    public boolean hasExtendedImplementedInvokerAssistantClass() {
-        return getProperties().getLittleAdjustmentProperties().hasExtendedImplementedInvokerAssistantClass();
+    public String getDBFluteInitializerClass() {
+        return getProperties().getLittleAdjustmentProperties().getDBFluteInitializerClass();
     }
 
-    public String getExtendedImplementedInvokerAssistantClass() {
-        return getProperties().getLittleAdjustmentProperties().getExtendedImplementedInvokerAssistantClass();
+    public String getImplementedInvokerAssistantClass() {
+        return getProperties().getLittleAdjustmentProperties().getImplementedInvokerAssistantClass();
     }
 
-    public boolean hasExtendedImplementedCommonColumnAutoSetupperClass() {
-        return getProperties().getLittleAdjustmentProperties().hasExtendedImplementedCommonColumnAutoSetupperClass();
+    public String getImplementedCommonColumnAutoSetupperClass() {
+        return getProperties().getLittleAdjustmentProperties().getImplementedCommonColumnAutoSetupperClass();
     }
 
-    public String getExtendedImplementedCommonColumnAutoSetupperClass() {
-        return getProperties().getLittleAdjustmentProperties().getExtendedImplementedCommonColumnAutoSetupperClass();
-    }
-
-    public boolean hasExtendedS2DaoSettingClassValid() {
-        return getProperties().getLittleAdjustmentProperties().hasExtendedS2DaoSettingClassValid();
-    }
-
-    public String getExtendedS2DaoSettingClass() {
-        return getProperties().getLittleAdjustmentProperties().getExtendedS2DaoSettingClass();
+    public String getS2DaoSettingClass() {
+        return getProperties().getLittleAdjustmentProperties().getS2DaoSettingClass();
     }
 
     public boolean isShortCharHandlingValid() {

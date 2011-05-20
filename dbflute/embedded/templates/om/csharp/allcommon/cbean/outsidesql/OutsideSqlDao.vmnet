@@ -12,11 +12,7 @@ using ${glPackageBaseCommonS2Dao};
 namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
     [Implementation]
-#if ($database.hasExtendedS2DaoSettingClassValid())
-    [S2Dao(typeof(${database.extendedS2DaoSettingClass}))]
-#else
-    [S2Dao(typeof(${glS2DaoSetting}))]
-#end
+    [S2Dao(typeof(${database.S2DaoSettingClass}))]
     [Bean(typeof(OutsideSqlDaoDummyEntity))]
     public interface ${glOutsideSqlDao} : ${glDaoReadable} {
 

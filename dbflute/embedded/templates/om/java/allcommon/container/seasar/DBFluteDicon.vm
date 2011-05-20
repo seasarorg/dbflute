@@ -15,17 +15,9 @@
 #end
 
     <!-- The components of DBFlute Runtime. -->
-    <component name="introduction" class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
-#if ($database.hasExtendedImplementedInvokerAssistantClass())
-    <component name="invokerAssistant" class="${database.extendedImplementedInvokerAssistantClass}"/>
-#else
-    <component name="invokerAssistant" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}"/>
-#end
-#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
-    <component name="commonColumnAutoSetupper" class="${database.extendedImplementedCommonColumnAutoSetupperClass}"/>
-#else
-    <component name="commonColumnAutoSetupper" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}"/>
-#end
+    <component name="introduction" class="${database.DBFluteInitializerClass}"/>
+    <component name="invokerAssistant" class="${database.implementedInvokerAssistantClass}"/>
+    <component name="commonColumnAutoSetupper" class="${database.implementedCommonColumnAutoSetupperClass}"/>
     <component name="behaviorSelector" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}"/>
     <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker"/>
 

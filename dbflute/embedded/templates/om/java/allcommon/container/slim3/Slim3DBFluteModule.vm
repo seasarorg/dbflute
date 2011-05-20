@@ -28,7 +28,7 @@ public class ${glDBFluteModule} {
     }
 
     public void configure() {
-        new ${glDBFluteInitializer}(); // Initialize!
+        new ${database.DBFluteInitializerClass}(); // Initialize!
         
         // The components of DBFlute Runtime.
         ${glImplementedBehaviorSelector} behaviorSelector = new ${glImplementedBehaviorSelector}();
@@ -61,21 +61,13 @@ public class ${glDBFluteModule} {
     }
 
     protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant() {
-#if ($database.hasExtendedImplementedInvokerAssistantClass())
-        ${glImplementedInvokerAssistant} invokerAssistant = new ${database.extendedImplementedInvokerAssistantClass}();
-#else
-        ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
-#end
+        ${glImplementedInvokerAssistant} invokerAssistant = new ${database.implementedInvokerAssistantClass}();
         invokerAssistant.setDataSource(dataSource);
         return invokerAssistant;
     }
 
     protected ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
-#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
-        return new ${database.extendedImplementedCommonColumnAutoSetupperClass}();
-#else
-        return new ${glImplementedCommonColumnAutoSetupper}();
-#end
+        return new ${database.implementedCommonColumnAutoSetupperClass}();
     }
 
     protected Setupper bind(Class<?> type) {

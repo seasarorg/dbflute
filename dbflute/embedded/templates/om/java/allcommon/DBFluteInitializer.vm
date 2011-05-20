@@ -50,6 +50,9 @@ public class ${glDBFluteInitializer} {
         standBy();
     }
 
+    // ===================================================================================
+    //                                                                             Curtain
+    //                                                                             =======
     protected void announce() {
         _log.info("...Initializing DBFlute components");
     }
@@ -69,6 +72,9 @@ public class ${glDBFluteInitializer} {
         }
     }
 
+    // ===================================================================================
+    //                                                                            Contents
+    //                                                                            ========
     protected void handleSqlLogRegistry() { // for S2Container
         if (${glDBFluteConfig}.getInstance().isUseSqlLogRegistry()) {
             final StringBuilder sb = new StringBuilder();

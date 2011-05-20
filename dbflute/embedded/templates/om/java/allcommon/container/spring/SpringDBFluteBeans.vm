@@ -5,21 +5,14 @@
 >
 <beans>
     <!-- The components of DBFlute Runtime. -->
-    <bean id="${database.DBFluteInitializerComponentName}" class="${glPackageBaseCommon}.${glDBFluteInitializer}">
+    <bean id="${database.DBFluteInitializerComponentName}" class="${database.DBFluteInitializerClass}">
         <constructor-arg index="0"><ref bean="${database.DBFluteBeansDataSourceName}"/></constructor-arg>
     </bean>
-#if ($database.hasExtendedImplementedInvokerAssistantClass())
-    <bean id="${database.invokerAssistantComponentName}" class="${database.extendedImplementedInvokerAssistantClass}" autowire="byType">
-#else
-    <bean id="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}" autowire="byType">
-#end
+    <bean id="${database.invokerAssistantComponentName}" class="${database.implementedInvokerAssistantClass}" autowire="byType">
         <property name="dataSource"><ref bean="${database.DBFluteBeansDataSourceName}"/></property>
+        <property name="introduction"><ref bean="${database.DBFluteInitializerComponentName}"/></property>
     </bean>
-#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
-    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${database.extendedImplementedCommonColumnAutoSetupperClass}" autowire="byType"/>
-#else
-    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}" autowire="byType"/>
-#end
+    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${database.implementedCommonColumnAutoSetupperClass}" autowire="byType"/>
     <bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}" autowire="byType"/>
     <bean id="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType">
         <property name="invokerAssistant"><ref bean="${database.invokerAssistantComponentName}"/></property>

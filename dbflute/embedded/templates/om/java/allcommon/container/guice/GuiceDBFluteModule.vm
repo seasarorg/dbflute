@@ -45,7 +45,7 @@ public class ${glDBFluteModule} extends AbstractModule {
     }
 
     protected ${glDBFluteInitializer} createDBFluteInitializer() {
-        return new ${glDBFluteInitializer}();
+        return new ${database.DBFluteInitializerClass}();
     }
 
     protected ${glImplementedBehaviorSelector} createImplementedBehaviorSelector() {
@@ -57,21 +57,13 @@ public class ${glDBFluteModule} extends AbstractModule {
     }
 
     protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant() {
-#if ($database.hasExtendedImplementedInvokerAssistantClass())
-        ${glImplementedInvokerAssistant} invokerAssistant = new ${database.extendedImplementedInvokerAssistantClass}();
-#else
-        ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
-#end
+        ${glImplementedInvokerAssistant} invokerAssistant = new ${database.implementedInvokerAssistantClass}();
         invokerAssistant.setDataSource(dataSource);
         return invokerAssistant;
     }
 
     protected ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
-#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
-        return new ${database.extendedImplementedCommonColumnAutoSetupperClass}();
-#else
-        return new ${glImplementedCommonColumnAutoSetupper}();
-#end
+        return new ${database.implementedCommonColumnAutoSetupperClass}();
     }
 
     protected void setupBehavior(BehaviorCommandInvoker ker, BehaviorSelector tor, CommonColumnAutoSetupper per) {

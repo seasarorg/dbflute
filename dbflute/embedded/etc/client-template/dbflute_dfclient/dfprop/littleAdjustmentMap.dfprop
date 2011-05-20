@@ -15,6 +15,7 @@
 # o isMakeConditionQueryEqualEmptyString: (NotRequired - Default false)
 # o isMakeDeprecated: (NotRequired - Default false)
 # o isMakeRecentlyDeprecated: (NotRequired - Default true)
+# o extendedDBFluteInitializerClass: (NotRequired - Default '')
 # o extendedImplementedInvokerAssistantClass: (NotRequired - Default '')
 # o extendedImplementedCommonColumnAutoSetupperClass: (NotRequired - Default '')
 # o extendedS2DaoSettingClass: (NotRequired - Default '')
@@ -168,6 +169,17 @@ map:{
     #     Non.
     #
     #; isMakeRecentlyDeprecated = true
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o extendedDBFluteInitializerClass: (NotRequired - Default '')
+    #  If you want to extend the embedded DBFlute initializer,
+    #  specify the class name of your original initializer
+    #  that extends the embedded one.
+    #  *Basically for fixed DBFluteConfig settings
+    #
+    # @JavaOnly
+    #; extendedDBFluteInitializerClass = com.example.ExtendedDBFluteInitializer
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
