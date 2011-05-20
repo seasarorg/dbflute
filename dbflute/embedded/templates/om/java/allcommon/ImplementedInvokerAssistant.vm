@@ -32,6 +32,8 @@ import org.seasar.dbflute.twowaysql.factory.DefaultSqlAnalyzerFactory;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 #if ($database.isTargetContainerSeasar())
 
+import org.seasar.framework.container.annotation.tiger.Binding;
+import org.seasar.framework.container.annotation.tiger.BindingType;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 #end
@@ -372,6 +374,9 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // so this variable is actually unused in this class
     // (needs to be injected only when the DI container
     // is set by its DI setting file)
+#if ($database.isTargetContainerSeasar())
+    @Binding(bindingType=BindingType.MUST)
+#end
     public void setIntroduction(${glDBFluteInitializer} introduction) {
         _introduction = introduction;
     }

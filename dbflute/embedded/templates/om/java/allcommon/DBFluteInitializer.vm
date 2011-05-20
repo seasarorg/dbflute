@@ -53,10 +53,18 @@ public class ${glDBFluteInitializer} {
     // ===================================================================================
     //                                                                             Curtain
     //                                                                             =======
+    /**
+     * DBFlute will begin in just a few second.
+     */
     protected void announce() {
         _log.info("...Initializing DBFlute components");
     }
 
+    /**
+     * This is the story for ... <br />
+     * You can override this to set your DBFluteConfig settings
+     * with calling super.prologue() in it.
+     */
     protected void prologue() {
 #if ($database.isTargetContainerSeasar())
         handleSqlLogRegistry();
@@ -66,6 +74,9 @@ public class ${glDBFluteInitializer} {
 #end
     }
 
+    /**
+     * Enjoy your DBFlute life.
+     */
     protected void standBy() {
         if (!${glDBFluteConfig}.getInstance().isLocked()) {
             ${glDBFluteConfig}.getInstance().lock();

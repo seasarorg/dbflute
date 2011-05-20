@@ -328,6 +328,9 @@ public class ${myClassName} {
 	}
 	
 	public void Lock() {
+        if (_locked) {
+            return;
+        }
 		if (_log.IsInfoEnabled) {
 		    _log.Info("...Locking the config of dbflute");
 		}
@@ -335,6 +338,9 @@ public class ${myClassName} {
 	}
 	
 	public void Unlock() {
+        if (!_locked) {
+            return;
+        }
 		if (_log.IsInfoEnabled) {
 		    _log.Info("...Unlocking the config of dbflute");
 		}

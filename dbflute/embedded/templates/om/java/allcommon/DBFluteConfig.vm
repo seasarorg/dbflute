@@ -583,6 +583,9 @@ public class ${glDBFluteConfig} {
     }
 
     public void lock() {
+        if (_locked) {
+            return;
+        }
         if (_log.isInfoEnabled()) {
             _log.info("...Locking the configuration of DBFlute");
         }
@@ -590,6 +593,9 @@ public class ${glDBFluteConfig} {
     }
 
     public void unlock() {
+        if (!_locked) {
+            return;
+        }
         if (_log.isInfoEnabled()) {
             _log.info("...Unlocking the configuration of DBFlute");
         }
