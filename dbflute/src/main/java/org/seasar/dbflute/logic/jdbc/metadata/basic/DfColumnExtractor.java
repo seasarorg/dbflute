@@ -140,7 +140,11 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
                 columnMetaInfo.setDecimalDigits(decimalDigits);
                 columnMetaInfo.setRequired(nullType == 0);
                 columnMetaInfo.setColumnComment(columnComment);
-                columnMetaInfo.setDefaultValue(defaultValue);
+
+                // default value as meta data may have illegal characters
+                //  e.g. Oracle, MySQL
+                columnMetaInfo.setDefaultValue(defaultValue != null ? defaultValue.trim() : null);
+
                 columnList.add(columnMetaInfo);
             }
         } finally {
