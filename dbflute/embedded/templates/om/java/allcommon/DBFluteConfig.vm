@@ -12,6 +12,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.QLog;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.name.SqlNameFilter;
 import org.seasar.dbflute.exception.IllegalDBFluteConfigAccessException;
@@ -98,6 +99,7 @@ public class ${glDBFluteConfig} {
     protected SqlClauseCreator _sqlClauseCreator;
     protected SqlNameFilter _tableSqlNameFilter;
     protected OutsideSqlExecutorFactory _outsideSqlExecutorFactory;
+    protected GearedCipherManager _gearedCipherManager;
 
     // internal
     protected boolean _internalDebug;
@@ -482,7 +484,23 @@ public class ${glDBFluteConfig} {
         }
         _outsideSqlExecutorFactory = outsideSqlExecutorFactory;
     }
-    
+
+    // [DBFlute-0.9.7.0]
+    // ===================================================================================
+    //                                                               Geared Cipher Manager
+    //                                                               =====================
+    public GearedCipherManager getGearedCipherManager() {
+        return _gearedCipherManager;
+    }
+
+    public void setGearedCipherManager(GearedCipherManager gearedCipherManager) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting gearedCipherManager: " + gearedCipherManager);
+        }
+        _gearedCipherManager = gearedCipherManager;
+    }
+
     // ===================================================================================
     //                                                                 Database Dependency
     //                                                                 ===================

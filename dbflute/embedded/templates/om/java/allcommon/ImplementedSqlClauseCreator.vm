@@ -2,6 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.*;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
@@ -31,8 +32,7 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 	 * @return SQL clause. (NotNull)
 	 */
     public SqlClause createSqlClause(String tableDbName) {
-        DBMetaProvider dbmetaProvider = ${glDBMetaInstanceHandler}.getProvider();
-        SqlClause sqlClause = doCreateSqlClause(tableDbName, dbmetaProvider);
+        SqlClause sqlClause = doCreateSqlClause(tableDbName);
         setupSqlClauseOption(sqlClause);
         return sqlClause;
     }
@@ -40,83 +40,99 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
     // ===================================================================================
     //                                                                            Creation
     //                                                                            ========
-    protected SqlClause doCreateSqlClause(String tableDbName, DBMetaProvider dbmetaProvider) {
-        SqlClause sqlClause; // dynamic resolution but no perfect (almost static)
+    protected SqlClause doCreateSqlClause(String tableDbName) {
+        AbstractSqlClause sqlClause; // dynamic resolution but no perfect (almost static)
         if (isCurrentDBDef(DBDef.MySQL)) {
-            sqlClause = createSqlClauseMySql(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseMySql(tableDbName);
         } else if (isCurrentDBDef(DBDef.PostgreSQL)) {
-            sqlClause = createSqlClausePostgreSql(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClausePostgreSql(tableDbName);
         } else if (isCurrentDBDef(DBDef.Oracle)) {
-            sqlClause = createSqlClauseOracle(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseOracle(tableDbName);
         } else if (isCurrentDBDef(DBDef.DB2)) {
-            sqlClause = createSqlClauseDb2(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseDb2(tableDbName);
         } else if (isCurrentDBDef(DBDef.SQLServer)) {
-            sqlClause = createSqlClauseSqlServer(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseSqlServer(tableDbName);
         } else if (isCurrentDBDef(DBDef.H2)) {
-            sqlClause = createSqlClauseH2(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseH2(tableDbName);
         } else if (isCurrentDBDef(DBDef.Derby)) {
-            sqlClause = createSqlClauseDerby(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseDerby(tableDbName);
         } else if (isCurrentDBDef(DBDef.SQLite)) {
-            sqlClause = createSqlClauseSqlite(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseSqlite(tableDbName);
         } else if (isCurrentDBDef(DBDef.MSAccess)) {
-            sqlClause = createSqlClauseMsAccess(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseMsAccess(tableDbName);
         } else if (isCurrentDBDef(DBDef.FireBird)) {
-            sqlClause = createSqlClauseFirebird(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseFirebird(tableDbName);
         } else if (isCurrentDBDef(DBDef.Sybase)) {
-            sqlClause = createSqlClauseSybase(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClauseSybase(tableDbName);
         } else {
             // as the database when generating
-            sqlClause = createSqlClause${database.generateDbName}(tableDbName, dbmetaProvider);
+            sqlClause = createSqlClause${database.generateDbName}(tableDbName);
         }
+        prepareSupporterComponent(sqlClause);
         return sqlClause;
     }
 
-    protected SqlClause createSqlClauseMySql(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseMySql(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseMySql createSqlClauseMySql(String tableDbName) {
+        return new SqlClauseMySql(tableDbName);
     }
 
-    protected SqlClause createSqlClausePostgreSql(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClausePostgreSql(tableDbName).provider(dbmetaProvider);
+    protected SqlClausePostgreSql createSqlClausePostgreSql(String tableDbName) {
+        return new SqlClausePostgreSql(tableDbName);
     }
 
-    protected SqlClause createSqlClauseOracle(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseOracle(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseOracle createSqlClauseOracle(String tableDbName) {
+        return new SqlClauseOracle(tableDbName);
     }
 
-    protected SqlClause createSqlClauseDb2(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseDb2(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseDb2 createSqlClauseDb2(String tableDbName) {
+        return new SqlClauseDb2(tableDbName);
     }
 
-    protected SqlClause createSqlClauseSqlServer(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseSqlServer(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseSqlServer createSqlClauseSqlServer(String tableDbName) {
+        return new SqlClauseSqlServer(tableDbName);
     }
 
-    protected SqlClause createSqlClauseH2(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseH2(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseH2 createSqlClauseH2(String tableDbName) {
+        return new SqlClauseH2(tableDbName);
     }
 
-    protected SqlClause createSqlClauseDerby(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseDerby(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseDerby createSqlClauseDerby(String tableDbName) {
+        return new SqlClauseDerby(tableDbName);
     }
 
-    protected SqlClause createSqlClauseSqlite(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseSqlite(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseSqlite createSqlClauseSqlite(String tableDbName) {
+        return new SqlClauseSqlite(tableDbName);
     }
 
-    protected SqlClause createSqlClauseMsAccess(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseMsAccess(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseMsAccess createSqlClauseMsAccess(String tableDbName) {
+        return new SqlClauseMsAccess(tableDbName);
     }
 
-    protected SqlClause createSqlClauseFirebird(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseFirebird(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseFirebird createSqlClauseFirebird(String tableDbName) {
+        return new SqlClauseFirebird(tableDbName);
     }
 
-    protected SqlClause createSqlClauseSybase(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseSybase(tableDbName).provider(dbmetaProvider);
+    protected SqlClauseSybase createSqlClauseSybase(String tableDbName) {
+        return new SqlClauseSybase(tableDbName);
     }
 
-    protected SqlClause createSqlClauseDefault(String tableDbName, DBMetaProvider dbmetaProvider) {
-        return new SqlClauseDefault(tableDbName).provider(dbmetaProvider);
+    protected SqlClause createSqlClauseDefault(String tableDbName) {
+        return new SqlClauseDefault(tableDbName);
+    }
+
+    protected void prepareSupporterComponent(AbstractSqlClause sqlClause) {
+        sqlClause.dbmetaProvider(getDBMetaProvider()).cipherManager(getGearedCipherManager());
+    }
+
+    // ===================================================================================
+    //                                                                           Supporter
+    //                                                                           =========
+    protected DBMetaProvider getDBMetaProvider() {
+        return ${glDBMetaInstanceHandler}.getProvider();
+    }
+
+    protected GearedCipherManager getGearedCipherManager() {
+        return ${glDBFluteConfig}.getInstance().getGearedCipherManager();
     }
 
     // ===================================================================================

@@ -9,6 +9,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
@@ -311,6 +312,13 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                            --------------------------
     public BehaviorExceptionThrower assistBehaviorExceptionThrower() {
         return new BehaviorExceptionThrower();
+    }
+
+    // -----------------------------------------------------
+    //                                 Geared Cipher Manager
+    //                                 ---------------------
+    public GearedCipherManager assistGearedCipherManager() {
+        return ${glDBFluteConfig}.getInstance().getGearedCipherManager();
     }
 
     // -----------------------------------------------------
