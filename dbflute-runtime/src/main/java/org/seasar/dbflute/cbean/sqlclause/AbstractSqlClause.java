@@ -1101,7 +1101,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public void registerWhereClause(ColumnRealName columnRealName // real name of column
             , ConditionKey key, ConditionValue value // basic resources
             , ColumnFunctionCipher cipher) { // optional resources
-        registerWhereClause(columnRealName, key, value, null);
+        registerWhereClause(columnRealName, key, value, cipher, null);
     }
 
     public void registerWhereClause(ColumnRealName columnRealName // real name of column
