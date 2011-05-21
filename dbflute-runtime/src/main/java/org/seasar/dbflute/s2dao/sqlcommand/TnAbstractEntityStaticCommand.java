@@ -105,9 +105,8 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
     //                                                                              ======
     protected void setupDeleteSql() {
         checkPrimaryKey();
-        final StringBuilder sb = new StringBuilder(100);
-        sb.append("delete from ");
-        sb.append(_targetDBMeta.getTableSqlName());
+        final StringBuilder sb = new StringBuilder(64);
+        sb.append("delete from ").append(_targetDBMeta.getTableSqlName());
         setupDeleteWhere(sb);
         _sql = sb.toString();
     }

@@ -27,6 +27,8 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -201,11 +203,18 @@ public class ResourceContext {
         if (!isExistResourceContextOnThread()) {
             return false;
         }
-        SqlClauseCreator sqlClauseCreator = getResourceContextOnThread().getSqlClauseCreator();
+        final SqlClauseCreator sqlClauseCreator = getResourceContextOnThread().getSqlClauseCreator();
         if (sqlClauseCreator == null) {
             return false;
         }
         return currentDBDef().dbway().isUniqueConstraintException(sqlState, errorCode);
+    }
+
+    public static ColumnFunctionCipher findColumnFunctionCipher(String tableDbName, String columnDbName) {
+        assertResourceContextExists();
+        final ResourceContext context = getResourceContextOnThread();
+        final GearedCipherManager manager = context.getGearedCipherManager();
+        return manager != null ? manager.findColumnFunctionCipher(tableDbName, columnDbName) : null;
     }
 
     public static String getOutsideSqlPackage() {
@@ -322,17 +331,20 @@ public class ResourceContext {
     protected DBDef _currentDBDef;
     protected DBMetaProvider _dbmetaProvider;
     protected SqlClauseCreator _sqlClauseCreator;
-    protected ResourceParameter _resourceParameter;
     protected SqlAnalyzerFactory _sqlAnalyzerFactory;
     protected SQLExceptionHandlerFactory _sqlExceptionHandlerFactory;
+    protected GearedCipherManager _gearedCipherManager;
+    protected ResourceParameter _resourceParameter;
 
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _behaviorCommand + ", " + _currentDBDef + ", " + _dbmetaProvider + ", " + _sqlClauseCreator + ", "
-                + _resourceParameter + ", " + _sqlAnalyzerFactory + "}";
+        return "{" + _behaviorCommand + ", " + _currentDBDef // core resources
+                + ", " + _dbmetaProvider + ", " + _sqlClauseCreator // basic resources
+                + ", " + _sqlAnalyzerFactory + ", " + _sqlExceptionHandlerFactory // factories
+                + ", " + _gearedCipherManager + ", " + _resourceParameter + "}"; // various
     }
 
     // ===================================================================================
@@ -370,14 +382,6 @@ public class ResourceContext {
         _sqlClauseCreator = sqlClauseCreator;
     }
 
-    public ResourceParameter getResourceParameter() {
-        return _resourceParameter;
-    }
-
-    public void setResourceParameter(ResourceParameter resourceParameter) {
-        _resourceParameter = resourceParameter;
-    }
-
     public SqlAnalyzerFactory getSqlAnalyzerFactory() {
         return _sqlAnalyzerFactory;
     }
@@ -392,5 +396,21 @@ public class ResourceContext {
 
     public void setSQLExceptionHandlerFactory(SQLExceptionHandlerFactory sqlExceptionHandlerFactory) {
         _sqlExceptionHandlerFactory = sqlExceptionHandlerFactory;
+    }
+
+    public GearedCipherManager getGearedCipherManager() {
+        return _gearedCipherManager;
+    }
+
+    public void setGearedCipherManager(GearedCipherManager gearedCipherManager) {
+        _gearedCipherManager = gearedCipherManager;
+    }
+
+    public ResourceParameter getResourceParameter() {
+        return _resourceParameter;
+    }
+
+    public void setResourceParameter(ResourceParameter resourceParameter) {
+        _resourceParameter = resourceParameter;
     }
 }

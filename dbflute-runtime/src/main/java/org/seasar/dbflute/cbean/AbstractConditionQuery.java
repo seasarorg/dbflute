@@ -31,6 +31,7 @@ import org.seasar.dbflute.cbean.ManualOrderBean.FreeParameterManualOrderThemeLis
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.ckey.ConditionKeyInScope;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -740,11 +741,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // If Java, it is necessary to use uncapPropName!
         key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, xgetLocation(uncapPropName));
         final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
+        final ColumnFunctionCipher cipher = xgetSqlClause().findColumnFunctionCipher(columnInfo);
         if (isBaseQuery()) {
-            xgetSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue);
+            xgetSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue, cipher);
         } else {
             final String aliasName = xgetAliasName();
-            xgetSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, _onClause);
+            xgetSqlClause()
+                    .registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, cipher, _onClause);
         }
     }
 
@@ -761,12 +764,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String location = xgetLocation(uncapPropName);
         key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, location, option);
         final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
+        final ColumnFunctionCipher cipher = xgetSqlClause().findColumnFunctionCipher(columnInfo);
         if (isBaseQuery()) {
-            xgetSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue, option);
+            xgetSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue, cipher, option);
         } else {
             final String aliasName = xgetAliasName();
-            xgetSqlClause()
-                    .registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, option, _onClause);
+            xgetSqlClause().registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, cipher, option,
+                    _onClause);
         }
     }
 
@@ -980,7 +984,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // If Java, it is necessary to use uncapPropName!
         final String location = xgetLocation(uncapPropName);
         key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, location, option);
-        xgetSqlClause().registerWhereClause(toColumnRealName(columnDbName), key, cvalue, option);
+        final ColumnFunctionCipher cipher = xgetSqlClause().findColumnFunctionCipher(columnInfo);
+        xgetSqlClause().registerWhereClause(toColumnRealName(columnDbName), key, cvalue, cipher, option);
     }
 
     protected void registerWhereClause(String whereClause) {

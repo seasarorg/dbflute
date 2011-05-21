@@ -33,6 +33,8 @@ import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -212,16 +214,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected List<QueryClauseFilter> _whereClauseSimpleFilterList;
 
     // -----------------------------------------------------
+    //                                        Free Parameter
+    //                                        --------------
+    /** The map for free parameters. (only for saving) {Internal} (NullAllowed) */
+    protected Map<String, Object> _freeParameterMap;
+
+    // -----------------------------------------------------
+    //                                         Geared Cipher
+    //                                         -------------
+    /** The manager of geared cipher. (also for saving) {Internal} (NullAllowed) */
+    protected GearedCipherManager _gearedCipherManager;
+
+    // -----------------------------------------------------
     //                                          Purpose Type
     //                                          ------------
     /** The purpose of condition-bean for check at condition-query. (NotNull) */
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
-
-    // -----------------------------------------------------
-    //                                        Free Parameter
-    //                                        --------------
-    /** The map for free parameters. {Internal} (NullAllowed) */
-    protected Map<String, Object> _freeParameterMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -244,7 +252,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * @param dbmetaProvider The provider of DB meta. (NotNull)
      * @return this. (NotNull)
      */
-    public SqlClause provider(DBMetaProvider dbmetaProvider) {
+    public AbstractSqlClause dbmetaProvider(DBMetaProvider dbmetaProvider) {
         if (dbmetaProvider == null) {
             String msg = "The argument 'dbmetaProvider' should not be null:";
             msg = msg + " tableDbName=" + _tableDbName;
@@ -252,6 +260,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
         _dbmetaProvider = dbmetaProvider;
         _dbmeta = findDBMeta(_tableDbName);
+        return this;
+    }
+
+    /**
+     * Set the manager of geared cipher.
+     * @param manager The manager of geared cipher. (NullAllowed)
+     * @return this. (NotNull)
+     */
+    public AbstractSqlClause cipherManager(GearedCipherManager manager) {
+        _gearedCipherManager = manager;
         return this;
     }
 
@@ -515,7 +533,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             } else {
                 onQueryName = columnSqlName.toString();
             }
-            sb.append(realColumnName).append(" as ").append(onQueryName);
+            sb.append(decrypt(columnInfo, realColumnName)).append(" as ").append(onQueryName);
             getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
             if (validSpecifiedLocal && localSpecifiedMap.containsKey(columnDbName)) {
@@ -538,7 +556,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final boolean validSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
             boolean finishedForeignIndent = false;
             for (SelectedRelationColumn selectColumnInfo : selectColumnInfoList) {
-                final String columnDbName = selectColumnInfo.getColumnDbName();
+                final ColumnInfo columnInfo = selectColumnInfo.getColumnInfo();
+                final String columnDbName = columnInfo.getColumnDbName();
                 if (validSpecifiedForeign && !foreginSpecifiedMap.containsKey(columnDbName)) {
                     continue;
                 }
@@ -557,7 +576,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                     sb.append(ln()).append("     ");
                     finishedForeignIndent = true;
                 }
-                sb.append(", ").append(realColumnName).append(" as ").append(onQueryName);
+                sb.append(", ").append(decrypt(columnInfo, realColumnName)).append(" as ").append(onQueryName);
                 getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
                 if (validSpecifiedForeign && foreginSpecifiedMap.containsKey(columnDbName)) {
@@ -648,13 +667,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected String buildSelectClauseSpecifiedScalar(String aliasName, String function) {
         final String columnAlias = getScalarSelectColumnAlias();
         final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
+        final ColumnInfo columnInfo = getSpecifiedColumnInfoAsOne();
         if (columnSqlName != null) {
-            return "select " + function + "(" + aliasName + "." + columnSqlName + ") as " + columnAlias;
+            final String valueExp = aliasName + "." + columnSqlName;
+            return "select " + function + "(" + decrypt(columnInfo, valueExp) + ") as " + columnAlias;
         }
         final String subQuery = getSpecifiedDerivingSubQueryAsOne();
         if (subQuery != null) {
             if (hasUnionQuery()) {
-                return "select " + function + "(" + aliasName + "." + columnAlias + ")";
+                final String valueExp = aliasName + "." + columnAlias;
+                return "select " + function + "(" + decrypt(columnInfo, valueExp) + ")";
             } else {
                 final String aliasDef = " as " + columnAlias;
                 final StringBuilder sb = new StringBuilder();
@@ -969,11 +991,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<ColumnInfo> columnInfoList = foreignDBMeta.getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnDbName = columnInfo.getColumnDbName();
-            final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
             final SelectedRelationColumn selectColumnInfo = new SelectedRelationColumn();
             selectColumnInfo.setTableAliasName(foreignTableAliasName);
-            selectColumnInfo.setColumnDbName(columnDbName);
-            selectColumnInfo.setColumnSqlName(columnSqlName);
+            selectColumnInfo.setColumnInfo(columnInfo);
             selectColumnInfo.setColumnAliasName(columnDbName + nextRelationPath);
             resultMap.put(columnDbName, selectColumnInfo);
         }
@@ -1078,15 +1098,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                                Normal
     //                                                ------
-    public void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value) {
+    public void registerWhereClause(ColumnRealName columnRealName // real name of column
+            , ConditionKey key, ConditionValue value // basic resources
+            , ColumnFunctionCipher cipher) { // optional resources
         registerWhereClause(columnRealName, key, value, null);
     }
 
-    public void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value,
-            ConditionOption option) {
+    public void registerWhereClause(ColumnRealName columnRealName // real name of column
+            , ConditionKey key, ConditionValue value // basic resources
+            , ColumnFunctionCipher cipher, ConditionOption option) { // optional resources
         assertObjectNotNull("columnRealName", columnRealName);
         final List<QueryClause> clauseList = getWhereClauseList4Register();
-        doRegisterWhereClause(clauseList, columnRealName, key, value, option, false, false);
+        doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, false, false);
     }
 
     public void registerWhereClause(String clause) {
@@ -1131,16 +1154,20 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // -----------------------------------------------------
-    //                                 Inline for Base Table
-    //                                 ---------------------
-    public void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value) {
-        registerBaseTableInlineWhereClause(columnSqlName, key, value, null);
+    //                                In-line for Base Table
+    //                                ----------------------
+    public void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName // SQL name of column
+            , ConditionKey key, ConditionValue value // basic resources
+            , ColumnFunctionCipher cipher) { // optional resources
+        registerBaseTableInlineWhereClause(columnSqlName, key, value, cipher, null);
     }
 
-    public void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
-            ConditionOption option) {
+    public void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName // SQL name of column
+            , ConditionKey key, ConditionValue value // basic resources
+            , ColumnFunctionCipher cipher, ConditionOption option) { // optional resources
         final List<QueryClause> clauseList = getBaseTableInlineWhereClauseList4Register();
-        doRegisterWhereClause(clauseList, new ColumnRealName(null, columnSqlName), key, value, option, true, false);
+        final ColumnRealName columnRealName = new ColumnRealName(null, columnSqlName);
+        doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, true, false);
     }
 
     public void registerBaseTableInlineWhereClause(String value) {
@@ -1168,19 +1195,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // -----------------------------------------------------
-    //                                 Inline for Outer Join
-    //                                 ---------------------
+    //                                In-line for Outer Join
+    //                                ----------------------
     public void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
-            ConditionValue value, boolean onClause) {
-        registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, value, null, onClause);
+            ConditionValue value, ColumnFunctionCipher cipher, boolean onClause) {
+        registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, value, cipher, null, onClause);
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
-            ConditionValue value, ConditionOption option, boolean onClause) {
+    public void registerOuterJoinInlineWhereClause(String aliasName // table alias of column 
+            , ColumnSqlName columnSqlName // SQL name of column
+            , ConditionKey key, ConditionValue value // basic resources
+            , ColumnFunctionCipher cipher, ConditionOption option // optional resources
+            , boolean onClause) {
         assertNotYetOuterJoin(aliasName);
         final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
         final ColumnRealName columnRealName = new ColumnRealName((onClause ? aliasName : ""), columnSqlName);
-        doRegisterWhereClause(clauseList, columnRealName, key, value, option, true, onClause);
+        doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, true, onClause);
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String clause, boolean onClause) {
@@ -1218,8 +1248,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                         Assist Helper
     //                                         -------------
-    protected void doRegisterWhereClause(List<QueryClause> clauseList, ColumnRealName columnRealName, ConditionKey key,
-            ConditionValue value, ConditionOption option, final boolean inline, final boolean onClause) {
+    protected void doRegisterWhereClause(List<QueryClause> clauseList // the list of query clause
+            , ColumnRealName columnRealName, ConditionKey key, ConditionValue value // basic resources
+            , ColumnFunctionCipher cipher, ConditionOption option // optional resources
+            , final boolean inline, final boolean onClause) {
         key.addWhereClause(new QueryModeProvider() {
             public boolean isOrScopeQuery() {
                 return isOrScopeQueryEffective();
@@ -1232,7 +1264,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             public boolean isOnClause() {
                 return onClause;
             }
-        }, clauseList, columnRealName, value, option);
+        }, clauseList, columnRealName, value, cipher, option);
         markOrScopeQueryAndPart(clauseList);
     }
 
@@ -2166,10 +2198,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
             if (index == 0) {
-                sb.append("   set ").append(columnSqlName).append(" = ").append(parameter).append(ln());
+                sb.append("   set ");
             } else {
-                sb.append("     , ").append(columnSqlName).append(" = ").append(parameter).append(ln());
+                sb.append("     , ");
             }
+            sb.append(columnSqlName).append(" = ");
+            sb.append(encrypt(columnInfo, parameter)).append(ln());
             ++index;
         }
         if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasCompoundPrimaryKey()) {
@@ -2277,18 +2311,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _selectClauseType = _previousSelectClauseType != null ? _previousSelectClauseType : DEFAULT_SELECT_CLAUSE_TYPE;
     }
 
-    // [DBFlute-0.9.7.2]
-    // ===================================================================================
-    //                                                                        Purpose Type
-    //                                                                        ============
-    public HpCBPurpose getPurpose() {
-        return _purpose;
-    }
-
-    public void setPurpose(HpCBPurpose purpose) {
-        _purpose = purpose;
-    }
-
     // [DBFlute-0.9.4]
     // ===================================================================================
     //                                                                       InScope Limit
@@ -2336,6 +2358,46 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected String buildFreeParameterBindExp(String relativePath) {
         return "/*pmb.freeParameterMap." + relativePath + "*/null";
+    }
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                       Geared Cipher
+    //                                                                       =============
+    public GearedCipherManager getGearedCipherManager() {
+        return _gearedCipherManager;
+    }
+
+    public ColumnFunctionCipher findColumnFunctionCipher(ColumnInfo columnInfo) {
+        if (_gearedCipherManager != null) {
+            final ColumnFunctionCipher cipher = _gearedCipherManager.findColumnFunctionCipher(columnInfo);
+            if (cipher != null) {
+                return cipher;
+            }
+        }
+        return null;
+    }
+
+    protected String encrypt(ColumnInfo columnInfo, String valueExp) {
+        final ColumnFunctionCipher cipher = findColumnFunctionCipher(columnInfo);
+        return cipher != null ? cipher.encrypt(valueExp) : valueExp;
+    }
+
+    protected String decrypt(ColumnInfo columnInfo, String valueExp) {
+        final ColumnFunctionCipher cipher = findColumnFunctionCipher(columnInfo);
+        return cipher != null ? cipher.decrypt(valueExp) : valueExp;
+    }
+
+    // [DBFlute-0.9.7.2]
+    // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
+    public HpCBPurpose getPurpose() {
+        return _purpose;
+    }
+
+    public void setPurpose(HpCBPurpose purpose) {
+        _purpose = purpose;
     }
 
     // ===================================================================================

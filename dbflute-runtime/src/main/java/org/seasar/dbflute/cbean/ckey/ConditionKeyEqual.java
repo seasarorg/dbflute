@@ -17,6 +17,7 @@ package org.seasar.dbflute.cbean.ckey;
 
 import java.util.List;
 
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -72,8 +73,9 @@ public class ConditionKeyEqual extends ConditionKey {
      * {@inheritDoc}
      */
     @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
-        conditionList.add(buildBindClause(columnRealName, value.getEqualLatestLocation()));
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
+            ConditionValue value, ColumnFunctionCipher cipher) {
+        conditionList.add(buildBindClause(columnRealName, value.getEqualLatestLocation(), cipher));
     }
 
     /**
@@ -81,7 +83,7 @@ public class ConditionKeyEqual extends ConditionKey {
      */
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ConditionOption option) {
+            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
         throw new UnsupportedOperationException();
     }
 

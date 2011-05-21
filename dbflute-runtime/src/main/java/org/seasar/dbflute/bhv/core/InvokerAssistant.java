@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.factory.SQLExceptionHandlerFactory;
@@ -114,6 +115,11 @@ public interface InvokerAssistant {
      * @return The thrower of behavior exception. (NotNull)
      */
     BehaviorExceptionThrower assistBehaviorExceptionThrower();
+
+    /**
+     * @return The manager of geared cipher. (NullAllowed)
+     */
+    GearedCipherManager assistGearedCipherManager();
 
     /**
      * @return The parameter of resource. (NotNull)

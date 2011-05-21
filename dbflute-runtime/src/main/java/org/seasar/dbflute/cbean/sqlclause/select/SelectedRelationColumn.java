@@ -1,5 +1,6 @@
 package org.seasar.dbflute.cbean.sqlclause.select;
 
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 
 /**
@@ -11,18 +12,18 @@ public class SelectedRelationColumn {
     //                                                                           Attribute
     //                                                                           =========
     protected String _tableAliasName;
-    protected String _columnDbName;
-    protected ColumnSqlName _columnSqlName;
+    protected ColumnInfo _columnInfo;
     protected String _columnAliasName;
 
     // ===================================================================================
     //                                                                              Naming
     //                                                                              ======
     public String buildRealColumnSqlName() {
+        final ColumnSqlName columnSqlName = _columnInfo.getColumnSqlName();
         if (_tableAliasName != null) {
-            return _tableAliasName + "." + _columnSqlName.toString();
+            return _tableAliasName + "." + columnSqlName;
         } else {
-            return _columnSqlName.toString();
+            return columnSqlName.toString();
         }
     }
 
@@ -37,20 +38,12 @@ public class SelectedRelationColumn {
         this._tableAliasName = tableAliasName;
     }
 
-    public String getColumnDbName() {
-        return _columnDbName;
+    public ColumnInfo getColumnInfo() {
+        return _columnInfo;
     }
 
-    public void setColumnDbName(String columnName) {
-        this._columnDbName = columnName;
-    }
-
-    public ColumnSqlName getColumnSqlName() {
-        return _columnSqlName;
-    }
-
-    public void setColumnSqlName(ColumnSqlName columnSqlName) {
-        this._columnSqlName = columnSqlName;
+    public void setColumnInfo(ColumnInfo columnInfo) {
+        this._columnInfo = columnInfo;
     }
 
     public String getColumnAliasName() {

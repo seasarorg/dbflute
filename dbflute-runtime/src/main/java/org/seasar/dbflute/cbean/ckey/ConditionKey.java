@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.CallbackProcessor;
@@ -132,28 +133,18 @@ public abstract class ConditionKey implements Serializable {
      * @param conditionList Condition list. (NotNull)
      * @param columnRealName The real name of column. (NotNull)
      * @param cvalue Condition value. (NotNull)
-     */
-    public void addWhereClause(QueryModeProvider provider, List<QueryClause> conditionList,
-            ColumnRealName columnRealName, ConditionValue cvalue) {
-        addWhereClause(provider, conditionList, columnRealName, cvalue, null);
-    }
-
-    /**
-     * Add where clause.
-     * @param provider The provider of query mode. (NotNull)
-     * @param conditionList Condition list. (NotNull)
-     * @param columnRealName The real name of column. (NotNull)
-     * @param cvalue Condition value. (NotNull)
+     * @param cipher The cipher of column by function. (NullAllowed)
      * @param option Condition option. (NullAllowed)
      */
     public void addWhereClause(final QueryModeProvider provider, final List<QueryClause> conditionList,
-            final ColumnRealName columnRealName, final ConditionValue cvalue, final ConditionOption option) {
+            final ColumnRealName columnRealName, final ConditionValue cvalue, // basic resources
+            final ColumnFunctionCipher cipher, final ConditionOption option) { // optional resources
         cvalue.process(new CallbackProcessor<Void>() {
             public Void process() {
                 if (option != null) {
-                    doAddWhereClause(conditionList, columnRealName, cvalue, option);
+                    doAddWhereClause(conditionList, columnRealName, cvalue, cipher, option);
                 } else {
-                    doAddWhereClause(conditionList, columnRealName, cvalue);
+                    doAddWhereClause(conditionList, columnRealName, cvalue, cipher);
                 }
                 return null;
             }
@@ -169,19 +160,21 @@ public abstract class ConditionKey implements Serializable {
      * @param conditionList Condition list. (NotNull)
      * @param columnRealName The real name of column. (NotNull)
      * @param value Condition value. (NotNull)
+     * @param cipher The cipher of column by function. (NullAllowed)
      */
     protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value);
+            ConditionValue value, ColumnFunctionCipher cipher);
 
     /**
      * Do add where clause.
      * @param conditionList Condition list. (NotNull)
      * @param columnRealName The real name of column. (NotNull)
      * @param value Condition value. (NotNull)
+     * @param cipher The cipher of column by function. (NullAllowed)
      * @param option Condition option. (NotNull)
      */
     protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ConditionOption option);
+            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option);
 
     // ===================================================================================
     //                                                                     Condition Value
@@ -250,9 +243,10 @@ public abstract class ConditionKey implements Serializable {
      * @param columnRealName The real name of column. (NotNull)
      * @param location Location. (NotNull)
      * @return Bind clause. (NotNull)
+     * @param cipher The cipher of column by function. (NullAllowed)
      */
-    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location) {
-        final String bindExpression = buildBindExpression(location, null);
+    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher) {
+        final String bindExpression = buildBindExpression(location, null, cipher);
         final String clause = columnRealName + " " + getOperand() + " " + bindExpression;
         return new StringQueryClause(clause);
     }
@@ -263,11 +257,12 @@ public abstract class ConditionKey implements Serializable {
      * @param operand Operand. (NotNull)
      * @param location Location. (NotNull)
      * @param rearOption Rear option. (NotNull)
+     * @param cipher The cipher of column by function. (NullAllowed)
      * @return Bind clause. (NotNull)
      */
     protected QueryClause buildBindClause(ColumnRealName columnRealName, String operand, String location,
-            String rearOption) {
-        final String bindExpression = buildBindExpression(location, null);
+            String rearOption, ColumnFunctionCipher cipher) {
+        final String bindExpression = buildBindExpression(location, null, cipher);
         final String clause = columnRealName + " " + operand + " " + bindExpression + rearOption;
         return new StringQueryClause(clause);
     }
@@ -277,10 +272,12 @@ public abstract class ConditionKey implements Serializable {
      * @param columnRealName The real name of column. (NotNull)
      * @param location Location. (NotNull)
      * @param dummyValue Dummy value. (NotNull)
+     * @param cipher The cipher of column by function. (NullAllowed)  
      * @return Bind clause. (NotNull)
      */
-    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, String dummyValue) {
-        final String bindExpression = buildBindExpression(location, dummyValue);
+    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, String dummyValue,
+            ColumnFunctionCipher cipher) {
+        final String bindExpression = buildBindExpression(location, dummyValue, cipher);
         final String clause = columnRealName + " " + getOperand() + " " + bindExpression;
         return new StringQueryClause(clause);
     }
@@ -295,8 +292,9 @@ public abstract class ConditionKey implements Serializable {
         return new StringQueryClause(clause);
     }
 
-    protected String buildBindExpression(String location, String dummyValue) {
-        return "/*pmb." + location + "*/" + dummyValue;
+    protected String buildBindExpression(String location, String dummyValue, ColumnFunctionCipher cipher) {
+        final String bindExpression = "/*pmb." + location + "*/" + dummyValue;
+        return cipher != null ? cipher.encrypt(bindExpression) : bindExpression;
     }
 
     /**

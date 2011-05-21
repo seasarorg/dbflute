@@ -84,7 +84,6 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             throwDerivedReferrerInvalidColumnSpecificationException(function);
         }
         final ColumnRealName derivedColumnRealName = getDerivedColumnRealName();
-
         final String subQueryClause;
         if (_subQuerySqlClause.hasUnionQuery()) {
             subQueryClause = getUnionSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName, option,

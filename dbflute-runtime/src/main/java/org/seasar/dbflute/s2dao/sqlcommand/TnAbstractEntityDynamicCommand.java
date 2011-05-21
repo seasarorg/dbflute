@@ -17,9 +17,11 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 
 /**
@@ -40,6 +42,14 @@ public abstract class TnAbstractEntityDynamicCommand extends TnAbstractBasicSqlC
     //                                                                         ===========
     public TnAbstractEntityDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
+    }
+
+    // ===================================================================================
+    //                                                                       Cipher Helper
+    //                                                                       =============
+    protected String encrypt(String tableDbName, String columnDbName, String valueExp) {
+        final ColumnFunctionCipher cipher = ResourceContext.findColumnFunctionCipher(tableDbName, columnDbName);
+        return cipher != null ? cipher.encrypt(valueExp) : valueExp;
     }
 
     // ===================================================================================

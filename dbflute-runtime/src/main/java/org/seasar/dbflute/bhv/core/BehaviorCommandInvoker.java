@@ -226,6 +226,7 @@ public class BehaviorCommandInvoker {
         resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
         resourceContext.setSqlAnalyzerFactory(_invokerAssistant.assistSqlAnalyzerFactory());
         resourceContext.setSQLExceptionHandlerFactory(_invokerAssistant.assistSQLExceptionHandlerFactory());
+        resourceContext.setGearedCipherManager(_invokerAssistant.assistGearedCipherManager());
         resourceContext.setResourceParameter(_invokerAssistant.assistResourceParameter());
         ResourceContext.setResourceContextOnThread(resourceContext);
     }

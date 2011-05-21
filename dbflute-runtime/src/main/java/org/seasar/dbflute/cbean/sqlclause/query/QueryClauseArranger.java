@@ -18,10 +18,18 @@ package org.seasar.dbflute.cbean.sqlclause.query;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
- * The arranger of where clause.
+ * The arranger of query clause.
  * @author jflute
  */
 public interface QueryClauseArranger {
 
+    /**
+     * Arrange the query clause.
+     * @param columnRealName The real name of column. (NotNull)
+     * @param operand The operand for the query. (NotNull)
+     * @param bindExpression The expression for binding. (NotNull)
+     * @param rearOption The option of rear. (NotNull)
+     * @return The arranged query clause. (NotNull)
+     */
     String arrange(ColumnRealName columnRealName, String operand, String bindExpression, String rearOption);
 }

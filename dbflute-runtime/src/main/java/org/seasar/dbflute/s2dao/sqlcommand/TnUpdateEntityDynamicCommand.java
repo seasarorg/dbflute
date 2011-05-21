@@ -27,7 +27,6 @@ import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
-import org.seasar.dbflute.dbmeta.name.TableSqlName;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateEntityHandler;
@@ -156,13 +155,13 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
      * @return The update SQL. (NotNull)
      */
     protected String createUpdateSql(TnPropertyType[] propertyTypes, UpdateOption<ConditionBean> option) {
-        final TableSqlName tableSqlName = _targetDBMeta.getTableSqlName();
+        final String tableDbName = _targetDBMeta.getTableDbName();
         if (_beanMetaData.getPrimaryKeySize() == 0) {
-            String msg = "The table '" + tableSqlName + "' does not have primary keys!";
+            String msg = "The table '" + tableDbName + "' should have primary key.";
             throw new IllegalStateException(msg);
         }
-        final StringBuilder sb = new StringBuilder(100);
-        sb.append("update ").append(tableSqlName).append(" set ");
+        final StringBuilder sb = new StringBuilder(96);
+        sb.append("update ").append(_targetDBMeta.getTableSqlName()).append(" set ");
         final String versionNoPropertyName = _beanMetaData.getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; i++) {
             final TnPropertyType pt = propertyTypes[i];
@@ -183,7 +182,8 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
                 sb.append(columnSqlName).append(" = ").append(statement);
                 continue;
             }
-            sb.append(columnSqlName).append(" = ?");
+            sb.append(columnSqlName).append(" = ");
+            sb.append(encrypt(tableDbName, columnDbName, "?"));
         }
         sb.append(ln()).append(" where ");
         for (int i = 0; i < _beanMetaData.getPrimaryKeySize(); i++) { // never zero loop

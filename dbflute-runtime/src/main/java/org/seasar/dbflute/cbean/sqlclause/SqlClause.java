@@ -23,6 +23,8 @@ import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -220,12 +222,13 @@ public interface SqlClause {
     /**
      * Register 'where' clause.
      * @param columnRealName The real name of column. {[alias-name].[column-name]}. (NotNull)
-     * @param key Condition-key. (NotNull)
-     * @param value Condition-value. (NotNull)
-     * @param option Condition-option. (NullAllowed)
+     * @param key The key of condition. (NotNull)
+     * @param value The value of condition. (NotNull)
+     * @param cipher The cipher of column by function. (NullAllowed)
+     * @param option The option of condition. (NullAllowed)
      */
     void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value,
-            ConditionOption option);
+            ColumnFunctionCipher cipher, ConditionOption option);
 
     /**
      * Register 'where' clause.
@@ -254,18 +257,19 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
-    void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value);
+    void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
+            ColumnFunctionCipher cipher);
 
     void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
-            ConditionOption option);
+            ColumnFunctionCipher cipher, ConditionOption option);
 
     void registerBaseTableInlineWhereClause(String value);
 
     void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
-            ConditionValue value, boolean onClause);
+            ConditionValue value, ColumnFunctionCipher cipher, boolean onClause);
 
     void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
-            ConditionValue value, ConditionOption option, boolean onClause);
+            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option, boolean onClause);
 
     void registerOuterJoinInlineWhereClause(String aliasName, String clause, boolean onClause);
 
@@ -743,24 +747,6 @@ public interface SqlClause {
         }
     }
 
-    // [DBFlute-0.9.7.2]
-    // ===================================================================================
-    //                                                                        Purpose Type
-    //                                                                        ============
-    HpCBPurpose getPurpose();
-
-    void setPurpose(HpCBPurpose purpose);
-
-    // [DBFlute-0.9.4]
-    // ===================================================================================
-    //                                                                       InScope Limit
-    //                                                                       =============
-    /**
-     * Get the limit of inScope.
-     * @return The limit of inScope. (If it's zero or minus, it means no limit)
-     */
-    int getInScopeLimit();
-
     // ===================================================================================
     //                                                                      Free Parameter
     //                                                                      ==============
@@ -785,4 +771,30 @@ public interface SqlClause {
      * @return The expression for binding. (NotNull)
      */
     String registerFreeParameterToThemeList(String themeKey, Object addedValue);
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                       Geared Cipher
+    //                                                                       =============
+    GearedCipherManager getGearedCipherManager();
+
+    ColumnFunctionCipher findColumnFunctionCipher(ColumnInfo columnInfo);
+
+    // [DBFlute-0.9.7.2]
+    // ===================================================================================
+    //                                                                        Purpose Type
+    //                                                                        ============
+    HpCBPurpose getPurpose();
+
+    void setPurpose(HpCBPurpose purpose);
+
+    // [DBFlute-0.9.4]
+    // ===================================================================================
+    //                                                                       InScope Limit
+    //                                                                       =============
+    /**
+     * Get the limit of inScope.
+     * @return The limit of inScope. (If it's zero or minus, it means no limit)
+     */
+    int getInScopeLimit();
 }

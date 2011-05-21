@@ -17,6 +17,7 @@ package org.seasar.dbflute.cbean.ckey;
 
 import java.util.List;
 
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -63,6 +64,7 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         return value != null;
     }
@@ -70,15 +72,18 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     /**
      * {@inheritDoc}
      */
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName, ConditionValue value) {
+    @Override
+    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
+            ConditionValue value, ColumnFunctionCipher cipher) {
         throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ConditionOption option) {
+            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
         assertWhereClauseArgument(columnRealName, value, option);
         final String location = getLocation(value);
         final LikeSearchOption myOption = (LikeSearchOption) option;
@@ -87,11 +92,11 @@ public class ConditionKeyLikeSearch extends ConditionKey {
         final QueryClauseArranger arranger = myOption.getWhereClauseArranger();
         final QueryClause clause;
         if (arranger != null) {
-            final String bindExpression = buildBindExpression(location, null);
+            final String bindExpression = buildBindExpression(location, null, cipher);
             final String arranged = arranger.arrange(columnRealName, realOperand, bindExpression, rearOption);
             clause = new StringQueryClause(arranged);
         } else {
-            clause = buildBindClause(columnRealName, realOperand, location, rearOption);
+            clause = buildBindClause(columnRealName, realOperand, location, rearOption, cipher);
         }
         conditionList.add(clause);
     }
@@ -123,6 +128,7 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
         throw new UnsupportedOperationException();
     }
@@ -130,6 +136,7 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
             ConditionOption option) {
         conditionValue.setupLikeSearch((String) value, (LikeSearchOption) option, location);

@@ -164,8 +164,8 @@ public interface ConditionBean extends PagingBean {
     String toDisplaySql();
 
     // ===================================================================================
-    //                                                          Basic Status Determination
-    //                                                          ==========================
+    //                                                                        Basic Status
+    //                                                                        ============
     /**
      * Does it have where clauses? <br />
      * If this condition-bean has union queries,

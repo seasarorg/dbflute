@@ -137,26 +137,24 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     //                                                                          ==========
     protected String createInsertSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes,
             InsertOption<ConditionBean> option) {
-        final StringBuilder sb = new StringBuilder(100);
-        sb.append("insert into ");
-        sb.append(_targetDBMeta.getTableSqlName());
-        sb.append(" (");
+        final String tableDbName = _targetDBMeta.getTableDbName();
+        final StringBuilder columnSb = new StringBuilder(48);
+        final StringBuilder valuesSb = new StringBuilder(48);
         for (int i = 0; i < propertyTypes.length; ++i) {
             final TnPropertyType pt = propertyTypes[i];
             final ColumnSqlName columnSqlName = pt.getColumnSqlName();
             if (i > 0) {
-                sb.append(", ");
+                columnSb.append(", ");
+                valuesSb.append(", ");
             }
-            sb.append(columnSqlName);
+            columnSb.append(columnSqlName);
+            final String columnDbName = pt.getColumnDbName();
+            valuesSb.append(encrypt(tableDbName, columnDbName, "?"));
         }
-        sb.append(")").append(ln()).append(" values (");
-        for (int i = 0; i < propertyTypes.length; ++i) {
-            if (i > 0) {
-                sb.append(", ");
-            }
-            sb.append("?");
-        }
-        sb.append(")");
+        final StringBuilder sb = new StringBuilder(128);
+        sb.append("insert into ").append(_targetDBMeta.getTableSqlName());
+        sb.append(" (").append(columnSb).append(")");
+        sb.append(ln()).append(" values (").append(valuesSb).append(")");
         return sb.toString();
     }
 
