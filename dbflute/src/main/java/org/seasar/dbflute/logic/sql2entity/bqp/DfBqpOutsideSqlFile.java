@@ -58,15 +58,18 @@ public class DfBqpOutsideSqlFile {
     }
 
     protected void doAnalyze() {
-        final String exbhvName;
+        final String exbhvMark;
         {
-            String exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
-            if (exbhvPackage.contains(".")) {
-                exbhvPackage = exbhvPackage.substring(exbhvPackage.lastIndexOf(".") + ".".length());
+            final String exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
+            final String exbhvName = Srl.substringLastRear(exbhvPackage, ".");
+            final String sqlPackage;
+            if (getOutsideSqlProperties().isSqlPackageValid()) {
+                sqlPackage = getOutsideSqlProperties().getSqlPackage();
+            } else {
+                sqlPackage = Srl.substringLastFront(exbhvPackage, ".");
             }
-            exbhvName = exbhvPackage;
+            exbhvMark = Srl.replace(sqlPackage, ".", "/") + "/" + exbhvName + "/";
         }
-        final String exbhvMark = "/" + exbhvName + "/";
 
         // both types are target
         final String bhvSuffix = "Bhv";
