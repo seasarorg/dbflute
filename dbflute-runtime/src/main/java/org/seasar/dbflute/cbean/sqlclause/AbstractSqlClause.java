@@ -202,11 +202,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Does it accept an empty string for query? */
     protected boolean _emptyStringQueryAllowed;
 
+    /** Does it check an invalid query? */
+    protected boolean _invalidQueryChecked;
+
     /** The list of invalid query info. */
     protected List<HpInvalidQueryInfo> _invalidQueryList;
-
-    /** Does it check invalid query? */
-    protected boolean _invalidQueryChecked;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -226,8 +226,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The manager of geared cipher. (also for saving) (NullAllowed) */
     protected GearedCipherManager _gearedCipherManager;
 
-    /** Does it suppress cipher for select clause? */
-    protected boolean _suppressSelectClauseCipher;
+    /** Does it suppress decription for select columns? */
+    protected boolean _suppressSelectColumnDecryption;
 
     // -----------------------------------------------------
     //                                          Purpose Type
@@ -2391,12 +2391,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return null;
     }
 
-    public void makeSelectClauseCipherEffective() { // after suppressSelectClauseCipher()
-        _suppressSelectClauseCipher = false;
+    public void makeSelectColumnDecryptionEffective() { // after suppressSelectColumnDecryption()
+        _suppressSelectColumnDecryption = false;
     }
 
-    public void suppressSelectClauseCipher() { // basically for queryInsert()
-        _suppressSelectClauseCipher = true;
+    public void suppressSelectColumnDecryption() { // basically for queryInsert()
+        _suppressSelectColumnDecryption = true;
     }
 
     protected String encrypt(ColumnInfo columnInfo, String valueExp) {
@@ -2410,7 +2410,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String decryptSelect(ColumnInfo columnInfo, String valueExp) {
-        return !_suppressSelectClauseCipher ? decrypt(columnInfo, valueExp) : valueExp;
+        return !_suppressSelectColumnDecryption ? decrypt(columnInfo, valueExp) : valueExp;
     }
 
     // [DBFlute-0.9.7.2]
