@@ -1,5 +1,6 @@
 package org.seasar.dbflute.cbean.sqlclause.subquery;
 
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -23,9 +24,10 @@ public class InScopeRelation extends AbstractSubQuery {
     //                                                                         ===========
     public InScopeRelation(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
             ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta, boolean suppressLocalAliasName) {
+            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager,
+            boolean suppressLocalAliasName) {
         super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
-                subQueryIdentity, subQueryDBMeta);
+                subQueryIdentity, subQueryDBMeta, cipherManager);
         _suppressLocalAliasName = suppressLocalAliasName;
     }
 

@@ -32,6 +32,7 @@ import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.ckey.ConditionKeyInScope;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -801,8 +802,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final ExistsReferrer existsReferrer = new ExistsReferrer(subQueryPath, localRealNameProvider,
-                subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta);
+                subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager);
         final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName, existsOption);
         registerWhereClause(clause);
     }
@@ -837,10 +839,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final boolean suppressLocalAliasName = isInScopeRelationSuppressLocalAliasName();
         final InScopeRelation inScopeRelation = new InScopeRelation(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta,
-                suppressLocalAliasName);
+                cipherManager, suppressLocalAliasName);
         final String clause = inScopeRelation.buildInScopeRelation(columnDbName, relatedColumnDbName, inScopeOption);
         registerWhereClause(clause);
     }
@@ -872,10 +875,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final SpecifyDerivedReferrer derivedReferrer = option.createSpecifyDerivedReferrer(subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity,
-                subQueryDBMeta, mainSubQueryIdentity, aliasName);
+                subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
         registerParameterOption(option);
         final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
         final HpDerivingSubQueryInfo subQueryInfo = new HpDerivingSubQueryInfo(aliasName, clause, derivedReferrer);
@@ -905,11 +909,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final String parameterPath = xgetLocation(parameterPropertyName);
         final QueryDerivedReferrer derivedReferrer = option.createQueryDerivedReferrer(subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity,
-                subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
+                subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value, parameterPath);
         registerParameterOption(option);
         final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
         registerWhereClause(clause);
@@ -933,10 +938,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         };
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
+        final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
         final ScalarCondition scalarCondition = new ScalarCondition(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta,
-                mainSubQueryIdentity, operand);
+                cipherManager, mainSubQueryIdentity, operand);
         final String clause = scalarCondition.buildScalarCondition(function);
         registerWhereClause(clause);
     }

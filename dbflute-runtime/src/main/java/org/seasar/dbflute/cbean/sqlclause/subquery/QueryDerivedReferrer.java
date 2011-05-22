@@ -1,5 +1,6 @@
 package org.seasar.dbflute.cbean.sqlclause.subquery;
 
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -25,10 +26,10 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     //                                                                         ===========
     public QueryDerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
             ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta, String mainSubQueryIdentity, String operand, Object value,
-            String parameterPath) {
+            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager,
+            String mainSubQueryIdentity, String operand, Object value, String parameterPath) {
         super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
-                subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity);
+                subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity);
         _operand = operand;
         _value = value;
         _parameterPath = parameterPath;

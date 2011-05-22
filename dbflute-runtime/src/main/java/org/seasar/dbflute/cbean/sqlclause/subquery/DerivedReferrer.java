@@ -2,6 +2,7 @@ package org.seasar.dbflute.cbean.sqlclause.subquery;
 
 import java.util.List;
 
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
@@ -34,9 +35,10 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     //                                                                         ===========
     public DerivedReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
             ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta, String mainSubQueryIdentity) {
+            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager,
+            String mainSubQueryIdentity) {
         super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
-                subQueryIdentity, subQueryDBMeta);
+                subQueryIdentity, subQueryDBMeta, cipherManager);
         _mainSubQueryIdentity = mainSubQueryIdentity;
     }
 
@@ -169,13 +171,17 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
                 final String resolved = _subQueryPath.resolveParameterLocationPath(specifiedExp);
                 columnWithEndExp = replace(resolved, dummyAlias, ")");
             } else {
-                columnWithEndExp = specifiedExp + ")";
+                final ColumnInfo derivedColumnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
+                columnWithEndExp = decrypt(derivedColumnInfo, specifiedExp) + ")";
             }
         }
         final String functionExp = function + connector + columnWithEndExp;
         return option.filterFunction(functionExp);
     }
 
+    // ===================================================================================
+    //                                                                    Assert/Exception
+    //                                                                    ================
     protected abstract void throwDerivedReferrerInvalidColumnSpecificationException(String function);
 
     protected void assertDerivedReferrerColumnType(String function, String derivedColumnDbName) {

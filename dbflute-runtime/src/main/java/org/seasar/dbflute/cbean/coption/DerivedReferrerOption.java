@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.subquery.QueryDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
@@ -261,17 +262,19 @@ public class DerivedReferrerOption implements ParameterOption {
     public SpecifyDerivedReferrer createSpecifyDerivedReferrer(SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
             int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            String mainSubQueryIdentity, String aliasName) {
+            GearedCipherManager cipherManager, String mainSubQueryIdentity, String aliasName) {
         return new SpecifyDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
-                subQueryClause, subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, aliasName);
+                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
     }
 
     public QueryDerivedReferrer createQueryDerivedReferrer(SubQueryPath subQueryPath,
             ColumnRealNameProvider localRealNameProvider, ColumnSqlNameProvider subQuerySqlNameProvider,
             int subQueryLevel, SqlClause subQueryClause, String subQueryIdentity, DBMeta subQueryDBMeta,
-            String mainSubQueryIdentity, String operand, Object value, String parameterPath) {
+            GearedCipherManager cipherManager, String mainSubQueryIdentity, String operand, Object value,
+            String parameterPath) {
         return new QueryDerivedReferrer(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel,
-                subQueryClause, subQueryIdentity, subQueryDBMeta, mainSubQueryIdentity, operand, value, parameterPath);
+                subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value,
+                parameterPath);
     }
 
     // ===================================================================================

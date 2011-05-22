@@ -1,7 +1,10 @@
 package org.seasar.dbflute.cbean.sqlclause.subquery;
 
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -26,6 +29,7 @@ public abstract class AbstractSubQuery {
     protected final SqlClause _subQuerySqlClause;
     protected final String _subQueryIdentity;
     protected final DBMeta _subQueryDBMeta;
+    protected final GearedCipherManager _cipherManager;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -38,10 +42,11 @@ public abstract class AbstractSubQuery {
      * @param subQuerySqlClause The SQL clause for sub-query. (NotNull)
      * @param subQueryIdentity The identity string for sub-query. (NotNull)
      * @param subQueryDBMeta The DB meta for sub-query. (NotNull)
+     * @param cipherManager The manager of geared cipher. (NullAllowed)
      */
     public AbstractSubQuery(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
             ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta) {
+            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager) {
         _subQueryPath = subQueryPath;
         _localRealNameProvider = localRealNameProvider;
         _subQuerySqlNameProvider = subQuerySqlNameProvider;
@@ -49,6 +54,7 @@ public abstract class AbstractSubQuery {
         _subQuerySqlClause = subQuerySqlClause;
         _subQueryIdentity = subQueryIdentity;
         _subQueryDBMeta = subQueryDBMeta;
+        _cipherManager = cipherManager;
     }
 
     // ===================================================================================
@@ -121,6 +127,18 @@ public abstract class AbstractSubQuery {
 
     protected String resolveSubQueryEndMark(String subQueryIdentity) {
         return _subQuerySqlClause.resolveSubQueryEndMark(subQueryIdentity);
+    }
+
+    // ===================================================================================
+    //                                                                       Geared Cipher
+    //                                                                       =============
+    protected ColumnFunctionCipher findColumnFunctionCipher(ColumnInfo columnInfo) {
+        return _cipherManager != null ? _cipherManager.findColumnFunctionCipher(columnInfo) : null;
+    }
+
+    protected String decrypt(ColumnInfo columnInfo, String valueExp) {
+        final ColumnFunctionCipher cipher = findColumnFunctionCipher(columnInfo);
+        return cipher != null ? cipher.decrypt(valueExp) : valueExp;
     }
 
     // ===================================================================================

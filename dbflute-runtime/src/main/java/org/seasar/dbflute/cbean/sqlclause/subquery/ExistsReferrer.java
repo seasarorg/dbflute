@@ -2,6 +2,7 @@ package org.seasar.dbflute.cbean.sqlclause.subquery;
 
 import java.util.List;
 
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -21,9 +22,9 @@ public class ExistsReferrer extends AbstractSubQuery {
     //                                                                         ===========
     public ExistsReferrer(SubQueryPath subQueryPath, ColumnRealNameProvider localRealNameProvider,
             ColumnSqlNameProvider subQuerySqlNameProvider, int subQueryLevel, SqlClause subQuerySqlClause,
-            String subQueryIdentity, DBMeta subQueryDBMeta) {
+            String subQueryIdentity, DBMeta subQueryDBMeta, GearedCipherManager cipherManager) {
         super(subQueryPath, localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQuerySqlClause,
-                subQueryIdentity, subQueryDBMeta);
+                subQueryIdentity, subQueryDBMeta, cipherManager);
     }
 
     // ===================================================================================
