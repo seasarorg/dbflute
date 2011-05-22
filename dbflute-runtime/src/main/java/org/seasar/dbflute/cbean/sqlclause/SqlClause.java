@@ -780,6 +780,10 @@ public interface SqlClause {
 
     ColumnFunctionCipher findColumnFunctionCipher(ColumnInfo columnInfo);
 
+    void makeSelectClauseCipherEffective();
+
+    void suppressSelectClauseCipher();
+
     // [DBFlute-0.9.7.2]
     // ===================================================================================
     //                                                                        Purpose Type

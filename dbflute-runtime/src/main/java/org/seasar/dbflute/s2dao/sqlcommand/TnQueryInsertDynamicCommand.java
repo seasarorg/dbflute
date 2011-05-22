@@ -188,15 +188,7 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
                 continue;
             }
             final Object value = columnInfo.read(entity);
-            final String fixedValueQueryExp;
-            if (value != null) {
-                fixedValueQueryExp = "/*entity." + propertyName + "*/null";
-            } else {
-                // it uses null literal on query
-                // because the SQL analyzer blocks null parameters
-                // (the analyzer should do it for condition-bean)
-                fixedValueQueryExp = "null";
-            }
+            final String fixedValueQueryExp = (value != null ? "/*entity." + propertyName + "*/null" : null);
             fixedValueQueryExpMap.put(columnInfo.getColumnDbName(), fixedValueQueryExp);
         }
         return intoCB.getSqlClause().getClauseQueryInsert(fixedValueQueryExpMap, resourceCB.getSqlClause());

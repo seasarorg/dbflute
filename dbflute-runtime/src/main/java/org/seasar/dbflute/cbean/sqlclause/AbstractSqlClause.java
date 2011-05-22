@@ -142,7 +142,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The map of outer join. */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap;
 
-    /** Is inner-join effective? Default value is false. */
+    /** Is inner-join effective? */
     protected boolean _innerJoinEffective;
 
     /** The list of where clause. */
@@ -157,7 +157,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The list of union clause. (NullAllowed: This is lazy-loaded) */
     protected List<UnionQueryInfo> _unionQueryInfoList;
 
-    /** Is order-by effective? Default value is false. */
+    /** Is order-by effective? Default value is false. True when registered. */
     protected boolean _orderByEffective;
 
     // -----------------------------------------------------
@@ -172,13 +172,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Fetch page number. (for fetchXxx()) This value should be plus. */
     protected int _fetchPageNumber = 1;
 
-    /** Is fetch-narrowing effective? Default value is false. */
+    /** Is fetch-narrowing effective? Default value is false but true when registered. */
     protected boolean _fetchScopeEffective;
 
     // -----------------------------------------------------
     //                                          OrScopeQuery
     //                                          ------------
-    /** Is or-scope query effective?*/
+    /** Is or-scope query effective? */
     protected boolean _orScopeQueryEffective;
 
     /** The current temporary information of or-scope query?*/
@@ -193,6 +193,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                       SubQuery Indent
     //                                       ---------------
+    /** The processor for sub-query indent. */
     protected SubQueryIndentProcessor _subQueryIndentProcessor;
 
     // -----------------------------------------------------
@@ -201,11 +202,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Does it accept an empty string for query? */
     protected boolean _emptyStringQueryAllowed;
 
-    /** Does it check an invalid query? */
-    protected boolean _invalidQueryChecked;
-
     /** The list of invalid query info. */
     protected List<HpInvalidQueryInfo> _invalidQueryList;
+
+    /** Does it check invalid query? */
+    protected boolean _invalidQueryChecked;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -216,14 +217,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                        Free Parameter
     //                                        --------------
-    /** The map for free parameters. (only for saving) {Internal} (NullAllowed) */
+    /** The map for free parameters. (only for saving) (NullAllowed) */
     protected Map<String, Object> _freeParameterMap;
 
     // -----------------------------------------------------
     //                                         Geared Cipher
     //                                         -------------
-    /** The manager of geared cipher. (also for saving) {Internal} (NullAllowed) */
+    /** The manager of geared cipher. (also for saving) (NullAllowed) */
     protected GearedCipherManager _gearedCipherManager;
+
+    /** Does it suppress cipher for select clause? */
+    protected boolean _suppressSelectClauseCipher;
 
     // -----------------------------------------------------
     //                                          Purpose Type
@@ -533,7 +537,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             } else {
                 onQueryName = columnSqlName.toString();
             }
-            sb.append(decrypt(columnInfo, realColumnName)).append(" as ").append(onQueryName);
+            sb.append(decryptSelect(columnInfo, realColumnName)).append(" as ").append(onQueryName);
             getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
             if (validSpecifiedLocal && localSpecifiedMap.containsKey(columnDbName)) {
@@ -576,7 +580,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                     sb.append(ln()).append("     ");
                     finishedForeignIndent = true;
                 }
-                sb.append(", ").append(decrypt(columnInfo, realColumnName)).append(" as ").append(onQueryName);
+                sb.append(", ");
+                sb.append(decryptSelect(columnInfo, realColumnName)).append(" as ").append(onQueryName);
                 getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
                 if (validSpecifiedForeign && foreginSpecifiedMap.containsKey(columnDbName)) {
@@ -670,13 +675,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final ColumnInfo columnInfo = getSpecifiedColumnInfoAsOne();
         if (columnSqlName != null) {
             final String valueExp = aliasName + "." + columnSqlName;
-            return "select " + function + "(" + decrypt(columnInfo, valueExp) + ") as " + columnAlias;
+            return "select " + function + "(" + decryptSelect(columnInfo, valueExp) + ") as " + columnAlias;
         }
         final String subQuery = getSpecifiedDerivingSubQueryAsOne();
         if (subQuery != null) {
             if (hasUnionQuery()) {
                 final String valueExp = aliasName + "." + columnAlias;
-                return "select " + function + "(" + decrypt(columnInfo, valueExp) + ")";
+                return "select " + function + "(" + decryptSelect(columnInfo, valueExp) + ")";
             } else {
                 final String aliasDef = " as " + columnAlias;
                 final StringBuilder sb = new StringBuilder();
@@ -2137,7 +2142,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             if (specifiedColumn != null) {
                 onQueryName = specifiedColumn.getValidMappedOnQueryName();
             } else if (fixedValueQueryExpMap.containsKey(columnDbName)) {
-                onQueryName = fixedValueQueryExpMap.get(columnDbName);
+                final String fixedValueQueryExp = fixedValueQueryExpMap.get(columnDbName);
+                if (fixedValueQueryExp != null) {
+                    onQueryName = encrypt(columnInfo, fixedValueQueryExp);
+                } else {
+                    // it uses null literal on query
+                    // because the SQL analyzer blocks null parameters
+                    // (the analyzer should do it for condition-bean)
+                    onQueryName = "null";
+                }
             } else {
                 continue;
             }
@@ -2378,6 +2391,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return null;
     }
 
+    public void makeSelectClauseCipherEffective() { // after suppressSelectClauseCipher()
+        _suppressSelectClauseCipher = false;
+    }
+
+    public void suppressSelectClauseCipher() { // basically for queryInsert()
+        _suppressSelectClauseCipher = true;
+    }
+
     protected String encrypt(ColumnInfo columnInfo, String valueExp) {
         final ColumnFunctionCipher cipher = findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.encrypt(valueExp) : valueExp;
@@ -2386,6 +2407,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected String decrypt(ColumnInfo columnInfo, String valueExp) {
         final ColumnFunctionCipher cipher = findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.decrypt(valueExp) : valueExp;
+    }
+
+    protected String decryptSelect(ColumnInfo columnInfo, String valueExp) {
+        return !_suppressSelectClauseCipher ? decrypt(columnInfo, valueExp) : valueExp;
     }
 
     // [DBFlute-0.9.7.2]
