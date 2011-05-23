@@ -157,8 +157,9 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         final String mainAlias = buildSubQueryMainAliasName();
         final String joinCondition = mainAlias + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
         final ColumnRealName mainDerivedColumnRealName = new ColumnRealName(mainAlias, derivedColumnSqlName);
-        return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) + ln() + "  from ("
-                + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark + ln() + " where " + joinCondition;
+        return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) + ln() // select
+                + "  from (" + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark + ln() // from
+                + " where " + joinCondition; // where
     }
 
     protected String buildFunctionPart(String function, ColumnRealName columnRealName, DerivedReferrerOption option) {

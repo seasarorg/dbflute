@@ -3,6 +3,7 @@ package org.seasar.dbflute.cbean.sqlclause.subquery;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -53,7 +54,10 @@ public class ScalarCondition extends AbstractSubQuery {
         final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
-        return columnRealName + " " + _operand + " (" + beginMark + subQueryClause + ln() + endIndent + ") " + endMark;
+        final ColumnInfo columnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
+        final String specifiedExp = decrypt(columnInfo, columnRealName.toString());
+        return specifiedExp + " " + _operand // left and operand
+                + " (" + beginMark + subQueryClause + ln() + endIndent + ") " + endMark; // right
     }
 
     protected String getSubQueryClause(String function) {
@@ -74,7 +78,9 @@ public class ScalarCondition extends AbstractSubQuery {
         if (_subQuerySqlClause.hasUnionQuery()) {
             subQueryClause = getUnionSubQuerySql(function, tableAliasName, derivedColumnSqlName, derivedColumnRealName);
         } else {
-            final String selectClause = "select " + function + "(" + derivedColumnRealName + ")";
+            final ColumnInfo columnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
+            final String specifiedExp = decrypt(columnInfo, derivedColumnRealName.toString());
+            final String selectClause = "select " + function + "(" + specifiedExp + ")";
             final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
             subQueryClause = selectClause + " " + fromWhereClause;
         }
@@ -95,8 +101,10 @@ public class ScalarCondition extends AbstractSubQuery {
         }
         final String mainAlias = buildSubQueryMainAliasName();
         final ColumnRealName mainDerivedColumnRealName = new ColumnRealName(mainAlias, derivedColumnSqlName);
-        return "select " + function + "(" + mainDerivedColumnRealName + ")" + ln() + "  from (" + beginMark + mainSql
-                + ln() + "       ) " + mainAlias + endMark;
+        final ColumnInfo columnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
+        final String specifiedExp = decrypt(columnInfo, mainDerivedColumnRealName.toString());
+        return "select " + function + "(" + specifiedExp + ")" + ln() // select
+                + "  from (" + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark; // from
     }
 
     protected void throwScalarConditionInvalidColumnSpecificationException(String function) {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -39,6 +40,10 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
 
     public ColumnInfo getSpecifiedColumnInfo() {
         return _cb.getSqlClause().getSpecifiedColumnInfoAsOne();
+    }
+
+    public ColumnInfo getSpecifiedDerivingColumnInfo() {
+        return _cb.getSqlClause().getSpecifiedDerivingColumnInfoAsOne();
     }
 
     public ColumnRealName getSpecifiedColumnRealName() {
@@ -141,7 +146,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             return null;
         }
         final StringBuilder sb = new StringBuilder();
-        sb.append(columnExp);
+        sb.append(decrypt(columnExp));
         int index = 0;
         for (CalculationElement calculation : calculationList) {
             if (index > 0) {
@@ -152,6 +157,15 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             ++index;
         }
         return sb.toString();
+    }
+
+    protected String decrypt(String valueExp) {
+        final ColumnInfo columnInfo = getSpecifiedColumnInfo();
+        if (columnInfo == null) { // means sub-query
+            return valueExp;
+        }
+        final ColumnFunctionCipher cipher = _cb.getSqlClause().findColumnFunctionCipher(columnInfo);
+        return cipher != null ? cipher.decrypt(valueExp) : valueExp;
     }
 
     // ===================================================================================

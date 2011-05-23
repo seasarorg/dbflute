@@ -27,6 +27,7 @@ import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -226,7 +227,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         {
             final ColumnRealName realName = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
             if (realName != null) {
-                leftSource = realName.toString();
+                final ColumnInfo columnInfo = leftCB.getSqlClause().getSpecifiedColumnInfoAsOne();
+                leftSource = decrypt(columnInfo, realName.toString());
             } else {
                 leftSource = leftCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
             }
@@ -265,6 +267,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     protected <CB extends ConditionBean> QueryClause xcreateColQyClause(final String leftColumn, final String operand,
             final String rightColumn, final HpCalcSpecification<CB> rightCalcSp) {
+        //getSqlClause().getE
         return new QueryClause() {
             @Override
             public String toString() {
@@ -272,15 +275,21 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 {
                     final String statement = rightCalcSp.buildStatementAsRealName();
                     if (statement != null) { // exists calculation
-                        final ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
-                        if (!columnInfo.isPropertyTypeNumber()) {
-                            // *simple message because other types may be supported at the future
-                            String msg = "Not number column specified: " + columnInfo;
-                            throw new ColumnQueryCalculationUnsupportedColumnTypeException(msg);
+                        ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
+                        if (columnInfo == null) { // deriving sub-query
+                            columnInfo = rightCalcSp.getSpecifiedDerivingColumnInfo();
                         }
-                        rightExp = statement;
+                        if (columnInfo != null) { // basically true but checked just in case
+                            if (!columnInfo.isPropertyTypeNumber()) {
+                                // *simple message because other types may be supported at the future
+                                String msg = "Not number column specified: " + columnInfo;
+                                throw new ColumnQueryCalculationUnsupportedColumnTypeException(msg);
+                            }
+                        }
+                        rightExp = statement; // cipher already resolved
                     } else {
-                        rightExp = rightColumn;
+                        final ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
+                        rightExp = decrypt(columnInfo, rightColumn);
                     }
                 }
                 return xbuildColQyClause(leftColumn, operand, rightExp);
@@ -942,6 +951,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
         _unionQuerySynchronizer = unionQuerySynchronizer;
+    }
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                       Geared Cipher
+    //                                                                       =============
+    protected String decrypt(ColumnInfo columnInfo, String valueExp) {
+        final ColumnFunctionCipher cipher = getSqlClause().findColumnFunctionCipher(columnInfo);
+        return cipher != null ? cipher.decrypt(valueExp) : valueExp;
     }
 
     // [DBFlute-0.7.4]
