@@ -38,15 +38,20 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         _cb = cb; // saves for handling the specified column
     }
 
-    public ColumnInfo getSpecifiedColumnInfo() {
+    public ColumnInfo getSpecifiedColumnInfo() { // only when plain
         return _cb.getSqlClause().getSpecifiedColumnInfoAsOne();
     }
 
-    public ColumnInfo getSpecifiedDerivingColumnInfo() {
+    public ColumnInfo getSpecifiedDerivingColumnInfo() { // only when deriving sub-query
         return _cb.getSqlClause().getSpecifiedDerivingColumnInfoAsOne();
     }
 
-    public ColumnRealName getSpecifiedColumnRealName() {
+    public ColumnInfo getResolvedSpecifiedColumnInfo() { // resolved plain or deriving sub-query
+        ColumnInfo columnInfo = getSpecifiedColumnInfo();
+        return columnInfo != null ? columnInfo : getSpecifiedDerivingColumnInfo();
+    }
+
+    public ColumnRealName getResolvedSpecifiedColumnRealName() { // resolved plain or deriving sub-query
         final ColumnRealName columnRealName = _cb.getSqlClause().getSpecifiedColumnRealNameAsOne();
         if (columnRealName != null) {
             return columnRealName;
@@ -59,7 +64,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return null;
     }
 
-    public ColumnSqlName getSpecifiedColumnSqlName() {
+    public ColumnSqlName getResolvedSpecifiedColumnSqlName() { // resolved plain or deriving sub-query
         final ColumnSqlName columnSqlName = _cb.getSqlClause().getSpecifiedColumnSqlNameAsOne();
         if (columnSqlName != null) {
             return columnSqlName;
@@ -135,10 +140,10 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     protected String doBuildStatement(boolean real) {
         final String columnExp;
         if (real) {
-            final ColumnRealName columnRealName = getSpecifiedColumnRealName();
+            final ColumnRealName columnRealName = getResolvedSpecifiedColumnRealName();
             columnExp = columnRealName.toString();
         } else {
-            final ColumnSqlName columnSqlName = getSpecifiedColumnSqlName();
+            final ColumnSqlName columnSqlName = getResolvedSpecifiedColumnSqlName();
             columnExp = columnSqlName.toString();
         }
         final List<CalculationElement> calculationList = getCalculationList();

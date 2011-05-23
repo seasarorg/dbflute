@@ -240,7 +240,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected <CB extends ConditionBean> String xbuildRightColumn(CB rightCB, HpCalcSpecification<CB> rightCalcSp) {
-        final ColumnRealName realName = rightCalcSp.getSpecifiedColumnRealName();
+        final ColumnRealName realName = rightCalcSp.getResolvedSpecifiedColumnRealName();
         if (realName == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
@@ -275,24 +275,29 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 {
                     final String statement = rightCalcSp.buildStatementAsRealName();
                     if (statement != null) { // exists calculation
-                        ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
-                        if (columnInfo == null) { // deriving sub-query
-                            columnInfo = rightCalcSp.getSpecifiedDerivingColumnInfo();
-                        }
-                        if (columnInfo != null) { // basically true but checked just in case
-                            if (!columnInfo.isPropertyTypeNumber()) {
-                                // *simple message because other types may be supported at the future
-                                String msg = "Not number column specified: " + columnInfo;
-                                throw new ColumnQueryCalculationUnsupportedColumnTypeException(msg);
-                            }
-                        }
+                        assertCalculationColumnType();
                         rightExp = statement; // cipher already resolved
                     } else {
                         final ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
-                        rightExp = decrypt(columnInfo, rightColumn);
+                        if (columnInfo != null) { // means plain column
+                            rightExp = decrypt(columnInfo, rightColumn);
+                        } else { // deriving sub-query
+                            rightExp = rightColumn;
+                        }
                     }
                 }
                 return xbuildColQyClause(leftColumn, operand, rightExp);
+            }
+
+            protected void assertCalculationColumnType() {
+                final ColumnInfo columnInfo = rightCalcSp.getResolvedSpecifiedColumnInfo();
+                if (columnInfo != null) { // basically true but checked just in case
+                    if (!columnInfo.isPropertyTypeNumber()) {
+                        // *simple message because other types may be supported at the future
+                        String msg = "Not number column specified: " + columnInfo;
+                        throw new ColumnQueryCalculationUnsupportedColumnTypeException(msg);
+                    }
+                }
             }
 
             protected String xbuildColQyClause(String leftExp, String operand, String rightExp) {

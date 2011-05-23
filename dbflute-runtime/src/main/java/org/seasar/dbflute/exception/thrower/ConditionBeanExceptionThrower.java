@@ -351,8 +351,6 @@ public class ConditionBeanExceptionThrower {
         br.addElement(baseCB.getClass().getName());
         br.addItem("Specified Referrer");
         br.addElement(referrerName);
-        br.addItem("Already Registered Referrer");
-        br.addElement(baseCB.getSqlClause().getSpecifiedDerivingAliasList());
         final String msg = br.buildExceptionMessage();
         throw new SpecifyDerivedReferrerTwoOrMoreException(msg);
     }
