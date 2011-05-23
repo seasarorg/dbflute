@@ -60,7 +60,12 @@ public class DfBqpOutsideSqlFile {
     protected void doAnalyze() {
         final String exbhvMark;
         {
-            final String exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
+            final String exbhvPackage;
+            if (isApplicationBehaviorProject()) {
+                exbhvPackage = getLibraryBehaviorPackage();
+            } else {
+                exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
+            }
             final String exbhvName = Srl.substringLastRear(exbhvPackage, ".");
             final String sqlPackage;
             if (getOutsideSqlProperties().isSqlPackageValid()) {
@@ -179,8 +184,8 @@ public class DfBqpOutsideSqlFile {
         return getBasicProperties().isApplicationBehaviorProject();
     }
 
-    protected String getLibraryProjectPrefix() {
-        return getBasicProperties().getLibraryProjectPrefix();
+    protected String getLibraryBehaviorPackage() {
+        return getBasicProperties().getLibraryBehaviorPackage();
     }
 
     protected String getApplicationBehaviorAdditionalSuffix() {
