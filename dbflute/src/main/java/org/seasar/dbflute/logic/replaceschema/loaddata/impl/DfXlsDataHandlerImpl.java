@@ -354,25 +354,24 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             br.addItem("Non-Batch Retry");
             br.addElement(retryEx.getClass().getName());
             br.addElement(retryEx.getMessage());
-            br.addElement("");
             br.addElement(columnNameList.toString());
             br.addElement(retryDataRow.toString());
             br.addElement("Row Line: " + (retryRowIndex + 2));
         }
         final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
+        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
         if (bindTypeCacheMap != null) {
             br.addItem("Bind Type");
             final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
             for (Entry<String, Class<?>> entry : entrySet) {
-                br.addElement(entry.getKey() + " = " + entry.getValue().getName());
-            }
-        }
-        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
-        if (stringProcessorCacheMap != null) {
-            br.addItem("String Processor");
-            final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
-            for (Entry<String, StringProcessor> entry : entrySet) {
-                br.addElement(entry.getKey() + " = " + entry.getValue());
+                final String columnName = entry.getKey();
+                StringProcessor processor = null;
+                if (stringProcessorCacheMap != null) {
+                    processor = stringProcessorCacheMap.get(columnName);
+                }
+                final String bindType = entry.getValue().getName();
+                final String processorExp = (processor != null ? " (" + processor + ")" : "");
+                br.addElement(columnName + " = " + bindType + processorExp);
             }
         }
         return br.buildExceptionMessage();
