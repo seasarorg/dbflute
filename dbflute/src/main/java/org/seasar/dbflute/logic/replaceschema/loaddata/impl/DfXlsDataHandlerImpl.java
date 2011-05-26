@@ -17,6 +17,7 @@ package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -151,44 +152,69 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
 
         Connection conn = null;
         PreparedStatement ps = null;
+        String preparedSql = null;
+        SQLException retryEx = null;
+        Integer retryRowIndex = null;
+        DfDataRow retryDataRow = null;
         try {
             conn = _dataSource.getConnection();
-            for (int j = 0; j < dataTable.getRowSize(); j++) {
-                final DfDataRow dataRow = dataTable.getRow(j);
+            for (int i = 0; i < dataTable.getRowSize(); i++) {
+                final DfDataRow dataRow = dataTable.getRow(i);
                 if (ps == null) {
                     final MyCreatedState myCreatedState = new MyCreatedState();
-                    final String preparedSql = myCreatedState.buildPreparedSql(dataRow);
+                    preparedSql = myCreatedState.buildPreparedSql(dataRow);
                     ps = conn.prepareStatement(preparedSql);
                 }
-                doWriteDataRow(file, dataTable, dataRow, columnInfoMap, columnNameList, conn, ps);
+                doWriteDataRow(file, dataTable, dataRow // basic resources
+                        , columnInfoMap, columnNameList // meta data
+                        , conn, ps // JDBC resources
+                        , _loggingInsertSql, _suppressBatchUpdate); // option
             }
             if (!_suppressBatchUpdate) {
-                ps.executeBatch();
+                boolean transactionClosed = false;
+                try {
+                    conn.setAutoCommit(false); // transaction to retry after
+                    ps.executeBatch();
+                    conn.commit();
+                    transactionClosed = true;
+                } catch (SQLException e) {
+                    conn.rollback();
+                    transactionClosed = true;
+                    if (!(e instanceof BatchUpdateException)) {
+                        throw e;
+                    }
+                    _log.info("...Retrying by suppressing batch update: " + tableDbName);
+                    final PreparedStatement retryPs = conn.prepareStatement(preparedSql);
+                    for (int i = 0; i < dataTable.getRowSize(); i++) {
+                        final DfDataRow dataRow = dataTable.getRow(i);
+                        try {
+                            doWriteDataRow(file, dataTable, dataRow // basic resources
+                                    , columnInfoMap, columnNameList // meta data
+                                    , conn, retryPs // JDBC resources
+                                    , false, true); // option (no logging and suppress batch)
+                        } catch (SQLException rowEx) {
+                            retryEx = rowEx;
+                            retryRowIndex = i;
+                            retryDataRow = dataRow;
+                            break;
+                        }
+                    }
+                    try {
+                        retryPs.close();
+                    } catch (SQLException ignored) {
+                    }
+                    throw e;
+                } finally {
+                    if (!transactionClosed) {
+                        conn.rollback(); // for other exceptions
+                    }
+                }
             }
         } catch (SQLException e) {
-            final SQLException nextEx = e.getNextException();
-            if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
-                _log.warn("*Failed to register the xls data: " + e.getMessage());
-                String msg = buildRegistrationExceptionMessage(file, tableDbName, nextEx);
-                throw new DfXlsDataRegistrationFailureException(msg, nextEx); // switch!
-            }
-            String msg = buildRegistrationExceptionMessage(file, tableDbName, e);
-            throw new DfXlsDataRegistrationFailureException(msg, e);
+            handleWriteTableException(file, dataTable, e, retryEx, retryRowIndex, retryDataRow, columnNameList);
         } finally {
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException ignored) {
-                    _log.info("Statement#close() threw the exception!", ignored);
-                }
-            }
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("Connection#close() threw the exception!", ignored);
-                }
-            }
+            closeResource(conn, ps);
+
             // process after (finally) handling table
             finallyHandlingTable(tableDbName, columnInfoMap);
         }
@@ -208,34 +234,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         throw new DfXlsDataTableNotFoundException(msg);
     }
 
-    protected String buildRegistrationExceptionMessage(File file, String tableDbName, Exception e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to register the table data.");
-        br.addItem("Xls File");
-        br.addElement(file);
-        br.addItem("Table");
-        br.addElement(tableDbName);
-        br.addItem("Message");
-        br.addElement(e.getMessage());
-        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
-        if (bindTypeCacheMap != null) {
-            br.addItem("Bind Type");
-            final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
-            for (Entry<String, Class<?>> entry : entrySet) {
-                br.addElement(entry.getKey() + " = " + entry.getValue());
-            }
-        }
-        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
-        if (stringProcessorCacheMap != null) {
-            br.addItem("String Processor");
-            final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
-            for (Entry<String, StringProcessor> entry : entrySet) {
-                br.addElement(entry.getKey() + " = " + entry.getValue());
-            }
-        }
-        return br.buildExceptionMessage();
-    }
-
     protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
         if (_dataWritingInterceptor != null) {
             _dataWritingInterceptor.processBeforeHandlingTable(tableDbName, columnInfoMap);
@@ -249,8 +247,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMeta> columnInfoMap, List<String> columnNameList, Connection conn, PreparedStatement ps)
-            throws SQLException {
+            Map<String, DfColumnMeta> columnInfoMap, List<String> columnNameList, Connection conn,
+            PreparedStatement ps, boolean loggingInsertSql, boolean suppressBatchUpdate) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
@@ -258,7 +256,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         if (columnValueMap.isEmpty()) {
             throwXlsDataColumnDefFailureException(file, dataTable);
         }
-        if (_loggingInsertSql) {
+        if (loggingInsertSql) {
             final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
             _log.info(getSql4Log(tableDbName, columnNameList, valueList));
         }
@@ -293,7 +291,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             processNotNullString(file, tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
             bindCount++;
         }
-        if (_suppressBatchUpdate) {
+        if (suppressBatchUpdate) {
             ps.execute();
         } else {
             ps.addBatch();
@@ -322,6 +320,79 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
         final String msg = br.buildExceptionMessage();
         throw new DfXlsDataColumnDefFailureException(msg);
+    }
+
+    protected void handleWriteTableException(File file, DfDataTable dataTable // basic
+            , SQLException mainEx // an exception of main process
+            , SQLException retryEx, Integer retryRowIndex, DfDataRow retryDataRow // retry
+            , List<String> columnNameList) { // supplement
+        final SQLException nextEx = mainEx.getNextException();
+        if (nextEx != null && !mainEx.equals(nextEx)) { // focus on next exception
+            _log.warn("*Failed to register the xls data: " + mainEx.getMessage()); // trace just in case
+            mainEx = nextEx; // switch
+        }
+        final String tableDbName = dataTable.getTableDbName();
+        final String msg = buildWriteFailureMessage(file, tableDbName, mainEx, retryEx, retryRowIndex, retryDataRow,
+                columnNameList);
+        throw new DfXlsDataRegistrationFailureException(msg, mainEx);
+    }
+
+    protected String buildWriteFailureMessage(File file, String tableDbName // basic
+            , SQLException mainEx // an exception of main process
+            , SQLException retryEx, Integer retryRowIndex, DfDataRow retryDataRow // retry
+            , List<String> columnNameList) { // supplement
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to register the table data.");
+        br.addItem("Xls File");
+        br.addElement(file);
+        br.addItem("Table");
+        br.addElement(tableDbName);
+        br.addItem("SQLException");
+        br.addElement(mainEx.getClass().getName());
+        br.addElement(mainEx.getMessage());
+        if (retryEx != null) {
+            br.addItem("Non-Batch Retry");
+            br.addElement(retryEx.getClass().getName());
+            br.addElement(retryEx.getMessage());
+            br.addElement("");
+            br.addElement(columnNameList.toString());
+            br.addElement(retryDataRow.toString());
+            br.addElement("Row Line: " + (retryRowIndex + 2));
+        }
+        final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
+        if (bindTypeCacheMap != null) {
+            br.addItem("Bind Type");
+            final Set<Entry<String, Class<?>>> entrySet = bindTypeCacheMap.entrySet();
+            for (Entry<String, Class<?>> entry : entrySet) {
+                br.addElement(entry.getKey() + " = " + entry.getValue().getName());
+            }
+        }
+        final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);
+        if (stringProcessorCacheMap != null) {
+            br.addItem("String Processor");
+            final Set<Entry<String, StringProcessor>> entrySet = stringProcessorCacheMap.entrySet();
+            for (Entry<String, StringProcessor> entry : entrySet) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        }
+        return br.buildExceptionMessage();
+    }
+
+    protected void closeResource(Connection conn, PreparedStatement ps) {
+        if (ps != null) {
+            try {
+                ps.close();
+            } catch (SQLException ignored) {
+                _log.info("Statement#close() threw the exception!", ignored);
+            }
+        }
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ignored) {
+                _log.info("Connection#close() threw the exception!", ignored);
+            }
+        }
     }
 
     // ===================================================================================

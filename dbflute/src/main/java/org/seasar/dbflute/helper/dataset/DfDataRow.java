@@ -91,18 +91,7 @@ public class DfDataRow {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
-    public String toString() {
-        StringBuffer buf = new StringBuffer(100);
-        buf.append("{");
-        for (int i = 0; i < _values.size(); ++i) {
-            buf.append(getValue(i));
-            buf.append(", ");
-        }
-        buf.setLength(buf.length() - 2);
-        buf.append('}');
-        return buf.toString();
-    }
-
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -110,17 +99,30 @@ public class DfDataRow {
         if (!(o instanceof DfDataRow)) {
             return false;
         }
-        DfDataRow other = (DfDataRow) o;
+        final DfDataRow other = (DfDataRow) o;
         for (int i = 0; i < _table.getColumnSize(); ++i) {
-            String columnName = _table.getColumnName(i);
-            Object value = _values.get(i);
-            Object otherValue = other.getValue(columnName);
-            DfDtsColumnType ct = DfDtsColumnTypes.getColumnType(value);
+            final String columnName = _table.getColumnName(i);
+            final Object value = _values.get(i);
+            final Object otherValue = other.getValue(columnName);
+            final DfDtsColumnType ct = DfDtsColumnTypes.getColumnType(value);
             if (ct.equals(value, otherValue)) {
                 continue;
             }
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder(100);
+        sb.append("{");
+        for (int i = 0; i < _values.size(); ++i) {
+            sb.append(getValue(i));
+            sb.append(", ");
+        }
+        sb.setLength(sb.length() - 2);
+        sb.append('}');
+        return sb.toString();
     }
 }
