@@ -28,8 +28,8 @@ public class DfPmbPropertyOptionComment {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String OPTION_PREFIX = "comment(";
-    protected static final String OPTION_SUFFIX = ")";
+    public static final String OPTION_PREFIX = "comment(";
+    public static final String OPTION_SUFFIX = ")";
 
     // ===================================================================================
     //                                                                           Attribute

@@ -38,6 +38,7 @@ import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData.DfPagingType;
+import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbPropertyOptionComment;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -210,9 +211,12 @@ public class DfParameterBeanResolver {
             final int delimiterIndex = element.indexOf(optionDelimiter);
             final String slaslaOption;
             {
+                final String optionPrefix = DfPmbPropertyOptionComment.OPTION_PREFIX;
+                final String optionSuffix = DfPmbPropertyOptionComment.OPTION_SUFFIX;
                 final String comment = mark.getComment();
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
-                    slaslaOption = "comment(" + comment + ")";
+                    final String filtered = Srl.replace(comment, "|", "/").trim();
+                    slaslaOption = optionPrefix + filtered + optionSuffix;
                 } else {
                     slaslaOption = null;
                 }

@@ -556,7 +556,23 @@ public class DfPmbMetaData {
 
     protected String getPropertyOptionDisp(String propertyName) {
         final String option = findPropertyOption(propertyName);
-        return option != null ? ":" + option : "";
+        if (option != null) {
+            // remove comment because comment is displayed in other place
+            // (first comment only removed because first is only displayed in it)
+            final String optionPrefix = DfPmbPropertyOptionComment.OPTION_PREFIX;
+            final String front = Srl.substringFirstFront(option, optionPrefix);
+            final String rear = Srl.substringFirstRear(option, optionPrefix);
+            final String filtered;
+            if (rear.contains("|")) {
+                final String rearOptions = Srl.substringFirstRear(rear, "|");
+                filtered = front + rearOptions;
+            } else {
+                filtered = front;
+            }
+            return Srl.is_NotNull_and_NotTrimmedEmpty(filtered) ? ":" + filtered : "";
+        } else {
+            return "";
+        }
     }
 
     // -----------------------------------------------------

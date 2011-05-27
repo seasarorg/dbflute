@@ -603,7 +603,7 @@ public class Database {
         return getPmbBasicHandler().hasPropertyOptionComment(className, propertyName);
     }
 
-    protected String getPropertyOptionComment(String className, String propertyName) {
+    public String getPropertyOptionComment(String className, String propertyName) {
         return getPmbBasicHandler().getPropertyOptionComment(className, propertyName);
     }
 
