@@ -1,6 +1,6 @@
 @echo off
 
-set ANT_OPTS=-Xmx256M
+set ANT_OPTS=-Xmx512M
 
 set DBFLUTE_HOME=..\mydbflute\dbflute-@dbflute.version@
 
