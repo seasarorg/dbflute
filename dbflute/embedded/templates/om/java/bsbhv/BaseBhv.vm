@@ -439,7 +439,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
     }
     /**
-     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the set-upper for condition-bean of referrer.
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the set-upper for condition-bean of referrer. <br />
+     * ${referrer.referrerDispForJavaDocNest}
      * <pre>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">load${referrer.referrerJavaBeansRulePropertyNameInitCap}</span>(${myEntityListVariableName}, new ConditionBeanSetupper&lt;${referrerCBClassName}&gt;() {
      *     public void setup(${referrerCBClassName} cb) {

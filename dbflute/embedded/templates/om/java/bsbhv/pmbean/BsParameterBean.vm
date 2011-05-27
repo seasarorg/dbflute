@@ -350,7 +350,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #set ($argumentName = "$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /**
-     * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
+     * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
      * @return The value of ${propertyName}. (Nullable, NotEmptyString(when String): if empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
@@ -373,7 +376,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
 
     /**
-     * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
+     * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${argumentName}) {
@@ -383,7 +389,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
+     * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      * @param ${argumentName}Option The option of likeSearch for ${propertyName} which is NOT split mode. (NotNull)
      */
@@ -396,7 +405,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
+     * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${argumentName}) {
@@ -407,7 +419,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
+     * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${argumentName}) {
@@ -418,7 +433,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
+     * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${argumentName}) {
@@ -439,7 +457,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
 
     /**
-     * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
+     * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
@@ -449,7 +470,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
 
     /**
-     * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
+     * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
      * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
@@ -462,6 +486,9 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 
     /**
      * [set as ${classificationMap.get('name')}] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)} <br />
+#end
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {

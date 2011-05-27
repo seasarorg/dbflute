@@ -522,6 +522,19 @@ public class DfPmbMetaData {
     }
 
     // -----------------------------------------------------
+    //                                               Comment
+    //                                               -------
+    public boolean hasPropertyOptionComment(String propertyName) {
+        final DfPmbPropertyOptionComment obj = createPropertyOptionComment(propertyName);
+        return obj.hasPmbMetaDataPropertyOptionComment();
+    }
+
+    public String getPropertyOptionComment(String propertyName) {
+        final DfPmbPropertyOptionComment obj = createPropertyOptionComment(propertyName);
+        return obj.extractCommentFromOption(propertyName);
+    }
+
+    // -----------------------------------------------------
     //                                               Display
     //                                               -------
     public String getPropertyRefColumnInfo(String propertyName, AppData schemaData) {
@@ -576,6 +589,11 @@ public class DfPmbMetaData {
     protected DfPmbPropertyOptionReference createPropertyOptionReference(String propertyName) {
         final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(propertyName);
         return new DfPmbPropertyOptionReference(this, propertyName, finder);
+    }
+
+    protected DfPmbPropertyOptionComment createPropertyOptionComment(String propertyName) {
+        final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(propertyName);
+        return new DfPmbPropertyOptionComment(this, propertyName, finder);
     }
 
     protected String findPropertyOption(String propertyName) {

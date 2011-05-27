@@ -597,6 +597,17 @@ public class Database {
     }
 
     // -----------------------------------------------------
+    //                                        Option Comment
+    //                                        --------------
+    public boolean hasPropertyOptionComment(String className, String propertyName) {
+        return getPmbBasicHandler().hasPropertyOptionComment(className, propertyName);
+    }
+
+    protected String getPropertyOptionComment(String className, String propertyName) {
+        return getPmbBasicHandler().getPropertyOptionComment(className, propertyName);
+    }
+
+    // -----------------------------------------------------
     //                              Alternate Boolean Method
     //                              ------------------------
     public boolean existsPmbMetaDataAlternateBooleanMethodNameSet(String className) {

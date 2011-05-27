@@ -191,31 +191,42 @@ public class DfParameterBeanResolver {
         pmbMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
         pmbMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
         pmbMetaData.setAutoDetectedPropertyNameSet(autoDetectedPropertyNameSet);
-        final List<String> parameterBeanElement = getParameterBeanPropertyTypeList(sql);
+        final List<DfSql2EntityMark> parameterBeanElement = getParameterBeanPropertyTypeList(sql);
         final String autoDetectMark = "AutoDetect";
-        for (String element : parameterBeanElement) {
-            element = element.trim();
+        for (DfSql2EntityMark mark : parameterBeanElement) {
+            final String element = mark.getContent().trim();
             if (element.equalsIgnoreCase(autoDetectMark)) {
                 processAutoDetect(sql, propertyNameTypeMap, propertyNameOptionMap, autoDetectedPropertyNameSet);
                 break;
             }
         }
-        for (String element : parameterBeanElement) {
+        for (DfSql2EntityMark mark : parameterBeanElement) {
+            final String element = mark.getContent().trim();
             final String nameDelimiter = " ";
             final String optionDelimiter = ":";
-            element = element.trim();
             if (autoDetectMark.equals(element)) {
                 continue; // because of already resolved
             }
-            final int optionIndex = element.indexOf(optionDelimiter);
+            final int delimiterIndex = element.indexOf(optionDelimiter);
+            final String slaslaOption;
+            {
+                final String comment = mark.getComment();
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+                    slaslaOption = "comment(" + comment + ")";
+                } else {
+                    slaslaOption = null;
+                }
+            }
             final String propertyDef;
             final String optionDef;
-            if (optionIndex > 0) {
-                propertyDef = element.substring(0, optionIndex).trim();
-                optionDef = element.substring(optionIndex + optionDelimiter.length()).trim();
+            if (delimiterIndex > 0) {
+                propertyDef = element.substring(0, delimiterIndex).trim();
+                final int optionIndex = delimiterIndex + optionDelimiter.length();
+                final String basicOption = element.substring(optionIndex).trim();
+                optionDef = basicOption + (slaslaOption != null ? "|" + slaslaOption : "");
             } else {
                 propertyDef = element;
-                optionDef = null;
+                optionDef = (slaslaOption != null ? slaslaOption : null);
             }
             final int nameIndex = propertyDef.lastIndexOf(nameDelimiter);
             if (nameIndex <= 0) {
@@ -550,7 +561,7 @@ public class DfParameterBeanResolver {
         return _outsideSqlMarkAnalyzer.getParameterBeanName(sql);
     }
 
-    protected List<String> getParameterBeanPropertyTypeList(final String sql) {
+    protected List<DfSql2EntityMark> getParameterBeanPropertyTypeList(final String sql) {
         return _outsideSqlMarkAnalyzer.getParameterBeanPropertyTypeList(sql);
     }
 

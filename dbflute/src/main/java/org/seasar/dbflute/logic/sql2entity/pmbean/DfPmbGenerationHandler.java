@@ -426,6 +426,17 @@ public class DfPmbGenerationHandler {
     }
 
     // -----------------------------------------------------
+    //                                               Comment
+    //                                               -------
+    public boolean hasPropertyOptionComment(String className, String propertyName) {
+        return findPmbMetaData(className).hasPropertyOptionComment(propertyName);
+    }
+
+    public String getPropertyOptionComment(String className, String propertyName) {
+        return findPmbMetaData(className).getPropertyOptionComment(propertyName);
+    }
+
+    // -----------------------------------------------------
     //                                               Display
     //                                               -------
     public String getPropertyRefColumnInfo(String className, String propertyName, AppData schemaData) {

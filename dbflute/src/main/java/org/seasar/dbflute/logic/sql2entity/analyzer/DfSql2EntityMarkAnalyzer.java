@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
@@ -44,27 +43,27 @@ public class DfSql2EntityMarkAnalyzer {
      * @return The name of entity. (NullAllowed: If it's not found, this returns null)
      */
     public String getCustomizeEntityName(String sql) {
-        return getTargetString(sql, "#");
+        return getMarkString(sql, "#");
     }
 
     public boolean isDomain(final String sql) {
-        final String targetString = getTargetString(sql, "+");
+        final String targetString = getMarkString(sql, "+");
         return targetString != null && Srl.containsAnyIgnoreCase(targetString, "domain");
     }
 
     public boolean isCursor(final String sql) {
-        final String targetString = getTargetString(sql, "+");
+        final String targetString = getMarkString(sql, "+");
         return targetString != null && Srl.containsAnyIgnoreCase(targetString, "cursor", "cursol");
         // "cursol" is spell-miss but for compatibility with old versions
     }
 
     public boolean isScalar(final String sql) {
-        final String targetString = getTargetString(sql, "+");
+        final String targetString = getMarkString(sql, "+");
         return targetString != null && Srl.containsIgnoreCase(targetString, "scalar");
     }
 
-    public List<String> getCustomizeEntityPropertyTypeList(final String sql) {
-        return getTargetList(sql, "##");
+    public List<DfSql2EntityMark> getCustomizeEntityPropertyTypeList(final String sql) {
+        return getMarkList(sql, "##");
     }
 
     /**
@@ -72,11 +71,11 @@ public class DfSql2EntityMarkAnalyzer {
      * @return The name of parameter-bean. (NullAllowed: If it's not found, this returns null)
      */
     public String getParameterBeanName(final String sql) {
-        return getTargetString(sql, "!");
+        return getMarkString(sql, "!");
     }
 
-    public List<String> getParameterBeanPropertyTypeList(final String sql) {
-        return getTargetList(sql, "!!");
+    public List<DfSql2EntityMark> getParameterBeanPropertyTypeList(final String sql) {
+        return getMarkList(sql, "!!");
     }
 
     public List<String> getPrimaryKeyColumnNameList(final String sql) {
@@ -156,19 +155,19 @@ public class DfSql2EntityMarkAnalyzer {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected String getTargetString(final String sql, final String mark) {
-        final List<String> targetList = getTargetList(sql, mark);
-        return !targetList.isEmpty() ? targetList.get(0) : null;
+    protected String getMarkString(final String sql, final String mark) {
+        final List<DfSql2EntityMark> targetList = getMarkList(sql, mark);
+        return !targetList.isEmpty() ? targetList.get(0).getContent() : null;
     }
 
-    protected List<String> getTargetList(final String sql, final String mark) {
+    protected List<DfSql2EntityMark> getMarkList(final String sql, final String mark) {
         if (sql == null || sql.trim().length() == 0) {
             String msg = "The sql is invalid: " + sql;
             throw new IllegalArgumentException(msg);
         }
-        final List<String> betweenBeginEndMarkList = getListBetweenBeginEndMark(sql, "--" + mark, mark);
-        if (!betweenBeginEndMarkList.isEmpty()) {
-            return betweenBeginEndMarkList;
+        final List<DfSql2EntityMark> markList = getListBetweenBeginEndMark(sql, "--" + mark, mark);
+        if (!markList.isEmpty()) {
+            return markList;
         } else {
             // for MySQL. 
             return getListBetweenBeginEndMark(sql, "-- " + mark, mark);
@@ -180,12 +179,22 @@ public class DfSql2EntityMarkAnalyzer {
         return scope != null ? scope.getContent() : null;
     }
 
-    protected List<String> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
+    protected List<DfSql2EntityMark> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
         final List<ScopeInfo> scopeList = Srl.extractScopeList(targetStr, beginMark, endMark);
-        final List<String> resultList = DfCollectionUtil.newArrayList();
-        for (ScopeInfo scope : scopeList) {
-            resultList.add(scope.getContent());
+        final List<DfSql2EntityMark> markList = new ArrayList<DfSql2EntityMark>();
+        for (ScopeInfo scopeInfo : scopeList) {
+            final DfSql2EntityMark markInfo = new DfSql2EntityMark();
+            markInfo.setContent(scopeInfo.getContent());
+            final int endIndex = scopeInfo.getEndIndex();
+            String outsideComment = null;
+            final String rearAll = targetStr.substring(endIndex);
+            final String rearLine = Srl.substringFirstFront(rearAll, "\n");
+            if (rearLine.contains("//")) {
+                outsideComment = Srl.substringFirstRear(rearLine, "//");
+            }
+            markInfo.setComment(outsideComment);
+            markList.add(markInfo);
         }
-        return resultList;
+        return markList;
     }
 }

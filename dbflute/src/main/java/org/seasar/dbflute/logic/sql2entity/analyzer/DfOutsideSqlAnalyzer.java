@@ -196,12 +196,12 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     }
 
     protected Map<String, String> createColumnForcedJavaNativeMap(String sql) {
-        final List<String> entityPropertyTypeList = getEntityPropertyTypeList(sql);
+        final List<DfSql2EntityMark> entityPropertyTypeList = getEntityPropertyTypeList(sql);
         final Map<String, String> columnJavaNativeMap = StringKeyMap.createAsFlexible();
-        for (String element : entityPropertyTypeList) {
+        for (DfSql2EntityMark mark : entityPropertyTypeList) {
             final String nameDelimiter = " ";
             final int nameDelimiterLength = nameDelimiter.length();
-            element = element.trim();
+            final String element = mark.getContent().trim();
             final int nameIndex = element.lastIndexOf(nameDelimiter);
             if (nameIndex <= 0) {
                 String msg = "The customize entity element should be [typeName columnName].";
@@ -354,7 +354,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         return _outsideSqlMarkAnalyzer.isScalar(sql);
     }
 
-    protected List<String> getEntityPropertyTypeList(final String sql) {
+    protected List<DfSql2EntityMark> getEntityPropertyTypeList(final String sql) {
         return _outsideSqlMarkAnalyzer.getCustomizeEntityPropertyTypeList(sql);
     }
 

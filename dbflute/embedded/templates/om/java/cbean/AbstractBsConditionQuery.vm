@@ -314,7 +314,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up ExistsReferrer (co-related sub-query). <br />
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
@@ -350,7 +350,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up NotExistsReferrer (co-related sub-query). <br />
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
@@ -378,7 +378,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up InScopeRelation (sub-query). <br />
      * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
-     * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+     * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
     public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -406,7 +406,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up InScopeRelation (sub-query). <br />
      * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
     public void inScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -427,7 +427,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up NotInScopeRelation (sub-query). <br />
      * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
-     * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+     * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
     public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -455,7 +455,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up NotInScopeRelation (sub-query). <br />
      * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
     public void notInScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -496,7 +496,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Prepare for (Query)DerivedReferrer. <br />
      * {FOO &lt;= (select max(BAR) from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * @return The object to set up a function for referrer table. (NotNull)
      */
     public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
@@ -727,7 +727,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up ExistsReferrer (co-related sub-query). <br />
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
@@ -763,7 +763,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up NotExistsReferrer (co-related sub-query). <br />
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
      *     public void query(${myConditionBeanClassName} subCB) {
@@ -791,7 +791,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up InScopeRelation (sub-query). <br />
      * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
-     * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+     * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
     public void inScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -819,7 +819,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up InScopeRelation (sub-query). <br />
      * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
     public void inScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -840,7 +840,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up NotInScopeRelation (sub-query). <br />
      * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
-     * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+     * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
     public void notInScope${fk.foreignPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -868,7 +868,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Set up NotInScopeRelation (sub-query). <br />
      * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
     public void notInScope${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
@@ -909,7 +909,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Prepare for (Query)DerivedReferrer. <br />
      * {FOO &lt;= (select max(BAR) from ${referrer.table.name} where ...)} <br />
-     * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * @return The object to set up a function for referrer table. (NotNull)
      */
     public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {

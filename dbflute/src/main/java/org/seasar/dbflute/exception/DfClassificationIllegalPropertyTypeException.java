@@ -1,6 +1,5 @@
 package org.seasar.dbflute.exception;
 
-
 /**
  * @author jflute
  * @since 0.9.5.1 (2009/07/03 Friday)
