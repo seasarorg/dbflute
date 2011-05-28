@@ -36,7 +36,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResource;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
-import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
+import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -179,18 +179,8 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     }
 
     protected Map<String, String> getDefaultValueMap(DfDelimiterDataResource info, String encoding) {
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = info.getBasePath() + "/" + encoding + "/defaultValueMap.dataprop";
-        final Map<String, String> resultMap = StringKeyMap.createAsFlexibleOrdered();
-        Map<String, String> readMap = reader.readMapAsStringValue(path);
-        if (readMap != null && !readMap.isEmpty()) {
-            resultMap.putAll(readMap);
-            return resultMap;
-        }
-        path = info.getBasePath() + "/" + encoding + "/default-value.txt";
-        readMap = reader.readMapAsStringValue(path);
-        resultMap.putAll(readMap);
-        return resultMap;
+        final String dataDirectory = info.getBasePath() + "/" + encoding;
+        return DfXlsDataHandlerImpl.doGetDefaultValueMap(dataDirectory);
     }
 
     protected FilenameFilter createFilenameFilter(final String typeName) {

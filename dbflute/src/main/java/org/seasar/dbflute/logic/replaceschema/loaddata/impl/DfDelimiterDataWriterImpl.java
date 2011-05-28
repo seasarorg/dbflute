@@ -88,9 +88,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         InputStreamReader ir = null;
         BufferedReader br = null;
 
-        String tableDbName = _fileName.substring(_fileName.lastIndexOf("/") + 1, _fileName.lastIndexOf("."));
-        if (tableDbName.indexOf("-") >= 0) {
-            tableDbName = tableDbName.substring(tableDbName.indexOf("-") + "-".length());
+        final String tableDbName;
+        {
+            String tmp = _fileName.substring(_fileName.lastIndexOf("/") + 1, _fileName.lastIndexOf("."));
+            if (tmp.indexOf("-") >= 0) {
+                tmp = tmp.substring(tmp.indexOf("-") + "-".length());
+            }
+            tableDbName = tmp;
         }
         final Map<String, DfColumnMeta> columnInfoMap = getColumnInfoMap(tableDbName);
         if (columnInfoMap.isEmpty()) {

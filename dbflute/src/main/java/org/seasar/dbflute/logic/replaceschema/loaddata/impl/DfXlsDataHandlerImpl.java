@@ -57,6 +57,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * The implementation of xls data handler. And also of writer.
@@ -403,11 +404,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final Map<String, List<String>> emptyStringTableColumnMap = getEmptyStringTableColumnMap(dataDirectory);
         final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap,
                 emptyStringTableColumnMap, _skipSheetPattern);
-        if (tableNameMap != null && !tableNameMap.isEmpty()) {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
-            _log.info("tableNameMap = " + tableNameMap);
-            _log.info("- - - - - - - - - -/");
-        }
         return xlsReader;
     }
 
@@ -452,8 +448,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     // ===================================================================================
-    //                                                                              Option
-    //                                                                              ======
+    //                                                                    Directory Option
+    //                                                                    ================
     protected void setupDefaultValue(String dataDirectory, final DfDataSet dataSet) {
         final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectory);
         for (int i = 0; i < dataSet.getTableSize(); i++) {
@@ -488,61 +484,97 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
-    private Map<String, String> getDefaultValueMap(String dataDirectory) {
+    // map for delimiter data is defined at the handler
+    protected Map<String, Map<String, String>> _defaultValueMapMap = DfCollectionUtil.newHashMap();
+
+    protected Map<String, String> getDefaultValueMap(String dataDirectory) {
+        final Map<String, String> cachedMap = _defaultValueMapMap.get(dataDirectory);
+        if (cachedMap != null) {
+            return cachedMap;
+        }
+        final StringKeyMap<String> flmap = doGetDefaultValueMap(dataDirectory);
+        _defaultValueMapMap.put(dataDirectory, flmap);
+        return _defaultValueMapMap.get(dataDirectory);
+    }
+
+    public static StringKeyMap<String> doGetDefaultValueMap(String dataDirectory) { // recycle
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = dataDirectory + "/defaultValueMap.dataprop";
         Map<String, String> resultMap = reader.readMapAsStringValue(path);
-        if (resultMap != null && !resultMap.isEmpty()) {
-            return resultMap;
-        }
-        path = dataDirectory + "/default-value.txt";
-        resultMap = reader.readMapAsStringValue(path);
-        return resultMap;
-    }
-
-    private Map<String, String> getTableNameMap(String dataDirectory) {
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectory + "/tableNameMap.dataprop";
-        Map<String, String> resultMap = reader.readMapAsStringValue(path);
         if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectory + "/table-name.txt";
+            path = dataDirectory + "/default-value.txt"; // old style
             resultMap = reader.readMapAsStringValue(path);
         }
-        final StringKeyMap<String> flmap = StringKeyMap.createAsFlexible();
+        // ordered here because of columns added
+        final StringKeyMap<String> flmap = StringKeyMap.createAsFlexibleOrdered();
         flmap.putAll(resultMap);
         return flmap;
     }
 
-    private Map<String, List<String>> getNotTrimTableColumnMap(String dataDirectory) {
+    protected Map<String, Map<String, String>> _tableNameMapMap = DfCollectionUtil.newHashMap();
+
+    protected Map<String, String> getTableNameMap(String dataDirectory) {
+        final Map<String, String> cachedMap = _tableNameMapMap.get(dataDirectory);
+        if (cachedMap != null) {
+            return cachedMap;
+        }
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        String path = dataDirectory + "/tableNameMap.dataprop";
+        Map<String, String> resultMap = reader.readMapAsStringValue(path);
+        if (resultMap == null || resultMap.isEmpty()) {
+            path = dataDirectory + "/table-name.txt"; // old style
+            resultMap = reader.readMapAsStringValue(path);
+        }
+        final StringKeyMap<String> flmap = StringKeyMap.createAsFlexible();
+        flmap.putAll(resultMap);
+        _tableNameMapMap.put(dataDirectory, flmap);
+        return _tableNameMapMap.get(dataDirectory);
+    }
+
+    protected Map<String, Map<String, List<String>>> _notTrimTableColumnMapMap = DfCollectionUtil.newHashMap();
+
+    protected Map<String, List<String>> getNotTrimTableColumnMap(String dataDirectory) {
+        final Map<String, List<String>> cachedMap = _notTrimTableColumnMapMap.get(dataDirectory);
+        if (cachedMap != null) {
+            return cachedMap;
+        }
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = dataDirectory + "/notTrimColumnMap.dataprop";
         Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
         if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectory + "/not-trim-column.txt";
+            path = dataDirectory + "/not-trim-column.txt"; // old style
             resultMap = reader.readMapAsStringListValue(path);
         }
         final Set<Entry<String, List<String>>> entrySet = resultMap.entrySet();
-        final StringKeyMap<List<String>> stringKeyMap = StringKeyMap.createAsFlexible();
+        final StringKeyMap<List<String>> flmap = StringKeyMap.createAsFlexible();
         for (Entry<String, List<String>> entry : entrySet) {
-            stringKeyMap.put(entry.getKey(), entry.getValue());
+            flmap.put(entry.getKey(), entry.getValue());
         }
-        return stringKeyMap;
+        _notTrimTableColumnMapMap.put(dataDirectory, flmap);
+        return _notTrimTableColumnMapMap.get(dataDirectory);
     }
 
-    private Map<String, List<String>> getEmptyStringTableColumnMap(String dataDirectory) {
+    protected Map<String, Map<String, List<String>>> _emptyStringColumnMapMap = DfCollectionUtil.newHashMap();
+
+    protected Map<String, List<String>> getEmptyStringTableColumnMap(String dataDirectory) {
+        final Map<String, List<String>> cachedMap = _emptyStringColumnMapMap.get(dataDirectory);
+        if (cachedMap != null) {
+            return cachedMap;
+        }
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = dataDirectory + "/emptyStringColumnMap.dataprop";
         Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
         if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectory + "/empty-string-column.txt";
+            path = dataDirectory + "/empty-string-column.txt"; // old style
             resultMap = reader.readMapAsStringListValue(path);
         }
         final Set<Entry<String, List<String>>> entrySet = resultMap.entrySet();
-        final StringKeyMap<List<String>> stringKeyMap = StringKeyMap.createAsFlexible();
+        final StringKeyMap<List<String>> flmap = StringKeyMap.createAsFlexible();
         for (Entry<String, List<String>> entry : entrySet) {
-            stringKeyMap.put(entry.getKey(), entry.getValue());
+            flmap.put(entry.getKey(), entry.getValue());
         }
-        return stringKeyMap;
+        _emptyStringColumnMapMap.put(dataDirectory, flmap);
+        return _emptyStringColumnMapMap.get(dataDirectory);
     }
 
     protected String getSql4Log(String tableName, List<String> columnNameList,

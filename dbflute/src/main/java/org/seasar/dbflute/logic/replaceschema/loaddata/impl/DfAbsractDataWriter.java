@@ -44,7 +44,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
-import org.seasar.dbflute.logic.replaceschema.loaddata.interceotpr.DfDataWritingInterceptor;
+import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
