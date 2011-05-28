@@ -130,8 +130,8 @@ public class DfTemplateDataExtractor {
     }
 
     public class DfTemplateDataResultSetWrapper {
-        protected ResultSet _rs;
-        protected Map<String, ValueType> _columnValueTypeMap;
+        protected final ResultSet _rs;
+        protected final Map<String, ValueType> _columnValueTypeMap;
 
         public DfTemplateDataResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap) {
             _rs = rs;
@@ -270,11 +270,15 @@ public class DfTemplateDataExtractor {
         if (_extractingLimit < 1) {
             return "";
         }
-        final DfBasicProperties prop = getBasicProperties();
-        if (prop.isDatabaseMySQL() || prop.isDatabasePostgreSQL() || prop.isDatabaseH2()) {
+        if (hasLimitQuery()) {
             return " limit " + _extractingLimit;
         }
         return "";
+    }
+
+    protected boolean hasLimitQuery() {
+        final DfBasicProperties prop = getBasicProperties();
+        return prop.isDatabaseMySQL() || prop.isDatabasePostgreSQL() || prop.isDatabaseH2();
     }
 
     // ===================================================================================

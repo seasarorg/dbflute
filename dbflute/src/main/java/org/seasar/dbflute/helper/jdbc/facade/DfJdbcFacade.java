@@ -36,7 +36,6 @@ public class DfJdbcFacade {
     //                                                                           =========
     protected final DataSource _dataSource;
     protected final Connection _conn;
-    protected final boolean _closeConnection;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -44,17 +43,11 @@ public class DfJdbcFacade {
     public DfJdbcFacade(DataSource dataSource) {
         _dataSource = dataSource;
         _conn = null;
-        _closeConnection = true;
     }
 
     public DfJdbcFacade(Connection conn) {
-        this(conn, false);
-    }
-
-    public DfJdbcFacade(Connection conn, boolean closeConnection) {
         _dataSource = null;
         _conn = conn;
-        _closeConnection = closeConnection;
     }
 
     // ===================================================================================
@@ -283,7 +276,7 @@ public class DfJdbcFacade {
     }
 
     protected void closeConnection(Connection conn) {
-        if (conn != null && _closeConnection) {
+        if (conn != null) {
             try {
                 conn.close();
             } catch (SQLException ignored) {
