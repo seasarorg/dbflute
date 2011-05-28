@@ -2,8 +2,11 @@ package org.seasar.dbflute.logic.doc.dataxls;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -17,6 +20,8 @@ import org.seasar.dbflute.util.Srl;
  * @since 0.9.8.3 (2011/04/23 Saturday)
  */
 public class DfTableOrderAnalyzer {
+
+    public static final int STANDARD_SIZE = 9;
 
     public List<List<Table>> analyzeOrder(Database database) {
         final Set<String> alreadyRegisteredSet = new HashSet<String>();
@@ -100,20 +105,29 @@ public class DfTableOrderAnalyzer {
     }
 
     protected List<List<Table>> groupingCategory(List<List<Table>> outputOrderedList) {
+        return doGroupingCategory(doGroupingCategory(outputOrderedList, false), true);
+    }
+
+    protected List<List<Table>> doGroupingCategory(List<List<Table>> outputOrderedList, boolean secondLevel) {
+        final int standardSize = STANDARD_SIZE;
         final List<List<Table>> groupedList = new ArrayList<List<Table>>();
         for (List<Table> tableList : outputOrderedList) {
+            if (secondLevel && (!isFirstLevelGroup(tableList) || tableList.size() <= standardSize)) {
+                groupedList.add(new ArrayList<Table>(tableList));
+                continue;
+            }
             List<Table> workTableList = new ArrayList<Table>(); // as initial instance
             String currentPrefix = null;
             boolean inGroup = false;
             for (Table table : tableList) {
-                final String name = table.getName();
+                final String tableName = table.getName();
                 if (currentPrefix != null) {
-                    if (name.startsWith(currentPrefix)) { // grouped
+                    if (tableName.startsWith(currentPrefix)) { // grouped
                         inGroup = true;
                         final int workSize = workTableList.size();
                         if (workSize >= 2) {
-                            final Table secondBefore = workTableList.get(workSize - 2);
-                            if (!secondBefore.getName().startsWith(currentPrefix)) {
+                            final Table requiredSizeBefore = workTableList.get(workSize - 2);
+                            if (!requiredSizeBefore.getName().startsWith(currentPrefix)) {
                                 // the work list has non-group elements at the front so split them
                                 final Table groupBase = workTableList.remove(workSize - 1);
                                 groupedList.add(workTableList);
@@ -132,7 +146,11 @@ public class DfTableOrderAnalyzer {
                     }
                 }
                 if (currentPrefix == null) {
-                    currentPrefix = Srl.substringFirstFront(name, "_");
+                    if (secondLevel) {
+                        currentPrefix = extractSecondLevelPrefix(tableName);
+                    } else {
+                        currentPrefix = extractFirstLevelPrefix(tableName);
+                    }
                     workTableList.add(table);
                 }
             }
@@ -145,7 +163,7 @@ public class DfTableOrderAnalyzer {
     }
 
     protected List<List<Table>> groupingSize(List<List<Table>> outputOrderedList) {
-        final int standardSize = 7;
+        final int standardSize = STANDARD_SIZE;
         final List<List<Table>> groupedList = new ArrayList<List<Table>>();
         for (List<Table> tableList : outputOrderedList) {
             final int tableSize = tableList.size();
@@ -157,37 +175,40 @@ public class DfTableOrderAnalyzer {
                     final List<ForeignKey> foreignKeyList = onlyOneTable.getForeignKeyList();
                     final Set<String> foreignTableSet = new HashSet<String>();
                     for (ForeignKey fk : foreignKeyList) {
-                        foreignTableSet.add(fk.getForeignTableName());
+                        if (!fk.hasFixedCondition()) { // ignore fixed condition
+                            foreignTableSet.add(fk.getForeignTableName());
+                        }
                     }
-                    List<Table> candidateFrontList = null;
-                    for (int i = groupedList.size() - 1; i >= 0; --i) { // back to front
-                        final List<Table> frontList = groupedList.get(i);
+                    List<Table> candidatePreviousList = null;
+                    for (int i = groupedList.size() - 1; i >= 0; --i) { // reverse loop
+                        final List<Table> previousList = groupedList.get(i);
                         boolean existsFK = false;
-                        for (Table frontTable : frontList) {
-                            if (foreignTableSet.contains(frontTable.getName())) {
+                        for (Table previousTable : previousList) {
+                            if (foreignTableSet.contains(previousTable.getName())) {
                                 existsFK = true;
                             }
                         }
-                        if (!isGroupTableList(frontList) && frontList.size() < standardSize) {
+                        if (!isFirstLevelGroup(previousList) && previousList.size() < standardSize) {
                             // not group and small
-                            candidateFrontList = frontList;
+                            candidatePreviousList = previousList;
                         }
                         if (existsFK) {
                             break;
                         }
                     }
-                    if (candidateFrontList != null) {
-                        candidateFrontList.add(onlyOneTable);
+                    if (candidatePreviousList != null) {
+                        candidatePreviousList.add(onlyOneTable);
                         continue;
                     }
                 }
                 // join small sections
                 final List<Table> lastList = groupedList.get(groupedList.size() - 1);
-                if (!isGroupTableList(lastList) || !isGroupTableList(tableList)) { // either not group
-                    if ((lastList.size() + tableSize) <= standardSize) {
-                        lastList.addAll(tableList);
-                        continue;
-                    }
+                if (isSecondLevelGroup(lastList) && isSecondLevelGroup(tableList)) {
+
+                }
+                if (isJoinSmallSection(lastList, tableList)) {
+                    lastList.addAll(tableList);
+                    continue;
                 }
             }
             groupedList.add(new ArrayList<Table>(tableList)); // needs new list to manipulate
@@ -196,15 +217,45 @@ public class DfTableOrderAnalyzer {
         return groupedList;
     }
 
-    protected boolean isGroupTableList(List<Table> tableList) {
+    protected boolean isJoinSmallSection(List<Table> lastList, List<Table> tableList) {
+        boolean result = false;
+        if (!isFirstLevelGroup(lastList) || !isFirstLevelGroup(tableList)) { // either not group
+            result = true;
+        } else if (isFirstLevelGroup(lastList) && isFirstLevelGroup(tableList)) {
+            final String lastPrefix = extractFirstLevelPrefix(lastList.get(0).getName());
+            final String mainPrefix = extractFirstLevelPrefix(tableList.get(0).getName());
+            if (lastPrefix.equals(mainPrefix)) {
+                result = true;
+            } else if (lastList.size() <= 3 && tableList.size() <= 3) {
+                result = true;
+            }
+        }
+        return result && (lastList.size() + tableList.size()) <= STANDARD_SIZE;
+    }
+
+    protected boolean isFirstLevelGroup(List<Table> tableList) {
         if (tableList.size() == 1) {
             return false;
         }
         final Set<String> prefixSet = new HashSet<String>();
-        for (Table frontTable : tableList) {
-            final String frontName = frontTable.getName();
-            final String frontPrefix = Srl.substringFirstFront(frontName, "_");
-            prefixSet.add(frontPrefix);
+        for (Table table : tableList) {
+            final String prefix = extractFirstLevelPrefix(table.getName());
+            prefixSet.add(prefix);
+        }
+        return prefixSet.size() == 1;
+    }
+
+    protected boolean isSecondLevelGroup(List<Table> tableList) {
+        if (tableList.size() == 1) {
+            return false;
+        }
+        final Set<String> prefixSet = new HashSet<String>();
+        for (Table table : tableList) {
+            final String prefix = extractSecondLevelPrefix(table.getName());
+            if (prefix == null) {
+                return false;
+            }
+            prefixSet.add(prefix);
         }
         return prefixSet.size() == 1;
     }
@@ -223,5 +274,90 @@ public class DfTableOrderAnalyzer {
             msg = msg + " resourceCount=" + resourceCount + " groupedCount=" + groupedCount;
             throw new IllegalStateException(msg);
         }
+    }
+
+    public String extractMainName(List<Table> tableList) {
+        final String miscName = "misc";
+        if (tableList.size() < 2) {
+            return miscName;
+        }
+        final String firstTableName = tableList.get(0).getName();
+        if (isSecondLevelGroup(tableList)) {
+            return extractSecondLevelPrefix(firstTableName).toUpperCase();
+        }
+        final String secondLevelPrefix = deriveMostName(tableList, true);
+        if (secondLevelPrefix != null) {
+            return secondLevelPrefix;
+        }
+        if (isFirstLevelGroup(tableList)) {
+            return extractFirstLevelPrefix(firstTableName).toUpperCase();
+        }
+        final String firstLevelPrefix = deriveMostName(tableList, false);
+        if (firstLevelPrefix != null) {
+            return firstLevelPrefix;
+        }
+        return miscName;
+    }
+
+    protected String deriveMostName(List<Table> tableList, boolean secondLevel) {
+        final String plusSuffix = "-plus";
+        final Map<String, Integer> prefixMap = new HashMap<String, Integer>();
+        for (Table table : tableList) {
+            final String tableName = table.getName();
+            final String prefix;
+            if (secondLevel) {
+                final String secondLevelPrefix = extractSecondLevelPrefix(tableName);
+                if (secondLevelPrefix != null) {
+                    prefix = secondLevelPrefix;
+                } else {
+                    prefix = extractFirstLevelPrefix(tableName);
+                }
+            } else {
+                prefix = extractFirstLevelPrefix(tableName);
+            }
+            final Integer size = prefixMap.get(prefix);
+            if (size != null) {
+                prefixMap.put(prefix, size + 1);
+            } else {
+                prefixMap.put(prefix, 1);
+            }
+        }
+        if (prefixMap.size() == 1) { // no way because of process before
+            return prefixMap.keySet().iterator().next().toUpperCase() + plusSuffix;
+        } else if (prefixMap.size() >= 2) {
+            String mostPrefix = null;
+            Integer mostSize = 0;
+            for (Entry<String, Integer> entry : prefixMap.entrySet()) {
+                final Integer count = entry.getValue();
+                if (mostSize < count) {
+                    mostPrefix = entry.getKey();
+                    mostSize = count;
+                }
+            }
+            if (secondLevel && mostPrefix.contains("_")) {
+                final String firstLevelPrefix = extractFirstLevelPrefix(mostPrefix);
+                final Integer firstLevelSize = prefixMap.get(firstLevelPrefix);
+                if (firstLevelSize != null && firstLevelSize > 0) {
+                    return firstLevelPrefix.toUpperCase() + (isFirstLevelGroup(tableList) ? "" : plusSuffix);
+                }
+            }
+            if (mostSize > 1 && mostSize > (tableList.size() / 2)) {
+                return mostPrefix.toUpperCase() + plusSuffix;
+            }
+        }
+        return null;
+    }
+
+    protected String extractFirstLevelPrefix(String tableName) { // not null
+        return Srl.substringFirstFront(tableName, "_");
+    }
+
+    protected String extractSecondLevelPrefix(String tableName) { // null allowed
+        if (!tableName.contains("_")) {
+            return null;
+        }
+        final String firstPrefix = Srl.substringFirstFront(tableName, "_");
+        final String firstRear = Srl.substringFirstRear(tableName, "_");
+        return firstPrefix + "_" + Srl.substringFirstFront(firstRear, "_");
     }
 }

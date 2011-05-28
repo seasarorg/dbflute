@@ -328,7 +328,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public String getDataXlsTemplateFileTitle() {
         if (isDataXlsTemplateLoadDataReverse()) {
-            return "reverse-data";
+            return "loadxls";
         } else {
             return "dataxls";
         }
