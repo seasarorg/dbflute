@@ -114,20 +114,20 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             filterValidColumn(dataSet);
             setupDefaultValue(dataDirectory, dataSet);
 
-            doWriteDataSet(file, dataSet);
+            doWriteDataSet(resource, file, dataSet);
             final boolean warned = false; // this has no warning fixedly
             loadedDataInfo.addLoadedFile(resource.getEnvType(), "xls", null, file.getName(), warned);
         }
     }
 
-    protected void doWriteDataSet(File file, DfDataSet dataSet) {
+    protected void doWriteDataSet(DfXlsDataResource resource, File file, DfDataSet dataSet) {
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable dataTable = dataSet.getTable(i);
-            doWriteDataTable(file, dataTable);
+            doWriteDataTable(resource, file, dataTable);
         }
     }
 
-    protected void doWriteDataTable(File file, DfDataTable dataTable) {
+    protected void doWriteDataTable(DfXlsDataResource resource, File file, DfDataTable dataTable) {
         final String tableDbName = dataTable.getTableDbName();
         if (dataTable.getRowSize() == 0) {
             _log.info("*Not found row at the table: " + tableDbName);
@@ -151,6 +151,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             columnNameList.add(columnName);
         }
 
+        final String dataDirectory = resource.getDataDirectory();
+        final LoggingInsertType loggingInsertType = getLoggingInsertType(dataDirectory);
+        final boolean suppressBatchUpdate = isMergedSuppressBatchUpdate(resource.getDataDirectory());
         Connection conn = null;
         PreparedStatement ps = null;
         String preparedSql = null;
@@ -169,9 +172,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 doWriteDataRow(file, dataTable, dataRow // basic resources
                         , columnInfoMap, columnNameList // meta data
                         , conn, ps // JDBC resources
-                        , _loggingInsertSql, _suppressBatchUpdate); // option
+                        , loggingInsertType, suppressBatchUpdate); // option
             }
-            if (!_suppressBatchUpdate) {
+            if (!suppressBatchUpdate) {
                 boolean transactionClosed = false;
                 try {
                     conn.setAutoCommit(false); // transaction to retry after
@@ -192,7 +195,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                             doWriteDataRow(file, dataTable, dataRow // basic resources
                                     , columnInfoMap, columnNameList // meta data
                                     , conn, retryPs // JDBC resources
-                                    , false, true); // option (no logging and suppress batch)
+                                    , LoggingInsertType.NONE, true); // option (no logging and suppress batch)
                         } catch (SQLException rowEx) {
                             retryEx = rowEx;
                             retryRowIndex = i;
@@ -249,7 +252,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
 
     protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,
             Map<String, DfColumnMeta> columnInfoMap, List<String> columnNameList, Connection conn,
-            PreparedStatement ps, boolean loggingInsertSql, boolean suppressBatchUpdate) throws SQLException {
+            PreparedStatement ps, LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
@@ -257,10 +260,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         if (columnValueMap.isEmpty()) {
             throwXlsDataColumnDefFailureException(file, dataTable);
         }
-        if (loggingInsertSql) {
-            final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
-            _log.info(getSql4Log(tableDbName, columnNameList, valueList));
-        }
+
+        final int rowNumber = dataRow.getRowNumber();
+        handleLoggingInsert(tableDbName, columnNameList, columnValueMap, loggingInsertType, rowNumber);
+
         int bindCount = 1;
         final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
@@ -575,13 +578,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
         _emptyStringColumnMapMap.put(dataDirectory, flmap);
         return _emptyStringColumnMapMap.get(dataDirectory);
-    }
-
-    protected String getSql4Log(String tableName, List<String> columnNameList,
-            final List<? extends Object> bindParameters) {
-        String bindParameterString = bindParameters.toString();
-        bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
-        return tableName + ":{" + bindParameterString + "}";
     }
 
     protected ColumnContainer createColumnContainer(final DfDataTable dataTable, final DfDataRow dataRow) {

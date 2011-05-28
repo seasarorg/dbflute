@@ -25,7 +25,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -88,6 +87,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         InputStreamReader ir = null;
         BufferedReader br = null;
 
+        final String dataDirectory = Srl.substringLastFront(_fileName, "/");
+        final LoggingInsertType loggingInsertType = getLoggingInsertType(dataDirectory);
         final String tableDbName;
         {
             String tmp = _fileName.substring(_fileName.lastIndexOf("/") + 1, _fileName.lastIndexOf("."));
@@ -121,6 +122,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
 
             FirstLineInfo firstLineInfo = null;
             int loopIndex = -1;
+            int rowNumber = 0;
             int addedBatchSize = 0;
             while (true) {
                 ++loopIndex;
@@ -169,6 +171,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     valueList.addAll(ls);
                 }
                 // *one record is prepared here
+                ++rowNumber;
 
                 // /- - - - - - - - - - - - - -
                 // check definition differences
@@ -205,9 +208,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     ps = conn.prepareStatement(executedSql);
                 }
                 final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
-                if (_loggingInsertSql) {
-                    _log.info(buildSql4Log(tableDbName, columnNameList, columnValueMap.values()));
-                }
+                handleLoggingInsert(tableDbName, columnNameList, columnValueMap, loggingInsertType, rowNumber);
+
                 int bindCount = 1;
                 final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
                 for (Entry<String, Object> entry : entrySet) {
@@ -436,12 +438,6 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         } else {
             ls.add(value != null ? value : "");
         }
-    }
-
-    protected String buildSql4Log(String tableName, List<String> columnNameList, final Collection<Object> bindParameters) {
-        String bindParameterString = bindParameters.toString();
-        bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
-        return tableName + ":{" + bindParameterString + "}";
     }
 
     // ===================================================================================

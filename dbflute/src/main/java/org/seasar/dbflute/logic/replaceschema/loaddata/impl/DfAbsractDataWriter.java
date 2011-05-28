@@ -34,9 +34,12 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -46,6 +49,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -60,6 +64,12 @@ import org.seasar.dbflute.util.Srl;
  * @since 0.9.4 (2009/03/25 Wednesday)
  */
 public abstract class DfAbsractDataWriter {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DfAbsractDataWriter.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -872,6 +882,97 @@ public abstract class DfAbsractDataWriter {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                      Logging Insert
+    //                                                                      ==============
+    protected void handleLoggingInsert(String tableDbName, List<String> columnNameList,
+            Map<String, Object> columnValueMap, LoggingInsertType loggingInsertType, int recordCount) {
+        boolean logging = false;
+        if (LoggingInsertType.ALL.equals(loggingInsertType)) {
+            logging = true;
+        } else if (LoggingInsertType.PART.equals(loggingInsertType)) {
+            if (recordCount <= 10) { // first 10 lines
+                logging = true;
+            } else if (recordCount == 11) {
+                _log.info("...Loading several records");
+            }
+        }
+        if (logging) {
+            final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
+            _log.info(buildLoggingInsert(tableDbName, columnNameList, valueList));
+        }
+    }
+
+    protected String buildLoggingInsert(String tableName, List<String> columnNameList,
+            final List<? extends Object> bindParameters) {
+        final StringBuilder sb = new StringBuilder();
+        for (Object parameter : bindParameters) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(parameter);
+        }
+        return tableName + ":{" + sb.toString() + "}";
+    }
+
+    // ===================================================================================
+    //                                                                    Directory Option
+    //                                                                    ================
+    protected LoggingInsertType getLoggingInsertType(String dataDirectory) {
+        final Map<String, String> loadingOptionMap = getLoadingOptionMap(dataDirectory);
+        final String prop = loadingOptionMap.get("loggingInsertType");
+        if (isSpecifiedValieProperty(prop)) {
+            final String trimmed = prop.trim();
+            if (trimmed.equalsIgnoreCase("all")) {
+                return LoggingInsertType.ALL;
+            } else if (trimmed.equalsIgnoreCase("none")) {
+                return LoggingInsertType.NONE;
+            } else if (trimmed.equalsIgnoreCase("part")) {
+                return LoggingInsertType.PART;
+            } else {
+                String msg = "Unknown property value for dataLoggingType:";
+                msg = msg + " dataLoggingType=" + trimmed + " dataDirectory=" + dataDirectory;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+        }
+        return _loggingInsertSql ? LoggingInsertType.ALL : LoggingInsertType.NONE;
+    }
+
+    protected static enum LoggingInsertType {
+        ALL, NONE, PART
+    }
+
+    protected boolean isMergedSuppressBatchUpdate(String dataDirectory) {
+        final Map<String, String> loadingOptionMap = getLoadingOptionMap(dataDirectory);
+        final String prop = loadingOptionMap.get("suppressBatchUpdate");
+        if (isSpecifiedValieProperty(prop)) {
+            return prop.trim().equalsIgnoreCase("true");
+        }
+        return _suppressBatchUpdate;
+    }
+
+    protected Map<String, Map<String, String>> _loadingOptionMapMap = DfCollectionUtil.newHashMap();
+
+    protected Map<String, String> getLoadingOptionMap(String dataDirectory) {
+        final Map<String, String> cachedMap = _loadingOptionMapMap.get(dataDirectory);
+        if (cachedMap != null) {
+            return cachedMap;
+        }
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        String path = dataDirectory + "/loadingOptionMap.dataprop";
+        final Map<String, String> resultMap = reader.readMapAsStringValue(path);
+        final StringKeyMap<String> flmap = StringKeyMap.createAsFlexible();
+        if (resultMap != null && !resultMap.isEmpty()) {
+            flmap.putAll(resultMap);
+        }
+        _loadingOptionMapMap.put(dataDirectory, flmap);
+        return _loadingOptionMapMap.get(dataDirectory);
+    }
+
+    protected boolean isSpecifiedValieProperty(String prop) {
+        return prop != null && prop.trim().length() > 0 && !prop.trim().equalsIgnoreCase("null");
     }
 
     // ===================================================================================

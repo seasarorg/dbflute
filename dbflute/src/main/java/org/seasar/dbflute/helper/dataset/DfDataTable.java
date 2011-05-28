@@ -31,12 +31,12 @@ public class DfDataTable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private final String _tableDbName;
-    private final Map<String, DfDataColumn> _columnMap = StringKeyMap.createAsFlexibleOrdered();
-    private final List<DfDataColumn> _columnList = new ArrayList<DfDataColumn>();
-    private final List<DfDataRow> _rows = new ArrayList<DfDataRow>();
-    private final List<DfDataRow> _removedRows = new ArrayList<DfDataRow>();
-    private boolean _hasMetaData = false;
+    protected final String _tableDbName;
+    protected final Map<String, DfDataColumn> _columnMap = StringKeyMap.createAsFlexibleOrdered();
+    protected final List<DfDataColumn> _columnList = new ArrayList<DfDataColumn>();
+    protected final List<DfDataRow> _rows = new ArrayList<DfDataRow>();
+    protected final List<DfDataRow> _removedRows = new ArrayList<DfDataRow>();
+    protected boolean _hasMetaData = false;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -57,7 +57,8 @@ public class DfDataTable {
     }
 
     public DfDataRow addRow() {
-        final DfDataRow row = new DfDataRow(this);
+        final int rowNumber = _rows.size() + 1;
+        final DfDataRow row = new DfDataRow(this, rowNumber);
         _rows.add(row);
         row.setState(DfDtsRowStates.CREATED);
         return row;

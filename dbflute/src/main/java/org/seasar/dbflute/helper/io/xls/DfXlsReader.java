@@ -210,7 +210,7 @@ public class DfXlsReader {
     }
 
     protected void setupRow(DfDataTable table, HSSFRow row) {
-        DfDataRow dataRow = table.addRow();
+        final DfDataRow dataRow = table.addRow();
         HSSFCell cell = null;
         Object value = null;
         DfDataColumn column = null;

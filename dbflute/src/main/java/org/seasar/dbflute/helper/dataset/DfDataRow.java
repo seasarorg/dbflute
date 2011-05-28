@@ -18,28 +18,18 @@ public class DfDataRow {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private DfDataTable _table;
-
-    private List<Object> _values = new ArrayList<Object>();
-
-    private DfDtsRowState _state = DfDtsRowStates.UNCHANGED;
+    protected final DfDataTable _table;
+    protected final int _rowNumber;
+    protected final List<Object> _values = new ArrayList<Object>();
+    protected DfDtsRowState _state = DfDtsRowStates.UNCHANGED;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataRow(DfDataTable table) {
+    public DfDataRow(DfDataTable table, int rowNumber) {
         _table = table;
-
-        // *unused on DBFlute
-        // initValues();
+        _rowNumber = rowNumber;
     }
-
-    // *unused on DBFlute
-    // private void initValues() {
-    //     for (int i = 0; i < _table.getColumnSize(); ++i) {
-    //         _values.add(null);
-    //     }
-    // }
 
     // ===================================================================================
     //                                                                      Value Handling
@@ -78,6 +68,10 @@ public class DfDataRow {
 
     public DfDataTable getTable() {
         return _table;
+    }
+
+    public int getRowNumber() {
+        return _rowNumber;
     }
 
     public DfDtsRowState getState() {
