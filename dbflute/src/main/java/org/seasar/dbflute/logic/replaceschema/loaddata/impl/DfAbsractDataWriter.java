@@ -885,8 +885,8 @@ public abstract class DfAbsractDataWriter {
     }
 
     // ===================================================================================
-    //                                                                      Logging Insert
-    //                                                                      ==============
+    //                                                                        Log Handling
+    //                                                                        ============
     protected void handleLoggingInsert(String tableDbName, List<String> columnNameList,
             Map<String, Object> columnValueMap, LoggingInsertType loggingInsertType, int recordCount) {
         boolean logging = false;
@@ -896,7 +896,7 @@ public abstract class DfAbsractDataWriter {
             if (recordCount <= 10) { // first 10 lines
                 logging = true;
             } else if (recordCount == 11) {
-                _log.info("...Loading several records");
+                _log.info(tableDbName + ":{... more several records}");
             }
         }
         if (logging) {
@@ -917,6 +917,10 @@ public abstract class DfAbsractDataWriter {
         return tableName + ":{" + sb.toString() + "}";
     }
 
+    protected void noticeLoadedRowSize(String tableDbName, int rowSize) {
+        _log.info(" -> " + rowSize + " rows are loaded to " + tableDbName);
+    }
+
     // ===================================================================================
     //                                                                    Directory Option
     //                                                                    ================
@@ -932,8 +936,8 @@ public abstract class DfAbsractDataWriter {
             } else if (trimmed.equalsIgnoreCase("part")) {
                 return LoggingInsertType.PART;
             } else {
-                String msg = "Unknown property value for dataLoggingType:";
-                msg = msg + " dataLoggingType=" + trimmed + " dataDirectory=" + dataDirectory;
+                String msg = "Unknown property value for loggingInsertType:";
+                msg = msg + " value=" + trimmed + " dataDirectory=" + dataDirectory;
                 throw new DfIllegalPropertySettingException(msg);
             }
         }
@@ -946,7 +950,7 @@ public abstract class DfAbsractDataWriter {
 
     protected boolean isMergedSuppressBatchUpdate(String dataDirectory) {
         final Map<String, String> loadingOptionMap = getLoadingOptionMap(dataDirectory);
-        final String prop = loadingOptionMap.get("suppressBatchUpdate");
+        final String prop = loadingOptionMap.get("isSuppressBatchUpdate");
         if (isSpecifiedValieProperty(prop)) {
             return prop.trim().equalsIgnoreCase("true");
         }

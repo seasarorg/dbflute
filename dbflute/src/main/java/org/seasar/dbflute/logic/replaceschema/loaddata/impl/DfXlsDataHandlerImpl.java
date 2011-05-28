@@ -158,7 +158,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         PreparedStatement ps = null;
         String preparedSql = null;
         SQLException retryEx = null;
-        Integer retryRowIndex = null;
         DfDataRow retryDataRow = null;
         try {
             conn = _dataSource.getConnection();
@@ -198,7 +197,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                                     , LoggingInsertType.NONE, true); // option (no logging and suppress batch)
                         } catch (SQLException rowEx) {
                             retryEx = rowEx;
-                            retryRowIndex = i;
                             retryDataRow = dataRow;
                             break;
                         }
@@ -214,8 +212,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     }
                 }
             }
+            noticeLoadedRowSize(tableDbName, dataTable.getRowSize());
         } catch (SQLException e) {
-            handleWriteTableException(file, dataTable, e, retryEx, retryRowIndex, retryDataRow, columnNameList);
+            handleWriteTableException(file, dataTable, e, retryEx, retryDataRow, columnNameList);
         } finally {
             closeResource(conn, ps);
 
@@ -328,7 +327,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
 
     protected void handleWriteTableException(File file, DfDataTable dataTable // basic
             , SQLException mainEx // an exception of main process
-            , SQLException retryEx, Integer retryRowIndex, DfDataRow retryDataRow // retry
+            , SQLException retryEx, DfDataRow retryDataRow // retry
             , List<String> columnNameList) { // supplement
         final SQLException nextEx = mainEx.getNextException();
         if (nextEx != null && !mainEx.equals(nextEx)) { // focus on next exception
@@ -336,14 +335,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             mainEx = nextEx; // switch
         }
         final String tableDbName = dataTable.getTableDbName();
-        final String msg = buildWriteFailureMessage(file, tableDbName, mainEx, retryEx, retryRowIndex, retryDataRow,
-                columnNameList);
+        final String msg = buildWriteFailureMessage(file, tableDbName, mainEx, retryEx, retryDataRow, columnNameList);
         throw new DfXlsDataRegistrationFailureException(msg, mainEx);
     }
 
     protected String buildWriteFailureMessage(File file, String tableDbName // basic
             , SQLException mainEx // an exception of main process
-            , SQLException retryEx, Integer retryRowIndex, DfDataRow retryDataRow // retry
+            , SQLException retryEx, DfDataRow retryDataRow // retry
             , List<String> columnNameList) { // supplement
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
@@ -360,7 +358,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             br.addElement(retryEx.getMessage());
             br.addElement(columnNameList.toString());
             br.addElement(retryDataRow.toString());
-            br.addElement("Row Line: " + (retryRowIndex + 2));
+            br.addElement("Row Number: " + retryDataRow.getRowNumber());
         }
         final Map<String, Class<?>> bindTypeCacheMap = _bindTypeCacheMap.get(tableDbName);
         final Map<String, StringProcessor> stringProcessorCacheMap = _stringProcessorCacheMap.get(tableDbName);

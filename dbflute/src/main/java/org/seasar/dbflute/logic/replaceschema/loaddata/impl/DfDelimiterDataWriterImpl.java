@@ -81,7 +81,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     //                                                                               =====
     public void writeData(DfDelimiterDataResultInfo resultInfo) throws IOException {
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
-        _log.info("writeData(" + _fileName + ", " + _encoding + ")");
+        _log.info("writeData(" + _fileName + ")");
         _log.info("= = = = = = =/");
         FileInputStream fis = null;
         InputStreamReader ir = null;
@@ -171,7 +171,6 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     valueList.addAll(ls);
                 }
                 // *one record is prepared here
-                ++rowNumber;
 
                 // /- - - - - - - - - - - - - -
                 // check definition differences
@@ -188,6 +187,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     preContinueString = null;
                     continue;
                 }
+                // *valid record is prepared here
+                ++rowNumber;
 
                 // /- - - - - - - - - - - - - - - -
                 // process registration to database
@@ -265,6 +266,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             if (ps != null && addedBatchSize > 0) {
                 ps.executeBatch();
             }
+            noticeLoadedRowSize(tableDbName, rowNumber);
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
