@@ -567,7 +567,7 @@ public class DfPmbMetaData {
                 final String rearOptions = Srl.substringFirstRear(rear, "|");
                 filtered = front + rearOptions;
             } else {
-                filtered = front;
+                filtered = Srl.rtrim(front, "|");
             }
             return Srl.is_NotNull_and_NotTrimmedEmpty(filtered) ? ":" + filtered : "";
         } else {
