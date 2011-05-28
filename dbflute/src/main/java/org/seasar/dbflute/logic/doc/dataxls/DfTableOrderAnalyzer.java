@@ -51,57 +51,7 @@ public class DfTableOrderAnalyzer {
                 }
             }
         }
-        return groupingLargeSection(outputOrderedList);
-    }
-
-    protected List<List<Table>> groupingLargeSection(List<List<Table>> outputOrderedList) {
-        final List<List<Table>> groupedList = new ArrayList<List<Table>>();
-        for (List<Table> tableList : outputOrderedList) {
-            if (tableList.size() < 10) {
-                groupedList.add(tableList);
-                continue;
-            }
-            List<Table> workTableList = new ArrayList<Table>(); // as initial instance
-            String currentPrefix = null;
-            for (Table table : tableList) {
-                final String name = table.getName();
-                if (currentPrefix != null) {
-                    if (name.startsWith(currentPrefix)) { // grouped
-                        workTableList.add(table);
-                    } else {
-                        if (workTableList.size() > 1) { // switched
-                            groupedList.add(workTableList);
-                            workTableList = new ArrayList<Table>();
-                        }
-                        currentPrefix = null;
-                    }
-                }
-                if (currentPrefix == null) {
-                    currentPrefix = Srl.substringFirstFront(name, "_");
-                    workTableList.add(table);
-                }
-            }
-            if (!workTableList.isEmpty()) {
-                groupedList.add(workTableList);
-            }
-        }
-
-        // assert here
-        int resourceCount = 0;
-        for (List<Table> tableList : outputOrderedList) {
-            resourceCount = resourceCount + tableList.size();
-        }
-        int groupedCount = 0;
-        for (List<Table> tableList : groupedList) {
-            groupedCount = groupedCount + tableList.size();
-        }
-        if (resourceCount != groupedCount) {
-            String msg = "The grouping process had the loss:";
-            msg = msg + " resourceCount=" + resourceCount + " groupedCount=" + groupedCount;
-            throw new IllegalStateException(msg);
-        }
-
-        return groupedList;
+        return groupingSize(groupingCategory(outputOrderedList));
     }
 
     /**
@@ -147,5 +97,119 @@ public class DfTableOrderAnalyzer {
             outputOrderedList.add(elementList);
         }
         return unregisteredTableList;
+    }
+
+    protected List<List<Table>> groupingCategory(List<List<Table>> outputOrderedList) {
+        final List<List<Table>> groupedList = new ArrayList<List<Table>>();
+        for (List<Table> tableList : outputOrderedList) {
+            List<Table> workTableList = new ArrayList<Table>(); // as initial instance
+            String currentPrefix = null;
+            boolean inGroup = false;
+            for (Table table : tableList) {
+                final String name = table.getName();
+                if (currentPrefix != null) {
+                    if (name.startsWith(currentPrefix)) { // grouped
+                        inGroup = true;
+                        final int workSize = workTableList.size();
+                        if (workSize >= 2) {
+                            final Table secondBefore = workTableList.get(workSize - 2);
+                            if (!secondBefore.getName().startsWith(currentPrefix)) {
+                                // the work list has non-group elements at the front so split them
+                                final Table groupBase = workTableList.remove(workSize - 1);
+                                groupedList.add(workTableList);
+                                workTableList = new ArrayList<Table>();
+                                workTableList.add(groupBase);
+                            }
+                        }
+                        workTableList.add(table);
+                    } else {
+                        if (inGroup) { // switched
+                            groupedList.add(workTableList);
+                            workTableList = new ArrayList<Table>();
+                            inGroup = false;
+                        }
+                        currentPrefix = null;
+                    }
+                }
+                if (currentPrefix == null) {
+                    currentPrefix = Srl.substringFirstFront(name, "_");
+                    workTableList.add(table);
+                }
+            }
+            if (!workTableList.isEmpty()) {
+                groupedList.add(workTableList);
+            }
+        }
+        assertAdjustmentBeforeAfter(outputOrderedList, groupedList);
+        return groupedList;
+    }
+
+    protected List<List<Table>> groupingSize(List<List<Table>> outputOrderedList) {
+        final int standardSize = 7;
+        final List<List<Table>> groupedList = new ArrayList<List<Table>>();
+        for (List<Table> tableList : outputOrderedList) {
+            final int tableSize = tableList.size();
+
+            if (!groupedList.isEmpty() && tableSize < standardSize) {
+                // handle only-one table
+                if (tableSize == 1) {
+                    final Table onlyOneTable = tableList.get(0);
+                    final List<ForeignKey> foreignKeyList = onlyOneTable.getForeignKeyList();
+                    final Set<String> foreignTableSet = new HashSet<String>();
+                    for (ForeignKey fk : foreignKeyList) {
+                        foreignTableSet.add(fk.getForeignTableName());
+                    }
+                    List<Table> candidateFrontList = null;
+                    for (int i = groupedList.size() - 1; i >= 0; --i) { // back to front
+                        final List<Table> frontList = groupedList.get(i);
+                        final Set<String> prefixSet = new HashSet<String>();
+                        boolean existsFK = false;
+                        for (Table frontTable : frontList) {
+                            final String frontName = frontTable.getName();
+                            final String frontPrefix = Srl.substringFirstFront(frontName, "_");
+                            prefixSet.add(frontPrefix);
+                            if (foreignTableSet.contains(frontTable.getName())) {
+                                existsFK = true;
+                            }
+                        }
+                        if (prefixSet.size() > 1 && frontList.size() < standardSize) { // not group and small
+                            candidateFrontList = frontList;
+                        }
+                        if (existsFK) {
+                            break;
+                        }
+                    }
+                    if (candidateFrontList != null) {
+                        candidateFrontList.add(onlyOneTable);
+                        continue;
+                    }
+                }
+                // join small sections
+                final List<Table> lastList = groupedList.get(groupedList.size() - 1);
+                if ((lastList.size() + tableSize) <= standardSize) {
+                    lastList.addAll(tableList);
+                    continue;
+                }
+            }
+            groupedList.add(new ArrayList<Table>(tableList));
+        }
+        assertAdjustmentBeforeAfter(outputOrderedList, groupedList);
+        return groupedList;
+    }
+
+    protected void assertAdjustmentBeforeAfter(List<List<Table>> outputOrderedList, List<List<Table>> groupedList) {
+        int resourceCount = 0;
+        for (List<Table> tableList : outputOrderedList) {
+            resourceCount = resourceCount + tableList.size();
+        }
+        int groupedCount = 0;
+        for (List<Table> tableList : groupedList) {
+            groupedCount = groupedCount + tableList.size();
+        }
+        if (resourceCount != groupedCount) {
+            String msg = "The grouping process had the loss:";
+            msg = msg + " resourceCount=" + resourceCount + " groupedCount=" + groupedCount;
+            throw new IllegalStateException(msg);
+        }
     }
 }

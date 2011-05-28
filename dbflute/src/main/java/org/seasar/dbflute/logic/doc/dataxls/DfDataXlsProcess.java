@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.mapstring.MapListString;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -63,13 +66,50 @@ public class DfDataXlsProcess {
             if (!baseDir.exists()) {
                 baseDir.mkdirs();
             }
-            final File xlsFile = new File(_outputDir + "/" + _fileTitle + "-section" + number + ".xls");
+            final String mainName = extractMainName(tableList);
+            final String filePath = _outputDir + "/" + _fileTitle + number + "-" + mainName + ".xls";
+            final File xlsFile = new File(filePath);
             _templateGenerator.outputData(tableInfoMap, _limit, xlsFile);
             ++sectionNo;
         }
         final Map<String, Table> tableNameMap = _templateGenerator.getTableNameMap();
         if (!tableNameMap.isEmpty()) {
             outputTableNameMap(tableNameMap);
+        }
+    }
+
+    protected String extractMainName(List<Table> tableList) {
+        final String miscName = "misc";
+        if (tableList.size() < 2) {
+            return miscName;
+        }
+        final Map<String, Integer> prefixMap = new HashMap<String, Integer>();
+        for (Table table : tableList) {
+            final String prefix = Srl.substringFirstFront(table.getName(), "_");
+            final Integer count = prefixMap.get(prefix);
+            if (count != null) {
+                prefixMap.put(prefix, count + 1);
+            } else {
+                prefixMap.put(prefix, 1);
+            }
+        }
+        if (prefixMap.size() == 1) {
+            return prefixMap.keySet().iterator().next();
+        } else if (prefixMap.size() == 2 && tableList.size() > 2) {
+            final Iterator<String> ite = prefixMap.keySet().iterator();
+            final String first = ite.next();
+            final String second = ite.next();
+            final Integer firstSize = prefixMap.get(first);
+            final Integer secondSize = prefixMap.get(second);
+            if (firstSize > secondSize) {
+                return first + "-plus";
+            } else if (firstSize < secondSize) {
+                return second + "-plus";
+            } else {
+                return first + "-" + second;
+            }
+        } else {
+            return miscName;
         }
     }
 
