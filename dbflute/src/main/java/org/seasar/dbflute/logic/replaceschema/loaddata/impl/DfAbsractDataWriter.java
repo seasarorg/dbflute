@@ -925,8 +925,8 @@ public abstract class DfAbsractDataWriter {
     //                                                                    Directory Option
     //                                                                    ================
     protected LoggingInsertType getLoggingInsertType(String dataDirectory) {
-        final Map<String, String> loadingOptionMap = getLoadingOptionMap(dataDirectory);
-        final String prop = loadingOptionMap.get("loggingInsertType");
+        final Map<String, String> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final String prop = loadingControlMap.get("loggingInsertType");
         if (isSpecifiedValieProperty(prop)) {
             final String trimmed = prop.trim();
             if (trimmed.equalsIgnoreCase("all")) {
@@ -949,30 +949,30 @@ public abstract class DfAbsractDataWriter {
     }
 
     protected boolean isMergedSuppressBatchUpdate(String dataDirectory) {
-        final Map<String, String> loadingOptionMap = getLoadingOptionMap(dataDirectory);
-        final String prop = loadingOptionMap.get("isSuppressBatchUpdate");
+        final Map<String, String> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final String prop = loadingControlMap.get("isSuppressBatchUpdate");
         if (isSpecifiedValieProperty(prop)) {
             return prop.trim().equalsIgnoreCase("true");
         }
         return _suppressBatchUpdate;
     }
 
-    protected Map<String, Map<String, String>> _loadingOptionMapMap = DfCollectionUtil.newHashMap();
+    protected Map<String, Map<String, String>> _loadingControlMapMap = DfCollectionUtil.newHashMap();
 
-    protected Map<String, String> getLoadingOptionMap(String dataDirectory) {
-        final Map<String, String> cachedMap = _loadingOptionMapMap.get(dataDirectory);
+    protected Map<String, String> getLoadingControlMap(String dataDirectory) {
+        final Map<String, String> cachedMap = _loadingControlMapMap.get(dataDirectory);
         if (cachedMap != null) {
             return cachedMap;
         }
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectory + "/loadingOptionMap.dataprop";
+        String path = dataDirectory + "/loadingControlMap.dataprop";
         final Map<String, String> resultMap = reader.readMapAsStringValue(path);
         final StringKeyMap<String> flmap = StringKeyMap.createAsFlexible();
         if (resultMap != null && !resultMap.isEmpty()) {
             flmap.putAll(resultMap);
         }
-        _loadingOptionMapMap.put(dataDirectory, flmap);
-        return _loadingOptionMapMap.get(dataDirectory);
+        _loadingControlMapMap.put(dataDirectory, flmap);
+        return _loadingControlMapMap.get(dataDirectory);
     }
 
     protected boolean isSpecifiedValieProperty(String prop) {
