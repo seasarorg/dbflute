@@ -11,6 +11,7 @@ else
   # {thank you Mr.Akikusa}
   read -p "Database will be initialized. Are you ready? (y or n) " answer
 fi
+antReturnCode=0
 if [ $answer = "y" ] ;then
   sh $DBFLUTE_HOME/etc/cmd/_df-copy-extlib.sh
 
