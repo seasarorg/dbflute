@@ -3,6 +3,7 @@ package org.seasar.dbflute.logic.doc.dataxls;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
@@ -66,6 +67,7 @@ public class DfDataXlsProcess {
             if (!baseDir.exists()) {
                 baseDir.mkdirs();
             }
+            cleanPreviousFile(baseDir);
             final String mainName = extractMainName(tableList);
             final String filePath = _outputDir + "/" + _fileTitle + number + "-" + mainName + ".xls";
             final File xlsFile = new File(filePath);
@@ -75,6 +77,19 @@ public class DfDataXlsProcess {
         final Map<String, Table> tableNameMap = _templateGenerator.getTableNameMap();
         if (!tableNameMap.isEmpty()) {
             outputTableNameMap(tableNameMap);
+        }
+    }
+
+    protected void cleanPreviousFile(File baseDir) {
+        final File[] listFiles = baseDir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith(_fileTitle) && name.endsWith(".xls");
+            }
+        });
+        if (listFiles != null) {
+            for (File previousFile : listFiles) {
+                previousFile.delete();
+            }
         }
     }
 

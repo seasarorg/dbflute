@@ -162,17 +162,14 @@ public class DfTableOrderAnalyzer {
                     List<Table> candidateFrontList = null;
                     for (int i = groupedList.size() - 1; i >= 0; --i) { // back to front
                         final List<Table> frontList = groupedList.get(i);
-                        final Set<String> prefixSet = new HashSet<String>();
                         boolean existsFK = false;
                         for (Table frontTable : frontList) {
-                            final String frontName = frontTable.getName();
-                            final String frontPrefix = Srl.substringFirstFront(frontName, "_");
-                            prefixSet.add(frontPrefix);
                             if (foreignTableSet.contains(frontTable.getName())) {
                                 existsFK = true;
                             }
                         }
-                        if (prefixSet.size() > 1 && frontList.size() < standardSize) { // not group and small
+                        if (!isGroupTableList(frontList) && frontList.size() < standardSize) {
+                            // not group and small
                             candidateFrontList = frontList;
                         }
                         if (existsFK) {
@@ -186,15 +183,30 @@ public class DfTableOrderAnalyzer {
                 }
                 // join small sections
                 final List<Table> lastList = groupedList.get(groupedList.size() - 1);
-                if ((lastList.size() + tableSize) <= standardSize) {
-                    lastList.addAll(tableList);
-                    continue;
+                if (!isGroupTableList(lastList) || !isGroupTableList(tableList)) { // either not group
+                    if ((lastList.size() + tableSize) <= standardSize) {
+                        lastList.addAll(tableList);
+                        continue;
+                    }
                 }
             }
-            groupedList.add(new ArrayList<Table>(tableList));
+            groupedList.add(new ArrayList<Table>(tableList)); // needs new list to manipulate
         }
         assertAdjustmentBeforeAfter(outputOrderedList, groupedList);
         return groupedList;
+    }
+
+    protected boolean isGroupTableList(List<Table> tableList) {
+        if (tableList.size() == 1) {
+            return false;
+        }
+        final Set<String> prefixSet = new HashSet<String>();
+        for (Table frontTable : tableList) {
+            final String frontName = frontTable.getName();
+            final String frontPrefix = Srl.substringFirstFront(frontName, "_");
+            prefixSet.add(frontPrefix);
+        }
+        return prefixSet.size() == 1;
     }
 
     protected void assertAdjustmentBeforeAfter(List<List<Table>> outputOrderedList, List<List<Table>> groupedList) {
