@@ -65,9 +65,8 @@ public class DfLReverseProcess {
             }
             final String number = (sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo));
             final String mainName = extractMainName(tableList);
-            final String filePath = _outputDir + "/" + _fileTitle + number + "-" + mainName + ".xls";
             _log.info("[Section " + sectionNo + "]: " + mainName);
-            final File xlsFile = new File(filePath);
+            final File xlsFile = new File(buildXlsFilePath(number, mainName));
             _lreverseGenerator.outputData(tableInfoMap, _limit, xlsFile);
             ++sectionNo;
         }
@@ -88,6 +87,10 @@ public class DfLReverseProcess {
                 previousFile.delete();
             }
         }
+    }
+
+    protected String buildXlsFilePath(String number, String mainName) {
+        return _outputDir + "/" + _fileTitle + "-" + number + "-" + mainName + ".xls";
     }
 
     // ===================================================================================
