@@ -36,13 +36,13 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfLReverseGenerator {
+public class DfLReverseOutputHandler {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfLReverseGenerator.class);
+    private static final Log _log = LogFactory.getLog(DfLReverseOutputHandler.class);
 
     protected static final int XLS_LIMIT = 65000; // about
 
@@ -61,7 +61,7 @@ public class DfLReverseGenerator {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfLReverseGenerator(DataSource dataSource) {
+    public DfLReverseOutputHandler(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
@@ -76,11 +76,11 @@ public class DfLReverseGenerator {
      */
     public void outputData(Map<String, Table> tableInfoMap, int limit, File xlsFile) {
         filterUnsupportedTable(tableInfoMap);
-        final DfLoadDataExtractor extractor = new DfLoadDataExtractor(_dataSource);
+        final DfLReverseDataExtractor extractor = new DfLReverseDataExtractor(_dataSource);
         extractor.setExtractingLimit(limit);
         extractor.setLargeBorder(XLS_LIMIT);
-        final Map<String, DfLoadDataResult> templateDataMap = extractor.extractData(tableInfoMap);
-        transferToXls(tableInfoMap, templateDataMap, limit, xlsFile);
+        final Map<String, DfLReverseDataResult> loadDataMap = extractor.extractData(tableInfoMap);
+        transferToXls(tableInfoMap, loadDataMap, limit, xlsFile);
     }
 
     protected void filterUnsupportedTable(Map<String, Table> tableInfoMap) {
@@ -98,12 +98,12 @@ public class DfLReverseGenerator {
     /**
      * Transfer data to excel. (state-less)
      * @param tableMap The map of table. (NotNull)
-     * @param templateDataMap The map of template data. (NotNull)
+     * @param loadDataMap The map of load data. (NotNull)
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param xlsFile The file of xls. (NotNull)
      */
-    protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLoadDataResult> templateDataMap,
-            int limit, File xlsFile) {
+    protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int limit,
+            File xlsFile) {
         final DfDataSet dataSet = new DfDataSet();
         int index = 0;
         for (Entry<String, Table> entry : tableMap.entrySet()) {
@@ -113,7 +113,7 @@ public class DfLReverseGenerator {
             if (_managedTableOnly && (table.isAdditionalSchema() || table.isTypeView())) {
                 continue;
             }
-            final DfLoadDataResult templateDataResult = templateDataMap.get(tableDbName);
+            final DfLReverseDataResult templateDataResult = loadDataMap.get(tableDbName);
             if (templateDataResult.isLargeData()) {
                 outputDelimiterData(table, templateDataResult, limit);
             } else {
@@ -217,7 +217,7 @@ public class DfLReverseGenerator {
     // ===================================================================================
     //                                                                      Delimiter Data
     //                                                                      ==============
-    protected void outputDelimiterData(Table table, DfLoadDataResult templateDataResult, final int limit) {
+    protected void outputDelimiterData(Table table, DfLReverseDataResult templateDataResult, final int limit) {
         if (_delimiterDataDir == null) {
             return;
         }

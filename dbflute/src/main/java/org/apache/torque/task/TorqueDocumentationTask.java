@@ -59,7 +59,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.logic.doc.lreverse.DfLReverseGenerator;
+import org.seasar.dbflute.logic.doc.lreverse.DfLReverseOutputHandler;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -126,13 +126,13 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         final Database database = _schemaData.getDatabase();
-        _log.info("...Outputting load-data: tables=" + database.getTableList().size());
+        _log.info("...Outputting load data: tables=" + database.getTableList().size());
         outputLoadDataReverse(database);
         _log.info("");
     }
 
     protected void outputLoadDataReverse(Database database) {
-        final DfLReverseGenerator handler = new DfLReverseGenerator(getDataSource());
+        final DfLReverseOutputHandler handler = new DfLReverseOutputHandler(getDataSource());
         handler.setContainsCommonColumn(isLoadDataReverseContainsCommonColumn());
         handler.setManagedTableOnly(isLoadDataReverseManagedTableOnly());
         handler.setDelimiterDataDir(getLoadDataReverseDelimiterDataDir());
@@ -141,8 +141,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final String xlsDataDir = getLoadDataReverseXlsDataDir();
         final String fileTitle = getLoadDataReverseFileTitle();
         final int limit = getLoadDataReverseRecordLimit();
-        final DfLReverseProcess generator = new DfLReverseProcess(handler, xlsDataDir, fileTitle, limit);
-        generator.execute(database);
+        final DfLReverseProcess process = new DfLReverseProcess(handler, xlsDataDir, fileTitle, limit);
+        process.execute(database);
     }
 
     // ===================================================================================

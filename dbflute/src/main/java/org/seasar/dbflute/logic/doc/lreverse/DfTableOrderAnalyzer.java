@@ -23,6 +23,9 @@ public class DfTableOrderAnalyzer {
 
     public static final int STANDARD_SIZE = 9;
 
+    // ===================================================================================
+    //                                                                      Analyzer Order
+    //                                                                      ==============
     public List<List<Table>> analyzeOrder(Database database) {
         final Set<String> alreadyRegisteredSet = new HashSet<String>();
         final List<List<Table>> outputOrderedList = new ArrayList<List<Table>>();
@@ -225,9 +228,9 @@ public class DfTableOrderAnalyzer {
             final String lastPrefix = extractFirstLevelPrefix(lastList.get(0).getName());
             final String mainPrefix = extractFirstLevelPrefix(tableList.get(0).getName());
             if (lastPrefix.equals(mainPrefix)) {
-                result = true;
+                result = true; // same category groups are joined
             } else if (lastList.size() <= 3 && tableList.size() <= 3) {
-                result = true;
+                result = true; // small groups are joined
             }
         }
         return result && (lastList.size() + tableList.size()) <= STANDARD_SIZE;
@@ -276,6 +279,9 @@ public class DfTableOrderAnalyzer {
         }
     }
 
+    // ===================================================================================
+    //                                                                           Main Name
+    //                                                                           =========
     public String extractMainName(List<Table> tableList) {
         final String miscName = "misc";
         if (tableList.size() < 2) {
@@ -348,6 +354,9 @@ public class DfTableOrderAnalyzer {
         return null;
     }
 
+    // ===================================================================================
+    //                                                                    Prefix Extractor
+    //                                                                    ================
     protected String extractFirstLevelPrefix(String tableName) { // not null
         return Srl.substringFirstFront(tableName, "_");
     }

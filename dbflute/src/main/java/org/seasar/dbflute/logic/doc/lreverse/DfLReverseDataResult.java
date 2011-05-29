@@ -9,7 +9,7 @@ import org.seasar.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
  * @author jflute
  * @since 0.9.8.3 (2011/04/25 Monday)
  */
-public class DfLoadDataResult {
+public class DfLReverseDataResult {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -27,12 +27,12 @@ public class DfLoadDataResult {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfLoadDataResult(List<Map<String, String>> resultList) {
+    public DfLReverseDataResult(List<Map<String, String>> resultList) {
         _resultList = resultList;
         _cursorCallback = null;
     }
 
-    public DfLoadDataResult(DfJFadCursorCallback cursorCallback) {
+    public DfLReverseDataResult(DfJFadCursorCallback cursorCallback) {
         _resultList = null;
         _cursorCallback = cursorCallback;
     }

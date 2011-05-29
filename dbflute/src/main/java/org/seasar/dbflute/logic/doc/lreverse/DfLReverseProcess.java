@@ -32,7 +32,7 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfLReverseGenerator _templateGenerator;
+    protected final DfLReverseOutputHandler _lreverseGenerator;
     protected final String _outputDir;
     protected final String _fileTitle;
     protected final int _limit;
@@ -40,8 +40,8 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfLReverseProcess(DfLReverseGenerator templateGenerator, String outputDir, String fileTitle, int limit) {
-        _templateGenerator = templateGenerator;
+    public DfLReverseProcess(DfLReverseOutputHandler lreverseGenerator, String outputDir, String fileTitle, int limit) {
+        _lreverseGenerator = lreverseGenerator;
         _outputDir = outputDir;
         _fileTitle = fileTitle;
         _limit = limit;
@@ -68,10 +68,10 @@ public class DfLReverseProcess {
             final String filePath = _outputDir + "/" + _fileTitle + number + "-" + mainName + ".xls";
             _log.info("[Section " + sectionNo + "]: " + mainName);
             final File xlsFile = new File(filePath);
-            _templateGenerator.outputData(tableInfoMap, _limit, xlsFile);
+            _lreverseGenerator.outputData(tableInfoMap, _limit, xlsFile);
             ++sectionNo;
         }
-        final Map<String, Table> tableNameMap = _templateGenerator.getTableNameMap();
+        final Map<String, Table> tableNameMap = _lreverseGenerator.getTableNameMap();
         if (!tableNameMap.isEmpty()) {
             outputTableNameMap(tableNameMap);
         }

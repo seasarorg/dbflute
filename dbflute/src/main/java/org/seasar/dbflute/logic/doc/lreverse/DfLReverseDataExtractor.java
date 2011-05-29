@@ -36,7 +36,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfLoadDataExtractor {
+public class DfLReverseDataExtractor {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -48,29 +48,29 @@ public class DfLoadDataExtractor {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfLoadDataExtractor(DataSource dataSource) {
+    public DfLReverseDataExtractor(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
     // ===================================================================================
-    //                                                                             Extract
-    //                                                                             =======
+    //                                                                        Extract Data
+    //                                                                        ============
     /**
-     * Extract data for template.
+     * Extract load-data.
      * @param tableMap The map of table. (NotNull)
      */
-    public Map<String, DfLoadDataResult> extractData(Map<String, Table> tableMap) {
-        final Map<String, DfLoadDataResult> templateDataMap = new LinkedHashMap<String, DfLoadDataResult>();
+    public Map<String, DfLReverseDataResult> extractData(Map<String, Table> tableMap) {
+        final Map<String, DfLReverseDataResult> loadDataMap = new LinkedHashMap<String, DfLReverseDataResult>();
         for (Entry<String, Table> entry : tableMap.entrySet()) {
             final String tableDbName = entry.getKey();
             final Table table = entry.getValue();
-            final DfLoadDataResult result = selectData(table);
-            templateDataMap.put(tableDbName, result);
+            final DfLReverseDataResult result = selectData(table);
+            loadDataMap.put(tableDbName, result);
         }
-        return templateDataMap;
+        return loadDataMap;
     }
 
-    protected DfLoadDataResult selectData(Table table) {
+    protected DfLReverseDataResult selectData(Table table) {
         final String tableSqlName = table.getTableSqlNameDirectUse();
 
         boolean large = false;
@@ -109,31 +109,31 @@ public class DfLoadDataExtractor {
     // ===================================================================================
     //                                                                         Normal Data
     //                                                                         ===========
-    protected DfLoadDataResult processNormalData(Table table, String sql) {
+    protected DfLReverseDataResult processNormalData(Table table, String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
         final DfJFadStringConverter converter = createStringConverter();
         final Integer limit = _extractingLimit;
         final List<Map<String, String>> resultList = facade.selectStringList(sql, valueTypeMap, converter, limit);
-        return new DfLoadDataResult(resultList);
+        return new DfLReverseDataResult(resultList);
     }
 
     // ===================================================================================
     //                                                                          Large Data
     //                                                                          ==========
-    protected DfLoadDataResult processLargeData(Table table, final String sql) {
+    protected DfLReverseDataResult processLargeData(Table table, final String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
         final DfJFadStringConverter converter = createStringConverter();
         final DfJFadCursorCallback callback = facade.selectCursor(sql, valueTypeMap, converter);
-        return new DfLoadDataResult(callback);
+        return new DfLReverseDataResult(callback);
     }
 
-    public class DfLodaDataResultSetWrapper {
+    public class DfLReverseLargeDataResultSetWrapper {
         protected final ResultSet _rs;
         protected final Map<String, ValueType> _columnValueTypeMap;
 
-        public DfLodaDataResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap) {
+        public DfLReverseLargeDataResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap) {
             _rs = rs;
             _columnValueTypeMap = columnValueTypeMap;
         }
@@ -180,7 +180,7 @@ public class DfLoadDataExtractor {
                     valueType = new TimestampType();
                 }
             } else if (column.isJavaNativeBinaryObject()) {
-                // unsupported BLOG as template data
+                // unsupported BLOG as loda data
                 valueType = new NullBytesType();
             } else {
                 // other types are treated as string
