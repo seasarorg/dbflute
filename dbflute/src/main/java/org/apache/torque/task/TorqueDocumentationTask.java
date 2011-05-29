@@ -61,6 +61,7 @@ import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseOutputHandler;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseProcess;
+import org.seasar.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
@@ -101,8 +102,12 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     protected void doExecute() {
         processSchemaHtml();
 
-        if (isLoadDataReverseRecordLimitValid()) {
+        if (isLoadDataReverseValid()) {
             processLoadDataReverse();
+        }
+
+        if (isSchemaSyncCheckValid()) {
+            processSchemaSyncCheck();
         }
 
         refreshResources();
@@ -145,6 +150,17 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         process.execute(database);
     }
 
+    protected void processSchemaSyncCheck() {
+        _log.info("* * * * * * * * * * *");
+        _log.info("*                   *");
+        _log.info("* Schema Sync Check *");
+        _log.info("*                   *");
+        _log.info("* * * * * * * * * * *");
+        final DfSchemaSyncChecker checker = new DfSchemaSyncChecker(getDataSource());
+        checker.checkSync();
+        _log.info("");
+    }
+
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
@@ -152,8 +168,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getProperties().getDocumentProperties();
     }
 
-    protected boolean isLoadDataReverseRecordLimitValid() {
-        return getDocumentProperties().isLoadDataReverseRecordLimitValid();
+    protected boolean isLoadDataReverseValid() {
+        return getDocumentProperties().isLoadDataReverseValid();
     }
 
     protected int getLoadDataReverseRecordLimit() {
@@ -182,6 +198,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected boolean isLoadDataReverseLoadDataReverse() {
         return getDocumentProperties().isLoadDataReverseOutputToPlaySql();
+    }
+
+    protected boolean isSchemaSyncCheckValid() {
+        return getDocumentProperties().isSchemaSyncCheckValid();
     }
 
     // ===================================================================================

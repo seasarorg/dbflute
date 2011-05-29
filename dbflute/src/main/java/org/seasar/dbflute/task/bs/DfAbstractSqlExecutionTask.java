@@ -66,7 +66,7 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
         final DfRunnerInformation runInfo = new DfRunnerInformation();
         runInfo.setDriver(_driver);
         runInfo.setUrl(_url);
-        runInfo.setUser(_userId);
+        runInfo.setUser(_user);
         runInfo.setPassword(_password);
         runInfo.setAutoCommit(isAutoCommit());
         runInfo.setErrorContinue(isErrorContinue());

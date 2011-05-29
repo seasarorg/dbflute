@@ -5,9 +5,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -269,7 +271,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return _loadDataReverseMap;
     }
 
-    public boolean isLoadDataReverseRecordLimitValid() {
+    public boolean isLoadDataReverseValid() {
         return getLoadDataReverseRecordLimit() != null;
     }
 
@@ -324,6 +326,59 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     public boolean isLoadDataReverseOutputToPlaySql() {
         final String key = "isOutputToPlaySql";
         return isProperty(key, false, getLoadDataReverseMap());
+    }
+
+    // ===================================================================================
+    //                                                                     SchemaSyncCheck
+    //                                                                     ===============
+    protected Map<String, String> _schemaSyncCheckMap;
+
+    protected Map<String, String> getSchemaSyncCheckMap() {
+        if (_schemaSyncCheckMap != null) {
+            return _schemaSyncCheckMap;
+        }
+        final String key = "schemaSyncCheckMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, String> map = (Map<String, String>) getDocumentDefinitionMap().get(key);
+        if (map != null) {
+            _schemaSyncCheckMap = map;
+        } else {
+            _schemaSyncCheckMap = DfCollectionUtil.emptyMap();
+        }
+        return _schemaSyncCheckMap;
+    }
+
+    public boolean isSchemaSyncCheckValid() {
+        return getSchemaSyncCheckDatabaseUser() != null;
+    }
+
+    public String getSchemaSyncCheckDatabaseUrl() {
+        final Map<String, String> dataXlsTemplateMap = getLoadDataReverseMap();
+        final String url = dataXlsTemplateMap.get("url");
+        return Srl.is_NotNull_and_NotTrimmedEmpty(url) ? url : getDatabaseProperties().getDatabaseUrl();
+    }
+
+    public String getSchemaSyncCheckDatabaseCatalog() {
+        final Map<String, String> dataXlsTemplateMap = getLoadDataReverseMap();
+        final String catalog = dataXlsTemplateMap.get("catalog");
+        return getDatabaseProperties().prepareMainCatalog(catalog);
+    }
+
+    public UnifiedSchema getSchemaSyncCheckDatabaseSchema() {
+        final Map<String, String> dataXlsTemplateMap = getLoadDataReverseMap();
+        final String schema = dataXlsTemplateMap.get("schema");
+        final String catalog = getSchemaSyncCheckDatabaseCatalog();
+        return getDatabaseProperties().prepareMainUnifiedSchema(catalog, schema);
+    }
+
+    public String getSchemaSyncCheckDatabaseUser() {
+        final Map<String, String> dataXlsTemplateMap = getLoadDataReverseMap();
+        return dataXlsTemplateMap.get("user");
+    }
+
+    public String getSchemaSyncCheckDatabasePassword() {
+        final Map<String, String> dataXlsTemplateMap = getLoadDataReverseMap();
+        return dataXlsTemplateMap.get("password");
     }
 
     // ===================================================================================

@@ -72,17 +72,23 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
         _catalogDone = true;
 
-        // first
-        String catalog = _databaseInfo.getDatabaseCatalog(); // It's closet!
-        if (Srl.is_Null_or_TrimmedEmpty(catalog)) {
-            // second
-            final DfUrlAnalyzerFactory factory = new DfUrlAnalyzerFactory(getBasicProperties(), getDatabaseUrl());
-            final DfUrlAnalyzer analyzer = factory.createAnalyzer();
-            final String extracted = analyzer.extractCatalog();
-            catalog = Srl.is_NotNull_and_NotTrimmedEmpty(extracted) ? extracted : null;
-        }
-        _mainCatalog = filterDatabaseCatalog(catalog);
+        final String catalog = _databaseInfo.getDatabaseCatalog(); // It's closet!
+        _mainCatalog = prepareMainCatalog(catalog);
         return _mainCatalog;
+    }
+
+    public String prepareMainCatalog(String catalog) {
+        if (Srl.is_Null_or_TrimmedEmpty(catalog)) {
+            catalog = extractCatalogFromUrl(); // second way
+        }
+        return filterDatabaseCatalog(catalog);
+    }
+
+    public String extractCatalogFromUrl() {
+        final DfUrlAnalyzerFactory factory = new DfUrlAnalyzerFactory(getBasicProperties(), getDatabaseUrl());
+        final DfUrlAnalyzer analyzer = factory.createAnalyzer();
+        final String extracted = analyzer.extractCatalog();
+        return Srl.is_NotNull_and_NotTrimmedEmpty(extracted) ? extracted : null;
     }
 
     protected String filterDatabaseCatalog(String catalog) {
@@ -100,10 +106,14 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         if (_mainSchema != null) {
             return _mainSchema;
         }
-        String schema = _databaseInfo.getDatabaseSchema();
-        schema = filterDatabaseSchema(schema);
-        _mainSchema = createAsMainSchema(getDatabaseCatalog(), schema);
+        final String schema = _databaseInfo.getDatabaseSchema();
+        _mainSchema = prepareMainUnifiedSchema(getDatabaseCatalog(), schema);
         return _mainSchema;
+    }
+
+    public UnifiedSchema prepareMainUnifiedSchema(String catalog, String schema) {
+        schema = filterDatabaseSchema(schema);
+        return createAsMainSchema(catalog, schema);
     }
 
     protected String filterDatabaseSchema(String schema) {
@@ -163,14 +173,14 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                 Connection Properties
     //                                 ---------------------
-    protected Properties _databaseConnectionProperties;
+    protected Properties _connectionProperties;
 
-    public Properties getDatabaseConnectionProperties() {
-        if (_databaseConnectionProperties != null) {
-            return _databaseConnectionProperties;
+    public Properties getConnectionProperties() {
+        if (_connectionProperties != null) {
+            return _connectionProperties;
         }
-        _databaseConnectionProperties = _databaseInfo.getDatabaseConnectionProperties();
-        return _databaseConnectionProperties;
+        _connectionProperties = _databaseInfo.getConnectionProperties();
+        return _connectionProperties;
     }
 
     // -----------------------------------------------------
@@ -654,7 +664,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             return stringProp("torque.database.password");
         }
 
-        public Properties getDatabaseConnectionProperties() {
+        public Properties getConnectionProperties() {
             initializeDatabaseInfoMap();
             final String key = KEY_PROPERTIES_MAP;
             final Map<String, String> propertiesMap = getDatabaseInfoElementAsPropertiesMap(key);

@@ -70,7 +70,7 @@ public abstract class DfAbstractTask extends Task {
     protected UnifiedSchema _mainSchema;
 
     /** User name. */
-    protected String _userId;
+    protected String _user;
 
     /** Password */
     protected String _password;
@@ -182,7 +182,7 @@ public abstract class DfAbstractTask extends Task {
         sb.append(ln).append("    driver = " + _driver);
         sb.append(ln).append("    url    = " + _url);
         sb.append(ln).append("    schema = " + _mainSchema);
-        sb.append(ln).append("    user   = " + _userId);
+        sb.append(ln).append("    user   = " + _user);
         sb.append(ln).append("    props  = " + _connectionProperties);
 
         final String additionalSchemaDisp = buildAdditionalSchemaDisp();
@@ -275,10 +275,10 @@ public abstract class DfAbstractTask extends Task {
     protected void initializeDatabaseInfo() {
         _driver = getDatabaseProperties().getDatabaseDriver();
         _url = getDatabaseProperties().getDatabaseUrl();
-        _userId = getDatabaseProperties().getDatabaseUser();
+        _user = getDatabaseProperties().getDatabaseUser();
         _mainSchema = getDatabaseProperties().getDatabaseSchema();
         _password = getDatabaseProperties().getDatabasePassword();
-        _connectionProperties = getDatabaseProperties().getDatabaseConnectionProperties();
+        _connectionProperties = getDatabaseProperties().getConnectionProperties();
     }
 
     protected void initializeVariousEnvironment() {
@@ -334,7 +334,7 @@ public abstract class DfAbstractTask extends Task {
     protected abstract boolean isUseDataSource();
 
     protected void setupDataSource() throws SQLException {
-        _dataSourceHandler.setUserId(_userId);
+        _dataSourceHandler.setUser(_user);
         _dataSourceHandler.setPassword(_password);
         _dataSourceHandler.setDriver(_driver);
         _dataSourceHandler.setUrl(_url);

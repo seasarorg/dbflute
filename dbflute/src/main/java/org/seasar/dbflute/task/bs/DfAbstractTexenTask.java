@@ -299,7 +299,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         _userId = getDatabaseProperties().getDatabaseUser();
         _mainSchema = getDatabaseProperties().getDatabaseSchema();
         _password = getDatabaseProperties().getDatabasePassword();
-        _connectionProperties = getDatabaseProperties().getDatabaseConnectionProperties();
+        _connectionProperties = getDatabaseProperties().getConnectionProperties();
     }
 
     protected void initializeVariousEnvironment() {
@@ -533,7 +533,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected abstract boolean isUseDataSource();
 
     protected void setupDataSource() throws SQLException {
-        _dataSourceHandler.setUserId(_userId);
+        _dataSourceHandler.setUser(_userId);
         _dataSourceHandler.setPassword(_password);
         _dataSourceHandler.setDriver(_driver);
         _dataSourceHandler.setUrl(_url);

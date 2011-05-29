@@ -44,7 +44,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
     protected String _url;
 
     /** User name. */
-    protected String _userId;
+    protected String _user;
 
     /** Password */
     protected String _password;
@@ -72,7 +72,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
             _log.info("...Creating data source:");
             _log.info("  driver = " + _driver);
             _log.info("  url    = " + _url);
-            _log.info("  user   = " + _userId);
+            _log.info("  user   = " + _user);
             DfDataSourceContext.setDataSource(new DfSimpleDataSource(this));
         }
     }
@@ -154,7 +154,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
         if (_connectionProperties != null && !_connectionProperties.isEmpty()) {
             info.putAll(_connectionProperties);
         }
-        info.put("user", _userId);
+        info.put("user", _user);
         info.put("password", _password);
 
         try {
@@ -162,7 +162,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
             conn = driverInstance.connect(_url, info);
         } catch (SQLException e) {
             String msg = "Failed to connect:";
-            msg = msg + " url=" + _url + " user=" + _userId;
+            msg = msg + " url=" + _url + " user=" + _user;
             throw new DfJDBCException(msg, e);
         }
         if (conn == null) {
@@ -227,7 +227,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{url=" + _url + ", user=" + _userId + ", prop=" + _connectionProperties + "}";
+        return "{url=" + _url + ", user=" + _user + ", prop=" + _connectionProperties + "}";
     }
 
     // ===================================================================================
@@ -251,10 +251,10 @@ public class DfDataSourceHandler implements DfConnectionProvider {
 
     /**
      * Set the user name for the DB connection.
-     * @param userId database user
+     * @param user database user
      */
-    public void setUserId(String userId) {
-        this._userId = userId;
+    public void setUser(String user) {
+        this._user = user;
     }
 
     /**
