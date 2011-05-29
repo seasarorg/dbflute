@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.doc.dataxls;
+package org.seasar.dbflute.logic.doc.ldreverse;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,13 +36,13 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfDataXlsGenerator {
+public class DfLdReverseGenerator {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfDataXlsGenerator.class);
+    private static final Log _log = LogFactory.getLog(DfLdReverseGenerator.class);
 
     protected static final int XLS_LIMIT = 65000; // about
 
@@ -54,15 +54,14 @@ public class DfDataXlsGenerator {
     protected boolean _managedTableOnly;
 
     // option for large data
-    protected String _delimiterDataOutputDir;
-    protected boolean _delimiterDataTypeCsv; // default is TSV
+    protected String _delimiterDataDir;
 
     protected final Map<String, Table> _tableNameMap = new LinkedHashMap<String, Table>();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataXlsGenerator(DataSource dataSource) {
+    public DfLdReverseGenerator(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
@@ -77,10 +76,10 @@ public class DfDataXlsGenerator {
      */
     public void outputData(Map<String, Table> tableInfoMap, int limit, File xlsFile) {
         filterUnsupportedTable(tableInfoMap);
-        final DfTemplateDataExtractor extractor = new DfTemplateDataExtractor(_dataSource);
+        final DfLoadDataExtractor extractor = new DfLoadDataExtractor(_dataSource);
         extractor.setExtractingLimit(limit);
         extractor.setLargeBorder(XLS_LIMIT);
-        final Map<String, DfTemplateDataResult> templateDataMap = extractor.extractData(tableInfoMap);
+        final Map<String, DfLoadDataResult> templateDataMap = extractor.extractData(tableInfoMap);
         transferToXls(tableInfoMap, templateDataMap, limit, xlsFile);
     }
 
@@ -103,7 +102,7 @@ public class DfDataXlsGenerator {
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param xlsFile The file of xls. (NotNull)
      */
-    protected void transferToXls(Map<String, Table> tableMap, Map<String, DfTemplateDataResult> templateDataMap,
+    protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLoadDataResult> templateDataMap,
             int limit, File xlsFile) {
         final DfDataSet dataSet = new DfDataSet();
         int index = 0;
@@ -114,9 +113,9 @@ public class DfDataXlsGenerator {
             if (_managedTableOnly && (table.isAdditionalSchema() || table.isTypeView())) {
                 continue;
             }
-            final DfTemplateDataResult templateDataResult = templateDataMap.get(tableDbName);
+            final DfLoadDataResult templateDataResult = templateDataMap.get(tableDbName);
             if (templateDataResult.isLargeData()) {
-                outputDataDelimiterTemplate(table, templateDataResult, limit);
+                outputDelimiterData(table, templateDataResult, limit);
             } else {
                 final List<Map<String, String>> extractedList = templateDataResult.getResultList();
                 setupXlsDataTable(dataSet, table, extractedList, index);
@@ -218,20 +217,14 @@ public class DfDataXlsGenerator {
     // ===================================================================================
     //                                                                      Delimiter Data
     //                                                                      ==============
-    protected void outputDataDelimiterTemplate(Table table, DfTemplateDataResult templateDataResult, final int limit) {
-        if (_delimiterDataOutputDir == null) {
+    protected void outputDelimiterData(Table table, DfLoadDataResult templateDataResult, final int limit) {
+        if (_delimiterDataDir == null) {
             return;
         }
-        final File delimiterDir = new File(_delimiterDataOutputDir);
-        final String ext;
+        final File delimiterDir = new File(_delimiterDataDir);
+        final String ext = "tsv"; // fixed
         final FileMakingOption option = new FileMakingOption().encodeAsUTF8().separateLf();
-        if (_delimiterDataTypeCsv) {
-            option.delimitateByComma();
-            ext = "csv";
-        } else {
-            option.delimitateByTab(); // as default
-            ext = "tsv";
-        }
+        option.delimitateByTab();
         final String tableDbName = table.getName();
         _log.info("...Outputting the over-xls-limit table: " + tableDbName);
         if (!delimiterDir.exists()) {
@@ -307,12 +300,8 @@ public class DfDataXlsGenerator {
         _managedTableOnly = managedTableOnly;
     }
 
-    public void setDelimiterDataOutputDir(String delimiterDataOutputDir) {
-        _delimiterDataOutputDir = delimiterDataOutputDir;
-    }
-
-    public void setDelimiterDataTypeCsv(boolean delimiterDataTypeCsv) {
-        _delimiterDataTypeCsv = delimiterDataTypeCsv;
+    public void setDelimiterDataDir(String delimiterDataDir) {
+        _delimiterDataDir = delimiterDataDir;
     }
 
     public Map<String, Table> getTableNameMap() {

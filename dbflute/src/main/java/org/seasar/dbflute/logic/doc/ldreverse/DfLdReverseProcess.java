@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.doc.dataxls;
+package org.seasar.dbflute.logic.doc.ldreverse;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,18 +21,18 @@ import org.seasar.dbflute.helper.mapstring.MapListString;
  * @author jflute
  * @since 0.9.8.3 (2011/04/23 Saturday)
  */
-public class DfDataXlsProcess {
+public class DfLdReverseProcess {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfDataXlsProcess.class);
+    private static final Log _log = LogFactory.getLog(DfLdReverseProcess.class);
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfDataXlsGenerator _templateGenerator;
+    protected final DfLdReverseGenerator _templateGenerator;
     protected final String _outputDir;
     protected final String _fileTitle;
     protected final int _limit;
@@ -40,7 +40,7 @@ public class DfDataXlsProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataXlsProcess(DfDataXlsGenerator templateGenerator, String outputDir, String fileTitle, int limit) {
+    public DfLdReverseProcess(DfLdReverseGenerator templateGenerator, String outputDir, String fileTitle, int limit) {
         _templateGenerator = templateGenerator;
         _outputDir = outputDir;
         _fileTitle = fileTitle;

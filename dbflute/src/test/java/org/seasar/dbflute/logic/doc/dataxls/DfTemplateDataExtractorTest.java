@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Date;
 
 import org.junit.Test;
-import org.seasar.dbflute.logic.doc.dataxls.DfTemplateDataExtractor;
+import org.seasar.dbflute.logic.doc.ldreverse.DfLoadDataExtractor;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -17,7 +17,7 @@ public class DfTemplateDataExtractorTest extends PlainTestCase {
     @Test
     public void test_formatDate_basic() {
         // ## Arrange ##
-        DfTemplateDataExtractor extractor = new DfTemplateDataExtractor(null);
+        DfLoadDataExtractor extractor = new DfLoadDataExtractor(null);
         Date date = DfTypeUtil.toDate("0001/01/01 00:00:00.000");
 
         // ## Act ##
@@ -30,7 +30,7 @@ public class DfTemplateDataExtractorTest extends PlainTestCase {
     @Test
     public void test_formatDate_BC() {
         // ## Arrange ##
-        DfTemplateDataExtractor extractor = new DfTemplateDataExtractor(null);
+        DfLoadDataExtractor extractor = new DfLoadDataExtractor(null);
         Date date = DfTypeUtil.toDate("BC0001/12/31 23:59:59.999");
 
         // ## Act ##

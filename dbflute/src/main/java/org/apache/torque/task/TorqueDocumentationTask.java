@@ -59,8 +59,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsGenerator;
-import org.seasar.dbflute.logic.doc.dataxls.DfDataXlsProcess;
+import org.seasar.dbflute.logic.doc.ldreverse.DfLdReverseGenerator;
+import org.seasar.dbflute.logic.doc.ldreverse.DfLdReverseProcess;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
@@ -101,8 +101,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     protected void doExecute() {
         processSchemaHtml();
 
-        if (isDataXlsTemplateRecordLimitValid()) {
-            processDataXlsTemplate();
+        if (isLoadDataReverseRecordLimitValid()) {
+            processLoadDataReverse();
         }
 
         refreshResources();
@@ -119,34 +119,29 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("");
     }
 
-    protected void processDataXlsTemplate() {
+    protected void processLoadDataReverse() {
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
-        if (isDataXlsTemplateLoadDataReverse()) {
-            _log.info("* Load Data Reverse *");
-        } else {
-            _log.info("* Data Xls Template *");
-        }
+        _log.info("* Load Data Reverse *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         final Database database = _schemaData.getDatabase();
-        final String title = isDataXlsTemplateLoadDataReverse() ? "migration-data" : "dataxls";
-        _log.info("...Outputting " + title + ": tables=" + database.getTableList().size());
-        outputDataXlsTemplate(database);
+        _log.info("...Outputting load-data: tables=" + database.getTableList().size());
+        outputLoadDataReverse(database);
         _log.info("");
     }
 
-    protected void outputDataXlsTemplate(Database database) {
-        final DfDataXlsGenerator handler = new DfDataXlsGenerator(getDataSource());
-        handler.setContainsCommonColumn(isDataXlsTemplateContainsCommonColumn());
-        handler.setManagedTableOnly(isDataXlsTemplateManagedTableOnly());
-        handler.setDelimiterDataOutputDir(getDataDelimiterTemplateDir());
+    protected void outputLoadDataReverse(Database database) {
+        final DfLdReverseGenerator handler = new DfLdReverseGenerator(getDataSource());
+        handler.setContainsCommonColumn(isLoadDataReverseContainsCommonColumn());
+        handler.setManagedTableOnly(isLoadDataReverseManagedTableOnly());
+        handler.setDelimiterDataDir(getLoadDataReverseDelimiterDataDir());
         // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
         //handler.setDelimiterDataTypeCsv(true);
-        final String templateDir = getDataXlsTemplateDir();
-        final String fileTitle = getDataXlsTemplateFileTitle();
-        final int limit = getDataXlsTemplateRecordLimit();
-        final DfDataXlsProcess generator = new DfDataXlsProcess(handler, templateDir, fileTitle, limit);
+        final String xlsDataDir = getLoadDataReverseXlsDataDir();
+        final String fileTitle = getLoadDataReverseFileTitle();
+        final int limit = getLoadDataReverseRecordLimit();
+        final DfLdReverseProcess generator = new DfLdReverseProcess(handler, xlsDataDir, fileTitle, limit);
         generator.execute(database);
     }
 
@@ -157,36 +152,36 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getProperties().getDocumentProperties();
     }
 
-    protected boolean isDataXlsTemplateRecordLimitValid() {
-        return getDocumentProperties().isDataXlsTemplateRecordLimitValid();
+    protected boolean isLoadDataReverseRecordLimitValid() {
+        return getDocumentProperties().isLoadDataReverseRecordLimitValid();
     }
 
-    protected int getDataXlsTemplateRecordLimit() {
-        return getDocumentProperties().getDataXlsTemplateRecordLimit();
+    protected int getLoadDataReverseRecordLimit() {
+        return getDocumentProperties().getLoadDataReverseRecordLimit();
     }
 
-    protected boolean isDataXlsTemplateContainsCommonColumn() {
-        return getDocumentProperties().isDataXlsTemplateContainsCommonColumn();
+    protected boolean isLoadDataReverseContainsCommonColumn() {
+        return getDocumentProperties().isLoadDataReverseContainsCommonColumn();
     }
 
-    protected boolean isDataXlsTemplateManagedTableOnly() {
-        return getDocumentProperties().isDataXlsTemplateManagedTableOnly();
+    protected boolean isLoadDataReverseManagedTableOnly() {
+        return getDocumentProperties().isLoadDataReverseManagedTableOnly();
     }
 
-    protected String getDataXlsTemplateDir() {
-        return getDocumentProperties().getDataXlsTemplateDir();
+    protected String getLoadDataReverseXlsDataDir() {
+        return getDocumentProperties().getLoadDataReverseXlsDataDir();
     }
 
-    protected String getDataDelimiterTemplateDir() {
-        return getDocumentProperties().getDataDelimiterTemplateDir();
+    protected String getLoadDataReverseDelimiterDataDir() {
+        return getDocumentProperties().getLoadDataReverseDelimiterDataDir();
     }
 
-    protected String getDataXlsTemplateFileTitle() {
-        return getDocumentProperties().getDataXlsTemplateFileTitle();
+    protected String getLoadDataReverseFileTitle() {
+        return getDocumentProperties().getLoadDataReverseFileTitle();
     }
 
-    protected boolean isDataXlsTemplateLoadDataReverse() {
-        return getDocumentProperties().isDataXlsTemplateLoadDataReverse();
+    protected boolean isLoadDataReverseLoadDataReverse() {
+        return getDocumentProperties().isLoadDataReverseOutputToPlaySql();
     }
 
     // ===================================================================================

@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -250,66 +250,57 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                   Data Xls Template
-    //                                                                   =================
-    protected Map<String, String> _dataXlsTemplateMap;
+    //                                                                     LoadDataReverse
+    //                                                                     ===============
+    protected Map<String, String> _loadDataReverseMap;
 
-    protected Map<String, String> getDataXlsTemplateMap() {
-        if (_dataXlsTemplateMap != null) {
-            return _dataXlsTemplateMap;
+    protected Map<String, String> getLoadDataReverseMap() {
+        if (_loadDataReverseMap != null) {
+            return _loadDataReverseMap;
         }
-        final String key = "dataXlsTemplateMap";
+        final String key = "loadDataReverseMap";
         @SuppressWarnings("unchecked")
         final Map<String, String> map = (Map<String, String>) getDocumentDefinitionMap().get(key);
         if (map != null) {
-            _dataXlsTemplateMap = map;
+            _loadDataReverseMap = map;
         } else {
-            _dataXlsTemplateMap = DfCollectionUtil.emptyMap();
+            _loadDataReverseMap = DfCollectionUtil.emptyMap();
         }
-        return _dataXlsTemplateMap;
+        return _loadDataReverseMap;
     }
 
-    public boolean isDataXlsTemplateRecordLimitValid() {
-        final Integer limit = getDataXlsTemplateRecordLimit();
-        return limit != null;
+    public boolean isLoadDataReverseRecordLimitValid() {
+        return getLoadDataReverseRecordLimit() != null;
     }
 
-    public Integer getDataXlsTemplateRecordLimit() {
-        final Map<String, String> dataXlsTemplateMap = getDataXlsTemplateMap();
+    public Integer getLoadDataReverseRecordLimit() {
+        final Map<String, String> dataXlsTemplateMap = getLoadDataReverseMap();
         String limitExp = null;
         if (!dataXlsTemplateMap.isEmpty()) {
-            final String newKey = "recordLimit";
-            limitExp = dataXlsTemplateMap.get(newKey);
+            limitExp = dataXlsTemplateMap.get("recordLimit");
         }
-        if (Srl.is_Null_or_TrimmedEmpty(limitExp) || limitExp.trim().equalsIgnoreCase("null")) {
-            final String oldKey = "dataXlsTemplateRecordLimit";
-            limitExp = (String) getDocumentDefinitionMap().get(oldKey);
-            if (Srl.is_Null_or_TrimmedEmpty(limitExp) || limitExp.trim().equalsIgnoreCase("null")) {
-                return null;
-            }
+        if (limitExp == null) {
+            return null;
         }
         try {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
-            String msg = "The property 'dataXlsTemplateRecordLimit' of " + KEY_documentDefinitionMap;
+            String msg = "The property 'recordLimit' of loadDataReverse in " + KEY_documentDefinitionMap;
             msg = msg + " should be number but: value=" + limitExp;
-            throw new IllegalStateException(msg, e);
+            throw new DfIllegalPropertyTypeException(msg, e);
         }
     }
 
-    public boolean isDataXlsTemplateContainsCommonColumn() {
-        final String newKey = "isContainsCommonColumn";
-        final String oldKey = "isDataXlsTemplateContainsCommonColumn";
-        final boolean defaultValue = isProperty(oldKey, false, getDocumentDefinitionMap());
-        return isProperty(newKey, defaultValue, getDataXlsTemplateMap());
+    public boolean isLoadDataReverseContainsCommonColumn() {
+        return isProperty("isContainsCommonColumn", false, getLoadDataReverseMap());
     }
 
-    public boolean isDataXlsTemplateManagedTableOnly() {
-        return isDataXlsTemplateLoadDataReverse();
+    public boolean isLoadDataReverseManagedTableOnly() {
+        return isLoadDataReverseOutputToPlaySql();
     }
 
-    public String getDataXlsTemplateDir() {
-        if (isDataXlsTemplateLoadDataReverse()) {
+    public String getLoadDataReverseXlsDataDir() {
+        if (isLoadDataReverseOutputToPlaySql()) {
             return getReplaceSchemaProperties().getMainCurrentLoadTypeFirstXlsDataDir();
         } else {
             final String outputDirectory = getDocumentOutputDirectory();
@@ -317,26 +308,22 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
     }
 
-    public String getDataDelimiterTemplateDir() { // for large data
-        if (isDataXlsTemplateLoadDataReverse()) {
+    public String getLoadDataReverseDelimiterDataDir() { // for large data
+        if (isLoadDataReverseOutputToPlaySql()) {
             return getReplaceSchemaProperties().getMainCurrentLoadTypeTsvUTF8DataDir();
         } else {
-            final String templateDir = getDataXlsTemplateDir();
+            final String templateDir = getLoadDataReverseXlsDataDir();
             return templateDir + "/large-data";
         }
     }
 
-    public String getDataXlsTemplateFileTitle() {
-        if (isDataXlsTemplateLoadDataReverse()) {
-            return "loadxls";
-        } else {
-            return "dataxls";
-        }
+    public String getLoadDataReverseFileTitle() {
+        return "load-data";
     }
 
-    public boolean isDataXlsTemplateLoadDataReverse() {
-        final String key = "isLoadDataReverse";
-        return isProperty(key, false, getDataXlsTemplateMap());
+    public boolean isLoadDataReverseOutputToPlaySql() {
+        final String key = "isOutputToPlaySql";
+        return isProperty(key, false, getLoadDataReverseMap());
     }
 
     // ===================================================================================

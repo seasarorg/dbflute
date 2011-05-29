@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.doc.dataxls;
+package org.seasar.dbflute.logic.doc.ldreverse;
 
 import java.util.ArrayList;
 import java.util.Comparator;

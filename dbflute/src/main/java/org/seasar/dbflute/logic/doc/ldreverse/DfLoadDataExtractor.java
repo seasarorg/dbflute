@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.doc.dataxls;
+package org.seasar.dbflute.logic.doc.ldreverse;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -36,7 +36,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfTemplateDataExtractor {
+public class DfLoadDataExtractor {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -48,7 +48,7 @@ public class DfTemplateDataExtractor {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfTemplateDataExtractor(DataSource dataSource) {
+    public DfLoadDataExtractor(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
@@ -59,18 +59,18 @@ public class DfTemplateDataExtractor {
      * Extract data for template.
      * @param tableMap The map of table. (NotNull)
      */
-    public Map<String, DfTemplateDataResult> extractData(Map<String, Table> tableMap) {
-        final Map<String, DfTemplateDataResult> templateDataMap = new LinkedHashMap<String, DfTemplateDataResult>();
+    public Map<String, DfLoadDataResult> extractData(Map<String, Table> tableMap) {
+        final Map<String, DfLoadDataResult> templateDataMap = new LinkedHashMap<String, DfLoadDataResult>();
         for (Entry<String, Table> entry : tableMap.entrySet()) {
             final String tableDbName = entry.getKey();
             final Table table = entry.getValue();
-            final DfTemplateDataResult result = selectData(table);
+            final DfLoadDataResult result = selectData(table);
             templateDataMap.put(tableDbName, result);
         }
         return templateDataMap;
     }
 
-    protected DfTemplateDataResult selectData(Table table) {
+    protected DfLoadDataResult selectData(Table table) {
         final String tableSqlName = table.getTableSqlNameDirectUse();
 
         boolean large = false;
@@ -109,31 +109,31 @@ public class DfTemplateDataExtractor {
     // ===================================================================================
     //                                                                         Normal Data
     //                                                                         ===========
-    protected DfTemplateDataResult processNormalData(Table table, String sql) {
+    protected DfLoadDataResult processNormalData(Table table, String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
         final DfJFadStringConverter converter = createStringConverter();
         final Integer limit = _extractingLimit;
         final List<Map<String, String>> resultList = facade.selectStringList(sql, valueTypeMap, converter, limit);
-        return new DfTemplateDataResult(resultList);
+        return new DfLoadDataResult(resultList);
     }
 
     // ===================================================================================
     //                                                                          Large Data
     //                                                                          ==========
-    protected DfTemplateDataResult processLargeData(Table table, final String sql) {
+    protected DfLoadDataResult processLargeData(Table table, final String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Map<String, ValueType> valueTypeMap = createColumnValueTypeMap(table.getColumnList());
         final DfJFadStringConverter converter = createStringConverter();
         final DfJFadCursorCallback callback = facade.selectCursor(sql, valueTypeMap, converter);
-        return new DfTemplateDataResult(callback);
+        return new DfLoadDataResult(callback);
     }
 
-    public class DfTemplateDataResultSetWrapper {
+    public class DfLodaDataResultSetWrapper {
         protected final ResultSet _rs;
         protected final Map<String, ValueType> _columnValueTypeMap;
 
-        public DfTemplateDataResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap) {
+        public DfLodaDataResultSetWrapper(ResultSet rs, Map<String, ValueType> columnValueTypeMap) {
             _rs = rs;
             _columnValueTypeMap = columnValueTypeMap;
         }

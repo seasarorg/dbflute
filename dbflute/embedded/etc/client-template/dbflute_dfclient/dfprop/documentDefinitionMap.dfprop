@@ -9,7 +9,8 @@
 # o schemaHtmlFileName (NotRequired - Default 'schema-[project-name].html')
 # o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)
 # o historyHtmlFileName (NotRequired - Default 'history-[project-name].html')
-# o dataXlsTemplateMap (NotRequired - Default map:{})
+# o loadDataReverseMap (NotRequired - Default map:{})
+# o schemaSyncCheckMap (NotRequired - Default map:{})
 # 
 # Example:
 # map:{
@@ -21,10 +22,16 @@
 #     ; schemaHtmlFileName = xxx.html
 #     ; isSuppressSchemaHtmlOutsideSql = false
 #     ; historyHtmlFileName = xxx.html
-#     ; dataXlsTemplateMap = map:{
+#     ; loadDataReverseMap = map:{
 #         ; recordLimit = 10
 #         ; isContainsCommonColumn = false
-#         ; isLoadDataReverse = false
+#         ; isOutputToPlaySql = false
+#     }
+#     ; schemaSyncCheckMap = map:{
+#         ; url = jdbc:...
+#         ; schema = EXAMPLEDB
+#         ; user = exampuser
+#         ; password = exampword
 #     }
 # }
 #
@@ -103,18 +110,36 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dataXlsTemplateMap: (NotRequired - Default map:{})
-    #  You can set DataXlsTemplate settings.
+    # o loadDataReverseMap: (NotRequired - Default map:{})
+    #  You can set LoadDataReverse settings.
     #  This property is valid when the property 'recordLimit' is set.
     #  Elements of this map are as below:
     #   o recordLimit: The limit of records to output. Minus means no limit. (NotRequired - Default '')
     #   o isContainsCommonColumn: Does the data contain common columns? (NotRequired - Default false)
     #   o isLoadDataReverse: Is the mode LoadDataReverse? (NotRequired - Default false)
     #
-    #; dataXlsTemplateMap = map:{
+    #; loadDataReverseMap = map:{
     #    ; recordLimit = 10
     #    ; isContainsCommonColumn = false
-    #    ; isLoadDataReverse = false
+    #    ; isOutputToPlaySql = false
+    #}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o schemaSyncCheckMap: (NotRequired - Default map:{})
+    #  You can set SchemaSyncCheck settings.
+    #  This property is valid when the property 'user' is set.
+    #  Elements of this map are as below:
+    #   o url: The URL for connecting database. (NotRequired - Default same as databaseInfoMap)
+    #   o schema: The schema name. (NotRequired - Default '' e.g. no setting when MySQL)
+    #   o user: The database user name. (Required)
+    #   o password: The database password. (NotRequired - Default '')
+    #
+    #; schemaSyncCheckMap = map:{
+    #    ; url = jdbc:...
+    #    ; schema = EXAMPLEDB
+    #    ; user = exampuser
+    #    ; password = exampword
     #}
     # - - - - - - - - - -/
 }
