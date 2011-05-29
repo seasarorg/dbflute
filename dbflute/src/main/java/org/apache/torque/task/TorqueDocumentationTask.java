@@ -59,8 +59,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.logic.doc.ldreverse.DfLdReverseGenerator;
-import org.seasar.dbflute.logic.doc.ldreverse.DfLdReverseProcess;
+import org.seasar.dbflute.logic.doc.lreverse.DfLReverseGenerator;
+import org.seasar.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
@@ -132,7 +132,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void outputLoadDataReverse(Database database) {
-        final DfLdReverseGenerator handler = new DfLdReverseGenerator(getDataSource());
+        final DfLReverseGenerator handler = new DfLReverseGenerator(getDataSource());
         handler.setContainsCommonColumn(isLoadDataReverseContainsCommonColumn());
         handler.setManagedTableOnly(isLoadDataReverseManagedTableOnly());
         handler.setDelimiterDataDir(getLoadDataReverseDelimiterDataDir());
@@ -141,7 +141,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final String xlsDataDir = getLoadDataReverseXlsDataDir();
         final String fileTitle = getLoadDataReverseFileTitle();
         final int limit = getLoadDataReverseRecordLimit();
-        final DfLdReverseProcess generator = new DfLdReverseProcess(handler, xlsDataDir, fileTitle, limit);
+        final DfLReverseProcess generator = new DfLReverseProcess(handler, xlsDataDir, fileTitle, limit);
         generator.execute(database);
     }
 

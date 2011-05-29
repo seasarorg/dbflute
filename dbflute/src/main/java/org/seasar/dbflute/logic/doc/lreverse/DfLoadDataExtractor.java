@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.doc.ldreverse;
+package org.seasar.dbflute.logic.doc.lreverse;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

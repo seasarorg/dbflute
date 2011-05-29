@@ -1,6 +1,6 @@
-package org.seasar.dbflute.logic.doc.ldreverse;
+package org.seasar.dbflute.logic.doc.lreverse;
 
-import org.seasar.dbflute.logic.doc.ldreverse.DfLoadDataExtractor.DfLodaDataResultSetWrapper;
+import org.seasar.dbflute.logic.doc.lreverse.DfLoadDataExtractor.DfLodaDataResultSetWrapper;
 
 /**
  * @author jflute

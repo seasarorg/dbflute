@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.doc.ldreverse;
+package org.seasar.dbflute.logic.doc.lreverse;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,13 +36,13 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfLdReverseGenerator {
+public class DfLReverseGenerator {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfLdReverseGenerator.class);
+    private static final Log _log = LogFactory.getLog(DfLReverseGenerator.class);
 
     protected static final int XLS_LIMIT = 65000; // about
 
@@ -61,7 +61,7 @@ public class DfLdReverseGenerator {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfLdReverseGenerator(DataSource dataSource) {
+    public DfLReverseGenerator(DataSource dataSource) {
         _dataSource = dataSource;
     }
 

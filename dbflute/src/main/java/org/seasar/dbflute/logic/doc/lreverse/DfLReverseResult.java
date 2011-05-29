@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.doc.ldreverse;
+package org.seasar.dbflute.logic.doc.lreverse;
 
 import java.util.List;
 import java.util.Map;
@@ -8,7 +8,7 @@ import org.apache.torque.engine.database.model.Column;
 /**
  * @author jflute
  */
-public class DfLdReverseResult {
+public class DfLReverseResult {
 
     protected Map<String, List<Column>> _overTableColumnMap;
     protected Map<String, List<Map<String, String>>> _overTemplateDataMap;
