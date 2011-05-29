@@ -57,7 +57,7 @@ public class DfLReverseProcess {
         if (!baseDir.exists()) {
             baseDir.mkdirs();
         }
-        cleanPreviousFile(baseDir);
+        deletePreviousDataFile(baseDir);
         for (List<Table> tableList : orderedList) {
             final Map<String, Table> tableInfoMap = new LinkedHashMap<String, Table>();
             for (Table table : tableList) {
@@ -76,12 +76,24 @@ public class DfLReverseProcess {
         }
     }
 
-    protected void cleanPreviousFile(File baseDir) {
-        final File[] listFiles = baseDir.listFiles(new FilenameFilter() {
+    protected void deletePreviousDataFile(File baseDir) {
+        doDeletePreviousDataFile(baseDir, new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.startsWith(_fileTitle) && name.endsWith(".xls");
             }
         });
+        final String delimiterDataDir = _lreverseGenerator.getDelimiterDataDir();
+        if (delimiterDataDir != null) {
+            doDeletePreviousDataFile(new File(delimiterDataDir), new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".tsv");
+                }
+            });
+        }
+    }
+
+    protected void doDeletePreviousDataFile(File baseDir, FilenameFilter filter) {
+        final File[] listFiles = baseDir.listFiles(filter);
         if (listFiles != null) {
             for (File previousFile : listFiles) {
                 previousFile.delete();

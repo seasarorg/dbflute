@@ -1,5 +1,7 @@
 package org.seasar.dbflute.logic.doc.synccheck;
 
+import java.io.File;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -47,13 +49,9 @@ public class DfSchemaSyncChecker {
     //                                                                          Check Sync
     //                                                                          ==========
     public void checkSync() {
-        final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
-        mainSerializer.serialize();
-
-        final DataSource targetDs = prepareTargetDataSource();
-        final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
-        targetSerializer.serialize();
-
+        clearPreviousResource();
+        serializeMainSchema();
+        final DfSchemaXmlSerializer targetSerializer = serializeTargetSchema();
         _log.info("...Checking the schema synchronized");
         final DfSchemaDiff schemaDiff = targetSerializer.getSchemaDiff();
         if (schemaDiff.hasDiff()) {
@@ -61,7 +59,38 @@ public class DfSchemaSyncChecker {
             throwSchemaSyncCheckTragedyResultException();
         } else { // synchronized
             _log.info(" -> the schema is synchronized");
+            clearTemporaryResource();
         }
+    }
+
+    protected void clearPreviousResource() {
+        final File schemaXml = new File(SCHEMA_XML);
+        if (schemaXml.exists()) {
+            schemaXml.delete();
+        }
+        final File historyFile = new File(HISTORY_FILE);
+        if (historyFile.exists()) {
+            historyFile.delete();
+        }
+    }
+
+    protected void clearTemporaryResource() {
+        final File schemaXml = new File(SCHEMA_XML);
+        if (schemaXml.exists()) {
+            schemaXml.delete();
+        }
+    }
+
+    protected void serializeMainSchema() {
+        final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
+        mainSerializer.serialize();
+    }
+
+    protected DfSchemaXmlSerializer serializeTargetSchema() {
+        final DataSource targetDs = prepareTargetDataSource();
+        final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
+        targetSerializer.serialize();
+        return targetSerializer;
     }
 
     protected DataSource prepareTargetDataSource() {
@@ -83,10 +112,10 @@ public class DfSchemaSyncChecker {
     protected void throwSchemaSyncCheckTragedyResultException() {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The schema was not synchronized with another schema.");
-        br.addItem("[Advice]");
-        br.addElement("You can confirm the result at " + HISTORY_FILE + ".");
-        br.addElement("'Previous' means your main schema, always connected by DBFlute tasks.");
-        br.addElement("'Next' means the sync target schema, set at schemaSyncCheckMap property.");
+        br.addItem("Advice");
+        br.addElement("You can confirm the result at '" + HISTORY_FILE + "'.");
+        br.addElement("'Previous' means the main schema, defined at databaseInfoMap.dfprop.");
+        br.addElement("'Next' means the sync-check target schema, defined at schemaSyncCheckMap property.");
         final String msg = br.buildExceptionMessage();
         throw new DfSchemaSyncCheckTragedyResultException(msg);
     }

@@ -113,11 +113,11 @@ public class DfLReverseOutputHandler {
             if (_managedTableOnly && (table.isAdditionalSchema() || table.isTypeView())) {
                 continue;
             }
-            final DfLReverseDataResult templateDataResult = loadDataMap.get(tableDbName);
-            if (templateDataResult.isLargeData()) {
-                outputDelimiterData(table, templateDataResult, limit);
+            final DfLReverseDataResult dataResult = loadDataMap.get(tableDbName);
+            if (dataResult.isLargeData()) {
+                outputDelimiterData(table, dataResult, limit);
             } else {
-                final List<Map<String, String>> extractedList = templateDataResult.getResultList();
+                final List<Map<String, String>> extractedList = dataResult.getResultList();
                 setupXlsDataTable(dataSet, table, extractedList, index);
             }
         }
@@ -298,6 +298,10 @@ public class DfLReverseOutputHandler {
 
     public void setManagedTableOnly(boolean managedTableOnly) {
         _managedTableOnly = managedTableOnly;
+    }
+
+    public String getDelimiterDataDir() {
+        return _delimiterDataDir;
     }
 
     public void setDelimiterDataDir(String delimiterDataDir) {

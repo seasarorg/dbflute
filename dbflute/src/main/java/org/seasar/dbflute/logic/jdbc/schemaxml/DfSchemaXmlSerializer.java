@@ -762,7 +762,7 @@ public class DfSchemaXmlSerializer {
         try {
             _log.info("...Initializing identity map");
             _identityMap = extractor.extractIdentityMap();
-            _log.info("  -> size=" + _identityMap.size());
+            _log.info(" -> size=" + _identityMap.size());
         } catch (Exception ignored) {
             _log.info("DfIdentityExtractor.extractIdentityMap() threw the exception!", ignored);
         }
@@ -959,7 +959,7 @@ public class DfSchemaXmlSerializer {
         _log.info("...Loading previous schema (schema diff process)");
         _schemaDiff.loadPreviousSchema();
         if (_schemaDiff.isFirstTime()) {
-            _log.info("  -> no previous (first time)");
+            _log.info(" -> no previous (first time)");
         }
     }
 
@@ -980,7 +980,7 @@ public class DfSchemaXmlSerializer {
         _schemaDiff.analyzeDiff();
         if (_schemaDiff.hasDiff()) {
             try {
-                _log.info("  -> different from previous");
+                _log.info(" -> different from previous");
                 final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(_historyFile);
                 _log.info("...Serializing schema-diff:");
                 _log.info("  filePath = " + schemaHistory.getHistoryFile());
@@ -990,7 +990,7 @@ public class DfSchemaXmlSerializer {
                 throw new IllegalStateException(msg, e);
             }
         } else {
-            _log.info("  -> same as previous");
+            _log.info(" -> same as previous");
         }
     }
 

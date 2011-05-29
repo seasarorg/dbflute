@@ -154,7 +154,15 @@ public class DfDataSourceHandler implements DfConnectionProvider {
         if (_connectionProperties != null && !_connectionProperties.isEmpty()) {
             info.putAll(_connectionProperties);
         }
+        if (_user == null) {
+            String msg = "The database user should not be null.";
+            throw new IllegalStateException(msg);
+        }
         info.put("user", _user);
+        if (_password == null) {
+            String msg = "The database password should not be null (but empty allowed).";
+            throw new IllegalStateException(msg);
+        }
         info.put("password", _password);
 
         try {

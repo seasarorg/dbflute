@@ -59,6 +59,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.exception.DfSchemaSyncCheckTragedyResultException;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseOutputHandler;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.seasar.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
@@ -107,7 +108,12 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         }
 
         if (isSchemaSyncCheckValid()) {
-            processSchemaSyncCheck();
+            try {
+                processSchemaSyncCheck();
+            } catch (DfSchemaSyncCheckTragedyResultException e) {
+                refreshResources();
+                throw e;
+            }
         }
 
         refreshResources();
