@@ -118,7 +118,7 @@ public class ${myClassName} : ${glSimpleStringOption} {
             tmp = filterEscape(tmp, "\uff05");
             tmp = filterEscape(tmp, "\uff3f");
 #end
-#if ($database.isDatabaseSQLServer())
+#if ($database.isDatabaseSQLServer() || $database.isDatabaseSybase())
             tmp = filterEscape(tmp, "[");
             tmp = filterEscape(tmp, "]");
 #end

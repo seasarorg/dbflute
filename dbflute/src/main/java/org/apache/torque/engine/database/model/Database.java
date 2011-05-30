@@ -920,6 +920,10 @@ public class Database {
         return getBasicProperties().isDatabaseMSAccess();
     }
 
+    public boolean isDatabaseSybase() {
+        return getBasicProperties().isDatabaseSybase();
+    }
+
     // -----------------------------------------------------
     //                                              Language
     //                                              --------
