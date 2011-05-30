@@ -17,10 +17,8 @@ package org.seasar.dbflute.cbean.coption;
 
 import java.util.List;
 
-import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
-import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -45,6 +43,7 @@ public class LikeSearchOption extends SimpleStringOption {
     protected String _like;
     protected String _escape;
     protected boolean _asOrSplit;
+    protected boolean _suppressSpecialWildCard;
 
     // ===================================================================================
     //                                                                         Rear Option
@@ -241,18 +240,29 @@ public class LikeSearchOption extends SimpleStringOption {
     public String generateRealValue(String value) {
         value = super.generateRealValue(value);
 
-        // Escape
+        // escape wild-cards
         if (_escape != null && _escape.trim().length() != 0) {
             String tmp = replace(value, _escape, _escape + _escape);
-            tmp = replace(tmp, "%", _escape + "%");
-            tmp = replace(tmp, "_", _escape + "_");
 
-            // escape double-byte wild-cards
-            // Oracle and DB2 treat these symbols as wild-card
-            // but other DBMS ignore unused escape characters
-            // so if-statement does not exist here
-            tmp = replace(tmp, "\uff05", _escape + "\uff05");
-            tmp = replace(tmp, "\uff3f", _escape + "\uff3f");
+            // basic wild-cards
+            tmp = filterEscape(tmp, "%");
+            tmp = filterEscape(tmp, "_");
+
+            if (isEscapeSpecialWildCard()) {
+                // double-byte wild-cards
+                // Oracle and DB2 treat these symbols as wild-card
+                // but other DBMS ignore unused escape characters
+                // so if-statement does not exist here
+                tmp = filterEscape(tmp, "\uff05");
+                tmp = filterEscape(tmp, "\uff3f");
+
+                // regular expression wild-cards
+                // SQLServer can use regular expression on LikeSearch
+                // so it needs to escape the wild-cards for it
+                // the reason for if-statement is same as double-byte
+                tmp = filterEscape(tmp, "[");
+                tmp = filterEscape(tmp, "]");
+            }
 
             value = tmp;
         }
@@ -271,8 +281,20 @@ public class LikeSearchOption extends SimpleStringOption {
         }
     }
 
-    protected boolean isCurrentDBDef(DBDef currentDBDef) {
-        return ResourceContext.isCurrentDBDef(currentDBDef);
+    protected String filterEscape(String target, String wildCard) {
+        return replace(target, wildCard, _escape + wildCard);
+    }
+
+    protected boolean isEscapeSpecialWildCard() {
+        return !_suppressSpecialWildCard;
+    }
+
+    public LikeSearchOption suppressSpecialWildCardEscape() {
+        // called after being set to condition-query
+        // for DBMS that does not ignore an unused escape character
+        //  e.g. Apache Derby
+        _suppressSpecialWildCard = true;
+        return this;
     }
 
     @Override

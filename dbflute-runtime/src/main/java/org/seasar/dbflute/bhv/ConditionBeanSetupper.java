@@ -26,7 +26,7 @@ public interface ConditionBeanSetupper<CONDITION_BEAN extends ConditionBean> {
 
     /**
      * Set up condition-bean.
-     * @param cb Condition-bean. (NotNull)
+     * @param cb The prepared instance of condition-bean. (NotNull)
      */
-    public void setup(CONDITION_BEAN cb);
+    void setup(CONDITION_BEAN cb);
 }

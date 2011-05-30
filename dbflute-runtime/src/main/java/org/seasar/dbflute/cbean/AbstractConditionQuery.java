@@ -43,6 +43,7 @@ import org.seasar.dbflute.cbean.coption.ParameterOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.SqlClauseDerby;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
@@ -652,6 +653,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         if (xsuppressEscape()) {
             option.notEscape();
+        }
+        if (xgetSqlClause() instanceof SqlClauseDerby) {
+            // for DBMS that does not ignore an unused escape character
+            option.suppressSpecialWildCardEscape();
         }
         if (value == null || !option.isSplit()) {
             // as normal condition
