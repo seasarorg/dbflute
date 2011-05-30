@@ -20,6 +20,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.dbway.DBWay;
+import org.seasar.dbflute.dbway.WayOfOracle;
 
 /**
  * SqlClause for Oracle.
@@ -32,6 +34,9 @@ public class SqlClauseOracle extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+
+    /** The instance of DBWay. */
+    protected final DBWay _dbway = new WayOfOracle();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -215,6 +220,14 @@ public class SqlClauseOracle extends AbstractSqlClause {
         }
         conditionValue = "{" + conditionValue + "}";
         return conditionValue;
+    }
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                               DBWay
+    //                                                                               =====
+    public DBWay dbway() {
+        return _dbway;
     }
 
     // [DBFlute-0.9.6.9]

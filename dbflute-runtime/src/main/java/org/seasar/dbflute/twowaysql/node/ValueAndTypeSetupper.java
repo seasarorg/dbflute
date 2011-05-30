@@ -26,6 +26,7 @@ import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexNotNumberException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentListIndexOutOfBoundsException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentNotFoundPropertyException;
@@ -166,6 +167,7 @@ public class ValueAndTypeSetupper {
             }
             throwNotFoundPropertyException(clazz, currentName);
         }
+        adjustLikeSearchEscape(likeSearchOption);
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
         valueAndType.setLikeSearchOption(likeSearchOption);
@@ -210,6 +212,13 @@ public class ValueAndTypeSetupper {
 
     protected String buildLikeSearchPropertyName(String resourceName) {
         return resourceName + LIKE_SEARCH_OPTION_SUFFIX;
+    }
+
+    protected void adjustLikeSearchEscape(LikeSearchOption option) {
+        if (option != null) {
+            final List<String> wildCardList = ResourceContext.currentDBDef().dbway().getOriginalWildCardList();
+            option.acceptOriginalWildCardList(wildCardList);
+        }
     }
 
     // -----------------------------------------------------

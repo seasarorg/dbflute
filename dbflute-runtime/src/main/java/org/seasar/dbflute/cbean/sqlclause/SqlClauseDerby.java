@@ -16,6 +16,8 @@
 package org.seasar.dbflute.cbean.sqlclause;
 
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.seasar.dbflute.dbway.DBWay;
+import org.seasar.dbflute.dbway.WayOfDerby;
 
 /**
  * SqlClause for Default.
@@ -28,6 +30,9 @@ public class SqlClauseDerby extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+
+    /** The instance of DBWay. */
+    protected final DBWay _dbway = new WayOfDerby();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -117,5 +122,13 @@ public class SqlClauseDerby extends AbstractSqlClause {
      */
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
+    }
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                               DBWay
+    //                                                                               =====
+    public DBWay dbway() {
+        return _dbway;
     }
 }

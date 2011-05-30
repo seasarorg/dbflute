@@ -15,11 +15,21 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * The DB way of Unknown.
  * @author jflute
  */
-public class WayOfUnknown implements DBWay {
+public class WayOfUnknown implements DBWay, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -33,6 +43,14 @@ public class WayOfUnknown implements DBWay {
     //                                                                       =============
     public String getIdentitySelectSql() {
         return null;
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    @SuppressWarnings("unchecked")
+    public List<String> getOriginalWildCardList() {
+        return Collections.EMPTY_LIST;
     }
 
     // ===================================================================================

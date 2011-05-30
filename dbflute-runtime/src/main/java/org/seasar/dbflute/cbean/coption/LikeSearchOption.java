@@ -43,7 +43,7 @@ public class LikeSearchOption extends SimpleStringOption {
     protected String _like;
     protected String _escape;
     protected boolean _asOrSplit;
-    protected boolean _suppressSpecialWildCard;
+    protected List<String> _originalWildCardList;
 
     // ===================================================================================
     //                                                                         Rear Option
@@ -248,20 +248,10 @@ public class LikeSearchOption extends SimpleStringOption {
             tmp = filterEscape(tmp, "%");
             tmp = filterEscape(tmp, "_");
 
-            if (isEscapeSpecialWildCard()) {
-                // double-byte wild-cards
-                // Oracle and DB2 treat these symbols as wild-card
-                // but other DBMS ignore unused escape characters
-                // so if-statement does not exist here
-                tmp = filterEscape(tmp, "\uff05");
-                tmp = filterEscape(tmp, "\uff3f");
-
-                // regular expression wild-cards
-                // SQLServer can use regular expression on LikeSearch
-                // so it needs to escape the wild-cards for it
-                // the reason for if-statement is same as double-byte
-                tmp = filterEscape(tmp, "[");
-                tmp = filterEscape(tmp, "]");
+            if (_originalWildCardList != null) {
+                for (String wildCard : _originalWildCardList) {
+                    tmp = filterEscape(tmp, wildCard);
+                }
             }
 
             value = tmp;
@@ -285,15 +275,12 @@ public class LikeSearchOption extends SimpleStringOption {
         return replace(target, wildCard, _escape + wildCard);
     }
 
-    protected boolean isEscapeSpecialWildCard() {
-        return !_suppressSpecialWildCard;
-    }
+    // called after being set to condition-query or parameter-bean
+    // for DBMS that does not ignore an unused escape character
+    //  e.g. Oracle, Apache Derby
 
-    public LikeSearchOption suppressSpecialWildCardEscape() {
-        // called after being set to condition-query
-        // for DBMS that does not ignore an unused escape character
-        //  e.g. Apache Derby
-        _suppressSpecialWildCard = true;
+    public LikeSearchOption acceptOriginalWildCardList(List<String> originalWildCardList) {
+        _originalWildCardList = originalWildCardList;
         return this;
     }
 

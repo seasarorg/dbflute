@@ -15,11 +15,21 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * The DB way of Sybase.
  * @author jflute
  */
-public class WayOfSybase implements DBWay {
+public class WayOfSybase implements DBWay, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -46,6 +56,14 @@ public class WayOfSybase implements DBWay {
     protected String buildIdentityOnOffSql(String tableSqlName, boolean insertOn) {
         final String settingValue = (insertOn ? tableSqlName : "");
         return "set temporary option identity_insert = '" + settingValue + "'";
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    @SuppressWarnings("unchecked")
+    public List<String> getOriginalWildCardList() {
+        return Collections.EMPTY_LIST;
     }
 
     // ===================================================================================

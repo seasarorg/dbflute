@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.util.List;
+
 /**
  * The interface of DB way.
  * @author jflute
@@ -51,6 +53,11 @@ public interface DBWay {
     //                                                                        JDBC Support
     //                                                                        ============
     boolean isScrollableCursorSupported();
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    List<String> getOriginalWildCardList();
 
     // ===================================================================================
     //                                                                   SQLException Info

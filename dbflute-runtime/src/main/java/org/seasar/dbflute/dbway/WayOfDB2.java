@@ -15,11 +15,23 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * The DB way of DB2.
  * @author jflute
  */
-public class WayOfDB2 implements DBWay {
+public class WayOfDB2 implements DBWay, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    protected static final List<String> ORIGNAL_WILD_CARD_LIST = Arrays.asList("\uff05", "\uff3f");
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -33,6 +45,13 @@ public class WayOfDB2 implements DBWay {
     //                                                                       =============
     public String getIdentitySelectSql() {
         return "values IDENTITY_VAL_LOCAL()";
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    public List<String> getOriginalWildCardList() {
+        return ORIGNAL_WILD_CARD_LIST;
     }
 
     // ===================================================================================

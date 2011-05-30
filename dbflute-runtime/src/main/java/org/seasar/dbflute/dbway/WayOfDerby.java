@@ -15,11 +15,21 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * The DB way of Derby.
  * @author jflute
  */
-public class WayOfDerby implements DBWay {
+public class WayOfDerby implements DBWay, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -33,6 +43,14 @@ public class WayOfDerby implements DBWay {
     //                                                                       =============
     public String getIdentitySelectSql() {
         return "values IDENTITY_VAL_LOCAL()";
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    @SuppressWarnings("unchecked")
+    public List<String> getOriginalWildCardList() {
+        return Collections.EMPTY_LIST;
     }
 
     // ===================================================================================

@@ -15,14 +15,23 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * The DB way of MySQL.
  * @author jflute
  */
-public class WayOfMySQL implements DBWay {
+public class WayOfMySQL implements DBWay, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -54,6 +63,14 @@ public class WayOfMySQL implements DBWay {
     //                                                                        ============
     public boolean isScrollableCursorSupported() {
         return true;
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    @SuppressWarnings("unchecked")
+    public List<String> getOriginalWildCardList() {
+        return Collections.EMPTY_LIST;
     }
 
     // ===================================================================================

@@ -15,14 +15,23 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * The DB way of PostgreSQL.
  * @author jflute
  */
-public class WayOfPostgreSQL implements DBWay {
+public class WayOfPostgreSQL implements DBWay, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -36,6 +45,14 @@ public class WayOfPostgreSQL implements DBWay {
     //                                                                       =============
     public String getIdentitySelectSql() {
         return null;
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    @SuppressWarnings("unchecked")
+    public List<String> getOriginalWildCardList() {
+        return Collections.EMPTY_LIST;
     }
 
     // ===================================================================================

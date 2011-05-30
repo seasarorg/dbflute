@@ -15,11 +15,21 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * The DB way of SQLite.
  * @author jflute
  */
-public class WayOfSQLite implements DBWay {
+public class WayOfSQLite implements DBWay, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -33,6 +43,14 @@ public class WayOfSQLite implements DBWay {
     //                                                                       =============
     public String getIdentitySelectSql() {
         return "select last_insert_rowid()";
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    @SuppressWarnings("unchecked")
+    public List<String> getOriginalWildCardList() {
+        return Collections.EMPTY_LIST;
     }
 
     // ===================================================================================

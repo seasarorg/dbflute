@@ -27,6 +27,7 @@ import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
@@ -35,6 +36,7 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.dbway.DBWay;
 
 /**
  * The interface of SQL clause. <br />
@@ -801,4 +803,16 @@ public interface SqlClause {
      * @return The limit of inScope. (If it's zero or minus, it means no limit)
      */
     int getInScopeLimit();
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                   LikeSearch Escape
+    //                                                                   =================
+    void adjustLikeSearchEscape(LikeSearchOption option);
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                               DBWay
+    //                                                                               =====
+    DBWay dbway();
 }

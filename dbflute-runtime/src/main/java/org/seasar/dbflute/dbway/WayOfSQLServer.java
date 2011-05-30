@@ -15,11 +15,23 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * The DB way of SQLServer.
  * @author jflute
  */
-public class WayOfSQLServer implements DBWay {
+public class WayOfSQLServer implements DBWay, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    protected static final List<String> _originalWildCardList = Arrays.asList("[", "]");
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -45,6 +57,13 @@ public class WayOfSQLServer implements DBWay {
 
     protected String buildIdentityOnOffSql(String tableSqlName, boolean insertOn) {
         return "set identity_insert " + tableSqlName + " " + (insertOn ? "on" : "off");
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    public List<String> getOriginalWildCardList() {
+        return _originalWildCardList;
     }
 
     // ===================================================================================

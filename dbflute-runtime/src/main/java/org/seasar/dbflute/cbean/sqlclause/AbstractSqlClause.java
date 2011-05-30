@@ -37,6 +37,7 @@ import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
@@ -2324,14 +2325,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _selectClauseType = _previousSelectClauseType != null ? _previousSelectClauseType : DEFAULT_SELECT_CLAUSE_TYPE;
     }
 
-    // [DBFlute-0.9.4]
-    // ===================================================================================
-    //                                                                       InScope Limit
-    //                                                                       =============
-    public int getInScopeLimit() {
-        return 0; // as default
-    }
-
     // [DBFlute-0.9.8.2]
     // ===================================================================================
     //                                                                      Free Parameter
@@ -2423,6 +2416,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public void setPurpose(HpCBPurpose purpose) {
         _purpose = purpose;
+    }
+
+    // [DBFlute-0.9.4]
+    // ===================================================================================
+    //                                                                       InScope Limit
+    //                                                                       =============
+    public int getInScopeLimit() {
+        return 0; // as default
+    }
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                   LikeSearch Escape
+    //                                                                   =================
+    public void adjustLikeSearchEscape(LikeSearchOption option) {
+        option.acceptOriginalWildCardList(dbway().getOriginalWildCardList());
     }
 
     // ===================================================================================

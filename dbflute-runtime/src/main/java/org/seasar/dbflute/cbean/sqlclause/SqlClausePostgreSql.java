@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import org.seasar.dbflute.dbway.DBWay;
+import org.seasar.dbflute.dbway.WayOfPostgreSQL;
+
 /**
  * SqlClause for PostreSQL.
  * @author jflute
@@ -26,6 +29,9 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+
+    /** The instance of DBWay. */
+    protected final DBWay _dbway = new WayOfPostgreSQL();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -129,4 +135,12 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     //    _lockSqlSuffix = _lockSqlSuffix + " wait " + waitSec;
     //    return this;
     //}
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                               DBWay
+    //                                                                               =====
+    public DBWay dbway() {
+        return _dbway;
+    }
 }

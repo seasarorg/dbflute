@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import org.seasar.dbflute.dbway.DBWay;
+import org.seasar.dbflute.dbway.WayOfFirebird;
+
 /**
  * SqlClause for Firebird.
  * @author jflute
@@ -26,6 +29,9 @@ public class SqlClauseFirebird extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+
+    /** The instance of DBWay. */
+    protected final DBWay _dbway = new WayOfFirebird();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -121,5 +127,13 @@ public class SqlClauseFirebird extends AbstractSqlClause {
      */
     protected String createSqlSuffix() {
         return _lockSqlSuffix;
+    }
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                               DBWay
+    //                                                                               =====
+    public DBWay dbway() {
+        return _dbway;
     }
 }
