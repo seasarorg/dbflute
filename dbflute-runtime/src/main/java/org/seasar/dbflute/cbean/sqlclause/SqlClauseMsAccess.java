@@ -38,7 +38,7 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
     private static final long serialVersionUID = 1L;
 
     /** The instance of DBWay. */
-    protected final DBWay _dbway = new WayOfMSAccess();
+    protected static final DBWay _dbway = new WayOfMSAccess();
 
     // ===================================================================================
     //                                                                         Constructor

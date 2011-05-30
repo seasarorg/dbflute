@@ -16,7 +16,7 @@
 package org.seasar.dbflute.dbway;
 
 import java.io.Serializable;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,6 +30,8 @@ public class WayOfSybase implements DBWay, Serializable {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+
+    protected static final List<String> _originalWildCardList = Arrays.asList("[", "]");
 
     // ===================================================================================
     //                                                                        Sequence Way
@@ -61,9 +63,8 @@ public class WayOfSybase implements DBWay, Serializable {
     // ===================================================================================
     //                                                                 LikeSearch WildCard
     //                                                                 ===================
-    @SuppressWarnings("unchecked")
     public List<String> getOriginalWildCardList() {
-        return Collections.EMPTY_LIST;
+        return _originalWildCardList;
     }
 
     // ===================================================================================

@@ -32,7 +32,7 @@ public class SqlClauseSqlite extends AbstractSqlClause {
     private static final long serialVersionUID = 1L;
 
     /** The instance of DBWay. */
-    protected final DBWay _dbway = new WayOfSQLite();
+    protected static final DBWay _dbway = new WayOfSQLite();
 
     // ===================================================================================
     //                                                                           Attribute

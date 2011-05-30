@@ -32,7 +32,7 @@ public class SqlClauseSybase extends AbstractSqlClause {
     private static final long serialVersionUID = 1L;
 
     /** The instance of DBWay. */
-    protected final DBWay _dbway = new WayOfSybase();
+    protected static final DBWay _dbway = new WayOfSybase();
 
     // ===================================================================================
     //                                                                           Attribute
