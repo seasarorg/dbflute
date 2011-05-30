@@ -112,11 +112,15 @@ public class ${myClassName} : ${glSimpleStringOption} {
         // Escape
         if (_escape != null && _escape.Trim().Length != 0) {
             String tmp = replaceString(value, _escape, _escape + _escape);
-            tmp = replaceString(tmp, "%", _escape + "%");
-            tmp = replaceString(tmp, "_", _escape + "_");
-#if ($database.isDatabaseOracle())
-            tmp = replaceString(tmp, "\uff05", _escape + "\uff05");
-            tmp = replaceString(tmp, "\uff3f", _escape + "\uff3f");
+            tmp = filterEscape(tmp, "%");
+            tmp = filterEscape(tmp, "_");
+#if ($database.isDatabaseOracle() || $database.isDatabaseDB2())
+            tmp = filterEscape(tmp, "\uff05");
+            tmp = filterEscape(tmp, "\uff3f");
+#end
+#if ($database.isDatabaseSQLServer())
+            tmp = filterEscape(tmp, "[");
+            tmp = filterEscape(tmp, "]");
 #end
             value = tmp;
         }
@@ -133,6 +137,10 @@ public class ${myClassName} : ${glSimpleStringOption} {
             String msg = "The like was wrong string: " + _like;
             throw new IllegalStateException(msg);
         }
+    }
+
+    protected String filterEscape(String target, String wildcard) {
+        return replaceString(target, wildcard, _escape + wildcard);
     }
 
     // ===================================================================================
