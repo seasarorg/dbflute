@@ -45,8 +45,10 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;
+import org.seasar.dbflute.twowaysql.node.ForNode;
 import org.seasar.dbflute.twowaysql.node.IfNode;
 import org.seasar.dbflute.twowaysql.node.Node;
+import org.seasar.dbflute.twowaysql.node.ScopeNode;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimeException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
@@ -269,9 +271,12 @@ public class DfParameterBeanResolver {
         return pack;
     }
 
+    // ===================================================================================
+    //                                                                          AutoDetect
+    //                                                                          ==========
     // -----------------------------------------------------
-    //                                            AutoDetect
-    //                                            ----------
+    //                                                  Core
+    //                                                  ----
     protected void processAutoDetect(String sql, Map<String, String> propertyNameTypeMap,
             Map<String, String> propertyNameOptionMap, Set<String> autoDetectedPropertyNameSet) {
         final SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
@@ -289,12 +294,14 @@ public class DfParameterBeanResolver {
                     bindNode);
         } else if (node instanceof IfNode) {
             final IfNode ifNode = (IfNode) node;
-            // *IF comment is unsupported about auto-detection
-            //doProcessAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
+            doProcessAutoDetectIfNode(sql, propertyNameTypeMap, propertyNameOptionMap, ifNode);
 
             // process alternate boolean methods
             // which is supported with auto-detect
             doProcessAlternateBooleanMethodIfNode(sql, ifNode);
+        } else if (node instanceof ForNode) {
+            final ForNode forNode = (ForNode) node;
+            doProcessAutoDetectForNode(sql, propertyNameTypeMap, propertyNameOptionMap, forNode);
         }
         for (int i = 0; i < node.getChildSize(); i++) {
             final Node childNode = node.getChild(i);
@@ -304,6 +311,9 @@ public class DfParameterBeanResolver {
         }
     }
 
+    // -----------------------------------------------------
+    //                                         Bind Variable
+    //                                         -------------
     protected void processAutoDetectBindNode(String sql, Map<String, String> propertyNameTypeMap,
             Map<String, String> propertyNameOptionMap, Set<String> autoDetectedPropertyNameSet,
             BindVariableNode variableNode) {
@@ -312,13 +322,13 @@ public class DfParameterBeanResolver {
         if (testValue == null) {
             return;
         }
-        if (Srl.count(expression, ".") != 1) { // e.g. "pmb.memberIdList.size()"
+        if (!isPmCommentStartsWithPmb(expression)) {
             return;
         }
-        if (!Srl.startsWith(expression, "pmb.")) {
+        if (isPmCommentNestedProperty(expression) || isPmCommentMethodCall(expression)) {
             return;
         }
-        final String propertyName = Srl.substringFirstRear(expression, "pmb.");
+        final String propertyName = substringPmCommentPmbRear(expression);
         if (Srl.equalsIgnoreCase(propertyName, "OutsideSqlPath", "EntityType", "ProcedureName", "EscapeStatement",
                 "CalledBySelect", "FetchStartIndex", "FetchSize", "FetchPageNumber", "PageStartIndex", "PageEndIndex",
                 "SafetyMaxResultSize", "ParameterMap", "OrderByClause", "OrderByComponent")) {
@@ -487,39 +497,194 @@ public class DfParameterBeanResolver {
         return null;
     }
 
-    // *IF comment is unsupported about auto-detection
-    //protected void doProcessAutoDetectIfNode(String sql, Map<String, String> propertyNameTypeMap,
-    //        Map<String, String> propertyNameOptionMap, IfNode ifNode) {
-    //    final String expression = ifNode.getExpression();
-    //    if (Srl.count(expression, ".") != 1) { // e.g. "pmb.memberIdList.size()"
-    //        return;
-    //    }
-    //    if (Srl.containsAny(expression, "=", "<>", "!=", ">", "<")) {
-    //        return; // unknown (type)
-    //    }
-    //    if (Srl.contains(expression, "()")) {
-    //        return; // method type
-    //    }
-    //    // only Boolean type is detected
-    //    final String propertyName = Srl.substringFirstRear(expression, "pmb.").trim();
-    //    propertyNameTypeMap.put(propertyName, "Boolean");
-    //}
+    // -----------------------------------------------------
+    //                                            If Comment
+    //                                            ----------
+    protected void doProcessAutoDetectIfNode(String sql, Map<String, String> propertyNameTypeMap,
+            Map<String, String> propertyNameOptionMap, IfNode ifNode) {
+        final String expression = ifNode.getExpression();
+        final List<String> elementList = Srl.splitList(expression, " ");
+        for (int i = 0; i < elementList.size(); i++) {
+            final String element = elementList.get(i);
+            if (!isPmCommentStartsWithPmb(element)) {
+                continue;
+            }
+            if (isPmCommentNestedProperty(element) || isPmCommentMethodCall(element)) {
+                continue;
+            }
+            final String propertyName = substringPmCommentPmbRear(element);
+            if (propertyNameTypeMap.containsKey(propertyName)) {
+                // because of priority low (bind variable is given priority over if-comment)
+                continue;
+            }
+            final int nextIndex = i + 1;
+            if (elementList.size() <= nextIndex) { // last now
+                propertyNameTypeMap.put(propertyName, "Boolean");
+            } else { // next exists
+                final String nextElement = elementList.get(nextIndex);
+                if (!Srl.equalsPlain(nextElement, getIfCommentAvailableOperands())) {
+                    continue; // e.g. '&&' or '||'
+                }
+                final int nextNextIndex = i + 2;
+                if (elementList.size() > nextNextIndex) { // next next exists
+                    final String nextNextElement = elementList.get(nextNextIndex);
+                    if (isPmCommentStartsWithPmb(nextNextElement)) {
+                        continue;
+                    }
+                    // treats as testValue
+                    final String propertyType = derivePropertyTypeFromTestValue(nextNextElement);
+                    propertyNameTypeMap.put(propertyName, propertyType);
+                }
+            }
+        }
+    }
 
     protected void doProcessAlternateBooleanMethodIfNode(String sql, IfNode ifNode) {
         final String expression = ifNode.getExpression().trim();
-        if (Srl.count(expression, ".") != 1) { // e.g. "pmb.memberIdList.size()"
+        if (isPmCommentNestedProperty(expression) || !isPmCommentMethodCall(expression)) {
             return;
         }
-        if (Srl.containsAny(expression, "=", "<>", "!=", ">", "<")) {
+        if (Srl.containsAny(expression, getIfCommentAvailableOperands())) {
             return; // unknown (type)
         }
-        if (!Srl.endsWith(expression, "()")) {
-            return; // no method type
-        }
         // pmb.foo() or !pmb.foo() here
-        String methodName = Srl.substringFirstRear(expression, "pmb.").trim(); // -> foo()
+        String methodName = substringPmCommentPmbRear(expression); // -> foo()
         methodName = Srl.substringLastFront(methodName, "()"); // -> foo
         _alternateBooleanMethodNameSet.add(methodName); // filter later
+    }
+
+    protected String[] getIfCommentAvailableOperands() {
+        return new String[] { "=", "<>", "!=", "<", ">", "<=", ">=" };
+    }
+
+    // -----------------------------------------------------
+    //                                           For Comment
+    //                                           -----------
+    protected void doProcessAutoDetectForNode(String sql, Map<String, String> propertyNameTypeMap,
+            Map<String, String> propertyNameOptionMap, ForNode forNode) {
+        final String expression = forNode.getExpression();
+        if (!isPmCommentStartsWithPmb(expression)) {
+            return;
+        }
+        final String propertyName = substringPmCommentPmbRear(expression);
+        if (propertyNameTypeMap.containsKey(propertyName)) {
+            // because of priority low (bind variable is given priority over for-comment)
+            return;
+        }
+        final DetectedPropertyInfo detected = analyzeForNodeElementType(forNode, propertyName);
+        if (detected != null) {
+            final String propertyType = switchPlainTypeNameIfCSharp(detected.getPropertyType());
+            propertyNameTypeMap.put(propertyName, propertyType);
+            final String propertyOption = detected.getPropertyOption();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(propertyOption)) {
+                propertyNameOptionMap.put(propertyName, propertyOption);
+            }
+        }
+    }
+
+    protected DetectedPropertyInfo analyzeForNodeElementType(Node node, String propertyName) {
+        if (isPmCommentNestedProperty(propertyName) || isPmCommentMethodCall(propertyName)) {
+            return null;
+        }
+        DetectedPropertyInfo detected = null;
+        for (int i = 0; i < node.getChildSize(); i++) {
+            final Node childNode = node.getChild(i);
+            if (childNode instanceof BindVariableNode) {
+                final BindVariableNode bindNode = (BindVariableNode) childNode;
+                final String expression = bindNode.getExpression();
+                if (!isPmCommentEqualsCurrent(expression)) {
+                    continue;
+                }
+                if (isPmCommentNestedProperty(expression) || isPmCommentMethodCall(expression)) {
+                    continue;
+                }
+                // /*#current*/ here
+                final String testValue = bindNode.getTestValue();
+                if (testValue == null) {
+                    continue;
+                }
+                final String propertyType = derivePropertyTypeFromTestValue(testValue);
+                final String propertyOption = derivePropertyOptionFromTestValue(testValue);
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(propertyType)) {
+                    detected = new DetectedPropertyInfo();
+                    detected.setPropertyType("List<" + propertyType + ">");
+                    detected.setPropertyOption(propertyOption);
+                }
+            } else if (childNode instanceof ForNode) {
+                final ForNode nestedNode = (ForNode) childNode;
+                final String expression = nestedNode.getExpression();
+                if (!isPmCommentStartsWithCurrent(expression)) {
+                    continue;
+                }
+                // /*FOR #current.xxx*/ here
+                final String nestedForPropName = substringPmCommentCurrentRear(expression);
+                detected = analyzeForNodeElementType(nestedNode, nestedForPropName); // recursive call
+                if (detected != null) {
+                    detected.setPropertyType("List<" + detected.getPropertyType() + ">");
+                }
+            } else if (childNode instanceof ScopeNode) { // IF, Begin, First, ...
+                detected = analyzeForNodeElementType(childNode, propertyName); // recursive call
+            }
+            if (detected != null) {
+                break;
+            }
+        }
+        if (detected == null) {
+            return null;
+        }
+        return detected;
+    }
+
+    protected static class DetectedPropertyInfo {
+        protected String _propertyType;
+        protected String _propertyOption;
+
+        public String getPropertyType() {
+            return _propertyType;
+        }
+
+        public void setPropertyType(String propertyType) {
+            this._propertyType = propertyType;
+        }
+
+        public String getPropertyOption() {
+            return _propertyOption;
+        }
+
+        public void setPropertyOption(String propertyOption) {
+            this._propertyOption = propertyOption;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         Common Helper
+    //                                         -------------
+    protected boolean isPmCommentStartsWithPmb(String expression) {
+        return Srl.startsWith(expression, "pmb."); // e.g. "pmb.foo"
+    }
+
+    protected String substringPmCommentPmbRear(String expression) {
+        return Srl.substringFirstRear(expression, "pmb.").trim();
+    }
+
+    protected boolean isPmCommentEqualsCurrent(String expression) {
+        return Srl.equalsPlain(expression, ForNode.CURRENT_VARIABLE); // e.g. "#current"
+    }
+
+    protected boolean isPmCommentStartsWithCurrent(String expression) {
+        return Srl.startsWith(expression, ForNode.CURRENT_VARIABLE + "."); // e.g. "#current.foo"
+    }
+
+    protected String substringPmCommentCurrentRear(String expression) {
+        return Srl.substringFirstRear(expression, ForNode.CURRENT_VARIABLE + ".").trim();
+    }
+
+    protected boolean isPmCommentNestedProperty(String expression) {
+        return Srl.count(expression, ".") > 1; // e.g. "pmb.foo.bar"
+    }
+
+    protected boolean isPmCommentMethodCall(String expression) {
+        return Srl.endsWith(expression, "()"); // e.g. "pmb.isPaging()"
     }
 
     // ===================================================================================
