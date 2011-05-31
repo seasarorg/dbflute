@@ -211,17 +211,19 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     protected void showTargetSqlFileInformation(List<File> sqlFileList) {
         super.showTargetSqlFileInformation(sqlFileList);
         if (_nonTargetSqlCount > 0) {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("Non target SQL count: " + _nonTargetSqlCount);
-            _log.info("- - - - - - - - - -/");
-            _log.info(" ");
+            final StringBuilder sb = new StringBuilder();
+            sb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            sb.append(ln()).append("Non-target SQL count: ").append(_nonTargetSqlCount);
+            sb.append(ln()).append("- - - - - - - - - -/");
+            _log.info(sb.toString());
         }
         final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
         if (specifiedSqlFile != null) {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("Specified SQL file: " + specifiedSqlFile);
-            _log.info("- - - - - - - - - -/");
-            _log.info(" ");
+            final StringBuilder sb = new StringBuilder();
+            sb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            sb.append(ln()).append("Specified SQL file: ").append(specifiedSqlFile);
+            sb.append(ln()).append("- - - - - - - - - -/");
+            _log.info(sb.toString());
         }
     }
 

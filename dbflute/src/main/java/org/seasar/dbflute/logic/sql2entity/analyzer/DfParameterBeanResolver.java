@@ -46,6 +46,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;
 import org.seasar.dbflute.twowaysql.node.ForNode;
+import org.seasar.dbflute.twowaysql.node.IfCommentEvaluator;
 import org.seasar.dbflute.twowaysql.node.IfNode;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.twowaysql.node.ScopeNode;
@@ -502,10 +503,12 @@ public class DfParameterBeanResolver {
     //                                            ----------
     protected void doProcessAutoDetectIfNode(String sql, Map<String, String> propertyNameTypeMap,
             Map<String, String> propertyNameOptionMap, IfNode ifNode) {
-        final String expression = ifNode.getExpression();
+        final String ifCommentBooleanType = "boolean";
+        final String expression = ifNode.getExpression().trim(); // trim it just in case
         final List<String> elementList = Srl.splitList(expression, " ");
         for (int i = 0; i < elementList.size(); i++) {
-            final String element = elementList.get(i);
+            // boolean-not mark unused here so remove it at first
+            final String element = substringBooleanNotRear(elementList.get(i));
             if (!isPmCommentStartsWithPmb(element)) {
                 continue;
             }
@@ -519,33 +522,42 @@ public class DfParameterBeanResolver {
             }
             final int nextIndex = i + 1;
             if (elementList.size() <= nextIndex) { // last now
-                propertyNameTypeMap.put(propertyName, "Boolean");
-            } else { // next exists
-                final String nextElement = elementList.get(nextIndex);
-                if (!Srl.equalsPlain(nextElement, getIfCommentAvailableOperands())) {
-                    continue; // e.g. '&&' or '||'
-                }
-                final int nextNextIndex = i + 2;
-                if (elementList.size() > nextNextIndex) { // next next exists
-                    final String nextNextElement = elementList.get(nextNextIndex);
-                    if (isPmCommentStartsWithPmb(nextNextElement)) {
-                        continue;
-                    }
-                    // treats as testValue
-                    final String propertyType = derivePropertyTypeFromTestValue(nextNextElement);
-                    propertyNameTypeMap.put(propertyName, propertyType);
-                }
+                propertyNameTypeMap.put(propertyName, ifCommentBooleanType);
+                continue;
             }
+            // next exists here
+            final String nextElement = elementList.get(nextIndex);
+            if (isIfCommentStatementConnector(nextElement)) { // e.g. '&&' or '||'
+                propertyNameTypeMap.put(propertyName, ifCommentBooleanType);
+                continue;
+            }
+            if (!isIfCommentStatementOperand(nextElement)) { // no way (wrong syntax)
+                continue;
+            }
+            final int nextNextIndex = i + 2;
+            if (elementList.size() <= nextNextIndex) { // no way (wrong syntax)
+                continue;
+            }
+            // next next exists
+            final String nextNextElement = elementList.get(nextNextIndex);
+            if (isPmCommentStartsWithPmb(nextNextElement)) { // e.g. pmb.foo == pmb.bar
+                continue;
+            }
+            // using-value statement here e.g. pmb.foo == 'foo'
+            // condition value is treated as testValue to derive
+            final String propertyType = derivePropertyTypeFromTestValue(nextNextElement);
+            propertyNameTypeMap.put(propertyName, propertyType);
         }
     }
 
     protected void doProcessAlternateBooleanMethodIfNode(String sql, IfNode ifNode) {
-        final String expression = ifNode.getExpression().trim();
+        final String expression = ifNode.getExpression().trim(); // trim it just in case
+        if (Srl.containsAny(expression, getIfCommentConnectors())
+                || Srl.containsAny(expression, getIfCommentOperands())) {
+            return; // unknown (type)
+        }
         if (isPmCommentNestedProperty(expression) || !isPmCommentMethodCall(expression)) {
             return;
-        }
-        if (Srl.containsAny(expression, getIfCommentAvailableOperands())) {
-            return; // unknown (type)
         }
         // pmb.foo() or !pmb.foo() here
         String methodName = substringPmCommentPmbRear(expression); // -> foo()
@@ -553,8 +565,24 @@ public class DfParameterBeanResolver {
         _alternateBooleanMethodNameSet.add(methodName); // filter later
     }
 
-    protected String[] getIfCommentAvailableOperands() {
-        return new String[] { "=", "<>", "!=", "<", ">", "<=", ">=" };
+    protected String[] getIfCommentConnectors() {
+        return IfCommentEvaluator.getConnectors();
+    }
+
+    protected String[] getIfCommentOperands() {
+        return IfCommentEvaluator.getOperands();
+    }
+
+    protected boolean isIfCommentStatementConnector(String target) {
+        return IfCommentEvaluator.isConnector(target);
+    }
+
+    protected boolean isIfCommentStatementOperand(String target) {
+        return IfCommentEvaluator.isOperand(target);
+    }
+
+    protected String substringBooleanNotRear(String expression) {
+        return IfCommentEvaluator.substringBooleanNotRear(expression);
     }
 
     // -----------------------------------------------------
