@@ -57,31 +57,63 @@ public class IfCommentEvaluator {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final String AND = " && ";
-    private static final String OR = " || ";
-    private static final String EQUAL = " == ";
-    private static final String NOT_EQUAL = " != ";
-    private static final String GREATER_THAN = " > ";
-    private static final String LESS_THAN = " < ";
-    private static final String GREATER_EQUAL = " >= ";
-    private static final String LESS_EQUAL = " <= ";
-    private static final String BOOLEAN_NOT = "!";
-    private static final String METHOD_SUFFIX = "()";
+    protected static final String AND = " && ";
+    protected static final String OR = " || ";
+    protected static final String EQUAL = " == ";
+    protected static final String NOT_EQUAL = " != ";
+    protected static final String GREATER_THAN = " > ";
+    protected static final String LESS_THAN = " < ";
+    protected static final String GREATER_EQUAL = " >= ";
+    protected static final String LESS_EQUAL = " <= ";
+    protected static final String BOOLEAN_NOT = "!";
+    protected static final String METHOD_SUFFIX = "()";
+
+    protected static final String[] CONNECTORS = new String[] { AND.trim(), OR.trim() };
+    protected static final String[] OPERANDS = new String[] { EQUAL.trim(), NOT_EQUAL.trim(), GREATER_THAN.trim(),
+            LESS_THAN.trim(), GREATER_EQUAL.trim(), LESS_EQUAL.trim() };
+
+    public static String[] getConnectors() {
+        return CONNECTORS;
+    }
+
+    public static String[] getOperands() {
+        return OPERANDS;
+    }
+
+    public static boolean isConnector(String target) {
+        return Srl.equalsPlain(target, CONNECTORS);
+    }
+
+    public static boolean isOperand(String target) {
+        return Srl.equalsPlain(target, OPERANDS);
+    }
+
+    public static boolean isNotStatement(String target) {
+        return Srl.startsWith(target, BOOLEAN_NOT);
+    }
+
+    public static boolean isMethodStatement(String target) {
+        return Srl.endsWith(target, METHOD_SUFFIX);
+    }
+
+    public static String substringBooleanNotRear(String target) {
+        return Srl.substringFirstRear(target, BOOLEAN_NOT);
+    }
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private ParameterFinder _finder;
-    private String _expression;
-    private String _specifiedSql;
-    private LoopInfo _loopInfo;
+    protected final ParameterFinder _finder;
+    protected final String _expression;
+    protected final String _specifiedSql;
+    protected final LoopInfo _loopInfo;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public IfCommentEvaluator(ParameterFinder finder, String expression, String specifiedSql, LoopInfo loopInfo) {
         this._finder = finder;
-        this._expression = expression;
+        this._expression = expression != null ? expression.trim() : null;
         this._specifiedSql = specifiedSql;
         this._loopInfo = loopInfo;
     }
@@ -91,7 +123,6 @@ public class IfCommentEvaluator {
     //                                                                              ======
     public boolean evaluate() {
         assertExpression();
-        _expression = _expression.trim();
         if (_expression.contains(AND)) {
             final List<String> splitList = splitList(_expression, AND);
             for (String booleanClause : splitList) {
@@ -733,19 +764,19 @@ public class IfCommentEvaluator {
     }
 
     protected void throwIfCommentNotBooleanResultException() {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The IF comment was not boolean!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your IF comment property." + ln();
-        msg = msg + ln();
-        msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+        br.addNotice("The IF comment was not boolean!");
+        br.addItem("Advice");
+        br.addElement("Please confirm your IF comment property.");
+        br.addElement("IF-statement result should be boolean type.");
+        br.addElement("(and also the result should not be null)");
+        br.addItem("IF Comment");
+        br.addElement(_expression);
+        br.addItem("Specified ParameterBean");
+        br.addElement(getDisplayParameterBean());
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
         throw new IfCommentNotBooleanResultException(msg);
     }
 
