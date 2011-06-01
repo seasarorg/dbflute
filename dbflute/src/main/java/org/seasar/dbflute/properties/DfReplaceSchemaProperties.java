@@ -1,8 +1,10 @@
 package org.seasar.dbflute.properties;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +61,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                      Base Directory
     //                                                                      ==============
-    public String getPlaySqlDirectory() {
+    public String getPlaySqlDir() {
         return getPlaySqlDirPureName(); // path relative to DBFlute client
     }
 
@@ -81,12 +83,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return "replace-schema";
     }
 
-    public List<File> getReplaceSchemaSqlFileList() {
-        return doGetSchemaSqlFileList(getPlaySqlDirectory(), getReplaceSchemaSqlTitle());
+    public List<File> getReplaceSchemaSqlFileList(String sqlRootDir) {
+        return doGetSchemaSqlFileList(sqlRootDir, getReplaceSchemaSqlTitle());
     }
 
-    public Map<String, File> getReplaceSchemaSqlFileMap() {
-        return doGetSchemaSqlFileMap(getReplaceSchemaSqlFileList());
+    public Map<String, File> getReplaceSchemaSqlFileMap(String sqlRootDir) {
+        return doGetSchemaSqlFileMap(getReplaceSchemaSqlFileList(sqlRootDir));
     }
 
     public Map<String, File> doGetSchemaSqlFileMap(List<File> sqlFileList) {
@@ -116,31 +118,34 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                          Take Finally
     //                                          ------------
     protected String getTakeFinallySqlFile() {
-        return getPlaySqlDirectory() + "/take-finally.sql";
+        return getPlaySqlDir() + "/take-finally.sql";
     }
 
     public String getTakeFinallySqlTitle() {
         return "take-finally";
     }
 
-    public List<File> getTakeFinallySqlFileList() {
-        final String targetDir = getPlaySqlDirectory();
-        return doGetSchemaSqlFileList(targetDir, getTakeFinallySqlTitle());
+    public List<File> getTakeFinallySqlFileList(String sqlRootDir) {
+        return doGetSchemaSqlFileList(sqlRootDir, getTakeFinallySqlTitle());
     }
 
-    public Map<String, File> getTakeFinallySqlFileMap() {
-        return doGetSchemaSqlFileMap(getTakeFinallySqlFileList());
+    public Map<String, File> getTakeFinallySqlFileMap(String sqlRootDir) {
+        return doGetSchemaSqlFileMap(getTakeFinallySqlFileList(sqlRootDir));
     }
 
     // ===================================================================================
     //                                                                         Schema Data
     //                                                                         ===========
+    public String getSchemaDataDir(String baseDir) {
+        return baseDir + "/data";
+    }
+
     public String getCommonDataDir(String baseDir, String typeName) {
-        return baseDir + "/data/common/" + typeName;
+        return getSchemaDataDir(baseDir) + "/common/" + typeName;
     }
 
     public String getLoadTypeDataDir(String baseDir, String loadType, String typeName) {
-        return baseDir + "/data/" + loadType + "/" + typeName;
+        return getSchemaDataDir(baseDir) + "/" + loadType + "/" + typeName;
     }
 
     protected List<File> doGetCommonDataFileList(String baseDir, String typeName) { // contains data-prop
@@ -176,7 +181,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // non-ApplicationPlaySql below
 
     protected String getMainCurrentLoadTypeDataDir() {
-        final String playSqlDirectory = getPlaySqlDirectory();
+        final String playSqlDirectory = getPlaySqlDir();
         final String dataLoadingType = getDataLoadingType();
         return playSqlDirectory + "/data/" + dataLoadingType;
     }
@@ -209,65 +214,29 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return getMainCurrentLoadTypeDataDir() + "/xls";
     }
 
-    // basically for AlterCheck below
+    public List<File> findSchemaDataAllList(String sqlRootDir) { // contains data-prop
+        final File sqlRoot = new File(sqlRootDir);
+        final List<File> fileList = new ArrayList<File>();
+        doFindHierarchyFileList(fileList, sqlRoot);
+        return fileList;
+    }
 
-    protected Map<String, File> _schemaDataMap;
-
-    public Map<String, File> getSchemaDataAllMap() { // contains data-prop
-        if (_schemaDataMap != null) {
-            return _schemaDataMap;
+    protected void doFindHierarchyFileList(final List<File> fileList, File baseDir) {
+        if (baseDir.getName().startsWith(".")) { // closed directory
+            return; // e.g. .svn
         }
-        final Map<String, File> dataMap = new LinkedHashMap<String, File>();
-        setupSchemaDataMap(dataMap, "common/firstxls", getCommonFirstXlsDataList());
-        setupSchemaDataMap(dataMap, "common/csv", getCommonCsvDataList());
-        setupSchemaDataMap(dataMap, "common/tsv", getCommonTsvDataList());
-        setupSchemaDataMap(dataMap, "common/xls", getCommonXlsDataList());
-        setupSchemaDataMap(dataMap, "loadtype/firstxls", getLoadTypeFirstXlsDataList());
-        setupSchemaDataMap(dataMap, "loadtype/csv", getLoadTypeCsvDataList());
-        setupSchemaDataMap(dataMap, "loadtype/tsv", getLoadTypeTsvDataList());
-        setupSchemaDataMap(dataMap, "loadtype/xls", getLoadTypeXlsDataList());
-        _schemaDataMap = dataMap;
-        return _schemaDataMap;
-    }
-
-    protected void setupSchemaDataMap(Map<String, File> dataMap, String keyBase, List<File> dataFileList) {
-        for (File dataFile : dataFileList) {
-            dataMap.put(keyBase + "/" + dataFile.getName(), dataFile);
+        final File[] listFiles = baseDir.listFiles(new FileFilter() {
+            public boolean accept(File subFile) {
+                if (subFile.isDirectory()) {
+                    doFindHierarchyFileList(fileList, subFile);
+                    return false;
+                }
+                return true;
+            }
+        });
+        if (listFiles != null) {
+            fileList.addAll(Arrays.asList(listFiles));
         }
-    }
-
-    // contains data-prop below
-
-    public List<File> getCommonFirstXlsDataList() {
-        return doGetCommonDataFileList(getPlaySqlDirectory(), DfLoadedDataInfo.FIRSTXLS_FILE_TYPE);
-    }
-
-    public List<File> getCommonXlsDataList() {
-        return doGetCommonDataFileList(getPlaySqlDirectory(), DfLoadedDataInfo.XLS_FILE_TYPE);
-    }
-
-    public List<File> getCommonTsvDataList() {
-        return doGetCommonDataFileList(getPlaySqlDirectory(), DfLoadedDataInfo.TSV_FILE_TYPE);
-    }
-
-    public List<File> getCommonCsvDataList() {
-        return doGetCommonDataFileList(getPlaySqlDirectory(), DfLoadedDataInfo.CSV_FILE_TYPE);
-    }
-
-    public List<File> getLoadTypeFirstXlsDataList() {
-        return doGetLoadTypeDataFileList(getPlaySqlDirectory(), DfLoadedDataInfo.FIRSTXLS_FILE_TYPE);
-    }
-
-    public List<File> getLoadTypeXlsDataList() {
-        return doGetLoadTypeDataFileList(getPlaySqlDirectory(), DfLoadedDataInfo.XLS_FILE_TYPE);
-    }
-
-    public List<File> getLoadTypeTsvDataList() {
-        return doGetLoadTypeDataFileList(getPlaySqlDirectory(), DfLoadedDataInfo.TSV_FILE_TYPE);
-    }
-
-    public List<File> getLoadTypeCsvDataList() {
-        return doGetLoadTypeDataFileList(getPlaySqlDirectory(), DfLoadedDataInfo.CSV_FILE_TYPE);
     }
 
     // ===================================================================================
@@ -643,8 +612,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                           Migration
     //                                                                           =========
-    protected String getMigrationDirectory() {
-        final String playSqlDirectory = getPlaySqlDirectory();
+    // -----------------------------------------------------
+    //                                        Basic Resource
+    //                                        --------------
+    protected String getMigrationDir() {
+        final String playSqlDirectory = getPlaySqlDir();
         return playSqlDirectory + "/" + getMigrationDirPureName();
     }
 
@@ -652,35 +624,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return "migration";
     }
 
-    public String getMigrationAlterNGMark() {
-        return getMigrationAlterDirectory() + "/alter-NG.dfmark";
-    }
-
-    public boolean hasMigrationAlterNGMark() {
-        return new File(getMigrationAlterNGMark()).exists();
-    }
-
-    public String getMigrationCreateNGMark() {
-        return getMigrationCreateDirectory() + "/create-NG.dfmark";
-    }
-
-    public boolean hasMigrationCreateNGMark() {
-        return new File(getMigrationCreateNGMark()).exists();
-    }
-
-    public String getMigrationPreviousNGMark() {
-        return getMigrationDirectory() + "/previous-NG.dfmark";
-    }
-
-    public boolean hasMigrationPreviousNGMark() {
-        return new File(getMigrationPreviousNGMark()).exists();
-    }
-
     // -----------------------------------------------------
     //                                        Alter Resource
     //                                        --------------
     public String getMigrationAlterDirectory() {
-        return getMigrationDirectory() + "/alter";
+        return getMigrationDir() + "/alter";
     }
 
     protected List<File> _migrationAlterSqlFileList;
@@ -707,155 +655,123 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // -----------------------------------------------------
-    //                                       Create Resource
-    //                                       ---------------
-    public String getMigrationCreateDirectory() {
-        return getMigrationDirectory() + "/" + getMigrationCreateDirPureName();
+    //                                     Previous Resource
+    //                                     -----------------
+    public String getMigrationPreviousDir() {
+        return getMigrationDir() + "/previous";
     }
 
-    public String getMigrationCreateDirPureName() {
-        return "create";
+    public boolean hasMigrationPreviousResource() {
+        return !getMigrationPreviousReplaceSchemaSqlFileList().isEmpty();
     }
 
-    public boolean hasMigrationCreateSqlResource() {
-        if (!getMigrationReplaceSchemaSqlFileList().isEmpty()) {
-            return true;
-        }
-        if (!getMigrationTakeFinallySqlFileList().isEmpty()) {
-            return true;
-        }
-        if (!getMigrationSchemaDataAllMap().isEmpty()) {
-            return true;
-        }
-        return false;
-    }
+    protected List<File> _migrationPreviousReplaceSchemaSqlFileList;
 
-    public String getMigrationCreateDirSymbol() {
-        return getMigrationDirPureName() + "/" + getMigrationCreateDirPureName();
-    }
-
-    protected List<File> _migrationReplaceSchemaSqlFileList;
-
-    public List<File> getMigrationReplaceSchemaSqlFileList() {
-        if (_migrationReplaceSchemaSqlFileList != null) {
-            return _migrationReplaceSchemaSqlFileList;
+    public List<File> getMigrationPreviousReplaceSchemaSqlFileList() {
+        if (_migrationPreviousReplaceSchemaSqlFileList != null) {
+            return _migrationPreviousReplaceSchemaSqlFileList;
         }
-        final String targetDir = getMigrationCreateDirectory();
+        final String targetDir = getMigrationPreviousDir();
         final String sqlTitle = getReplaceSchemaSqlTitle();
-        _migrationReplaceSchemaSqlFileList = doGetSchemaSqlFileList(targetDir, sqlTitle);
-        return _migrationReplaceSchemaSqlFileList;
+        _migrationPreviousReplaceSchemaSqlFileList = doGetSchemaSqlFileList(targetDir, sqlTitle);
+        return _migrationPreviousReplaceSchemaSqlFileList;
     }
 
-    public Map<String, File> getMigrationReplaceSchemaSqlFileMap() {
-        return doGetSchemaSqlFileMap(getMigrationReplaceSchemaSqlFileList());
+    public Map<String, File> getMigrationPreviousReplaceSchemaSqlFileMap() {
+        return doGetSchemaSqlFileMap(getMigrationPreviousReplaceSchemaSqlFileList());
     }
 
-    protected List<File> _migrationTakeFinallySqlFileList;
+    protected List<File> _migrationPreviousTakeFinallySqlFileList;
 
-    public List<File> getMigrationTakeFinallySqlFileList() {
-        if (_migrationTakeFinallySqlFileList != null) {
-            return _migrationTakeFinallySqlFileList;
+    public List<File> getMigrationPreviousTakeFinallySqlFileList() {
+        if (_migrationPreviousTakeFinallySqlFileList != null) {
+            return _migrationPreviousTakeFinallySqlFileList;
         }
-        final String targetDir = getMigrationCreateDirectory();
+        final String targetDir = getMigrationPreviousDir();
         final String sqlTitle = getTakeFinallySqlTitle();
-        _migrationTakeFinallySqlFileList = doGetSchemaSqlFileList(targetDir, sqlTitle);
-        return _migrationTakeFinallySqlFileList;
+        _migrationPreviousTakeFinallySqlFileList = doGetSchemaSqlFileList(targetDir, sqlTitle);
+        return _migrationPreviousTakeFinallySqlFileList;
     }
 
-    public Map<String, File> getMigrationTakeFinallySqlFileMap() {
-        return doGetSchemaSqlFileMap(getMigrationTakeFinallySqlFileList());
-    }
-
-    protected Map<String, File> _migrationSchemaDataMap;
-
-    public Map<String, File> getMigrationSchemaDataAllMap() { // contains data-prop
-        if (_migrationSchemaDataMap != null) {
-            return _migrationSchemaDataMap;
-        }
-        final Map<String, File> dataMap = new LinkedHashMap<String, File>();
-        setupSchemaDataMap(dataMap, "common/firstxls", getMigrationCommonFirstXlsDataList());
-        setupSchemaDataMap(dataMap, "common/csv", getMigrationCommonCsvDataList());
-        setupSchemaDataMap(dataMap, "common/tsv", getMigrationCommonTsvDataList());
-        setupSchemaDataMap(dataMap, "common/xls", getMigrationCommonXlsDataList());
-        setupSchemaDataMap(dataMap, "loadtype/firstxls", getMigrationLoadTypeFirstXlsDataList());
-        setupSchemaDataMap(dataMap, "loadtype/csv", getMigrationLoadTypeCsvDataList());
-        setupSchemaDataMap(dataMap, "loadtype/tsv", getMigrationLoadTypeTsvDataList());
-        setupSchemaDataMap(dataMap, "loadtype/xls", getMigrationLoadTypeXlsDataList());
-        _migrationSchemaDataMap = dataMap;
-        return _migrationSchemaDataMap;
-    }
-
-    // contains data-prop below
-
-    public List<File> getMigrationCommonFirstXlsDataList() {
-        return doGetCommonDataFileList(getMigrationCreateDirectory(), DfLoadedDataInfo.FIRSTXLS_FILE_TYPE);
-    }
-
-    public List<File> getMigrationCommonXlsDataList() {
-        return doGetCommonDataFileList(getMigrationCreateDirectory(), DfLoadedDataInfo.XLS_FILE_TYPE);
-    }
-
-    public List<File> getMigrationCommonTsvDataList() {
-        return doGetCommonDataFileList(getMigrationCreateDirectory(), DfLoadedDataInfo.TSV_FILE_TYPE);
-    }
-
-    public List<File> getMigrationCommonCsvDataList() {
-        return doGetCommonDataFileList(getMigrationCreateDirectory(), DfLoadedDataInfo.CSV_FILE_TYPE);
-    }
-
-    public List<File> getMigrationLoadTypeFirstXlsDataList() {
-        return doGetLoadTypeDataFileList(getMigrationCreateDirectory(), DfLoadedDataInfo.FIRSTXLS_FILE_TYPE);
-    }
-
-    public List<File> getMigrationLoadTypeXlsDataList() {
-        return doGetLoadTypeDataFileList(getMigrationCreateDirectory(), DfLoadedDataInfo.XLS_FILE_TYPE);
-    }
-
-    public List<File> getMigrationLoadTypeTsvDataList() {
-        return doGetLoadTypeDataFileList(getMigrationCreateDirectory(), DfLoadedDataInfo.TSV_FILE_TYPE);
-    }
-
-    public List<File> getMigrationLoadTypeCsvDataList() {
-        return doGetLoadTypeDataFileList(getMigrationCreateDirectory(), DfLoadedDataInfo.CSV_FILE_TYPE);
+    public Map<String, File> getMigrationPreviousTakeFinallySqlFileMap() {
+        return doGetSchemaSqlFileMap(getMigrationPreviousTakeFinallySqlFileList());
     }
 
     // -----------------------------------------------------
     //                                      History Resource
     //                                      ----------------
-    public String getMigrationHistoryDirectory() {
-        final String baseDirectory = getMigrationDirectory();
+    public String getMigrationHistoryDir() {
+        final String baseDirectory = getMigrationDir();
         return baseDirectory + "/history";
     }
 
     // -----------------------------------------------------
     //                                       Schema Resource
     //                                       ---------------
-    public String getMigrationSchemaXml() {
-        final String baseDirectory = getMigrationDirectory();
+    public String getMigrationAlterCheckSchemaXml() {
+        final String baseDirectory = getMigrationDir();
         return baseDirectory + "/schema/migration-schema.xml";
     }
 
     public String getMigrationAlterCheckResultDiff() {
-        final String baseDirectory = getMigrationDirectory();
+        final String baseDirectory = getMigrationDir();
         return baseDirectory + "/schema/alter-check-result.diffmap";
     }
 
     public String getMigrationChangeOutputResultDiff() {
-        final String baseDirectory = getMigrationDirectory();
+        final String baseDirectory = getMigrationDir();
         return baseDirectory + "/schema/change-output-result.diffmap";
     }
 
     // -----------------------------------------------------
-    //                                    Temporary Resource
-    //                                    ------------------
-    public String getMigrationTemporaryDirectory() {
-        final String baseDirectory = getMigrationDirectory();
-        return baseDirectory + "/tmp";
+    //                                         Mark Resource
+    //                                         -------------
+    public String getMigrationSavePreviousMark() {
+        return doGetMigrationMark("save-previous.dfmark");
     }
 
-    public String getMigrationTemporaryPreviousDirectory() {
-        final String baseDirectory = getMigrationTemporaryDirectory();
-        return baseDirectory + "/previous";
+    public boolean hasMigrationSavePreviousMark() {
+        return doHasMigrationMark(getMigrationSavePreviousMark());
+    }
+
+    public String getMigrationPreviousOKMark() {
+        return doGetMigrationMark("previous-OK.dfmark");
+    }
+
+    public boolean hasMigrationPreviousOKMark() {
+        return doHasMigrationMark(getMigrationPreviousOKMark());
+    }
+
+    public String getMigrationReplaceNGMark() {
+        return doGetMigrationMark("replace-NG.dfmark");
+    }
+
+    public boolean hasMigrationReplaceNGMark() {
+        return doHasMigrationMark(getMigrationReplaceNGMark());
+    }
+
+    public String getMigrationAlterNGMark() {
+        return doGetMigrationMark("alter-NG.dfmark");
+    }
+
+    public boolean hasMigrationAlterNGMark() {
+        return doHasMigrationMark(getMigrationAlterNGMark());
+    }
+
+    public String getMigrationPreviousNGMark() {
+        return doGetMigrationMark("previous-NG.dfmark");
+    }
+
+    public boolean hasMigrationPreviousNGMark() {
+        return doHasMigrationMark(getMigrationPreviousNGMark());
+    }
+
+    protected String doGetMigrationMark(String pureName) {
+        return getMigrationDir() + "/" + pureName;
+    }
+
+    protected boolean doHasMigrationMark(String markPath) {
+        return new File(markPath).exists();
     }
 
     // ===================================================================================

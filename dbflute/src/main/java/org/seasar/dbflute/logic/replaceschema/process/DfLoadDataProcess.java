@@ -26,7 +26,6 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWriting
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSQLServer;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSybase;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.util.Srl;
 
 public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
@@ -51,6 +50,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                        Basic Resource
     //                                        --------------
+    protected final String _sqlRootDir;
     protected final DataSource _dataSource;
     protected final UnifiedSchema _mainSchema;
 
@@ -67,14 +67,15 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfLoadDataProcess(DataSource dataSource, UnifiedSchema mainSchema) {
+    protected DfLoadDataProcess(String sqlRootDir, DataSource dataSource, UnifiedSchema mainSchema) {
+        _sqlRootDir = sqlRootDir;
         _dataSource = dataSource;
         _mainSchema = mainSchema;
     }
 
-    public static DfLoadDataProcess createAsCore(DataSource dataSource) {
+    public static DfLoadDataProcess createAsCore(String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfLoadDataProcess(dataSource, mainSchema);
+        return new DfLoadDataProcess(sqlRootDir, dataSource, mainSchema);
     }
 
     // ===================================================================================
@@ -115,32 +116,28 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected String getDataLoadingType() {
-        return getMyProperties().getDataLoadingType();
+        return getReplaceSchemaProperties().getDataLoadingType();
     }
 
     public boolean isLoggingInsertSql() {
-        return getMyProperties().isLoggingInsertSql();
+        return getReplaceSchemaProperties().isLoggingInsertSql();
     }
 
     public boolean isSuppressBatchUpdate() {
-        return getMyProperties().isSuppressBatchUpdate();
-    }
-
-    protected DfReplaceSchemaProperties getMyProperties() {
-        return DfBuildProperties.getInstance().getReplaceSchemaProperties();
+        return getReplaceSchemaProperties().isSuppressBatchUpdate();
     }
 
     // --------------------------------------------
     //                               Delimiter Data
     //                               --------------
     protected void writeDbFromDelimiterFileAsCommonData(String fileType, String delimter) {
-        final String dir = getMyProperties().getPlaySqlDirectory();
+        final String dir = _sqlRootDir;
         final String path = doGetCommonDataDirectoryPath(dir, fileType);
         writeDbFromDelimiterFile(COMMON_LOAD_TYPE, path, fileType, delimter);
     }
 
     protected void writeDbFromDelimiterFileAsLoadingTypeData(String fileType, String delimter) {
-        final String dir = getMyProperties().getPlaySqlDirectory();
+        final String dir = _sqlRootDir;
         final String envType = getDataLoadingType();
         final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, fileType);
         writeDbFromDelimiterFile(getDataLoadingType(), path, fileType, delimter);
@@ -272,9 +269,8 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void writeDbFromXls(XlsWritingResource res) {
-        final String repPlaySqlDir = getMyProperties().getPlaySqlDirectory();
-        final String appPlaySqlDir = getMyProperties().getApplicationPlaySqlDirectory();
-        final String dir = res.isApplication() ? appPlaySqlDir : repPlaySqlDir;
+        final String appPlaySqlDir = getReplaceSchemaProperties().getApplicationPlaySqlDirectory();
+        final String dir = res.isApplication() ? appPlaySqlDir : _sqlRootDir;
         if (Srl.is_Null_or_TrimmedEmpty(dir)) {
             return;
         }
@@ -300,7 +296,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         handler.setUnifiedSchema(_mainSchema); // for getting database meta data
         handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
-        handler.setSkipSheet(getMyProperties().getSkipSheet());
+        handler.setSkipSheet(getReplaceSchemaProperties().getSkipSheet());
         handler.setDataWritingInterceptor(getDataWritingInterceptor());
         _xlsDataHandlerImpl = handler;
         return _xlsDataHandlerImpl;
@@ -324,11 +320,11 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     //                                    Directory
     //                                    ---------
     protected String doGetCommonDataDirectoryPath(String dir, String typeName) {
-        return getMyProperties().getCommonDataDir(dir, typeName);
+        return getReplaceSchemaProperties().getCommonDataDir(dir, typeName);
     }
 
     protected String doGetLoadingTypeDataDirectoryPath(String dir, String envType, String typeName) {
-        return getMyProperties().getLoadTypeDataDir(dir, envType, typeName);
+        return getReplaceSchemaProperties().getLoadTypeDataDir(dir, envType, typeName);
     }
 
     // ===================================================================================

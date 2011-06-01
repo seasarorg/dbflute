@@ -1,6 +1,5 @@
 package org.seasar.dbflute.task;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -43,7 +42,6 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                           =========
     protected boolean _lazyConnection = false;
     protected DfReplaceSchemaFinalInfo _replaceSchemaFinalInfo;
-    protected DfReplaceSchemaFinalInfo _rollbackSchemaFinalInfo;
     protected DfCreateSchemaFinalInfo _createSchemaFinalInfo;
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
@@ -90,62 +88,25 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected void doExecute() {
         if (isAlterCheck()) {
             processAlterCheck();
-        } else if (isChangeOutput()) {
-            processChangeOutput();
         } else {
             processMain();
         }
     }
 
     protected boolean isAlterCheck() {
-        if (hasMigrationPreviousNGMark()) {
-            _log.info("*Found previous-NG mark, which supresses AlterCheck process");
-            return false;
-        } else {
-            return hasMigrationAlterSqlResource();
-        }
-    }
-
-    protected boolean isChangeOutput() {
-        if (hasMigrationPreviousNGMark()) {
-            _log.info("*Found previous-NG mark, which supresses ChangeOutput process");
-            return false;
-        } else {
-            return hasMigrationCreateSqlResource();
-        }
-    }
-
-    protected void processMain() {
-        executeCoreProcess();
-        closePreviousNGIfExists(); // after core process without error
-    }
-
-    protected void closePreviousNGIfExists() {
-        if (hasMigrationPreviousNGMark()) {
-            final String ngMark = getMigrationPreviousNGMark();
-            final File previousNGMark = new File(ngMark);
-            if (previousNGMark.exists()) {
-                _log.info("...Deleting previous-NG mark: " + ngMark);
-                previousNGMark.delete();
-                refreshResources();
-            }
-        }
+        return hasMigrationSavePreviousMark() || hasMigrationAlterSqlResource();
     }
 
     protected void processAlterCheck() {
-        doProcessAlterCheck(false);
+        doProcessAlterCheck();
     }
 
-    protected void processChangeOutput() {
-        doProcessAlterCheck(true);
-    }
-
-    protected void doProcessAlterCheck(boolean changeOutput) {
+    protected void doProcessAlterCheck() {
         final DfAlterCheckProcess process = createAlterCheckProcess();
         try {
-            if (changeOutput) {
-                _alterSchemaFinalInfo = process.outputChange();
-            } else {
+            if (hasMigrationSavePreviousMark()) {
+                _alterSchemaFinalInfo = process.savePrevious();
+            } else { // has alter-SQL resources
                 _alterSchemaFinalInfo = process.checkAlter();
             }
             _alterSchemaFinalInfo.throwAlterCheckExceptionIfExists();
@@ -158,40 +119,46 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected DfAlterCheckProcess createAlterCheckProcess() {
         return DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
-            public void play() {
-                executeCoreProcess();
-            }
-
-            public void rollback() {
-                executeRollbackProcess();
+            public void play(String sqlRootDirectory) {
+                executeCoreProcess(sqlRootDirectory);
             }
         });
+    }
+
+    protected void processMain() {
+        executeCoreProcess(getPlaySqlDir());
     }
 
     // ===================================================================================
     //                                                                        Core Process
     //                                                                        ============
-    protected void executeCoreProcess() {
-        doExecuteCoreProcess(false);
+    protected void executeCoreProcess(String sqlRootDir) {
+        doExecuteCoreProcess(sqlRootDir);
     }
 
-    protected void executeRollbackProcess() {
-        doExecuteCoreProcess(true);
-    }
-
-    protected void doExecuteCoreProcess(boolean rollback) {
+    protected void doExecuteCoreProcess(String sqlRootDir) {
         try {
-            createSchema();
-            loadData();
-            takeFinally();
+            createSchema(sqlRootDir);
+            loadData(sqlRootDir);
+            takeFinally(sqlRootDir);
         } finally {
-            setupReplaceSchemaFinalInfo(rollback);
+            setupReplaceSchemaFinalInfo();
         }
-        handleSchemaContinuedFailure(rollback);
+        handleSchemaContinuedFailure();
     }
 
-    protected void createSchema() {
-        final DfCreateSchemaProcess process = DfCreateSchemaProcess.createAsCore(new CreatingDataSourcePlayer() {
+    protected void createSchema(String sqlRootDir) {
+        final DfCreateSchemaProcess process = createCreateSchemaProcess(sqlRootDir);
+        _createSchemaFinalInfo = process.execute();
+    }
+
+    protected DfCreateSchemaProcess createCreateSchemaProcess(String sqlRootDir) {
+        final CreatingDataSourcePlayer player = createCreatingDataSourcePlayer();
+        return DfCreateSchemaProcess.createAsCore(sqlRootDir, player, _lazyConnection);
+    }
+
+    protected CreatingDataSourcePlayer createCreatingDataSourcePlayer() {
+        return new CreatingDataSourcePlayer() {
             public DataSource callbackGetDataSource() {
                 return getDataSource();
             }
@@ -199,12 +166,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             public void callbackSetupDataSource() throws SQLException {
                 setupDataSource();
             }
-        }, _lazyConnection);
-        _createSchemaFinalInfo = process.execute();
+        };
     }
 
-    protected void loadData() {
-        final DfLoadDataProcess process = DfLoadDataProcess.createAsCore(getDataSource());
+    protected void loadData(String sqlRootDir) {
+        final DfLoadDataProcess process = createLoadDataProcess(sqlRootDir);
         _loadDataFinalInfo = process.execute();
         final RuntimeException loadEx = _loadDataFinalInfo.getLoadEx();
         if (loadEx != null) { // high priority exception
@@ -212,8 +178,12 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         }
     }
 
-    protected void takeFinally() {
-        final DfTakeFinallyProcess process = DfTakeFinallyProcess.createAsCore(getDataSource());
+    protected DfLoadDataProcess createLoadDataProcess(String sqlRootDir) {
+        return DfLoadDataProcess.createAsCore(sqlRootDir, getDataSource());
+    }
+
+    protected void takeFinally(String sqlRootDir) {
+        final DfTakeFinallyProcess process = createTakeFinallyProcess(sqlRootDir);
         _takeFinallyFinalInfo = process.execute();
         final DfTakeFinallyAssertionFailureException assertionEx = _takeFinallyFinalInfo.getAssertionEx();
         if (assertionEx != null) { // high priority exception
@@ -221,25 +191,20 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         }
     }
 
-    protected void setupReplaceSchemaFinalInfo(boolean rollback) {
-        if (rollback) {
-            _rollbackSchemaFinalInfo = createReplaceSchemaFinalInfo();
-        } else { // main
-            _replaceSchemaFinalInfo = createReplaceSchemaFinalInfo();
-        }
+    protected DfTakeFinallyProcess createTakeFinallyProcess(String sqlRootDir) {
+        return DfTakeFinallyProcess.createAsCore(sqlRootDir, getDataSource());
+    }
+
+    protected void setupReplaceSchemaFinalInfo() {
+        _replaceSchemaFinalInfo = createReplaceSchemaFinalInfo();
     }
 
     protected DfReplaceSchemaFinalInfo createReplaceSchemaFinalInfo() {
         return new DfReplaceSchemaFinalInfo(_createSchemaFinalInfo, _loadDataFinalInfo, _takeFinallyFinalInfo);
     }
 
-    protected void handleSchemaContinuedFailure(boolean rollback) { // means continued errors
-        final DfReplaceSchemaFinalInfo finalInfo;
-        if (rollback) {
-            finalInfo = _rollbackSchemaFinalInfo;
-        } else {
-            finalInfo = _replaceSchemaFinalInfo;
-        }
+    protected void handleSchemaContinuedFailure() { // means continued errors
+        final DfReplaceSchemaFinalInfo finalInfo = _replaceSchemaFinalInfo;
         if (finalInfo.isCreateSchemaFailure()) {
             String msg = "Failed to create schema (Look at the final info)";
             throw new DfCreateSchemaFailureException(msg);
@@ -259,16 +224,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected String buildReplaceSchemaFinalMessage() {
-        final DfReplaceSchemaFinalInfo finalInfo; // null allowed
-        final boolean rollbackFailure;
-        if (_rollbackSchemaFinalInfo != null && _rollbackSchemaFinalInfo.hasFailure()) {
-            // failures of roll-back are prior here (means previous-NG exists)
-            finalInfo = _rollbackSchemaFinalInfo;
-            rollbackFailure = true;
-        } else {
-            finalInfo = _replaceSchemaFinalInfo;
-            rollbackFailure = false;
-        }
+        final DfReplaceSchemaFinalInfo finalInfo = _replaceSchemaFinalInfo; // null allowed
         final StringBuilder sb = new StringBuilder();
         boolean firstDone = false;
 
@@ -332,11 +288,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             }
         }
 
-        if (rollbackFailure) { // roll-back in AlterCheck
-            sb.append(ln()).append("    * * * * * * * * * * *");
-            sb.append(ln()).append("    * Rollback Failure  *");
-            sb.append(ln()).append("    * * * * * * * * * * *");
-        } else if (alterFailure) { // alter or create in AlterCheck
+        if (alterFailure) { // alter or create in AlterCheck
             sb.append(ln()).append("    * * * * * * * * * * *");
             sb.append(ln()).append("    * Migration Failure *");
             sb.append(ln()).append("    * * * * * * * * * * *");
@@ -367,19 +319,15 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         return getProperties().getReplaceSchemaProperties();
     }
 
-    public String getMigrationPreviousNGMark() {
-        return getReplaceSchemaProperties().getMigrationPreviousNGMark();
-    }
-
-    public boolean hasMigrationPreviousNGMark() {
-        return getReplaceSchemaProperties().hasMigrationPreviousNGMark();
+    protected String getPlaySqlDir() {
+        return getReplaceSchemaProperties().getPlaySqlDir();
     }
 
     public boolean hasMigrationAlterSqlResource() {
         return getReplaceSchemaProperties().hasMigrationAlterSqlResource();
     }
 
-    public boolean hasMigrationCreateSqlResource() {
-        return getReplaceSchemaProperties().hasMigrationCreateSqlResource();
+    public boolean hasMigrationSavePreviousMark() {
+        return getReplaceSchemaProperties().hasMigrationSavePreviousMark();
     }
 }

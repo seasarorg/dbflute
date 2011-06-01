@@ -47,6 +47,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                        Basic Resource
     //                                        --------------
+    protected final String _sqlRootDir;
     protected final DataSource _dataSource;
     protected final UnifiedSchema _mainSchema;
 
@@ -56,14 +57,15 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfTakeFinallyProcess(DataSource dataSource, UnifiedSchema mainSchema) {
+    protected DfTakeFinallyProcess(String sqlRootDir, DataSource dataSource, UnifiedSchema mainSchema) {
+        _sqlRootDir = sqlRootDir;
         _dataSource = dataSource;
         _mainSchema = mainSchema;
     }
 
-    public static DfTakeFinallyProcess createAsCore(DataSource dataSource) {
+    public static DfTakeFinallyProcess createAsCore(String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfTakeFinallyProcess(dataSource, mainSchema);
+        return new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema);
     }
 
     // ===================================================================================
@@ -157,7 +159,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
 
     protected List<File> getTakeFinallySqlFileList() {
         final List<File> fileList = new ArrayList<File>();
-        fileList.addAll(getReplaceSchemaProperties().getTakeFinallySqlFileList());
+        fileList.addAll(getReplaceSchemaProperties().getTakeFinallySqlFileList(_sqlRootDir));
         fileList.addAll(getReplaceSchemaProperties().getAppcalitionTakeFinallySqlFileList());
         return fileList;
     }

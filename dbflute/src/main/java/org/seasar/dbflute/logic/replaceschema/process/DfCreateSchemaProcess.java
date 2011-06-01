@@ -48,6 +48,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                        Basic Resource
     //                                        --------------
+    protected final String _sqlRootDir;
     protected final CreatingDataSourcePlayer _dataSourcePlayer;
 
     // -----------------------------------------------------
@@ -62,13 +63,15 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfCreateSchemaProcess(CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
+    protected DfCreateSchemaProcess(String sqlRootDir, CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
+        _sqlRootDir = sqlRootDir;
         _dataSourcePlayer = dataSourcePlayer;
         _lazyConnection = lazyConnection;
     }
 
-    public static DfCreateSchemaProcess createAsCore(CreatingDataSourcePlayer dataSourcePlayer, boolean lazyConnection) {
-        return new DfCreateSchemaProcess(dataSourcePlayer, lazyConnection);
+    public static DfCreateSchemaProcess createAsCore(String sqlRootDir, CreatingDataSourcePlayer dataSourcePlayer,
+            boolean lazyConnection) {
+        return new DfCreateSchemaProcess(sqlRootDir, dataSourcePlayer, lazyConnection);
     }
 
     public static interface CreatingDataSourcePlayer {
@@ -397,7 +400,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
 
     protected List<File> getReplaceSchemaSqlFileList() {
         final List<File> fileList = new ArrayList<File>();
-        fileList.addAll(getReplaceSchemaProperties().getReplaceSchemaSqlFileList());
+        fileList.addAll(getReplaceSchemaProperties().getReplaceSchemaSqlFileList(_sqlRootDir));
         fileList.addAll(getReplaceSchemaProperties().getApplicationReplaceSchemaSqlFileList());
         return fileList;
     }

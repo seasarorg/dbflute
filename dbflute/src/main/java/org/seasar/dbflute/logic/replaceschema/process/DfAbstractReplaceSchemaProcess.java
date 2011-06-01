@@ -83,7 +83,7 @@ public class DfAbstractReplaceSchemaProcess {
     }
 
     protected static DfReplaceSchemaProperties getReplaceSchemaProperties() {
-        return DfBuildProperties.getInstance().getReplaceSchemaProperties();
+        return getProperties().getReplaceSchemaProperties();
     }
 
     protected static DfBasicProperties getBasicProperties() {
