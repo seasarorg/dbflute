@@ -11,7 +11,7 @@ import org.seasar.dbflute.exception.DfCreateSchemaFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyFailureException;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAbstractSchemaTaskFinalInfo;
-import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterSchemaFinalInfo;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo;
@@ -45,7 +45,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected DfCreateSchemaFinalInfo _createSchemaFinalInfo;
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
-    protected DfAlterSchemaFinalInfo _alterSchemaFinalInfo;
+    protected DfAlterCheckFinalInfo _alterCheckFinalInfo;
 
     // ===================================================================================
     //                                                                          DataSource
@@ -105,11 +105,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final DfAlterCheckProcess process = createAlterCheckProcess();
         try {
             if (hasMigrationSavePreviousMark()) {
-                _alterSchemaFinalInfo = process.savePrevious();
+                _alterCheckFinalInfo = process.savePrevious();
             } else { // has alter-SQL resources
-                _alterSchemaFinalInfo = process.checkAlter();
+                _alterCheckFinalInfo = process.checkAlter();
             }
-            _alterSchemaFinalInfo.throwAlterCheckExceptionIfExists();
+            _alterCheckFinalInfo.throwAlterCheckExceptionIfExists();
         } finally {
             // because the alter check process
             // may output alter NG mark file
@@ -231,14 +231,14 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         // AlterSchema
         boolean alterFailure = false;
         {
-            final DfAlterSchemaFinalInfo alterSchemaFinalInfo = _alterSchemaFinalInfo;
-            if (alterSchemaFinalInfo != null && alterSchemaFinalInfo.isValidInfo()) {
+            final DfAlterCheckFinalInfo alterCheckFinalInfo = _alterCheckFinalInfo;
+            if (alterCheckFinalInfo != null && alterCheckFinalInfo.isValidInfo()) {
                 if (firstDone) {
                     sb.append(ln()).append(ln());
                 }
                 firstDone = true;
-                buildSchemaTaskContents(sb, alterSchemaFinalInfo);
-                alterFailure = alterSchemaFinalInfo.isFailure();
+                buildSchemaTaskContents(sb, alterCheckFinalInfo);
+                alterFailure = alterCheckFinalInfo.isFailure();
             }
         }
 
