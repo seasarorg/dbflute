@@ -742,12 +742,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return doHasMigrationMark(getMigrationPreviousOKMark());
     }
 
-    public String getMigrationReplaceNGMark() {
-        return doGetMigrationMark("replace-NG.dfmark");
+    public String getMigrationNextNGMark() {
+        return doGetMigrationMark("next-NG.dfmark");
     }
 
-    public boolean hasMigrationReplaceNGMark() {
-        return doHasMigrationMark(getMigrationReplaceNGMark());
+    public boolean hasMigrationNextNGMark() {
+        return doHasMigrationMark(getMigrationNextNGMark());
     }
 
     public String getMigrationAlterNGMark() {

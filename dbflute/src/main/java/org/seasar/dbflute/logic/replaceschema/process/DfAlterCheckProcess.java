@@ -305,8 +305,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(getAlterCheckRollbackSchemaFailureNotice());
         br.addItem("Advice");
-        br.addElement("The AlterCheck requires that resources for previous schema are correct.");
-        br.addElement("So you should prepare the previous DDL and data again.");
+        br.addElement("The AlterCheck requires that PreviousDDL are correct.");
+        br.addElement("So you should prepare the PreviousDDL again.");
         final String msg = br.buildExceptionMessage();
         throw new DfAlterCheckRollbackSchemaFailureException(msg, e);
     }
@@ -415,7 +415,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected String getAlterCheckAlterSqlFailureNotice() {
-        return "Failed to execute the alter SQL statements.";
+        return "Failed to execute the AlterDDL statements.";
     }
 
     // ===================================================================================
@@ -431,7 +431,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         try {
             playMainProcess();
         } catch (RuntimeException threwLater) {
-            markReplaceNG(getAlterCheckReplaceSchemaFailureNotice());
+            markNextNG(getAlterCheckReplaceSchemaFailureNotice());
             setupAlterCheckReplaceSchemaFailureException(finalInfo, threwLater);
         }
     }
@@ -440,17 +440,17 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         _coreProcessPlayer.play(getPlaySqlDir());
     }
 
-    protected void markReplaceNG(String notice) {
-        final String ngMark = getMigrationReplaceNGMark();
+    protected void markNextNG(String notice) {
+        final String ngMark = getMigrationNextNGMark();
         try {
             final File markFile = new File(ngMark);
             if (!markFile.exists()) {
-                _log.info("...Marking replace-NG: " + ngMark);
+                _log.info("...Marking next-NG: " + ngMark);
                 markFile.createNewFile();
                 writeNotice(markFile, notice);
             }
         } catch (IOException e) {
-            String msg = "Failed to create a file for replace-NG mark: " + ngMark;
+            String msg = "Failed to create a file for next-NG mark: " + ngMark;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -459,9 +459,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(getAlterCheckReplaceSchemaFailureNotice());
         br.addItem("Advice");
-        br.addElement("Make sure your replace-SQL or data for ReplaceSchema are correct,");
+        br.addElement("Make sure your NextDDL or data for ReplaceSchema are correct,");
         br.addElement("resources just below 'playsql' directory, are correct.");
-        br.addElement("and after that, execute ReplaceSchema again to check alter-SQL");
+        br.addElement("and after that, execute ReplaceSchema again to check AlterDDL");
         String msg = br.buildExceptionMessage();
         finalInfo.setReplaceSchemaFailureEx(new DfAlterCheckReplaceSchemaFailureException(msg, e));
         finalInfo.setFailure(true);
@@ -469,7 +469,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected String getAlterCheckReplaceSchemaFailureNotice() {
-        return "Failed to replace the schema using replace-SQL.";
+        return "Failed to replace the schema using NextDDL.";
     }
 
     // ===================================================================================
@@ -538,11 +538,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected String getAlterDiffNotice() {
-        return "Found the differences between alter SQL and create SQL.";
+        return "Found the differences between AlterDDL and NextDDL.";
     }
 
     protected void setupFixedAlterAdviceMessage(ExceptionMessageBuilder br) {
-        br.addElement("Make sure your alter-SQL are correct,");
+        br.addElement("Make sure your AlterDDL are correct,");
         br.addElement("and after that, execute ReplaceSchema again.");
     }
 
@@ -602,7 +602,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                       Mark Resource
     //                                                                       =============
     protected void deleteAllNGMark() {
-        deleteReplaceNGMark();
+        deleteNextNGMark();
         deleteAlterNGMark();
         deletePreviousNGMark();
     }
@@ -612,9 +612,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         deleteFile(new File(previousOKMark), "...Deleting the previous-OK mark");
     }
 
-    protected void deleteReplaceNGMark() {
-        final String replaceNGMark = getMigrationReplaceNGMark();
-        deleteFile(new File(replaceNGMark), "...Deleting the replace-NG mark");
+    protected void deleteNextNGMark() {
+        final String replaceNGMark = getMigrationNextNGMark();
+        deleteFile(new File(replaceNGMark), "...Deleting the next-NG mark");
     }
 
     protected void deleteAlterNGMark() {
@@ -623,8 +623,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void deletePreviousNGMark() {
-        final String replaceNGMark = getMigrationPreviousNGMark();
-        deleteFile(new File(replaceNGMark), "...Deleting the previous-NG mark");
+        final String previousNGMark = getMigrationPreviousNGMark();
+        deleteFile(new File(previousNGMark), "...Deleting the previous-NG mark");
     }
 
     protected void deleteDiffResult() {
@@ -800,8 +800,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().getMigrationPreviousOKMark();
     }
 
-    protected String getMigrationReplaceNGMark() {
-        return getReplaceSchemaProperties().getMigrationReplaceNGMark();
+    protected String getMigrationNextNGMark() {
+        return getReplaceSchemaProperties().getMigrationNextNGMark();
     }
 
     protected String getMigrationAlterNGMark() {
