@@ -47,7 +47,9 @@ import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
+import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
@@ -364,7 +366,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
 
         /**
-         * Select the maximum value. <br />
+         * Select the maximum value.
          * <pre>
          * memberBhv.scalarSelect(Date.class).max(new ScalarQuery(MemberCB cb) {
          *     cb.specify().columnMemberBirthday(); // the required specification of target column
@@ -375,12 +377,28 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * @return The maximum value. (NullAllowed)
          */
         public RESULT max(ScalarQuery<CB> scalarQuery) {
-            assertObjectNotNull("scalarQuery", scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.MAX);
+            return max(scalarQuery, null);
         }
 
         /**
-         * Select the minimum value. <br />
+         * Select the maximum value with function conversion option.
+         * <pre>
+         * memberBhv.scalarSelect(Date.class).max(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().columnMemberBirthday(); // the required specification of target column
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); // query as you like it
+         * }, new ScalarSelectOption().coalesce(0));
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @param option The option for scalar. (NullAllowed)
+         * @return The maximum value. (NullAllowed)
+         */
+        public RESULT max(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertObjectNotNull("scalarQuery", scalarQuery);
+            return exec(scalarQuery, SqlClause.SelectClauseType.MAX, option);
+        }
+
+        /**
+         * Select the minimum value.
          * <pre>
          * memberBhv.scalarSelect(Date.class).min(new ScalarQuery(MemberCB cb) {
          *     cb.specify().columnMemberBirthday(); // the required specification of target column
@@ -391,12 +409,28 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * @return The minimum value. (NullAllowed)
          */
         public RESULT min(ScalarQuery<CB> scalarQuery) {
-            assertObjectNotNull("scalarQuery", scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.MIN);
+            return min(scalarQuery, null);
         }
 
         /**
-         * Select the summary value. <br />
+         * Select the minimum value with function conversion option.
+         * <pre>
+         * memberBhv.scalarSelect(Date.class).min(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().columnMemberBirthday(); // the required specification of target column
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); // query as you like it
+         * }, new ScalarSelectOption().coalesce(0));
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @param option The option for scalar. (NullAllowed)
+         * @return The minimum value. (NullAllowed)
+         */
+        public RESULT min(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertObjectNotNull("scalarQuery", scalarQuery);
+            return exec(scalarQuery, SqlClause.SelectClauseType.MIN, option);
+        }
+
+        /**
+         * Select the summary value.
          * <pre>
          * purchaseBhv.scalarSelect(Integer.class).sum(new ScalarQuery(PurchaseCB cb) {
          *     cb.specify().columnPurchaseCount(); // the required specification of target column
@@ -407,12 +441,28 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * @return The summary value. (NullAllowed)
          */
         public RESULT sum(ScalarQuery<CB> scalarQuery) {
-            assertObjectNotNull("scalarQuery", scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.SUM);
+            return sum(scalarQuery, null);
         }
 
         /**
-         * Select the average value. <br />
+         * Select the summary value with function conversion option.
+         * <pre>
+         * purchaseBhv.scalarSelect(Integer.class).sum(new ScalarQuery(PurchaseCB cb) {
+         *     cb.specify().columnPurchaseCount(); // the required specification of target column
+         *     cb.query().setPurchaseDatetime_GreaterEqual(date); // query as you like it
+         * }, new ScalarSelectOption().coalesce(0));
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @param option The option for scalar. (NullAllowed)
+         * @return The summary value. (NullAllowed)
+         */
+        public RESULT sum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertObjectNotNull("scalarQuery", scalarQuery);
+            return exec(scalarQuery, SqlClause.SelectClauseType.SUM, option);
+        }
+
+        /**
+         * Select the average value.
          * <pre>
          * purchaseBhv.scalarSelect(Integer.class).avg(new ScalarQuery(PurchaseCB cb) {
          *     cb.specify().columnPurchaseCount(); // the required specification of target column
@@ -423,23 +473,62 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * @return The average value. (NullAllowed)
          */
         public RESULT avg(ScalarQuery<CB> scalarQuery) {
-            assertObjectNotNull("scalarQuery", scalarQuery);
-            return exec(scalarQuery, SqlClause.SelectClauseType.AVG);
+            return avg(scalarQuery, null);
         }
 
-        protected RESULT exec(ScalarQuery<CB> scalarQuery, SqlClause.SelectClauseType selectClauseType) {
+        /**
+         * Select the average value.
+         * <pre>
+         * purchaseBhv.scalarSelect(Integer.class).avg(new ScalarQuery(PurchaseCB cb) {
+         *     cb.specify().columnPurchaseCount(); // the required specification of target column
+         *     cb.query().setPurchaseDatetime_GreaterEqual(date); // query as you like it
+         * }, new ScalarSelectOption().coalesce(0));
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @param option The option for scalar. (NullAllowed)
+         * @return The average value. (NullAllowed)
+         */
+        public RESULT avg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertObjectNotNull("scalarQuery", scalarQuery);
+            return exec(scalarQuery, SqlClause.SelectClauseType.AVG, option);
+        }
+
+        protected RESULT exec(ScalarQuery<CB> scalarQuery, SqlClause.SelectClauseType selectClauseType,
+                ScalarSelectOption option) {
             assertObjectNotNull("scalarQuery", scalarQuery);
             assertObjectNotNull("selectClauseType", selectClauseType);
             assertObjectNotNull("conditionBean", _conditionBean);
             assertObjectNotNull("resultType", _resultType);
             scalarQuery.query(_conditionBean);
+            setupTargetColumnInfo(option);
+            setupScalarSelectOption(option);
             assertScalarSelectRequiredSpecifyColumn();
             return invoke(createSelectScalarCBCommand(_conditionBean, _resultType, selectClauseType));
         }
 
+        protected void setupTargetColumnInfo(ScalarSelectOption option) {
+            if (option == null) {
+                return;
+            }
+            final SqlClause sqlClause = _conditionBean.getSqlClause();
+            ColumnInfo columnInfo = sqlClause.getSpecifiedColumnInfoAsOne();
+            if (columnInfo != null) {
+                columnInfo = sqlClause.getSpecifiedDerivingColumnInfoAsOne();
+            }
+            option.xsetTargetColumnInfo(columnInfo);
+        }
+
+        protected void setupScalarSelectOption(ScalarSelectOption option) {
+            if (option != null) {
+                _conditionBean.xacceptScalarSelectOption(option);
+                _conditionBean.localCQ().xregisterParameterOption(option);
+            }
+        }
+
         protected void assertScalarSelectRequiredSpecifyColumn() {
-            final String columnName = _conditionBean.getSqlClause().getSpecifiedColumnDbNameAsOne();
-            final String subQuery = _conditionBean.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
+            final SqlClause sqlClause = _conditionBean.getSqlClause();
+            final String columnName = sqlClause.getSpecifiedColumnDbNameAsOne();
+            final String subQuery = sqlClause.getSpecifiedDerivingSubQueryAsOne();
             // should be specified is an only one object (column or sub-query)
             if ((columnName != null && subQuery != null) || (columnName == null && subQuery == null)) {
                 throwScalarSelectInvalidColumnSpecificationException();

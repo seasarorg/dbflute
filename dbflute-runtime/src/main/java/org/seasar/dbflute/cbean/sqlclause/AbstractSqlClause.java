@@ -38,6 +38,7 @@ import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
@@ -229,6 +230,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     /** Does it suppress decription for select columns? */
     protected boolean _suppressSelectColumnDecryption;
+
+    // -----------------------------------------------------
+    //                                         Scalar Select
+    //                                         -------------
+    /** The option for ScalarSelect. */
+    protected ScalarSelectOption _scalarSelectOption;
 
     // -----------------------------------------------------
     //                                          Purpose Type
@@ -676,24 +683,32 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final ColumnInfo columnInfo = getSpecifiedColumnInfoAsOne();
         if (columnSqlName != null) {
             final String valueExp = aliasName + "." + columnSqlName;
-            return "select " + function + "(" + decryptSelect(columnInfo, valueExp) + ") as " + columnAlias;
+            final String functionExp = doBuildFunctionExp(function, decryptSelect(columnInfo, valueExp));
+            return "select " + functionExp + " as " + columnAlias;
         }
         final String subQuery = getSpecifiedDerivingSubQueryAsOne();
         if (subQuery != null) {
             if (hasUnionQuery()) {
                 final String valueExp = aliasName + "." + columnAlias;
-                return "select " + function + "(" + decryptSelect(columnInfo, valueExp) + ")";
+                return "select " + doBuildFunctionExp(function, decryptSelect(columnInfo, valueExp));
             } else {
+                // adjusts alias definition target (move to function's scope)
                 final String aliasDef = " as " + columnAlias;
                 final StringBuilder sb = new StringBuilder();
-                sb.append("select ").append(function).append("(");
-                // adjusts alias definition target (move to function's scope)
-                sb.append(replace(subQuery, aliasDef, ")" + aliasDef));
+                final String pureSubQuery = Srl.substringLastFront(subQuery, aliasDef);
+                final String aliasDefRear = Srl.substringLastRear(subQuery, aliasDef); // just in case
+                final String functionExp = doBuildFunctionExp(function, pureSubQuery);
+                sb.append("select ").append(functionExp).append(aliasDef).append(aliasDefRear);
                 return sb.toString();
             }
         }
         String msg = "Not found specifed column for scalar: function=" + function;
         throw new IllegalStateException(msg); // basically no way (checked before)
+    }
+
+    protected String doBuildFunctionExp(String function, String columnExp) {
+        final String functionExp = function + "(" + columnExp + ")";
+        return _scalarSelectOption != null ? _scalarSelectOption.filterFunction(functionExp) : functionExp;
     }
 
     // -----------------------------------------------------
@@ -2404,6 +2419,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected String decryptSelect(ColumnInfo columnInfo, String valueExp) {
         return !_suppressSelectColumnDecryption ? decrypt(columnInfo, valueExp) : valueExp;
+    }
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                 ScalarSelect Option
+    //                                                                 ===================
+    public void acceptScalarSelectOption(ScalarSelectOption option) {
+        if (option != null) {
+            option.xjudgeDatabase(this);
+        }
+        _scalarSelectOption = option;
     }
 
     // [DBFlute-0.9.7.2]

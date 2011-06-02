@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
@@ -121,6 +122,15 @@ public interface ConditionBean extends PagingBean {
      * @return Determination.
      */
     boolean isSelectCountIgnoreFetchScope();
+
+    // ===================================================================================
+    //                                                                       Scalar Select
+    //                                                                       =============
+    /**
+     * Accept the option for ScalarSelect.
+     * @param option The option for ScalarSelect. (NullAllowed)
+     */
+    void xacceptScalarSelectOption(ScalarSelectOption option);
 
     // ===================================================================================
     //                                                                       Invalid Query

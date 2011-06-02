@@ -28,6 +28,7 @@ import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -751,6 +752,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public boolean isSelectCountIgnoreFetchScope() {
         return _isSelectCountIgnoreFetchScope;
+    }
+
+    // ===================================================================================
+    //                                                                       Scalar Select
+    //                                                                       =============
+    /**
+     * {@inheritDoc}
+     */
+    public void xacceptScalarSelectOption(ScalarSelectOption option) {
+        getSqlClause().acceptScalarSelectOption(option);
     }
 
     // ===================================================================================

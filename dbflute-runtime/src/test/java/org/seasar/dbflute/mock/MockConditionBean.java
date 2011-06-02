@@ -9,6 +9,7 @@ import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -79,6 +80,9 @@ public class MockConditionBean implements ConditionBean {
 
     public ConditionBean xsetupSelectCountIgnoreFetchScope(boolean uniqueCount) {
         return null;
+    }
+
+    public void xacceptScalarSelectOption(ScalarSelectOption option) {
     }
 
     public boolean canPagingCountLater() {

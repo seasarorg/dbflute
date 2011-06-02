@@ -28,6 +28,7 @@ import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
@@ -785,6 +786,12 @@ public interface SqlClause {
     void makeSelectColumnDecryptionEffective();
 
     void suppressSelectColumnDecryption();
+
+    // [DBFlute-0.9.8.4]
+    // ===================================================================================
+    //                                                                 ScalarSelect Option
+    //                                                                 ===================
+    void acceptScalarSelectOption(ScalarSelectOption option);
 
     // [DBFlute-0.9.7.2]
     // ===================================================================================

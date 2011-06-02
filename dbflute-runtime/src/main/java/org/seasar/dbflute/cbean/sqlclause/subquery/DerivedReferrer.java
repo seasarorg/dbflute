@@ -5,13 +5,6 @@ import java.util.List;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseDerby;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseH2;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
-import org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseSqlServer;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -64,14 +57,8 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         if (columnInfo == null) {
             columnInfo = _subQuerySqlClause.getSpecifiedDerivingColumnInfoAsOne();
         }
-        option.setTargetColumnInfo(columnInfo); // basically not null (checked before)
-        option.setDatabaseMySQL(_subQuerySqlClause instanceof SqlClauseMySql);
-        option.setDatabasePostgreSQL(_subQuerySqlClause instanceof SqlClausePostgreSql);
-        option.setDatabaseOracle(_subQuerySqlClause instanceof SqlClauseOracle);
-        option.setDatabaseDB2(_subQuerySqlClause instanceof SqlClauseDb2);
-        option.setDatabaseSQLServer(_subQuerySqlClause instanceof SqlClauseSqlServer);
-        option.setDatabaseH2(_subQuerySqlClause instanceof SqlClauseH2);
-        option.setDatabaseDerby(_subQuerySqlClause instanceof SqlClauseDerby);
+        option.xsetTargetColumnInfo(columnInfo); // basically not null (checked before)
+        option.xjudgeDatabase(_subQuerySqlClause);
     }
 
     protected abstract String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,

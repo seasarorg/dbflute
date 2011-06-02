@@ -883,7 +883,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final SpecifyDerivedReferrer derivedReferrer = option.createSpecifyDerivedReferrer(subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity,
                 subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
-        registerParameterOption(option);
+        xregisterParameterOption(option);
         final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
         final HpDerivingSubQueryInfo subQueryInfo = new HpDerivingSubQueryInfo(aliasName, clause, derivedReferrer);
         xgetSqlClause().specifyDerivingSubQuery(subQueryInfo);
@@ -918,7 +918,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final QueryDerivedReferrer derivedReferrer = option.createQueryDerivedReferrer(subQueryPath,
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity,
                 subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value, parameterPath);
-        registerParameterOption(option);
+        xregisterParameterOption(option);
         final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
         registerWhereClause(clause);
     }
@@ -1758,7 +1758,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                    Option Parameter
     //                                                                    ================
-    protected void registerParameterOption(ParameterOption option) {
+    public void xregisterParameterOption(ParameterOption option) {
         if (option == null) {
             return;
         }

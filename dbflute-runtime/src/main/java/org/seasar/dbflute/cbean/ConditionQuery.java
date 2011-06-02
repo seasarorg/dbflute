@@ -16,6 +16,7 @@
 package org.seasar.dbflute.cbean;
 
 import org.seasar.dbflute.cbean.coption.ConditionOption;
+import org.seasar.dbflute.cbean.coption.ParameterOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -173,4 +174,13 @@ public interface ConditionQuery {
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
     boolean invokeHasForeignCQ(String foreignPropertyName);
+
+    // ===================================================================================
+    //                                                                    Option Parameter
+    //                                                                    ================
+    /**
+     * Register the parameter option.
+     * @param option The option of parameter. (NullAllowed)
+     */
+    void xregisterParameterOption(ParameterOption option);
 }

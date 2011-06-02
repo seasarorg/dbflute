@@ -16,11 +16,11 @@
 package org.seasar.dbflute.cbean.coption;
 
 /**
- * The option for DerivedReferrer. <br />
+ * The option for ScalarSelect. <br />
  * You can filter an aggregate function by scalar function filters.
  * @author jflute
  */
-public class DerivedReferrerOption extends FunctionConversionOption {
+public class ScalarSelectOption extends FunctionConversionOption {
 
     // ===================================================================================
     //                                                                              Option
@@ -32,7 +32,7 @@ public class DerivedReferrerOption extends FunctionConversionOption {
      * @param coalesce An alternate value when group function returns null. (NullAllowed: if null, no coalesce)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption coalesce(Object coalesce) {
+    public ScalarSelectOption coalesce(Object coalesce) {
         doCoalesce(coalesce);
         return this;
     }
@@ -42,7 +42,7 @@ public class DerivedReferrerOption extends FunctionConversionOption {
      * @param round Decimal digits or date format for round. (NullAllowed: if null, no round)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption round(Object round) {
+    public ScalarSelectOption round(Object round) {
         doRound(round);
         return this;
     }
@@ -52,7 +52,7 @@ public class DerivedReferrerOption extends FunctionConversionOption {
      * @param trunc Decimal digits or date format for trunc. (NullAllowed: if null, no trunc)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption trunc(Object trunc) {
+    public ScalarSelectOption trunc(Object trunc) {
         doTrunc(trunc);
         return this;
     }
