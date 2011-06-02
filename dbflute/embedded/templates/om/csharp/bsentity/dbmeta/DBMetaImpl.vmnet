@@ -248,7 +248,7 @@ namespace ${myDBMetaPackageName} {
         public override String DaoTypeName { get { return null; } }
 #end
 #if (${isExistConditionBean})
-        public override String ConditionBeanTypeName { get { return "${glPackageBaseCB}.${myConditionBeanClassName}"; } }
+        public override String ConditionBeanTypeName { get { return "${glPackageCB}.${myConditionBeanClassName}"; } }
 #else
         public override String ConditionBeanTypeName { get { return null; } }
 #end

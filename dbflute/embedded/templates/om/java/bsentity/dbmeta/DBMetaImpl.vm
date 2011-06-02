@@ -246,7 +246,7 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                           =========
     public String getEntityTypeName() { return "${myExtendedEntityPackageName}.${myExtendedObjectClassName}"; }
 #if ($isExistConditionBean)
-    public String getConditionBeanTypeName() { return "${glPackageBaseCB}.${myConditionBeanClassName}"; }
+    public String getConditionBeanTypeName() { return "${glPackageCB}.${myConditionBeanClassName}"; }
 #else
     public String getConditionBeanTypeName() { return null; }
 #end
