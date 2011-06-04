@@ -330,11 +330,7 @@ public class DfParameterBeanResolver {
             return;
         }
         final String propertyName = substringPmCommentPmbRear(expression);
-        if (Srl.equalsIgnoreCase(propertyName, "OutsideSqlPath", "EntityType", "ProcedureName", "EscapeStatement",
-                "CalledBySelect", "FetchStartIndex", "FetchSize", "FetchPageNumber", "PageStartIndex", "PageEndIndex",
-                "SafetyMaxResultSize", "ParameterMap", "OrderByClause", "OrderByComponent")) {
-            // reservation names should be skipped
-            // (properties for TypedParameterBean and SimplePagingBean and so on...)
+        if (isRevervedProperty(propertyName)) {
             return;
         }
         final String typeName = derivePropertyTypeFromTestValue(testValue);
@@ -520,6 +516,9 @@ public class DfParameterBeanResolver {
                 // because of priority low (bind variable is given priority over if-comment)
                 continue;
             }
+            if (isRevervedProperty(propertyName)) {
+                continue;
+            }
             final int nextIndex = i + 1;
             if (elementList.size() <= nextIndex) { // last now
                 propertyNameTypeMap.put(propertyName, ifCommentBooleanType);
@@ -597,6 +596,9 @@ public class DfParameterBeanResolver {
         final String propertyName = substringPmCommentPmbRear(expression);
         if (propertyNameTypeMap.containsKey(propertyName)) {
             // because of priority low (bind variable is given priority over for-comment)
+            return;
+        }
+        if (isRevervedProperty(propertyName)) {
             return;
         }
         final DetectedPropertyInfo detected = analyzeForNodeElementType(forNode, propertyName);
@@ -687,6 +689,21 @@ public class DfParameterBeanResolver {
     // -----------------------------------------------------
     //                                         Common Helper
     //                                         -------------
+    protected boolean isRevervedProperty(String propertyName) {
+        // properties for TypedParameterBean and SimplePagingBean and so on...
+        return Srl.equalsIgnoreCase(propertyName, "OutsideSqlPath" // TypedParameterBean
+                , "EntityType" // TypedSelectPmb
+                , "ProcedureName", "EscapeStatement", "CalledBySelect" // ProcedurePmb
+                , "IsEscapeStatement", "IsCalledBySelect" // ProcedurePmb (C#)
+                , "FetchStartIndex", "FetchSize", "FetchPageNumber" // PagingBean
+                , "PageStartIndex", "PageEndIndex" // PagingBean
+                , "IsPaging" // PagingBean (C#)
+                , "OrderByClause", "OrderByComponent" // OrderByBean
+                , "SafetyMaxResultSize" // FetchBean
+                , "ParameterMap" // MapParameterBean
+        );
+    }
+
     protected boolean isPmCommentStartsWithPmb(String expression) {
         return Srl.startsWith(expression, "pmb."); // e.g. "pmb.foo"
     }
