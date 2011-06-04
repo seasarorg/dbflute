@@ -469,6 +469,8 @@ public class DfParameterBeanResolver {
             return "DateTime?";
         } else if (Srl.equalsPlain(plainTypeName, "Boolean")) {
             return "bool?";
+        } else if (Srl.equalsPlain(plainTypeName, "boolean")) {
+            return "bool";
         } else if (Srl.isQuotedAnything(plainTypeName, "List<", ">")) {
             final String elementType = Srl.unquoteAnything(plainTypeName, "List<", ">");
             return "IList<" + doSwitchPlainTypeNameIfCSharp(elementType) + ">";
