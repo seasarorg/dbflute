@@ -501,7 +501,7 @@ public class DfParameterBeanResolver {
     //                                            ----------
     protected void doProcessAutoDetectIfNode(String sql, Map<String, String> propertyNameTypeMap,
             Map<String, String> propertyNameOptionMap, IfNode ifNode) {
-        final String ifCommentBooleanType = "boolean";
+        final String ifCommentBooleanType = switchPlainTypeNameIfCSharp("boolean");
         final String expression = ifNode.getExpression().trim(); // trim it just in case
         final List<String> elementList = Srl.splitList(expression, " ");
         for (int i = 0; i < elementList.size(); i++) {
