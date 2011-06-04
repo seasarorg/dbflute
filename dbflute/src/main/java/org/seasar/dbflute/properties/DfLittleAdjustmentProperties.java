@@ -154,7 +154,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public String getS2DaoSettingClass() { // CSharp only
-        return getExtensionClass("S2DaoSetting");
+        final String className = "S2DaoSetting";
+        if (hasExtensionClass(className)) {
+            return getExtendedExtensionClass(className);
+        } else {
+            return getBasicProperties().getProjectPrefix() + className;
+        }
     }
 
     protected String getExtensionClass(String className) {
@@ -172,7 +177,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    protected String getExtendedExtensionClass(String className) { // Java Only
+    protected String getExtendedExtensionClass(String className) {
         return getProperty("extended" + className + "Class", null);
     }
 
