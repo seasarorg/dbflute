@@ -528,17 +528,18 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpPropertyName = "${referrer.referrerPropertyName}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($tmpEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         /**
          * Prepare for '(Specify)DerivedReferrer'. <br />
          * ${referrer.referrerDispForJavaDocNest}
          * <pre>
-         * cb.specify().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.max(new SubQuery&lt;${tmpCBClassName}&gt;() {
+         * cb.specify().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
          *     public void query(${tmpCBClassName} subCB) {
-         *         subCB.specify().<span style="color: #FD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column for function</span>
+         *         subCB.specify().<span style="color: #FD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
          *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
          *     }
-         * }, aliasName);
+         * }, ${tmpEntityClassName}.<span style="color: #FD4747">ALIAS_foo...</span>);
          * </pre>
          * @return The object to set up a function for referrer table. (NotNull)
          */
