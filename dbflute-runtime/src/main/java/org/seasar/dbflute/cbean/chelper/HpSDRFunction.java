@@ -44,10 +44,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * <pre>
      * cb.specify().derivePurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchaseId(); // *Point! (Basically PK)
+     *         subCB.specify().columnPurchaseId(); // *Point (Basically PK)
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }, \"PAID_PURCHASE_COUNT\");
+     * }, Member.ALIAS_purchaseCount);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -63,7 +63,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * }, Member.ALIAS_purchaseCount, new DerivedReferrerOption().coalesce(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -79,10 +79,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * <pre>
      * cb.specify().derivePurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnProductId(); // *Point!
+     *         subCB.specify().columnProductId(); // *Point
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }, \"PAID_PURCHASE_PRODUCT_KIND_COUNT\");
+     * }, Member.ALIAS_productKindCount);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -98,7 +98,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * }, Member.ALIAS_productKindCount, new DerivedReferrerOption().coalesce(0));
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -114,10 +114,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * <pre>
      * cb.specify().derivePurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchaseDatetime(); // *Point!
+     *         subCB.specify().columnPurchaseDatetime(); // *Point
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }, \"LATEST_PURCHASE_DATETIME\");
+     * }, Member.ALIAS_latestPurchaseDatetime);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -133,7 +133,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * }, Member.ALIAS_latestPurchaseDatetime, new DerivedReferrerOption().coalesce(0));
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -149,10 +149,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * <pre>
      * cb.specify().derivePurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchaseDatetime(); // *Point!
+     *         subCB.specify().columnPurchaseDatetime(); // *Point
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }, \"LATEST_PURCHASE_DATETIME\");
+     * }, Member.ALIAS_firstPurchaseDatetime);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -168,7 +168,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * }, Member.ALIAS_firstPurchaseDatetime, new DerivedReferrerOption().coalesce(0));
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -184,10 +184,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * <pre>
      * cb.specify().derivePurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchasePrice(); // *Point!
+     *         subCB.specify().columnPurchasePrice(); // *Point
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }, \"SUMMARY_PURCHASE_PRICE\");
+     * }, Member.ALIAS_purchasePriceSummary);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -203,7 +203,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * }, Member.ALIAS_purchasePriceSummary, new DerivedReferrerOption().coalesce(0));
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -219,10 +219,10 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * <pre>
      * cb.specify().derivePurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchasePrice(); // *Point!
+     *         subCB.specify().columnPurchasePrice(); // *Point
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }, \"AVERAGE_PURCHASE_PRICE\");
+     * }, Member.ALIAS_purchasePriceAverage);
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -238,7 +238,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
-     * }, \"PAID_PURCHASE_COUNT\", new DerivedReferrerOption().coalesce(0));
+     * }, Member.ALIAS_purchasePriceAverage, new DerivedReferrerOption().coalesce(0));
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
