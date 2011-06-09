@@ -10,7 +10,7 @@ if "%answer%"=="" set /P answer=Database will be initialized. Are you ready? (y 
 if "%answer%"=="y" (
   call %DBFLUTE_HOME%\etc\cmd\_df-copy-extlib.cmd
 
-  call %DBFLUTE_HOME%\ant\bin\ant -Ddfenv=%DBFLUTE_ENVIRONMENT_TYPE% -f %DBFLUTE_HOME%\build-torque.xml db-renewal
+  call %DBFLUTE_HOME%\ant\bin\ant -Ddfenv=%DBFLUTE_ENVIRONMENT_TYPE% -f %DBFLUTE_HOME%\build-torque.xml renewal
 
   call %DBFLUTE_HOME%\etc\cmd\_df-delete-extlib.cmd
 )

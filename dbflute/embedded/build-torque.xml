@@ -69,7 +69,7 @@
     classname="org.seasar.dbflute.task.DfOutsideSqlTestTask"/>
   <taskdef name="df-sql2entity" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
-  <taskdef name="df-refresh-resource" classpathref="torque-classpath"
+  <taskdef name="df-refresh" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.manage.DfRefreshResourceTask"/>
 
   <!--
@@ -193,7 +193,7 @@
   <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
   <!--                                                                          Manage -->
   <!--                                                                          nnnnnn -->
-  <target name="db-renewal" description="DBRenewal task">
+  <target name="renewal" description="Renewal task">
   	<antcall target="replace-schema"/>
   	<antcall target="jdbc"/>
   	<antcall target="doc"/>
@@ -202,19 +202,19 @@
   	<antcall target="sql2entity"/>
   </target>
 
-  <target name="re-generate" description="ReGenerate task">
+  <target name="regenerate" description="Regenerate task">
   	<antcall target="jdbc"/>
   	<antcall target="doc"/>
   	<antcall target="generate"/>
   	<antcall target="sql2entity"/>
   </target>
 
-  <target name="refresh-resource" description="RefreshResource">
-    <df-refresh-resource
+  <target name="refresh" description="Refresh task">
+    <df-refresh
         contextProperties="${torque.contextProperties}"
         environmentType="${dfenv}"
         refreshProject="${dfprj}">
-    </df-refresh-resource>
+    </df-refresh>
   </target>
 
 </project>

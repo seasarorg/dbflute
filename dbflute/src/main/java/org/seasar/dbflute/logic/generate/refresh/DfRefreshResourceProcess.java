@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -98,6 +99,9 @@ public class DfRefreshResourceProcess {
     protected URL getRefreshRequestURL(String path) {
         final DfRefreshProperties prop = getRefreshProperties();
         String requestUrl = prop.getRequestUrl();
+        if (Srl.is_Null_or_TrimmedEmpty(requestUrl)) {
+            return null;
+        }
         if (requestUrl.length() > 0) {
             if (!requestUrl.endsWith("/")) {
                 requestUrl = requestUrl + "/";

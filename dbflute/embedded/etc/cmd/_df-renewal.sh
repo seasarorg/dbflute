@@ -15,7 +15,7 @@ antReturnCode=0
 if [ $answer = "y" ] ;then
   sh $DBFLUTE_HOME/etc/cmd/_df-copy-extlib.sh
 
-  sh $DBFLUTE_HOME/ant/bin/ant -Ddfenv=$DBFLUTE_ENVIRONMENT_TYPE -f $DBFLUTE_HOME/build-torque.xml db-renewal
+  sh $DBFLUTE_HOME/ant/bin/ant -Ddfenv=$DBFLUTE_ENVIRONMENT_TYPE -f $DBFLUTE_HOME/build-torque.xml renewal
   antReturnCode=$?
 
   sh $DBFLUTE_HOME/etc/cmd/_df-delete-extlib.sh

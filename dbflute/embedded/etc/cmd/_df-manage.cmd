@@ -6,23 +6,23 @@ if "%FIRST_ARG%"=="" set FIRST_ARG=""
 set SECOND_ARG=%3
 if "%SECOND_ARG%"=="" set SECOND_ARG=""
 
-if "%FIRST_ARG%"=="DBRenewal" (
-  rem /nnnnnnnnnnnnnnnnnnnnnnnnnn
-  rem Execute the DBRenewal task.
+if "%FIRST_ARG%"=="renewal" (
+  rem /nnnnnnnnnnnnnnnnnnnnnnnn
+  rem Execute the Renewal task.
   rem nnnnnnnnnn/
-  call %DBFLUTE_HOME%\etc\cmd\_df-db-renewal.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+  call %DBFLUTE_HOME%\etc\cmd\_df-renewal.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 )
 
-if "%FIRST_ARG%"=="ReGenerate" (
-  rem /nnnnnnnnnnnnnnnnnnnnnnnnnn
-  rem Execute the ReGenerate task.
+if "%FIRST_ARG%"=="regenerate" (
+  rem /nnnnnnnnnnnnnnnnnnnnnnnnnnn
+  rem Execute the Regenerate task.
   rem nnnnnnnnnn/
-  call %DBFLUTE_HOME%\etc\cmd\_df-re-generate.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+  call %DBFLUTE_HOME%\etc\cmd\_df-regenerate.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 )
 
-if "%FIRST_ARG%"=="RefreshResource" (
-  rem /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-  rem Execute the RefreshResource task.
+if "%FIRST_ARG%"=="refresh" (
+  rem /nnnnnnnnnnnnnnnnnnnnnnnn
+  rem Execute the Refresh task.
   rem nnnnnnnnnn/
-  call %DBFLUTE_HOME%\etc\cmd\_df-refresh-resource.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+  call %DBFLUTE_HOME%\etc\cmd\_df-refresh.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 )
