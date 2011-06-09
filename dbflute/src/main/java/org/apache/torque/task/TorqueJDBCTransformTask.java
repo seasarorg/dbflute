@@ -53,6 +53,8 @@
  */
 package org.apache.torque.task;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
@@ -60,6 +62,24 @@ import org.seasar.dbflute.task.bs.DfAbstractTask;
  * @author Modified by jflute
  */
 public class TorqueJDBCTransformTask extends DfAbstractTask {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(TorqueJDBCTransformTask.class);
+
+    // ===================================================================================
+    //                                                                           Beginning
+    //                                                                           =========
+    @Override
+    protected void begin() {
+        _log.info("+------------------------------------------+");
+        _log.info("|                                          |");
+        _log.info("|                   JDBC                   |");
+        _log.info("|                                          |");
+        _log.info("+------------------------------------------+");
+    }
 
     // ===================================================================================
     //                                                                          DataSource

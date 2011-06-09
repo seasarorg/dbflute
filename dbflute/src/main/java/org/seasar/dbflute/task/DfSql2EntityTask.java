@@ -92,6 +92,18 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Database _database = new Database();
 
     // ===================================================================================
+    //                                                                           Beginning
+    //                                                                           =========
+    @Override
+    protected void begin() {
+        _log.info("+------------------------------------------+");
+        _log.info("|                                          |");
+        _log.info("|                Sql2Entity                |");
+        _log.info("|                                          |");
+        _log.info("+------------------------------------------+");
+    }
+
+    // ===================================================================================
     //                                                                          DataSource
     //                                                                          ==========
     @Override

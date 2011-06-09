@@ -24,6 +24,18 @@ public class DfRefreshResourceProcess {
     private static final Log _log = LogFactory.getLog(DfRefreshResourceProcess.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final List<String> _projectNameList;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfRefreshResourceProcess(List<String> projectNameList) {
+        _projectNameList = projectNameList;
+    }
+
+    // ===================================================================================
     //                                                                             Refresh
     //                                                                             =======
     public void refreshResources() {
@@ -72,8 +84,7 @@ public class DfRefreshResourceProcess {
     }
 
     protected boolean isRefresh() {
-        final DfRefreshProperties prop = getRefreshProperties();
-        return prop.hasRefreshDefinition();
+        return _projectNameList != null && !_projectNameList.isEmpty();
     }
 
     protected int getRefreshRequestReadTimeout() {
@@ -81,8 +92,7 @@ public class DfRefreshResourceProcess {
     }
 
     protected List<String> getRefreshProjectNameList() {
-        final DfRefreshProperties prop = getRefreshProperties();
-        return prop.getProjectNameList();
+        return _projectNameList;
     }
 
     protected URL getRefreshRequestURL(String path) {

@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.config;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  * @since 0.9.5.5 (2009/09/19 Saturday)
@@ -40,7 +42,7 @@ public class DfSpecifiedSqlFile {
     }
 
     public void setSpecifiedSqlFile(String specifiedSqlFile) {
-        if (specifiedSqlFile == null || specifiedSqlFile.trim().length() == 0) {
+        if (Srl.is_Null_or_TrimmedEmpty(specifiedSqlFile)) {
             return;
         }
         if (specifiedSqlFile.equals("${dfsql}")) {

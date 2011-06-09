@@ -110,6 +110,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         Throwable cause = null;
         long before = getTaskBeforeTimeMillis();
         try {
+            begin();
             initializeDatabaseInfo();
             if (isUseDataSource()) {
                 setupDataSource();
@@ -159,6 +160,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         }
     }
 
+    protected abstract void begin();
+
     protected long getTaskBeforeTimeMillis() {
         return System.currentTimeMillis();
     }
@@ -179,6 +182,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return true;
     }
 
+    // -----------------------------------------------------
+    //                                         Final Message
+    //                                         -------------
     protected void showFinalMessage(long before, long after, boolean abort) {
         final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
         final StringBuilder sb = new StringBuilder();
@@ -222,7 +228,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         DfDBFluteTaskUtil.logFinalMessage(sb.toString());
     }
 
-    private String buildAdditionalSchemaDisp() {
+    protected String buildAdditionalSchemaDisp() {
         final DfDatabaseProperties databaseProp = getDatabaseProperties();
         final List<UnifiedSchema> additionalSchemaList = databaseProp.getAdditionalSchemaList();
         String disp;
@@ -258,7 +264,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return disp;
     }
 
-    private String buildRefreshProjectDisp() {
+    protected String buildRefreshProjectDisp() {
         final DfRefreshProperties refreshProp = getProperties().getRefreshProperties();
         if (!refreshProp.hasRefreshDefinition()) {
             return "";
@@ -615,7 +621,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                    Refresh Resource
     //                                                                    ================
     protected void refreshResources() {
-        new DfRefreshResourceProcess().refreshResources();
+        final List<String> projectNameList = getRefreshProperties().getProjectNameList();
+        new DfRefreshResourceProcess(projectNameList).refreshResources();
     }
 
     // ===================================================================================
@@ -697,6 +704,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return getProperties().getLittleAdjustmentProperties();
+    }
+
+    protected DfRefreshProperties getRefreshProperties() {
+        return getProperties().getRefreshProperties();
     }
 
     // ===================================================================================

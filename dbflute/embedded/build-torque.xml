@@ -57,18 +57,20 @@
     Do forward declarations of all of our tasks to
     centralize them and clean up the targets.
   -->
+  <taskdef name="df-replace-schema" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.DfReplaceSchemaTask"/>
   <taskdef name="df-jdbc" classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueJDBCTransformTask"/>
   <taskdef name="df-doc" classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueDocumentationTask"/>
   <taskdef name="df-generate" classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueDataModelTask"/>
-  <taskdef name="df-sql2entity" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
   <taskdef name="df-outside-sql-test" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.DfOutsideSqlTestTask"/>
-  <taskdef name="df-replace-schema" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.DfReplaceSchemaTask"/>
+  <taskdef name="df-sql2entity" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
+  <taskdef name="df-refresh-resource" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfRefreshResourceTask"/>
 
   <!--
     for Ant-Contrib
@@ -101,56 +103,45 @@
     </condition>
   </target>
 
-  <!-- ******************************************************************************* -->
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                   ReplaceSchema -->
+  <!--                                                                   nnnnnnnnnnnnn -->
+  <target name="replace-schema" description="ReplaceSchema task">
+    <df-replace-schema
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}">
+    </df-replace-schema>
+  </target>
+
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
   <!--                                                                            JDBC -->
-  <!--                                                                            **** -->
-  <!-- ================================================================ -->
-  <!-- J D B C  TO  X M L                                               -->
-  <!-- ================================================================ -->
-
-  <target name="jdbc" description="==> jdbc to xml">
-
-    <echo message="+-----------------------------------------------+"/>
-    <echo message="|                                               |"/>
-    <echo message="| Generating XML from JDBC connection !         |"/>
-    <echo message="|                                               |"/>
-    <echo message="+-----------------------------------------------+"/>
-
-    <echo message=" "/>
-    <echo message="+-------------------------------------------------------------------------------+"/>
-    <echo message="contextProperties = ${torque.contextProperties}"/>
-    <echo message="environmentType   = ${dfenv}"/>
-    <echo message="+-----------------+"/>
-
+  <!--                                                                            nnnn -->
+  <target name="jdbc" description="JDBC task">
     <df-jdbc
       contextProperties="${torque.contextProperties}"
-      environmentType="${dfenv}"
-    >
+      environmentType="${dfenv}">
     </df-jdbc>
   </target>
 
-  <!-- ******************************************************************************* -->
-  <!--                                                                              OM -->
-  <!--                                                                              ** -->
-  <!-- ================================================================ -->
-  <!-- G E N E R A T E  P R O J E C T  P E E R  B A S E D  O M          -->
-  <!-- ================================================================ -->
-  <!-- Generate the Peer-based object model for your project.           -->
-  <!-- These are in addition to the base Torque OM!                     -->
-  <!-- ================================================================ -->
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                             Doc -->
+  <!--                                                                             nnn -->
+  <target name="doc" description="Doc task">
+    <df-doc
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="${torque.template.doc}"
+      templatePath="${torque.templatePath}"
+      useClasspath="${torque.useClasspath}"
+      environmentType="${dfenv}">
+    </df-doc>
+  </target>
 
-  <target name="om" depends="check-use-classpath"
-    description="==> generates class files for your DB">
-
-    <echo message="+------------------------------------------+"/>
-    <echo message="|                                          |"/>
-    <echo message="| Generating Class Files for your DB       |"/>
-    <echo message="|                                          |"/>
-    <echo message="+------------------------------------------+"/>
-
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                        Generate -->
+  <!--                                                                        nnnnnnnn -->
+  <target name="generate" depends="check-use-classpath" description="Generate task">
     <antcall target="om-classpath"/>
     <antcall target="om-template"/>
-    <!-- antcall target="zip-base-om"/ -->
   </target>
 
   <target name="om-classpath" if="torque.internal.useClasspath">
@@ -171,57 +162,10 @@
     </df-generate>
   </target>
 
-  <!-- ******************************************************************************* -->
-  <!--                                                                             Doc -->
-  <!--                                                                             *** -->
-  <!-- ================================================================ -->
-  <!-- G E N E R A T E   D O C S                                        -->
-  <!-- ================================================================ -->
-  <!-- Generates documentation to project-schema-xxx.html               -->
-  <!-- ================================================================ -->
-
-  <target name="doc" description="==> generates documentation for your datamodel">
-
-    <echo message="+------------------------------------------+"/>
-    <echo message="|                                          |"/>
-    <echo message="| Generating docs for YOUR datamodel!      |"/>
-    <echo message="|                                          |"/>
-    <echo message="+------------------------------------------+"/>
-
-    <df-doc
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.doc}"
-      templatePath="${torque.templatePath}"
-      useClasspath="${torque.useClasspath}"
-      environmentType="${dfenv}">
-    </df-doc>
-  </target>
-
-  <!-- ******************************************************************************* -->
-  <!--                                                                         PlaySQL -->
-  <!--                                                                         ******* -->
-  <target name="replace-schema" description="==> replace-schema">
-
-    <echo message="+-----------------------------------------------+"/>
-    <echo message="|                                               |"/>
-    <echo message="| Replace-Schema !                              |"/>
-    <echo message="|                                               |"/>
-    <echo message="+-----------------------------------------------+"/>
-
-    <df-replace-schema
-        contextProperties="${torque.contextProperties}"
-        environmentType="${dfenv}">
-    </df-replace-schema>
-  </target>
-
-  <target name="outside-sql-test" description="==> outside-sql-test">
-
-    <echo message="+-----------------------------------------------+"/>
-    <echo message="|                                               |"/>
-    <echo message="| Outside-Sql Test !                            |"/>
-    <echo message="|                                               |"/>
-    <echo message="+-----------------------------------------------+"/>
-  	
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                  OutsideSqlTest -->
+  <!--                                                                  nnnnnnnnnnnnnn -->
+  <target name="outside-sql-test" description="OutsideSqlTest task">
     <df-outside-sql-test
         contextProperties="${torque.contextProperties}"
         environmentType="${dfenv}"
@@ -229,14 +173,10 @@
     </df-outside-sql-test>
   </target>
 
-  <target name="sql2entity" description="==> sql2entity">
-
-    <echo message="+-----------------------------------------------+"/>
-    <echo message="|                                               |"/>
-    <echo message="| Sql 2 Entity !                                |"/>
-    <echo message="|                                               |"/>
-    <echo message="+-----------------------------------------------+"/>
-
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                      Sql2Entity -->
+  <!--                                                                      nnnnnnnnnn -->
+  <target name="sql2entity" description="Sql2Entity task">
     <!--
       Parameters, outputDirectory and outputFile, are actually unused (as old).
       But the parameters may be referred to by Velocity so it remains.
@@ -248,6 +188,33 @@
         environmentType="${dfenv}"
         specifiedSqlFile="${dfsql}">
     </df-sql2entity>
+  </target>
+
+  <!-- nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn -->
+  <!--                                                                          Manage -->
+  <!--                                                                          nnnnnn -->
+  <target name="db-renewal" description="DBRenewal task">
+  	<antcall target="replace-schema"/>
+  	<antcall target="jdbc"/>
+  	<antcall target="doc"/>
+  	<antcall target="generate"/>
+  	<antcall target="outside-sql-test"/>
+  	<antcall target="sql2entity"/>
+  </target>
+
+  <target name="re-generate" description="ReGenerate task">
+  	<antcall target="jdbc"/>
+  	<antcall target="doc"/>
+  	<antcall target="generate"/>
+  	<antcall target="sql2entity"/>
+  </target>
+
+  <target name="refresh-resource" description="RefreshResource">
+    <df-refresh-resource
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        refreshProject="${dfprj}">
+    </df-refresh-resource>
   </target>
 
 </project>

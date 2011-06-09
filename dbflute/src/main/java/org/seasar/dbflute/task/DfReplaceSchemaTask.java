@@ -48,6 +48,18 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected DfAlterCheckFinalInfo _alterCheckFinalInfo;
 
     // ===================================================================================
+    //                                                                           Beginning
+    //                                                                           =========
+    @Override
+    protected void begin() {
+        _log.info("+------------------------------------------+");
+        _log.info("|                                          |");
+        _log.info("|              ReplaceSchema               |");
+        _log.info("|                                          |");
+        _log.info("+------------------------------------------+");
+    }
+
+    // ===================================================================================
     //                                                                          DataSource
     //                                                                          ==========
     @Override

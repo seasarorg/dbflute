@@ -80,6 +80,18 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     private static final Log _log = LogFactory.getLog(TorqueDocumentationTask.class);
 
     // ===================================================================================
+    //                                                                           Beginning
+    //                                                                           =========
+    @Override
+    protected void begin() {
+        _log.info("+------------------------------------------+");
+        _log.info("|                                          |");
+        _log.info("|                   Doc                    |");
+        _log.info("|                                          |");
+        _log.info("+------------------------------------------+");
+    }
+
+    // ===================================================================================
     //                                                                         Data Source
     //                                                                         ===========
     @Override

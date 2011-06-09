@@ -51,13 +51,28 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     protected int _nonTargetSqlCount;
 
     // ===================================================================================
-    //                                                                            Override
-    //                                                                            ========
+    //                                                                           Beginning
+    //                                                                           =========
+    @Override
+    protected void begin() {
+        _log.info("+------------------------------------------+");
+        _log.info("|                                          |");
+        _log.info("|              OutsideSqlTest              |");
+        _log.info("|                                          |");
+        _log.info("+------------------------------------------+");
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     @Override
     protected void doExecute() {
         super.doExecute();
     }
 
+    // ===================================================================================
+    //                                                                       Main Override
+    //                                                                       =============
     @Override
     protected List<File> getTargetSqlFileList() {
         final DfOutsideSqlPack outsideSqlPack = collectSqlFileList();
