@@ -67,13 +67,18 @@ public class DfBqpOutsideSqlFile {
                 exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
             }
             final String exbhvName = Srl.substringLastRear(exbhvPackage, ".");
-            final String sqlPackage;
-            if (getOutsideSqlProperties().isSqlPackageValid()) {
-                sqlPackage = getOutsideSqlProperties().getSqlPackage();
-            } else {
-                sqlPackage = Srl.substringLastFront(exbhvPackage, ".");
+            if (getBasicProperties().isTargetLanguageJava()) {
+                final String sqlPackage;
+                if (getOutsideSqlProperties().isSqlPackageValid()) {
+                    sqlPackage = getOutsideSqlProperties().getSqlPackage();
+                } else {
+                    sqlPackage = Srl.substringLastFront(exbhvPackage, ".");
+                }
+                exbhvMark = Srl.replace(sqlPackage, ".", "/") + "/" + exbhvName + "/";
+            } else { // e.g. CSharp
+                // because CSharp is allowed to have free directory structure
+                exbhvMark = "/" + exbhvName + "/";
             }
-            exbhvMark = Srl.replace(sqlPackage, ".", "/") + "/" + exbhvName + "/";
         }
 
         // both types are target
