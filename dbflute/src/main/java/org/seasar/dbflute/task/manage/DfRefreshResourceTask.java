@@ -50,7 +50,7 @@ public class DfRefreshResourceTask extends DfAbstractTask {
     protected void begin() {
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
-        _log.info("|             RefreshResource              |");
+        _log.info("|                 Refresh                  |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
     }
