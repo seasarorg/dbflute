@@ -28,7 +28,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
-     * cb.query().scalarPurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchaseId(); // *Point!
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
@@ -45,7 +45,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for count(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().scalarPurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
@@ -62,7 +62,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'count(with distinct)'.
      * <pre>
-     * cb.query().scalarPurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); // *Point!
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
@@ -79,7 +79,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for countDistinct(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().scalarPurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
@@ -96,7 +96,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'max'.
      * <pre>
-     * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); // *Point!
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
@@ -113,7 +113,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for max(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
@@ -130,7 +130,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'min'.
      * <pre>
-     * cb.query().scalarPurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); // *Point!
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
@@ -147,7 +147,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for min(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().scalarPurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
@@ -164,7 +164,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'sum'.
      * <pre>
-     * cb.query().scalarPurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); // *Point!
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
@@ -181,7 +181,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for sum(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().scalarPurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
@@ -198,7 +198,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * Set up the sub query of referrer for the scalar 'avg'.
      * <pre>
-     * cb.query().scalarPurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         subCB.specify().columnPurchasePrice(); // *Point!
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
@@ -215,7 +215,7 @@ public class HpQDRFunction<CB extends ConditionBean> {
     /**
      * An overload method for avg(). So refer to the method's java-doc about basic info.
      * <pre>
-     * cb.query().scalarPurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
+     * cb.query().derivedPurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
      *         ...
      *     }
