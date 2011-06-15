@@ -17,6 +17,7 @@ package org.seasar.dbflute.dbway;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -63,8 +64,13 @@ public class WayOfSybase implements DBWay, Serializable {
     // ===================================================================================
     //                                                                 LikeSearch WildCard
     //                                                                 ===================
+    @SuppressWarnings("unchecked")
     public List<String> getOriginalWildCardList() {
-        return _originalWildCardList;
+        return Collections.EMPTY_LIST;
+        // The original wild-cards '[' and ']' of Sybase
+        // have an original escape way, so DBFlute cannot
+        // handle them
+        //return _originalWildCardList;
     }
 
     // ===================================================================================
