@@ -31,12 +31,12 @@ public class DfEnvironmentType {
     public static final Log _log = LogFactory.getLog(DfEnvironmentType.class);
 
     private static final DfEnvironmentType _instance = new DfEnvironmentType();
-    private static final String DEFAULT_ENVIRONMENT_TYPE = "df:default";
+    private static final String DEFAULT_TYPE = "df:default";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _environmentType = DEFAULT_ENVIRONMENT_TYPE;
+    protected String _environmentType = DEFAULT_TYPE;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -55,7 +55,7 @@ public class DfEnvironmentType {
     //                                                                    Environment Type
     //                                                                    ================
     public boolean isDefault() {
-        return _environmentType != null && _environmentType.equalsIgnoreCase(DEFAULT_ENVIRONMENT_TYPE);
+        return _environmentType != null && _environmentType.equalsIgnoreCase(DEFAULT_TYPE);
     }
 
     /**

@@ -1,7 +1,11 @@
 package org.seasar.dbflute.properties;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +19,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
@@ -240,22 +245,52 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                   Data Loading Type
-    //                                                                   =================
-    public String getDataLoadingType() {
-        final String propString = (String) getReplaceSchemaDefinitionMap().get("dataLoadingType");
+    //                                                                    Environment Type
+    //                                                                    ================
+    public String getRepsEnvType() {
+        final String dataLoadingType = getDataLoadingType();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(dataLoadingType)) {
+            return dataLoadingType;
+        }
+        final String propString = (String) getReplaceSchemaDefinitionMap().get("repsEnvType");
         if (propString == null) {
-            return getOldStyleEnvironmentType();
+            if (!DfEnvironmentType.getInstance().isDefault()) {
+                return DfEnvironmentType.getInstance().getEnvironmentType();
+            } else {
+                return "ut"; // final default
+            }
         }
         return propString;
     }
 
-    protected String getOldStyleEnvironmentType() { // Old Style!
-        final String propString = (String) getReplaceSchemaDefinitionMap().get("environmentType");
-        if (propString == null) {
-            return "ut";
+    protected String getDataLoadingType() { // old style
+        return (String) getReplaceSchemaDefinitionMap().get("dataLoadingType");
+    }
+
+    public boolean isTargetRepsFile(String sql) {
+        final String repsEnvExp = analyzeRepsEnvType(sql);
+        if (Srl.is_Null_or_TrimmedEmpty(repsEnvExp)) {
+            return true;
         }
-        return propString;
+        final List<String> envList = Srl.splitListTrimmed(repsEnvExp, ",");
+        final String repsEnvType = getRepsEnvType();
+        return envList.contains(repsEnvType);
+    }
+
+    protected String analyzeRepsEnvType(String sql) {
+        final String beginMark = "#df:checkEnv(";
+        final int markIndex = sql.indexOf(beginMark);
+        if (markIndex < 0) {
+            return null;
+        }
+        final String rear = sql.substring(markIndex + beginMark.length());
+        final int endIndex = rear.indexOf(")");
+        if (endIndex < 0) {
+            String msg = "The command checkEnv should have its end mark ')':";
+            msg = msg + " example=[#df:checkEnv(ut)#], sql=" + sql;
+            throw new IllegalStateException(msg);
+        }
+        return rear.substring(0, endIndex).trim();
     }
 
     // ===================================================================================
@@ -384,7 +419,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                     ===============
     protected Map<String, Map<String, String>> _additionalUesrMap;
 
-    public Map<String, Map<String, String>> getAdditionalUserMap() {
+    protected Map<String, Map<String, String>> getAdditionalUserMap() {
         if (_additionalUesrMap != null) {
             return _additionalUesrMap;
         }
@@ -428,9 +463,51 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final String schema = propertyMap.get("schema");
         final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema);
         final String user = propertyMap.get("user");
-        final String password = propertyMap.get("password");
+        final String password = resolvePasswordVariable(propertyMap.get("password"));
         _log.info("...Creating a connection for additional user");
         return createConnection(driver, url, unifiedSchema, user, password);
+    }
+
+    protected String resolvePasswordVariable(String password) {
+        if (Srl.is_Null_or_TrimmedEmpty(password)) {
+            return password;
+        }
+        final String prefix = "df:dfprop/";
+        if (!password.startsWith(prefix)) {
+            return password;
+        }
+        final String fileName;
+        final String defaultPwd;
+        {
+            final String content = Srl.substringFirstRear(password, prefix);
+            if (content.contains("|")) {
+                fileName = Srl.substringFirstFront(content, "|");
+                defaultPwd = Srl.substringFirstRear(content, "|");
+            } else {
+                fileName = content;
+                defaultPwd = null;
+            }
+        }
+        final File pwdFile = new File("./dfprop/" + fileName);
+        if (!pwdFile.exists()) {
+            return defaultPwd; // no password
+        }
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(pwdFile), "UTF-8"));
+            final String line = br.readLine();
+            return line; // first line is password
+        } catch (Exception continued) {
+            _log.info("Failed to read the password file: " + pwdFile);
+            return defaultPwd; // no password
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 
     // ===================================================================================

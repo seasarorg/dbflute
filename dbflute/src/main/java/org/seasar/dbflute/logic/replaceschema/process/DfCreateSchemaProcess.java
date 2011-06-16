@@ -320,6 +320,11 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         }
 
         @Override
+        protected boolean isTargetFile(String sql) {
+            return getReplaceSchemaProperties().isTargetRepsFile(sql);
+        }
+
+        @Override
         protected boolean isTargetSql(String sql) {
             final String changeUesr = analyzeChangeUser(sql);
             if (changeUesr != null) {
@@ -351,7 +356,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
                     _log.warn("*The mark 'reviveUser()' is unsupported at the timing!");
                 }
             }
-            return super.isTargetSql(sql);
+            return true;
         }
 
         @Override

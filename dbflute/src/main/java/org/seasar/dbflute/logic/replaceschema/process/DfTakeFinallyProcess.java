@@ -141,11 +141,16 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
             protected String getTerminater4Tool() {
                 return resolveTerminater4Tool();
             }
+
+            @Override
+            protected boolean isTargetFile(String sql) {
+                return getReplaceSchemaProperties().isTargetRepsFile(sql);
+            }
         };
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
             public boolean dispatch(File sqlFile, Statement st, String sql) throws SQLException {
-                final String dataLoadingType = getReplaceSchemaProperties().getDataLoadingType();
-                final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(dataLoadingType);
+                final String loadType = getReplaceSchemaProperties().getRepsEnvType();
+                final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(loadType);
                 final DfDataAssertHandler dataAssertHandler = dataAssertProvider.provideDataAssertHandler(sql);
                 if (dataAssertHandler == null) {
                     return false;

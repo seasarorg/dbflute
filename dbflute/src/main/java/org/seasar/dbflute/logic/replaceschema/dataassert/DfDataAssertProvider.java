@@ -59,13 +59,13 @@ public class DfDataAssertProvider {
             }
         });
     }
-    protected String _dataLoadingType;
+    protected String _loadType;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataAssertProvider(String dataLoadingType) {
-        _dataLoadingType = dataLoadingType;
+    public DfDataAssertProvider(String loadType) {
+        _loadType = loadType;
     }
 
     // ===================================================================================
@@ -98,7 +98,7 @@ public class DfDataAssertProvider {
             }
 
             // Find with data loading type.
-            final String secondMark = "--" + starter + key + typeAtMark + _dataLoadingType + terminator;
+            final String secondMark = "--" + starter + key + typeAtMark + _loadType + terminator;
             if (sql.contains(secondMark)) {
                 return entry.getValue();
             }

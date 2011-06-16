@@ -115,8 +115,8 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         return createFinalInfo(loadEx);
     }
 
-    protected String getDataLoadingType() {
-        return getReplaceSchemaProperties().getDataLoadingType();
+    protected String getRepsEnvType() {
+        return getReplaceSchemaProperties().getRepsEnvType();
     }
 
     public boolean isLoggingInsertSql() {
@@ -138,9 +138,9 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
 
     protected void writeDbFromDelimiterFileAsLoadingTypeData(String fileType, String delimter) {
         final String dir = _sqlRootDir;
-        final String envType = getDataLoadingType();
-        final String path = doGetLoadingTypeDataDirectoryPath(dir, envType, fileType);
-        writeDbFromDelimiterFile(getDataLoadingType(), path, fileType, delimter);
+        final String loadType = getRepsEnvType();
+        final String path = doGetLoadingTypeDataDirectoryPath(dir, loadType, fileType);
+        writeDbFromDelimiterFile(loadType, path, fileType, delimter);
     }
 
     protected void writeDbFromDelimiterFile(String loadType, String directoryPath, String fileType, String delimiter) {
@@ -274,10 +274,10 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         if (Srl.is_Null_or_TrimmedEmpty(dir)) {
             return;
         }
-        final String envType = res.isCommonType() ? COMMON_LOAD_TYPE : getDataLoadingType();
+        final String loadType = res.isCommonType() ? COMMON_LOAD_TYPE : getRepsEnvType();
         final String typeName = res.isFirstXls() ? FIRSTXLS_FILE_TYPE : XLS_FILE_TYPE;
-        final String dataDirectory = doGetLoadingTypeDataDirectoryPath(dir, envType, typeName);
-        writeDbFromXls(envType, dataDirectory);
+        final String dataDirectory = doGetLoadingTypeDataDirectoryPath(dir, loadType, typeName);
+        writeDbFromXls(loadType, dataDirectory);
     }
 
     protected void writeDbFromXls(String envType, String dataDirectory) {
@@ -323,8 +323,8 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().getCommonDataDir(dir, typeName);
     }
 
-    protected String doGetLoadingTypeDataDirectoryPath(String dir, String envType, String typeName) {
-        return getReplaceSchemaProperties().getLoadTypeDataDir(dir, envType, typeName);
+    protected String doGetLoadingTypeDataDirectoryPath(String dir, String loadType, String typeName) {
+        return getReplaceSchemaProperties().getLoadTypeDataDir(dir, loadType, typeName);
     }
 
     // ===================================================================================

@@ -194,7 +194,7 @@ public abstract class DfAbstractTask extends Task {
         final String additionalSchemaDisp = buildAdditionalSchemaDisp();
         sb.append(ln).append("    additionalSchema = " + additionalSchemaDisp);
         final DfReplaceSchemaProperties replaceSchemaProp = getProperties().getReplaceSchemaProperties();
-        sb.append(ln).append("    dataLoadingType  = " + replaceSchemaProp.getDataLoadingType());
+        sb.append(ln).append("    repsEnvType      = " + replaceSchemaProp.getRepsEnvType());
         final String refreshProjectDisp = buildRefreshProjectDisp();
         sb.append(ln).append("    refreshProject   = " + refreshProjectDisp);
 

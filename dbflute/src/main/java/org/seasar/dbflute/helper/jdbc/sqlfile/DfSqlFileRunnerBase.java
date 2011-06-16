@@ -100,6 +100,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             setupStatement();
             for (String sql : sqlList) {
                 currentSql = sql;
+                if (!isTargetFile(sql)) {
+                    break;
+                }
                 if (!isTargetSql(sql)) {
                     continue;
                 }
@@ -164,6 +167,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         _result.setGoodSqlCount(_goodSqlCount);
         _result.setTotalSqlCount(_totalSqlCount);
         return _result;
+    }
+
+    protected boolean isTargetFile(String sql) {
+        return true;
     }
 
     protected boolean isTargetSql(String sql) {

@@ -3,7 +3,7 @@
 #
 # The various settings about replace-schema.
 # 
-# o dataLoadingType: (NotRequired - Default 'ut')
+# o repsEnvType: (NotRequired - Default inherits or 'ut')
 # o isLoggingInsertSql: (NotRequired - Default true)
 # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
 # o skipSheet: (NotRequired - Default '')
@@ -25,18 +25,19 @@
 #
 map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dataLoadingType: (NotRequired - Default 'ut')
-    #  The type of data loading.
-    #  If the value is 'ut', the target is './playsql/data/ut/...'.
+    # o repsEnvType: (NotRequired - Default inherits or 'ut')
+    #  The environment type of ReplaceSchema.
+    #   e.g. if ut, data files in './playsql/data/ut/...' are loaded
+    #  If DBFlute environment type is specified, inherits it as default.
     #
-    ; dataLoadingType = ut
+    #; repsEnvType = ut
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isLoggingInsertSql: (NotRequired - Default true)
     #  Does it show insert values on log?
     #
-    ; isLoggingInsertSql = true
+    #; isLoggingInsertSql = true
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
