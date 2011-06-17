@@ -45,18 +45,17 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
     protected void arrangeCopy(String src, String dest) {
         final File destFile = new File(dest);
         if (destFile.exists() && destFile.isDirectory()) {
-            String msg = "Setting a directory in dest is unsupported: " + dest;
-            throw new IllegalStateException(msg);
+            throwRepsArrangeCopyDestDirectoryException(src, dest);
         }
         if (!src.contains("/")) {
-            String msg = "The value in src should be a path expression: " + src;
-            throw new IllegalStateException(msg);
+            throwRepsArrangeCopySrcNotPathException(src, dest);
         }
         final String pureName = Srl.substringLastRear(src, "/");
         if (pureName.startsWith("*.")) {
             final String ext = Srl.substringFirstRear(pureName, "*.");
             final File baseDir = new File(Srl.substringLastFront(src, "/*."));
             if (!baseDir.exists()) {
+                _log.info("*Not existing the copy src directory: " + baseDir.getPath());
                 return;
             }
             final String extSuffix = "." + ext;
@@ -66,6 +65,7 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
                 }
             });
             if (elementList == null) { // no file in the directory
+                _log.info("*Not found the file in the copy src directory: " + baseDir.getPath());
                 return;
             }
             String targetElement = null;
@@ -74,16 +74,19 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
                     if (targetElement == null) {
                         targetElement = element; // found the only one file
                     } else { // duplicate
-                        throwRepsArrangeCopyDuplicateFileException(src, dest, targetElement, element);
+                        throwRepsArrangeCopySrcDuplicateFileException(src, dest, targetElement, element);
                     }
                 }
             }
             if (targetElement != null) {
                 copyFile(new File(baseDir.getPath() + "/" + targetElement), destFile);
+            } else {
+                _log.info("*Not found the corresponding copy src file: " + src);
             }
         } else {
             final File srcFile = new File(src);
             if (!srcFile.exists()) {
+                _log.info("*Not existing the copy src file: " + src);
                 return;
             }
             copyFile(srcFile, destFile);
@@ -103,12 +106,39 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
         }
     }
 
-    protected void throwRepsArrangeCopyDuplicateFileException(String src, String dest, String first, String second) {
+    protected void throwRepsArrangeCopyDestDirectoryException(String src, String dest) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The file that has the extension is duplicate.");
+        br.addNotice("The path in dest was directory.");
+        br.addItem("Advice");
+        br.addElement("The path in copy dest should be a file.");
+        br.addItem("Source");
+        br.addElement(src);
+        br.addItem("Destination");
+        br.addElement(dest);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    protected void throwRepsArrangeCopySrcNotPathException(String src, String dest) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The path in src was not a path expression.");
+        br.addItem("Advice");
+        br.addElement("The path in src should be a path expression.");
+        br.addElement("For example, './foo.txt' (should contain '/')");
+        br.addItem("Source");
+        br.addElement(src);
+        br.addItem("Destination");
+        br.addElement(dest);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    protected void throwRepsArrangeCopySrcDuplicateFileException(String src, String dest, String first, String second) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The file corresponding to the extension was duplicate.");
         br.addItem("Advice");
         br.addElement("The file that has the extension should be the only one");
-        br.addElement("when you use wild-card, e.g. '/*.sql', in src");
+        br.addElement("when you use wild-card, e.g. '/*.sql', in copy src");
         br.addElement("and you specify a file in desc");
         br.addItem("Source");
         br.addElement(src);
