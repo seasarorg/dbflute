@@ -18,6 +18,7 @@ import org.seasar.dbflute.logic.replaceschema.finalinfo.DfReplaceSchemaFinalInfo
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.process.DfAlterCheckProcess;
 import org.seasar.dbflute.logic.replaceschema.process.DfAlterCheckProcess.CoreProcessPlayer;
+import org.seasar.dbflute.logic.replaceschema.process.DfArrangeBeforeRepsProcess;
 import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaProcess;
 import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.CreatingDataSourcePlayer;
 import org.seasar.dbflute.logic.replaceschema.process.DfLoadDataProcess;
@@ -98,6 +99,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
+        arrangeBeforeReps();
         if (isAlterCheck()) {
             processAlterCheck();
         } else {
@@ -225,6 +227,14 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             String msg = "Failed to take finally (Look at the final info)";
             throw new DfTakeFinallyFailureException(msg);
         }
+    }
+
+    // ===================================================================================
+    //                                                                 Arrange before Reps
+    //                                                                 ===================
+    protected void arrangeBeforeReps() {
+        final DfArrangeBeforeRepsProcess process = new DfArrangeBeforeRepsProcess();
+        process.arrangeBeforeReps();
     }
 
     // ===================================================================================

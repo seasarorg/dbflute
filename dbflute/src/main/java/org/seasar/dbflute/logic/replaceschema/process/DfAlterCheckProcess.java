@@ -174,33 +174,33 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final String playSqlDirSymbol = getPlaySqlDir() + "/";
         final Map<String, File> replaceSchemaSqlFileMap = getReplaceSchemaSqlFileMap();
         for (File mainFile : replaceSchemaSqlFileMap.values()) {
-            doMoveToPreviousResource(mainFile, previousDir, playSqlDirSymbol, copyToFileList);
+            doCopyToPreviousResource(mainFile, previousDir, playSqlDirSymbol, copyToFileList);
         }
         final Map<String, File> takeFinallySqlFileMap = getTakeFinallySqlFileMap();
         for (File mainFile : takeFinallySqlFileMap.values()) {
-            doMoveToPreviousResource(mainFile, previousDir, playSqlDirSymbol, copyToFileList);
+            doCopyToPreviousResource(mainFile, previousDir, playSqlDirSymbol, copyToFileList);
         }
         final List<File> dataFileList = findHierarchyFileList(getSchemaDataDir());
         for (File dataFile : dataFileList) {
-            doMoveToPreviousResource(dataFile, previousDir, playSqlDirSymbol, copyToFileList);
+            doCopyToPreviousResource(dataFile, previousDir, playSqlDirSymbol, copyToFileList);
         }
         return copyToFileList;
     }
 
-    protected void doMoveToPreviousResource(File mainFile, String previousDir, String playSqlDirSymbol,
+    protected void doCopyToPreviousResource(File mainFile, String previousDir, String playSqlDirSymbol,
             List<File> copyToFileList) {
         final String relativePath = Srl.substringLastRear(mainFile.getPath(), playSqlDirSymbol);
-        final File moveToFile = new File(previousDir + "/" + relativePath);
-        final File moveToDir = new File(Srl.substringLastFront(moveToFile.getPath(), "/"));
-        if (!moveToDir.exists()) {
-            moveToDir.mkdirs();
+        final File copyToFile = new File(previousDir + "/" + relativePath);
+        final File copyToDir = new File(Srl.substringLastFront(copyToFile.getPath(), "/"));
+        if (!copyToDir.exists()) {
+            copyToDir.mkdirs();
         }
-        if (moveToFile.exists()) {
-            moveToFile.delete();
+        if (copyToFile.exists()) {
+            copyToFile.delete();
         }
-        _log.info("...Saving the file to " + moveToFile.getPath());
-        copyFile(mainFile, moveToFile);
-        copyToFileList.add(moveToFile);
+        _log.info("...Saving the file to " + copyToFile.getPath());
+        copyFile(mainFile, copyToFile);
+        copyToFileList.add(copyToFile);
     }
 
     protected void checkSavedResource(DfAlterCheckFinalInfo finalInfo) {
@@ -707,7 +707,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             FileUtils.getFileUtils().copyFile(src, dest);
         } catch (IOException e) {
             String msg = "Failed to copy file: " + src + " to " + dest;
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(msg, e);
         }
     }
 

@@ -14,6 +14,7 @@
 # o additionalUserMap: (NotRequired - Default map:{})
 # o additionalDropMapList: (NotRequired - Default list:{})
 # o applicationPlaySqlDirectory: (NotRequired - Default '')
+# o arrangeBeforeRepsMap: (NotRequired - Default map:{})
 # o isSuppressTruncateTable: (NotRequired - Default false)
 # o isSuppressDropForeignKey: (NotRequired - Default false)
 # o isSuppressDropTable: (NotRequired - Default false)
@@ -137,6 +138,17 @@ map:{
     #  which is basically used with ApplicationBehavior.
     #
     #; applicationPlaySqlDirectory = ../../foo-project/dbflute_apbranch/playsql
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o arrangeBeforeRepsMap: (NotRequired - Default map:{})
+    #  You can arrange resource files before ReplaceSchema.
+    #
+    #; arrangeBeforeRepsMap = map:{
+    #    ; copy = map:{
+    #        ; ../erd/*.ddl = ./playsql/replace-schema-10-basic.sql
+    #    }
+    #}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

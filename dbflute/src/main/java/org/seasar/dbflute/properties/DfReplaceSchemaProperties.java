@@ -661,6 +661,47 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
+    //                                                                 Arrange before Reps
+    //                                                                 ===================
+    protected Map<String, Map<String, Object>> _arrangeBeforeRepsMap;
+
+    protected Map<String, Map<String, Object>> getArrangeBeforeRepsMap() {
+        if (_arrangeBeforeRepsMap != null) {
+            return _arrangeBeforeRepsMap;
+        }
+        final Object obj = getReplaceSchemaDefinitionMap().get("arrangeBeforeRepsMap");
+        if (obj == null) {
+            _arrangeBeforeRepsMap = DfCollectionUtil.emptyMap();
+        } else {
+            @SuppressWarnings("unchecked")
+            final Map<String, Map<String, Object>> arrangeMap = (Map<String, Map<String, Object>>) obj;
+            checkArrangeUnsupportedManupulation(arrangeMap);
+            _arrangeBeforeRepsMap = arrangeMap;
+        }
+        return _arrangeBeforeRepsMap;
+    }
+
+    protected void checkArrangeUnsupportedManupulation(Map<String, Map<String, Object>> arrangeMap) {
+        if (arrangeMap.size() >= 2) { // may support other manipulations
+            String msg = "The arrangeBeforeReps supports only 'copy' now: " + arrangeMap.keySet();
+            throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    public Map<String, String> getArrangeBeforeRepsCopyMap() {
+        final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
+        final Map<String, Object> elementMap = repsMap.get("copy");
+        if (elementMap == null) {
+            return DfCollectionUtil.emptyMap();
+        }
+        final Map<String, String> copyMap = new LinkedHashMap<String, String>();
+        for (Entry<String, Object> entry : elementMap.entrySet()) {
+            copyMap.put(entry.getKey(), (String) entry.getValue());
+        }
+        return copyMap;
+    }
+
+    // ===================================================================================
     //                                                        Suppress Initializing Schema
     //                                                        ============================
     public boolean isSuppressTruncateTable() {
