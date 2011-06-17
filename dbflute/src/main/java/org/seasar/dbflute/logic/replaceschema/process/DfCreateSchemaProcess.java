@@ -296,7 +296,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
 
         @Override
         protected boolean isSqlTrimAndRemoveLineSeparator() {
-            return true;
+            return false; // for looks
         }
 
         @Override

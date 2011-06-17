@@ -119,7 +119,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
 
             @Override
             protected boolean isSqlTrimAndRemoveLineSeparator() {
-                return true;
+                return false; // for looks
             }
 
             @Override

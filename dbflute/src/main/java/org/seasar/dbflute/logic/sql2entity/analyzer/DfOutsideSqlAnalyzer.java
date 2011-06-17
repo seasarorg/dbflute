@@ -288,9 +288,9 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     @Override
     protected void traceResult(int goodSqlCount, int totalSqlCount) {
         if (totalSqlCount > 0) {
-            _log.info("  -> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount));
+            _log.info(" -> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount));
         } else {
-            _log.info("  -> SQL for sql2entity was not found in the SQL file!");
+            _log.info(" -> SQL for sql2entity was not found in the SQL file!");
         }
     }
 

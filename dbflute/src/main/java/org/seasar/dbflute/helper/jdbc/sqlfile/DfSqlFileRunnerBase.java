@@ -185,7 +185,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     protected void traceResult(int goodSqlCount, int totalSqlCount) {
-        _log.info("  -> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount));
+        _log.info(" -> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount));
     }
 
     protected String filterSql(String sql) { // for override
@@ -281,9 +281,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 // and in Oracle it may contain a hint
                 // so we cannot just remove it, instead we must end it
                 if (line.trim().startsWith("--")) { // If this line is comment only, ...
-                    // * * * * * * * * * * *
+                    // = = = = = = = = = = =
                     // Line for Line Comment
-                    // * * * * * * * * * * *
+                    // = = = = = = = = = = =
 
                     // Group Specification
                     // /- - - - - - - - - - - - - - - -
@@ -312,9 +312,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     }
                     sql = sql + line + ln();
                 } else {
-                    // * * * * * * * * * *
+                    // = = = = = = = = = =
                     // Line for SQL Clause
-                    // * * * * * * * * * *
+                    // = = = = = = = = = =
 
                     if (inGroup) {
                         sql = sql + line + ln();
@@ -343,9 +343,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 }
 
                 if (sql.trim().endsWith(_runInfo.getDelimiter())) {
-                    // * * * * * * * *
+                    // = = = = = = = =
                     // End of the SQL
-                    // * * * * * * * *
+                    // = = = = = = = =
+
                     sql = sql.trim();
                     sql = sql.substring(0, sql.length() - _runInfo.getDelimiter().length());
                     sql = sql.trim();

@@ -274,6 +274,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         final List<String> envList = Srl.splitListTrimmed(repsEnvExp, ",");
         final String repsEnvType = getRepsEnvType();
+        _log.info("...Checking repsEnvType: " + repsEnvType + " in " + envList);
         return envList.contains(repsEnvType);
     }
 

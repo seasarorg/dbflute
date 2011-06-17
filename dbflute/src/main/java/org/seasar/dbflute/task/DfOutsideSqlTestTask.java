@@ -138,7 +138,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
             @Override
             protected void traceResult(int goodSqlCount, int totalSqlCount) {
-                _log.info("  -> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount) + ln());
+                _log.info(" -> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount) + ln());
             }
 
             @Override
