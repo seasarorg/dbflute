@@ -84,7 +84,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      *  8 / 23 pages (453 records)
      * <span style="color: #FD4747">previous</span> 3 4 5 6 <span style="color: #FD4747">7</span> 8 9 10 11 12 13 next
      * </pre>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isExistPrePage() {
         return (_allRecordCount > 0 && _currentPageNumber > 1);
@@ -98,7 +98,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      *  8 / 23 pages (453 records)
      * previous 3 4 5 6 7 8 <span style="color: #FD4747">9</span> 10 11 12 13 <span style="color: #FD4747">next</span>
      * </pre>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isExistNextPage() {
         return (_allRecordCount > 0 && _currentPageNumber < getAllPageCount());

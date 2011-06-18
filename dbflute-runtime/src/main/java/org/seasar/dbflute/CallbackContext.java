@@ -52,7 +52,7 @@ public class CallbackContext {
 
     /**
      * Is existing callback-context on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistCallbackContextOnThread() {
         return (_threadLocal.get() != null);

@@ -60,7 +60,7 @@ public interface OracleAgent {
     /**
      * Is this object Oracle's ARRAY?
      * @param obj The doubtful instance. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isOracleArray(Object obj);
 
@@ -88,7 +88,7 @@ public interface OracleAgent {
     /**
      * Is this object Oracle's STRUCT?
      * @param obj The doubtful instance. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isOracleStruct(Object obj);
 

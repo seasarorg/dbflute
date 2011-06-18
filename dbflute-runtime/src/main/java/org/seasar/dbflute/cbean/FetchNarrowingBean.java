@@ -37,19 +37,19 @@ public interface FetchNarrowingBean extends FetchBean {
 
     /**
      * Is fetch start index supported?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isFetchNarrowingSkipStartIndexEffective();
 
     /**
      * Is fetch size supported?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isFetchNarrowingLoopCountEffective();
 
     /**
      * Is fetch-narrowing effective?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isFetchNarrowingEffective();
 

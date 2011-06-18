@@ -69,7 +69,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does it has the value of equal?
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean hasEqual() {
         return getEqualValueHandler().hasValue();
@@ -78,7 +78,7 @@ public class ConditionValue implements Serializable {
     /**
      * Does the value equal the value of equal?
      * @param value The value of equal. (NullAllowed)
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean equalEqual(Object value) {
         return getEqualValueHandler().equalValue(value);
@@ -124,7 +124,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does it has the value of notEqual?
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean hasNotEqual() {
         return getNotEqualValueHandler().hasValue();
@@ -133,7 +133,7 @@ public class ConditionValue implements Serializable {
     /**
      * Does the value equal the value of notEqual?
      * @param value The value of notEqual. (NullAllowed)
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean equalNotEqual(Object value) {
         return getNotEqualValueHandler().equalValue(value);
@@ -179,7 +179,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does it has the value of greaterThan?
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean hasGreaterThan() {
         return getGreaterThanValueHandler().hasValue();
@@ -188,7 +188,7 @@ public class ConditionValue implements Serializable {
     /**
      * Does the value equal the value of greaterThan?
      * @param value The value of greaterThan. (NullAllowed)
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean equalGreaterThan(Object value) {
         return getGreaterThanValueHandler().equalValue(value);
@@ -234,7 +234,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does it has the value of lessThan?
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean hasLessThan() {
         return getLessThanValueHandler().hasValue();
@@ -243,7 +243,7 @@ public class ConditionValue implements Serializable {
     /**
      * Does the value equal the value of lessThan?
      * @param value The value of lessThan. (NullAllowed)
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean equalLessThan(Object value) {
         return getLessThanValueHandler().equalValue(value);
@@ -289,7 +289,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does it has the value of greaterEqual?
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean hasGreaterEqual() {
         return getGreaterEqualValueHandler().hasValue();
@@ -298,7 +298,7 @@ public class ConditionValue implements Serializable {
     /**
      * Does the value equal the value of greaterEqual?
      * @param value The value of greaterEqual. (NullAllowed)
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean equalGreaterEqual(Object value) {
         return getGreaterEqualValueHandler().equalValue(value);
@@ -344,7 +344,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does it has the value of lessEqual?
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean hasLessEqual() {
         return getLessEqualValueHandler().hasValue();
@@ -353,7 +353,7 @@ public class ConditionValue implements Serializable {
     /**
      * Does the value equal the value of lessEqual?
      * @param value The value of lessEqual. (NullAllowed)
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean equalLessEqual(Object value) {
         return getLessEqualValueHandler().equalValue(value);
@@ -533,7 +533,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does it has the value of isNotNull?
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean hasIsNotNull() {
         return getIsNotNullValueHandler().hasValue();
@@ -562,7 +562,7 @@ public class ConditionValue implements Serializable {
 
     /**
      * Does it has the value of isNull?
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean hasIsNull() {
         return getIsNullValueHandler().hasValue();

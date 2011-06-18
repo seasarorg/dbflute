@@ -33,7 +33,7 @@ public interface ProcedurePmb extends ParameterBean {
      * Does it escape the procedure statement? <br />
      * If true, 'call SP_FOO()' to '{call = SP_FOO()}'. <br />
      * This default value should be true basically.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isEscapeStatement();
 
@@ -41,7 +41,7 @@ public interface ProcedurePmb extends ParameterBean {
      * Does it call the procedure statement by select statement? <br />
      * If true, '{call SP_FOO()}' to 'select * from SP_FOO()'. <br />
      * This default value is resolved by generator automatically.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isCalledBySelect();
 }

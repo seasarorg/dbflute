@@ -82,7 +82,7 @@ public class PageRangeOption implements Serializable {
 
     /**
      * Is fill-limit valid?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isFillLimit() {
         return _fillLimit;

@@ -442,7 +442,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * Has union query or union all query?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean hasUnionQueryOrUnionAllQuery() {
         return (_unionQueryMap != null && !_unionQueryMap.isEmpty())
@@ -1535,7 +1535,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * Does it allowed an empty string to set for query?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isEmptyStringQueryAllowed() {
         return xgetSqlClause().isEmptyStringQueryAllowed();

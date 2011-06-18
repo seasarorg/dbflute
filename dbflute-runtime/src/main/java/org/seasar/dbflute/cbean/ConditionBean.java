@@ -119,7 +119,7 @@ public interface ConditionBean extends PagingBean {
     /**
      * Is set up various things for select-count-ignore-fetch-scope? {Internal}
      * This method is for INTERNAL. Don't call this!
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isSelectCountIgnoreFetchScope();
 
@@ -181,20 +181,20 @@ public interface ConditionBean extends PagingBean {
      * If this condition-bean has union queries,
      * all unions must have each where clauses for true. <br />
      * However, where clauses in in-line views is NOT contained.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasWhereClause();
 
     /**
      * Does it have order-by clauses? <br />
      * Whether that order-by is effective or not has no influence.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasOrderByClause();
 
     /**
      * Has union query or union all query?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasUnionQueryOrUnionAllQuery();
 

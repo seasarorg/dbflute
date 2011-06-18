@@ -137,7 +137,7 @@ public class PageRangeBean implements Serializable {
      * 
      * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">2</span>
      * </pre>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isExistPrePageRange() {
         assertPageRangeValid();
@@ -157,7 +157,7 @@ public class PageRangeBean implements Serializable {
      * 
      * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">14</span>
      * </pre>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isExistNextPageRange() {
         assertPageRangeValid();

@@ -219,7 +219,7 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
     //                                                                ====================
     /**
      * Is the fetch narrowing effective?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isFetchNarrowingEffective() {
         if (_fetchNarrowingBean == null) {
@@ -231,7 +231,7 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
     /**
      * Is the skip start index of fetch narrowing effective?
      * If isFetchNarrowingEffective() is false, this is not called by anyone.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isFetchNarrowingSkipStartIndexEffective() {
         if (_fetchNarrowingBean == null) {
@@ -245,7 +245,7 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
     /**
      * Is the loop count of fetch narrowing effective?
      * If isFetchNarrowingEffective() is false, this is not called by anyone.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isFetchNarrowingLoopCountEffective() {
         if (_fetchNarrowingBean == null) {

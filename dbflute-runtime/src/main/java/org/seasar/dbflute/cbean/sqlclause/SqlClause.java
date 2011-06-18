@@ -64,7 +64,7 @@ public interface SqlClause {
 
     /**
      * Is this SQL for sub-query?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isForSubQuery();
 
@@ -253,7 +253,7 @@ public interface SqlClause {
     /**
      * Does it have where clauses? <br />
      * In-line where clause is NOT contained.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasWhereClause();
 
@@ -301,13 +301,13 @@ public interface SqlClause {
 
     /**
      * Is or-scope query effective?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isOrScopeQueryEffective();
 
     /**
      * Is and-part of or-scope effective?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isOrScopeQueryAndPartEffective();
 
@@ -343,7 +343,7 @@ public interface SqlClause {
     /**
      * Does it have order-by clauses? <br />
      * Whether effective or not has no influence.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasOrderByClause();
 
@@ -434,13 +434,13 @@ public interface SqlClause {
 
     /**
      * Is fetch start index supported?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isFetchStartIndexSupported();
 
     /**
      * Is fetch size supported?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isFetchSizeSupported();
 
@@ -565,7 +565,7 @@ public interface SqlClause {
     /**
      * Does it have specified select columns?
      * @param tableAliasName The alias name of table. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasSpecifiedSelectColumn(String tableAliasName);
 
@@ -573,7 +573,7 @@ public interface SqlClause {
      * Does it have the specified select column?
      * @param tableAliasName The alias name of table. (NotNull)
      * @param columnDbName The DB name of column. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasSpecifiedSelectColumn(String tableAliasName, String columnDbName);
 
@@ -735,7 +735,7 @@ public interface SqlClause {
 
         /**
          * Should the scalar be selected uniquely?
-         * @return Determination.
+         * @return The determination, true or false.
          */
         public boolean isUniqueScalar() { // not contains plain-count
             return _uniqueScalar;
@@ -743,7 +743,7 @@ public interface SqlClause {
 
         /**
          * Does the scalar need specified only-one column?
-         * @return Determination.
+         * @return The determination, true or false.
          */
         public boolean isSpecifiedScalar() { // not contains all-count
             return _specifiedScalar;

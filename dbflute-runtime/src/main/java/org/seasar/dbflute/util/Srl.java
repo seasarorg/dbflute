@@ -30,26 +30,56 @@ public class Srl {
     // ===================================================================================
     //                                                                        Null & Empty
     //                                                                        ============
+    /**
+     * Is the string null or empty string? 
+     * @param str A judged string. (NullAllowed)
+     * @return The determination.
+     */
     public static boolean is_Null_or_Empty(final String str) {
         return str == null || str.length() == 0;
     }
 
+    /**
+     * Is the string null or trimmed-empty string? 
+     * @param str A judged string. (NullAllowed)
+     * @return The determination.
+     */
     public static boolean is_Null_or_TrimmedEmpty(final String str) {
         return str == null || str.trim().length() == 0;
     }
 
+    /**
+     * Is the string not null and not empty string? 
+     * @param str A judged string. (NullAllowed)
+     * @return The determination.
+     */
     public static boolean is_NotNull_and_NotEmpty(final String str) {
         return !is_Null_or_Empty(str);
     }
 
+    /**
+     * Is the string not null and not trimmed-empty string? 
+     * @param str A judged string. (NullAllowed)
+     * @return The determination.
+     */
     public static boolean is_NotNull_and_NotTrimmedEmpty(final String str) {
         return !is_Null_or_TrimmedEmpty(str);
     }
 
+    /**
+     * Is the string empty string? 
+     * @param str A judged string. (NullAllowed)
+     * @return The determination.
+     */
     public static boolean isEmpty(final String str) {
         return str != null && str.length() == 0;
     }
 
+    /**
+     * Is the string trimmed-empty string? 
+     * @param str A judged string. (NullAllowed)
+     * @return The determination.
+     */
     public static boolean isTrimmedEmpty(final String str) {
         return str != null && str.trim().length() == 0;
     }

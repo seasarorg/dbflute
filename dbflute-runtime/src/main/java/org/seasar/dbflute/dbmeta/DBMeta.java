@@ -104,7 +104,7 @@ public interface DBMeta {
     /**
      * Has column?
      * @param columnFlexibleName The flexible name of the column. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasColumn(String columnFlexibleName);
 
@@ -138,7 +138,7 @@ public interface DBMeta {
 
     /**
      * Has primary-key?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasPrimaryKey();
 
@@ -146,7 +146,7 @@ public interface DBMeta {
      * Has compound primary-key? <br />
      * If this table does not have primary-key in the first place,
      * this method returns false. 
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasCompoundPrimaryKey();
 
@@ -169,7 +169,7 @@ public interface DBMeta {
     /**
      * Has foreign?
      * @param foreignPropName The flexible name of the foreign property. (NotNull)
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     boolean hasForeign(String foreignPropName);
 
@@ -199,7 +199,7 @@ public interface DBMeta {
     /**
      * Has referrer?
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     boolean hasReferrer(String referrerPropertyName);
 
@@ -253,7 +253,7 @@ public interface DBMeta {
     //                                                                       =============
     /**
      * Has identity?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasIdentity();
 
@@ -262,7 +262,7 @@ public interface DBMeta {
     //                                                                       =============
     /**
      * Has sequence?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasSequence();
 
@@ -295,7 +295,7 @@ public interface DBMeta {
     //                                                                ====================
     /**
      * Does the table have a column for version no?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasVersionNo();
 
@@ -307,7 +307,7 @@ public interface DBMeta {
 
     /**
      * Does the table have a column for update date?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasUpdateDate();
 
@@ -322,7 +322,7 @@ public interface DBMeta {
     //                                                                  ==================
     /**
      * Does the table have common columns?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasCommonColumn();
 
@@ -350,7 +350,7 @@ public interface DBMeta {
     /**
      * Does the table have an object for the flexible name? {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasFlexibleName(String flexibleName);
 
@@ -451,7 +451,7 @@ public interface DBMeta {
      * Has the set-upper of entity property by the name of property? <br />
      * Comparing is so flexible. {Ignore cases and underscore}
      * @param propertyName The name of the property. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasEntityPropertySetupper(String propertyName);
 

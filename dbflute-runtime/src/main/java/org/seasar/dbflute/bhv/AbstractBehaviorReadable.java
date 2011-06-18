@@ -985,14 +985,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * Does the entity have a value of version-no? 
      * @param entity The instance of entity. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected abstract boolean hasVersionNoValue(Entity entity);
 
     /**
      * Does the entity have a value of update-date? 
      * @param entity The instance of entity. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected abstract boolean hasUpdateDateValue(Entity entity);
 

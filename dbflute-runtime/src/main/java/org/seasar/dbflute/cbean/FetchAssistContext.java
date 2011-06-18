@@ -53,7 +53,7 @@ public class FetchAssistContext {
 
     /**
      * Is existing fetch-bean on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistFetchBeanOnThread() {
         return (_threadLocal.get() != null);
@@ -85,7 +85,7 @@ public class FetchAssistContext {
 
     /**
      * Is existing fetch-narrowing-bean on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistFetchNarrowingBeanOnThread() {
         return (getFetchNarrowingBeanOnThread() != null);

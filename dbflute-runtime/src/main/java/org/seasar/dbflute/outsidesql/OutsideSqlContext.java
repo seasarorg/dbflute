@@ -71,7 +71,7 @@ public class OutsideSqlContext {
 
     /**
      * Is existing the context of outside-SQL on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistOutsideSqlContextOnThread() {
         return (_threadLocal.get() != null);

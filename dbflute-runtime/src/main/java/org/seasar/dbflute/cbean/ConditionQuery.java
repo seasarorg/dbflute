@@ -89,7 +89,7 @@ public interface ConditionQuery {
 
     /**
      * Is this a base query?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isBaseQuery();
 

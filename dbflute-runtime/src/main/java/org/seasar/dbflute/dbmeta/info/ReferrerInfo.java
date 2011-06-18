@@ -255,7 +255,7 @@ public class ReferrerInfo implements RelationInfo {
     /**
      * Does the relation is one-to-one? <br />
      * But basically this returns false because DBFlute treats one-to-one relations as a foreign relation.  
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isOneToOne() {
         return _oneToOne;

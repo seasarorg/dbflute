@@ -114,7 +114,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     }
 
     /**
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isFetchStartIndexSupported() {
         return false;

@@ -58,7 +58,7 @@ public class AccessContext {
 
     /**
      * Is existing access-context on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistAccessContextOnThread() {
         return (_threadLocal.get() != null);

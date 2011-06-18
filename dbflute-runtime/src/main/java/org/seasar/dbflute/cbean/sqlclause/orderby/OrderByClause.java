@@ -196,7 +196,7 @@ public class OrderByClause implements Serializable {
 
     /**
      * @param expectedColumnName Expected column-name. (NullAllowed)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isSameAsFirstElementColumnName(String expectedColumnName) {
         if (isEmpty()) {
@@ -217,7 +217,7 @@ public class OrderByClause implements Serializable {
     //                                                                    ================
     /**
      * Is empty?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isEmpty() {
         return _orderByList.isEmpty();
@@ -225,7 +225,7 @@ public class OrderByClause implements Serializable {
 
     /**
      * Get iterator of order-by list.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public Iterator<OrderByElement> iterator() {
         return _orderByList.iterator();

@@ -256,7 +256,7 @@ public class ForeignInfo implements RelationInfo {
 
     /**
      * Does the relation is one-to-one?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isOneToOne() {
         return _oneToOne;
@@ -264,7 +264,7 @@ public class ForeignInfo implements RelationInfo {
 
     /**
      * Does the relation is biz-one-to-one?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isBizOneToOne() {
         return _bizOneToOne;

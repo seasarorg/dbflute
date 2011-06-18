@@ -69,7 +69,7 @@ public class ResourceContext {
 
     /**
      * Is existing the context of resource on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistResourceContextOnThread() {
         return (threadLocal.get() != null);

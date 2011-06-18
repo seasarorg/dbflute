@@ -359,7 +359,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                      ----------------
     /**
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
-     * @return Determination. (NotNull)
+     * @return The determination, true or false. (NotNull)
      */
     public boolean hasReferrer(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
@@ -1029,7 +1029,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * Does it have the method?
      * @param methodName The name of method. (NotNull, NotEmpty, PublicMethodOnly)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean hasMethod(String methodName) {
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);

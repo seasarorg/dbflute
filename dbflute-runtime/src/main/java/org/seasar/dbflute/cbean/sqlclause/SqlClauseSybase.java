@@ -114,7 +114,7 @@ public class SqlClauseSybase extends AbstractSqlClause {
     }
 
     /**
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isFetchStartIndexSupported() {
         return false;

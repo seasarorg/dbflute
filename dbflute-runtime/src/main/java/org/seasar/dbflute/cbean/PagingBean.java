@@ -26,19 +26,19 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     //                                                                ====================
     /**
      * Is the execution for paging(NOT count)? {for parameter comment}
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isPaging();
 
     /**
      * Can the paging execute count later? {for framework}
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean canPagingCountLater();
 
     /**
      * Can the paging re-select? {for framework}
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean canPagingReSelect();
 
@@ -160,7 +160,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
 
     /**
      * Is fetch scope effective?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean isFetchScopeEffective();
 }

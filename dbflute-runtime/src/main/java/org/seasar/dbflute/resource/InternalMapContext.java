@@ -64,7 +64,7 @@ public class InternalMapContext {
 
     /**
      * Is existing internal-map-context on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistInternalMapContextOnThread() {
         return (threadLocal.get() != null);

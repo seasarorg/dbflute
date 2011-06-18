@@ -533,7 +533,7 @@ public class MapListString {
     /**
      * Does it start with map-prefix?
      * @param targetString Target-string. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isStartsWithMapPrefix(String targetString) {
         if (targetString == null) {
@@ -551,7 +551,7 @@ public class MapListString {
     /**
      * Does it start with list-prefix?
      * @param targetString Target-string. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isStartsWithListPrefix(String targetString) {
         if (targetString == null) {
@@ -569,7 +569,7 @@ public class MapListString {
     /**
      * Does it start with delimiter?
      * @param targetString Target-string. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isStartsWithDelimiter(String targetString) {
         if (targetString == null) {
@@ -587,7 +587,7 @@ public class MapListString {
     /**
      * Does it start with end-brace?
      * @param targetString Target-string. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isStartsWithEndBrace(String targetString) {
         if (targetString == null) {
@@ -605,7 +605,7 @@ public class MapListString {
     /**
      * Does it end with end-brace?
      * @param targetString Target-string. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isEndsWithEndBrace(String targetString) {
         if (targetString == null) {

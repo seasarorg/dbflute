@@ -59,7 +59,7 @@ public interface Entity {
     //                                                                         ===========
     /**
      * Does it have the value of primary keys?
-     * @return Determination. (if all PK values are not null, returns true)
+     * @return The determination, true or false. (if all PK values are not null, returns true)
      */
     boolean hasPrimaryKeyValue();
 
@@ -80,7 +80,7 @@ public interface Entity {
 
     /**
      * Does it have modifications of property names. (basically for Framework)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasModification();
 
@@ -113,7 +113,7 @@ public interface Entity {
 
         /**
          * Is empty?
-         * @return Determination.
+         * @return The determination, true or false.
          */
         public boolean isEmpty() {
             return _propertiesSet.isEmpty();

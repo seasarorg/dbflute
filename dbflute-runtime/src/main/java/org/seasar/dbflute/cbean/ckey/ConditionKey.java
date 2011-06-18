@@ -107,7 +107,7 @@ public abstract class ConditionKey implements Serializable {
      * @param cvalue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param callerName Caller's real name. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isValidRegistration(final QueryModeProvider provider, final ConditionValue cvalue,
             final Object value, final ColumnRealName callerName) {

@@ -10,7 +10,7 @@ public interface HpSpQyCall<CQ extends ConditionQuery> {
 
     /**
      * Does it have its own query?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean has();
 

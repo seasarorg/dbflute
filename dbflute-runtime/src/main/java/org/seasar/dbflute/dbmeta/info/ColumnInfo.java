@@ -284,7 +284,7 @@ public class ColumnInfo {
 
     /**
      * Is the column not null?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isNotNull() {
         return this._notNull;
@@ -308,7 +308,7 @@ public class ColumnInfo {
 
     /**
      * Is the property type String? (assignable from)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isPropertyTypeString() {
         return String.class.isAssignableFrom(getPropertyType());
@@ -316,7 +316,7 @@ public class ColumnInfo {
 
     /**
      * Is the property type Number? (assignable from)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isPropertyTypeNumber() {
         return Number.class.isAssignableFrom(getPropertyType());
@@ -324,7 +324,7 @@ public class ColumnInfo {
 
     /**
      * Is the property type Date? (assignable from)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isPropertyTypeDate() {
         return Date.class.isAssignableFrom(getPropertyType());
@@ -332,7 +332,7 @@ public class ColumnInfo {
 
     /**
      * Is the column a part of primary keys?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isPrimary() {
         return this._primary;
@@ -340,7 +340,7 @@ public class ColumnInfo {
 
     /**
      * Is the column auto increment?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isAutoIncrement() {
         return this._autoIncrement;
@@ -372,7 +372,7 @@ public class ColumnInfo {
 
     /**
      * Is the column a part of common columns?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isCommonColumn() {
         return this._commonColumn;
@@ -380,7 +380,7 @@ public class ColumnInfo {
 
     /**
      * Is the column for optimistic lock?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isOptimisticLock() {
         return isVersionNo() || isUpdateDate();
@@ -388,7 +388,7 @@ public class ColumnInfo {
 
     /**
      * Is the column version-no for optimistic lock?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isVersionNo() {
         return OptimisticLockType.VERSION_NO == _optimisticLockType;
@@ -396,7 +396,7 @@ public class ColumnInfo {
 
     /**
      * Is the column update-date for optimistic lock?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isUpdateDate() {
         return OptimisticLockType.UPDATE_DATE == _optimisticLockType;

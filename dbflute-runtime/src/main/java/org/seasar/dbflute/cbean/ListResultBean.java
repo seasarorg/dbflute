@@ -194,7 +194,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
     //                                                                       =============
     /**
      * Has this result selected?
-     * @return Determination. {Whether table DB name is not null}
+     * @return The determination, true or false. {Whether table DB name is not null}
      */
     public boolean isSelectedResult() {
         return _tableDbName != null;

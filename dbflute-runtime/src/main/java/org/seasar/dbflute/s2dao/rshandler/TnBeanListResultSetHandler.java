@@ -233,7 +233,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * Does it have the relation as selected?
      * You should call hasConditionBean() before calling this!
      * @param relationNoSuffix The suffix of relation NO. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean hasSelectedRelation(String relationNoSuffix) {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();

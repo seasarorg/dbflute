@@ -49,7 +49,7 @@ public interface TnBeanMetaData {
     /**
      * Does it has the property type by the key as case insensitive.
      * @param propertyName The name of property. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean hasPropertyType(String propertyName);
 

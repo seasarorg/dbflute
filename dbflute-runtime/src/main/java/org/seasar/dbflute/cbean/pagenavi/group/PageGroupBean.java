@@ -142,7 +142,7 @@ public class PageGroupBean implements Serializable {
      * 
      * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">10</span>
      * </pre>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isExistPrePageGroup() {
         assertPageGroupValid();
@@ -159,7 +159,7 @@ public class PageGroupBean implements Serializable {
      * 
      * <span style="color: #3F7E5E">// this method returns existence of</span> <span style="color: #FD4747">21</span>
      * </pre>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isExistNextPageGroup() {
         assertPageGroupValid();

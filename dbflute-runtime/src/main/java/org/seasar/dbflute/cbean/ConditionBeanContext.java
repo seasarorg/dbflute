@@ -59,7 +59,7 @@ public class ConditionBeanContext {
 
     /**
      * Is existing condition-bean on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistConditionBeanOnThread() {
         return (_conditionBeanLocal.get() != null);
@@ -100,7 +100,7 @@ public class ConditionBeanContext {
 
     /**
      * Is existing the handler of entity row on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistEntityRowHandlerOnThread() {
         return (_entityRowHandlerLocal.get() != null);
@@ -119,7 +119,7 @@ public class ConditionBeanContext {
     /**
      * Is the argument condition-bean?
      * @param dtoInstance DTO instance.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isTheArgumentConditionBean(final Object dtoInstance) {
         return dtoInstance instanceof ConditionBean;
@@ -128,7 +128,7 @@ public class ConditionBeanContext {
     /**
      * Is the type condition-bean?
      * @param dtoClass DtoClass.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isTheTypeConditionBean(final Class<?> dtoClass) {
         return ConditionBean.class.isAssignableFrom(dtoClass);

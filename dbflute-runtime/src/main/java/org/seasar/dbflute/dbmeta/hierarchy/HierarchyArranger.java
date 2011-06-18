@@ -482,7 +482,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
      * 
      * @param topInfo The information object of top that has generics of local entity. (NotNull)
      * @param relationPath The path of relation. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isNotExistPrimaryKey(TopInfo<LOCAL_ENTITY> topInfo, String relationPath) {
         final Map<String, Object> primaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, relationPath);

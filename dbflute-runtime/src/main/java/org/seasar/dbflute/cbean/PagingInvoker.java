@@ -120,7 +120,7 @@ public class PagingInvoker<ENTITY> {
      * Is the current page is last page?
      * @param selectedList The selected list. (NotNull)
      * @param pagingBean The bean of paging. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isCurrentLastPage(List<ENTITY> selectedList, PagingBean pagingBean) {
         if (selectedList.size() == 0 && pagingBean.getFetchPageNumber() > 1) {
@@ -155,7 +155,7 @@ public class PagingInvoker<ENTITY> {
     /**
      * Is it necessary to read page again?
      * @param rb The result bean of paging. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isNecessaryToReadPageAgain(PagingResultBean<ENTITY> rb) {
         return rb.getAllRecordCount() > 0 && rb.getSelectedList().isEmpty();

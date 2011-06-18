@@ -55,7 +55,7 @@ public class ContextStack {
 
     /**
      * Is existing context-stack on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistContextStackOnThread() {
         return (_threadLocal.get() != null);
