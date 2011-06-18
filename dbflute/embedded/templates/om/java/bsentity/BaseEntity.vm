@@ -231,7 +231,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
         ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();

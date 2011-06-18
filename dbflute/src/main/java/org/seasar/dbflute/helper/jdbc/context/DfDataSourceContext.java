@@ -47,7 +47,7 @@ public class DfDataSourceContext {
 
     /**
      * Is existing DataSource on thread?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isExistDataSource() {
         return (_threadLocal.get() != null);

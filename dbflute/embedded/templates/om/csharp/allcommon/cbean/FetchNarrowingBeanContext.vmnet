@@ -49,7 +49,7 @@ namespace ${glPackageBaseCommonCBean} {
         /**
          * Is existing fetch-narrowing-bean context on thread?
          * 
-         * @return Determination.
+         * @return The determination, true or false.
          */
         public static bool IsExistFetchNarrowingBeanOnThread() {
             return (Thread.GetData(_fetchNarrowingBeanSlot) != null);
@@ -59,7 +59,7 @@ namespace ${glPackageBaseCommonCBean} {
          * Is the argument fetch-narrowing-bean?
          * 
          * @param dtoInstance Dto instance.
-         * @return Determination.
+         * @return The determination, true or false.
          */
         public static bool IsTheArgumentFetchNarrowingBean(Object dtoInstance) {
             if (dtoInstance is ${glFetchNarrowingBean}) {
@@ -73,7 +73,7 @@ namespace ${glPackageBaseCommonCBean} {
          * Is the type fetch-narrowing-bean?
          * 
          * @param dtoClass DtoClass.
-         * @return Determination.
+         * @return The determination, true or false.
          */
         public static bool IsTheTypeFetchNarrowingBean(Type dtoType) {
             if (typeof(${glFetchNarrowingBean}).IsAssignableFrom(dtoType)) {

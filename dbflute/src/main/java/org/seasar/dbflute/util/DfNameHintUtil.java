@@ -51,7 +51,7 @@ public class DfNameHintUtil {
      * Does it hit the target name by the hint. {CaseInsensitive}
      * @param name The target name. (NotNull)
      * @param hint The hint of the name. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public static boolean isHitByTheHint(String name, String hint) {
         final String prefixMark = PREFIX_MARK;

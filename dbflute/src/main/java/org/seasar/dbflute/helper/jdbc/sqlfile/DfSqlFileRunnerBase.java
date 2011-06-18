@@ -534,14 +534,14 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     protected abstract void execSQL(String sql);
 
     /**
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isSqlTrimAndRemoveLineSeparator() {
         return false; // as Default
     }
 
     /**
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isHandlingCommentOnLineSeparator() {
         return false; // as Default

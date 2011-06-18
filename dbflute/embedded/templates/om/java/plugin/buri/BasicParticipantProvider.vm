@@ -38,7 +38,7 @@ public class ${glBasicParticipantProvider} implements ParticipantProvider {
      * Does the current user have an authority of execution about target data? <br />
      * This method is called when it executes action to target data.
      * @param context The context of participant that provides current informations. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean hasAuthority(ParticipantContext context) {
         return true;

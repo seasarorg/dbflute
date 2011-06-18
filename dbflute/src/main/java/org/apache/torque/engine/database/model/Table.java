@@ -852,7 +852,7 @@ public class Table {
     //                                         -------------
     /**
      * Determine whether this table has a primary key.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean hasPrimaryKey() {
         return (getPrimaryKey().size() > 0);
@@ -860,7 +860,7 @@ public class Table {
 
     /**
      * Determine whether this table has a single primary key.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean hasSinglePrimaryKey() {
         return (getPrimaryKey().size() == 1);
@@ -868,7 +868,7 @@ public class Table {
 
     /**
      * Determine whether this table has a compound primary key.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean hasCompoundPrimaryKey() {
         return (getPrimaryKey().size() > 1);
@@ -884,7 +884,7 @@ public class Table {
 
     /**
      * Is this table writable?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isWritable() {
         return hasPrimaryKey();
@@ -1122,7 +1122,7 @@ public class Table {
 
     /**
      * Has relation? (hasForeignKey() or hasReferrer())
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean hasRelation() {
         return (hasForeignKey() || hasReferrer());
@@ -2031,7 +2031,7 @@ public class Table {
     //                                                                            ========
     /**
      * Determine whether this table uses a sequence.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isUseSequence() {
         final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
@@ -2192,7 +2192,7 @@ public class Table {
 
     /**
      * Has sequence name of postgreSQL serial type column.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean hasPostgreSQLSerialSequenceName() {
         final String postgreSQLSerialSequenceName = extractPostgreSQLSerialSequenceName();
@@ -2281,7 +2281,7 @@ public class Table {
     //                                                                            ========
     /**
      * Determine whether this table uses an identity.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isUseIdentity() {
         final DfBasicProperties basicProperties = getBasicProperties();
@@ -2363,7 +2363,7 @@ public class Table {
     //                                                                          ==========
     /**
      * Determine whether this table uses a update date column.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isUseUpdateDate() {
         final String updateDateColumnName = getProperties().getOptimisticLockProperties().getUpdateDateFieldName();
@@ -2435,7 +2435,7 @@ public class Table {
     //                                                                           =========
     /**
      * Determine whether this table uses a version-no column.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isUseVersionNo() {
         final String versionNoColumnName = getProperties().getOptimisticLockProperties().getVersionNoFieldName();
@@ -2491,7 +2491,7 @@ public class Table {
     //                                                                       =============
     /**
      * Is this table defined all common columns?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean hasAllCommonColumn() {
         try {

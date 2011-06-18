@@ -237,7 +237,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #foreach ($alternateBooleanMethodName in $database.getPmbMetaDataAlternateBooleanMethodNameSet($pmbClassName))
     /**
      * This is an alternate boolean method waiting for your overriding.
-     * @return Determination for your complex conditions.
+     * @return The determination, true or false for your complex conditions.
      */
     public abstract boolean ${alternateBooleanMethodName}();
 

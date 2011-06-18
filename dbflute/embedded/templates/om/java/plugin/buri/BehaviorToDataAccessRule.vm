@@ -489,7 +489,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * Is the method for selecting sequence next value?
      * @param src The field type of BURI data. (NotNull)
      * @param method The current method of the behavior. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     protected boolean isSelectNextValMethod(BuriDataFieldType src, Method method) {
         if (method.getName().startsWith("selectNextVal") && method.getParameterTypes().length == 0) {

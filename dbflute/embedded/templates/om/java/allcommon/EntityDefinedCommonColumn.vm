@@ -50,7 +50,7 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
      * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     boolean is${javaName}${classificationMap.get('name')}();
 #end
@@ -73,7 +73,7 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 
     /**
 	 * Can the entity set up common column by auto? (basically for Framework)
-	 * @return Determination.
+	 * @return The determination, true or false.
 	 */
 	boolean canCommonColumnAutoSetup();
 }

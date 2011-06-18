@@ -37,7 +37,7 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param conn Connection.
      * @param tableInfo The meta information of table from which to retrieve PK information.
      * @param primaryKeyColumnInfo The meta information of primary-key column.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo, DfColumnMeta primaryKeyColumnInfo)
             throws SQLException {
@@ -61,7 +61,7 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
      * @param conn Connection.
      * @param tableInfo The meta information of table from which to retrieve PK information.
      * @param primaryKeyColumnName The name of primary-key column.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName)
             throws SQLException {

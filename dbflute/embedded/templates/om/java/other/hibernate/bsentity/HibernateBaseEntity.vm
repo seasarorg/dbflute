@@ -193,7 +193,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!
      * </p>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
         ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
@@ -366,7 +366,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     
     /**
      * Can the entity set up common column by auto?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean canCommonColumnAutoSetup() { // for Framework
         return _canCommonColumnAutoSetup;

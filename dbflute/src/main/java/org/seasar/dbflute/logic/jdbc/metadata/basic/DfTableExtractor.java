@@ -176,7 +176,7 @@ public class DfTableExtractor extends DfAbstractMetaDataBasicExtractor {
      * Is the table name out of sight?
      * @param unifiedSchema The unified schema that can contain catalog name and no-name schema. (NullAllowed)
      * @param tableName The name of table. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isTableExcept(UnifiedSchema unifiedSchema, final String tableName) {
         if (tableName == null) {

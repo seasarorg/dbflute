@@ -993,7 +993,7 @@ public class ForeignKey {
     //                                                                       =============
     /**
      * Is this relation 'one-to-one'?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isOneToOne() {
         final List<Column> localColumnList = getLocalColumnList();
@@ -1039,7 +1039,7 @@ public class ForeignKey {
 
     /**
      * Are all local columns primary-key?
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isLocalColumnPrimaryKey() {
         return isColumnPrimaryKey(getLocalColumnList());
@@ -1048,7 +1048,7 @@ public class ForeignKey {
     /**
      * Are all foreign columns primary-key? <br />
      * Basically true. If biz-one-to-one and unique key, false.
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isForeignColumnPrimaryKey() {
         return isColumnPrimaryKey(getForeignColumnList());
@@ -1056,7 +1056,7 @@ public class ForeignKey {
 
     /**
      * Are all foreign columns unique-key? <br />
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isForeignColumnUnique() {
         return isColumnUnique(getForeignColumnList());

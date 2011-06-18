@@ -47,7 +47,7 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @param tableName The name of table. (NotNull)
      * @param columnName The name of column. (NotNull)
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isColumnExcept(UnifiedSchema unifiedSchema, String tableName, String columnName) {
         if (tableName == null) {

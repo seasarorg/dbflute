@@ -43,7 +43,7 @@ public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!
      * </p>
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean is${javaName}${classificationMap.get('name')}();
 #end
@@ -63,7 +63,7 @@ public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
 	
     /**
 	 * Can the entity set up common column by auto?
-	 * @return Determination.
+	 * @return The determination, true or false.
 	 */
 	public boolean canCommonColumnAutoSetup();
 }

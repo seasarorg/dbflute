@@ -781,7 +781,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     /**
      * Is the column target of all column classification?
      * @param columnName The name of column. (NotNull)
-     * @return Determination. (If all table classification does not exist, it returns false.)
+     * @return The determination, true or false. (If all table classification does not exist, it returns false.)
      */
     public boolean isAllClassificationColumn(String columnName) {
         return getAllClassificationName(columnName) != null;

@@ -451,7 +451,7 @@ public class Column {
     /**
      * Return auto increment/sequence string for the target database. We need to
      * pass in the props for the target database!
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isAutoIncrement() {
         return _isAutoIncrement;
@@ -830,7 +830,7 @@ public class Column {
     /**
      * Adds the foreign key from another table that refers to this column.
      * 
-     * @return Determination.
+     * @return The determination, true or false.
      */
     public boolean isSingleKeyForeignKey() {
         final ForeignKey fk = getForeignKey();
