@@ -53,7 +53,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void count(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        count(subQuery, aliasName, null);
+        doCount(subQuery, aliasName, null);
     }
 
     /**
@@ -68,9 +68,15 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      */
     public void count(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertDerivedReferrerOption(option);
+        doCount(subQuery, aliasName, option);
+    }
+
+    protected void doCount(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
         assertAliasName(aliasName);
         _querySetupper.setup("count", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
@@ -89,7 +95,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        countDistinct(subQuery, aliasName, null);
+        doCountDistinct(subQuery, aliasName, null);
     }
 
     /**
@@ -104,9 +110,15 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      */
     public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertDerivedReferrerOption(option);
+        doCountDistinct(subQuery, aliasName, option);
+    }
+
+    protected void doCountDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
         assertAliasName(aliasName);
         _querySetupper.setup("count(distinct", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
@@ -125,7 +137,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void max(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        max(subQuery, aliasName, null);
+        doMax(subQuery, aliasName, null);
     }
 
     /**
@@ -140,9 +152,15 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      */
     public void max(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertDerivedReferrerOption(option);
+        doMax(subQuery, aliasName, option);
+    }
+
+    protected void doMax(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
         assertAliasName(aliasName);
         _querySetupper.setup("max", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
@@ -161,7 +179,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void min(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        min(subQuery, aliasName, null);
+        doMin(subQuery, aliasName, null);
     }
 
     /**
@@ -176,9 +194,15 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      */
     public void min(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertDerivedReferrerOption(option);
+        doMin(subQuery, aliasName, option);
+    }
+
+    protected void doMin(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
         assertAliasName(aliasName);
         _querySetupper.setup("min", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
@@ -197,7 +221,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        sum(subQuery, aliasName, null);
+        doSum(subQuery, aliasName, null);
     }
 
     /**
@@ -212,9 +236,15 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      */
     public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertDerivedReferrerOption(option);
+        doSum(subQuery, aliasName, option);
+    }
+
+    protected void doSum(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
         assertAliasName(aliasName);
         _querySetupper.setup("sum", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
@@ -233,7 +263,7 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
      */
     public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-        avg(subQuery, aliasName, null);
+        doAvg(subQuery, aliasName, null);
     }
 
     /**
@@ -248,9 +278,15 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
      * </pre>
      * @param subQuery The sub query of referrer. (NotNull)
      * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NullAllowed)
+     * @param option The option for DerivedReferrer. For example, you can use a coalesce function. (NotNull)
      */
     public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertDerivedReferrerOption(option);
+        doAvg(subQuery, aliasName, option);
+    }
+
+    protected void doAvg(SubQuery<REFERRER_CB> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertSubQuery(subQuery);
         assertAliasName(aliasName);
         _querySetupper.setup("avg", subQuery, _localCQ, filterAliasName(aliasName), option);
     }
@@ -258,6 +294,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected void assertSubQuery(SubQuery<?> subQuery) {
+        if (subQuery == null) {
+            String msg = "The argument 'subQuery' for DerivedReferrer should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
     protected void assertAliasName(String aliasName) {
         if (isPurposeNullAlias()) {
             if (aliasName != null) {
@@ -297,6 +340,13 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
 
     protected void throwSpecifyDerivedReferrerInvalidAliasNameException() {
         createCBExThrower().throwSpecifyDerivedReferrerInvalidAliasNameException(_localCQ);
+    }
+
+    protected void assertDerivedReferrerOption(DerivedReferrerOption option) {
+        if (option == null) {
+            String msg = "The argument 'option' for DerivedReferrer should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     //protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {

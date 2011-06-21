@@ -377,7 +377,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * @return The maximum value. (NullAllowed)
          */
         public RESULT max(ScalarQuery<CB> scalarQuery) {
-            return max(scalarQuery, null);
+            return doMax(scalarQuery, null);
         }
 
         /**
@@ -389,11 +389,16 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * }, new ScalarSelectOption().coalesce(0));
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NullAllowed)
-         * @return The maximum value. (NullAllowed)
+         * @param option The option for scalar. (NotNull)
+         * @return The maximum value. (NullAllowed: but NotNull null if you use coalesce by option)
          */
         public RESULT max(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertObjectNotNull("scalarQuery", scalarQuery);
+            assertScalarSelectOption(option);
+            return doMax(scalarQuery, option);
+        }
+
+        protected RESULT doMax(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertScalarQuery(scalarQuery);
             return exec(scalarQuery, SqlClause.SelectClauseType.MAX, option);
         }
 
@@ -409,7 +414,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * @return The minimum value. (NullAllowed)
          */
         public RESULT min(ScalarQuery<CB> scalarQuery) {
-            return min(scalarQuery, null);
+            return doMin(scalarQuery, null);
         }
 
         /**
@@ -421,11 +426,16 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * }, new ScalarSelectOption().coalesce(0));
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NullAllowed)
-         * @return The minimum value. (NullAllowed)
+         * @param option The option for scalar. (NotNull)
+         * @return The minimum value. (NullAllowed: but NotNull null if you use coalesce by option)
          */
         public RESULT min(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertObjectNotNull("scalarQuery", scalarQuery);
+            assertScalarSelectOption(option);
+            return doMin(scalarQuery, option);
+        }
+
+        protected RESULT doMin(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertScalarQuery(scalarQuery);
             return exec(scalarQuery, SqlClause.SelectClauseType.MIN, option);
         }
 
@@ -441,7 +451,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * @return The summary value. (NullAllowed)
          */
         public RESULT sum(ScalarQuery<CB> scalarQuery) {
-            return sum(scalarQuery, null);
+            return doSum(scalarQuery, null);
         }
 
         /**
@@ -453,11 +463,16 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * }, new ScalarSelectOption().coalesce(0));
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NullAllowed)
-         * @return The summary value. (NullAllowed)
+         * @param option The option for scalar. (NotNull)
+         * @return The summary value. (NullAllowed: but NotNull null if you use coalesce by option)
          */
         public RESULT sum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertObjectNotNull("scalarQuery", scalarQuery);
+            assertScalarSelectOption(option);
+            return doSum(scalarQuery, option);
+        }
+
+        protected RESULT doSum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertScalarQuery(scalarQuery);
             return exec(scalarQuery, SqlClause.SelectClauseType.SUM, option);
         }
 
@@ -473,7 +488,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * @return The average value. (NullAllowed)
          */
         public RESULT avg(ScalarQuery<CB> scalarQuery) {
-            return avg(scalarQuery, null);
+            return doAvg(scalarQuery, null);
         }
 
         /**
@@ -485,11 +500,16 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * }, new ScalarSelectOption().coalesce(0));
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @param option The option for scalar. (NullAllowed)
-         * @return The average value. (NullAllowed)
+         * @param option The option for scalar. (NotNull)
+         * @return The average value. (NullAllowed: but NotNull null if you use coalesce by option)
          */
         public RESULT avg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
-            assertObjectNotNull("scalarQuery", scalarQuery);
+            assertScalarSelectOption(option);
+            return doAvg(scalarQuery, option);
+        }
+
+        protected RESULT doAvg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertScalarQuery(scalarQuery);
             return exec(scalarQuery, SqlClause.SelectClauseType.AVG, option);
         }
 
@@ -537,6 +557,20 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
         protected void throwScalarSelectInvalidColumnSpecificationException() {
             createCBExThrower().throwScalarSelectInvalidColumnSpecificationException(_conditionBean, _resultType);
+        }
+
+        protected void assertScalarQuery(ScalarQuery<?> scalarQuery) {
+            if (scalarQuery == null) {
+                String msg = "The argument 'scalarQuery' for ScalarSelect should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
+        }
+
+        protected void assertScalarSelectOption(ScalarSelectOption option) {
+            if (option == null) {
+                String msg = "The argument 'option' for ScalarSelect should not be null.";
+                throw new IllegalArgumentException(msg);
+            }
         }
     }
 
