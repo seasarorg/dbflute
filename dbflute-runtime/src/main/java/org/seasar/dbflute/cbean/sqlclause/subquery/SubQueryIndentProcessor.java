@@ -79,9 +79,7 @@ public class SubQueryIndentProcessor implements Serializable {
                         indent = buildSpaceBar(markIndex - preIndent.length());
                     }
                 } else { // normal line
-                    if (needsNormalLineConnection(mainSb)) {
-                        // if a previous line is sub-query,
-                        // it may not end with a line separator
+                    if (needsLineConnection(mainSb)) {
                         mainSb.append(ln());
                     }
                     mainSb.append(line).append(ln());
@@ -101,10 +99,13 @@ public class SubQueryIndentProcessor implements Serializable {
                     preRemainder = line.substring(terminalIndex + terminalLength);
                     subSb.append(clause).append(Srl.is_Null_or_TrimmedEmpty(preRemainder) ? ln() : "");
                     final String currentSql = processSubQueryIndent(subSb.toString(), preIndent + indent, originalSql);
+                    if (needsLineConnection(mainSb)) {
+                        mainSb.append(ln());
+                    }
                     mainSb.append(currentSql);
                     throughBegin = false;
                     throughBeginFirst = false;
-                } else { // in-scope line
+                } else { // scope line
                     if (!throughBeginFirst) {
                         subSb.append(line.trim()).append(ln());
                         throughBeginFirst = true;
@@ -128,9 +129,18 @@ public class SubQueryIndentProcessor implements Serializable {
         return filteredSql;
     }
 
-    protected boolean needsNormalLineConnection(StringBuilder sb) {
-        // strings exist and it does not end with a line separator
-        return sb.length() > 0 && !sb.substring(sb.length() - 1, sb.length()).equals(ln());
+    protected boolean needsLineConnection(StringBuilder sb) {
+        final int length = sb.length();
+        if (length == 0) {
+            return false;
+        }
+        final String lastStr = sb.substring(length - 1, length);
+        if (lastStr.equals(ln())) {
+            return false;
+        }
+        // if a previous line is sub-query,
+        // it may not end with a line separator
+        return true;
     }
 
     protected void throwSubQueryNotFoundEndMarkException(String subQueryIdentity, String sql, String filteredSql,
