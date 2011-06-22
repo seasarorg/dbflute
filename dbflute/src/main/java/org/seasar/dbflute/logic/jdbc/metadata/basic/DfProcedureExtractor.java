@@ -271,7 +271,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             resultList.add(metaInfo);
         }
         if (passedCount == 0) {
-            log("  -> All procedures are target: count=" + procedureList.size());
+            log(" -> All procedures are target: count=" + procedureList.size());
         }
         return resultList;
     }
