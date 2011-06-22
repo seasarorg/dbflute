@@ -3,8 +3,8 @@
 cd `dirname $0`
 . _project.sh
 
-echo "/nnnnnnnnnnnnnnnnnnnnnnnnn"
-echo "Execute the Document task."
+echo "/nnnnnnnnnnnnnnnnnnnnnnnnnnn"
+echo "...Calling the Document task"
 echo "nnnnnnnnnn/"
 sh $DBFLUTE_HOME/etc/cmd/_df-doc.sh $MY_PROPERTIES_PATH
 taskReturnCode=$?

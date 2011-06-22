@@ -5,9 +5,9 @@ setlocal
 cd %~p0
 call _project.bat
 
-rem /nnnnnnnnnnnnnnnnnnnnnnnnn
-rem Execute the Document task.
-rem nnnnnnnnnn/
+echo /nnnnnnnnnnnnnnnnnnnnnnnnnnn
+echo ...Calling the Document task
+echo nnnnnnnnnn/
 call %DBFLUTE_HOME%\etc\cmd\_df-doc.cmd %MY_PROPERTIES_PATH%
 
 if "%pause_at_end%"=="y" (

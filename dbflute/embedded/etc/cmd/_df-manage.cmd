@@ -7,22 +7,22 @@ set SECOND_ARG=%3
 if "%SECOND_ARG%"=="" set SECOND_ARG=""
 
 if "%FIRST_ARG%"=="renewal" (
-  rem /nnnnnnnnnnnnnnnnnnnnnnnn
-  rem Execute the Renewal task.
-  rem nnnnnnnnnn/
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the Renewal task
+  echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-renewal.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 )
 
 if "%FIRST_ARG%"=="regenerate" (
-  rem /nnnnnnnnnnnnnnnnnnnnnnnnnnn
-  rem Execute the Regenerate task.
-  rem nnnnnnnnnn/
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the Regenerate task
+  echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-regenerate.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 )
 
 if "%FIRST_ARG%"=="refresh" (
-  rem /nnnnnnnnnnnnnnnnnnnnnnnn
-  rem Execute the Refresh task.
-  rem nnnnnnnnnn/
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the Refresh task
+  echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-refresh.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 )

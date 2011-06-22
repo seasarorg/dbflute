@@ -3,8 +3,8 @@
 cd `dirname $0`
 . _project.sh
 
-echo "/nnnnnnnnnnnnnnnnnnnnn"
-echo "Execute the JDBC task."
+echo "/nnnnnnnnnnnnnnnnnnnnnnn"
+echo "...Calling the JDBC task"
 echo "nnnnnnnnnn/"
 sh $DBFLUTE_HOME/etc/cmd/_df-jdbc.sh $MY_PROPERTIES_PATH
 taskReturnCode=$?
