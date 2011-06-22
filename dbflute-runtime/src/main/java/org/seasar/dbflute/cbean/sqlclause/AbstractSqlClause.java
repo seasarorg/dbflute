@@ -223,6 +223,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected Map<String, Object> _freeParameterMap;
 
     // -----------------------------------------------------
+    //                                          Column Query
+    //                                          ------------
+    /** The map for column query objects. (only for saving) (NullAllowed) */
+    protected Map<String, Object> _columyQueryObjectMap;
+
+    // -----------------------------------------------------
     //                                         Geared Cipher
     //                                         -------------
     /** The manager of geared cipher. (also for saving) (NullAllowed) */
@@ -2362,6 +2368,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return buildFreeParameterBindExp(key);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String registerFreeParameterToThemeList(String themeKey, Object addedValue) {
         if (_freeParameterMap == null) {
             _freeParameterMap = new LinkedHashMap<String, Object>();
@@ -2379,6 +2388,27 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected String buildFreeParameterBindExp(String relativePath) {
         return "/*pmb.freeParameterMap." + relativePath + "*/null";
+    }
+
+    // [DBFlute-0.9.8.6]
+    // ===================================================================================
+    //                                                                  ColumnQuery Object
+    //                                                                  ==================
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, Object> getColumyQueryObjectMap() {
+        return _columyQueryObjectMap;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerColumyQueryObject(String key, Object value) {
+        if (_columyQueryObjectMap == null) {
+            _columyQueryObjectMap = new LinkedHashMap<String, Object>();
+        }
+        _columyQueryObjectMap.put(key, value);
     }
 
     // [DBFlute-0.9.8.4]

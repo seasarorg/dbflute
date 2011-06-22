@@ -127,31 +127,25 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * {@inheritDoc}
      */
     public String buildStatementAsSqlName() {
-        return doBuildStatement(false);
+        final ColumnSqlName columnSqlName = getResolvedSpecifiedColumnSqlName();
+        final String columnExp = columnSqlName.toString();
+        return doBuildStatement(columnExp);
     }
 
     /**
      * {@inheritDoc}
      */
-    public String buildStatementAsRealName() {
-        return doBuildStatement(true);
+    public String buildStatementToSpecifidName(String columnExp) {
+        return doBuildStatement(columnExp);
     }
 
-    protected String doBuildStatement(boolean real) {
-        final String columnExp;
-        if (real) {
-            final ColumnRealName columnRealName = getResolvedSpecifiedColumnRealName();
-            columnExp = columnRealName.toString();
-        } else {
-            final ColumnSqlName columnSqlName = getResolvedSpecifiedColumnSqlName();
-            columnExp = columnSqlName.toString();
-        }
+    protected String doBuildStatement(String columnExp) {
         final List<CalculationElement> calculationList = getCalculationList();
         if (calculationList.isEmpty()) {
             return null;
         }
         final StringBuilder sb = new StringBuilder();
-        sb.append(decrypt(columnExp));
+        sb.append(decryptIfNeeds(columnExp));
         int index = 0;
         for (CalculationElement calculation : calculationList) {
             if (index > 0) {
@@ -164,7 +158,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return sb.toString();
     }
 
-    protected String decrypt(String valueExp) {
+    protected String decryptIfNeeds(String valueExp) {
         final ColumnInfo columnInfo = getSpecifiedColumnInfo();
         if (columnInfo == null) { // means sub-query
             return valueExp;

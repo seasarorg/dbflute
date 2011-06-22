@@ -244,7 +244,7 @@ public class ValueAndTypeSetupper {
     protected void throwPropertyReadFailureException(Class<?> targetType, String propertyName,
             DfBeanIllegalPropertyException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("Failed to read the property on the " + _commentType.textName() + "!");
+        br.addNotice("Failed to read the property on the " + _commentType.textName() + ".");
         br.addItem("Advice");
         br.addElement("Please confirm your comment properties.");
         br.addElement("(readable? accessbile? and so on...)");
@@ -281,7 +281,7 @@ public class ValueAndTypeSetupper {
 
     protected void throwNotFoundPropertyException(Class<?> targetType, String notFoundProperty) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The property on the " + _commentType.textName() + " was not found!");
+        br.addNotice("The property on the " + _commentType.textName() + " was not found.");
         br.addItem("Advice");
         br.addElement("Please confirm the existence of your property on your arguments.");
         br.addElement("And has the property had misspelling?");
@@ -305,7 +305,7 @@ public class ValueAndTypeSetupper {
 
     protected void throwListIndexNotNumberException(String notNumberIndex, NumberFormatException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The list index on the " + _commentType.textName() + " was not number!");
+        br.addNotice("The list index on the " + _commentType.textName() + " was not number.");
         br.addItem("Advice");
         br.addElement("Please confirm the index on your comment.");
         br.addItem(_commentType.titleName());
@@ -330,7 +330,7 @@ public class ValueAndTypeSetupper {
 
     protected void throwListIndexOutOfBoundsException(String numberIndex, IndexOutOfBoundsException e) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The list index on the " + _commentType.textName() + " was out of bounds!");
+        br.addNotice("The list index on the " + _commentType.textName() + " was out of bounds.");
         br.addItem("Advice");
         br.addElement("Please confirm the index on your comment.");
         br.addItem(_commentType.titleName());

@@ -775,6 +775,23 @@ public interface SqlClause {
      */
     String registerFreeParameterToThemeList(String themeKey, Object addedValue);
 
+    // [DBFlute-0.9.8.6]
+    // ===================================================================================
+    //                                                                  ColumnQuery Object
+    //                                                                  ==================
+    /**
+     * Get the map for ColumnQuery objects for parameter comment. {Internal}
+     * @return The map for ColumnQuery objects. (NullAllowed: if null, means no object)
+     */
+    Map<String, Object> getColumyQueryObjectMap();
+
+    /**
+     * Register ColumnQuery objects. {Internal}
+     * @param key The key for the object. (NotNull)
+     * @param value The instance of the object for ColumnQuery. (NotNull)
+     */
+    void registerColumyQueryObject(String key, Object value);
+
     // [DBFlute-0.9.8.4]
     // ===================================================================================
     //                                                                       Geared Cipher

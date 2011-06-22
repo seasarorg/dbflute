@@ -51,7 +51,7 @@ public class NodeUtil {
         final String name = (bind ? "bind variable" : "embedded variable");
         final String emmark = (bind ? "" : "$");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The value of " + name + " was null!");
+        br.addNotice("The value of " + name + " was null.");
         br.addItem("Advice");
         br.addElement("Is it within the scope of your assumption?");
         br.addElement("If the answer is YES, please confirm your application logic about the parameter.");
@@ -77,7 +77,7 @@ public class NodeUtil {
             String specifiedSql, boolean bind) {
         final String emmark = (bind ? "" : "$");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The parameter for in-scope condition was not list or array!");
+        br.addNotice("The parameter for in-scope condition was not list or array.");
         br.addItem("Advice");
         br.addElement("If a style of a test value is '(...)', parameter should be list or array for in-scope.");
         br.addElement("For example:");
@@ -102,7 +102,7 @@ public class NodeUtil {
         final String name = (bind ? "bind variable" : "embedded variable");
         final String emmark = (bind ? "" : "$");
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The " + name + " comment had the illegal parameter-bean specification!");
+        br.addNotice("The " + name + " comment had the illegal parameter-bean specification.");
         br.addItem("Advice");
         br.addElement("At first, is it really " + name + " comment?");
         br.addElement("Have you had a spell miss?");
@@ -147,7 +147,7 @@ public class NodeUtil {
             boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The list of " + (bind ? "bind" : "embedded") + " variable was empty!" + ln();
+        msg = msg + "The list of " + (bind ? "bind" : "embedded") + " variable was empty." + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your application logic." + ln();
@@ -172,7 +172,7 @@ public class NodeUtil {
             boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The list of " + (bind ? "bind" : "embedded") + " variable was null-only list'!" + ln();
+        msg = msg + "The list of " + (bind ? "bind" : "embedded") + " variable was null-only list." + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your application logic." + ln();
@@ -221,7 +221,7 @@ public class NodeUtil {
 
     public static void throwLoopCurrentVariableOutOfForCommentException(String expression, String specifiedSql) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Loop's current variable was out of FOR comment scope!");
+        br.addNotice("Loop's current variable was out of FOR comment scope.");
         br.addItem("Advice");
         br.addElement("Loop's current variables should be in FOR comment scope.");
         br.addElement("For example:");

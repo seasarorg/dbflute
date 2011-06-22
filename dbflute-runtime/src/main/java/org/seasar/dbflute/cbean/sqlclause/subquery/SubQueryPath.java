@@ -27,7 +27,7 @@ public class SubQueryPath {
     //                                                                   Location Resolver
     //                                                                   =================
     public String resolveParameterLocationPath(String clause) {
-        return replaceString(clause, ".conditionQuery.", "." + _subQueryPath + ".");
+        return replaceString(clause, "/*pmb.conditionQuery.", "/*pmb." + _subQueryPath + ".");
     }
 
     // ===================================================================================

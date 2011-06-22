@@ -45,7 +45,6 @@ import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -199,15 +198,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                         ColumnQuery
     //                                                                         ===========
-    protected Map<String, ConditionBean> _colQyCBMap;
-
     /**
-     * Get the condition-bean map for ColumnQuery. <br />
+     * Get the condition-bean map of ColumnQuery. <br />
      * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery.
      * @return The instance of the map. (NullAllowed)
      */
-    public Map<String, ConditionBean> getColQyCBMap() {
-        return _colQyCBMap;
+    public Map<String, Object> getColQyCBMap() {
+        return getSqlClause().getColumyQueryObjectMap();
     }
 
     protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
@@ -249,14 +246,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected <CB extends ConditionBean> String xbuildColQyColumn(CB cb, String source, String keyPrefix) {
-        if (_colQyCBMap == null) {
-            _colQyCBMap = DfCollectionUtil.newHashMap();
+        final String key;
+        {
+            final Map<String, Object> colQyCBMap = getColQyCBMap();
+            key = keyPrefix + (colQyCBMap != null ? colQyCBMap.size() : 0);
         }
-        final int colQyCBIndex = _colQyCBMap.size();
-        final String key = keyPrefix + colQyCBIndex;
-        _colQyCBMap.put(key, cb);
+        getSqlClause().registerColumyQueryObject(key, cb);
         final String from = "/*pmb.conditionQuery.";
-        final String to = "/*pmb.colQyCBMap." + key + ".conditionQuery.";
+        final String to = "/*pmb.conditionQuery.colQyCBMap." + key + ".conditionQuery.";
         String result = source;
         result = Srl.replace(result, from, to);
         return result;
@@ -268,13 +265,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     protected <CB extends ConditionBean> QueryClause xcreateColQyClause(final String leftColumn, final String operand,
             final String rightColumn, final HpCalcSpecification<CB> rightCalcSp) {
-        //getSqlClause().getE
         return new QueryClause() {
             @Override
             public String toString() {
                 final String rightExp;
                 {
-                    final String statement = rightCalcSp.buildStatementAsRealName();
+                    final String statement = rightCalcSp.buildStatementToSpecifidName(rightColumn);
                     if (statement != null) { // exists calculation
                         assertCalculationColumnType();
                         rightExp = statement; // cipher already resolved

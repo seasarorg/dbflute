@@ -1037,9 +1037,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     + whereClause.substring(clauseIndex);
             unionQueryClause = fromClause + " " + markedClause;
         }
-        final String oldStr = ".conditionQuery.";
-        final String newStr = ".conditionQuery." + unionQueryPropertyName + ".";
-        return replaceString(unionQueryClause, oldStr, newStr); // Very Important!
+        final String oldStr = "/*pmb.conditionQuery.";
+        final String newStr = "/*pmb.conditionQuery." + unionQueryPropertyName + ".";
+        return replaceString(unionQueryClause, oldStr, newStr);
     }
 
     // -----------------------------------------------------
@@ -1788,6 +1788,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected String xregisterFreeParameterToThemeList(String themeKey, Object addedValue) {
         return xgetSqlClause().registerFreeParameterToThemeList(themeKey, addedValue);
+    }
+
+    // ===================================================================================
+    //                                                                  ColumnQuery Object
+    //                                                                  ==================
+    /**
+     * Get the condition-bean map of ColumnQuery for parameter comment. {Internal}. <br />
+     * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery.
+     * @return The instance of the map. (NullAllowed)
+     */
+    public Map<String, Object> getColQyCBMap() {
+        return xgetSqlClause().getColumyQueryObjectMap();
     }
 
     // ===================================================================================
