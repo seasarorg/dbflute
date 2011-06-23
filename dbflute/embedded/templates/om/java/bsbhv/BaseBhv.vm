@@ -531,7 +531,6 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
                 final String aliasName = cb.getSqlClause().getBasePointAliasName();
                 String identity = null;
                 StringBuilder sb = new StringBuilder();
-                int index = 0;
                 for (${keyJavaNative} primaryKeyMap : ls) {
                     if (sb.length() > 0) { sb.append(")").append(ln()).append("     or ("); }
 #set ($referrerColumnIndex = 0)
@@ -541,11 +540,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
                     sb.append(" and ");
 #end
                     sb.append(aliasName).append(".${referrerColumn.name} = ");
-                    identity = "${referrer.referrerJavaBeansRulePropertyName}${localColumn.javaName}" + index;
-                    sb.append(cb.xregisterFreeParameter(identity, primaryKeyMap.get("${localColumn.javaName}")));
+                    identity = "${referrer.referrerJavaBeansRulePropertyName}${localColumn.javaName}";
+                    sb.append(cb.query().xregisterFreeParameterToThemeList(identity, primaryKeyMap.get("${localColumn.javaName}")));
 #set ($referrerColumnIndex = $referrerColumnIndex + 1)
 #end
-                    ++index;
                 }
                 sb.insert(0, "((").append("))");
                 cb.getSqlClause().registerWhereClause(sb.toString());
