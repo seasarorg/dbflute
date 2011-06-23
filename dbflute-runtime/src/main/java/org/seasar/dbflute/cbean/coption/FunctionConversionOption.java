@@ -174,7 +174,7 @@ public class FunctionConversionOption implements ParameterOption {
         final String functionName;
         final String thirdArg;
         final boolean leftArg;
-        if (isTruncTrancate()) {
+        if (isTruncTruncate()) {
             functionName = "truncate";
             thirdArg = null;
             leftArg = false;
@@ -194,7 +194,7 @@ public class FunctionConversionOption implements ParameterOption {
         return processSimpleFunction(functionExp, _trunc, functionName, "trunc", thirdArg, leftArg);
     }
 
-    protected boolean isTruncTrancate() {
+    protected boolean isTruncTruncate() {
         return isDatabaseMySQL() || isDatabaseH2();
     }
 
