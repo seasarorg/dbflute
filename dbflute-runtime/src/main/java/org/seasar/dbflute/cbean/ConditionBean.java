@@ -215,31 +215,6 @@ public interface ConditionBean extends PagingBean {
     void invokeSetupSelect(String foreignPropertyNamePath);
 
     // ===================================================================================
-    //                                                                      Free Parameter
-    //                                                                      ==============
-    /**
-     * Get the map for free parameters for parameter comment. {Internal}
-     * @return The map for free parameters. (NullAllowed: if null, means no parameter)
-     */
-    Map<String, Object> getFreeParameterMap();
-
-    /**
-     * Register free parameters. {Internal}
-     * @param key The key for the parameter. (NotNull)
-     * @param value The value for the parameter. (NullAllowed)
-     * @return The expression for binding. (NotNull)
-     */
-    String xregisterFreeParameter(String key, Object value);
-
-    /**
-     * Register free parameters to theme list. {Internal}
-     * @param themeKey The theme as key for the parameter. (NotNull)
-     * @param addedValue The value added to theme list for the parameter. (NullAllowed)
-     * @return The expression for binding. (NotNull)
-     */
-    String xregisterFreeParameterToThemeList(String themeKey, Object addedValue);
-
-    // ===================================================================================
     //                                                                  Query Synchronizer
     //                                                                  ==================
     /**

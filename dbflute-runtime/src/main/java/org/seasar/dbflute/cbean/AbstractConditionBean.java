@@ -198,15 +198,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                         ColumnQuery
     //                                                                         ===========
-    /**
-     * Get the condition-bean map of ColumnQuery. <br />
-     * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery.
-     * @return The instance of the map. (NullAllowed)
-     */
-    public Map<String, Object> getColQyCBMap() {
-        return getSqlClause().getColumyQueryObjectMap();
-    }
-
     protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
             SpecifyQuery<CB> rightSp, final String operand) {
         assertQueryPurpose();
@@ -245,18 +236,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return xbuildColQyColumn(rightCB, realName.toString(), "right");
     }
 
-    protected <CB extends ConditionBean> String xbuildColQyColumn(CB cb, String source, String keyPrefix) {
-        final String key;
-        {
-            final Map<String, Object> colQyCBMap = getColQyCBMap();
-            key = keyPrefix + (colQyCBMap != null ? colQyCBMap.size() : 0);
-        }
-        getSqlClause().registerColumyQueryObject(key, cb);
-        final String from = "/*pmb.conditionQuery.";
-        final String to = "/*pmb.conditionQuery.colQyCBMap." + key + ".conditionQuery.";
-        String result = source;
-        result = Srl.replace(result, from, to);
-        return result;
+    protected <CB extends ConditionBean> String xbuildColQyColumn(CB cb, String source, String themeKey) {
+        final String bindingExp = getSqlClause().registerColumnQueryObjectToThemeList(themeKey, cb);
+        return Srl.replace(source, "/*pmb.conditionQuery.", bindingExp);
     }
 
     protected <CB extends ConditionBean> HpCalcSpecification<CB> xcreateCalcSpecification(SpecifyQuery<CB> rightSp) {
@@ -910,31 +892,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 break;
             }
         }
-    }
-
-    // [DBFlute-0.9.5.2]
-    // ===================================================================================
-    //                                                                      Free Parameter
-    //                                                                      ==============
-    /**
-     * {@inheritDoc}
-     */
-    public Map<String, Object> getFreeParameterMap() {
-        return getSqlClause().getFreeParameterMap();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String xregisterFreeParameter(String key, Object value) {
-        return getSqlClause().registerFreeParameter(key, value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String xregisterFreeParameterToThemeList(String key, Object value) {
-        return getSqlClause().registerFreeParameterToThemeList(key, value);
     }
 
     // ===================================================================================

@@ -1164,7 +1164,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         assertObjectNotNull("withManualOrder(manualOrderBean)", manualOrderBean);
         manualOrderBean.bind(new FreeParameterManualOrderThemeListHandler() {
             public String register(String themeKey, Object orderValue) {
-                return xregisterFreeParameterToThemeList(themeKey, orderValue);
+                return xregisterManualOrderParameterToThemeList(themeKey, orderValue);
             }
         });
         xgetSqlClause().addManualOrderToPreviousOrderByElement(manualOrderBean);
@@ -1776,30 +1776,35 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
-    //                                                                      Free Parameter
-    //                                                                      ==============
-    protected Map<String, Object> getFreeParameterMap() {
-        return xgetSqlClause().getFreeParameterMap();
-    }
-
-    protected String xregisterFreeParameter(String key, Object value) {
-        return xgetSqlClause().registerFreeParameter(key, value);
-    }
-
-    protected String xregisterFreeParameterToThemeList(String themeKey, Object addedValue) {
-        return xgetSqlClause().registerFreeParameterToThemeList(themeKey, addedValue);
-    }
-
-    // ===================================================================================
     //                                                                  ColumnQuery Object
     //                                                                  ==================
     /**
      * Get the condition-bean map of ColumnQuery for parameter comment. {Internal}. <br />
-     * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery.
+     * This is basically for (Specify)DerivedReferrer's bind conditions in ColumnQuery. <br />
+     * The value is treated as Object type because this will be only called from parameter comment.
      * @return The instance of the map. (NullAllowed)
      */
     public Map<String, Object> getColQyCBMap() {
-        return xgetSqlClause().getColumyQueryObjectMap();
+        return xgetSqlClause().getColumnQueryObjectMap();
+    }
+
+    protected String xregisterColumyQueryObjectToThemeList(String themeKey, Object addedValue) {
+        return xgetSqlClause().registerColumnQueryObjectToThemeList(themeKey, addedValue);
+    }
+
+    // ===================================================================================
+    //                                                               ManualOrder Parameter
+    //                                                               =====================
+    /**
+     * Get the parameter map of ManualOrder for parameter comment. {Internal}.
+     * @return The instance of the map. (NullAllowed)
+     */
+    public Map<String, Object> getMnuOdrPrmMap() {
+        return xgetSqlClause().getManualOrderParameterMap();
+    }
+
+    protected String xregisterManualOrderParameterToThemeList(String themeKey, Object addedValue) {
+        return xgetSqlClause().registerManualOrderParameterToThemeList(themeKey, addedValue);
     }
 
     // ===================================================================================

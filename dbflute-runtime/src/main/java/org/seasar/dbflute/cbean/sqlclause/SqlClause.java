@@ -750,31 +750,6 @@ public interface SqlClause {
         }
     }
 
-    // ===================================================================================
-    //                                                                      Free Parameter
-    //                                                                      ==============
-    /**
-     * Get the map for free parameters for parameter comment. {Internal}
-     * @return The map for free parameters. (NullAllowed: if null, means no parameter)
-     */
-    Map<String, Object> getFreeParameterMap();
-
-    /**
-     * Register free parameters. {Internal}
-     * @param key The key for the parameter. (NotNull)
-     * @param value The value for the parameter. (NullAllowed)
-     * @return The expression for binding. (NotNull)
-     */
-    String registerFreeParameter(String key, Object value);
-
-    /**
-     * Register free parameters to theme list. {Internal}
-     * @param themeKey The theme as key for the parameter. (NotNull)
-     * @param addedValue The value added to theme list for the parameter. (NullAllowed)
-     * @return The expression for binding. (NotNull)
-     */
-    String registerFreeParameterToThemeList(String themeKey, Object addedValue);
-
     // [DBFlute-0.9.8.6]
     // ===================================================================================
     //                                                                  ColumnQuery Object
@@ -783,14 +758,33 @@ public interface SqlClause {
      * Get the map for ColumnQuery objects for parameter comment. {Internal}
      * @return The map for ColumnQuery objects. (NullAllowed: if null, means no object)
      */
-    Map<String, Object> getColumyQueryObjectMap();
+    Map<String, Object> getColumnQueryObjectMap();
 
     /**
-     * Register ColumnQuery objects. {Internal}
-     * @param key The key for the object. (NotNull)
-     * @param value The instance of the object for ColumnQuery. (NotNull)
+     * Register ColumnQuery object to theme list. {Internal}
+     * @param themeKey The key for the object. (NotNull)
+     * @param addedValue The value added to theme list for the object. (NotNull)
+     * @return The expression for binding. (NotNull)
      */
-    void registerColumyQueryObject(String key, Object value);
+    String registerColumnQueryObjectToThemeList(String themeKey, Object addedValue);
+
+    // [DBFlute-0.9.8.2]
+    // ===================================================================================
+    //                                                               ManualOrder Parameter
+    //                                                               =====================
+    /**
+     * Get the map for free parameters for parameter comment. {Internal}
+     * @return The map for free parameters. (NullAllowed: if null, means no parameter)
+     */
+    Map<String, Object> getManualOrderParameterMap();
+
+    /**
+     * Register ManualOrder parameter to theme list. {Internal}
+     * @param themeKey The theme as key for the parameter. (NotNull)
+     * @param addedValue The value added to theme list for the parameter. (NullAllowed)
+     * @return The expression for binding. (NotNull)
+     */
+    String registerManualOrderParameterToThemeList(String themeKey, Object addedValue);
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================
