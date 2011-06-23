@@ -217,16 +217,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected List<QueryClauseFilter> _whereClauseSimpleFilterList;
 
     // -----------------------------------------------------
-    //                                        Free Parameter
-    //                                        --------------
-    /** The map for free parameters. (only for saving) (NullAllowed) */
+    //                                    ColumnQuery Object
+    //                                    ------------------
+    /** The map for column query objects. (only for saving) (NullAllowed) */
+    protected Map<String, Object> _columyQueryObjectMap;
+
+    // -----------------------------------------------------
+    //                                 ManualOrder Parameter
+    //                                 ---------------------
+    /** The map for ManualOrder parameters. (only for saving) (NullAllowed) */
     protected Map<String, Object> _manualOrderParameterMap;
 
     // -----------------------------------------------------
-    //                                          Column Query
-    //                                          ------------
-    /** The map for column query objects. (only for saving) (NullAllowed) */
-    protected Map<String, Object> _columyQueryObjectMap;
+    //                                        Free Parameter
+    //                                        --------------
+    /** The map for free parameters. (only for saving) (NullAllowed) */
+    protected Map<String, Object> _freeParameterMap;
 
     // -----------------------------------------------------
     //                                         Geared Cipher
@@ -2364,14 +2370,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_columyQueryObjectMap == null) {
             _columyQueryObjectMap = new LinkedHashMap<String, Object>();
         }
-        @SuppressWarnings("unchecked")
-        List<Object> valueList = (List<Object>) _columyQueryObjectMap.get(themeKey);
-        if (valueList == null) {
-            valueList = new ArrayList<Object>();
-            _columyQueryObjectMap.put(themeKey, valueList);
-        }
-        final int listIndex = valueList.size();
-        valueList.add(addedValue);
+        final int listIndex = doAddValueToThemeList(themeKey, addedValue, _columyQueryObjectMap);
         return buildColumnQueryObjectBindExp(themeKey + ".get(" + listIndex + ")");
     }
 
@@ -2380,7 +2379,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return "/*pmb.conditionQuery.colQyCBMap." + relativePath + ".conditionQuery.";
     }
 
-    // [DBFlute-0.9.8.2]
+    // [DBFlute-0.9.8.6]
     // ===================================================================================
     //                                                               ManualOrder Parameter
     //                                                               =====================
@@ -2398,19 +2397,50 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_manualOrderParameterMap == null) {
             _manualOrderParameterMap = new LinkedHashMap<String, Object>();
         }
-        @SuppressWarnings("unchecked")
-        List<Object> valueList = (List<Object>) _manualOrderParameterMap.get(themeKey);
-        if (valueList == null) {
-            valueList = new ArrayList<Object>();
-            _manualOrderParameterMap.put(themeKey, valueList);
-        }
-        final int listIndex = valueList.size();
-        valueList.add(addedValue);
+        final int listIndex = doAddValueToThemeList(themeKey, addedValue, _manualOrderParameterMap);
         return buildManualOrderParameterBindExp(themeKey + ".get(" + listIndex + ")");
     }
 
     protected String buildManualOrderParameterBindExp(String relativePath) {
         return "/*pmb.conditionQuery.mnuOdrPrmMap." + relativePath + "*/null";
+    }
+
+    // [DBFlute-0.9.8.2]
+    // ===================================================================================
+    //                                                                      Free Parameter
+    //                                                                      ==============
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, Object> getFreeParameterMap() {
+        return _freeParameterMap;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String registerFreeParameterToThemeList(String themeKey, Object addedValue) {
+        if (_freeParameterMap == null) {
+            _freeParameterMap = new LinkedHashMap<String, Object>();
+        }
+        final int listIndex = doAddValueToThemeList(themeKey, addedValue, _freeParameterMap);
+        return buildFreeParameterBindExp(themeKey + ".get(" + listIndex + ")");
+    }
+
+    protected String buildFreeParameterBindExp(String relativePath) {
+        return "/*pmb.conditionQuery.freePrmMap." + relativePath + "*/null";
+    }
+
+    protected int doAddValueToThemeList(String themeKey, Object addedValue, Map<String, Object> map) {
+        @SuppressWarnings("unchecked")
+        List<Object> valueList = (List<Object>) map.get(themeKey);
+        if (valueList == null) {
+            valueList = new ArrayList<Object>();
+            map.put(themeKey, valueList);
+        }
+        final int listIndex = valueList.size();
+        valueList.add(addedValue);
+        return listIndex;
     }
 
     // [DBFlute-0.9.8.4]

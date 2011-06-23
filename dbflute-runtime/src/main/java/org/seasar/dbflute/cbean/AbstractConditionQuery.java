@@ -1756,26 +1756,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // ===================================================================================
-    //                                                                    Option Parameter
-    //                                                                    ================
-    public void xregisterParameterOption(ParameterOption option) {
-        if (option == null) {
-            return;
-        }
-        if (_parameterOptionMap == null) {
-            _parameterOptionMap = newHashMap();
-        }
-        final String parameterKey = "option" + _parameterOptionMap.size();
-        _parameterOptionMap.put(parameterKey, option);
-        final String parameterMapPath = xgetLocationBase() + "optionParameterMap";
-        option.acceptParameterKey(parameterKey, parameterMapPath);
-    }
-
-    public Map<String, ParameterOption> getOptionParameterMap() { // for parameter comment
-        return _parameterOptionMap;
-    }
-
-    // ===================================================================================
     //                                                                  ColumnQuery Object
     //                                                                  ==================
     /**
@@ -1805,6 +1785,43 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected String xregisterManualOrderParameterToThemeList(String themeKey, Object addedValue) {
         return xgetSqlClause().registerManualOrderParameterToThemeList(themeKey, addedValue);
+    }
+
+    // ===================================================================================
+    //                                                                      Free Parameter
+    //                                                                      ==============
+    /**
+     * Get the map of free parameter for parameter comment. {Internal}.
+     * @return The instance of the map. (NullAllowed)
+     */
+    public Map<String, Object> getFreePrmMap() {
+        return xgetSqlClause().getFreeParameterMap();
+    }
+
+    // 'public' modifier for versatility
+    //  e.g. called by compound PK's LoadReferrer
+    public String xregisterFreeParameterToThemeList(String themeKey, Object addedValue) {
+        return xgetSqlClause().registerFreeParameterToThemeList(themeKey, addedValue);
+    }
+
+    // ===================================================================================
+    //                                                                    Option Parameter
+    //                                                                    ================
+    public void xregisterParameterOption(ParameterOption option) {
+        if (option == null) {
+            return;
+        }
+        if (_parameterOptionMap == null) {
+            _parameterOptionMap = newHashMap();
+        }
+        final String parameterKey = "option" + _parameterOptionMap.size();
+        _parameterOptionMap.put(parameterKey, option);
+        final String parameterMapPath = xgetLocationBase() + "optionParameterMap";
+        option.acceptParameterKey(parameterKey, parameterMapPath);
+    }
+
+    public Map<String, ParameterOption> getOptionParameterMap() { // for parameter comment
+        return _parameterOptionMap;
     }
 
     // ===================================================================================

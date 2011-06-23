@@ -768,13 +768,13 @@ public interface SqlClause {
      */
     String registerColumnQueryObjectToThemeList(String themeKey, Object addedValue);
 
-    // [DBFlute-0.9.8.2]
+    // [DBFlute-0.9.8.6]
     // ===================================================================================
     //                                                               ManualOrder Parameter
     //                                                               =====================
     /**
-     * Get the map for free parameters for parameter comment. {Internal}
-     * @return The map for free parameters. (NullAllowed: if null, means no parameter)
+     * Get the map for ManualOrder parameters for parameter comment. {Internal}
+     * @return The map for ManualOrder parameters. (NullAllowed: if null, means no parameter)
      */
     Map<String, Object> getManualOrderParameterMap();
 
@@ -785,6 +785,24 @@ public interface SqlClause {
      * @return The expression for binding. (NotNull)
      */
     String registerManualOrderParameterToThemeList(String themeKey, Object addedValue);
+
+    // [DBFlute-0.9.8.2]
+    // ===================================================================================
+    //                                                                      Free Parameter
+    //                                                                      ==============
+    /**
+     * Get the map for free parameters for parameter comment. {Internal}
+     * @return The map for free parameters. (NullAllowed: if null, means no parameter)
+     */
+    Map<String, Object> getFreeParameterMap();
+
+    /**
+     * Register free parameter to theme list. {Internal}
+     * @param themeKey The theme as key for the parameter. (NotNull)
+     * @param addedValue The value added to theme list for the parameter. (NullAllowed)
+     * @return The expression for binding. (NotNull)
+     */
+    String registerFreeParameterToThemeList(String themeKey, Object addedValue);
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================
