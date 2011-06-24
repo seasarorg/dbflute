@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -212,11 +213,15 @@ public class SubQueryIndentProcessor implements Serializable {
         return false;
     }
 
-    public static String insertSubQueryEndOnLastLine(String exp, String inserted) {
+    // should be checked before calling if on last line
+    public static String moveSubQueryEndToRear(String exp) {
         final String sqend = END_MARK_PREFIX;
-        final String front = Srl.substringLastFront(exp, sqend);
-        final String rear = Srl.substringLastRear(exp, sqend);
-        return front + inserted + sqend + rear;
+        final String idterm = IDENTITY_TERMINAL;
+        final ScopeInfo lastScope = Srl.extractScopeLast(exp, sqend, idterm);
+        final String scopeStr = lastScope.getScope();
+        final String front = exp.substring(0, lastScope.getBeginIndex());
+        final String rear = exp.substring(lastScope.getEndIndex());
+        return front + rear + scopeStr;
     }
 
     // ===================================================================================

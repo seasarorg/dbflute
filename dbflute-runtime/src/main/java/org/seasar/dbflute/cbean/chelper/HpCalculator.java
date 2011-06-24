@@ -1,5 +1,7 @@
 package org.seasar.dbflute.cbean.chelper;
 
+import org.seasar.dbflute.cbean.coption.ColumnConversionOption;
+
 /**
  * @author jflute
  */
@@ -33,12 +35,35 @@ public interface HpCalculator {
      */
     HpCalculator divide(Number divideValue);
 
+    /**
+     * Convert the value of right column by function.
+     * @param option The conversion option of column. (NotNull)
+     * @return this. (NotNull)
+     */
+    HpCalculator rconv(ColumnConversionOption option);
+
+    /**
+     * Convert the value of left column by function.
+     * @param option The conversion option of column. (NotNull)
+     * @return this. (NotNull)
+     */
+    HpCalculator lconv(ColumnConversionOption option);
+
     // ===================================================================================
     //                                                                       Related Class
     //                                                                       =============
     public static class CalculationElement {
         protected CalculationType _calculationType;
         protected Number _calculationValue;
+        protected ColumnConversionOption _columnConversionOption;
+
+        protected String buildExp(String targetExp) {
+            if (_calculationType.equals(CalculationType.CONV)) {
+                return _columnConversionOption.filterFunction(targetExp);
+            } else {
+                return targetExp + " " + _calculationType.operand() + " " + _calculationValue;
+            }
+        }
 
         public CalculationType getCalculationType() {
             return _calculationType;
@@ -55,10 +80,18 @@ public interface HpCalculator {
         public void setCalculationValue(Number calculationValue) {
             this._calculationValue = calculationValue;
         }
+
+        public ColumnConversionOption getColumnConversionOption() {
+            return _columnConversionOption;
+        }
+
+        public void setColumnConversionOption(ColumnConversionOption columnConversionOption) {
+            this._columnConversionOption = columnConversionOption;
+        }
     }
 
     public static enum CalculationType {
-        PLUS("+"), MINUS("-"), MULTIPLY("*"), DIVIDE("/");
+        CONV("$$FUNC$$"), PLUS("+"), MINUS("-"), MULTIPLY("*"), DIVIDE("/");
         private String _operand;
 
         private CalculationType(String operand) {

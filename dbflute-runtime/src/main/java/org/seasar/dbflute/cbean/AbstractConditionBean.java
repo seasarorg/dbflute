@@ -201,31 +201,40 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected <CB extends ConditionBean> HpCalculator xcolqy(CB leftCB, CB rightCB, SpecifyQuery<CB> leftSp,
             SpecifyQuery<CB> rightSp, final String operand) {
         assertQueryPurpose();
-        leftSp.specify(leftCB);
-        final String leftColumn = xbuildLeftColumn(leftCB);
+
+        final HpCalcSpecification<CB> leftCalcSp = xcreateCalcSpecification(leftSp);
+        leftCalcSp.specify(leftCB);
+        final String leftColumn = xbuildLeftColumn(leftCB, leftCalcSp);
+
         final HpCalcSpecification<CB> rightCalcSp = xcreateCalcSpecification(rightSp);
         rightCalcSp.specify(rightCB);
         final String rightColumn = xbuildRightColumn(rightCB, rightCalcSp);
+        rightCalcSp.setLeftCalcSp(leftCalcSp);
+
         final QueryClause queryClause = xcreateColQyClause(leftColumn, operand, rightColumn, rightCalcSp);
         getSqlClause().registerWhereClause(queryClause);
         return rightCalcSp;
     }
 
-    protected <CB extends ConditionBean> String xbuildLeftColumn(CB leftCB) {
-        final String leftSource;
-        {
-            final ColumnRealName realName = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
-            if (realName != null) {
-                final ColumnInfo columnInfo = leftCB.getSqlClause().getSpecifiedColumnInfoAsOne();
-                leftSource = decrypt(columnInfo, realName.toString());
-            } else {
-                leftSource = leftCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
-            }
-        }
-        if (leftSource == null) {
+    protected <CB extends ConditionBean> String xbuildLeftColumn(CB leftCB, HpCalcSpecification<CB> leftCalcSp) {
+        final ColumnRealName realName = leftCalcSp.getResolvedSpecifiedColumnRealName();
+        if (realName == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
-        return xbuildColQyColumn(leftCB, leftSource, "left");
+        //        final String leftSource;
+        //        {
+        //            final ColumnRealName realName = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
+        //            if (realName != null) {
+        //                final ColumnInfo columnInfo = leftCB.getSqlClause().getSpecifiedColumnInfoAsOne();
+        //                leftSource = decrypt(columnInfo, realName.toString());
+        //            } else {
+        //                leftSource = leftCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
+        //            }
+        //        }
+        //        if (leftSource == null) {
+        //            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
+        //        }
+        return xbuildColQyColumn(leftCB, realName.toString(), "left");
     }
 
     protected <CB extends ConditionBean> String xbuildRightColumn(CB rightCB, HpCalcSpecification<CB> rightCalcSp) {
@@ -242,7 +251,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected <CB extends ConditionBean> HpCalcSpecification<CB> xcreateCalcSpecification(SpecifyQuery<CB> rightSp) {
-        return new HpCalcSpecification<CB>(rightSp);
+        return new HpCalcSpecification<CB>(rightSp, this);
     }
 
     protected <CB extends ConditionBean> QueryClause xcreateColQyClause(final String leftColumn, final String operand,
@@ -250,26 +259,37 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return new QueryClause() {
             @Override
             public String toString() {
-                final String rightExp;
-                {
-                    final String statement = rightCalcSp.buildStatementToSpecifidName(rightColumn);
-                    if (statement != null) { // exists calculation
-                        assertCalculationColumnType();
-                        rightExp = statement; // cipher already resolved
-                    } else {
-                        final ColumnInfo columnInfo = rightCalcSp.getSpecifiedColumnInfo();
-                        if (columnInfo != null) { // means plain column
-                            rightExp = decrypt(columnInfo, rightColumn);
-                        } else { // deriving sub-query
-                            rightExp = rightColumn;
-                        }
-                    }
-                }
-                return xbuildColQyClause(leftColumn, operand, rightExp);
+                final String leftExp = resolveColumnExp(rightCalcSp.getLeftCalcSp(), leftColumn);
+                final String rightExp = resolveColumnExp(rightCalcSp, rightColumn);
+                return xbuildColQyClause(leftExp, operand, rightExp);
             }
 
-            protected void assertCalculationColumnType() {
-                final ColumnInfo columnInfo = rightCalcSp.getResolvedSpecifiedColumnInfo();
+            protected String resolveColumnExp(HpCalcSpecification<CB> calcSp, String columnExp) {
+                final String resolvedExp;
+                if (calcSp != null) {
+                    final String statement = calcSp.buildStatementToSpecifidName(columnExp);
+                    if (statement != null) { // exists calculation
+                        assertCalculationColumnType(calcSp);
+                        resolvedExp = statement; // cipher already resolved
+                    } else {
+                        final ColumnInfo columnInfo = calcSp.getSpecifiedColumnInfo();
+                        if (columnInfo != null) { // means plain column
+                            resolvedExp = decrypt(columnInfo, columnExp);
+                        } else { // deriving sub-query
+                            resolvedExp = columnExp;
+                        }
+                    }
+                } else {
+                    resolvedExp = columnExp;
+                }
+                return resolvedExp;
+            }
+
+            protected void assertCalculationColumnType(HpCalcSpecification<CB> calcSp) {
+                if (calcSp.hasConvert()) {
+                    return; // because it may be Date type
+                }
+                final ColumnInfo columnInfo = calcSp.getResolvedSpecifiedColumnInfo();
                 if (columnInfo != null) { // basically true but checked just in case
                     if (!columnInfo.isPropertyTypeNumber()) {
                         // *simple message because other types may be supported at the future
@@ -285,10 +305,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
                     if (hasSubQueryEndOnLastLine(rightExp)) { // (sub-query = sub-query)
                         // add line separator before right expression
                         // because of independent format for right query
-                        sb.append(insertSubQueryEndOnLastLine(leftExp, " " + operand + " "));
+                        sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " "));
                         sb.append(ln() + "       ").append(rightExp);
                     } else { // (sub-query = column)
-                        sb.append(insertSubQueryEndOnLastLine(leftExp, " " + operand + " " + rightExp));
+                        sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " " + rightExp));
                     }
                 } else { // (column = sub-query) or (column = column) 
                     sb.append(leftExp).append(" ").append(operand).append(" ").append(rightExp);
@@ -306,8 +326,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(columnExp);
     }
 
-    protected String insertSubQueryEndOnLastLine(String columnExp, String inserted) {
-        return SubQueryIndentProcessor.insertSubQueryEndOnLastLine(columnExp, inserted);
+    protected String reflectToSubQueryEndOnLastLine(String columnExp, String inserted) {
+        return SubQueryIndentProcessor.moveSubQueryEndToRear(columnExp + inserted);
     }
 
     // [DBFlute-0.9.6.3]

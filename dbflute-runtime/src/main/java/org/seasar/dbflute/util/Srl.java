@@ -1387,6 +1387,14 @@ public class Srl {
         return scopeList.get(0);
     }
 
+    public static final ScopeInfo extractScopeLast(final String str, final String beginMark, final String endMark) {
+        final List<ScopeInfo> scopeList = doExtractScopeList(str, beginMark, endMark, false);
+        if (scopeList == null || scopeList.isEmpty()) {
+            return null;
+        }
+        return scopeList.get(scopeList.size() - 1);
+    }
+
     public static final List<ScopeInfo> extractScopeList(final String str, final String beginMark, final String endMark) {
         final List<ScopeInfo> scopeList = doExtractScopeList(str, beginMark, endMark, false);
         return scopeList != null ? scopeList : new ArrayList<ScopeInfo>();

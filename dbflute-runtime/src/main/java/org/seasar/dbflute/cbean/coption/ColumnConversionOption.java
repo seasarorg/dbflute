@@ -16,11 +16,11 @@
 package org.seasar.dbflute.cbean.coption;
 
 /**
- * The option for DerivedReferrer. <br />
+ * The conversion option for column. e.g. ColumnQuery <br />
  * You can filter an aggregate function by scalar function filters.
  * @author jflute
  */
-public class DerivedReferrerOption extends FunctionFilterOption {
+public class ColumnConversionOption extends FunctionFilterOption {
 
     // ===================================================================================
     //                                                                     Function Option
@@ -32,7 +32,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param coalesce An alternate value when group function returns null. (NullAllowed: if null, no coalesce)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption coalesce(Object coalesce) {
+    public ColumnConversionOption coalesce(Object coalesce) {
         doCoalesce(coalesce);
         return this;
     }
@@ -42,7 +42,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param round Decimal digits or date format for round. (NullAllowed: if null, no round)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption round(Object round) {
+    public ColumnConversionOption round(Object round) {
         doRound(round);
         return this;
     }
@@ -52,7 +52,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param trunc Decimal digits or date option for trunc. (NullAllowed: if null, no trunc)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption trunc(Object trunc) {
+    public ColumnConversionOption trunc(Object trunc) {
         doTrunc(trunc);
         return this;
     }
@@ -64,7 +64,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * Truncate the time part of the date-time value.
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption truncTime() {
+    public ColumnConversionOption truncTime() {
         doTruncTime();
         return this;
     }
@@ -74,7 +74,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedYear The count of added years. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addYear(Integer addedYear) {
+    public ColumnConversionOption addYear(Integer addedYear) {
         doAddYear(addedYear);
         return this;
     }
@@ -84,7 +84,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedMonth The count of added months. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addMonth(Integer addedMonth) {
+    public ColumnConversionOption addMonth(Integer addedMonth) {
         doAddMonth(addedMonth);
         return this;
     }
@@ -94,7 +94,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedDay The count of added days. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addDay(Integer addedDay) {
+    public ColumnConversionOption addDay(Integer addedDay) {
         doAddDay(addedDay);
         return this;
     }
@@ -104,7 +104,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedHour The count of added hours. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addHour(Integer addedHour) {
+    public ColumnConversionOption addHour(Integer addedHour) {
         doAddHour(addedHour);
         return this;
     }
@@ -114,7 +114,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedMinute The count of added minutes. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addMinute(Integer addedMinute) {
+    public ColumnConversionOption addMinute(Integer addedMinute) {
         doAddMinute(addedMinute);
         return this;
     }
@@ -124,7 +124,7 @@ public class DerivedReferrerOption extends FunctionFilterOption {
      * @param addedSecond The count of added seconds. (NullAllowed: if null, no dateAdd)
      * @return this. (NotNull)
      */
-    public DerivedReferrerOption addSecond(Integer addedSecond) {
+    public ColumnConversionOption addSecond(Integer addedSecond) {
         doAddSecond(addedSecond);
         return this;
     }

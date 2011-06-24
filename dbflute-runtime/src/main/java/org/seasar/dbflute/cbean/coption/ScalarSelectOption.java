@@ -20,11 +20,11 @@ package org.seasar.dbflute.cbean.coption;
  * You can filter an aggregate function by scalar function filters.
  * @author jflute
  */
-public class ScalarSelectOption extends FunctionConversionOption {
+public class ScalarSelectOption extends FunctionFilterOption {
 
     // ===================================================================================
-    //                                                                              Option
-    //                                                                              ======
+    //                                                                     Function Option
+    //                                                                     ===============
     /**
      * Set the value for coalesce function. <br />
      * If you set string value and the derived column is date type, it converts it to a date object internally.
@@ -38,7 +38,7 @@ public class ScalarSelectOption extends FunctionConversionOption {
     }
 
     /**
-     * Set the value for round function.
+     * Round the specified part of the number.
      * @param round Decimal digits or date format for round. (NullAllowed: if null, no round)
      * @return this. (NotNull)
      */
@@ -48,12 +48,84 @@ public class ScalarSelectOption extends FunctionConversionOption {
     }
 
     /**
-     * Set the value for trunc function.
-     * @param trunc Decimal digits or date format for trunc. (NullAllowed: if null, no trunc)
+     * Truncate the specified part of the number or date-time value.
+     * @param trunc Decimal digits or date option for trunc. (NullAllowed: if null, no trunc)
      * @return this. (NotNull)
      */
     public ScalarSelectOption trunc(Object trunc) {
         doTrunc(trunc);
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                      Purpose Option
+    //                                                                      ==============
+    /**
+     * Truncate the time part of the date-time value.
+     * @return this. (NotNull)
+     */
+    public ScalarSelectOption truncTime() {
+        doTruncTime();
+        return this;
+    }
+
+    /**
+     * Add years to the date or date-time value.
+     * @param addedYear The count of added years. (NullAllowed: if null, no dateAdd)
+     * @return this. (NotNull)
+     */
+    public ScalarSelectOption addYear(Integer addedYear) {
+        doAddYear(addedYear);
+        return this;
+    }
+
+    /**
+     * Add months to the date or date-time value.
+     * @param addedMonth The count of added months. (NullAllowed: if null, no dateAdd)
+     * @return this. (NotNull)
+     */
+    public ScalarSelectOption addMonth(Integer addedMonth) {
+        doAddMonth(addedMonth);
+        return this;
+    }
+
+    /**
+     * Add days to the date or date-time value.
+     * @param addedDay The count of added days. (NullAllowed: if null, no dateAdd)
+     * @return this. (NotNull)
+     */
+    public ScalarSelectOption addDay(Integer addedDay) {
+        doAddDay(addedDay);
+        return this;
+    }
+
+    /**
+     * Add hours to date-time value.
+     * @param addedHour The count of added hours. (NullAllowed: if null, no dateAdd)
+     * @return this. (NotNull)
+     */
+    public ScalarSelectOption addHour(Integer addedHour) {
+        doAddHour(addedHour);
+        return this;
+    }
+
+    /**
+     * Add minutes to date-time value.
+     * @param addedMinute The count of added minutes. (NullAllowed: if null, no dateAdd)
+     * @return this. (NotNull)
+     */
+    public ScalarSelectOption addMinute(Integer addedMinute) {
+        doAddMinute(addedMinute);
+        return this;
+    }
+
+    /**
+     * Add seconds to date-time value.
+     * @param addedSecond The count of added seconds. (NullAllowed: if null, no dateAdd)
+     * @return this. (NotNull)
+     */
+    public ScalarSelectOption addSecond(Integer addedSecond) {
+        doAddSecond(addedSecond);
         return this;
     }
 }

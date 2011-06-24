@@ -5,6 +5,7 @@ import java.util.List;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.coption.ColumnConversionOption;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -20,8 +21,11 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     //                                                                           Attribute
     //                                                                           =========
     protected final SpecifyQuery<CB> _specifyQuery;
-    protected CB _cb;
+    protected ConditionBean _baseCB;
+    protected CB _specifedCB;
     protected final List<CalculationElement> _calculationList = DfCollectionUtil.newArrayList();
+    protected boolean _convert;
+    protected HpCalcSpecification<CB> _leftCalcSp;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -30,20 +34,28 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         _specifyQuery = specifyQuery;
     }
 
+    public HpCalcSpecification(SpecifyQuery<CB> specifyQuery, ConditionBean baseCB) {
+        _specifyQuery = specifyQuery;
+        _baseCB = baseCB;
+    }
+
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
     public void specify(CB cb) {
         _specifyQuery.specify(cb);
-        _cb = cb; // saves for handling the specified column
+        _specifedCB = cb; // saves for handling the specified column
+        if (_baseCB == null) { // means base CB is same as specified one
+            _baseCB = cb;
+        }
     }
 
     public ColumnInfo getSpecifiedColumnInfo() { // only when plain
-        return _cb.getSqlClause().getSpecifiedColumnInfoAsOne();
+        return _specifedCB.getSqlClause().getSpecifiedColumnInfoAsOne();
     }
 
     public ColumnInfo getSpecifiedDerivingColumnInfo() { // only when deriving sub-query
-        return _cb.getSqlClause().getSpecifiedDerivingColumnInfoAsOne();
+        return _specifedCB.getSqlClause().getSpecifiedDerivingColumnInfoAsOne();
     }
 
     public ColumnInfo getResolvedSpecifiedColumnInfo() { // resolved plain or deriving sub-query
@@ -52,11 +64,11 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     public ColumnRealName getResolvedSpecifiedColumnRealName() { // resolved plain or deriving sub-query
-        final ColumnRealName columnRealName = _cb.getSqlClause().getSpecifiedColumnRealNameAsOne();
+        final ColumnRealName columnRealName = _specifedCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
         if (columnRealName != null) {
             return columnRealName;
         }
-        final String subQuery = _cb.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
+        final String subQuery = _specifedCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
         if (subQuery != null) {
             // basically for (Specify)DerivedReferrer in ColumnQuery
             return new ColumnRealName(null, new ColumnSqlName(subQuery));
@@ -65,11 +77,11 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     public ColumnSqlName getResolvedSpecifiedColumnSqlName() { // resolved plain or deriving sub-query
-        final ColumnSqlName columnSqlName = _cb.getSqlClause().getSpecifiedColumnSqlNameAsOne();
+        final ColumnSqlName columnSqlName = _specifedCB.getSqlClause().getSpecifiedColumnSqlNameAsOne();
         if (columnSqlName != null) {
             return columnSqlName;
         }
-        final String subQuery = _cb.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
+        final String subQuery = _specifedCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
         if (subQuery != null) {
             // basically for (Specify)DerivedReferrer in ColumnQuery
             return new ColumnSqlName(subQuery);
@@ -120,6 +132,45 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator rconv(ColumnConversionOption option) {
+        return registerConv(option); // registered as main
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator lconv(ColumnConversionOption option) {
+        if (_leftCalcSp == null) {
+            String msg = "The conversion for left column is unsupported: " + option;
+            throw new IllegalStateException(msg);
+        }
+        _leftCalcSp.rconv(option); // dispatch to nested one
+        return this;
+    }
+
+    protected HpCalculator registerConv(ColumnConversionOption option) {
+        if (option == null) {
+            String msg = "The null value was specified as conversion option: " + _specifyQuery;
+            throw new IllegalArgumentException(msg);
+        }
+        final CalculationElement calculation = new CalculationElement();
+        calculation.setCalculationType(CalculationType.CONV);
+        calculation.setColumnConversionOption(option);
+        _calculationList.add(calculation);
+        prepareConvOption(option);
+        _convert = true;
+        return this;
+    }
+
+    protected void prepareConvOption(ColumnConversionOption option) {
+        option.xjudgeDatabase(_baseCB.getSqlClause());
+        option.xsetTargetColumnInfo(getResolvedSpecifiedColumnInfo());
+        _baseCB.localCQ().xregisterParameterOption(option);
+    }
+
     // ===================================================================================
     //                                                                           Statement
     //                                                                           =========
@@ -144,18 +195,16 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         if (calculationList.isEmpty()) {
             return null;
         }
-        final StringBuilder sb = new StringBuilder();
-        sb.append(decryptIfNeeds(columnExp));
+        String targetExp = decryptIfNeeds(columnExp);
         int index = 0;
         for (CalculationElement calculation : calculationList) {
             if (index > 0) {
-                sb.insert(0, "(").append(")");
+                targetExp = "(" + targetExp + ")";
             }
-            sb.append(" ").append(calculation.getCalculationType().operand());
-            sb.append(" ").append(calculation.getCalculationValue());
+            targetExp = calculation.buildExp(targetExp);
             ++index;
         }
-        return sb.toString();
+        return targetExp;
     }
 
     protected String decryptIfNeeds(String valueExp) {
@@ -163,7 +212,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         if (columnInfo == null) { // means sub-query
             return valueExp;
         }
-        final ColumnFunctionCipher cipher = _cb.getSqlClause().findColumnFunctionCipher(columnInfo);
+        final ColumnFunctionCipher cipher = _specifedCB.getSqlClause().findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.decrypt(valueExp) : valueExp;
     }
 
@@ -176,5 +225,17 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
 
     public List<CalculationElement> getCalculationList() {
         return _calculationList;
+    }
+
+    public boolean hasConvert() {
+        return _convert;
+    }
+
+    public HpCalcSpecification<CB> getLeftCalcSp() {
+        return _leftCalcSp;
+    }
+
+    public void setLeftCalcSp(HpCalcSpecification<CB> leftCalcSp) {
+        _leftCalcSp = leftCalcSp;
     }
 }

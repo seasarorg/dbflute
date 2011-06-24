@@ -43,11 +43,16 @@ import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * The option for conversion by function. <br />
+ * The option to filter by function. <br />
  * You can filter an aggregate function by scalar function filters.
  * @author jflute
  */
-public class FunctionConversionOption implements ParameterOption {
+public class FunctionFilterOption implements ParameterOption {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String DATE_TRUNC_TIME = "df:time";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -55,6 +60,12 @@ public class FunctionConversionOption implements ParameterOption {
     protected Object _coalesce;
     protected Object _round;
     protected Object _trunc;
+    protected Object _addYear;
+    protected Object _addMonth;
+    protected Object _addDay;
+    protected Object _addHour;
+    protected Object _addMinute;
+    protected Object _addSecond;
     protected LinkedHashMap<String, ProcessCallback> _callbackMap; // order should be guaranteed
     protected String _parameterKey;
     protected String _parameterMapPath;
@@ -74,12 +85,6 @@ public class FunctionConversionOption implements ParameterOption {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    /**
-     * Set the value for coalesce function. <br />
-     * If you set string value and the derived column is date type, it converts it to a date object internally.
-     * For example, "2010-10-30 12:34:56.789", "2010/10/30" and so on ... are acceptable.
-     * @param coalesce An alternate value when group function returns null. (NullAllowed: if null, no coalesce)
-     */
     protected void doCoalesce(Object coalesce) {
         _coalesce = coalesce;
         addProcessCallback("coalesce", new ProcessCallback() {
@@ -89,10 +94,6 @@ public class FunctionConversionOption implements ParameterOption {
         });
     }
 
-    /**
-     * Set the value for round function.
-     * @param round Decimal digits or date format for round. (NullAllowed: if null, no round)
-     */
     protected void doRound(Object round) {
         _round = round;
         addProcessCallback("round", new ProcessCallback() {
@@ -102,15 +103,69 @@ public class FunctionConversionOption implements ParameterOption {
         });
     }
 
-    /**
-     * Set the value for trunc function.
-     * @param trunc Decimal digits or date format for trunc. (NullAllowed: if null, no trunc)
-     */
     protected void doTrunc(Object trunc) {
         _trunc = trunc;
         addProcessCallback("trunc", new ProcessCallback() {
             public String callback(String functionExp) {
                 return processTrunc(functionExp);
+            }
+        });
+    }
+
+    protected void doTruncTime() {
+        doTrunc(DATE_TRUNC_TIME);
+    }
+
+    protected void doAddYear(Integer addedYear) {
+        _addYear = addedYear;
+        addProcessCallback("addYear", new ProcessCallback() {
+            public String callback(String functionExp) {
+                return processAddYear(functionExp);
+            }
+        });
+    }
+
+    protected void doAddMonth(Integer addedMonth) {
+        _addMonth = addedMonth;
+        addProcessCallback("addMonth", new ProcessCallback() {
+            public String callback(String functionExp) {
+                return processAddMonth(functionExp);
+            }
+        });
+    }
+
+    protected void doAddDay(Integer addedDay) {
+        _addDay = addedDay;
+        addProcessCallback("addDay", new ProcessCallback() {
+            public String callback(String functionExp) {
+                return processAddDay(functionExp);
+            }
+        });
+    }
+
+    protected void doAddHour(Integer addedHour) {
+        _addHour = addedHour;
+        addProcessCallback("addHour", new ProcessCallback() {
+            public String callback(String functionExp) {
+                return processAddHour(functionExp);
+            }
+        });
+    }
+
+    protected void doAddMinute(Integer addedMinute) {
+        _addMinute = addedMinute;
+        addProcessCallback("addMinute", new ProcessCallback() {
+            public String callback(String functionExp) {
+                return processAddMinute(functionExp);
+            }
+        });
+    }
+
+    protected void doAddSecond(Integer addedSecond) {
+        _addSecond = addedSecond;
+        addProcessCallback("addSecond", new ProcessCallback() {
+            public String callback(String functionExp) {
+                return processAddSecond(functionExp);
             }
         });
     }
@@ -155,49 +210,198 @@ public class FunctionConversionOption implements ParameterOption {
     // ===================================================================================
     //                                                                             Process
     //                                                                             =======
+    // -----------------------------------------------------
+    //                                              Coalesce
+    //                                              --------
     protected String processCoalesce(String functionExp) {
+        if (_coalesce == null) {
+            return functionExp;
+        }
         if (_coalesce instanceof String && isDateTypeColumn()) {
             _coalesce = DfTypeUtil.toDate(_coalesce);
         }
         final String functionName = "coalesce";
         final String propertyName = functionName;
-        return processSimpleFunction(functionExp, _coalesce, functionName, propertyName, null, false);
+        return processSimpleFunction(functionExp, functionName, propertyName, null, false);
     }
 
+    // -----------------------------------------------------
+    //                                                 Round
+    //                                                 -----
     protected String processRound(String functionExp) {
+        if (_round == null) {
+            return functionExp;
+        }
         final String functionName = "round";
         final String propertyName = functionName;
-        return processSimpleFunction(functionExp, _round, functionName, propertyName, null, false);
+        return processSimpleFunction(functionExp, functionName, propertyName, null, false);
     }
 
+    // -----------------------------------------------------
+    //                                                 Trunc
+    //                                                 -----
     protected String processTrunc(String functionExp) {
+        if (_trunc == null) {
+            return functionExp;
+        }
+        // process irregular case
+        if (isDateTypeColumn()) {
+            if (_trunc.equals(DATE_TRUNC_TIME)) {
+                if (isDatabaseMySQL()) {
+                    return "cast(substring(" + functionExp + ", 1, 10) as date)";
+                } else if (isDatabasePostgreSQL()) {
+                    _trunc = "day"; // switch and treats it as simple case
+                } else if (isDatabaseOracle()) {
+                    _trunc = "DD"; // switch and treats it as simple case
+                } else if (isDatabaseSQLServer()) {
+                    return "convert(datetime, convert(nvarchar, " + functionExp + ", 111), 120)";
+                }
+            }
+        }
+        // process simple case
         final String functionName;
-        final String thirdArg;
-        final boolean leftArg;
-        if (isTruncTruncate()) {
+        String thirdArg = null;
+        boolean leftArg = false;
+        if (isTruncNamedTruncate()) {
             functionName = "truncate";
-            thirdArg = null;
-            leftArg = false;
         } else if (isDatabaseSQLServer()) {
             functionName = "round";
             thirdArg = "1";
-            leftArg = false;
         } else if (isDatabasePostgreSQL() && isDateTypeColumn()) {
             functionName = "date_trunc";
-            thirdArg = null;
             leftArg = true;
         } else {
             functionName = "trunc";
-            thirdArg = null;
-            leftArg = false;
         }
-        return processSimpleFunction(functionExp, _trunc, functionName, "trunc", thirdArg, leftArg);
+        return processSimpleFunction(functionExp, functionName, "trunc", thirdArg, leftArg);
     }
 
-    protected boolean isTruncTruncate() {
+    protected boolean isTruncNamedTruncate() {
         return isDatabaseMySQL() || isDatabaseH2();
     }
 
+    // -----------------------------------------------------
+    //                                               DateAdd
+    //                                               -------
+    protected String processAddYear(String functionExp) {
+        return doProcessDateAdd(functionExp, _addYear, "addYear");
+    }
+
+    protected String processAddMonth(String functionExp) {
+        return doProcessDateAdd(functionExp, _addMonth, "addMonth");
+    }
+
+    protected String processAddDay(String functionExp) {
+        return doProcessDateAdd(functionExp, _addDay, "addDay");
+    }
+
+    protected String processAddHour(String functionExp) {
+        return doProcessDateAdd(functionExp, _addHour, "addHour");
+    }
+
+    protected String processAddMinute(String functionExp) {
+        return doProcessDateAdd(functionExp, _addMinute, "addMinute");
+    }
+
+    protected String processAddSecond(String functionExp) {
+        return doProcessDateAdd(functionExp, _addSecond, "addSecond");
+    }
+
+    protected String doProcessDateAdd(String functionExp, Object addedValue, String propertyName) {
+        if (addedValue == null) {
+            return functionExp;
+        }
+        if (!isDateTypeColumn()) { // basically no way
+            String msg = "The column should be Date type for the function addXxx():";
+            msg = msg + " column=" + _targetColumnInfo;
+            throw new IllegalStateException(msg);
+        }
+        final String bindParameter = buildBindParameter(propertyName);
+        if (isDatabaseMySQL()) {
+            final String type = findDateExpType(propertyName, null, false);
+            return "date_add(" + functionExp + ", interval " + bindParameter + " " + type + ")";
+        } else if (isDatabasePostgreSQL()) {
+            final String type = findDateExpType(propertyName, null, true);
+            return functionExp + " + '" + addedValue + " " + type + "'"; // no binding
+        } else if (isDatabaseOracle()) {
+            if (isPropertyAddYear(propertyName)) {
+                return "add_months(" + functionExp + ", 12 * " + bindParameter + ")";
+            } else if (isPropertyAddMonth(propertyName)) {
+                return "add_months(" + functionExp + ", " + bindParameter + ")";
+            } else if (isPropertyAddDay(propertyName)) {
+                return functionExp + " + " + bindParameter;
+            } else if (isPropertyAddHour(propertyName)) {
+                return functionExp + " + " + bindParameter + " / 24";
+            } else if (isPropertyAddMinute(propertyName)) {
+                return functionExp + " + " + bindParameter + " / 1440";
+            } else if (isPropertyAddSecond(propertyName)) {
+                return functionExp + " + " + bindParameter + " / 86400";
+            } else {
+                String msg = "Unknown property for date-add: " + propertyName;
+                throw new IllegalStateException(msg);
+            }
+        } else if (isDatabaseSQLServer() || isDatabaseH2()) {
+            final String type = findDateExpType(propertyName, null, false);
+            return "dateadd(" + type + ", " + bindParameter + ", " + functionExp + ")";
+        } else if (isDatabaseDB2()) {
+            final String type = findDateExpType(propertyName, "SQL_TSI_", false).toUpperCase();
+            return "timestampadd(" + type + ", " + bindParameter + ", " + functionExp + ")";
+        } else {
+            String msg = "Unsupported database to the function addXxx(): " + propertyName;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected String findDateExpType(String propertyName, String prefix, boolean plural) {
+        prefix = (prefix != null ? prefix : "");
+        final String suffix = plural ? "s" : "";
+        final String type;
+        if (isPropertyAddYear(propertyName)) {
+            type = prefix + "year" + suffix;
+        } else if (isPropertyAddMonth(propertyName)) {
+            type = prefix + "month" + suffix;
+        } else if (isPropertyAddDay(propertyName)) {
+            type = prefix + "day" + suffix;
+        } else if (isPropertyAddHour(propertyName)) {
+            type = prefix + "hour" + suffix;
+        } else if (isPropertyAddMinute(propertyName)) {
+            type = prefix + "minute" + suffix;
+        } else if (isPropertyAddSecond(propertyName)) {
+            type = prefix + "second" + suffix;
+        } else {
+            String msg = "Unknown property for date-add: " + propertyName;
+            throw new IllegalStateException(msg);
+        }
+        return type;
+    }
+
+    protected boolean isPropertyAddYear(String propertyName) {
+        return "addYear".equals(propertyName);
+    }
+
+    protected boolean isPropertyAddMonth(String propertyName) {
+        return "addMonth".equals(propertyName);
+    }
+
+    protected boolean isPropertyAddDay(String propertyName) {
+        return "addDay".equals(propertyName);
+    }
+
+    protected boolean isPropertyAddHour(String propertyName) {
+        return "addHour".equals(propertyName);
+    }
+
+    protected boolean isPropertyAddMinute(String propertyName) {
+        return "addMinute".equals(propertyName);
+    }
+
+    protected boolean isPropertyAddSecond(String propertyName) {
+        return "addSecond".equals(propertyName);
+    }
+
+    // -----------------------------------------------------
+    //                                               Various
+    //                                               -------
     /**
      * Process various filters defined by user. (for extension)
      * @param functionExp The expression of derived function. (NotNull)
@@ -207,11 +411,11 @@ public class FunctionConversionOption implements ParameterOption {
         return functionExp;
     }
 
-    protected String processSimpleFunction(String functionExp, Object specifiedValue, String functionName,
-            String propertyName, String thirdArg, boolean leftArg) {
-        if (specifiedValue == null) {
-            return functionExp;
-        }
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
+    protected String processSimpleFunction(String functionExp, String functionName, String propertyName,
+            String thirdArg, boolean leftArg) {
         final String bindParameter = buildBindParameter(propertyName);
         final StringBuilder sb = new StringBuilder();
         sb.append(functionName).append("(");
@@ -219,11 +423,7 @@ public class FunctionConversionOption implements ParameterOption {
         final boolean handleSqEnd = hasSubQueryEndOnLastLine(functionExp);
         final String pureFunction = handleSqEnd ? Srl.substringLastFront(functionExp, sqend) : functionExp;
         if (leftArg) { // for example, PostgreSQL's date_trunc()
-            // add line separator and indent for SQL format
-            // because a left bind parameter destroys its format
-            // also this is not perfect but almost OK 
-            final String indent = Srl.indent(("select ").length());
-            sb.append(bindParameter).append(ln()).append(indent).append(", ").append(pureFunction);
+            sb.append(bindParameter).append(", ").append(pureFunction);
         } else { // normal
             sb.append(pureFunction).append(", ").append(bindParameter);
         }
@@ -307,6 +507,30 @@ public class FunctionConversionOption implements ParameterOption {
 
     public Object getTrunc() {
         return _trunc;
+    }
+
+    public Object getAddYear() {
+        return _addYear;
+    }
+
+    public Object getAddMonth() {
+        return _addMonth;
+    }
+
+    public Object getAddDay() {
+        return _addDay;
+    }
+
+    public Object getAddHour() {
+        return _addHour;
+    }
+
+    public Object getAddMinute() {
+        return _addMinute;
+    }
+
+    public Object getAddSecond() {
+        return _addSecond;
     }
 
     // -----------------------------------------------------
