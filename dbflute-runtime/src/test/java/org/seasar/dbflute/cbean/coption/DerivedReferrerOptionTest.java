@@ -48,8 +48,7 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
 
         // ## Assert ##
         log(actual);
-        assertTrue(Srl.contains(actual, "func(/*pmb.path.key.bar*/null" + ln()));
-        assertTrue(Srl.contains(actual, " , max(foo.COL), third)"));
+        assertTrue(Srl.contains(actual, "func(/*pmb.path.key.bar*/null, max(foo.COL), third)"));
     }
 
     public void test_processSimpleFunction_nested_basic() throws Exception {
