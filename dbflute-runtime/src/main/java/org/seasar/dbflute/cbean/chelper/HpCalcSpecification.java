@@ -9,6 +9,7 @@ import org.seasar.dbflute.cbean.coption.ColumnConversionOption;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -24,8 +25,9 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     protected ConditionBean _baseCB;
     protected CB _specifedCB;
     protected final List<CalculationElement> _calculationList = DfCollectionUtil.newArrayList();
-    protected boolean _convert;
+    protected boolean _leftMode;
     protected HpCalcSpecification<CB> _leftCalcSp;
+    protected boolean _convert;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -90,34 +92,58 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     // ===================================================================================
-    //                                                                          Calculator
-    //                                                                          ==========
+    //                                                                         Calculation
+    //                                                                         ===========
     /**
      * {@inheritDoc}
      */
     public HpCalculator plus(Number plusValue) {
-        return register(CalculationType.PLUS, plusValue);
+        if (_leftMode) {
+            assertLeftCalcSp();
+            _leftCalcSp.plus(plusValue); // dispatch to nested one
+            return this;
+        } else {
+            return register(CalculationType.PLUS, plusValue); // main process
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public HpCalculator minus(Number minusValue) {
-        return register(CalculationType.MINUS, minusValue);
+        if (_leftMode) {
+            assertLeftCalcSp();
+            _leftCalcSp.minus(minusValue); // dispatch to nested one
+            return this;
+        } else {
+            return register(CalculationType.MINUS, minusValue); // main process
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public HpCalculator multiply(Number multiplyValue) {
-        return register(CalculationType.MULTIPLY, multiplyValue);
+        if (_leftMode) {
+            assertLeftCalcSp();
+            _leftCalcSp.multiply(multiplyValue); // dispatch to nested one
+            return this;
+        } else {
+            return register(CalculationType.MULTIPLY, multiplyValue); // main process
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public HpCalculator divide(Number divideValue) {
-        return register(CalculationType.DIVIDE, divideValue);
+        if (_leftMode) {
+            assertLeftCalcSp();
+            _leftCalcSp.divide(divideValue); // dispatch to nested one
+            return this;
+        } else {
+            return register(CalculationType.DIVIDE, divideValue); // main process
+        }
     }
 
     protected HpCalculator register(CalculationType type, Number value) {
@@ -135,20 +161,14 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public HpCalculator rconv(ColumnConversionOption option) {
-        return registerConv(option); // registered as main
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public HpCalculator lconv(ColumnConversionOption option) {
-        if (_leftCalcSp == null) {
-            String msg = "The conversion for left column is unsupported: " + option;
-            throw new IllegalStateException(msg);
+    public HpCalculator convert(ColumnConversionOption option) {
+        if (_leftMode) {
+            assertLeftCalcSp();
+            _leftCalcSp.convert(option); // dispatch to nested one
+            return this;
+        } else {
+            return registerConv(option); // main process
         }
-        _leftCalcSp.rconv(option); // dispatch to nested one
-        return this;
     }
 
     protected HpCalculator registerConv(ColumnConversionOption option) {
@@ -169,6 +189,41 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         option.xjudgeDatabase(_baseCB.getSqlClause());
         option.xsetTargetColumnInfo(getResolvedSpecifiedColumnInfo());
         _baseCB.localCQ().xregisterParameterOption(option);
+    }
+
+    protected void assertLeftCalcSp() {
+        if (_leftCalcSp == null) {
+            String msg = "The conversion for left column is unsupported at the function.";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void throwCalculationLeftColumnUnsupportedException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The calculation for left column is unsupported at the function.");
+        br.addItem("Advice");
+        br.addElement("For example, ColumnQuery supports it but UpdateOption does not.");
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                     Left/Right Mode
+    //                                                                     ===============
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator left() {
+        _leftMode = true;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator right() {
+        _leftMode = false;
+        return this;
     }
 
     // ===================================================================================

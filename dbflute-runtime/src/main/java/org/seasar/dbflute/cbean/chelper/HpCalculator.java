@@ -7,6 +7,9 @@ import org.seasar.dbflute.cbean.coption.ColumnConversionOption;
  */
 public interface HpCalculator {
 
+    // ===================================================================================
+    //                                                                         Calculation
+    //                                                                         ===========
     /**
      * Plus the specified column with the value. (+)
      * @param plusValue The number value for plus. (NotNull)
@@ -40,14 +43,23 @@ public interface HpCalculator {
      * @param option The conversion option of column. (NotNull)
      * @return this. (NotNull)
      */
-    HpCalculator rconv(ColumnConversionOption option);
+    HpCalculator convert(ColumnConversionOption option);
 
+    // ===================================================================================
+    //                                                                     Left/Right Mode
+    //                                                                     ===============
     /**
-     * Convert the value of left column by function.
-     * @param option The conversion option of column. (NotNull)
+     * To be for left column.
      * @return this. (NotNull)
      */
-    HpCalculator lconv(ColumnConversionOption option);
+    HpCalculator left();
+
+    /**
+     * To be for right column. (default)<br />
+     * It also means main process internally.
+     * @return this. (NotNull)
+     */
+    HpCalculator right();
 
     // ===================================================================================
     //                                                                       Related Class
