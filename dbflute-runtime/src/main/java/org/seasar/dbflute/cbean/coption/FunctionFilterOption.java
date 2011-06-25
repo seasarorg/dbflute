@@ -322,14 +322,14 @@ public class FunctionFilterOption implements ParameterOption {
         // DB2 is interested in difference between date and time-stamp
         final String baseExp = "cast(to_char(" + functionExp + ", 'yyyy";
         final String timePartBasicSuffix = isJustDateTypeColumn() ? "" : " 00:00:00";
-        final String timePartConnectSuffix = isJustDateTypeColumn() ? "" : " || ' 00:00:00";
         final String finalType = isJustDateTypeColumn() ? "date" : "timestamp";
         if (isDateTruncMonth()) {
             return baseExp + "') || '-01-01" + timePartBasicSuffix + "' as " + finalType + ")";
         } else if (isDateTruncDay()) {
             return baseExp + "-MM') || '-01" + timePartBasicSuffix + "' as " + finalType + ")";
         } else if (isDateTruncTime()) {
-            return baseExp + "-MM-dd') " + timePartConnectSuffix + "as " + finalType + ")";
+            final String timePartConnectSuffix = isJustDateTypeColumn() ? "" : " || ' 00:00:00'";
+            return baseExp + "-MM-dd')" + timePartConnectSuffix + " as " + finalType + ")";
         }
         return null;
     }
