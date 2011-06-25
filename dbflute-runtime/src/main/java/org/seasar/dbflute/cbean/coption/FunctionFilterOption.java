@@ -429,10 +429,12 @@ public class FunctionFilterOption implements ParameterOption {
         final boolean handleSqEnd = hasSubQueryEndOnLastLine(functionExp);
         final String pureFunction = handleSqEnd ? Srl.substringLastFront(functionExp, sqend) : functionExp;
         if (leftArg) { // for example, PostgreSQL's date_trunc()
-            // leftArg binding breaks formatting so add line here
-            // it's not perfect but almost OK
             sb.append(bindParameter);
-            sb.append(ln()).append("       ");
+            if (handleSqEnd) {
+                // leftArg binding breaks formatting so add line here
+                // it's not perfect but almost OK
+                sb.append(ln()).append("       ");
+            }
             sb.append(", ").append(pureFunction);
         } else { // normal
             sb.append(pureFunction).append(", ").append(bindParameter);
