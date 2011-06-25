@@ -247,14 +247,14 @@ public class FunctionFilterOption implements ParameterOption {
         // process irregular case
         if (isDateTypeColumn()) {
             if (_trunc.equals(DATE_TRUNC_TIME)) {
-                if (isDatabaseMySQL()) {
-                    return "cast(substring(" + functionExp + ", 1, 10) as date)";
-                } else if (isDatabasePostgreSQL()) {
+                if (isDatabasePostgreSQL()) {
                     _trunc = "day"; // switch and treats it as simple case
                 } else if (isDatabaseOracle()) {
                     _trunc = "DD"; // switch and treats it as simple case
                 } else if (isDatabaseSQLServer()) {
                     return "convert(datetime, convert(nvarchar, " + functionExp + ", 111), 120)";
+                } else {
+                    return "cast(substring(" + functionExp + ", 1, 10) as date)";
                 }
             }
         }

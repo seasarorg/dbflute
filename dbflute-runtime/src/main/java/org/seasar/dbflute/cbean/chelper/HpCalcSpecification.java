@@ -193,8 +193,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
 
     protected void assertLeftCalcSp() {
         if (_leftCalcSp == null) {
-            String msg = "The conversion for left column is unsupported at the function.";
-            throw new IllegalStateException(msg);
+            throwCalculationLeftColumnUnsupportedException();
         }
     }
 
@@ -202,7 +201,8 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The calculation for left column is unsupported at the function.");
         br.addItem("Advice");
-        br.addElement("For example, ColumnQuery supports it but UpdateOption does not.");
+        br.addElement("For example, ColumnQuery supports it);");
+        br.addElement("but UpdateOption does not.");
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
     }
