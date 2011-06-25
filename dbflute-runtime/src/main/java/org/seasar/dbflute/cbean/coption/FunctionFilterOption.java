@@ -60,12 +60,12 @@ public class FunctionFilterOption implements ParameterOption {
     protected Object _coalesce;
     protected Object _round;
     protected Object _trunc;
-    protected Object _addYear;
-    protected Object _addMonth;
-    protected Object _addDay;
-    protected Object _addHour;
-    protected Object _addMinute;
-    protected Object _addSecond;
+    protected Integer _addYear;
+    protected Integer _addMonth;
+    protected Integer _addDay;
+    protected Integer _addHour;
+    protected Integer _addMinute;
+    protected Integer _addSecond;
     protected LinkedHashMap<String, ProcessCallback> _callbackMap; // order should be guaranteed
     protected String _parameterKey;
     protected String _parameterMapPath;
@@ -307,7 +307,7 @@ public class FunctionFilterOption implements ParameterOption {
         return doProcessDateAdd(functionExp, _addSecond, "addSecond");
     }
 
-    protected String doProcessDateAdd(String functionExp, Object addedValue, String propertyName) {
+    protected String doProcessDateAdd(String functionExp, Integer addedValue, String propertyName) {
         if (addedValue == null) {
             return functionExp;
         }
@@ -320,7 +320,7 @@ public class FunctionFilterOption implements ParameterOption {
         if (isDatabaseMySQL()) {
             final String type = findDateExpType(propertyName, null, false);
             return "date_add(" + functionExp + ", interval " + bindParameter + " " + type + ")";
-        } else if (isDatabasePostgreSQL()) { // no binding
+        } else if (isDatabasePostgreSQL()) { // no binding because it does not allowed
             final String type = findDateExpType(propertyName, null, true);
             if (isJustDateTypeColumn()) {
                 return "cast(" + functionExp + " as timestamp) + '" + addedValue + " " + type + "'";
@@ -345,8 +345,10 @@ public class FunctionFilterOption implements ParameterOption {
                 throw new IllegalStateException(msg);
             }
         } else if (isDatabaseSQLServer() || isDatabaseH2()) {
+            // no binding for correct formatting (related to leftArg binding problem)
+            // it does not need to bind here in the first place because of specified as Integer
             final String type = findDateExpType(propertyName, null, false);
-            return "dateadd(" + type + ", " + bindParameter + ", " + functionExp + ")";
+            return "dateadd(" + type + ", " + addedValue + ", " + functionExp + ")";
         } else if (isDatabaseDB2()) {
             final String type = findDateExpType(propertyName, "SQL_TSI_", false).toUpperCase();
             return "timestampadd(" + type + ", " + bindParameter + ", " + functionExp + ")";
@@ -427,7 +429,11 @@ public class FunctionFilterOption implements ParameterOption {
         final boolean handleSqEnd = hasSubQueryEndOnLastLine(functionExp);
         final String pureFunction = handleSqEnd ? Srl.substringLastFront(functionExp, sqend) : functionExp;
         if (leftArg) { // for example, PostgreSQL's date_trunc()
-            sb.append(bindParameter).append(", ").append(pureFunction);
+            // leftArg binding breaks formatting so add line here
+            // it's not perfect but almost OK
+            sb.append(bindParameter);
+            sb.append(ln()).append("       ");
+            sb.append(", ").append(pureFunction);
         } else { // normal
             sb.append(pureFunction).append(", ").append(bindParameter);
         }

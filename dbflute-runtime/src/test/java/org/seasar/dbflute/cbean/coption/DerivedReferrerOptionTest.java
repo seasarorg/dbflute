@@ -48,7 +48,8 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
 
         // ## Assert ##
         log(actual);
-        assertEquals("func(/*pmb.path.key.bar*/null, max(foo.COL), third)", actual);
+        assertTrue(Srl.contains(actual, "func(/*pmb.path.key.bar*/null" + ln()));
+        assertTrue(Srl.contains(actual, " , max(foo.COL), third)"));
     }
 
     public void test_processSimpleFunction_nested_basic() throws Exception {
@@ -117,7 +118,8 @@ public class DerivedReferrerOptionTest extends PlainTestCase {
 
         // ## Assert ##
         log(ln() + actual);
-        assertTrue(actual.contains("func(/*pmb.path.key.bar*/null, max(" + sqbegin + identity));
+        assertTrue(actual.contains("func(/*pmb.path.key.bar*/null" + ln()));
+        assertTrue(actual.contains(" , max(" + sqbegin + identity));
         assertTrue(Srl.contains(actual, "select max(foo.COL)"));
         assertTrue(Srl.contains(actual, "  from FOO foo"));
         assertTrue(Srl.endsWith(actual, "), third)" + sqend + identity));
