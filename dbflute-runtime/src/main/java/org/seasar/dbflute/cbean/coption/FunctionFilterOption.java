@@ -244,7 +244,7 @@ public class FunctionFilterOption implements ParameterOption {
         if (_trunc == null) {
             return functionExp;
         }
-        // process irregular case
+        // process purpose case
         if (isDateTypeColumn()) {
             if (_trunc.equals(DATE_TRUNC_TIME)) {
                 if (isDatabasePostgreSQL()) {
