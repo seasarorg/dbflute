@@ -320,9 +320,13 @@ public class FunctionFilterOption implements ParameterOption {
         if (isDatabaseMySQL()) {
             final String type = findDateExpType(propertyName, null, false);
             return "date_add(" + functionExp + ", interval " + bindParameter + " " + type + ")";
-        } else if (isDatabasePostgreSQL()) {
+        } else if (isDatabasePostgreSQL()) { // no binding
             final String type = findDateExpType(propertyName, null, true);
-            return functionExp + " + '" + addedValue + " " + type + "'"; // no binding
+            if (isJustDateTypeColumn()) {
+                return "cast(" + functionExp + " as timestamp) + '" + addedValue + " " + type + "'";
+            } else {
+                return functionExp + " + '" + addedValue + " " + type + "'";
+            }
         } else if (isDatabaseOracle()) {
             if (isPropertyAddYear(propertyName)) {
                 return "add_months(" + functionExp + ", 12 * " + bindParameter + ")";
@@ -447,6 +451,10 @@ public class FunctionFilterOption implements ParameterOption {
 
     protected boolean isDateTypeColumn() {
         return _targetColumnInfo != null && Date.class.isAssignableFrom(_targetColumnInfo.getPropertyType());
+    }
+
+    protected boolean isJustDateTypeColumn() {
+        return _targetColumnInfo != null && Date.class.equals(_targetColumnInfo.getPropertyType());
     }
 
     // ===================================================================================
