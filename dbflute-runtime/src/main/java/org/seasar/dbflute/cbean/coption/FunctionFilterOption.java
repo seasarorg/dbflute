@@ -275,9 +275,9 @@ public class FunctionFilterOption implements ParameterOption {
             } else if (isDatabaseOracle()) {
                 _trunc = "YYYY";
             } else if (isDatabaseDB2()) {
-                return "cast(to_char(" + functionExp + ", 'yyyy') || '-01-01' as date)";
+                return "cast(to_char(" + functionExp + ", 'yyyy') || '-01-01' as timestamp)";
             } else if (isDatabaseSQLServer()) {
-                return "cast(substring(convert(" + functionExp + ", 120), 1, 4) + '-01-01' as date)";
+                return "cast(substring(convert(" + functionExp + ", 120), 1, 4) + '-01-01' as datetime)";
             } else { // as default
                 return "cast(substring(" + functionExp + ", 1, 4) || '-01-01' as date)";
             }
@@ -289,9 +289,9 @@ public class FunctionFilterOption implements ParameterOption {
             } else if (isDatabaseOracle()) {
                 _trunc = "MM";
             } else if (isDatabaseDB2()) {
-                return "cast(to_char(" + functionExp + ", 'yyyy-MM') || '-01' as date)";
+                return "cast(to_char(" + functionExp + ", 'yyyy-MM') || '-01' as timestamp)";
             } else if (isDatabaseSQLServer()) {
-                return "cast(substring(convert(" + functionExp + ", 120), 1, 7) + '-01' as date)";
+                return "cast(substring(convert(" + functionExp + ", 120), 1, 7) + '-01' as datetime)";
             } else { // as default
                 return "cast(substring(" + functionExp + ", 1, 7) || '-01' as date)";
             }
@@ -301,9 +301,9 @@ public class FunctionFilterOption implements ParameterOption {
             } else if (isDatabaseOracle()) {
                 _trunc = "DD";
             } else if (isDatabaseDB2()) {
-                return "cast(to_char(" + functionExp + ", 'yyyy-MM-dd') as date)";
+                return "cast(to_char(" + functionExp + ", 'yyyy-MM-dd') as timestamp)";
             } else if (isDatabaseSQLServer()) {
-                return "cast(substring(convert(" + functionExp + ", 120), 1, 10) as date)";
+                return "cast(substring(convert(" + functionExp + ", 120), 1, 10) as datetime)";
             } else { // as default
                 return "cast(substring(" + functionExp + ", 1, 10) as date)";
             }
@@ -424,25 +424,9 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected String doProcessDateAddDB2(String functionExp, Integer addedValue, String propertyName) {
-        final String type;
-        if (isPropertyAddYear(propertyName)) {
-            type = "256";
-        } else if (isPropertyAddMonth(propertyName)) {
-            type = "64";
-        } else if (isPropertyAddDay(propertyName)) {
-            type = "16";
-        } else if (isPropertyAddHour(propertyName)) {
-            type = "8";
-        } else if (isPropertyAddMinute(propertyName)) {
-            type = "4";
-        } else if (isPropertyAddSecond(propertyName)) {
-            type = "2";
-        } else {
-            String msg = "Unknown property for date-add: " + propertyName;
-            throw new IllegalStateException(msg);
-        }
         final String bindParameter = buildBindParameter(propertyName);
-        return "timestampadd(" + type + ", " + bindParameter + ", " + functionExp + ")";
+        final String type = buildDateAddExpType(propertyName, null, true);
+        return functionExp + " + " + bindParameter + " " + type;
     }
 
     protected String doProcessDateAddSQLServer(String functionExp, Integer addedValue, String propertyName) {
