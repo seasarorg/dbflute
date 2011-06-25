@@ -61,6 +61,24 @@ public class ScalarSelectOption extends FunctionFilterOption {
     //                                                                      Purpose Option
     //                                                                      ==============
     /**
+     * Truncate the month and day and time part of the date or the date-time value.
+     * @return this. (NotNull)
+     */
+    public ScalarSelectOption truncMonth() {
+        doTruncMonth();
+        return this;
+    }
+
+    /**
+     * Truncate the day and time part of the date or the date-time value.
+     * @return this. (NotNull)
+     */
+    public ScalarSelectOption truncDay() {
+        doTruncDay();
+        return this;
+    }
+
+    /**
      * Truncate the time part of the date-time value.
      * @return this. (NotNull)
      */

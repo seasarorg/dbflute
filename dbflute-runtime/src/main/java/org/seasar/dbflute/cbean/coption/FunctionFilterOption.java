@@ -52,6 +52,8 @@ public class FunctionFilterOption implements ParameterOption {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    protected static final String DATE_TRUNC_MONTH = "df:month";
+    protected static final String DATE_TRUNC_DAY = "df:day";
     protected static final String DATE_TRUNC_TIME = "df:time";
 
     // ===================================================================================
@@ -110,6 +112,14 @@ public class FunctionFilterOption implements ParameterOption {
                 return processTrunc(functionExp);
             }
         });
+    }
+
+    protected void doTruncMonth() {
+        doTrunc(DATE_TRUNC_MONTH);
+    }
+
+    protected void doTruncDay() {
+        doTrunc(DATE_TRUNC_DAY);
     }
 
     protected void doTruncTime() {
@@ -246,13 +256,35 @@ public class FunctionFilterOption implements ParameterOption {
         }
         // process purpose case
         if (isDateTypeColumn()) {
-            if (_trunc.equals(DATE_TRUNC_TIME)) {
+            if (_trunc.equals(DATE_TRUNC_MONTH)) {
+                if (isDatabasePostgreSQL()) {
+                    _trunc = "year"; // switch and treats it as simple case
+                } else if (isDatabaseOracle()) {
+                    _trunc = "YYYY"; // switch and treats it as simple case
+                } else if (isDatabaseMySQL()) {
+                    return "cast(concat(substring(" + functionExp + ", 1, 4), '-01-01') as date)";
+                } else if (isDatabaseSQLServer()) {
+                    return "cast(substring(" + functionExp + ", 1, 4) + '-01-01' as date)";
+                } else {
+                    return "cast(substring(" + functionExp + ", 1, 4) || '-01-01' as date)";
+                }
+            } else if (_trunc.equals(DATE_TRUNC_DAY)) {
+                if (isDatabasePostgreSQL()) {
+                    _trunc = "month"; // switch and treats it as simple case
+                } else if (isDatabaseOracle()) {
+                    _trunc = "MM"; // switch and treats it as simple case
+                } else if (isDatabaseMySQL()) {
+                    return "cast(concat(substring(" + functionExp + ", 1, 7), '-01') as date)";
+                } else if (isDatabaseSQLServer()) {
+                    return "cast(substring(" + functionExp + ", 1, 7) + '-01' as date)";
+                } else {
+                    return "cast(substring(" + functionExp + ", 1, 7) || '-01' as date)";
+                }
+            } else if (_trunc.equals(DATE_TRUNC_TIME)) {
                 if (isDatabasePostgreSQL()) {
                     _trunc = "day"; // switch and treats it as simple case
                 } else if (isDatabaseOracle()) {
                     _trunc = "DD"; // switch and treats it as simple case
-                } else if (isDatabaseSQLServer()) {
-                    return "convert(datetime, convert(nvarchar, " + functionExp + ", 111), 120)";
                 } else {
                     return "cast(substring(" + functionExp + ", 1, 10) as date)";
                 }

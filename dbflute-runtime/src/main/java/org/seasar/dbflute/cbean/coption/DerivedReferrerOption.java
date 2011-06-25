@@ -61,6 +61,24 @@ public class DerivedReferrerOption extends FunctionFilterOption {
     //                                                                      Purpose Option
     //                                                                      ==============
     /**
+     * Truncate the month and day and time part of the date or the date-time value.
+     * @return this. (NotNull)
+     */
+    public DerivedReferrerOption truncMonth() {
+        doTruncMonth();
+        return this;
+    }
+
+    /**
+     * Truncate the day and time part of the date or the date-time value.
+     * @return this. (NotNull)
+     */
+    public DerivedReferrerOption truncDay() {
+        doTruncDay();
+        return this;
+    }
+
+    /**
      * Truncate the time part of the date-time value.
      * @return this. (NotNull)
      */
