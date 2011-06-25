@@ -256,35 +256,38 @@ public class FunctionFilterOption implements ParameterOption {
         }
         // process purpose case
         if (isDateTypeColumn()) {
+            // PostgreSQL and Oracle can treat it as simple case by only switching
             if (_trunc.equals(DATE_TRUNC_MONTH)) {
                 if (isDatabasePostgreSQL()) {
-                    _trunc = "year"; // switch and treats it as simple case
+                    _trunc = "year";
                 } else if (isDatabaseOracle()) {
-                    _trunc = "YYYY"; // switch and treats it as simple case
+                    _trunc = "YYYY";
                 } else if (isDatabaseMySQL()) {
                     return "cast(concat(substring(" + functionExp + ", 1, 4), '-01-01') as date)";
                 } else if (isDatabaseSQLServer()) {
-                    return "cast(substring(" + functionExp + ", 1, 4) + '-01-01' as date)";
+                    return "cast(substring(convert(" + functionExp + ", 120), 1, 4) + '-01-01' as date)";
                 } else {
                     return "cast(substring(" + functionExp + ", 1, 4) || '-01-01' as date)";
                 }
             } else if (_trunc.equals(DATE_TRUNC_DAY)) {
                 if (isDatabasePostgreSQL()) {
-                    _trunc = "month"; // switch and treats it as simple case
+                    _trunc = "month";
                 } else if (isDatabaseOracle()) {
-                    _trunc = "MM"; // switch and treats it as simple case
+                    _trunc = "MM";
                 } else if (isDatabaseMySQL()) {
                     return "cast(concat(substring(" + functionExp + ", 1, 7), '-01') as date)";
                 } else if (isDatabaseSQLServer()) {
-                    return "cast(substring(" + functionExp + ", 1, 7) + '-01' as date)";
+                    return "cast(substring(convert(" + functionExp + ", 120), 1, 7) + '-01' as date)";
                 } else {
                     return "cast(substring(" + functionExp + ", 1, 7) || '-01' as date)";
                 }
             } else if (_trunc.equals(DATE_TRUNC_TIME)) {
                 if (isDatabasePostgreSQL()) {
-                    _trunc = "day"; // switch and treats it as simple case
+                    _trunc = "day";
                 } else if (isDatabaseOracle()) {
-                    _trunc = "DD"; // switch and treats it as simple case
+                    _trunc = "DD";
+                } else if (isDatabaseSQLServer()) {
+                    return "cast(substring(convert(" + functionExp + ", 120), 1, 10) as date)";
                 } else {
                     return "cast(substring(" + functionExp + ", 1, 10) as date)";
                 }
