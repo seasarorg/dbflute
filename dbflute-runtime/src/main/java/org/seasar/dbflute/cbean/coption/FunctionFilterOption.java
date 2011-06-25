@@ -266,49 +266,110 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     protected String doProcessTruncPurposeDateType(String functionExp) {
-        // PostgreSQL and Oracle can treat it as simple case by only switching
-        if (_trunc.equals(DATE_TRUNC_MONTH)) {
-            if (isDatabaseMySQL()) {
-                return "cast(concat(substring(" + functionExp + ", 1, 4), '-01-01') as date)";
-            } else if (isDatabasePostgreSQL()) {
-                _trunc = "year";
-            } else if (isDatabaseOracle()) {
-                _trunc = "YYYY";
-            } else if (isDatabaseDB2()) {
-                return "cast(to_char(" + functionExp + ", 'yyyy') || '-01-01' as timestamp)";
-            } else if (isDatabaseSQLServer()) {
-                return "cast(substring(convert(" + functionExp + ", 120), 1, 4) + '-01-01' as datetime)";
-            } else { // as default
-                return "cast(substring(" + functionExp + ", 1, 4) || '-01-01' as date)";
-            }
-        } else if (_trunc.equals(DATE_TRUNC_DAY)) {
-            if (isDatabaseMySQL()) {
-                return "cast(concat(substring(" + functionExp + ", 1, 7), '-01') as date)";
-            } else if (isDatabasePostgreSQL()) {
-                _trunc = "month";
-            } else if (isDatabaseOracle()) {
-                _trunc = "MM";
-            } else if (isDatabaseDB2()) {
-                return "cast(to_char(" + functionExp + ", 'yyyy-MM') || '-01' as timestamp)";
-            } else if (isDatabaseSQLServer()) {
-                return "cast(substring(convert(" + functionExp + ", 120), 1, 7) + '-01' as datetime)";
-            } else { // as default
-                return "cast(substring(" + functionExp + ", 1, 7) || '-01' as date)";
-            }
-        } else if (_trunc.equals(DATE_TRUNC_TIME)) {
-            if (isDatabasePostgreSQL()) {
-                _trunc = "day";
-            } else if (isDatabaseOracle()) {
-                _trunc = "DD";
-            } else if (isDatabaseDB2()) {
-                return "cast(to_char(" + functionExp + ", 'yyyy-MM-dd') as timestamp)";
-            } else if (isDatabaseSQLServer()) {
-                return "cast(substring(convert(" + functionExp + ", 120), 1, 10) as datetime)";
-            } else { // as default
-                return "cast(substring(" + functionExp + ", 1, 10) as date)";
-            }
+        final String processed;
+        if (isDatabaseMySQL()) {
+            processed = doProcessTruncPurposeDateTypeMySQL(functionExp);
+        } else if (isDatabasePostgreSQL()) {
+            processed = doProcessTruncPurposeDateTypePostgreSQL(functionExp);
+        } else if (isDatabaseOracle()) {
+            processed = doProcessTruncPurposeDateTypeOracle(functionExp);
+        } else if (isDatabaseDB2()) {
+            processed = doProcessTruncPurposeDateTypeDB2(functionExp);
+        } else if (isDatabaseSQLServer()) {
+            processed = doProcessTruncPurposeDateTypeSQLServer(functionExp);
+        } else { // as default
+            processed = doProcessTruncPurposeDateTypeDefault(functionExp);
         }
-        return null; // means not processed or simple case (switched)
+        return processed; // null means not processed or simple case (switched)
+    }
+
+    protected String doProcessTruncPurposeDateTypeMySQL(String functionExp) {
+        if (isDateTruncMonth()) {
+            return "cast(concat(substring(" + functionExp + ", 1, 4), '-01-01') as date)";
+        } else if (isDateTruncDay()) {
+            return "cast(concat(substring(" + functionExp + ", 1, 7), '-01') as date)";
+        } else if (isDateTruncTime()) {
+            return "cast(substring(" + functionExp + ", 1, 10) as date)";
+        }
+        return null;
+    }
+
+    protected String doProcessTruncPurposeDateTypePostgreSQL(String functionExp) {
+        // PostgreSQL can treat it as simple case by only switching
+        if (isDateTruncMonth()) {
+            _trunc = "year";
+        } else if (isDateTruncDay()) {
+            _trunc = "month";
+        } else if (isDateTruncTime()) {
+            _trunc = "day";
+        }
+        return null;
+    }
+
+    protected String doProcessTruncPurposeDateTypeOracle(String functionExp) {
+        // Oracle can treat it as simple case by only switching
+        if (isDateTruncMonth()) {
+            _trunc = "YYYY";
+        } else if (isDateTruncDay()) {
+            _trunc = "MM";
+        } else if (isDateTruncTime()) {
+            _trunc = "DD";
+        }
+        return null;
+    }
+
+    protected String doProcessTruncPurposeDateTypeDB2(String functionExp) {
+        // DB2 is interested in difference between date and time-stamp
+        final String baseExp = "cast(to_char(" + functionExp + ", 'yyyy";
+        final String timePartBasicSuffix = isJustDateTypeColumn() ? "" : " 00:00:00";
+        final String timePartConnectSuffix = isJustDateTypeColumn() ? "" : " || ' 00:00:00";
+        final String finalType = isJustDateTypeColumn() ? "date" : "timestamp";
+        if (isDateTruncMonth()) {
+            return baseExp + "') || '-01-01" + timePartBasicSuffix + "' as " + finalType + ")";
+        } else if (isDateTruncDay()) {
+            return baseExp + "-MM') || '-01" + timePartBasicSuffix + "' as " + finalType + ")";
+        } else if (isDateTruncTime()) {
+            return baseExp + "-MM-dd') " + timePartConnectSuffix + "as " + finalType + ")";
+        }
+        return null;
+    }
+
+    protected String doProcessTruncPurposeDateTypeSQLServer(String functionExp) {
+        final String baseExp = "cast(substring(convert(nvarchar, ";
+        final String finalType = "datetime";
+        if (isDateTruncMonth()) {
+            return baseExp + functionExp + ", 120), 1, 4) + '-01-01' as " + finalType + ")";
+        } else if (isDateTruncDay()) {
+            return baseExp + functionExp + ", 120), 1, 7) + '-01' as " + finalType + ")";
+        } else if (isDateTruncTime()) {
+            return baseExp + functionExp + ", 120), 1, 10) as " + finalType + ")";
+        }
+        return null;
+    }
+
+    protected String doProcessTruncPurposeDateTypeDefault(String functionExp) {
+        final String baseExp = "cast(substring(";
+        final String finalType = "date";
+        if (isDateTruncMonth()) {
+            return baseExp + functionExp + ", 1, 4) || '-01-01' as " + finalType + ")";
+        } else if (isDateTruncDay()) {
+            return baseExp + functionExp + ", 1, 7) || '-01' as " + finalType + ")";
+        } else if (isDateTruncTime()) {
+            return baseExp + functionExp + ", 1, 10) as " + finalType + ")";
+        }
+        return null;
+    }
+
+    protected boolean isDateTruncMonth() {
+        return _trunc.equals(DATE_TRUNC_MONTH);
+    }
+
+    protected boolean isDateTruncDay() {
+        return _trunc.equals(DATE_TRUNC_DAY);
+    }
+
+    protected boolean isDateTruncTime() {
+        return _trunc.equals(DATE_TRUNC_TIME);
     }
 
     protected String doProcessTruncSimpleCase(String functionExp) {
@@ -425,7 +486,7 @@ public class FunctionFilterOption implements ParameterOption {
 
     protected String doProcessDateAddDB2(String functionExp, Integer addedValue, String propertyName) {
         final String bindParameter = buildBindParameter(propertyName);
-        final String type = buildDateAddExpType(propertyName, null, true);
+        final String type = buildDateAddExpType(propertyName, null, false);
         return functionExp + " + " + bindParameter + " " + type;
     }
 
