@@ -369,49 +369,90 @@ public class FunctionFilterOption implements ParameterOption {
             msg = msg + " column=" + _targetColumnInfo;
             throw new IllegalStateException(msg);
         }
-        final String bindParameter = buildBindParameter(propertyName);
         if (isDatabaseMySQL()) {
-            final String type = findDateExpType(propertyName, null, false);
-            return "date_add(" + functionExp + ", interval " + bindParameter + " " + type + ")";
-        } else if (isDatabasePostgreSQL()) { // no binding because it does not allowed
-            final String type = findDateExpType(propertyName, null, true);
-            if (isJustDateTypeColumn()) {
-                return "cast(" + functionExp + " as timestamp) + '" + addedValue + " " + type + "'";
-            } else {
-                return functionExp + " + '" + addedValue + " " + type + "'";
-            }
+            return doProcessDateAddMySQL(functionExp, addedValue, propertyName);
+        } else if (isDatabasePostgreSQL()) {
+            return doProcessDateAddPostgreSQL(functionExp, addedValue, propertyName);
         } else if (isDatabaseOracle()) {
-            if (isPropertyAddYear(propertyName)) {
-                return "add_months(" + functionExp + ", 12 * " + bindParameter + ")";
-            } else if (isPropertyAddMonth(propertyName)) {
-                return "add_months(" + functionExp + ", " + bindParameter + ")";
-            } else if (isPropertyAddDay(propertyName)) {
-                return functionExp + " + " + bindParameter;
-            } else if (isPropertyAddHour(propertyName)) {
-                return functionExp + " + " + bindParameter + " / 24";
-            } else if (isPropertyAddMinute(propertyName)) {
-                return functionExp + " + " + bindParameter + " / 1440";
-            } else if (isPropertyAddSecond(propertyName)) {
-                return functionExp + " + " + bindParameter + " / 86400";
-            } else {
-                String msg = "Unknown property for date-add: " + propertyName;
-                throw new IllegalStateException(msg);
-            }
-        } else if (isDatabaseSQLServer() || isDatabaseH2()) {
-            // no binding for correct formatting (related to leftArg binding problem)
-            // it does not need to bind here in the first place because of specified as Integer
-            final String type = findDateExpType(propertyName, null, false);
-            return "dateadd(" + type + ", " + addedValue + ", " + functionExp + ")";
+            return doProcessDateAddOracle(functionExp, addedValue, propertyName);
         } else if (isDatabaseDB2()) {
-            final String type = findDateExpType(propertyName, "SQL_TSI_", false).toUpperCase();
-            return "timestampadd(" + type + ", " + bindParameter + ", " + functionExp + ")";
+            return doProcessDateAddDB2(functionExp, addedValue, propertyName);
+        } else if (isDatabaseSQLServer()) {
+            return doProcessDateAddSQLServer(functionExp, addedValue, propertyName);
+        } else if (isDatabaseH2()) { // same as SQLServer
+            return doProcessDateAddSQLServer(functionExp, addedValue, propertyName);
         } else {
             String msg = "Unsupported database to the function addXxx(): " + propertyName;
             throw new IllegalStateException(msg);
         }
     }
 
-    protected String findDateExpType(String propertyName, String prefix, boolean plural) {
+    protected String doProcessDateAddMySQL(String functionExp, Integer addedValue, String propertyName) {
+        final String type = buildDateAddExpType(propertyName, null, false);
+        final String bindParameter = buildBindParameter(propertyName);
+        return "date_add(" + functionExp + ", interval " + bindParameter + " " + type + ")";
+    }
+
+    protected String doProcessDateAddPostgreSQL(String functionExp, Integer addedValue, String propertyName) {
+        // no binding because it does not allowed
+        final String type = buildDateAddExpType(propertyName, null, true);
+        if (isJustDateTypeColumn()) {
+            return "cast(" + functionExp + " as timestamp) + '" + addedValue + " " + type + "'";
+        } else {
+            return functionExp + " + '" + addedValue + " " + type + "'";
+        }
+    }
+
+    protected String doProcessDateAddOracle(String functionExp, Integer addedValue, String propertyName) {
+        final String bindParameter = buildBindParameter(propertyName);
+        if (isPropertyAddYear(propertyName)) {
+            return "add_months(" + functionExp + ", 12 * " + bindParameter + ")";
+        } else if (isPropertyAddMonth(propertyName)) {
+            return "add_months(" + functionExp + ", " + bindParameter + ")";
+        } else if (isPropertyAddDay(propertyName)) {
+            return functionExp + " + " + bindParameter;
+        } else if (isPropertyAddHour(propertyName)) {
+            return functionExp + " + " + bindParameter + " / 24";
+        } else if (isPropertyAddMinute(propertyName)) {
+            return functionExp + " + " + bindParameter + " / 1440";
+        } else if (isPropertyAddSecond(propertyName)) {
+            return functionExp + " + " + bindParameter + " / 86400";
+        } else {
+            String msg = "Unknown property for date-add: " + propertyName;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected String doProcessDateAddDB2(String functionExp, Integer addedValue, String propertyName) {
+        final String type;
+        if (isPropertyAddYear(propertyName)) {
+            type = "256";
+        } else if (isPropertyAddMonth(propertyName)) {
+            type = "64";
+        } else if (isPropertyAddDay(propertyName)) {
+            type = "16";
+        } else if (isPropertyAddHour(propertyName)) {
+            type = "8";
+        } else if (isPropertyAddMinute(propertyName)) {
+            type = "4";
+        } else if (isPropertyAddSecond(propertyName)) {
+            type = "2";
+        } else {
+            String msg = "Unknown property for date-add: " + propertyName;
+            throw new IllegalStateException(msg);
+        }
+        final String bindParameter = buildBindParameter(propertyName);
+        return "timestampadd(" + type + ", " + bindParameter + ", " + functionExp + ")";
+    }
+
+    protected String doProcessDateAddSQLServer(String functionExp, Integer addedValue, String propertyName) {
+        // no binding for correct formatting (related to leftArg binding problem)
+        // it does not need to bind here in the first place because of specified as Integer
+        final String type = buildDateAddExpType(propertyName, null, false);
+        return "dateadd(" + type + ", " + addedValue + ", " + functionExp + ")";
+    }
+
+    protected String buildDateAddExpType(String propertyName, String prefix, boolean plural) {
         prefix = (prefix != null ? prefix : "");
         final String suffix = plural ? "s" : "";
         final String type;
