@@ -23,6 +23,7 @@ import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.process.SystemScript;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
@@ -464,12 +465,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final String schema = propertyMap.get("schema");
         final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema);
         final String user = propertyMap.get("user");
-        final String password = resolvePasswordVariable(propertyMap.get("password"));
+        final String password = resolvePasswordVariable(additonalUser, propertyMap.get("password"));
         _log.info("...Creating a connection for additional user");
         return createConnection(driver, url, unifiedSchema, user, password);
     }
 
-    protected String resolvePasswordVariable(String password) {
+    protected String resolvePasswordVariable(String additonalUser, String password) {
         if (Srl.is_Null_or_TrimmedEmpty(password)) {
             return password;
         }
@@ -491,6 +492,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         final File pwdFile = new File("./dfprop/" + fileName);
         if (!pwdFile.exists()) {
+            if (defaultPwd == null) {
+                throwAdditionalUserPasswordFileNotFoundException(additonalUser, password, pwdFile);
+            }
             return defaultPwd; // no password
         }
         BufferedReader br = null;
@@ -509,6 +513,25 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
                 }
             }
         }
+    }
+
+    protected void throwAdditionalUserPasswordFileNotFoundException(String additonalUser, String password, File pwdFile) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The password file for additional user was not found.");
+        br.addItem("Advice");
+        br.addElement("Check your password file existing.");
+        br.addElement("And check the setting in DBFlute property.");
+        br.addElement("If you need to set a default password,");
+        br.addElement("Set a password as follows: (default = defpwd)");
+        br.addElement("  password = df:dfprop/system-password.txt|defpwd");
+        br.addItem("AdditionalUser");
+        br.addElement(additonalUser);
+        br.addItem("Password Setting");
+        br.addElement(password);
+        br.addItem("Password File");
+        br.addElement(pwdFile);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================
