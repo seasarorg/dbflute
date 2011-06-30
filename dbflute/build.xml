@@ -5,9 +5,9 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.9.8.6"/>
-	<property name="build.version" value="${version}"/>
-	<property name="pre.version" value="0.9.8.5"/>
+	<property name="version" value="0.9.8.7"/>
+	<property name="build.version" value="${version}-RC1"/>
+	<property name="pre.version" value="0.9.8.6"/>
 	<property name="runtime.version" value="0.9.8.6"/>
 	<property name="runtime.build.version" value="${runtime.version}"/>
 	<property name="runtime.pre.version" value="0.9.8.5"/>

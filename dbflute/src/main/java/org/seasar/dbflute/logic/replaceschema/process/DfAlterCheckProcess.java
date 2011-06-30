@@ -189,9 +189,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected void doCopyToPreviousResource(File mainFile, String previousDir, String playSqlDirSymbol,
             List<File> copyToFileList) {
-        final String relativePath = Srl.substringLastRear(mainFile.getPath(), playSqlDirSymbol);
+        final String relativePath = Srl.substringLastRear(resolvePath(mainFile), playSqlDirSymbol);
         final File copyToFile = new File(previousDir + "/" + relativePath);
-        final File copyToDir = new File(Srl.substringLastFront(copyToFile.getPath(), "/"));
+        final File copyToDir = new File(Srl.substringLastFront(resolvePath(copyToFile), "/"));
         if (!copyToDir.exists()) {
             copyToDir.mkdirs();
         }
@@ -351,14 +351,13 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return new DfSqlFileFireMan() {
             @Override
             protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
-                final String path = sqlFile.getPath();
+                final String path = resolvePath(sqlFile);
                 if (!Srl.endsWith(path, scriptExtAry)) { // SQL file
                     return super.processSqlFile(runner, sqlFile);
                 }
                 // script file
-                final String resolvedPath = Srl.replace(path, "\\", "/");
-                final String baseDir = Srl.substringLastFront(resolvedPath, "/");
-                final String scriptName = Srl.substringLastRear(resolvedPath, "/");
+                final String baseDir = Srl.substringLastFront(path, "/");
+                final String scriptName = Srl.substringLastRear(path, "/");
                 final ProcessResult processResult = script.execute(new File(baseDir), scriptName);
                 if (processResult.isSystemMismatch()) {
                     _log.info("...Skipping the script for system mismatch: " + scriptName);
@@ -817,5 +816,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                      ==============
     protected String replaceString(String text, String fromText, String toText) {
         return DfStringUtil.replace(text, fromText, toText);
+    }
+
+    protected String resolvePath(File file) {
+        return Srl.replace(file.getPath(), "\\", "/");
     }
 }
