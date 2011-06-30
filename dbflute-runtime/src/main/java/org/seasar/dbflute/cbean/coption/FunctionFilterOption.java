@@ -292,6 +292,7 @@ public class FunctionFilterOption implements ParameterOption {
             return "cast(substring(" + functionExp + ", 1, 10) as date)";
         }
         return null;
+        // e.g. cast(concat(substring(FOO_DATE, 1, 7), '-01') as date)
     }
 
     protected String doProcessTruncPurposeDateTypePostgreSQL(String functionExp) {
@@ -304,6 +305,7 @@ public class FunctionFilterOption implements ParameterOption {
             _trunc = "day";
         }
         return null;
+        // e.g. trunc(FOO_DATE, 'month')
     }
 
     protected String doProcessTruncPurposeDateTypeOracle(String functionExp) {
@@ -316,6 +318,7 @@ public class FunctionFilterOption implements ParameterOption {
             _trunc = "DD";
         }
         return null;
+        // e.g. trunc(FOO_DATE, 'MM')
     }
 
     protected String doProcessTruncPurposeDateTypeDB2(String functionExp) {
@@ -332,6 +335,7 @@ public class FunctionFilterOption implements ParameterOption {
             return baseExp + "-MM-dd')" + timePartConnectSuffix + " as " + finalType + ")";
         }
         return null;
+        // e.g. cast(to_char(FOO_DATE || '-01') as date)
     }
 
     protected String doProcessTruncPurposeDateTypeSQLServer(String functionExp) {
@@ -345,6 +349,7 @@ public class FunctionFilterOption implements ParameterOption {
             return baseExp + functionExp + ", 120), 1, 10) as " + finalType + ")";
         }
         return null;
+        // e.g. cast(substring(convert(nvarchar, FOO_DATE, 120), 1, 7) + '-01' as datetime)
     }
 
     protected String doProcessTruncPurposeDateTypeDefault(String functionExp) {
@@ -358,6 +363,7 @@ public class FunctionFilterOption implements ParameterOption {
             return baseExp + functionExp + ", 1, 10) as " + finalType + ")";
         }
         return null;
+        // e.g. cast(substring(FOO_DATE, 1, 7) || '-01' as date)
     }
 
     protected boolean isDateTruncMonth() {
@@ -452,6 +458,7 @@ public class FunctionFilterOption implements ParameterOption {
         final String type = buildDateAddExpType(propertyName, null, false);
         final String bindParameter = buildBindParameter(propertyName);
         return "date_add(" + functionExp + ", interval " + bindParameter + " " + type + ")";
+        // e.g. date_add(FOO_DATE, interval 1 month)
     }
 
     protected String doProcessDateAddPostgreSQL(String functionExp, Integer addedValue, String propertyName) {
@@ -462,6 +469,9 @@ public class FunctionFilterOption implements ParameterOption {
         } else {
             return functionExp + " + '" + addedValue + " " + type + "'";
         }
+        // e.g.
+        //  o cast(FOO_DATE as timestamp) + '1 months'
+        //  o FOO_DATE + '1 months'
     }
 
     protected String doProcessDateAddOracle(String functionExp, Integer addedValue, String propertyName) {
@@ -482,12 +492,17 @@ public class FunctionFilterOption implements ParameterOption {
             String msg = "Unknown property for date-add: " + propertyName;
             throw new IllegalStateException(msg);
         }
+        // e.g.
+        //  o add_months(FOO_DATE, 1)
+        //  o FOO_DATE + 1
+        //  o FOO_DATE + 1 / 24
     }
 
     protected String doProcessDateAddDB2(String functionExp, Integer addedValue, String propertyName) {
         final String bindParameter = buildBindParameter(propertyName);
         final String type = buildDateAddExpType(propertyName, null, false);
         return functionExp + " + " + bindParameter + " " + type;
+        // e.g. FOO_DATE + 1 month
     }
 
     protected String doProcessDateAddSQLServer(String functionExp, Integer addedValue, String propertyName) {
@@ -495,6 +510,7 @@ public class FunctionFilterOption implements ParameterOption {
         // it does not need to bind here in the first place because of specified as Integer
         final String type = buildDateAddExpType(propertyName, null, false);
         return "dateadd(" + type + ", " + addedValue + ", " + functionExp + ")";
+        // e.g. dateadd(month, 1, FOO_DATE)
     }
 
     protected String buildDateAddExpType(String propertyName, String prefix, boolean plural) {
