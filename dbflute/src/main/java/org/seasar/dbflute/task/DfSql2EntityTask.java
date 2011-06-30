@@ -142,7 +142,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         showTargetSqlFileInformation(outsideSqlPack);
         showSkippedFileInformation();
-        handleNotFoundResult(outsideSqlPack);
         handleException();
         refreshResources();
     }
@@ -228,24 +227,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
      */
     protected DfSqlFileRunner createSqlFileRunner(DfRunnerInformation runInfo, DfOutsideSqlPack outsideSqlPack) {
         return new DfOutsideSqlAnalyzer(runInfo, getDataSource(), _sql2entityMeta, outsideSqlPack, _schemaData);
-    }
-
-    protected void handleNotFoundResult(DfOutsideSqlPack outsideSqlPack) {
-        final Map<String, DfCustomizeEntityInfo> entityInfoMap = _sql2entityMeta.getEntityInfoMap();
-        final Map<String, DfPmbMetaData> pmbMetaDataMap = _sql2entityMeta.getPmbMetaDataMap();
-        if (entityInfoMap.isEmpty() && pmbMetaDataMap.isEmpty()) {
-            _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-            _log.warn("SQL for sql2entity was not found!");
-            _log.warn("");
-            _log.warn("SQL Files: " + outsideSqlPack.size());
-            int index = 0;
-            for (DfOutsideSqlFile file : outsideSqlPack.getOutsideSqlFileList()) {
-                index++;
-                _log.warn("  " + index + " -- " + file.getPhysicalFile());
-            }
-            _log.warn("* * * * * * * * * */");
-            _log.warn(" ");
-        }
     }
 
     protected void handleException() {
