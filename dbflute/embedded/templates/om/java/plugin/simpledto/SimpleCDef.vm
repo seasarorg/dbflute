@@ -1,0 +1,69 @@
+${database.allClassCopyright}package ${database.simpleCDefPackage};
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * The definition of classification.
+ * @author ${database.classAuthor}
+ */
+public interface ${database.simpleCDefClass} {
+
+    /**
+     * @return The code of the classification. (NotNull)
+     */
+    String code();
+
+    /**
+     * @return The name of the classification. (NotNull)
+     */
+    String name();
+
+    /**
+     * @return The code of the classification. (NullAllowed: when an alias is not specified in its setting)
+     */
+    String alias();
+
+#foreach ($classificationName in $database.classificationNameList)
+#if ($database.isSimpleCDefTarget($classificationName))
+#set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
+#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#set ($existTop = true)
+#end
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+    /**
+     * $classificationTopMap.get('topComment')
+     */
+#end
+    public enum ${classificationName} implements ${database.simpleCDefClass} {
+#set ($count = 0)
+#foreach ($classificationMap in $classificationMapList)
+#if ($count != 0)
+        ,
+#end
+        /** $database.buildClassificationApplicationComment($classificationMap) */
+        ${classificationMap.get('name')}($database.buildClassificationCodeAliasVariables($classificationMap))
+#set ($count = $count + 1)
+#end
+        ;
+        private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
+        static { for (${classificationName} value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
+        private String _code; private String _alias;
+        private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
+        public String code() { return _code; } public String alias() { return _alias; }
+        public static ${classificationName} codeOf(Object code) {
+            if (code == null) { return null; } if (code instanceof ${classificationName}) { return (${classificationName})code; }
+            return _codeValueMap.get(code.toString().toLowerCase());
+        }
+#if ($database.isCDefToStringReturnsName())
+        @Override public String toString() { return name(); }
+#else
+        @Override public String toString() { return code(); }
+#end
+    }
+
+#end
+#end
+}

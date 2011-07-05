@@ -457,7 +457,8 @@ $database.info(" ")
 ## ===================================================================================
 ##                                                                          Simple Dto
 ##                                                                          ==========
-#if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
+#if ($database.hasSimpleDtoDefinition())
+  $database.enableSimpleDtoOutputDirectory()
   $database.info("parseSimpleDto() { // mapper=$database.isSimpleDtoUseDtoMapper()")
   #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}")
   #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}")
@@ -470,7 +471,6 @@ $database.info(" ")
   #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
   $database.makeDirectory($path)
 
-  $database.enableSimpleDtoOutputDirectory()
   #foreach ($table in $database.tableList)
   #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
   #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
@@ -508,11 +508,27 @@ $database.info(" ")
   $database.info("}")
   $database.backToGenerateOutputDirectory()
 #end
+#if ($database.hasSimpleCDefDefinition())
+  $database.enableSimpleCDefOutputDirectory()
+  $database.info("parseSimpleCDef() {")
+
+  #set ($path = $database.getPackageAsPath(${database.simpleCDefPackage}))
+  $database.makeDirectory($path)
+
+  #if ($database.hasClassificationDefinitionMap())
+    $database.info("    parse('SimpleCDef');")
+    #set ( $path = "${database.getPackageAsPath(${database.simpleCDefPackage})}${database.simpleCDefClass}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleCDef.${glTemplateFileExtension}",$path ,"" ,"")
+  #end
+
+  $database.info("}")
+  $database.backToGenerateOutputDirectory()
+#end
 
 ## ===================================================================================
 ##                                                                            Flex Dto
 ##                                                                            ========
-#if ($database.hasFlexDtoDefinition() && $database.isTargetLanguageJava())
+#if ($database.hasFlexDtoDefinition())
   $database.enableFlexDtoOutputDirectory()
   $database.info("parseFlexDto() {")
   #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}")

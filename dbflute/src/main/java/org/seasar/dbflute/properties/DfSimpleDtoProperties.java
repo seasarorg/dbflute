@@ -1,9 +1,12 @@
 package org.seasar.dbflute.properties;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -34,7 +37,19 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     //                                                                       Determination
     //                                                                       =============
     public boolean hasSimpleDtoDefinition() {
-        return !getSimpleDtoDefinitionMap().isEmpty();
+        return !isEmptyDefinition() && hasDefinitionProperty("baseDtoPackage");
+    }
+
+    public boolean hasSimpleCDefDefinition() {
+        return !isEmptyDefinition() && hasDefinitionProperty("simpleCDefClass");
+    }
+
+    protected boolean isEmptyDefinition() {
+        return getSimpleDtoDefinitionMap().isEmpty();
+    }
+
+    protected boolean hasDefinitionProperty(String key) {
+        return getSimpleDtoDefinitionMap().containsKey(key);
     }
 
     // ===================================================================================
@@ -49,6 +64,12 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     public String getDtoMapperOutputDirectory() {
         final String baseDir = getBasicProperties().getGenerateOutputDirectory();
         final String value = (String) getSimpleDtoDefinitionMap().get("dtoMapperOutputDirectory");
+        return value != null && value.trim().length() > 0 ? baseDir + "/" + value : baseDir;
+    }
+
+    public String getSimpleCDefOutputDirectory() {
+        final String baseDir = getBasicProperties().getGenerateOutputDirectory();
+        final String value = (String) getSimpleDtoDefinitionMap().get("simpleCDefOutputDirectory");
         return value != null && value.trim().length() > 0 ? baseDir + "/" + value : baseDir;
     }
 
@@ -89,6 +110,42 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     public boolean isUseDtoMapper() {
         final String dtoMapperPackage = getMapperPackage();
         return dtoMapperPackage != null && dtoMapperPackage.trim().length() > 0;
+    }
+
+    // ===================================================================================
+    //                                                                           CDef Info
+    //                                                                           =========
+    public String getSimpleCDefClass() {
+        return getPropertyRequired("simpleCDefClass");
+    }
+
+    public String getSimpleCDefPackage() {
+        return getPropertyRequired("simpleCDefPackage");
+    }
+
+    protected Set<String> _simpleCDefTargetSet;
+
+    protected Set<String> getSimpleCDefTargetSet() {
+        if (_simpleCDefTargetSet != null) {
+            return _simpleCDefTargetSet;
+        }
+        final Object obj = getSimpleDtoDefinitionMap().get("simpleCDefTargetList");
+        if (obj == null) {
+            _simpleCDefTargetSet = DfCollectionUtil.emptySet();
+            return _simpleCDefTargetSet;
+        }
+        @SuppressWarnings("unchecked")
+        final List<String> targetList = (List<String>) obj;
+        _simpleCDefTargetSet = DfCollectionUtil.newHashSet(targetList);
+        return _simpleCDefTargetSet;
+    }
+
+    public boolean isSimpleCDefTarget(String classificationName) {
+        final Set<String> targetSet = getSimpleCDefTargetSet();
+        if (targetSet.isEmpty()) {
+            return true;
+        }
+        return targetSet.contains(classificationName);
     }
 
     // ===================================================================================

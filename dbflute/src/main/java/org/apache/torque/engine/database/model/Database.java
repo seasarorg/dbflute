@@ -826,6 +826,12 @@ public class Database {
         getGeneratorInstance().setOutputPath(outputDirectory);
     }
 
+    public void enableSimpleCDefOutputDirectory() {
+        final String outputDirectory = getProperties().getSimpleDtoProperties().getSimpleCDefOutputDirectory();
+        _log.info("...Setting up simpleCDefOutputDirectory: " + outputDirectory);
+        getGeneratorInstance().setOutputPath(outputDirectory);
+    }
+
     public void enableFlexDtoOutputDirectory() {
         final String outputDirectory = getProperties().getFlexDtoProperties().getOutputDirectory();
         _log.info("...Setting up flexDtoOutputDirectory: " + outputDirectory);
@@ -1828,6 +1834,22 @@ public class Database {
 
     public boolean isSimpleDtoUseDtoMapper() {
         return getProperties().getSimpleDtoProperties().isUseDtoMapper();
+    }
+
+    public boolean hasSimpleCDefDefinition() {
+        return getProperties().getSimpleDtoProperties().hasSimpleCDefDefinition();
+    }
+
+    public String getSimpleCDefClass() {
+        return getProperties().getSimpleDtoProperties().getSimpleCDefClass();
+    }
+
+    public String getSimpleCDefPackage() {
+        return getProperties().getSimpleDtoProperties().getSimpleCDefPackage();
+    }
+
+    public boolean isSimpleCDefTarget(String classificationName) {
+        return getProperties().getSimpleDtoProperties().isSimpleCDefTarget(classificationName);
     }
 
     // ===================================================================================
