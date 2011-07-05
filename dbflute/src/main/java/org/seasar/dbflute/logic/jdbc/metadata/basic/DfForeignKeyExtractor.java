@@ -87,7 +87,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
 
     protected Map<String, DfForeignKeyMeta> doGetForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, boolean retry) throws SQLException {
-        final Map<String, DfForeignKeyMeta> fkMap = newLinkedHashMap();
+        final Map<String, DfForeignKeyMeta> fkMap = newTableConstraintMap();
         if (isForeignKeyExtractingUnsupported()) {
             return fkMap;
         }

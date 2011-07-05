@@ -215,7 +215,7 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             UnifiedSchema unifiedSchema, String tableName, List<String> pkList, boolean retry) throws SQLException { // non primary key only
         final StringSet pkSet = StringSet.createAsFlexible();
         pkSet.addAll(pkList);
-        final Map<String, Map<Integer, String>> uniqueKeyMap = newLinkedHashMap();
+        final Map<String, Map<Integer, String>> uniqueKeyMap = newTableConstraintMap();
         ResultSet rs = null;
         try {
             rs = extractUniqueKeyMetaData(metaData, unifiedSchema, tableName, retry);

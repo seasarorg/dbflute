@@ -18,7 +18,6 @@ package org.seasar.dbflute.logic.jdbc.metadata.basic;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -69,7 +68,7 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
 
     protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap, boolean retry) throws SQLException { // non unique only
-        final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
+        final Map<String, Map<Integer, String>> indexMap = newTableConstraintMap();
         ResultSet rs = null;
         try {
             rs = extractIndexMetaData(metaData, unifiedSchema, tableName, retry);

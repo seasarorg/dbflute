@@ -15,8 +15,10 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.basic;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
@@ -95,6 +97,17 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
             return false;
         }
         return true;
+    }
+
+    // ===================================================================================
+    //                                                                    Constraint Order
+    //                                                                    ================
+    protected <KEY, VALUE> Map<KEY, VALUE> newTableConstraintMap() {
+        return new TreeMap<KEY, VALUE>(new Comparator<KEY>() {
+            public int compare(KEY o1, KEY o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });
     }
 
     // ===================================================================================
