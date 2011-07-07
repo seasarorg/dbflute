@@ -39,12 +39,14 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     void set${javaName}_${classificationMap.get('name')}();
+#if ($database.isMakeEntityOldStyleClassify())
 
     /**
      * Same as set${javaName}_${classificationMap.get('name')}. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     void classify${javaName}${classificationMap.get('name')}();
+#end
 
     /**
      * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />

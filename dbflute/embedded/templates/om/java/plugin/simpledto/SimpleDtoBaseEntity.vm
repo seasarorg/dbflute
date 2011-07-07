@@ -4,6 +4,9 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 import java.io.Serializable;
 import java.util.*;
 
+#if ($database.isSimpleDtoClassificationDeployment() && $table.hasClassification())
+import ${database.simpleCDefPackage}.${database.simpleCDefClass};
+#end
 #if ($table.hasRelation())
 import ${myExtendedEntityPackageName}.*;
 #end
@@ -74,6 +77,86 @@ public abstract class $myClassName implements Serializable {
     public ${myClassName}() {
     }
 
+#if ($database.isSimpleDtoClassificationDeployment() && $table.hasClassification())
+    // ===================================================================================
+    //                                                             Classification Property
+    //                                                             =======================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
+#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#set ($existTop = true)
+#end
+    /**
+     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+     * $classificationTopMap.get('topComment')
+#end
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed)
+     */
+    public void set${col.javaName}As${col.classificationName}(${database.simpleCDefClass}.${col.classificationName} cdef) {
+#if ($col.isJavaNativeNumberObject())
+        set${col.javaName}(cdef != null ? InternalUtil.toNumber(cdef.code(), ${col.javaNative}.class) : null);
+#elseif ($col.isJavaNativeBooleanObject())
+        set${col.javaName}(cdef != null ? InternalUtil.toBoolean(cdef.code()) : null);
+#else
+        set${col.javaName}(cdef != null ? cdef.code() : null);
+#end
+    }
+
+    /**
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+     * $classificationTopMap.get('topComment')
+#end
+     * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
+     * @return The instance of classification definition (as ENUM type). (NullAllowed)
+     */
+    public ${database.simpleCDefClass}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
+        return ${database.simpleCDefClass}.${col.classificationName}.codeOf(get${col.javaName}());
+    }
+
+#end
+#end
+    // ===================================================================================
+    //                                                              Classification Setting
+    //                                                              ======================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#foreach ($classificationMap in $col.classificationMapList)
+    /**
+     * Set the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    public void set${col.javaName}_${classificationMap.get('name')}() {
+        set${col.javaName}As${col.classificationName}(${database.simpleCDefClass}.${col.classificationName}.${classificationMap.get('name')});
+    }
+
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                        Classification Determination
+    //                                                        ============================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#foreach ($classificationMap in $col.classificationMapList)
+    /**
+     * Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
+     * @return The determination, true or false.
+     */
+    public boolean is${col.JavaName}${classificationMap.get('name')}() {
+        ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
+        return cdef != null ? cdef.equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
+    }
+
+#end
+#end
+#end
+#end
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============

@@ -18,8 +18,10 @@ namespace ${glPackageBaseCommon} {
 #set ($classificationName = $database.getAllClassificationName($filteredColumnName))
 #set ($classificationList = $database.getClassificationMapList($classificationName))
 #foreach ($classificationMap in $classificationList)
-
+        void Set${javaName}_${classificationMap.get('name')}();
+#if ($database.isMakeEntityOldStyleClassify())
         void Classify${javaName}${classificationMap.get('name')}();
+#end
         bool Is${javaName}${classificationMap.get('name')} { get; }
 #end
 #end

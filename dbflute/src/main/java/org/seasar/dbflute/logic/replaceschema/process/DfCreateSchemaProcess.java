@@ -64,6 +64,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     protected StringKeyMap<Connection> _changeUserConnectionMap = StringKeyMap.createAsCaseInsensitive();
     protected boolean _skippedInitializeSchema;
     protected boolean _alreadyExistsMainSchema;
+    protected boolean _retryInitializeSchemaFinished;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -368,9 +369,10 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
 
         @Override
         protected void processNonDispatch(String sql) throws SQLException {
-            if (_skippedInitializeSchema && _alreadyExistsMainSchema) {
+            if (!_retryInitializeSchemaFinished && _skippedInitializeSchema && _alreadyExistsMainSchema) {
                 _log.info("...Intercepting by retry initializing schema because of skipped before");
                 initializeSchema();
+                _retryInitializeSchemaFinished = true; // only one called
             }
             super.processNonDispatch(sql);
         }

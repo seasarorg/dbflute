@@ -110,6 +110,10 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         return getPropertyIfNullEmpty("extendedDtoSuffix");
     }
 
+    public boolean isClassificationDeployment() { //  if true, SimpleCDef should be true
+        return isProperty("isClassificationDeployment", false, getSimpleDtoDefinitionMap());
+    }
+
     // ===================================================================================
     //                                                                              Mapper
     //                                                                              ======

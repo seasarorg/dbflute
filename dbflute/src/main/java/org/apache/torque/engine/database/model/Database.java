@@ -1836,6 +1836,10 @@ public class Database {
         return getProperties().getSimpleDtoProperties().isUseDtoMapper();
     }
 
+    public boolean isSimpleDtoClassificationDeployment() {
+        return getProperties().getSimpleDtoProperties().isClassificationDeployment();
+    }
+
     public boolean hasSimpleCDefDefinition() {
         return getProperties().getSimpleDtoProperties().hasSimpleCDefDefinition();
     }
