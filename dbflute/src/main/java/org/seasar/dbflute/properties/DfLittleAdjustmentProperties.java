@@ -95,7 +95,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean isMakeEntityOldStyleClassify() { // closet
-        return isProperty("isMakeEntityOldStyleClassify", true);
+        return isProperty("isMakeEntityOldStyleClassify", false);
     }
 
     // ===================================================================================
