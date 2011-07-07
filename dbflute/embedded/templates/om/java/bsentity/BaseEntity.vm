@@ -191,7 +191,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if ($col.hasClassification())
 #foreach ($classificationMap in $col.classificationMapList)
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
+     * Set the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')} (${classificationMap.get('code')}). <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${col.javaName}_${classificationMap.get('name')}() {
@@ -228,7 +228,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if ($col.hasClassification())
 #foreach ($classificationMap in $col.classificationMapList)
     /**
-     * Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
+     * Is the value of ${col.uncapitalisedJavaName} ${classificationMap.get('name')}? <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.

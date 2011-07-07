@@ -88,7 +88,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($classificationMap in $col.classificationMapList)
 
     /**
-     * Equal(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
+     * Equal(=). As ${classificationMap.get('name')} (${classificationMap.get('code')}). And OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
@@ -142,7 +142,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($classificationMap in $col.ClassificationMapList)
 
     /**
-     * NotEqual(&lt;&gt;). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
+     * NotEqual(&lt;&gt;). As ${classificationMap.get('name')} (${classificationMap.get('code')}). And OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
@@ -552,7 +552,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($classificationMap in $col.classificationMapList)
 
     /**
-     * Equal(=). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
+     * Equal(=). As ${classificationMap.get('name')} (${classificationMap.get('code')}). And NullIgnored, OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
@@ -593,7 +593,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #foreach ($classificationMap in $col.classificationMapList)
 
     /**
-     * NotEqual(&lt;&gt;). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
+     * NotEqual(&lt;&gt;). As ${classificationMap.get('name')} (${classificationMap.get('code')}). And NullIgnored, OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
