@@ -15,6 +15,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
@@ -28,7 +29,9 @@ import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitiali
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory.InitializeType;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -59,6 +62,8 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     protected StringSet _goodByeUserSet = StringSet.createAsCaseInsensitive();
     protected StringSet _revivedUserSet = StringSet.createAsCaseInsensitive();
     protected StringKeyMap<Connection> _changeUserConnectionMap = StringKeyMap.createAsCaseInsensitive();
+    protected boolean _skippedInitializeSchema;
+    protected boolean _alreadyExistsMainSchema;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -112,13 +117,6 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         if (additionalDropMapList.isEmpty()) {
             return;
         }
-        // /= = = = = = = = = = = = = = = = = 
-        // Unsupported at MySQL and SQLServer
-        // = = = = = = = = = =/
-        if (getDatabaseTypeFacadeProp().isDatabaseMySQL() || getDatabaseTypeFacadeProp().isDatabaseSQLServer()) {
-            String msg = "AdditionalDropDefinitionSchema is unsupported at MySQL and SQLServer!";
-            throw new UnsupportedOperationException(msg);
-        }
         _log.info("");
         _log.info("* * * * * * * * * * * * * * * * * * * *");
         _log.info("*                                     *");
@@ -160,6 +158,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("* * * * * * * * * * *");
         if (_lazyConnection) {
             _log.info("*Passed because it's a lazy connection");
+            _skippedInitializeSchema = true;
             return;
         }
         final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.MAIN);
@@ -218,9 +217,10 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
                         _changeUserConnectionMap.put(_currentUser, conn);
                     }
                     if (conn == null) {
-                        String msg = "...Saying good-bye to the user '" + _currentUser + "'";
-                        msg = msg + " because of no definition";
-                        _log.info(msg);
+                        final StringBuilder sb = new StringBuilder();
+                        sb.append("...Saying good-bye to the user '").append(_currentUser).append("'");
+                        sb.append(" because of no definition");
+                        _log.info(sb.toString());
                         _goodByeUserSet.add(_currentUser);
                         return true;
                     }
@@ -235,11 +235,17 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
                     dispatchStmt.execute(sql);
                     return true;
                 } catch (SQLException e) {
-                    final boolean checkUser = analyzeCheckUser(sql);
-                    if (checkUser) {
-                        String msg = "...Saying good-bye to the user '" + _currentUser + "'";
-                        msg = msg + " because of checked";
-                        _log.info(msg);
+                    final List<String> argList = analyzeCheckUser(sql);
+                    if (argList != null) { // means the command was found
+                        if (argList.contains("mainSchema")) {
+                            _alreadyExistsMainSchema = true;
+                        }
+                        final StringBuilder sb = new StringBuilder();
+                        sb.append("...Saying good-bye to the user '").append(_currentUser).append("'");
+                        sb.append(" because of checked: " + argList);
+                        _log.info(sb.toString());
+                        final String exmsg = e.getMessage();
+                        _log.info(" -> " + (exmsg != null ? exmsg.trim() : null));
                         _goodByeUserSet.add(_currentUser);
                         return true;
                     }
@@ -255,6 +261,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected class DfSqlFileRunnerExecuteCreateSchema extends DfSqlFileRunnerExecute {
+
         public DfSqlFileRunnerExecuteCreateSchema(DfRunnerInformation runInfo, DataSource dataSource) {
             super(runInfo, dataSource);
         }
@@ -360,6 +367,15 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         }
 
         @Override
+        protected void processNonDispatch(String sql) throws SQLException {
+            if (_skippedInitializeSchema && _alreadyExistsMainSchema) {
+                _log.info("...Intercepting by retry initializing schema because of skipped before");
+                initializeSchema();
+            }
+            super.processNonDispatch(sql);
+        }
+
+        @Override
         protected void lazyConnectIfNeeds() throws SQLException {
             if (_lazyConnection) {
                 _log.info("...Connecting by main user lazily");
@@ -372,25 +388,36 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         }
     }
 
+    /**
+     * @param sql The target SQL. (NotNull)
+     * @return The user changed to. (NotNull) 
+     */
     protected String analyzeChangeUser(String sql) {
-        final String beginMark = "#df:changeUser(";
-        final int markIndex = sql.indexOf(beginMark);
-        if (markIndex < 0) {
+        final List<String> argList = doAnalyzeCommand(sql, "changeUser");
+        if (argList == null) { // means not found
             return null;
         }
-        final String rear = sql.substring(markIndex + beginMark.length());
-        final int endIndex = rear.indexOf(")");
-        if (endIndex < 0) {
-            String msg = "The command changeUser should have its end mark ')':";
-            msg = msg + " example=[#df:changeUser(system)#], sql=" + sql;
-            throw new IllegalStateException(msg);
+        if (argList.isEmpty()) { // because of required
+            throwCreateSchemaChangeUserNotFoundArgException(sql);
         }
-        return rear.substring(0, endIndex).trim();
+        return argList.get(0); // only one argument
     }
 
-    protected boolean analyzeCheckUser(String sql) {
-        final String mark = "#df:checkUser()#";
-        return sql.contains(mark);
+    protected void throwCreateSchemaChangeUserNotFoundArgException(String sql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found argument in the 'changeUser' command.");
+        br.addItem("SQL");
+        br.addElement(sql);
+        String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    /**
+     * @param sql The target SQL. (NotNull)
+     * @return The list of arguments. (NullAllowed: if null, not found the command)
+     */
+    protected List<String> analyzeCheckUser(String sql) {
+        return doAnalyzeCommand(sql, "checkUser");
     }
 
     protected boolean analyzeBackToMainUser(String sql) {
@@ -401,6 +428,41 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     protected boolean analyzeReviveUser(String sql) {
         final String mark = "#df:reviveUser()#";
         return sql.contains(mark);
+    }
+
+    /**
+     * @param sql The target SQL. (NotNull)
+     * @param commandName The name of command. (NotNull)
+     * @return The list of arguments. (NullAllowed: if null, not found the command)
+     */
+    protected List<String> doAnalyzeCommand(String sql, String commandName) {
+        final String beginMark = "#df:" + commandName + "(";
+        final int markIndex = sql.indexOf(beginMark);
+        if (markIndex < 0) {
+            return null;
+        }
+        final String rear = sql.substring(markIndex + beginMark.length());
+        final int endIndex = rear.indexOf(")");
+        if (endIndex < 0) {
+            throwCreateSchemaCommandCommentInvalidException(sql, commandName);
+        }
+        final String args = rear.substring(0, endIndex).trim();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(args)) {
+            return Srl.splitListTrimmed(args, ",");
+        } else {
+            return DfCollectionUtil.emptyList();
+        }
+    }
+
+    protected void throwCreateSchemaCommandCommentInvalidException(String sql, String commandName) {
+        ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found end mark ')' in the command.");
+        br.addItem("SQL");
+        br.addElement(sql);
+        br.addItem("Command");
+        br.addElement(commandName);
+        String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     protected List<File> getReplaceSchemaSqlFileList() {

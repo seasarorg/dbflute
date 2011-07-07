@@ -371,7 +371,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             procedureList = handler.getPlainProcedureList(_dataSource, metaData, _unifiedSchema);
         } catch (SQLException e) {
             String msg = "Failed to get procedure meta data: " + _unifiedSchema;
-            throw new IllegalStateException(msg, e);
+            throw new SQLFailureException(msg, e);
         }
         callbackDropProcedureByJdbc(conn, procedureList, createDropProcedureByJdbcCallback());
     }

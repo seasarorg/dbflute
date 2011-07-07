@@ -689,11 +689,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         br.addElement(unifiedSchema);
         br.addItem("Current Procedure");
         br.addElement(procedureName);
-        if (!forSqlEx) {
-            br.addItem("Unexpected Exception");
-            br.addElement(e.getClass().getName());
-            br.addElement(e.getMessage());
-        }
+        br.addItem(forSqlEx ? "Caused SQLException" : "Unexpected Exception");
+        br.addElement(e.getClass().getName());
+        br.addElement(e.getMessage());
         final String msg = br.buildExceptionMessage();
         if (forSqlEx) {
             throw new DfJDBCException(msg, (SQLException) e);

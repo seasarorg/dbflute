@@ -63,8 +63,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                     lazyConnectFailed = true;
                     throw e;
                 }
-                checkStatement(sql);
-                _currentStatement.execute(sql);
+                processNonDispatch(sql);
             }
             _goodSqlCount++;
         } catch (SQLException e) {
@@ -79,6 +78,11 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
 
     protected boolean dispatch(String sql) throws SQLException {
         return _dispatcher != null && _dispatcher.dispatch(_sqlFile, _currentStatement, sql);
+    }
+
+    protected void processNonDispatch(String sql) throws SQLException {
+        checkStatement(sql);
+        _currentStatement.execute(sql);
     }
 
     protected void lazyConnectIfNeeds() throws SQLException {
