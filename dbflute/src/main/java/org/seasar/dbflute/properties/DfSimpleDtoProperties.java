@@ -56,21 +56,31 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     //                                                                    Output Directory
     //                                                                    ================
     public String getSimpleDtoOutputDirectory() {
-        final String baseDir = getBasicProperties().getGenerateOutputDirectory();
         final String value = (String) getSimpleDtoDefinitionMap().get("simpleDtoOutputDirectory");
-        return value != null && value.trim().length() > 0 ? baseDir + "/" + value : baseDir;
+        return doGetOutputDirectory(value);
     }
 
     public String getDtoMapperOutputDirectory() {
-        final String baseDir = getBasicProperties().getGenerateOutputDirectory();
         final String value = (String) getSimpleDtoDefinitionMap().get("dtoMapperOutputDirectory");
-        return value != null && value.trim().length() > 0 ? baseDir + "/" + value : baseDir;
+        return doGetOutputDirectory(value);
     }
 
     public String getSimpleCDefOutputDirectory() {
-        final String baseDir = getBasicProperties().getGenerateOutputDirectory();
         final String value = (String) getSimpleDtoDefinitionMap().get("simpleCDefOutputDirectory");
-        return value != null && value.trim().length() > 0 ? baseDir + "/" + value : baseDir;
+        return doGetOutputDirectory(value);
+    }
+
+    protected String doGetOutputDirectory(String value) {
+        final String baseDir = getBasicProperties().getGenerateOutputDirectory();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(value)) {
+            if (value.startsWith("~/")) {
+                return "./" + Srl.substringFirstRear(value, "~/");
+            } else {
+                return baseDir + "/" + value;
+            }
+        } else {
+            return baseDir;
+        }
     }
 
     // ===================================================================================
