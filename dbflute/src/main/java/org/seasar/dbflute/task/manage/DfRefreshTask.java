@@ -17,8 +17,7 @@ package org.seasar.dbflute.task.manage;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.generate.refresh.DfRefreshResourceProcess;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
@@ -30,13 +29,7 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.8.5 (2011/06/09 Thursday)
  */
-public class DfRefreshResourceTask extends DfAbstractTask {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfRefreshResourceTask.class);
+public class DfRefreshTask extends DfAbstractTask {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -48,11 +41,12 @@ public class DfRefreshResourceTask extends DfAbstractTask {
     //                                                                           =========
     @Override
     protected void begin() {
-        _log.info("+------------------------------------------+");
-        _log.info("|                                          |");
-        _log.info("|                 Refresh                  |");
-        _log.info("|                                          |");
-        _log.info("+------------------------------------------+");
+        // Refresh task is for utility so it's to be quietly as it can
+        //_log.info("+------------------------------------------+");
+        //_log.info("|                                          |");
+        //_log.info("|                 Refresh                  |");
+        //_log.info("|                                          |");
+        //_log.info("+------------------------------------------+");
     }
 
     // ===================================================================================
@@ -100,8 +94,13 @@ public class DfRefreshResourceTask extends DfAbstractTask {
     //                                                                       Final Message
     //                                                                       =============
     @Override
-    protected String buildRefreshProjectDisp() {
-        return getRefreshProjectList().toString();
+    protected void showFinalMessage(long before, long after, boolean abort) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("[Final Message]: ").append(getPerformanceView(after - before));
+        if (abort) {
+            sb.append(" *Abort");
+        }
+        DfDBFluteTaskUtil.logFinalMessage(sb.toString());
     }
 
     // ===================================================================================

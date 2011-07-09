@@ -44,37 +44,36 @@ public class DfRefreshResourceProcess {
             return;
         }
         final List<String> projectNameList = getRefreshProjectNameList();
+        _log.info("...Refreshing: " + projectNameList);
         for (String projectName : projectNameList) {
-            doRefreshResources(projectName);
+            final IOException ioEx = doRefreshResources(projectName);
+            if (ioEx != null) {
+                final String msg = ioEx.getMessage();
+                _log.info("*Failed to refresh: " + (msg != null ? msg.trim() : null));
+                break;
+            }
         }
     }
 
-    protected void doRefreshResources(String projectName) {
+    protected IOException doRefreshResources(String projectName) {
         final StringBuilder sb = new StringBuilder();
         sb.append("refresh?").append(projectName).append("=INFINITE");
 
         final URL url = getRefreshRequestURL(sb.toString());
         if (url == null) {
-            return;
+            return null;
         }
 
-        final StringBuilder logSb = new StringBuilder();
         InputStream is = null;
         try {
-            logSb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            logSb.append(ln()).append("...Refreshing the project: ").append(projectName);
-            logSb.append(ln());
             final URLConnection conn = url.openConnection();
             conn.setReadTimeout(getRefreshRequestReadTimeout());
             conn.connect();
             is = conn.getInputStream();
-            logSb.append(ln()).append("    --> OK, Look at the refreshed project!");
-            logSb.append(ln()).append("- - - - - - - - - -/");
+            return null;
         } catch (IOException continued) {
-            logSb.append(ln()).append("    --> Oh, no! ").append(continued.getMessage()).append(": ").append(url);
-            logSb.append(ln()).append("- - - - - - - - - -/");
+            return continued;
         } finally {
-            _log.info(logSb);
             if (is != null) {
                 try {
                     is.close();

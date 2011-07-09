@@ -70,7 +70,7 @@
   <taskdef name="df-sql2entity" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
   <taskdef name="df-refresh" classpathref="torque-classpath"
-    classname="org.seasar.dbflute.task.manage.DfRefreshResourceTask"/>
+    classname="org.seasar.dbflute.task.manage.DfRefreshTask"/>
 
   <!--
     for Ant-Contrib
