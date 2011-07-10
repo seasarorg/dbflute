@@ -230,13 +230,13 @@ $database.backToSql2EntityOutputDirectory()
       #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
       #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
 
-      $database.info("    parse('${myExtendedObjectClassName}');")
-
       $table.switchSql2EntitySimpleDtoOutputDirectory()
       #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
       $database.makeDirectory($path)
       #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
       $database.makeDirectory($path)
+
+      $database.info("    parse('${myExtendedObjectClassName}');")
 
       #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
