@@ -224,12 +224,6 @@ $database.backToSql2EntityOutputDirectory()
   #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}.customize")
   #set ($myDtoMapperPackageName = "${database.simpleDtoDtoMapperPackage}.customize")
 
-  #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
-  $database.makeDirectory($path)
-
   $database.enableSimpleDtoOutputDirectory()
   #foreach ($table in $database.tableList)
     #if (!$table.isSql2EntityTypeSafeCursor())
@@ -237,6 +231,12 @@ $database.backToSql2EntityOutputDirectory()
       #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
 
       $database.info("    parse('${myExtendedObjectClassName}');")
+
+      $table.switchSql2EntitySimpleDtoOutputDirectory()
+      #set ($path = $database.getPackageAsPath(${myBaseEntityPackageName}))
+      $database.makeDirectory($path)
+      #set ($path = $database.getPackageAsPath(${myExtendedEntityPackageName}))
+      $database.makeDirectory($path)
 
       #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoBaseEntity.${glTemplateFileExtension}", $path, "table", $table)
@@ -252,12 +252,13 @@ $database.backToSql2EntityOutputDirectory()
   #end
 
   #if ($database.isSimpleDtoUseDtoMapper())
-    #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
-    $database.makeDirectory($path)
-
     $database.enableDtoMapperOutputDirectory()
     #foreach ($table in $database.tableList)
       #if (!$table.isSql2EntityTypeSafeCursor())
+        $table.switchSql2EntityDtoMapperOutputDirectory()
+        #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
+        $database.makeDirectory($path)
+
         #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
         #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
         #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")

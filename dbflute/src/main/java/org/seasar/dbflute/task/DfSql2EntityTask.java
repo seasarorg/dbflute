@@ -323,8 +323,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             final Table tbl = new Table();
             tbl.setSql2EntityCustomize(true);
-            if (outsideSqlFile != null) {
-                tbl.setSql2EntityOutputDirectory(outsideSqlFile.getSql2EntityOutputDirectory());
+            if (outsideSqlFile != null) { // basically true but checked just in case
+                tbl.setSql2EntitySqlFile(outsideSqlFile);
             }
             tbl.setName(entityInfo.getTableDbName());
             if (!entityInfo.needsJavaNameConvert()) {

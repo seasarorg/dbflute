@@ -4,6 +4,9 @@ ${database.allClassCopyright}package ${myDtoMapperPackageName};
 import java.util.*;
 
 import org.seasar.dbflute.Entity;
+#if ($table.hasClassification())
+import ${glPackageBaseCommon}.${glCDef};
+#end
 import ${myDomainEntityPackageName}.*;
 import ${myExtendedEntityPackageName}.*;
 
@@ -191,7 +194,11 @@ public class ${myClassName} {
         ${table.extendedEntityClassName} entity = new ${table.extendedEntityClassName}();
 #foreach ($col in $table.columns)
         if (needsMapping(dto, dto.get${col.javaName}(), "${col.javaBeansRulePropertyName}")) {
+#if ($col.hasClassification())
+            entity.set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(dto.get${col.javaName}()));
+#else
             entity.set${col.javaName}(dto.get${col.javaName}());
+#end
         }
 #end
 #if ($table.hasRelation())
@@ -247,6 +254,9 @@ public class ${myClassName} {
      * Does the property need to be mapped to an entity? <br />
      * If modified info of DTO has at least one property, only modified properties are mapped.
      * And if no property is modified, all properties are mapped (but the other option exists).
+     * @param dto The instance of DTO. (NotNull)
+     * @param value The value of DTO's property. (NotNull)
+     * @param propName The property name of DTO. (NotNull)
      * @return The determination, true or false.
      */
     protected boolean needsMapping(${myExtendedObjectClassName} dto, Object value, String propName) {

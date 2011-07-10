@@ -393,7 +393,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     public void switchSql2EntityOutputDirectory(String outputDirectory) {
         final DfGenerator generator = getGeneratorInstance();
         final String outputPath = generator.getOutputPath();
-        if (outputDirectory == null) {
+        if (outputDirectory == null) { // means back to Sql2Entity output directory
             final String mainOutDir = getSql2EntityOutputDirectory();
             if (!outputPath.equals(mainOutDir)) { // if different
                 _log.info("...Switching sql2EntityOutputDirectory: " + mainOutDir);

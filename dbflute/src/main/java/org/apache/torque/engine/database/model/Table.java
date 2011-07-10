@@ -75,6 +75,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
+import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
@@ -84,6 +85,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
@@ -157,7 +159,10 @@ public class Table {
     private boolean _sql2EntityCustomize;
     private boolean _sql2EntityCustomizeHasNested;
     private boolean _sql2EntityTypeSafeCursor;
-    private String _sql2EntityOutputDirectory;
+
+    // basically not null if Sql2Entity
+    // but you should check it just in case
+    private DfOutsideSqlFile _sql2EntitySqlFile;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -1917,22 +1922,56 @@ public class Table {
     }
 
     /**
+     * @return The file of outside-SQL. (basically NotNull if Sql2Entity)
+     */
+    public DfOutsideSqlFile getSql2EntitySqlFile() {
+        return _sql2EntitySqlFile;
+    }
+
+    /**
+     * @param sql2EntitySqlFile The file of outside-SQL. (basically NotNull if Sql2Entity)
+     */
+    public void setSql2EntitySqlFile(DfOutsideSqlFile sql2EntitySqlFile) {
+        this._sql2EntitySqlFile = sql2EntitySqlFile;
+    }
+
+    /**
      * @return The output directory for Sql2Entity. (NotNull)
      */
     public String getSql2EntityOutputDirectory() {
-        if (_sql2EntityOutputDirectory != null) {
-            return _sql2EntityOutputDirectory;
+        if (_sql2EntitySqlFile != null) {
+            return _sql2EntitySqlFile.getSql2EntityOutputDirectory();
+        }
+        // basically no way if Sql2Entity
+        return getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory();
+    }
+
+    // -----------------------------------------------------
+    //                               Switch Output Directory
+    //                               -----------------------
+    public void switchSql2EntityOutputDirectory() {
+        final String outputDirectory = getSql2EntityOutputDirectory();
+        getProperties().getOutsideSqlProperties().switchSql2EntityOutputDirectory(outputDirectory);
+    }
+
+    public void switchSql2EntitySimpleDtoOutputDirectory() {
+        final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
+        if (_sql2EntitySqlFile != null && _sql2EntitySqlFile.isSqlAp()) {
+            prop.switchSql2EntityOutputDirectory(_sql2EntitySqlFile.getSql2EntityOutputDirectory());
         } else {
-            return getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory();
+            final String outputDirectory = getProperties().getSimpleDtoProperties().getSimpleDtoOutputDirectory();
+            prop.switchSql2EntityOutputDirectory(outputDirectory);
         }
     }
 
-    public void setSql2EntityOutputDirectory(String sql2EntityOutputDirectory) {
-        this._sql2EntityOutputDirectory = sql2EntityOutputDirectory;
-    }
-
-    public void switchSql2EntityOutputDirectory() {
-        getProperties().getOutsideSqlProperties().switchSql2EntityOutputDirectory(_sql2EntityOutputDirectory);
+    public void switchSql2EntityDtoMapperOutputDirectory() {
+        final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
+        if (_sql2EntitySqlFile != null && _sql2EntitySqlFile.isSqlAp()) {
+            prop.switchSql2EntityOutputDirectory(_sql2EntitySqlFile.getSql2EntityOutputDirectory());
+        } else {
+            final String outputDirectory = getProperties().getSimpleDtoProperties().getDtoMapperOutputDirectory();
+            prop.switchSql2EntityOutputDirectory(outputDirectory);
+        }
     }
 
     // ===================================================================================
