@@ -2729,6 +2729,16 @@ public class Table {
         return prefix + getJavaName() + suffix;
     }
 
+    public boolean hasSimpleDtoJsonicDecoration() {
+        final List<Column> columnList = getColumnList();
+        for (Column column : columnList) {
+            if (column.hasSimpleDtoJsonicDecoration()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                            Flex DTO
     //                                                                            ========

@@ -4,6 +4,9 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 import java.io.Serializable;
 import java.util.*;
 
+#if ($table.hasSimpleDtoJsonicDecoration())
+import net.arnx.jsonic.JSONHint;
+#end
 #if ($database.isSimpleDtoClassificationDeployment() && $table.hasClassification())
 import ${database.simpleCDefPackage}.${database.simpleCDefClass};
 #end
@@ -300,6 +303,15 @@ public abstract class $myClassName implements Serializable {
 #end
      * @return The value of the column '${col.name}'. (NullAllowed)
      */
+#if ($col.hasSimpleDtoJsonicDecorationDatePattern())
+    @JSONHint(format="${col.simpleDtoJsonicDecorationDatePattern}")
+#end
+#if ($col.hasSimpleDtoJsonicDecorationTimestampPattern())
+    @JSONHint(format="${col.simpleDtoJsonicDecorationTimestampPattern}")
+#end
+#if ($col.hasSimpleDtoJsonicDecorationTimePattern())
+    @JSONHint(format="${col.simpleDtoJsonicDecorationTimePattern}")
+#end
     public ${col.javaNative} get${col.javaName}() {
         return ${col.simpleDtoVariableName};
     }

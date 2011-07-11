@@ -1405,6 +1405,14 @@ public class Column {
         return getJavaNative().equals("java.util.Date");
     }
 
+    public boolean isJavaNativeTimestamp() { // as pinpoint
+        return getJavaNative().equals("java.sql.Timestamp");
+    }
+
+    public boolean isJavaNativeTime() { // as pinpoint
+        return getJavaNative().equals("java.sql.Time");
+    }
+
     public boolean isJavaNativeByteArray() { // as pinpoint
         return getJavaNative().equals("byte[]");
     }
@@ -2132,6 +2140,50 @@ public class Column {
     //                                                                          ==========
     public String getSimpleDtoVariableName() {
         return getProperties().getSimpleDtoProperties().buildFieldName(getJavaName());
+    }
+
+    // -----------------------------------------------------
+    //                                     JSONIC Decoration
+    //                                     -----------------
+    public boolean hasSimpleDtoJsonicDecoration() {
+        // add a determination element when a new decoration is added
+        return hasSimpleDtoJsonicDecorationDatePattern() // Date
+                || hasSimpleDtoJsonicDecorationTimestampPattern() // Timestamp
+                || hasSimpleDtoJsonicDecorationTimePattern() // Time
+        ;
+    }
+
+    public boolean hasSimpleDtoJsonicDecorationDatePattern() {
+        if (!isJavaNativeUtilDate()) {
+            return false;
+        }
+        return getProperties().getSimpleDtoProperties().hasJsonicDecorationDatePattern();
+    }
+
+    public String getSimpleDtoJsonicDecorationDatePattern() {
+        return getProperties().getSimpleDtoProperties().getJsonicDecorationDatePattern();
+    }
+
+    public boolean hasSimpleDtoJsonicDecorationTimestampPattern() {
+        if (!isJavaNativeTimestamp()) {
+            return false;
+        }
+        return getProperties().getSimpleDtoProperties().hasJsonicDecorationTimestampPattern();
+    }
+
+    public String getSimpleDtoJsonicDecorationTimestampPattern() {
+        return getProperties().getSimpleDtoProperties().getJsonicDecorationTimestampPattern();
+    }
+
+    public boolean hasSimpleDtoJsonicDecorationTimePattern() {
+        if (!isJavaNativeTime()) {
+            return false;
+        }
+        return getProperties().getSimpleDtoProperties().hasJsonicDecorationTimePattern();
+    }
+
+    public String getSimpleDtoJsonicDecorationTimePattern() {
+        return getProperties().getSimpleDtoProperties().getJsonicDecorationTimePattern();
     }
 
     // ===================================================================================

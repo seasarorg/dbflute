@@ -110,10 +110,6 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         return getPropertyIfNullEmpty("extendedDtoSuffix");
     }
 
-    public boolean isClassificationDeployment() { //  if true, SimpleCDef should be true
-        return isProperty("isClassificationDeployment", false, getSimpleDtoDefinitionMap());
-    }
-
     // ===================================================================================
     //                                                                              Mapper
     //                                                                              ======
@@ -160,6 +156,54 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
             return true;
         }
         return targetSet.contains(classificationName);
+    }
+
+    public boolean isClassificationDeployment() { //  if true, SimpleCDef should be true
+        return isProperty("isClassificationDeployment", false, getSimpleDtoDefinitionMap());
+    }
+
+    // ===================================================================================
+    //                                                                              JSONIC
+    //                                                                              ======
+    protected Map<String, String> _jsonicDecorationMap;
+
+    protected Map<String, String> getJSonicDecorationMap() {
+        if (_jsonicDecorationMap != null) {
+            return _jsonicDecorationMap;
+        }
+        final String key = "jsonicDecorationMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, String> map = (Map<String, String>) getSimpleDtoDefinitionMap().get(key);
+        if (map != null) {
+            _jsonicDecorationMap = map;
+        } else {
+            _jsonicDecorationMap = DfCollectionUtil.emptyMap();
+        }
+        return _jsonicDecorationMap;
+    }
+
+    public boolean hasJsonicDecorationDatePattern() {
+        return getJsonicDecorationDatePattern() != null;
+    }
+
+    public String getJsonicDecorationDatePattern() {
+        return getJSonicDecorationMap().get("datePattern");
+    }
+
+    public boolean hasJsonicDecorationTimestampPattern() {
+        return getJsonicDecorationTimestampPattern() != null;
+    }
+
+    public String getJsonicDecorationTimestampPattern() {
+        return getJSonicDecorationMap().get("timestampPattern");
+    }
+
+    public boolean hasJsonicDecorationTimePattern() {
+        return getJsonicDecorationTimePattern() != null;
+    }
+
+    public String getJsonicDecorationTimePattern() {
+        return getJSonicDecorationMap().get("timePattern");
     }
 
     // ===================================================================================
