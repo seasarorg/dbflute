@@ -460,6 +460,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void enablePagingCountLater() {
+        getSqlClause().enablePagingCountLater(); // tell her about it
         _pagingCountLater = true;
     }
 

@@ -822,6 +822,12 @@ public interface SqlClause {
     //                                                                 ===================
     void acceptScalarSelectOption(ScalarSelectOption option);
 
+    // [DBFlute-0.9.8.8]
+    // ===================================================================================
+    //                                                                       Paging Option
+    //                                                                       =============
+    void enablePagingCountLater();
+
     // [DBFlute-0.9.7.2]
     // ===================================================================================
     //                                                                        Purpose Type

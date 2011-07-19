@@ -61,6 +61,21 @@ public class SqlClauseMySql extends AbstractSqlClause {
     }
 
     // ===================================================================================
+    //                                                                       Main Override
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                       Complete Clause
+    //                                       ---------------
+    @Override
+    public String getClause() {
+        if (_pagingCountLater && isSelectClauseNonUnionScalar() && isSelectClauseTypeCount()) {
+            return "select found_rows()";
+            // and sql_calc_found_rows is implemented at select-hint process
+        }
+        return super.getClause();
+    }
+
+    // ===================================================================================
     //                                                                    OrderBy Override
     //                                                                    ================
     @Override
@@ -110,7 +125,12 @@ public class SqlClauseMySql extends AbstractSqlClause {
      * {@inheritDoc}
      */
     protected String createSelectHint() {
-        return "";
+        final StringBuilder sb = new StringBuilder();
+        if (_pagingCountLater && isSelectClauseNonUnionSelect()) {
+            sb.append(" sql_calc_found_rows");
+            // and found_rows() is implemented at getClause override
+        }
+        return sb.toString();
     }
 
     /**

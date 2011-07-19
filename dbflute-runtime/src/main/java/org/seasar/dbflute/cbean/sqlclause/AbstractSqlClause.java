@@ -250,6 +250,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected ScalarSelectOption _scalarSelectOption;
 
     // -----------------------------------------------------
+    //                                         Paging Select
+    //                                         -------------
+    /** Is the count executed later? {Internal} */
+    protected boolean _pagingCountLater;
+
+    // -----------------------------------------------------
     //                                          Purpose Type
     //                                          ------------
     /** The purpose of condition-bean for check at condition-query. (NotNull) */
@@ -479,7 +485,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                         Select Clause
     //                                         -------------
     public String getSelectClause() {
-        if (isSelectClauseTypeScalar() && !hasUnionQuery()) {
+        if (isSelectClauseNonUnionScalar()) {
             return buildSelectClauseScalar(getBasePointAliasName());
         }
         // if it's a scalar-select, it always has union-query since here
@@ -640,6 +646,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                       Count or Scalar
     //                                       ---------------
+    protected boolean isSelectClauseTypeCount() {
+        return _selectClauseType.isCount();
+    }
+
     protected boolean isSelectClauseTypeScalar() {
         return _selectClauseType.isScalar();
     }
@@ -652,8 +662,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _selectClauseType.isSpecifiedScalar();
     }
 
+    protected boolean isSelectClauseNonUnionScalar() {
+        return !hasUnionQuery() && isSelectClauseTypeScalar();
+    }
+
+    protected boolean isSelectClauseNonUnionSelect() {
+        return !hasUnionQuery() && !isSelectClauseTypeScalar();
+    }
+
     protected String buildSelectClauseScalar(String aliasName) {
-        if (_selectClauseType.isCount()) {
+        if (isSelectClauseTypeCount()) {
             return buildSelectClauseCount();
         } else if (_selectClauseType.equals(SelectClauseType.MAX)) {
             return buildSelectClauseMax(aliasName);
@@ -2492,6 +2510,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             option.xjudgeDatabase(this);
         }
         _scalarSelectOption = option;
+    }
+
+    // [DBFlute-0.9.8.8]
+    // ===================================================================================
+    //                                                                       Paging Option
+    //                                                                       =============
+    public void enablePagingCountLater() {
+        _pagingCountLater = true;
     }
 
     // [DBFlute-0.9.7.2]
