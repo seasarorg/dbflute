@@ -315,7 +315,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     protected String doQuoteName(String name, boolean directUse) {
         final String beginQuote;
         final String endQuote;
-        if (getBasicProperties().isDatabaseSQLServer()) {
+        if (getBasicProperties().isDatabaseMySQL()) {
+            // it works in spite of ANSI_QUOTES
+            beginQuote = "`";
+            endQuote = beginQuote;
+        } else if (getBasicProperties().isDatabaseSQLServer()) {
             beginQuote = "[";
             endQuote = "]";
         } else {
