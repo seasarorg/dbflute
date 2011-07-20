@@ -40,6 +40,18 @@ public class ${myClassName} extends AbstractConditionBean {
     protected ${myConditionQueryClassName} _conditionQuery;
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}() {
+        if (${glDBFluteConfig}.getInstance().isPagingCountJoinCutting()) {
+            //enablePagingJoinCutting();
+        }
+        if (${glDBFluteConfig}.getInstance().isPagingCountLater()) {
+            enablePagingCountLater();
+        }
+    }
+
+    // ===================================================================================
     //                                                                           SqlClause
     //                                                                           =========
     @Override

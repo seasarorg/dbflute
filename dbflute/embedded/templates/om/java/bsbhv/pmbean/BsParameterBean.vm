@@ -162,6 +162,11 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #end
      */
     public ${myClassName}() {
+#if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
+        if (${glDBFluteConfig}.getInstance().isPagingCountLater()) {
+            enablePagingCountLater();
+        }
+#end
     }
 
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
