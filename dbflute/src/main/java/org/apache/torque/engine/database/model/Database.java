@@ -1567,12 +1567,12 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().getConditionQueryNotEqualDefinitionName();
     }
 
-    public boolean isPagingCountJoinCutting() {
-        return getProperties().getLittleAdjustmentProperties().isPagingCountJoinCutting();
-    }
-
     public boolean isPagingCountLater() {
         return getProperties().getLittleAdjustmentProperties().isPagingCountLater();
+    }
+
+    public boolean isPagingCountLeastJoin() {
+        return getProperties().getLittleAdjustmentProperties().isPagingCountLeastJoin();
     }
 
     public boolean isAvailableDatabaseNativeJDBC() {

@@ -75,8 +75,8 @@ public class ${glDBFluteConfig} {
     //                                         Configuration
     //                                         -------------
     // condition-bean or parameter-bean
-    protected boolean _pagingCountJoinCutting = ${database.isPagingCountJoinCutting()};
     protected boolean _pagingCountLater = ${database.isPagingCountLater()};
+    protected boolean _pagingCountLeastJoin = ${database.isPagingCountLeastJoin()};
     protected boolean _disableSelectIndex;
     protected boolean _emptyStringQueryAllowed;
     protected boolean _emptyStringParameterAllowed;
@@ -159,18 +159,6 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============
-    public boolean isPagingCountJoinCutting() {
-        return _pagingCountJoinCutting;
-    }
-
-    public void setPagingCountJoinCutting(boolean pagingCountJoinCutting) {
-        assertNotLocked();
-        if (_log.isInfoEnabled()) {
-            _log.info("...Setting pagingCountJoinCutting: " + pagingCountJoinCutting);
-        }
-        _pagingCountJoinCutting = pagingCountJoinCutting;
-    }
-
     public boolean isPagingCountLater() {
         return _pagingCountLater;
     }
@@ -181,6 +169,18 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting pagingCountLater: " + pagingCountLater);
         }
         _pagingCountLater = pagingCountLater;
+    }
+
+    public boolean isPagingCountLeastJoin() {
+        return _pagingCountLeastJoin;
+    }
+
+    public void setPagingCountLeastJoin(boolean pagingCountLeastJoin) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting pagingCountLeastJoin: " + pagingCountLeastJoin);
+        }
+        _pagingCountLeastJoin = pagingCountLeastJoin;
     }
 
     // ===================================================================================

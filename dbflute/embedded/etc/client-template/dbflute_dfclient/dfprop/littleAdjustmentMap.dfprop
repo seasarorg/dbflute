@@ -13,8 +13,8 @@
 # o isMakeEntityChaseRelation: (NotRequired - Default false)
 # o isEntityConvertEmptyStringToNull: (NotRequired - Default false)
 # o isMakeConditionQueryEqualEmptyString: (NotRequired - Default false)
-# o isPagingCountJoinCutting: (NotRequired - Default false)
 # o isPagingCountLater: (NotRequired - Default false)
+# o isPagingCountLeastJoin: (NotRequired - Default false)
 # o isMakeDeprecated: (NotRequired - Default false)
 # o isMakeRecentlyDeprecated: (NotRequired - Default true)
 # o extendedDBFluteInitializerClass: (NotRequired - Default '')
@@ -150,18 +150,6 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isPagingCountJoinCutting: (NotRequired - Default false)
-    #   [true]
-    #     Join statements in count SQL of paging select are cut
-    #     for performance tuning. (only countable joins are valid)
-    #
-    #   [false]
-    #     Non.
-    #
-    #; isPagingCountJoinCutting = false
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isPagingCountLater: (NotRequired - Default false)
     #   [true]
     #     The count SQL for paging are executed after paging main select.
@@ -170,6 +158,18 @@ map:{
     #     Non.
     #
     #; isPagingCountLater = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isPagingCountLeastJoin: (NotRequired - Default false)
+    #   [true]
+    #     Join statements in count SQL of paging select are trimmed
+    #     for performance tuning. (only countable joins are valid)
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isPagingCountLeastJoin = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

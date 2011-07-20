@@ -546,7 +546,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
                 }
                 sb.insert(0, "((").append("))");
-                cb.getSqlClause().registerWhereClause(sb.toString());
+                cb.getSqlClause().registerWhereClause(sb.toString(), aliasName);
             }
             public void qyOdFKAsc(${referrerCBClassName} cb) {
 #foreach ($col in $referrer.localColumnList)

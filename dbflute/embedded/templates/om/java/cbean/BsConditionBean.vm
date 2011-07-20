@@ -43,11 +43,11 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                         Constructor
     //                                                                         ===========
     public ${myClassName}() {
-        if (${glDBFluteConfig}.getInstance().isPagingCountJoinCutting()) {
-            //enablePagingJoinCutting();
-        }
         if (${glDBFluteConfig}.getInstance().isPagingCountLater()) {
             enablePagingCountLater();
+        }
+        if (${glDBFluteConfig}.getInstance().isPagingCountLeastJoin()) {
+            enablePagingCountLeastJoin();
         }
     }
 
