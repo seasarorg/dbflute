@@ -93,7 +93,7 @@ public class ForeignKey {
     protected String _name; // constraint name (no change because it's used by templates)
 
     protected Table _localTable;
-    protected String _foreignTableName;
+    protected String _foreignTableName; // may be user input (if additional FK)
 
     protected String _fixedCondition;
     protected String _fixedSuffix;

@@ -773,9 +773,8 @@ public class Column {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
-            final String foreignTableName = fk.getForeignTableName(); // may be user input
-            final String metaTableName = getDatabaseChecked().getTable(foreignTableName).getName();
-            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, metaTableName, delimiter));
+            final String foreignTableName = fk.getForeignTable().getName();
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTableName, delimiter));
         }
         sb.delete(0, delimiter.length());
         return sb.toString();

@@ -1059,7 +1059,7 @@ public class Table {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
-            final String foreignTableName = fk.getForeignTableName();
+            final String foreignTableName = fk.getForeignTable().getName();
             sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTableName, delimiter));
         }
         sb.delete(0, delimiter.length());
