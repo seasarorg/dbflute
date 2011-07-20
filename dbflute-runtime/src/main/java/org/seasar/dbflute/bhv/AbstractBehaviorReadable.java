@@ -271,11 +271,21 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             }
 
             public int count() {
-                return callback.callbackSelectCount(cb);
+                try {
+                    cb.getSqlClause().makePagingAdjustmentEffective();
+                    return callback.callbackSelectCount(cb);
+                } finally {
+                    cb.getSqlClause().ignorePagingAdjustment();
+                }
             }
 
             public List<ENTITY> paging() {
-                return callback.callbackSelectList(cb, entityType);
+                try {
+                    cb.getSqlClause().makePagingAdjustmentEffective();
+                    return callback.callbackSelectList(cb, entityType);
+                } finally {
+                    cb.getSqlClause().ignorePagingAdjustment();
+                }
             }
         };
     }

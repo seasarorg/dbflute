@@ -151,6 +151,20 @@ public class SimplePagingBean implements PagingBean, MapParameterBean<Object>, S
     /**
      * {@inheritDoc}
      */
+    public void disablePagingCountLater() {
+        _pagingCountLater = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void enablePagingReSelect() {
+        _pagingReSelect = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void disablePagingReSelect() {
         _pagingReSelect = false;
     }

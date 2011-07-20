@@ -72,7 +72,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     private StatementConfig _statementConfig;
 
     /** Is the count executed later? {Internal} */
-    private boolean _pagingCountLater;
+    private boolean _pagingCountLater; // the default value is on the DBFlute generator
 
     /** Can the paging re-select? {Internal} */
     private boolean _pagingReSelect = true;
@@ -462,6 +462,21 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void enablePagingCountLater() {
         getSqlClause().enablePagingCountLater(); // tell her about it
         _pagingCountLater = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void disablePagingCountLater() {
+        getSqlClause().disablePagingCountLater(); // tell her about it
+        _pagingCountLater = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void enablePagingReSelect() {
+        _pagingReSelect = true;
     }
 
     /**

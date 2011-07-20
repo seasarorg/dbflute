@@ -64,7 +64,7 @@ public class PagingInvoker<ENTITY> {
         final int allRecordCount;
         final List<ENTITY> selectedList;
         try {
-            if (pagingBean.canPagingCountLater()) { // can expect good performance
+            if (pagingBean.canPagingCountLater()) { // faster when last page selected (contains zero record)
                 selectedList = executePaging(handler);
                 if (isCurrentLastPage(selectedList, pagingBean)) {
                     allRecordCount = deriveAllRecordCountByLastPage(selectedList, pagingBean);
@@ -72,7 +72,8 @@ public class PagingInvoker<ENTITY> {
                     allRecordCount = executeCount(handler); // count later
                 }
                 checkSafetyResultIfNeed(safetyMaxResultSize, allRecordCount);
-            } else { // basically main here because it has been used for a long time
+            } else { // faster when zero record selected
+                // basically main here because it has been used for a long time
                 allRecordCount = executeCount(handler);
                 checkSafetyResultIfNeed(safetyMaxResultSize, allRecordCount);
                 if (allRecordCount == 0) {

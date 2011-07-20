@@ -252,7 +252,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                         Paging Select
     //                                         -------------
-    /** Is the count executed later? {Internal} */
+    /** Is the clause for paging select? */
+    protected boolean _pagingAdjustment;
+
+    /** Is the count executed later? */
     protected boolean _pagingCountLater;
 
     // -----------------------------------------------------
@@ -2514,10 +2517,26 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     // [DBFlute-0.9.8.8]
     // ===================================================================================
-    //                                                                       Paging Option
+    //                                                                       Paging Select
     //                                                                       =============
+    public void makePagingAdjustmentEffective() {
+        _pagingAdjustment = true;
+    }
+
+    public void ignorePagingAdjustment() {
+        _pagingAdjustment = false;
+    }
+
     public void enablePagingCountLater() {
         _pagingCountLater = true;
+    }
+
+    public void disablePagingCountLater() {
+        _pagingCountLater = false;
+    }
+
+    protected boolean isPagingCountLaterProcess() {
+        return _pagingAdjustment && _pagingCountLater;
     }
 
     // [DBFlute-0.9.7.2]

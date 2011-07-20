@@ -824,9 +824,15 @@ public interface SqlClause {
 
     // [DBFlute-0.9.8.8]
     // ===================================================================================
-    //                                                                       Paging Option
+    //                                                                       Paging Select
     //                                                                       =============
+    void makePagingAdjustmentEffective();
+
+    void ignorePagingAdjustment();
+
     void enablePagingCountLater();
+
+    void disablePagingCountLater();
 
     // [DBFlute-0.9.7.2]
     // ===================================================================================

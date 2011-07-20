@@ -92,11 +92,17 @@ public class MockConditionBean implements ConditionBean {
     public void enablePagingCountLater() {
     }
 
+    public void disablePagingCountLater() {
+    }
+
     public boolean canPagingReSelect() {
         return false;
     }
 
     public void disablePagingReSelect() {
+    }
+
+    public void enablePagingReSelect() {
     }
 
     public PagingBean fetchFirst(int fetchSize) {
