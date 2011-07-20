@@ -71,7 +71,7 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
      * Enable paging count-later that means counting after selecting.
      */
     void enablePagingCountLater();
-    
+
     /**
      * Disable paging count-later that means counting after selecting.
      */

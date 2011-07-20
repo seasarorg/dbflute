@@ -123,13 +123,13 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                      Purpose Assert
     //                                                                      ==============
     protected void assertColumn(String columnName) {
-        if (_purpose.isNoSpecifyColumnTwoOrMore()) {
+        if (_purpose.isNonSpecifyColumnTwoOrMore()) {
             if (_specifiedColumnMap != null && _specifiedColumnMap.size() > 0) {
                 throwSpecifyColumnTwoOrMoreColumnException(columnName);
             }
             // no specification is checked at an other timing
         }
-        if (_purpose.isNoSpecifyColumnWithDerivedReferrer()) {
+        if (_purpose.isNonSpecifyColumnWithDerivedReferrer()) {
             if (hasDerivedReferrer()) {
                 throwSpecifyColumnWithDerivedReferrerException(columnName, null);
             }
@@ -142,21 +142,21 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     }
 
     protected void assertRelation(String relationName) {
-        if (_purpose.isNoSpecifyRelation()) {
+        if (_purpose.isNonSpecifyRelation()) {
             throwSpecifyRelationIllegalPurposeException(relationName);
         }
     }
 
     protected void assertDerived(String referrerName) {
-        if (_purpose.isNoSpecifyDerivedReferrer()) {
+        if (_purpose.isNonSpecifyDerivedReferrer()) {
             throwSpecifyDerivedReferrerIllegalPurposeException(referrerName);
         }
-        if (_purpose.isNoSpecifyDerivedReferrerTwoOrMore()) {
+        if (_purpose.isNonSpecifyDerivedReferrerTwoOrMore()) {
             if (hasDerivedReferrer()) {
                 throwSpecifyDerivedReferrerTwoOrMoreException(referrerName);
             }
         }
-        if (_purpose.isNoSpecifyColumnWithDerivedReferrer()) {
+        if (_purpose.isNonSpecifyColumnWithDerivedReferrer()) {
             if (_specifiedColumnMap != null && _specifiedColumnMap.size() > 0) {
                 throwSpecifyColumnWithDerivedReferrerException(null, referrerName);
             }

@@ -1084,7 +1084,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void assertOrderByPurpose(String columnName) {
-        if (xgetSqlClause().getPurpose().isNoOrderBy()) {
+        if (xgetSqlClause().getPurpose().isNonOrderBy()) {
             throwOrderByIllegalPurposeException(columnName);
         }
     }

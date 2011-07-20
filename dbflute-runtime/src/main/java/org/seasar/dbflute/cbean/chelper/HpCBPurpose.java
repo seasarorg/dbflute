@@ -8,28 +8,29 @@ import org.seasar.dbflute.util.Srl;
 public enum HpCBPurpose {
 
     NORMAL_USE(new HpSpec()) // basic (all functions can be used)
-    , UNION_QUERY(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // Union
-    , EXISTS_REFERRER(new HpSpec().noSetupSelect().noSpecify().noOrderBy().subQuery()) // ExistsReferrer 
-    , IN_SCOPE_RELATION(new HpSpec().noSetupSelect().noSpecify().noOrderBy().subQuery()) // InScopeRelation
-    , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
-            .noSpecifyDerivedReferrerTwoOrMore().noOrderBy().subQuery()) // DerivedReferrer
-    , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
-            .noSpecifyDerivedReferrerTwoOrMore().noSpecifyRelation().noOrderBy()) // ScalarSelect
-    , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
-            .noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarCondition
+    , UNION_QUERY(new HpSpec().nonSetupSelect().nonSpecify().nonOrderBy()) // Union
+    , EXISTS_REFERRER(new HpSpec().nonSetupSelect().nonSpecify().nonOrderBy().subQuery()) // ExistsReferrer 
+    , IN_SCOPE_RELATION(new HpSpec().nonSetupSelect().nonSpecify().nonOrderBy().subQuery()) // InScopeRelation
+    , DERIVED_REFERRER(new HpSpec().nonSetupSelect().nonSpecifyColumnTwoOrMore().nonSpecifyColumnWithDerivedReferrer()
+            .nonSpecifyDerivedReferrerTwoOrMore().nonOrderBy().subQuery()) // DerivedReferrer
+    , SCALAR_SELECT(new HpSpec().nonSetupSelect().nonSpecifyColumnTwoOrMore().nonSpecifyColumnWithDerivedReferrer()
+            .nonSpecifyDerivedReferrerTwoOrMore().nonSpecifyRelation().nonOrderBy()) // ScalarSelect
+    , SCALAR_CONDITION(new HpSpec().nonSetupSelect().nonSpecifyColumnTwoOrMore().nonSpecifyRelation()
+            .nonSpecifyDerivedReferrer().nonOrderBy().subQuery()) // ScalarCondition
 
     // A purpose that can specify but not allowed to query
     // needs to switch condition-bean used in specification
     // to non-checked condition-bean.
     // Because specification uses query internally.
-    , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
-            .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // ColumnQuery
-    , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
-            .noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
-    , SPECIFIED_UPDATE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyDerivedReferrer().noQuery()) // SpecifiedUpdate
+    , COLUMN_QUERY(new HpSpec().nonSetupSelect().nonSpecifyColumnTwoOrMore().nonSpecifyColumnWithDerivedReferrer()
+            .nonSpecifyDerivedReferrerTwoOrMore().nonQuery()) // ColumnQuery
+    , VARYING_UPDATE(new HpSpec().nonSetupSelect().nonSpecifyColumnTwoOrMore().nonSpecifyRelation()
+            .nonSpecifyDerivedReferrer().nonQuery()) // VaryingUpdate
+    , SPECIFIED_UPDATE(new HpSpec().nonSetupSelect().nonSpecifyRelation().nonSpecifyDerivedReferrer().nonQuery()) // SpecifiedUpdate
 
     // for intoCB (not for resourceCB)
-    , QUERY_INSERT(new HpSpec().noSetupSelect().noSpecifyDerivedReferrer().noSpecifyRelation().noQuery().noOrderBy()) // QueryInsert
+    , QUERY_INSERT(new HpSpec().nonSetupSelect().nonSpecifyDerivedReferrer().nonSpecifyRelation().nonQuery()
+            .nonOrderBy()) // QueryInsert
 
     // QueryUpdate and QueryDelete are not defined here
     // because their condition-beans are created by an application
@@ -56,40 +57,40 @@ public enum HpCBPurpose {
     // any checks are not implemented
     // because it's so touch
 
-    public boolean isNoSetupSelect() {
-        return _spec.isNoSetupSelect();
+    public boolean isNonSetupSelect() {
+        return _spec.isNonSetupSelect();
     }
 
-    public boolean isNoSpecify() {
-        return _spec.isNoSpecify();
+    public boolean isNonSpecify() {
+        return _spec.isNonSpecify();
     }
 
-    public boolean isNoSpecifyColumnTwoOrMore() {
-        return _spec.isNoSpecifyColumnTwoOrMore();
+    public boolean isNonSpecifyColumnTwoOrMore() {
+        return _spec.isNonSpecifyColumnTwoOrMore();
     }
 
-    public boolean isNoSpecifyColumnWithDerivedReferrer() {
-        return _spec.isNoSpecifyColumnWithDerivedReferrer();
+    public boolean isNonSpecifyColumnWithDerivedReferrer() {
+        return _spec.isNonSpecifyColumnWithDerivedReferrer();
     }
 
-    public boolean isNoSpecifyRelation() {
-        return _spec.isNoSpecifyRelation();
+    public boolean isNonSpecifyRelation() {
+        return _spec.isNonSpecifyRelation();
     }
 
-    public boolean isNoSpecifyDerivedReferrer() {
-        return _spec.isNoSpecifyDerivedReferrer();
+    public boolean isNonSpecifyDerivedReferrer() {
+        return _spec.isNonSpecifyDerivedReferrer();
     }
 
-    public boolean isNoSpecifyDerivedReferrerTwoOrMore() {
-        return _spec.isNoSpecifyDerivedReferrerTwoOrMore();
+    public boolean isNonSpecifyDerivedReferrerTwoOrMore() {
+        return _spec.isNonSpecifyDerivedReferrerTwoOrMore();
     }
 
-    public boolean isNoQuery() {
-        return _spec.isNoQuery();
+    public boolean isNonQuery() {
+        return _spec.isNonQuery();
     }
 
-    public boolean isNoOrderBy() {
-        return _spec.isNoOrderBy();
+    public boolean isNonOrderBy() {
+        return _spec.isNonOrderBy();
     }
 
     public boolean isSubQuery() {
@@ -102,59 +103,59 @@ public enum HpCBPurpose {
     }
 
     public static class HpSpec {
-        protected boolean _noSetupSelect;
-        protected boolean _noSpecify;
-        protected boolean _noSpecifyColumnTwoOrMore;
-        protected boolean _noSpecifyColumnWithDerivedReferrer;
-        protected boolean _noSpecifyRelation;
-        protected boolean _noSpecifyDerivedReferrer;
-        protected boolean _noSpecifyDerivedReferrerTwoOrMore;
-        protected boolean _noQuery;
-        protected boolean _noOrderBy;
+        protected boolean _nonSetupSelect;
+        protected boolean _nonSpecify;
+        protected boolean _nonSpecifyColumnTwoOrMore;
+        protected boolean _nonSpecifyColumnWithDerivedReferrer;
+        protected boolean _nonSpecifyRelation;
+        protected boolean _nonSpecifyDerivedReferrer;
+        protected boolean _nonSpecifyDerivedReferrerTwoOrMore;
+        protected boolean _nonQuery;
+        protected boolean _nonOrderBy;
         protected boolean _subQuery;
 
-        public HpSpec noSetupSelect() {
-            _noSetupSelect = true;
+        public HpSpec nonSetupSelect() {
+            _nonSetupSelect = true;
             return this;
         }
 
-        public HpSpec noSpecify() {
-            _noSpecify = true;
+        public HpSpec nonSpecify() {
+            _nonSpecify = true;
             return this;
         }
 
-        public HpSpec noSpecifyColumnTwoOrMore() {
-            _noSpecifyColumnTwoOrMore = true;
+        public HpSpec nonSpecifyColumnTwoOrMore() {
+            _nonSpecifyColumnTwoOrMore = true;
             return this;
         }
 
-        public HpSpec noSpecifyColumnWithDerivedReferrer() {
-            _noSpecifyColumnWithDerivedReferrer = true;
+        public HpSpec nonSpecifyColumnWithDerivedReferrer() {
+            _nonSpecifyColumnWithDerivedReferrer = true;
             return this;
         }
 
-        public HpSpec noSpecifyRelation() {
-            _noSpecifyRelation = true;
+        public HpSpec nonSpecifyRelation() {
+            _nonSpecifyRelation = true;
             return this;
         }
 
-        public HpSpec noSpecifyDerivedReferrer() {
-            _noSpecifyDerivedReferrer = true;
+        public HpSpec nonSpecifyDerivedReferrer() {
+            _nonSpecifyDerivedReferrer = true;
             return this;
         }
 
-        public HpSpec noSpecifyDerivedReferrerTwoOrMore() {
-            _noSpecifyDerivedReferrerTwoOrMore = true;
+        public HpSpec nonSpecifyDerivedReferrerTwoOrMore() {
+            _nonSpecifyDerivedReferrerTwoOrMore = true;
             return this;
         }
 
-        public HpSpec noQuery() {
-            _noQuery = true;
+        public HpSpec nonQuery() {
+            _nonQuery = true;
             return this;
         }
 
-        public HpSpec noOrderBy() {
-            _noOrderBy = true;
+        public HpSpec nonOrderBy() {
+            _nonOrderBy = true;
             return this;
         }
 
@@ -163,40 +164,40 @@ public enum HpCBPurpose {
             return this;
         }
 
-        public boolean isNoSetupSelect() {
-            return _noSetupSelect;
+        public boolean isNonSetupSelect() {
+            return _nonSetupSelect;
         }
 
-        public boolean isNoSpecify() {
-            return _noSpecify;
+        public boolean isNonSpecify() {
+            return _nonSpecify;
         }
 
-        public boolean isNoSpecifyColumnTwoOrMore() {
-            return _noSpecifyColumnTwoOrMore;
+        public boolean isNonSpecifyColumnTwoOrMore() {
+            return _nonSpecifyColumnTwoOrMore;
         }
 
-        public boolean isNoSpecifyColumnWithDerivedReferrer() {
-            return _noSpecifyColumnWithDerivedReferrer;
+        public boolean isNonSpecifyColumnWithDerivedReferrer() {
+            return _nonSpecifyColumnWithDerivedReferrer;
         }
 
-        public boolean isNoSpecifyRelation() {
-            return _noSpecifyRelation;
+        public boolean isNonSpecifyRelation() {
+            return _nonSpecifyRelation;
         }
 
-        public boolean isNoSpecifyDerivedReferrer() {
-            return _noSpecifyDerivedReferrer;
+        public boolean isNonSpecifyDerivedReferrer() {
+            return _nonSpecifyDerivedReferrer;
         }
 
-        public boolean isNoSpecifyDerivedReferrerTwoOrMore() {
-            return _noSpecifyDerivedReferrerTwoOrMore;
+        public boolean isNonSpecifyDerivedReferrerTwoOrMore() {
+            return _nonSpecifyDerivedReferrerTwoOrMore;
         }
 
-        public boolean isNoQuery() {
-            return _noQuery;
+        public boolean isNonQuery() {
+            return _nonQuery;
         }
 
-        public boolean isNoOrderBy() {
-            return _noOrderBy;
+        public boolean isNonOrderBy() {
+            return _nonOrderBy;
         }
 
         public boolean isSubQuery() {

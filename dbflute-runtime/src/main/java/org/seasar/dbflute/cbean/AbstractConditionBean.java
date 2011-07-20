@@ -143,7 +143,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void assertSetupSelectPurpose(String foreignPropertyName) {
-        if (_purpose.isNoSetupSelect()) {
+        if (_purpose.isNonSetupSelect()) {
             final String titleName = DfTypeUtil.toClassTitle(this);
             throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
         }
@@ -172,7 +172,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected abstract HpAbstractSpecification<? extends ConditionQuery> localSp();
 
     protected void assertSpecifyPurpose() {
-        if (_purpose.isNoSpecify()) {
+        if (_purpose.isNonSpecify()) {
             throwSpecifyIllegalPurposeException();
         }
     }
@@ -185,7 +185,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                               Query
     //                                                                               =====
     protected void assertQueryPurpose() {
-        if (_purpose.isNoQuery()) {
+        if (_purpose.isNonQuery()) {
             throwQueryIllegalPurposeException();
         }
     }
