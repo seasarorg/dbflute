@@ -212,7 +212,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         rightCalcSp.setLeftCalcSp(leftCalcSp);
 
         final QueryClause queryClause = xcreateColQyClause(leftColumn, operand, rightColumn, rightCalcSp);
-        getSqlClause().registerWhereClause(queryClause);
+        xregisterColumnQueryClause(queryClause, leftCalcSp, rightCalcSp);
         return rightCalcSp;
     }
 
@@ -221,19 +221,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
         if (realName == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
-        //        final String leftSource;
-        //        {
-        //            final ColumnRealName realName = leftCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
-        //            if (realName != null) {
-        //                final ColumnInfo columnInfo = leftCB.getSqlClause().getSpecifiedColumnInfoAsOne();
-        //                leftSource = decrypt(columnInfo, realName.toString());
-        //            } else {
-        //                leftSource = leftCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
-        //            }
-        //        }
-        //        if (leftSource == null) {
-        //            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
-        //        }
         return xbuildColQyColumn(leftCB, realName.toString(), "left");
     }
 
@@ -318,16 +305,19 @@ public abstract class AbstractConditionBean implements ConditionBean {
         };
     }
 
-    protected boolean hasSubQueryBeginOnFirstLine(String columnExp) {
-        return SubQueryIndentProcessor.hasSubQueryBeginOnFirstLine(columnExp);
-    }
-
     protected boolean hasSubQueryEndOnLastLine(String columnExp) {
         return SubQueryIndentProcessor.hasSubQueryEndOnLastLine(columnExp);
     }
 
     protected String reflectToSubQueryEndOnLastLine(String columnExp, String inserted) {
         return SubQueryIndentProcessor.moveSubQueryEndToRear(columnExp + inserted);
+    }
+
+    protected <CB extends ConditionBean> void xregisterColumnQueryClause(QueryClause queryClause,
+            HpCalcSpecification<CB> leftCalcSp, HpCalcSpecification<CB> rightCalcSp) {
+        final String leftAlias = leftCalcSp.getResolvedSpecifiedTableAliasName();
+        final String rightAlias = rightCalcSp.getResolvedSpecifiedTableAliasName();
+        getSqlClause().registerWhereClause(queryClause, leftAlias, rightAlias);
     }
 
     // [DBFlute-0.9.6.3]
@@ -460,16 +450,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void enablePagingCountLater() {
-        getSqlClause().enablePagingCountLater(); // tell her about it
         _pagingCountLater = true;
+        getSqlClause().enablePagingCountLater(); // tell her about it
     }
 
     /**
      * {@inheritDoc}
      */
     public void disablePagingCountLater() {
-        getSqlClause().disablePagingCountLater(); // tell her about it
         _pagingCountLater = false;
+        getSqlClause().disablePagingCountLater(); // tell her about it
     }
 
     /**
@@ -484,6 +474,21 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void disablePagingReSelect() {
         _pagingReSelect = false;
+    }
+
+    // ConditionBean original
+    /**
+     * Enable paging count-least-join that means least joined on count select.
+     */
+    public void enablePagingCountLeastJoin() {
+        getSqlClause().enablePagingCountLeastJoin();
+    }
+
+    /**
+     * Disable paging count-least-join that means least joined on count select.
+     */
+    public void disablePagingCountLeastJoin() {
+        getSqlClause().disablePagingCountLeastJoin();
     }
 
     // -----------------------------------------------------

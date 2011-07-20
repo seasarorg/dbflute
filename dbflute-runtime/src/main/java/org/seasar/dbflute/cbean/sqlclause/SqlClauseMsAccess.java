@@ -63,16 +63,17 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
     //                                                                  OuterJoin Override
     //                                                                  ==================
     @Override
-    public void registerOuterJoin(String baseTableDbName, String joinTableDbName, String aliasName,
-            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
+    public void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
             FixedConditionResolver fixedConditionResolver) {
-        super.registerOuterJoin(baseTableDbName, joinTableDbName, aliasName, joinOnMap, null, null);
+        super.registerOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName, joinOnMap,
+                fixedCondition, fixedConditionResolver);
         if (fixedCondition != null) {
             if (fixedConditionResolver != null) {
                 fixedCondition = fixedConditionResolver.resolveVariable(fixedCondition);
             }
-            final String clause = Srl.replace(fixedCondition, aliasName + ".", "");
-            registerOuterJoinInlineWhereClause(aliasName, clause, false);
+            final String clause = Srl.replace(fixedCondition, foreignAliasName + ".", "");
+            registerOuterJoinInlineWhereClause(foreignAliasName, clause, false);
         }
     }
 

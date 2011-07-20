@@ -240,7 +240,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The manager of geared cipher. (also for saving) (NullAllowed) */
     protected GearedCipherManager _gearedCipherManager;
 
-    /** Does it suppress decription for select columns? */
+    /** Does it suppress description for select columns? */
     protected boolean _suppressSelectColumnDecryption;
 
     // -----------------------------------------------------
@@ -254,6 +254,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                         -------------
     /** Is the clause for paging select? */
     protected boolean _pagingAdjustment;
+
+    /** Is the joins of count slimmed? */
+    protected boolean _pagingCountLeastJoin;
 
     /** Is the count executed later? */
     protected boolean _pagingCountLater;
@@ -665,6 +668,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _selectClauseType.isSpecifiedScalar();
     }
 
+    protected boolean isSelectClauseTypeNonUnionCount() {
+        return !hasUnionQuery() && isSelectClauseTypeCount();
+    }
+
     protected boolean isSelectClauseNonUnionScalar() {
         return !hasUnionQuery() && isSelectClauseTypeScalar();
     }
@@ -831,9 +838,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         for (Entry<String, LeftOuterJoinInfo> outerJoinEntry : outerJoinSet) {
             final String foreignAliasName = outerJoinEntry.getKey();
             final LeftOuterJoinInfo joinInfo = outerJoinEntry.getValue();
+            if (isTrimmedJoin(joinInfo)) {
+                continue; // means only joined countable
+            }
             buildLeftOuterJoinClause(sb, foreignAliasName, joinInfo);
         }
         return sb.toString();
+    }
+
+    protected boolean isTrimmedJoin(LeftOuterJoinInfo joinInfo) {
+        return canPagingCountLeastJoin() && isSelectClauseTypeNonUnionCount() && !joinInfo.isCountableJoin();
     }
 
     protected void buildLeftOuterJoinClause(StringBuilder sb, String foreignAliasName, LeftOuterJoinInfo joinInfo) {
@@ -1074,38 +1088,58 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public void registerOuterJoin(String localTableDbName, String foreignTableDbName, String foreignAliasName,
-            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
+    public void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
             FixedConditionResolver fixedConditionResolver) {
         assertAlreadyOuterJoin(foreignAliasName);
         assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
         final LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
         joinInfo.setForeignAliasName(foreignAliasName);
-        joinInfo.setLocalTableDbName(localTableDbName);
         joinInfo.setForeignTableDbName(foreignTableDbName);
+        joinInfo.setLocalAliasName(localAliasName);
+        joinInfo.setLocalTableDbName(localTableDbName);
         joinInfo.setJoinOnMap(joinOnMap);
         joinInfo.setFixedCondition(fixedCondition);
         joinInfo.setFixedConditionResolver(fixedConditionResolver);
-        if (_innerJoinEffective) { // basically false
-            joinInfo.setInnerJoin(true);
-        }
 
         // it should be resolved before registration because
         // the process may have Query(Relation) as precondition
         joinInfo.resolveFixedCondition();
 
         getOuterJoinMap().put(foreignAliasName, joinInfo);
+
+        if (_innerJoinEffective) { // basically false
+            // InnerJoin should be specified per joined table
+            // because it's basically for performance tuning
+            joinInfo.setInnerJoin(true);
+            reflectUnderInnerJoinToJoin(localAliasName);
+        }
+    }
+
+    protected void reflectUnderInnerJoinToJoin(final String localAliasName) {
+        String aliasKey = localAliasName;
+        while (true) {
+            final LeftOuterJoinInfo joinInfo = getOuterJoinMap().get(aliasKey);
+            if (joinInfo == null) { // means base point
+                break;
+            }
+            if (joinInfo.isInnerJoin()) { // means already traced
+                break;
+            }
+            joinInfo.setInnerJoin(true);
+            aliasKey = joinInfo.getLocalAliasName(); // trace back toward base point
+        }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void changeToInnerJoin(String aliasName) {
+    public void changeToInnerJoin(String foreignAliasName) {
         final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
-        final LeftOuterJoinInfo joinInfo = outerJoinMap.get(aliasName);
+        final LeftOuterJoinInfo joinInfo = outerJoinMap.get(foreignAliasName);
         if (joinInfo == null) {
             String msg = "The aliasName should be registered:";
-            msg = msg + " aliasName=" + aliasName + " outerJoinMap=" + outerJoinMap;
+            msg = msg + " aliasName=" + foreignAliasName + " outerJoinMap=" + outerJoinMap;
             throw new IllegalStateException(msg);
         }
         joinInfo.setInnerJoin(true);
@@ -1132,9 +1166,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _outerJoinMap != null && !_outerJoinMap.isEmpty();
     }
 
-    protected void assertAlreadyOuterJoin(String aliasName) {
-        if (getOuterJoinMap().containsKey(aliasName)) {
-            String msg = "The alias name have already registered in outer join: " + aliasName;
+    protected void assertAlreadyOuterJoin(String foreignAliasName) {
+        if (getOuterJoinMap().containsKey(foreignAliasName)) {
+            String msg = "The foreign alias name have already registered in outer join: " + foreignAliasName;
             throw new IllegalStateException(msg);
         }
     }
@@ -1152,30 +1186,55 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                                Normal
     //                                                ------
+    /**
+     * {@inheritDoc}
+     */
     public void registerWhereClause(ColumnRealName columnRealName // real name of column
             , ConditionKey key, ConditionValue value // basic resources
-            , ColumnFunctionCipher cipher) { // optional resources
-        registerWhereClause(columnRealName, key, value, cipher, null);
-    }
-
-    public void registerWhereClause(ColumnRealName columnRealName // real name of column
-            , ConditionKey key, ConditionValue value // basic resources
-            , ColumnFunctionCipher cipher, ConditionOption option) { // optional resources
+            , ColumnFunctionCipher cipher, ConditionOption option // optional resources
+            , String usedAliasName) { // table alias name used on where clause
         assertObjectNotNull("columnRealName", columnRealName);
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, false, false);
+        reflectWhereUsedToJoin(usedAliasName);
     }
 
-    public void registerWhereClause(String clause) {
+    /**
+     * {@inheritDoc}
+     */
+    public void registerWhereClause(String clause, String usedAliasName) {
         assertStringNotNullAndNotTrimmedEmpty("clause", clause);
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, clause);
+        reflectWhereUsedToJoin(usedAliasName);
     }
 
-    public void registerWhereClause(QueryClause clause) {
+    /**
+     * {@inheritDoc}
+     */
+    public void registerWhereClause(QueryClause clause, String usedAliasName, String... moreNames) {
         assertObjectNotNull("clause", clause);
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, clause);
+        reflectWhereUsedToJoin(usedAliasName);
+        for (String moreName : moreNames) {
+            reflectWhereUsedToJoin(moreName);
+        }
+    }
+
+    protected void reflectWhereUsedToJoin(final String usedAliasName) {
+        String aliasKey = usedAliasName;
+        while (true) {
+            final LeftOuterJoinInfo joinInfo = getOuterJoinMap().get(aliasKey);
+            if (joinInfo == null) { // means base point
+                break;
+            }
+            if (joinInfo.isWhereUsedJoin()) { // means already traced
+                break;
+            }
+            joinInfo.setWhereUsedJoin(true);
+            aliasKey = joinInfo.getLocalAliasName(); // trace back toward base point
+        }
     }
 
     protected List<QueryClause> getWhereClauseList4Register() {
@@ -1186,6 +1245,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void exchangeFirstWhereClauseForLastOne() {
         final List<QueryClause> whereList = getWhereList();
         if (whereList.size() > 1) {
@@ -1203,6 +1265,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _whereList;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean hasWhereClause() {
         return _whereList != null && !_whereList.isEmpty();
     }
@@ -1251,40 +1316,40 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                In-line for Outer Join
     //                                ----------------------
-    public void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
-            ConditionValue value, ColumnFunctionCipher cipher, boolean onClause) {
-        registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, value, cipher, null, onClause);
+    public void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName,
+            ConditionKey key, ConditionValue value, ColumnFunctionCipher cipher, boolean onClause) {
+        registerOuterJoinInlineWhereClause(foreignAliasName, columnSqlName, key, value, cipher, null, onClause);
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName // table alias of column 
+    public void registerOuterJoinInlineWhereClause(String foreignAliasName // foreign alias of column 
             , ColumnSqlName columnSqlName // SQL name of column
             , ConditionKey key, ConditionValue value // basic resources
             , ColumnFunctionCipher cipher, ConditionOption option // optional resources
             , boolean onClause) {
-        assertNotYetOuterJoin(aliasName);
-        final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
-        final ColumnRealName columnRealName = new ColumnRealName((onClause ? aliasName : ""), columnSqlName);
+        assertNotYetOuterJoin(foreignAliasName);
+        final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(foreignAliasName, onClause);
+        final ColumnRealName columnRealName = new ColumnRealName((onClause ? foreignAliasName : ""), columnSqlName);
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, true, onClause);
     }
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String clause, boolean onClause) {
-        assertNotYetOuterJoin(aliasName);
-        final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClause);
+    public void registerOuterJoinInlineWhereClause(String foreignAliasName, String clause, boolean onClause) {
+        assertNotYetOuterJoin(foreignAliasName);
+        final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(foreignAliasName, onClause);
         doRegisterWhereClause(clauseList, clause);
     }
 
-    protected List<QueryClause> getOuterJoinInlineWhereClauseList4Register(String aliasName, boolean onClause) {
-        final LeftOuterJoinInfo joinInfo = getOuterJoinMap().get(aliasName);
+    protected List<QueryClause> getOuterJoinInlineWhereClauseList4Register(String foreignAliasName, boolean onClause) {
+        final LeftOuterJoinInfo joinInfo = getOuterJoinMap().get(foreignAliasName);
         final List<QueryClause> clauseList;
         if (onClause) {
             if (_orScopeQueryEffective) {
-                clauseList = getTmpOrAdditionalOnClauseList(aliasName);
+                clauseList = getTmpOrAdditionalOnClauseList(foreignAliasName);
             } else {
                 clauseList = joinInfo.getAdditionalOnClauseList();
             }
         } else {
             if (_orScopeQueryEffective) {
-                clauseList = getTmpOrOuterJoinInlineClauseList(aliasName);
+                clauseList = getTmpOrOuterJoinInlineClauseList(foreignAliasName);
             } else {
                 clauseList = joinInfo.getInlineWhereClauseList();
             }
@@ -2527,6 +2592,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _pagingAdjustment = false;
     }
 
+    // -----------------------------------------------------
+    //                                           Count Later
+    //                                           -----------
     public void enablePagingCountLater() {
         _pagingCountLater = true;
     }
@@ -2535,8 +2603,23 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _pagingCountLater = false;
     }
 
-    protected boolean isPagingCountLaterProcess() {
+    protected boolean canPagingCountLater() {
         return _pagingAdjustment && _pagingCountLater;
+    }
+
+    // -----------------------------------------------------
+    //                                        Count Trimming
+    //                                        --------------
+    public void enablePagingCountLeastJoin() {
+        _pagingCountLeastJoin = true;
+    }
+
+    public void disablePagingCountLeastJoin() {
+        _pagingCountLeastJoin = false;
+    }
+
+    protected boolean canPagingCountLeastJoin() {
+        return _pagingAdjustment && _pagingCountLeastJoin;
     }
 
     // [DBFlute-0.9.7.2]

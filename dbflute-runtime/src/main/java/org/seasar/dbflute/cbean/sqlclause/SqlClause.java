@@ -198,22 +198,23 @@ public interface SqlClause {
     //                                                                           =========
     /**
      * Register outer-join.
-     * @param localTableDbName The DB name of local table. {[localTableDbName] left outer join} (NotNull)
-     * @param foreignTableDbName The DB name of foreign table. {left outer join [foreignTableDbName]} (NotNull)
-     * @param foreignAliasName The alias name of foreign table. {left outer join joinTableName [foreignAliasName]} (NotNull and Unique per invoking method)
+     * @param foreignAliasName The alias name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull, Unique)
+     * @param foreignTableDbName The DB name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull)
+     * @param localAliasName The alias name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
+     * @param localTableDbName The DB name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
      * @param joinOnMap The map of join condition on on-clause. (NotNull)
      * @param fixedCondition The fixed condition on on-clause. (NullAllowed: if null, means no fixed condition)
      * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
-    void registerOuterJoin(String localTableDbName, String foreignTableDbName, String foreignAliasName,
-            Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
+    void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
             FixedConditionResolver fixedConditionResolver);
 
     /**
      * Change the join type for the relation to inner join.
-     * @param aliasName The registered alias name of join table. (NotNull and Unique per invoking method)
+     * @param foreignAliasName The foreign alias name of join table. (NotNull and Unique per invoking method)
      */
-    void changeToInnerJoin(String aliasName);
+    void changeToInnerJoin(String foreignAliasName);
 
     SqlClause makeInnerJoinEffective();
 
@@ -229,21 +230,25 @@ public interface SqlClause {
      * @param value The value of condition. (NotNull)
      * @param cipher The cipher of column by function. (NullAllowed)
      * @param option The option of condition. (NullAllowed)
+     * @param usedAliasName The alias name of table used on the where clause. (NotNull)
      */
     void registerWhereClause(ColumnRealName columnRealName, ConditionKey key, ConditionValue value,
-            ColumnFunctionCipher cipher, ConditionOption option);
+            ColumnFunctionCipher cipher, ConditionOption option, String usedAliasName);
 
     /**
      * Register 'where' clause.
      * @param clause The string clause of 'where'. (NotNull)
+     * @param usedAliasName The alias name of table used on the where clause. (NotNull)
      */
-    void registerWhereClause(String clause);
+    void registerWhereClause(String clause, String usedAliasName);
 
     /**
      * Register 'where' clause.
      * @param clause The query clause of 'where'. (NotNull)
+     * @param usedAliasName The alias name of table used on the where clause. (NotNull)
+     * @param moreNames The more alias names used on the where clause. (NotNull)
      */
-    void registerWhereClause(QueryClause clause);
+    void registerWhereClause(QueryClause clause, String usedAliasName, String... moreNames);
 
     /**
      * Exchange first The clause of 'where' for last one.
@@ -268,13 +273,13 @@ public interface SqlClause {
 
     void registerBaseTableInlineWhereClause(String value);
 
-    void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
+    void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName, ConditionKey key,
             ConditionValue value, ColumnFunctionCipher cipher, boolean onClause);
 
-    void registerOuterJoinInlineWhereClause(String aliasName, ColumnSqlName columnSqlName, ConditionKey key,
+    void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName, ConditionKey key,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option, boolean onClause);
 
-    void registerOuterJoinInlineWhereClause(String aliasName, String clause, boolean onClause);
+    void registerOuterJoinInlineWhereClause(String foreignAliasName, String clause, boolean onClause);
 
     // ===================================================================================
     //                                                                        OrScopeQuery
@@ -707,8 +712,8 @@ public interface SqlClause {
      */
     public static enum SelectClauseType {
         COLUMNS(false, false, false, false) // normal
-        // count (also scalar) mainly for Behavior.selectCount(cb) or selectPage(cb)
-        , UNIQUE_COUNT(true, true, true, false), PLAIN_COUNT(true, true, false, false)
+        , UNIQUE_COUNT(true, true, true, false) // basically for selectCount(cb)
+        , PLAIN_COUNT(true, true, false, false) // basically for count of selectPage(cb)
         // scalar mainly for Behavior.scalarSelect(cb)
         , MAX(false, true, true, true), MIN(false, true, true, true) // max(), min()
         , SUM(false, true, true, true), AVG(false, true, true, true); // sum(), avg()
@@ -833,6 +838,10 @@ public interface SqlClause {
     void enablePagingCountLater();
 
     void disablePagingCountLater();
+
+    void enablePagingCountLeastJoin();
+
+    void disablePagingCountLeastJoin();
 
     // [DBFlute-0.9.7.2]
     // ===================================================================================

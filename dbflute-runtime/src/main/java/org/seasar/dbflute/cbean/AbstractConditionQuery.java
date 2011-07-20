@@ -357,11 +357,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             final String foreign = entry.getValue();
             joinOnMap.put(toColumnRealName(local), foreignCQ.toColumnRealName(foreign));
         }
-        final String localTable = getTableDbName();
-        final String foreignTable = foreignCQ.getTableDbName();
         final String foreignAlias = foreignCQ.xgetAliasName();
+        final String foreignTable = foreignCQ.getTableDbName();
+        final String localAlias = xgetAliasName();
+        final String localTable = getTableDbName();
         final FixedConditionResolver resolver = createFixedConditionResolver(foreignCQ, joinOnMap);
-        xgetSqlClause().registerOuterJoin(localTable, foreignTable, foreignAlias, joinOnMap, fixedCondition, resolver);
+        xgetSqlClause().registerOuterJoin(foreignAlias, foreignTable, localAlias, localTable, joinOnMap,
+                fixedCondition, resolver);
     }
 
     protected FixedConditionResolver createFixedConditionResolver(ConditionQuery foreignCQ,
@@ -990,15 +992,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
-        // If Java, it is necessary to use uncapPropName!
+        // if Java, it is necessary to use uncapPropName
         final String location = xgetLocation(uncapPropName);
         key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, location, option);
+        final ColumnRealName columnRealName = toColumnRealName(columnDbName);
         final ColumnFunctionCipher cipher = xgetSqlClause().findColumnFunctionCipher(columnInfo);
-        xgetSqlClause().registerWhereClause(toColumnRealName(columnDbName), key, cvalue, cipher, option);
+        final String usedAliasName = xgetAliasName();
+        xgetSqlClause().registerWhereClause(columnRealName, key, cvalue, cipher, option, usedAliasName);
     }
 
     protected void registerWhereClause(String whereClause) {
-        xgetSqlClause().registerWhereClause(whereClause);
+        final String usedAliasName = xgetAliasName();
+        xgetSqlClause().registerWhereClause(whereClause, usedAliasName);
     }
 
     protected void registerInlineWhereClause(String whereClause) {

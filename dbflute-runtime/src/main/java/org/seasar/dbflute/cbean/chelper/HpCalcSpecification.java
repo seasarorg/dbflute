@@ -91,6 +91,14 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return null;
     }
 
+    public String getResolvedSpecifiedTableAliasName() { // resolved plain or deriving sub-query
+        final ColumnRealName columnRealName = _specifedCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
+        if (columnRealName != null) {
+            return columnRealName.getTableAliasName();
+        }
+        return _specifedCB.getSqlClause().getSpecifiedDerivingAliasNameAsOne();
+    }
+
     // ===================================================================================
     //                                                                         Calculation
     //                                                                         ===========

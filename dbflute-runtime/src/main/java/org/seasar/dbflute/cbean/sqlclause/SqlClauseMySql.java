@@ -76,7 +76,7 @@ public class SqlClauseMySql extends AbstractSqlClause {
     }
 
     protected boolean canFoundRows() {
-        return isPagingCountLaterProcess() && isSelectClauseNonUnionScalar() && isSelectClauseTypeCount();
+        return canPagingCountLater() && isSelectClauseTypeNonUnionCount();
     }
 
     // ===================================================================================
@@ -138,7 +138,7 @@ public class SqlClauseMySql extends AbstractSqlClause {
     }
 
     protected boolean canSqlCalcFoundRows() {
-        return isPagingCountLaterProcess() && isSelectClauseNonUnionSelect();
+        return canPagingCountLater() && isSelectClauseNonUnionSelect();
     }
 
     /**
