@@ -34,6 +34,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.InternalMapContext;
+import org.seasar.dbflute.resource.ManualThreadDataSourceHandler;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
@@ -41,6 +42,7 @@ import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
 
 /**
  * The basic handler to execute SQL. <br />
+ * All SQL executions of DBFlute are under this handler. <br />
  * This is always created when executing so it's non thread safe. <br />
  * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
@@ -264,10 +266,20 @@ public abstract class TnAbstractBasicSqlHandler {
     }
 
     // ===================================================================================
-    //                                                                      JDBC Delegator
-    //                                                                      ==============
+    //                                                                       JDBC Handling
+    //                                                                       =============
+    /**
+     * Get the database connection from data source. <br />
+     * getting connection for SQL executions is only here. <br />
+     * (for meta data is at TnBeanMetaDataFactoryImpl)
+     * @return The instance of connection. (NotNull)
+     */
     protected Connection getConnection() {
         try {
+            final ManualThreadDataSourceHandler handler = ManualThreadDataSourceHandler.getDataSourceHandler();
+            if (handler != null) {
+                return handler.getConnection(_dataSource);
+            }
             return _dataSource.getConnection();
         } catch (SQLException e) {
             handleSQLException(e, null);

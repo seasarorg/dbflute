@@ -22,6 +22,7 @@ import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.PagingStatusInvalidException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.resource.ManualThreadDataSourceHandler;
 
 /**
  * The invoker of paging.
@@ -61,9 +62,13 @@ public class PagingInvoker<ENTITY> {
         }
         final int safetyMaxResultSize = pagingBean.getSafetyMaxResultSize();
         final ResultBeanBuilder<ENTITY> builder = createResultBeanBuilder();
-        final int allRecordCount;
-        final List<ENTITY> selectedList;
+        final boolean useManualThreadDataSource = isUseManualThreadDataSource();
+        if (useManualThreadDataSource) {
+            ManualThreadDataSourceHandler.prepareDataSourceHandler();
+        }
         try {
+            final int allRecordCount;
+            final List<ENTITY> selectedList;
             if (pagingBean.canPagingCountLater()) { // faster when last page selected (contains zero record)
                 selectedList = executePaging(handler);
                 if (isCurrentLastPage(selectedList, pagingBean)) {
@@ -90,6 +95,9 @@ public class PagingInvoker<ENTITY> {
             }
         } finally {
             pagingBean.xsetPaging(true); // restore its paging state finally
+            if (useManualThreadDataSource) {
+                ManualThreadDataSourceHandler.closeDataSourceHandler();
+            }
         }
     }
 
@@ -174,11 +182,8 @@ public class PagingInvoker<ENTITY> {
         }
     }
 
-    protected void throwPagingOverSafetySizeException(int safetyMaxResultSize, int allRecordCount) {
-        // here simple message because an entry method catches this
-        String msg = "The paging was over the specified safety size:";
-        msg = msg + " " + allRecordCount + " > " + safetyMaxResultSize;
-        throw new PagingOverSafetySizeException(msg, safetyMaxResultSize, allRecordCount);
+    protected boolean isUseManualThreadDataSource() {
+        return true; // basically for MySQL's found_rows() when no transaction
     }
 
     protected void throwPagingStatusInvalidException(PagingBean pagingBean) {
@@ -216,6 +221,13 @@ public class PagingInvoker<ENTITY> {
         br.addElement(pagingBean);
         final String msg = br.buildExceptionMessage();
         throw new PagingStatusInvalidException(msg);
+    }
+
+    protected void throwPagingOverSafetySizeException(int safetyMaxResultSize, int allRecordCount) {
+        // here simple message because an entry method catches this
+        String msg = "The paging was over the specified safety size:";
+        msg = msg + " " + allRecordCount + " > " + safetyMaxResultSize;
+        throw new PagingOverSafetySizeException(msg, safetyMaxResultSize, allRecordCount);
     }
 
     // ===================================================================================

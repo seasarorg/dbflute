@@ -22,6 +22,7 @@ public class NotClosingConnectionWrapper implements Connection {
     //                                                                           Attribute
     //                                                                           =========
     protected Connection _actualConnection;
+    protected boolean _keepActualIfClosed;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -37,6 +38,17 @@ public class NotClosingConnectionWrapper implements Connection {
         return _actualConnection;
     }
 
+    public void keepActualIfClosed() {
+        _keepActualIfClosed = true;
+    }
+
+    public void closeActualReally() throws SQLException {
+        if (_actualConnection != null) {
+            _actualConnection.close();
+            _actualConnection = null;
+        }
+    }
+
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
@@ -45,7 +57,9 @@ public class NotClosingConnectionWrapper implements Connection {
     }
 
     public void close() throws SQLException {
-        _actualConnection = null;
+        if (!_keepActualIfClosed) {
+            _actualConnection = null;
+        }
 
         // *Point
         //_actualConnection.close();

@@ -68,7 +68,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         }
         Connection conn = null;
         try {
-            conn = _dataSource.getConnection();
+            conn = _dataSource.getConnection(); // for meta data
             final DatabaseMetaData metaData = conn.getMetaData();
             return createBeanMetaData(metaData, beanClass, relationNestLevel);
         } catch (SQLException e) {
