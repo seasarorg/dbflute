@@ -84,11 +84,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                                           Data Source
     //                                           -----------
     public DataSource assistDataSource() { // DI component
-        DataSourceHandler dataSourceHandler = ${glDBFluteConfig}.getInstance().getDataSourceHandler();
-        if (dataSourceHandler != null) {
-            return new HandlingDataSourceWrapper(_dataSource, dataSourceHandler);
-        }
-        return _dataSource;
+        // this instance will be cached in SQL executions
+        // so the handler should be set before initialization of DBFlute
+        // (and it means you cannot switch data source after initialization)
+        DataSourceHandler handler = ${glDBFluteConfig}.getInstance().getDataSourceHandler();
+        return handler != null ? new HandlingDataSourceWrapper(_dataSource, handler) : _dataSource;
     }
 
     // -----------------------------------------------------
