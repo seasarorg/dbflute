@@ -25,7 +25,6 @@ import org.seasar.dbflute.unit.PlainTestCase;
 public class ManualThreadDataSourceTest extends PlainTestCase {
 
     public void test_thread() throws Exception {
-        ManualThreadDataSourceHandler.setInternalDebug(true);
         final Set<ManualThreadDataSourceHandler> handlerSet = Collections
                 .synchronizedSet(new HashSet<ManualThreadDataSourceHandler>());
         ExecutionCreator<ManualThreadDataSourceHandler> creator = new ExecutionCreator<ManualThreadDataSourceHandler>() {

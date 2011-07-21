@@ -276,7 +276,7 @@ public abstract class TnAbstractBasicSqlHandler {
      */
     protected Connection getConnection() {
         try {
-            final ManualThreadDataSourceHandler handler = ManualThreadDataSourceHandler.getDataSourceHandler();
+            final ManualThreadDataSourceHandler handler = getManualThreadDataSourceHandler();
             if (handler != null) {
                 return handler.getConnection(_dataSource);
             }
@@ -285,6 +285,14 @@ public abstract class TnAbstractBasicSqlHandler {
             handleSQLException(e, null);
             return null;// unreachable
         }
+    }
+
+    /**
+     * Get the data source handler of manual thread.
+     * @return (NullAllowed: if null, no manual thread handling)
+     */
+    protected ManualThreadDataSourceHandler getManualThreadDataSourceHandler() {
+        return ManualThreadDataSourceHandler.getDataSourceHandler();
     }
 
     protected PreparedStatement prepareStatement(Connection conn) {

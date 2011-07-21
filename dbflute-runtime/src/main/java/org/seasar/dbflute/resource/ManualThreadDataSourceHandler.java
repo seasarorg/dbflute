@@ -20,8 +20,6 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
 
@@ -31,14 +29,6 @@ import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
  * @since 0.9.8.8 (2011/07/21 Thursday)
  */
 public class ManualThreadDataSourceHandler implements DataSourceHandler {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance for internal debug. */
-    private static final Log _log = LogFactory.getLog(ManualThreadDataSourceHandler.class);
-
-    private static volatile boolean _internalDebug;
 
     // ===================================================================================
     //                                                                        Thread Local
@@ -61,9 +51,6 @@ public class ManualThreadDataSourceHandler implements DataSourceHandler {
             return; // already prepared
         }
         final ManualThreadDataSourceHandler handler = new ManualThreadDataSourceHandler();
-        if (isInternalDebug()) {
-            _log.debug("...Preparing the data source of manual thread: " + handler);
-        }
         _handlerLocal.set(handler);
     }
 
@@ -76,9 +63,6 @@ public class ManualThreadDataSourceHandler implements DataSourceHandler {
             return; // already closed
         }
         try {
-            if (isInternalDebug()) {
-                _log.debug("...Closing the data source handler on thread: " + handler);
-            }
             handler.close();
         } catch (SQLException e) {
             String msg = "Failed to close the data source handler of manual thread: " + handler;
@@ -109,17 +93,11 @@ public class ManualThreadDataSourceHandler implements DataSourceHandler {
      */
     public Connection getConnection(DataSource actualDs) throws SQLException {
         if (_connectionWrapper != null) {
-            if (isInternalDebug()) {
-                _log.debug("...Returning the connection wrapper: " + _connectionWrapper);
-            }
             return _connectionWrapper;
         }
         final Connection actualConnection = actualDs.getConnection();
         _connectionWrapper = new NotClosingConnectionWrapper(actualConnection);
         _connectionWrapper.keepActualIfClosed();
-        if (isInternalDebug()) {
-            _log.debug("...Wrapping the actual connection: " + actualConnection);
-        }
         return _connectionWrapper;
     }
 
@@ -133,16 +111,5 @@ public class ManualThreadDataSourceHandler implements DataSourceHandler {
             _connectionWrapper.closeActualReally();
             _connectionWrapper = null;
         }
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    public static boolean isInternalDebug() {
-        return _log.isDebugEnabled() && _internalDebug;
-    }
-
-    public static void setInternalDebug(boolean internalDebug) {
-        _internalDebug = internalDebug;
     }
 }
