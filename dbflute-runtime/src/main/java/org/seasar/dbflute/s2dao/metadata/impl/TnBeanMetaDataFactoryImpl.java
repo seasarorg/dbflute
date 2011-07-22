@@ -145,15 +145,13 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     }
 
     protected String getVersionNoPropertyName(TnBeanAnnotationReader beanAnnotationReader) {
-        final String defaultName = "versionNo";
+        final String defaultName = "versionNo"; // VERSION_NO is special name
         final String name = beanAnnotationReader.getVersionNoPropertyName();
         return name != null ? name : defaultName;
     }
 
     protected String getTimestampPropertyName(TnBeanAnnotationReader beanAnnotationReader) {
-        final String defaultName = "timestamp";
-        final String name = beanAnnotationReader.getTimestampPropertyName();
-        return name != null ? name : defaultName;
+        return beanAnnotationReader.getTimestampPropertyName(); // has no default name
     }
 
     protected TnPropertyTypeFactory createPropertyTypeFactory(Class<?> originalBeanClass,
