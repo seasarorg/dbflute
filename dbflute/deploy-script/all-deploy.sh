@@ -112,6 +112,9 @@ rm ./log/*.log
 . doc.sh
 . generate.sh
 . sql2entity.sh
+cd ..
+mvn -e eclipath:sync eclipath:clean
+cd dbflute_exampledb
 
 cd ../../dbflute-tricky-example/dbflute_exampledb
 rm ./log/*.log

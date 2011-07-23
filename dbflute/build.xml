@@ -6,10 +6,10 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.8.8"/>
-	<property name="build.version" value="${version}-RC3"/>
+	<property name="build.version" value="${version}-RC4"/>
 	<property name="pre.version" value="0.9.8.7"/>
 	<property name="runtime.version" value="0.9.8.8"/>
-	<property name="runtime.build.version" value="${runtime.version}-RC3"/>
+	<property name="runtime.build.version" value="${runtime.version}-RC4"/>
 	<property name="runtime.pre.version" value="0.9.8.7"/>
 
 	<!-- Resource Directories -->
@@ -367,10 +367,12 @@
 
 	<target name="reflect-to-sastruts" depends="prepare-reflection" description="==> reflect to sastruts example">
 	  	<copy todir="${sastruts.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<!-- because of eclipath
 		<delete file="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/${runtime.pre.jar}"/>
 		<delete file="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		-->
 		<replace file="${sastruts.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${sastruts.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${sastruts.example.dir}/mydbflute/dbflute-${pre.version}"/>

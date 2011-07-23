@@ -1575,6 +1575,10 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isPagingCountLeastJoin();
     }
 
+    public boolean isInnerJoinAutoDetect() {
+        return getProperties().getLittleAdjustmentProperties().isInnerJoinAutoDetect();
+    }
+
     public boolean isAvailableDatabaseNativeJDBC() {
         return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC();
     }

@@ -77,10 +77,11 @@ public class ${glDBFluteConfig} {
     // condition-bean or parameter-bean
     protected boolean _pagingCountLater = ${database.isPagingCountLater()};
     protected boolean _pagingCountLeastJoin = ${database.isPagingCountLeastJoin()};
-    protected boolean _disableSelectIndex;
+    protected boolean _innerJoinAutoDetect = ${database.isInnerJoinAutoDetect()};
     protected boolean _emptyStringQueryAllowed;
     protected boolean _emptyStringParameterAllowed;
     protected boolean _invalidQueryChecked;
+    protected boolean _disableSelectIndex;
 
     // logging
     protected boolean _queryLogLevelInfo;
@@ -184,18 +185,18 @@ public class ${glDBFluteConfig} {
     }
 
     // ===================================================================================
-    //                                                                        Select Index
-    //                                                                        ============
-    public boolean isDisableSelectIndex() {
-        return _disableSelectIndex;
+    //                                                                          Inner Join
+    //                                                                          ==========
+    public boolean isInnerJoinAutoDetect() {
+        return _innerJoinAutoDetect;
     }
 
-    public void setDisableSelectIndex(boolean disableSelectIndex) {
+    public void setInnerJoinAutoDetect(boolean innerJoinAutoDetect) {
         assertNotLocked();
         if (_log.isInfoEnabled()) {
-            _log.info("...Setting disableSelectIndex: " + disableSelectIndex);
+            _log.info("...Setting innerJoinAutoDetect: " + innerJoinAutoDetect);
         }
-        _disableSelectIndex = disableSelectIndex;
+        _innerJoinAutoDetect = innerJoinAutoDetect;
     }
 
     // ===================================================================================
@@ -250,6 +251,21 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting invalidQueryChecked: " + invalidQueryChecked);
         }
         _invalidQueryChecked = invalidQueryChecked;
+    }
+
+    // ===================================================================================
+    //                                                                        Select Index
+    //                                                                        ============
+    public boolean isDisableSelectIndex() {
+        return _disableSelectIndex;
+    }
+
+    public void setDisableSelectIndex(boolean disableSelectIndex) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting disableSelectIndex: " + disableSelectIndex);
+        }
+        _disableSelectIndex = disableSelectIndex;
     }
 
     // ===================================================================================

@@ -15,6 +15,7 @@
 # o isMakeConditionQueryEqualEmptyString: (NotRequired - Default false)
 # o isPagingCountLater: (NotRequired - Default false)
 # o isPagingCountLeastJoin: (NotRequired - Default false)
+# o isInnerJoinAutoDetect: (NotRequired - Default false)
 # o isMakeDeprecated: (NotRequired - Default false)
 # o isMakeRecentlyDeprecated: (NotRequired - Default true)
 # o extendedDBFluteInitializerClass: (NotRequired - Default '')
@@ -170,6 +171,18 @@ map:{
     #     Non.
     #
     #; isPagingCountLeastJoin = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isInnerJoinAutoDetect: (NotRequired - Default false)
+    #   [true]
+    #     Joins that can be inner-join on condition-bean are auto-detected
+    #     for performance tuning.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isInnerJoinAutoDetect = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

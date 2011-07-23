@@ -139,6 +139,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                          Inner Join
+    //                                                                          ==========
+    public boolean isInnerJoinAutoDetect() {
+        return isProperty("isInnerJoinAutoDetect", false);
+    }
+
+    // ===================================================================================
     //                                                                     Make Deprecated
     //                                                                     ===============
     public boolean isMakeDeprecated() {

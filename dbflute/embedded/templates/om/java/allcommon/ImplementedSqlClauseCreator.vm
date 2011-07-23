@@ -139,14 +139,17 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
     //                                                                              Option
     //                                                                              ======
     protected void setupSqlClauseOption(SqlClause sqlClause) {
-        if (isDisableSelectIndex()) {
-            sqlClause.disableSelectIndex();
+        if (isInnerJoinAutoDetect()) {
+            sqlClause.allowInnerJoinAutoDetect();
         }
         if (isEmptyStringQueryAllowed()) {
             sqlClause.allowEmptyStringQuery();
         }
         if (isInvalidQueryChecked()) {
             sqlClause.checkInvalidQuery();
+        }
+        if (isDisableSelectIndex()) {
+            sqlClause.disableSelectIndex();
         }
     }
 
@@ -157,8 +160,8 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 	    return ${glDBCurrent}.getInstance().isCurrentDBDef(currentDBDef);
     }
 
-    protected boolean isDisableSelectIndex() {
-	    return ${glDBFluteConfig}.getInstance().isDisableSelectIndex();
+    protected boolean isInnerJoinAutoDetect() {
+	    return ${glDBFluteConfig}.getInstance().isInnerJoinAutoDetect();
     }
 
     protected boolean isEmptyStringQueryAllowed() {
@@ -167,5 +170,9 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 
     protected boolean isInvalidQueryChecked() {
 	    return ${glDBFluteConfig}.getInstance().isInvalidQueryChecked();
+    }
+
+    protected boolean isDisableSelectIndex() {
+	    return ${glDBFluteConfig}.getInstance().isDisableSelectIndex();
     }
 }
