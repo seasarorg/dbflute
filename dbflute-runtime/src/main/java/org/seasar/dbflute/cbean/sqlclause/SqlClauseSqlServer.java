@@ -126,9 +126,8 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     /**
      * {@inheritDoc}
      */
-    public SqlClause lockForUpdate() {
+    public void lockForUpdate() {
         _lockFromHint = " with (updlock)";
-        return this;
     }
 
     // ===================================================================================

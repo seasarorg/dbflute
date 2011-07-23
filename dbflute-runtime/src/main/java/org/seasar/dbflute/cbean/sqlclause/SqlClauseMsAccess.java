@@ -120,7 +120,7 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
     /**
      * {@inheritDoc}
      */
-    public SqlClause lockForUpdate() {
+    public void lockForUpdate() {
         String msg = "LockForUpdate-SQL is unavailable in the database. Sorry...: " + toString();
         throw new IllegalConditionBeanOperationException(msg);
     }

@@ -68,22 +68,26 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     void xsetPaging(boolean paging);
 
     /**
-     * Enable paging count-later that means counting after selecting.
+     * Enable paging count-later that means counting after selecting. <br />
+     * You should call this before execution of selectPage().
      */
     void enablePagingCountLater();
 
     /**
-     * Disable paging count-later that means counting after selecting.
+     * Disable paging count-later that means counting after selecting. <br />
+     * You should call this before execution of selectPage().
      */
     void disablePagingCountLater();
 
     /**
-     * Enable paging re-select that is executed when the page number is over page count.
+     * Enable paging re-select that is executed when the page number is over page count. <br />
+     * You should call this before execution of selectPage().
      */
     void enablePagingReSelect();
 
     /**
-     * Disable paging re-select that is executed when the page number is over page count.
+     * Disable paging re-select that is executed when the page number is over page count. <br />
+     * You should call this before execution of selectPage().
      */
     void disablePagingReSelect();
 

@@ -18,10 +18,9 @@ public class SqlClauseOracleTest extends PlainTestCase {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public SqlClause lockForUpdate() {
+            public void lockForUpdate() {
                 _lockSqlSuffix = " for update of dummy";
                 markSet.add("lockForUpdate");
-                return this;
             }
         };
 
@@ -46,10 +45,9 @@ public class SqlClauseOracleTest extends PlainTestCase {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public SqlClause lockForUpdate() {
+            public void lockForUpdate() {
                 _lockSqlSuffix = " for update of dummy";
                 markSet.add("lockForUpdate");
-                return this;
             }
         };
 

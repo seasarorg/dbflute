@@ -93,9 +93,8 @@ public class SqlClauseFirebird extends AbstractSqlClause {
     /**
      * {@inheritDoc}
      */
-    public SqlClause lockForUpdate() {
+    public void lockForUpdate() {
         _lockSqlSuffix = " for update with lock";
-        return this;
     }
 
     // ===================================================================================

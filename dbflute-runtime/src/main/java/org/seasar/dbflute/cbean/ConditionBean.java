@@ -87,6 +87,16 @@ public interface ConditionBean extends PagingBean {
      */
     ConditionQuery localCQ();
 
+    /**
+     * Allow to auto-detect joins that can be inner-join. <br />
+     * You should call this before registrations of where clause. <br />
+     * Union and SubQuery and other sub condition-bean inherit this. <br />
+     * You should confirm your SQL on the log to be tuned by inner-join correctly.
+     * Because the auto-detect logic of inner-join is so difficult and
+     * the logic is not perfect. So human check is needed. <br />
+     */
+    void allowInnerJoinAutoDetect();
+
     // ===================================================================================
     //                                                                        Lock Setting
     //                                                                        ============
@@ -138,16 +148,33 @@ public interface ConditionBean extends PagingBean {
     /**
      * Allow an empty string for query. <br />
      * (you can use an empty string as condition) <br />
-     * If it has already been set as allowed, this calling is ignored.
+     * You should call this before registrations of where clause and other queries. <br />
+     * Union and SubQuery and other sub condition-bean inherit this.
      */
     void allowEmptyStringQuery();
 
     /**
      * Check an invalid query when a query is set. <br />
      * (it throws an exception if a set query is invalid) <br />
-     * If it has already been set as checked, this calling is ignored.
+     * You should call this before registrations of where clause and other queries. <br />
+     * Union and SubQuery and other sub condition-bean inherit this.
      */
     void checkInvalidQuery();
+
+    // ===================================================================================
+    //                                                                      Paging Setting
+    //                                                                      ==============
+    /**
+     * Enable paging count-least-join, which means least joined on count select. <br />
+     * You should call this before execution of selectPage().
+     */
+    void enablePagingCountLeastJoin();
+
+    /**
+     * Disable paging count-least-join, which means least joined on count select. <br />
+     * You should call this before execution of selectPage().
+     */
+    void disablePagingCountLeastJoin();
 
     // ===================================================================================
     //                                                                    Statement Config

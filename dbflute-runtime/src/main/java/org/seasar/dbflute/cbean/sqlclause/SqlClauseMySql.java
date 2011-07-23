@@ -117,9 +117,8 @@ public class SqlClauseMySql extends AbstractSqlClause {
     /**
      * {@inheritDoc}
      */
-    public SqlClause lockForUpdate() {
+    public void lockForUpdate() {
         _lockSqlSuffix = " for update";
-        return this;
     }
 
     // ===================================================================================

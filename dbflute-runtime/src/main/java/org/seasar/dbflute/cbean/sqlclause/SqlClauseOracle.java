@@ -132,7 +132,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
     /**
      * {@inheritDoc}
      */
-    public SqlClause lockForUpdate() {
+    public void lockForUpdate() {
         final DBMeta dbmeta = findDBMeta(_tableDbName);
         final String basePointAliasName = getBasePointAliasName();
         if (dbmeta.hasPrimaryKey()) {
@@ -142,7 +142,6 @@ public class SqlClauseOracle extends AbstractSqlClause {
             final ColumnSqlName randomColumnName = ((ColumnInfo) dbmeta.getColumnInfoList().get(0)).getColumnSqlName();
             _lockSqlSuffix = " for update of " + basePointAliasName + "." + randomColumnName;
         }
-        return this;
     }
 
     // ===================================================================================

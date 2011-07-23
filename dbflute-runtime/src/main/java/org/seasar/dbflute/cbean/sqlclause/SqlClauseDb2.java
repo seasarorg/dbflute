@@ -136,9 +136,8 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     /**
      * {@inheritDoc}
      */
-    public SqlClause lockForUpdate() {
+    public void lockForUpdate() {
         _lockSqlSuffix = " for update with RS";
-        return this;
     }
 
     // ===================================================================================

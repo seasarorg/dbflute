@@ -144,8 +144,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The map of outer join. */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap;
 
-    /** Is inner-join effective? */
-    protected boolean _innerJoinEffective;
+    /** Does it auto-detect joins that can be inner-join? */
+    protected boolean _innerJoinAutoDetect;
 
     /** The list of where clause. */
     protected List<QueryClause> _whereList;
@@ -1107,13 +1107,21 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         joinInfo.resolveFixedCondition();
 
         getOuterJoinMap().put(foreignAliasName, joinInfo);
+    }
 
-        if (_innerJoinEffective) { // basically false
-            // InnerJoin should be specified per joined table
-            // because it's basically for performance tuning
-            joinInfo.setInnerJoin(true);
-            reflectUnderInnerJoinToJoin(localAliasName);
+    /**
+     * {@inheritDoc}
+     */
+    public void changeToInnerJoin(String foreignAliasName) {
+        final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
+        final LeftOuterJoinInfo joinInfo = outerJoinMap.get(foreignAliasName);
+        if (joinInfo == null) {
+            String msg = "The aliasName should be registered:";
+            msg = msg + " aliasName=" + foreignAliasName + " outerJoinMap=" + outerJoinMap;
+            throw new IllegalStateException(msg);
         }
+        joinInfo.setInnerJoin(true);
+        reflectUnderInnerJoinToJoin(joinInfo.getLocalAliasName());
     }
 
     protected void reflectUnderInnerJoinToJoin(final String localAliasName) {
@@ -1131,28 +1139,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void changeToInnerJoin(String foreignAliasName) {
-        final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
-        final LeftOuterJoinInfo joinInfo = outerJoinMap.get(foreignAliasName);
-        if (joinInfo == null) {
-            String msg = "The aliasName should be registered:";
-            msg = msg + " aliasName=" + foreignAliasName + " outerJoinMap=" + outerJoinMap;
-            throw new IllegalStateException(msg);
-        }
-        joinInfo.setInnerJoin(true);
+    public void allowInnerJoinAutoDetect() {
+        _innerJoinAutoDetect = true;
     }
 
-    public SqlClause makeInnerJoinEffective() {
-        _innerJoinEffective = true;
-        return this;
+    public void backToLeftOuterJoinBasis() {
+        _innerJoinAutoDetect = false;
     }
 
-    public SqlClause backToOuterJoin() {
-        _innerJoinEffective = false;
-        return this;
+    public boolean isInnerJoinAutoDetectAllowed() {
+        return _innerJoinAutoDetect;
     }
 
     protected Map<String, LeftOuterJoinInfo> getOuterJoinMap() {
@@ -1197,6 +1193,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, false, false);
         reflectWhereUsedToJoin(usedAliasName);
+        reflectInnerJoinToJoin(usedAliasName, key);
     }
 
     /**
@@ -1207,6 +1204,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, clause);
         reflectWhereUsedToJoin(usedAliasName);
+        reflectInnerJoinToJoin(usedAliasName);
     }
 
     /**
@@ -1217,8 +1215,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, clause);
         reflectWhereUsedToJoin(usedAliasName);
+        reflectInnerJoinToJoin(usedAliasName);
         for (String moreName : moreNames) {
             reflectWhereUsedToJoin(moreName);
+            reflectInnerJoinToJoin(usedAliasName);
         }
     }
 
@@ -1234,6 +1234,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             }
             joinInfo.setWhereUsedJoin(true);
             aliasKey = joinInfo.getLocalAliasName(); // trace back toward base point
+        }
+    }
+
+    protected void reflectInnerJoinToJoin(final String usedAliasName) {
+        reflectInnerJoinToJoin(usedAliasName, null);
+    }
+
+    protected void reflectInnerJoinToJoin(final String usedAliasName, ConditionKey key) {
+        if (_innerJoinAutoDetect && !ConditionKey.CK_IS_NULL.equals(key)) {
+            changeToInnerJoin(usedAliasName);
         }
     }
 
@@ -1495,22 +1505,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return getOrderBy();
     }
 
-    public SqlClause clearOrderBy() {
+    public void clearOrderBy() {
         _orderByEffective = false;
         getOrderBy().clear();
-        return this;
     }
 
-    public SqlClause makeOrderByEffective() {
+    public void makeOrderByEffective() {
         if (hasOrderByClause()) {
             _orderByEffective = true;
         }
-        return this;
     }
 
-    public SqlClause ignoreOrderBy() {
+    public void ignoreOrderBy() {
         _orderByEffective = false;
-        return this;
     }
 
     public void registerOrderBy(String orderByProperty, boolean ascOrDesc) {
@@ -1663,10 +1670,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                                                          FetchScope
     //                                                                          ==========
     /**
-     * @param fetchSize Fetch-size. (NotMinus & NotZero)
-     * @return this. (NotNull)
+     * {@inheritDoc}
      */
-    public SqlClause fetchFirst(int fetchSize) {
+    public void fetchFirst(int fetchSize) {
         _fetchScopeEffective = true;
         if (fetchSize <= 0) {
             String msg = "Argument[fetchSize] should be plus: " + fetchSize;
@@ -1677,15 +1683,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _fetchPageNumber = 1;
         doClearFetchPageClause();
         doFetchFirst();
-        return this;
     }
 
     /**
-     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
-     * @param fetchSize Fetch size. (NotMinus)
-     * @return this. (NotNull)
+     * {@inheritDoc}
      */
-    public SqlClause fetchScope(int fetchStartIndex, int fetchSize) {
+    public void fetchScope(int fetchStartIndex, int fetchSize) {
         _fetchScopeEffective = true;
         if (fetchStartIndex < 0) {
             String msg = "Argument[fetchStartIndex] must be plus or zero: " + fetchStartIndex;
@@ -1697,14 +1700,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
         _fetchStartIndex = fetchStartIndex;
         _fetchSize = fetchSize;
-        return fetchPage(1);
+        fetchPage(1);
     }
 
     /**
-     * @param fetchPageNumber Page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
-     * @return this. (NotNull)
+     * {@inheritDoc}
      */
-    public SqlClause fetchPage(int fetchPageNumber) {
+    public void fetchPage(int fetchPageNumber) {
         _fetchScopeEffective = true;
         if (fetchPageNumber <= 0) {
             fetchPageNumber = 1;
@@ -1714,11 +1716,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
         _fetchPageNumber = fetchPageNumber;
         if (_fetchPageNumber == 1 && _fetchStartIndex == 0) {
-            return fetchFirst(_fetchSize);
+            fetchFirst(_fetchSize);
         }
         doClearFetchPageClause();
         doFetchPage();
-        return this;
     }
 
     protected void throwFetchSizeNotPlusException(int fetchPageNumber) { // as system exception
@@ -1850,17 +1851,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _fetchScopeEffective;
     }
 
-    public SqlClause ignoreFetchScope() {
+    public void ignoreFetchScope() {
         _fetchScopeEffective = false;
         doClearFetchPageClause();
-        return this;
     }
 
-    public SqlClause makeFetchScopeEffective() {
+    public void makeFetchScopeEffective() {
         if (getFetchSize() > 0 && getFetchPageNumber() > 0) {
             fetchPage(getFetchPageNumber());
         }
-        return this;
     }
 
     public boolean isFetchStartIndexSupported() {

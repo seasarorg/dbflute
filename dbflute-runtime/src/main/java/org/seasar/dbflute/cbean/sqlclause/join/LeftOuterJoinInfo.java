@@ -31,9 +31,9 @@ public class LeftOuterJoinInfo implements Serializable {
     protected Map<ColumnRealName, ColumnRealName> _joinOnMap;
     protected String _fixedCondition;
     protected transient FixedConditionResolver _fixedConditionResolver;
-    protected boolean _innerJoin; // option (true if inner-join effective)
+    protected boolean _innerJoin; // option (true if inner-join forced or auto-detected)
     protected boolean _underInnerJoin; // option (true if the join has foreign's inner-join)
-    protected boolean _whereUsedJoin; // option (true if used on where clause)
+    protected boolean _whereUsedJoin; // option (true if used on where clause or foreign's use)
 
     // ===================================================================================
     //                                                                        Judge Status

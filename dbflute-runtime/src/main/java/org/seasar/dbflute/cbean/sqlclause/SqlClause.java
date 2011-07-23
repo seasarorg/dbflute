@@ -211,14 +211,28 @@ public interface SqlClause {
             FixedConditionResolver fixedConditionResolver);
 
     /**
-     * Change the join type for the relation to inner join.
+     * Change the join type for the relation to inner join manually.
      * @param foreignAliasName The foreign alias name of join table. (NotNull and Unique per invoking method)
      */
     void changeToInnerJoin(String foreignAliasName);
 
-    SqlClause makeInnerJoinEffective();
+    /**
+     * Allow to auto-detect joins that can be inner-join. <br />
+     * You should call this before registrations of where clause.
+     */
+    void allowInnerJoinAutoDetect();
 
-    SqlClause backToOuterJoin();
+    /**
+     * Come back to left-outer join basis.
+     * You should call this before registrations of where clause.
+     */
+    void backToLeftOuterJoinBasis();
+
+    /**
+     * Does it allow to auto-detect inner-join? 
+     * @return Determination. (true or false)
+     */
+    boolean isInnerJoinAutoDetectAllowed();
 
     // ===================================================================================
     //                                                                               Where
@@ -321,11 +335,11 @@ public interface SqlClause {
     //                                                                             =======
     OrderByClause getOrderByComponent();
 
-    SqlClause clearOrderBy();
+    void clearOrderBy();
 
-    SqlClause makeOrderByEffective();
+    void makeOrderByEffective();
 
-    SqlClause ignoreOrderBy();
+    void ignoreOrderBy();
 
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnSqlName/aliasName.columnSqlName/...' (NotNull)
@@ -365,17 +379,15 @@ public interface SqlClause {
     /**
      * Fetch first.
      * @param fetchSize Fetch-size. (NotMinus)
-     * @return this. (NotNull)
      */
-    SqlClause fetchFirst(int fetchSize);
+    void fetchFirst(int fetchSize);
 
     /**
      * Fetch scope.
      * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
      * @param fetchSize Fetch-size. (NotMinus)
-     * @return this. (NotNull)
      */
-    SqlClause fetchScope(int fetchStartIndex, int fetchSize);
+    void fetchScope(int fetchStartIndex, int fetchSize);
 
     /**
      * Fetch page.
@@ -385,9 +397,8 @@ public interface SqlClause {
      * If you invoke this, your SQL returns [fetch-size] records from [fetch-start-index] calculated by [fetch-page-number].
      * </p>
      * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
-     * @return this. (NotNull)
      */
-    SqlClause fetchPage(int fetchPageNumber);
+    void fetchPage(int fetchPageNumber);
 
     /**
      * Get fetch start index.
@@ -427,15 +438,13 @@ public interface SqlClause {
 
     /**
      * Ignore fetch-scope.
-     * @return this. (NotNull)
      */
-    SqlClause ignoreFetchScope();
+    void ignoreFetchScope();
 
     /**
      * Make fetch-scope effective.
-     * @return this. (NotNull)
      */
-    SqlClause makeFetchScopeEffective();
+    void makeFetchScopeEffective();
 
     /**
      * Is fetch start index supported?
@@ -474,14 +483,13 @@ public interface SqlClause {
     //                                                                                Lock
     //                                                                                ====
     /**
-     * Lock for update.
+     * Lock selected records for update.
      * <p>
      * If you invoke this, your SQL lock target records for update.
      * It depends whether this method supports this on the database type.
      * </p>
-     * @return this. (NotNull)
      */
-    SqlClause lockForUpdate();
+    void lockForUpdate();
 
     // ===================================================================================
     //                                                                    Table Alias Info
@@ -835,12 +843,30 @@ public interface SqlClause {
 
     void ignorePagingAdjustment();
 
+    /**
+     * Enable paging count-later that means counting after selecting. <br />
+     * You should call this before execution of selectPage(). <br />
+     * And you should also make paging adjustment effective to enable this. 
+     */
     void enablePagingCountLater();
 
+    /**
+     * Disable paging count-later that means counting after selecting. <br />
+     * You should call this before execution of selectPage().
+     */
     void disablePagingCountLater();
 
+    /**
+     * Enable paging count-least-join, which means least joined on count select. <br />
+     * You should call this before execution of selectPage(). <br />
+     * And you should also make paging adjustment effective to enable this.
+     */
     void enablePagingCountLeastJoin();
 
+    /**
+     * Disable paging count-least-join, which means least joined on count select. <br />
+     * You should call this before execution of selectPage().
+     */
     void disablePagingCountLeastJoin();
 
     // [DBFlute-0.9.7.2]

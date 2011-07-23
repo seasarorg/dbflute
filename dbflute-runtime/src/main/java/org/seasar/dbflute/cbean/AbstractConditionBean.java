@@ -194,6 +194,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
         createCBExThrower().throwQueryIllegalPurposeException(_purpose, this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void allowInnerJoinAutoDetect() {
+        getSqlClause().allowInnerJoinAutoDetect();
+    }
+
     // [DBFlute-0.9.5.3]
     // ===================================================================================
     //                                                                         ColumnQuery
@@ -478,14 +485,14 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     // ConditionBean original
     /**
-     * Enable paging count-least-join that means least joined on count select.
+     * {@inheritDoc}
      */
     public void enablePagingCountLeastJoin() {
         getSqlClause().enablePagingCountLeastJoin();
     }
 
     /**
-     * Disable paging count-least-join that means least joined on count select.
+     * {@inheritDoc}
      */
     public void disablePagingCountLeastJoin() {
         getSqlClause().disablePagingCountLeastJoin();
@@ -1057,6 +1064,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             // all sub condition-query are target
             // (purposes not allowed to use query() also may have nested query())
             xinheritInvalidQueryInfo(mainCQ);
+            xinheritInnerJoinAutoDetect(mainCQ); // and also inherits inner-join
         }
     }
 
@@ -1066,6 +1074,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
         }
         if (mainCQ.xgetSqlClause().isInvalidQueryChecked()) {
             checkInvalidQuery(); // inherited
+        }
+    }
+
+    protected void xinheritInnerJoinAutoDetect(ConditionQuery mainCQ) {
+        if (mainCQ.xgetSqlClause().isInnerJoinAutoDetectAllowed()) {
+            allowInnerJoinAutoDetect(); // inherited
         }
     }
 

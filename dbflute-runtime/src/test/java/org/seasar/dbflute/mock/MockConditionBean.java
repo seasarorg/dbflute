@@ -243,4 +243,13 @@ public class MockConditionBean implements ConditionBean {
     public HpCBPurpose getPurpose() {
         return null;
     }
+
+    public void allowInnerJoinAutoDetect() {
+    }
+
+    public void enablePagingCountLeastJoin() {
+    }
+
+    public void disablePagingCountLeastJoin() {
+    }
 }
