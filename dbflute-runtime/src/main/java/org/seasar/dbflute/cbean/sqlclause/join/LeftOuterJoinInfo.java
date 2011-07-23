@@ -26,6 +26,7 @@ public class LeftOuterJoinInfo implements Serializable {
     protected String _foreignTableDbName;
     protected String _localAliasName;
     protected String _localTableDbName;
+    protected LeftOuterJoinInfo _localJoinInfo; // to be able to trace back toward base point
     protected final List<QueryClause> _inlineWhereClauseList = new ArrayList<QueryClause>();
     protected final List<QueryClause> _additionalOnClauseList = new ArrayList<QueryClause>();
     protected Map<ColumnRealName, ColumnRealName> _joinOnMap;
@@ -96,6 +97,14 @@ public class LeftOuterJoinInfo implements Serializable {
 
     public void setLocalTableDbName(String localTableDbName) {
         _localTableDbName = localTableDbName;
+    }
+
+    public LeftOuterJoinInfo getLocalJoinInfo() {
+        return _localJoinInfo;
+    }
+
+    public void setLocalJoinInfo(LeftOuterJoinInfo localJoinInfo) {
+        _localJoinInfo = localJoinInfo;
     }
 
     public List<QueryClause> getInlineWhereClauseList() {

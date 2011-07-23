@@ -1093,11 +1093,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             FixedConditionResolver fixedConditionResolver) {
         assertAlreadyOuterJoin(foreignAliasName);
         assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
+        final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
         final LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
         joinInfo.setForeignAliasName(foreignAliasName);
         joinInfo.setForeignTableDbName(foreignTableDbName);
         joinInfo.setLocalAliasName(localAliasName);
         joinInfo.setLocalTableDbName(localTableDbName);
+        final LeftOuterJoinInfo localJoinInfo = outerJoinMap.get(localAliasName);
+        if (localJoinInfo != null) { // means local is also joined (not base point)
+            joinInfo.setLocalJoinInfo(localJoinInfo);
+        }
         joinInfo.setJoinOnMap(joinOnMap);
         joinInfo.setFixedCondition(fixedCondition);
         joinInfo.setFixedConditionResolver(fixedConditionResolver);
@@ -1106,7 +1111,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         // the process may have Query(Relation) as precondition
         joinInfo.resolveFixedCondition();
 
-        getOuterJoinMap().put(foreignAliasName, joinInfo);
+        outerJoinMap.put(foreignAliasName, joinInfo);
     }
 
     /**
@@ -1125,25 +1130,25 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             throw new IllegalStateException(msg);
         }
         joinInfo.setInnerJoin(true);
-        reflectUnderInnerJoinToJoin(joinInfo.getLocalAliasName(), autoDetect);
+        final LeftOuterJoinInfo localJoinInfo = joinInfo.getLocalJoinInfo();
+        if (localJoinInfo != null) {
+            reflectUnderInnerJoinToJoin(localJoinInfo, autoDetect);
+        }
     }
 
-    protected void reflectUnderInnerJoinToJoin(final String localAliasName, boolean autoDetect) {
-        String aliasKey = localAliasName;
+    protected void reflectUnderInnerJoinToJoin(final LeftOuterJoinInfo foreignJoinInfo, boolean autoDetect) {
+        LeftOuterJoinInfo currentJoinInfo = foreignJoinInfo.getLocalJoinInfo();
         while (true) {
-            final LeftOuterJoinInfo joinInfo = getOuterJoinMap().get(aliasKey);
-            if (joinInfo == null) { // means base point
+            if (currentJoinInfo == null) { // means base point
                 break;
             }
-            if (joinInfo.isInnerJoin()) { // means already traced
-                break;
-            }
+            // all join-info are overridden because of complex logic
             if (autoDetect) {
-                joinInfo.setInnerJoin(true); // be inner-join as we can if auto-detect
+                currentJoinInfo.setInnerJoin(true); // be inner-join as we can if auto-detect
             } else {
-                joinInfo.setUnderInnerJoin(true); // manual is pinpoint setting
+                currentJoinInfo.setUnderInnerJoin(true); // manual is pinpoint setting
             }
-            aliasKey = joinInfo.getLocalAliasName(); // trace back toward base point
+            currentJoinInfo = currentJoinInfo.getLocalJoinInfo(); // trace back toward base point
         }
     }
 
@@ -1231,17 +1236,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void reflectWhereUsedToJoin(final String usedAliasName) {
-        String aliasKey = usedAliasName;
+        LeftOuterJoinInfo currentJoinInfo = getOuterJoinMap().get(usedAliasName);
         while (true) {
-            final LeftOuterJoinInfo joinInfo = getOuterJoinMap().get(aliasKey);
-            if (joinInfo == null) { // means base point
+            if (currentJoinInfo == null) { // means base point
                 break;
             }
-            if (joinInfo.isWhereUsedJoin()) { // means already traced
+            if (currentJoinInfo.isWhereUsedJoin()) { // means already traced
                 break;
             }
-            joinInfo.setWhereUsedJoin(true);
-            aliasKey = joinInfo.getLocalAliasName(); // trace back toward base point
+            currentJoinInfo.setWhereUsedJoin(true);
+            currentJoinInfo = currentJoinInfo.getLocalJoinInfo(); // trace back toward base point
         }
     }
 
