@@ -1113,6 +1113,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * {@inheritDoc}
      */
     public void changeToInnerJoin(String foreignAliasName) {
+        doChangeToInnerJoin(foreignAliasName, false);
+    }
+
+    protected void doChangeToInnerJoin(String foreignAliasName, boolean autoDetect) {
         final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
         final LeftOuterJoinInfo joinInfo = outerJoinMap.get(foreignAliasName);
         if (joinInfo == null) {
@@ -1121,10 +1125,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             throw new IllegalStateException(msg);
         }
         joinInfo.setInnerJoin(true);
-        reflectUnderInnerJoinToJoin(joinInfo.getLocalAliasName());
+        reflectUnderInnerJoinToJoin(joinInfo.getLocalAliasName(), autoDetect);
     }
 
-    protected void reflectUnderInnerJoinToJoin(final String localAliasName) {
+    protected void reflectUnderInnerJoinToJoin(final String localAliasName, boolean autoDetect) {
         String aliasKey = localAliasName;
         while (true) {
             final LeftOuterJoinInfo joinInfo = getOuterJoinMap().get(aliasKey);
@@ -1134,7 +1138,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             if (joinInfo.isInnerJoin()) { // means already traced
                 break;
             }
-            joinInfo.setInnerJoin(true);
+            if (autoDetect) {
+                joinInfo.setInnerJoin(true); // be inner-join as we can if auto-detect
+            } else {
+                joinInfo.setUnderInnerJoin(true); // manual is pinpoint setting
+            }
             aliasKey = joinInfo.getLocalAliasName(); // trace back toward base point
         }
     }
@@ -1193,7 +1201,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, false, false);
         reflectWhereUsedToJoin(usedAliasName);
-        reflectInnerJoinToJoin(usedAliasName, key);
+        reflectAutoDetectedInnerJoinToJoin(usedAliasName, key);
     }
 
     /**
@@ -1204,7 +1212,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, clause);
         reflectWhereUsedToJoin(usedAliasName);
-        reflectInnerJoinToJoin(usedAliasName);
+        reflectAutoDetectedInnerJoinToJoin(usedAliasName);
     }
 
     /**
@@ -1215,10 +1223,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, clause);
         reflectWhereUsedToJoin(usedAliasName);
-        reflectInnerJoinToJoin(usedAliasName);
+        reflectAutoDetectedInnerJoinToJoin(usedAliasName);
         for (String moreName : moreNames) {
             reflectWhereUsedToJoin(moreName);
-            reflectInnerJoinToJoin(usedAliasName);
+            reflectAutoDetectedInnerJoinToJoin(usedAliasName);
         }
     }
 
@@ -1237,13 +1245,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    protected void reflectInnerJoinToJoin(final String usedAliasName) {
-        reflectInnerJoinToJoin(usedAliasName, null);
+    protected void reflectAutoDetectedInnerJoinToJoin(String usedAliasName) {
+        reflectAutoDetectedInnerJoinToJoin(usedAliasName, null);
     }
 
-    protected void reflectInnerJoinToJoin(final String usedAliasName, ConditionKey key) {
+    protected void reflectAutoDetectedInnerJoinToJoin(String usedAliasName, ConditionKey key) {
         if (_innerJoinAutoDetect && !ConditionKey.CK_IS_NULL.equals(key)) {
-            changeToInnerJoin(usedAliasName);
+            doChangeToInnerJoin(usedAliasName, true);
         }
     }
 
