@@ -1125,15 +1125,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
         final LeftOuterJoinInfo joinInfo = outerJoinMap.get(foreignAliasName);
         if (joinInfo == null) {
-            String msg = "The foreignAliasName should be registered:";
-            msg = msg + " foreignAliasName=" + foreignAliasName + ", outerJoinMap=" + outerJoinMap;
+            String msg = "The foreignAliasName was not found:";
+            msg = msg + " " + foreignAliasName + " in " + outerJoinMap.keySet();
             throw new IllegalStateException(msg);
         }
         joinInfo.setInnerJoin(true);
-        final LeftOuterJoinInfo localJoinInfo = joinInfo.getLocalJoinInfo();
-        if (localJoinInfo != null) {
-            reflectUnderInnerJoinToJoin(localJoinInfo, autoDetect);
-        }
+        reflectUnderInnerJoinToJoin(joinInfo, autoDetect);
     }
 
     protected void reflectUnderInnerJoinToJoin(final LeftOuterJoinInfo foreignJoinInfo, boolean autoDetect) {
