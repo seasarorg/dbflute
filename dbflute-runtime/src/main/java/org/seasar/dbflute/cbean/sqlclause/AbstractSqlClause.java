@@ -1120,8 +1120,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
         final LeftOuterJoinInfo joinInfo = outerJoinMap.get(foreignAliasName);
         if (joinInfo == null) {
-            String msg = "The aliasName should be registered:";
-            msg = msg + " aliasName=" + foreignAliasName + " outerJoinMap=" + outerJoinMap;
+            String msg = "The foreignAliasName should be registered:";
+            msg = msg + " foreignAliasName=" + foreignAliasName + ", outerJoinMap=" + outerJoinMap;
             throw new IllegalStateException(msg);
         }
         joinInfo.setInnerJoin(true);
@@ -1251,7 +1251,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected void reflectAutoDetectedInnerJoinToJoin(String usedAliasName, ConditionKey key) {
         if (_innerJoinAutoDetect && !ConditionKey.CK_IS_NULL.equals(key)) {
-            doChangeToInnerJoin(usedAliasName, true);
+            if (getOuterJoinMap().containsKey(usedAliasName)) { // checked because it may be local
+                doChangeToInnerJoin(usedAliasName, true);
+            }
         }
     }
 
