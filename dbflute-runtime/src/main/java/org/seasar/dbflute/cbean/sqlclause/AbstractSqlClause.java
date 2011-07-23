@@ -1250,7 +1250,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void reflectAutoDetectedInnerJoinToJoin(String usedAliasName, ConditionKey key) {
-        if (_innerJoinAutoDetect && !ConditionKey.CK_IS_NULL.equals(key)) {
+        if (_innerJoinAutoDetect && !_orScopeQueryEffective && !ConditionKey.CK_IS_NULL.equals(key)) {
             if (getOuterJoinMap().containsKey(usedAliasName)) { // checked because it may be local
                 doChangeToInnerJoin(usedAliasName, true);
             }
