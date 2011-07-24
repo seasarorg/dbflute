@@ -234,10 +234,12 @@
 
 	<target name="reflect-to-basic" depends="prepare-reflection" description="==> reflect to basic example">
 	  	<copy todir="${basic.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<!-- because of eclipath
 		<delete file="${basic.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${basic.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${basic.example.dir}/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${basic.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		-->
 		<replace file="${basic.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${basic.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${basic.example.dir}/mydbflute/dbflute-${pre.version}"/>

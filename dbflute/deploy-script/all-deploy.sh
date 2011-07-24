@@ -1,7 +1,9 @@
 cd ..
 ant -f build.xml reflect-to-all-for-mac
 
-cd ../dbflute-basic-example/dbflute_exampledb
+cd ../dbflute-basic-example
+mvn -e eclipath:sync eclipath:clean
+cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
@@ -107,14 +109,14 @@ rm ./log/*.log
 #. sql2entity.sh
 
 cd ../../dbflute-sastruts-example/dbflute_exampledb
+cd ..
+mvn -e eclipath:sync eclipath:clean
+cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
 . generate.sh
 . sql2entity.sh
-cd ..
-mvn -e eclipath:sync eclipath:clean
-cd dbflute_exampledb
 
 cd ../../dbflute-tricky-example/dbflute_exampledb
 rm ./log/*.log
