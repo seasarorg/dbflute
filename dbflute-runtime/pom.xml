@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>0.9.8.8-RC4</version><!-- Latest RC version is 02-SNAPSHOT -->
+	<version>0.9.8.8</version><!-- Latest RC version is 02-SNAPSHOT -->
 	<packaging>jar</packaging>
 
 	<name>DBFlute Runtime</name>
@@ -105,11 +105,17 @@
 					<links>
 						<link>http://download.oracle.com/javase/1.5.0/docs/api/</link>
 						<link>http://jakarta.apache.org/commons/logging/apidocs/</link>
-						<link>http://www.junit.org/junit/javadoc/4.3/</link>
 						<link>http://www.junit.org/junit/javadoc/3.8.1/</link>
 					</links>
 				</configuration>
 				<executions>
+					<execution>
+						<id>javadoc-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
 					<execution>
 						<phase>site</phase>
 						<goals>
@@ -160,12 +166,13 @@
 	</repositories>
 
 	<dependencies>
-		<!-- for Compile -->
+		<!-- =============== -->
+		<!-- |   compile   | -->
+		<!-- =============== -->
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.1.1</version>
-			<type>jar</type>
 			<exclusions>
 				<exclusion>
 					<artifactId>avalon-framework</artifactId>
@@ -186,21 +193,23 @@
 			</exclusions>
 		</dependency>
 
-		<!-- for Runtime -->
+		<!-- =============== -->
+		<!-- |   runtime   | -->
+		<!-- =============== -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
-			<type>jar</type>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- for Test -->
+		<!-- ============ -->
+		<!-- |   test   | -->
+		<!-- ============ -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.2</version>
-			<type>jar</type>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
