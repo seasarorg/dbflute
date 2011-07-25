@@ -26,9 +26,7 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-guice-example
-. sync-lib.sh
-cd dbflute_exampledb
+cd ../../dbflute-guice-example/dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
