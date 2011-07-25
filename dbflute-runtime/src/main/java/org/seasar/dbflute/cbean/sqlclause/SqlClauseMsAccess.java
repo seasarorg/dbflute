@@ -68,9 +68,10 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
             FixedConditionResolver fixedConditionResolver) {
         // MS-Access does not support additional conditions on OnClause
         // so switch it to in-line where clause
-        super.registerOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName, joinOnMap,
-                null, null);
-        if (fixedCondition != null) {
+        super.registerOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName // normal 
+                , joinOnMap // normal until here
+                , null, null); // null set to OnClause
+        if (fixedCondition != null) { // uses it instead of null set
             if (fixedConditionResolver != null) {
                 fixedCondition = fixedConditionResolver.resolveVariable(fixedCondition);
             }
