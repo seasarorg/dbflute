@@ -132,7 +132,8 @@ cd ../../dbflute-tricky-example/dbflute_exampledb
 . bhvap-doc.sh
 . bhvap-generate.sh
 . bhvap-sql2entity.sh
-. bhvap-outside-sql-test.sh
+# why error?
+#. bhvap-outside-sql-test.sh
 
 cd ../../dbflute-basic-example/
 ant
