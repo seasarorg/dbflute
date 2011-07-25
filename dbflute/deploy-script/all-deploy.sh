@@ -134,12 +134,8 @@ cd ../../dbflute-tricky-example/dbflute_exampledb
 . bhvap-sql2entity.sh
 . bhvap-outside-sql-test.sh
 
-cd ../
-cd ../dbflute-spring-example/
+cd ../../dbflute-basic-example/
 ant
 
-cd ../dbflute-lucy-example/
-ant
-
-cd ../dbflute-guice-example/
+cd ../../dbflute-spring-example/
 ant
