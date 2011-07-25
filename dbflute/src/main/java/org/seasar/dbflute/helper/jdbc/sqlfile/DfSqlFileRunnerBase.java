@@ -63,6 +63,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
 
+    // for sub-class process use
     protected Connection _currentConnection;
     protected Statement _currentStatement;
 
@@ -112,19 +113,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 execSQL(realSql);
             }
             if (_currentConnection != null) {
-                Boolean autoCommit = null;
-                try {
-                    autoCommit = _currentConnection.getAutoCommit();
-                } catch (SQLException continued) {
-                    // because it is possible that the connection would have already closed
-                    _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
-                }
+                final Boolean autoCommit = getAutoCommit();
                 if (autoCommit != null && !autoCommit) {
-                    if (_runInfo.isRollbackOnly()) {
-                        _currentConnection.rollback();
-                    } else {
-                        _currentConnection.commit();
-                    }
+                    rollbackOrCommit();
                 }
             }
         } catch (SQLException e) {
@@ -132,36 +123,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             // so it always does not continue
             throwSQLFailureException(currentSql, e);
         } finally {
-            try {
-                if (_currentConnection != null) {
-                    _currentConnection.rollback();
-                }
-            } catch (SQLException ignored) {
-            }
-            try {
-                if (_currentStatement != null) {
-                    _currentStatement.close();
-                }
-            } catch (SQLException ignored) {
-            } finally {
-                _currentStatement = null;
-            }
-            try {
-                if (_currentConnection != null) {
-                    _currentConnection.close();
-                }
-            } catch (SQLException ignored) {
-            } finally {
-                _currentConnection = null;
-            }
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException ignored) {
-            } finally {
-                reader = null;
-            }
+            closeStatement();
+            closeConnection();
+            closeReader(reader);
         }
         traceResult(_goodSqlCount, _totalSqlCount);
         _result.setGoodSqlCount(_goodSqlCount);
@@ -228,6 +192,51 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
     }
 
+    protected void closeConnection() {
+        try {
+            if (_currentConnection != null) {
+                _currentConnection.rollback();
+            }
+        } catch (SQLException ignored) {
+        }
+        try {
+            if (_currentConnection != null) {
+                _currentConnection.close();
+            }
+        } catch (SQLException ignored) {
+        } finally {
+            _currentConnection = null;
+        }
+    }
+
+    protected Boolean getAutoCommit() {
+        Boolean autoCommit = null;
+        try {
+            autoCommit = _currentConnection.getAutoCommit();
+        } catch (SQLException continued) {
+            // because it is possible that the connection would have already closed
+            _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
+        }
+        return autoCommit;
+    }
+
+    protected void rollbackOrCommit() throws SQLException {
+        try {
+            if (_runInfo.isRollbackOnly()) {
+                _currentConnection.rollback();
+            } else {
+                _currentConnection.commit();
+            }
+        } catch (SQLException mayContinued) {
+            if (_runInfo.isIgnoreTxError()) {
+                // e.g. SQLite may throw an exception (actually said: Database is locked!)
+                _log.warn("Connection#rollback()/commit() said: " + mayContinued.getMessage());
+            } else {
+                throw mayContinued;
+            }
+        }
+    }
+
     protected void setupStatement() {
         if (_currentConnection == null) {
             return;
@@ -246,6 +255,28 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             String msg = "The statement should not be null at this timing:";
             msg = msg + " sql=" + sql;
             throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void closeStatement() {
+        try {
+            if (_currentStatement != null) {
+                _currentStatement.close();
+            }
+        } catch (SQLException ignored) {
+        } finally {
+            _currentStatement = null;
+        }
+    }
+
+    protected void closeReader(Reader reader) {
+        try {
+            if (reader != null) {
+                reader.close();
+            }
+        } catch (IOException ignored) {
+        } finally {
+            reader = null;
         }
     }
 

@@ -218,6 +218,17 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     }
 
     @Override
+    protected boolean isIgnoreTxError() {
+        if (getBasicProperties().isDatabaseSQLite()) {
+            // SQLite may throw an exception when roll-back
+            // (actually said, "Database is locked" at OutsideSqlTest only)
+            return true;
+        } else {
+            return false; // requires to be roll-backed correctly
+        }
+    }
+
+    @Override
     protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
         runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
     }

@@ -124,9 +124,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
-        runInfo.setAutoCommit(false);
         runInfo.setErrorContinue(false);
+        runInfo.setAutoCommit(false);
         runInfo.setRollbackOnly(true); // this task does not commit
+        runInfo.setIgnoreTxError(false); // requires to be roll-backed correctly
         runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
 
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();

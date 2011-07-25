@@ -31,6 +31,7 @@ public class DfRunnerInformation {
     protected boolean _errorContinue;
     protected boolean _autoCommit;
     protected boolean _rollbackOnly;
+    protected boolean _ignoreTxError;
     protected String _encoding;
 
     // ===================================================================================
@@ -102,6 +103,14 @@ public class DfRunnerInformation {
 
     public void setRollbackOnly(boolean rollbackOnly) {
         this._rollbackOnly = rollbackOnly;
+    }
+
+    public boolean isIgnoreTxError() {
+        return _ignoreTxError;
+    }
+
+    public void setIgnoreTxError(boolean ignoreTxError) {
+        this._ignoreTxError = ignoreTxError;
     }
 
     public String getEncoding() {

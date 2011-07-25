@@ -68,9 +68,10 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_user);
         runInfo.setPassword(_password);
-        runInfo.setAutoCommit(isAutoCommit());
         runInfo.setErrorContinue(isErrorContinue());
+        runInfo.setAutoCommit(isAutoCommit());
         runInfo.setRollbackOnly(isRollbackOnly());
+        runInfo.setIgnoreTxError(isIgnoreTxError());
         customizeRunnerInformation(runInfo);
         return runInfo;
     }
@@ -79,11 +80,13 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
 
     protected abstract DfSqlFileRunnerExecute getSqlFileRunner(DfRunnerInformation runInfo);
 
-    protected abstract boolean isAutoCommit();
-
     protected abstract boolean isErrorContinue();
 
+    protected abstract boolean isAutoCommit();
+
     protected abstract boolean isRollbackOnly();
+
+    protected abstract boolean isIgnoreTxError();
 
     protected abstract void customizeRunnerInformation(DfRunnerInformation runInfo);
 
