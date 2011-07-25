@@ -6,7 +6,7 @@
 
 	<!-- Version -->
 	<property name="version" value="0.8.9.31"/>
-	<property name="build.version" value="${version}-SNAPSHOT"/>
+	<property name="build.version" value="${version}"/>
 	<property name="pre.version" value="0.8.9.30"/>
 
 	<!-- Resource Directories -->

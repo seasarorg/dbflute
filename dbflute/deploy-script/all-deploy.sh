@@ -2,7 +2,7 @@ cd ..
 ant -f build.xml reflect-to-all-for-mac
 
 cd ../dbflute-basic-example
-mvn -e eclipath:sync eclipath:clean
+. sync-lib.sh
 cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
@@ -10,7 +10,9 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-spring-example/dbflute_exampledb
+cd ../../dbflute-spring-example
+. sync-lib.sh
+cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
@@ -24,7 +26,9 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-guice-example/dbflute_exampledb
+cd ../../dbflute-guice-example
+. sync-lib.sh
+cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
@@ -37,13 +41,6 @@ rm ./log/*.log
 . doc.sh
 . generate.sh
 . sql2entity.sh
-
-#cd ../../dbflute-slim3-example/dbflute_exampledb
-#rm ./log/*.log
-#. jdbc.sh
-#. doc.sh
-#. generate.sh
-#. sql2entity.sh
 
 cd ../../dbflute-mysql-example/dbflute_exampledb
 rm ./log/*.log
@@ -87,30 +84,26 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-flexserver-example/dbflute_exampledb
+cd ../../dbflute-flexserver-example
+. sync-lib.sh
+cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-ymir-example/dbflute_exampledb
+cd ../../dbflute-ymir-example
+. sync-lib.sh
+cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
 . generate.sh
 . sql2entity.sh
 
-#cd ../../dbflute-teeda-example/dbflute_exampledb
-#rm ./log/*.log
-#. jdbc.sh
-#. doc.sh
-#. generate.sh
-#. sql2entity.sh
-
-cd ../../dbflute-sastruts-example/dbflute_exampledb
-cd ..
-mvn -e eclipath:sync eclipath:clean
+cd ../../dbflute-sastruts-example
+. sync-lib.sh
 cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh

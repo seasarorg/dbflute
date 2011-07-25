@@ -130,7 +130,7 @@ public class ${glDBFluteInitializer} {
         }
         if (dataSourceFqcn.startsWith("org.apache.commons.dbcp.")) {
             config.unlock();
-            config.setDataSourceHandler(new ${glDBFluteConfig}.SpringDBCPDataSourceHandler());
+            config.setDataSourceHandler(new ${glDBFluteConfig}.SpringTransactionalDataSourceHandler());
         }
     }
 

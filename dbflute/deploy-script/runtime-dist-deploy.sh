@@ -1,5 +1,5 @@
 cd ../../dbflute-runtime
-mvn -e clean source:jar javadoc:jar deploy -DupdateReleaseInfo=true
+mvn -e clean deploy
 
 cd ../dbflute
 ant -f build.xml runtime-dist

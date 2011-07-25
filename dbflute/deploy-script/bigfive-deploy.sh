@@ -7,14 +7,18 @@ ant -f build.xml reflect-to-postgresql
 ant -f build.xml reflect-to-bhvap
 ant -f build.xml reflect-to-sqlap
 
-cd ../dbflute-basic-example/dbflute_exampledb
+cd ../dbflute-basic-example
+mvn -e eclipath:sync eclipath:clean
+cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-spring-example/dbflute_exampledb
+cd ../../dbflute-spring-example
+mvn -e eclipath:sync eclipath:clean
+cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh

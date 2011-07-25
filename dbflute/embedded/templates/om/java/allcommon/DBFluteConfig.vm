@@ -690,7 +690,7 @@ public class ${glDBFluteConfig} {
     // -----------------------------------------------------
     //                                                Spring
     //                                                ------
-    protected static class SpringDBCPDataSourceHandler implements DataSourceHandler {
+    protected static class SpringTransactionalDataSourceHandler implements DataSourceHandler {
 
         public Connection getConnection(DataSource ds) throws SQLException {
             final Connection conn = getConnectionFromUtils(ds);
@@ -715,11 +715,6 @@ public class ${glDBFluteConfig} {
 #else
             throw new IllegalStateException("This method is only for Spring Framework.");
 #end
-        }
-
-        @Override
-        public String toString() {
-            return "SpringDBCPDataSourceHandler(for Spring and Commons-DBCP)";
         }
     }
 
