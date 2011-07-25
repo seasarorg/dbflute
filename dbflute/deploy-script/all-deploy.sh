@@ -109,7 +109,7 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-tricky-example/dbflute_exampledb
+cd ../../dbflute-sqlite-example/dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh

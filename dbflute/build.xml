@@ -48,6 +48,7 @@
 	<property name="oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
 	<property name="sqlserver.example.dir" value="${workspace.base}/dbflute-sqlserver-example"/>
 	<property name="db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
+	<property name="sqlite.example.dir" value="${workspace.base}/dbflute-sqlite-example"/>
 	<property name="msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example"/>
 
 	<!-- Friendly Examples -->
@@ -67,7 +68,6 @@
 	<property name="bhvap.seasar.example.dir" value="${workspace.base}/dbflute-bhvap-seasar-example"/>
 	<property name="bhvap.spring.example.dir" value="${workspace.base}/dbflute-bhvap-spring-example"/>
 	<property name="bhvap.guice.example.dir" value="${workspace.base}/dbflute-bhvap-guice-example"/>
-	<property name="tricky.example.dir" value="${workspace.base}/dbflute-tricky-example"/>
 	<property name="javatest.dir" value="${workspace.base}/javatest"/>
 	<property name="hands.on.dblib.dir" value="${workspace.base}/dfhands-on-dblib"/>
 
@@ -321,6 +321,14 @@
 		<delete dir="${extraction.dir}"/>
 	</target>
 
+	<target name="reflect-to-sqlite" depends="prepare-reflection" description="==> reflect to sqlite example">
+	  	<copy todir="${sqlite.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${sqlite.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${sqlite.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${sqlite.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
+	</target>
+
 	<target name="reflect-to-msaccess" depends="prepare-reflection" description="==> reflect to msaccess example">
 	  	<copy todir="${msaccess.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${msaccess.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
@@ -414,22 +422,6 @@
 	</target>
 
 	<target name="reflect-to-bhvap" depends="prepare-reflection" description="==> reflect to bhvap all examples">
-		<delete file="${bhvap.guice.example.dir}/lib/${runtime.pre.jar}"/>
-		<delete file="${bhvap.guice.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
-		<copy file="${dist}/${runtime.jar}" tofile="${bhvap.guice.example.dir}/lib/${runtime.jar}" overwrite="true"/>
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${bhvap.guice.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
-		<delete dir="${extraction.dir}"/>
-	</target>
-
-	<target name="reflect-to-tricky" depends="prepare-reflection" description="==> reflect to tricky example">
-	  	<copy todir="${tricky.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
-		<delete file="${tricky.example.dir}/lib/${runtime.pre.jar}"/>
-		<delete file="${tricky.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
-		<copy file="${dist}/${runtime.jar}" tofile="${tricky.example.dir}/lib/${runtime.jar}" overwrite="true"/>
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${tricky.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
-		<replace file="${tricky.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
-		<replace file="${tricky.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
-		<delete dir="${tricky.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
@@ -458,13 +450,13 @@
 	  	<antcall target="reflect-to-cdi" />
 	  	<antcall target="reflect-to-mysql" />
 	  	<antcall target="reflect-to-postgresql" />
+	  	<antcall target="reflect-to-sqlite" />
 	  	<antcall target="reflect-to-multipledb" />
 	  	<antcall target="reflect-to-flex" />
 	  	<antcall target="reflect-to-ymir" />
 	  	<antcall target="reflect-to-sastruts" />
 	  	<antcall target="reflect-to-sqlap" />
 	  	<antcall target="reflect-to-bhvap" />
-	  	<antcall target="reflect-to-tricky" />
 	  	<antcall target="reflect-to-javatest" />
 	</target>
 
