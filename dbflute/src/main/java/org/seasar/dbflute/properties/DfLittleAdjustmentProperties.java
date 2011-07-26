@@ -131,18 +131,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                       Paging Select
     //                                                                       =============
     public boolean isPagingCountLater() {
-        return isProperty("isPagingCountLater", false);
+        return isProperty("isPagingCountLater", true);
     }
 
     public boolean isPagingCountLeastJoin() {
-        return isProperty("isPagingCountLeastJoin", false);
+        return isProperty("isPagingCountLeastJoin", true);
     }
 
     // ===================================================================================
     //                                                                          Inner Join
     //                                                                          ==========
     public boolean isInnerJoinAutoDetect() {
-        return isProperty("isInnerJoinAutoDetect", false);
+        return isProperty("isInnerJoinAutoDetect", true);
     }
 
     // ===================================================================================
