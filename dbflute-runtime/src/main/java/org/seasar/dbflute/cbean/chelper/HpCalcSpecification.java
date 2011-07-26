@@ -280,6 +280,30 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isSpecifyColumn() {
+        return getSpecifiedColumnInfo() != null;
+    }
+
+    public boolean isDerivedReferrer() {
+        return getSpecifiedDerivingColumnInfo() != null;
+    }
+
+    public boolean mayNullRevived() { // basically for auto-detect of inner-join
+        if (isDerivedReferrer()) {
+            return true;
+        }
+        for (CalculationElement calculationElement : _calculationList) {
+            final ColumnConversionOption option = calculationElement.getColumnConversionOption();
+            if (option != null && option.mayNullRevived()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public SpecifyQuery<CB> getSpecifyQuery() {

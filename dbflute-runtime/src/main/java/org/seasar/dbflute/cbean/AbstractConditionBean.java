@@ -45,6 +45,7 @@ import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -143,7 +144,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void assertSetupSelectPurpose(String foreignPropertyName) {
-        if (_purpose.isNonSetupSelect()) {
+        if (_purpose.isNoSetupSelect()) {
             final String titleName = DfTypeUtil.toClassTitle(this);
             throwSetupSelectIllegalPurposeException(titleName, foreignPropertyName);
         }
@@ -172,7 +173,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected abstract HpAbstractSpecification<? extends ConditionQuery> localSp();
 
     protected void assertSpecifyPurpose() {
-        if (_purpose.isNonSpecify()) {
+        if (_purpose.isNoSpecify()) {
             throwSpecifyIllegalPurposeException();
         }
     }
@@ -185,7 +186,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                               Query
     //                                                                               =====
     protected void assertQueryPurpose() {
-        if (_purpose.isNonQuery()) {
+        if (_purpose.isNoQuery()) {
             throwQueryIllegalPurposeException();
         }
     }
@@ -324,7 +325,31 @@ public abstract class AbstractConditionBean implements ConditionBean {
             HpCalcSpecification<CB> leftCalcSp, HpCalcSpecification<CB> rightCalcSp) {
         final String leftAlias = leftCalcSp.getResolvedSpecifiedTableAliasName();
         final String rightAlias = rightCalcSp.getResolvedSpecifiedTableAliasName();
-        getSqlClause().registerWhereClause(queryClause, leftAlias, rightAlias);
+        final List<String> usedAliasNameList = DfCollectionUtil.newArrayList(leftAlias, rightAlias);
+
+        // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+        // may null-revived -> no way to be inner-join
+        // (DerivedReferrer or conversion's coalesce)
+        // 
+        // for example, the following SQL is no way to be inner
+        // (suppose if PURCHASE refers WITHDRAWAL)
+        // 
+        // select mb.MEMBER_ID, mb.MEMBER_NAME
+        //      , mb.MEMBER_STATUS_CODE, wd.MEMBER_ID as WD_MEMBER_ID
+        //   from MEMBER mb
+        //     left outer join MEMBER_SERVICE ser on mb.MEMBER_ID = ser.MEMBER_ID
+        //     left outer join MEMBER_WITHDRAWAL wd on mb.MEMBER_ID = wd.MEMBER_ID
+        //  where (select coalesce(max(pc.PURCHASE_PRICE), 0)
+        //           from PURCHASE pc
+        //          where pc.MEMBER_ID = wd.MEMBER_ID -- may null
+        //        ) < ser.SERVICE_POINT_COUNT
+        //  order by mb.MEMBER_ID
+        // 
+        // it has a possible to be inner-join in various case
+        // but it is hard to analyze in detail so simplify it
+        // = = = = = = = = = =/
+        final boolean noWayInner = leftCalcSp.mayNullRevived() || rightCalcSp.mayNullRevived();
+        getSqlClause().registerWhereClause(queryClause, usedAliasNameList, noWayInner);
     }
 
     // [DBFlute-0.9.6.3]

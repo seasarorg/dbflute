@@ -89,11 +89,11 @@ public interface ConditionBean extends PagingBean {
 
     /**
      * Allow to auto-detect joins that can be inner-join. <br />
+     * You can use it by default on DBFlute so you don't need to call this basically.
+     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
      * You should call this before registrations of where clause. <br />
      * Union and SubQuery and other sub condition-bean inherit this. <br />
      * You should confirm your SQL on the log to be tuned by inner-join correctly.
-     * Because the auto-detect logic of inner-join is so difficult and
-     * the logic is not perfect. So human check is needed. <br />
      */
     void allowInnerJoinAutoDetect();
 
@@ -166,6 +166,8 @@ public interface ConditionBean extends PagingBean {
     //                                                                      ==============
     /**
      * Enable paging count-least-join, which means least joined on count select. <br />
+     * You can use it by default on DBFlute so you don't need to call this basically.
+     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
      * You should call this before execution of selectPage().
      */
     void enablePagingCountLeastJoin();

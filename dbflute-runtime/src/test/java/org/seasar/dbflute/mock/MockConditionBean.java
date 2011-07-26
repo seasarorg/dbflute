@@ -247,6 +247,9 @@ public class MockConditionBean implements ConditionBean {
     public void allowInnerJoinAutoDetect() {
     }
 
+    public void suppressInnerJoinAutoDetect() {
+    }
+
     public void enablePagingCountLeastJoin() {
     }
 

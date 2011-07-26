@@ -1200,35 +1200,55 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             , ColumnFunctionCipher cipher, ConditionOption option // optional resources
             , String usedAliasName) { // table alias name used on where clause
         assertObjectNotNull("columnRealName", columnRealName);
+        assertObjectNotNull("key", key);
+        assertObjectNotNull("value", value);
+        assertStringNotNullAndNotTrimmedEmpty("usedAliasName", usedAliasName);
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, false, false);
         reflectWhereUsedToJoin(usedAliasName);
-        reflectAutoDetectedInnerJoinToJoin(usedAliasName, key);
+        if (!ConditionKey.CK_IS_NULL.equals(key)) {
+            reflectAutoDetectedInnerJoinToJoin(usedAliasName);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public void registerWhereClause(String clause, String usedAliasName) {
-        assertStringNotNullAndNotTrimmedEmpty("clause", clause);
-        final List<QueryClause> clauseList = getWhereClauseList4Register();
-        doRegisterWhereClause(clauseList, clause);
-        reflectWhereUsedToJoin(usedAliasName);
-        reflectAutoDetectedInnerJoinToJoin(usedAliasName);
+        registerWhereClause(clause, usedAliasName, false); // possible to be inner-join as default
     }
 
     /**
      * {@inheritDoc}
      */
-    public void registerWhereClause(QueryClause clause, String usedAliasName, String... moreNames) {
-        assertObjectNotNull("clause", clause);
+    public void registerWhereClause(String clause, String usedAliasName, boolean noWayInner) {
+        assertStringNotNullAndNotTrimmedEmpty("clause", clause);
+        assertStringNotNullAndNotTrimmedEmpty("usedAliasName", usedAliasName);
         final List<QueryClause> clauseList = getWhereClauseList4Register();
         doRegisterWhereClause(clauseList, clause);
         reflectWhereUsedToJoin(usedAliasName);
-        reflectAutoDetectedInnerJoinToJoin(usedAliasName);
-        for (String moreName : moreNames) {
-            reflectWhereUsedToJoin(moreName);
+        if (!noWayInner) {
             reflectAutoDetectedInnerJoinToJoin(usedAliasName);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerWhereClause(QueryClause clause, List<String> usedAliasNameList, boolean noWayInner) {
+        assertObjectNotNull("clause", clause);
+        assertObjectNotNull("usedAliasNameList", usedAliasNameList);
+        if (usedAliasNameList.isEmpty()) {
+            String msg = "The argument 'usedAliasNameList' should not be empty.";
+            throw new IllegalArgumentException(msg);
+        }
+        final List<QueryClause> clauseList = getWhereClauseList4Register();
+        doRegisterWhereClause(clauseList, clause);
+        for (String usedAliasName : usedAliasNameList) {
+            reflectWhereUsedToJoin(usedAliasName);
+            if (!noWayInner) {
+                reflectAutoDetectedInnerJoinToJoin(usedAliasName);
+            }
         }
     }
 
@@ -1247,11 +1267,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void reflectAutoDetectedInnerJoinToJoin(String usedAliasName) {
-        reflectAutoDetectedInnerJoinToJoin(usedAliasName, null);
-    }
-
-    protected void reflectAutoDetectedInnerJoinToJoin(String usedAliasName, ConditionKey key) {
-        if (_innerJoinAutoDetect && !_orScopeQueryEffective && !ConditionKey.CK_IS_NULL.equals(key)) {
+        if (_innerJoinAutoDetect && !_orScopeQueryEffective) {
             if (getOuterJoinMap().containsKey(usedAliasName)) { // checked because it may be local
                 doChangeToInnerJoin(usedAliasName, true);
             }

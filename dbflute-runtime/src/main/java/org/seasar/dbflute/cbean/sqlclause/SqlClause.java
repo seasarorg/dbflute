@@ -250,19 +250,29 @@ public interface SqlClause {
             ColumnFunctionCipher cipher, ConditionOption option, String usedAliasName);
 
     /**
-     * Register 'where' clause.
+     * Register 'where' clause. <br />
+     * The join of the alias, if it's a relation condition, may have a chance to be inner-join.
      * @param clause The string clause of 'where'. (NotNull)
      * @param usedAliasName The alias name of table used on the where clause. (NotNull)
      */
     void registerWhereClause(String clause, String usedAliasName);
 
     /**
+     * Register 'where' clause. <br />
+     * You can control the inner-join possibility.
+     * @param clause The string clause of 'where'. (NotNull)
+     * @param usedAliasName The alias name of table used on the where clause. (NotNull)
+     * @param noWayInner No way, to be inner-join for the join of the alias?
+     */
+    void registerWhereClause(String clause, String usedAliasName, boolean noWayInner);
+
+    /**
      * Register 'where' clause.
      * @param clause The query clause of 'where'. (NotNull)
-     * @param usedAliasName The alias name of table used on the where clause. (NotNull)
-     * @param moreNames The more alias names used on the where clause. (NotNull)
+     * @param usedAliasNameList The list for alias name of table used on the where clause. (NotNull, NotEmpty)
+     * @param noWayInner No way, to be inner-join for the join of the alias?
      */
-    void registerWhereClause(QueryClause clause, String usedAliasName, String... moreNames);
+    void registerWhereClause(QueryClause clause, List<String> usedAliasNameList, boolean noWayInner);
 
     /**
      * Exchange first The clause of 'where' for last one.

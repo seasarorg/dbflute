@@ -650,6 +650,14 @@ public class FunctionFilterOption implements ParameterOption {
     }
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean mayNullRevived() { // basically for auto-detect of inner-join
+        // coalesce can change a null value to an existing value
+        return _coalesce != null;
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected final String ln() {

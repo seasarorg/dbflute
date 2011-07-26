@@ -12,13 +12,13 @@ public class HpCBPurposeTest extends TestCase {
         HpCBPurpose purpose = HpCBPurpose.NORMAL_USE; // all can be used
 
         // ## Act & Assert ##
-        assertFalse(purpose.isNonSetupSelect());
-        assertFalse(purpose.isNonSpecify());
-        assertFalse(purpose.isNonSpecifyColumnTwoOrMore());
-        assertFalse(purpose.isNonSpecifyRelation());
-        assertFalse(purpose.isNonSpecifyDerivedReferrer());
-        assertFalse(purpose.isNonQuery());
-        assertFalse(purpose.isNonOrderBy());
+        assertFalse(purpose.isNoSetupSelect());
+        assertFalse(purpose.isNoSpecify());
+        assertFalse(purpose.isNoSpecifyColumnTwoOrMore());
+        assertFalse(purpose.isNoSpecifyRelation());
+        assertFalse(purpose.isNoSpecifyDerivedReferrer());
+        assertFalse(purpose.isNoQuery());
+        assertFalse(purpose.isNoOrderBy());
     }
 
     public void test_toString() {

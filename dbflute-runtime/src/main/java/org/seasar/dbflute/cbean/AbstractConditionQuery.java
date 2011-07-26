@@ -31,6 +31,7 @@ import org.seasar.dbflute.cbean.ManualOrderBean.FreeParameterManualOrderThemeLis
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
+import org.seasar.dbflute.cbean.chelper.HpQDRParameter;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
@@ -785,16 +786,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                        --------------
     protected void registerExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName) {
-        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, null);
+        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, false);
     }
 
     protected void registerNotExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
             String propertyName) {
-        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, "not");
+        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, true);
     }
 
     protected void registerExistsReferrer(final ConditionQuery subQuery, String columnDbName,
-            String relatedColumnDbName, String propertyName, String existsOption) {
+            String relatedColumnDbName, String propertyName, boolean notExists) {
         assertSubQueryNotNull("ExistsReferrer", relatedColumnDbName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -810,8 +811,28 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final ExistsReferrer existsReferrer = new ExistsReferrer(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager);
+        final String existsOption = notExists ? "not" : "";
         final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName, existsOption);
-        registerWhereClause(clause);
+
+        // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+        // Exists -> possible to be inner
+        // NotExists -> no way to be inner
+        //
+        // for example, the following SQL is no way to be inner
+        // (suppose if PURCHASE refers WITHDRAWAL)
+        // 
+        // select mb.MEMBER_ID, mb.MEMBER_NAME
+        //      , mb.MEMBER_STATUS_CODE, wd.MEMBER_ID as WD_MEMBER_ID
+        //   from MEMBER mb
+        //     left outer join MEMBER_WITHDRAWAL wd on mb.MEMBER_ID = wd.MEMBER_ID
+        //  where not exists (select pc.PURCHASE_ID
+        //                      from PURCHASE pc
+        //                     where pc.MEMBER_ID = wd.MEMBER_ID
+        //        )
+        //  order by mb.MEMBER_ID
+        // = = = = = = = = = =/
+        final boolean noWayInner = notExists; // but 'exists' allowed
+        registerWhereClause(clause, noWayInner);
     }
 
     // *unsupported ExistsReferrer as in-line because it's so dangerous
@@ -922,7 +943,28 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value, parameterPath);
         xregisterParameterOption(option);
         final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
-        registerWhereClause(clause);
+
+        // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+        // is null or null-revived conversion (coalesce) -> no way to be inner
+        // 
+        // for example, the following SQL is no way to be inner
+        // (suppose if PURCHASE refers WITHDRAWAL)
+        // 
+        // select mb.MEMBER_ID, mb.MEMBER_NAME
+        //      , mb.MEMBER_STATUS_CODE, wd.MEMBER_ID as WD_MEMBER_ID
+        //   from MEMBER mb
+        //     left outer join MEMBER_WITHDRAWAL wd on mb.MEMBER_ID = wd.MEMBER_ID
+        //  where (select max(pc.PURCHASE_PRICE)
+        //           from PURCHASE pc
+        //          where pc.MEMBER_ID = wd.MEMBER_ID -- may null
+        //        ) is null
+        //  order by mb.MEMBER_ID
+        // 
+        // and using coalesce means it may select records that have null value
+        // so using coalesce is no way in spite of operand
+        // = = = = = = = = = =/
+        final boolean noWayInner = HpQDRParameter.isOperandIsNull(operand) || option.mayNullRevived();
+        registerWhereClause(clause, noWayInner);
     }
 
     // [DBFlute-0.8.8]
@@ -1002,8 +1044,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void registerWhereClause(String whereClause) {
+        registerWhereClause(whereClause, false);
+    }
+
+    protected void registerWhereClause(String whereClause, boolean noWayInner) {
         final String usedAliasName = xgetAliasName();
-        xgetSqlClause().registerWhereClause(whereClause, usedAliasName);
+        xgetSqlClause().registerWhereClause(whereClause, usedAliasName, noWayInner);
     }
 
     protected void registerInlineWhereClause(String whereClause) {
@@ -1089,7 +1135,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void assertOrderByPurpose(String columnName) {
-        if (xgetSqlClause().getPurpose().isNonOrderBy()) {
+        if (xgetSqlClause().getPurpose().isNoOrderBy()) {
             throwOrderByIllegalPurposeException(columnName);
         }
     }
