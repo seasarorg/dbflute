@@ -72,11 +72,11 @@ public class LeftOuterJoinInfo implements Serializable {
         return foreignTableSqlName.toString();
     }
 
-    public boolean isCountableJoin() {
+    public boolean isCountableJoin() { // called when building clause
         return isInnerJoin() || isUnderInnerJoin() || isWhereUsedJoin();
     }
 
-    public boolean isStructurePossibleInnerJoin() {
+    public boolean isStructurePossibleInnerJoin() { // called when building clause
         if (isInnerJoin() || isWhereUsedJoin() || hasInlineOrOnClause()) {
             return false;
         }
