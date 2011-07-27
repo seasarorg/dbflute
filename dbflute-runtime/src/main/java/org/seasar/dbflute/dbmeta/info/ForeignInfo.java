@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.seasar.dbflute.Entity;
@@ -281,11 +282,28 @@ public class ForeignInfo implements RelationInfo {
         return _additionalFK;
     }
 
+    // -----------------------------------------------------
+    //                                               Derived
+    //                                               -------
     /**
      * Does the relation is from pure foreign key?
      * @return The determination, true or false.
      */
     public boolean isPureFK() { // derived property
         return !_oneToOne && !_additionalFK;
+    }
+
+    /**
+     * Do the FK columns have not null constraint?
+     * @return The determination, true or false.
+     */
+    public boolean isNotNullFKColumn() {
+        for (Entry<ColumnInfo, ColumnInfo> entry : getLocalForeignColumnInfoMap().entrySet()) {
+            final ColumnInfo localColumnInfo = entry.getKey();
+            if (!localColumnInfo.isNotNull()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

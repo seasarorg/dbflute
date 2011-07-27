@@ -30,7 +30,7 @@ import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinAutoDetectNoWaySpeaker;
+import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
@@ -203,13 +203,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().allowInnerJoinAutoDetect();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void allowStructurePossibleInnerJoin() {
-        getSqlClause().allowStructurePossibleInnerJoin();
-    }
-
     // [DBFlute-0.9.5.3]
     // ===================================================================================
     //                                                                         ColumnQuery
@@ -361,7 +354,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     protected <CB extends ConditionBean> QueryUsedAliasInfo xcreateColQyAlsInfo(final String usedAliasName,
             final HpCalcSpecification<CB> calcSp) {
-        return new QueryUsedAliasInfo(usedAliasName, new InnerJoinAutoDetectNoWaySpeaker() {
+        return new QueryUsedAliasInfo(usedAliasName, new InnerJoinNoWaySpeaker() {
             public boolean isNoWayInner() {
                 return calcSp.mayNullRevived();
             }
@@ -1107,35 +1100,34 @@ public abstract class AbstractConditionBean implements ConditionBean {
             xinheritInvalidQueryInfo(mainCQ);
 
             // and also inherits inner-join
-            xinheritInnerJoinAutoDetect(mainCQ);
             xinheritStructurePossibleInnerJoin(mainCQ);
+            xinheritWhereUsedInnerJoin(mainCQ);
         }
     }
 
     protected void xinheritInvalidQueryInfo(ConditionQuery mainCQ) {
         if (mainCQ.xgetSqlClause().isEmptyStringQueryAllowed()) {
-            allowEmptyStringQuery(); // inherited
+            allowEmptyStringQuery();
         }
         if (mainCQ.xgetSqlClause().isInvalidQueryChecked()) {
-            checkInvalidQuery(); // inherited
-        }
-    }
-
-    protected void xinheritInnerJoinAutoDetect(ConditionQuery mainCQ) {
-        // inherited
-        if (mainCQ.xgetSqlClause().isInnerJoinAutoDetectAllowed()) { // default
-            allowInnerJoinAutoDetect();
-        } else { // e.g. if it suppresses it by DBFlute property
-            getSqlClause().backToLeftOuterJoinBasis();
+            checkInvalidQuery();
         }
     }
 
     protected void xinheritStructurePossibleInnerJoin(ConditionQuery mainCQ) {
         // inherited
-        if (mainCQ.xgetSqlClause().isStructurePossibleInnerJoinAllowed()) { // default
-            allowStructurePossibleInnerJoin();
+        if (mainCQ.xgetSqlClause().isStructuralPossibleInnerJoinAllowed()) { // DBFlute default
+            getSqlClause().allowStructuralPossibleInnerJoin();
         } else { // e.g. if it suppresses it by DBFlute property
-            getSqlClause().backToWhereUsedInnerJoinBasis();
+            getSqlClause().suppressStructuralPossibleInnerJoin();
+        }
+    }
+
+    protected void xinheritWhereUsedInnerJoin(ConditionQuery mainCQ) {
+        if (mainCQ.xgetSqlClause().isWhereUsedInnerJoinAllowed()) { // DBFlute default
+            getSqlClause().allowWhereUsedInnerJoin();
+        } else { // e.g. if it suppresses it by DBFlute property
+            getSqlClause().suppressWhereUsedInnerJoin();
         }
     }
 

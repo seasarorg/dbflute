@@ -42,8 +42,8 @@ import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
-import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinAutoDetectReflector;
-import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinAutoDetectReflectorBase;
+import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinLazyReflector;
+import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinLazyReflectorBase;
 import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
@@ -147,14 +147,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The map of outer join. */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap;
 
-    /** Does it auto-detect joins that can be inner-join? */
-    protected boolean _innerJoinAutoDetect;
+    /** Does it allow to auto-detect joins that can be structural-possible inner-join? */
+    protected boolean _structuralPossibleInnerJoinAllowed;
 
-    /** Does it auto-detect joins that can be structure-possible inner-join? */
-    protected boolean _structurePossibleInnerJoin;
+    /** Does it allow to auto-detect joins that can be where-used inner-join? */
+    protected boolean _whereUsedInnerJoinAllowed;
 
-    /** The list of reflector for auto-detect of inner-join. */
-    protected List<InnerJoinAutoDetectReflector> _innerJoinAutoDetectReflector;
+    /** The list of lazy reflector for auto-detected inner-join. */
+    protected List<InnerJoinLazyReflector> _innerJoinLazyReflector;
 
     /** The list of where clause. */
     protected List<QueryClause> _whereList;
@@ -856,11 +856,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void reflectInnerJoinAutoDetectLazily() {
-        if (!hasInnerJoinAutoDetectReflector()) {
+        if (!hasInnerJoinLazyReflector()) {
             return;
         }
-        final List<InnerJoinAutoDetectReflector> reflectorList = getInnerJoinAutoDetectReflectorList();
-        for (InnerJoinAutoDetectReflector reflector : reflectorList) {
+        final List<InnerJoinLazyReflector> reflectorList = getInnerJoinLazyReflectorList();
+        for (InnerJoinLazyReflector reflector : reflectorList) {
             reflector.reflect();
         }
         reflectorList.clear();
@@ -934,7 +934,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (joinInfo.isInnerJoin()) {
             return true;
         }
-        return _innerJoinAutoDetect && _structurePossibleInnerJoin && joinInfo.isStructurePossibleInnerJoin();
+        return _structuralPossibleInnerJoinAllowed && joinInfo.isStructurePossibleInnerJoin();
     }
 
     protected boolean isJoinInParentheses() { // for DBMS that needs to join in parentheses
@@ -1128,12 +1128,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         joinInfo.setForeignTableDbName(foreignTableDbName);
         joinInfo.setLocalAliasName(localAliasName);
         joinInfo.setLocalTableDbName(localTableDbName);
+        joinInfo.setJoinOnMap(joinOnMap);
         final LeftOuterJoinInfo localJoinInfo = outerJoinMap.get(localAliasName);
         if (localJoinInfo != null) { // means local is also joined (not base point)
             joinInfo.setLocalJoinInfo(localJoinInfo);
         }
-        joinInfo.setJoinOnMap(joinOnMap);
-        joinInfo.setForeignInfo(foreignInfo);
+        joinInfo.setPureFK(foreignInfo.isPureFK());
+        joinInfo.setNotNullFKColumn(foreignInfo.isNotNullFKColumn());
         joinInfo.setFixedCondition(fixedCondition);
         joinInfo.setFixedConditionResolver(fixedConditionResolver);
 
@@ -1142,6 +1143,20 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         joinInfo.resolveFixedCondition();
 
         outerJoinMap.put(foreignAliasName, joinInfo);
+    }
+
+    // -----------------------------------------------------
+    //                                   OuterJoin Attribute
+    //                                   -------------------
+    protected Map<String, LeftOuterJoinInfo> getOuterJoinMap() {
+        if (_outerJoinMap == null) {
+            _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>(4);
+        }
+        return _outerJoinMap;
+    }
+
+    protected boolean hasOuterJoin() {
+        return _outerJoinMap != null && !_outerJoinMap.isEmpty();
     }
 
     // -----------------------------------------------------
@@ -1183,54 +1198,68 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // -----------------------------------------------------
-    //                                        Join Attribute
-    //                                        --------------
-    protected Map<String, LeftOuterJoinInfo> getOuterJoinMap() {
-        if (_outerJoinMap == null) {
-            _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>(4);
-        }
-        return _outerJoinMap;
-    }
-
-    protected boolean hasOuterJoin() {
-        return _outerJoinMap != null && !_outerJoinMap.isEmpty();
-    }
-
+    //                                  InnerJoin AutoDetect
+    //                                  --------------------
+    // has several items of inner-join auto-detected
     public void allowInnerJoinAutoDetect() {
-        _innerJoinAutoDetect = true;
+        allowStructuralPossibleInnerJoin();
+        allowWhereUsedInnerJoin();
     }
 
-    public void backToLeftOuterJoinBasis() {
-        _innerJoinAutoDetect = false;
+    public void suppressInnerJoinAutoDetect() {
+        suppressStructuralPossibleInnerJoin();
+        suppressWhereUsedInnerJoin();
     }
 
-    public boolean isInnerJoinAutoDetectAllowed() {
-        return _innerJoinAutoDetect;
+    // -----------------------------------------------------
+    //                          StructuralPossible InnerJoin
+    //                          ----------------------------
+    // one of inner-join auto-detect
+    public void allowStructuralPossibleInnerJoin() {
+        _structuralPossibleInnerJoinAllowed = true;
     }
 
-    public void allowStructurePossibleInnerJoin() {
-        _structurePossibleInnerJoin = true;
+    public void suppressStructuralPossibleInnerJoin() {
+        _structuralPossibleInnerJoinAllowed = false;
     }
 
-    public void backToWhereUsedInnerJoinBasis() {
-        _structurePossibleInnerJoin = false;
+    public boolean isStructuralPossibleInnerJoinAllowed() {
+        return _structuralPossibleInnerJoinAllowed;
     }
 
-    public boolean isStructurePossibleInnerJoinAllowed() {
-        return _structurePossibleInnerJoin;
+    // -----------------------------------------------------
+    //                                   WhereUsed InnerJoin
+    //                                   -------------------
+    // one of inner-join auto-detect
+    public void allowWhereUsedInnerJoin() {
+        _whereUsedInnerJoinAllowed = true;
     }
 
-    protected List<InnerJoinAutoDetectReflector> getInnerJoinAutoDetectReflectorList() {
-        if (_innerJoinAutoDetectReflector == null) {
-            _innerJoinAutoDetectReflector = new ArrayList<InnerJoinAutoDetectReflector>(4);
+    public void suppressWhereUsedInnerJoin() {
+        _whereUsedInnerJoinAllowed = false;
+    }
+
+    public boolean isWhereUsedInnerJoinAllowed() {
+        return _whereUsedInnerJoinAllowed;
+    }
+
+    // -----------------------------------------------------
+    //                               InnerJoin LazyReflector
+    //                               -----------------------
+    protected List<InnerJoinLazyReflector> getInnerJoinLazyReflectorList() {
+        if (_innerJoinLazyReflector == null) {
+            _innerJoinLazyReflector = new ArrayList<InnerJoinLazyReflector>(4);
         }
-        return _innerJoinAutoDetectReflector;
+        return _innerJoinLazyReflector;
     }
 
-    protected boolean hasInnerJoinAutoDetectReflector() {
-        return _innerJoinAutoDetectReflector != null && !_innerJoinAutoDetectReflector.isEmpty();
+    protected boolean hasInnerJoinLazyReflector() {
+        return _innerJoinLazyReflector != null && !_innerJoinLazyReflector.isEmpty();
     }
 
+    // -----------------------------------------------------
+    //                                         Assert Helper
+    //                                         -------------
     protected void assertAlreadyOuterJoin(String foreignAliasName) {
         if (getOuterJoinMap().containsKey(foreignAliasName)) {
             String msg = "The foreign alias name have already registered in outer join: " + foreignAliasName;
@@ -1266,7 +1295,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, false, false);
         reflectWhereUsedToJoin(usedAliasName);
         if (!ConditionKey.CK_IS_NULL.equals(key)) {
-            registerInnerJoinAutoDetectReflector(usedAliasName);
+            registerInnerJoinLazyReflector(usedAliasName);
         }
     }
 
@@ -1287,7 +1316,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         doRegisterWhereClause(clauseList, clause);
         reflectWhereUsedToJoin(usedAliasName);
         if (!noWayInner) {
-            registerInnerJoinAutoDetectReflector(usedAliasName);
+            registerInnerJoinLazyReflector(usedAliasName);
         }
     }
 
@@ -1306,13 +1335,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         for (QueryUsedAliasInfo usedAliasInfo : usedAliasInfos) {
             final String usedAliasName = usedAliasInfo.getUsedAliasName();
             reflectWhereUsedToJoin(usedAliasName);
-            registerInnerJoinAutoDetectReflector(usedAliasInfo);
+            registerInnerJoinLazyReflector(usedAliasInfo);
         }
     }
 
     // -----------------------------------------------------
-    //                                       Where-used Join
-    //                                       ---------------
+    //                                        WhereUsed Join
+    //                                        --------------
     protected void reflectWhereUsedToJoin(final String usedAliasName) {
         LeftOuterJoinInfo currentJoinInfo = getOuterJoinMap().get(usedAliasName);
         while (true) {
@@ -1328,31 +1357,31 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // -----------------------------------------------------
-    //                                  InnerJoin AutoDetect
+    //                                  InnerJoin Reflection
     //                                  --------------------
-    protected void registerInnerJoinAutoDetectReflector(String usedAliasName) { // without no-way speaker
-        if (!isAutoDetectedInnerJoinFirstAllowed()) {
+    protected void registerInnerJoinLazyReflector(String usedAliasName) { // without no-way speaker
+        if (isOutOfWhereUsedInnerJoin()) {
             return;
         }
         final QueryUsedAliasInfo usedAliasInfo = new QueryUsedAliasInfo(usedAliasName, null);
-        registerInnerJoinAutoDetectReflector(usedAliasInfo);
+        registerInnerJoinLazyReflector(usedAliasInfo);
     }
 
-    protected void registerInnerJoinAutoDetectReflector(QueryUsedAliasInfo usedAliasInfo) {
-        if (!isAutoDetectedInnerJoinFirstAllowed()) {
+    protected void registerInnerJoinLazyReflector(QueryUsedAliasInfo usedAliasInfo) {
+        if (isOutOfWhereUsedInnerJoin()) {
             return;
         }
-        final List<InnerJoinAutoDetectReflector> reflectorList = getInnerJoinAutoDetectReflectorList();
-        reflectorList.add(createInnerJoinAutoDetectReflector(usedAliasInfo));
+        final List<InnerJoinLazyReflector> reflectorList = getInnerJoinLazyReflectorList();
+        reflectorList.add(createInnerJoinLazyReflector(usedAliasInfo));
     }
 
-    protected boolean isAutoDetectedInnerJoinFirstAllowed() {
-        return _innerJoinAutoDetect && !_orScopeQueryEffective;
+    protected boolean isOutOfWhereUsedInnerJoin() {
+        return !_whereUsedInnerJoinAllowed || _orScopeQueryEffective;
     }
 
-    protected InnerJoinAutoDetectReflectorBase createInnerJoinAutoDetectReflector(QueryUsedAliasInfo usedAliasInfo) {
+    protected InnerJoinLazyReflectorBase createInnerJoinLazyReflector(QueryUsedAliasInfo usedAliasInfo) {
         final String usedAliasName = usedAliasInfo.getUsedAliasName();
-        return new InnerJoinAutoDetectReflectorBase(usedAliasInfo.getInnerJoinAutoDetectNoWaySpeaker()) {
+        return new InnerJoinLazyReflectorBase(usedAliasInfo.getInnerJoinAutoDetectNoWaySpeaker()) {
             @Override
             protected void doReflect() {
                 if (getOuterJoinMap().containsKey(usedAliasName)) { // checked because it may be local

@@ -198,6 +198,9 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                          Registration
+    //                                          ------------
     /**
      * Register outer-join.
      * @param foreignAliasName The alias name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull, Unique)
@@ -213,48 +216,76 @@ public interface SqlClause {
             String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
             String fixedCondition, FixedConditionResolver fixedConditionResolver);
 
+    // -----------------------------------------------------
+    //                                    InnerJoin Handling
+    //                                    ------------------
     /**
      * Change the join type for the relation to inner join manually.
      * @param foreignAliasName The foreign alias name of join table. (NotNull and Unique per invoking method)
      */
     void changeToInnerJoin(String foreignAliasName);
 
+    // -----------------------------------------------------
+    //                                  InnerJoin AutoDetect
+    //                                  --------------------
+    // has several items of inner-join auto-detected
     /**
-     * Allow to auto-detect joins that can be inner-join. <br />
+     * Allow to auto-detect joins that can be (all type) inner-join. <br />
      * You should call this before registrations of where clause.
+     * (actually you can call before selecting but it's a fixed specification for user)
      */
     void allowInnerJoinAutoDetect();
 
     /**
-     * Come back to left-outer join basis.
+     * Suppress auto-detecting inner-join. <br />
      * You should call this before registrations of where clause.
      */
-    void backToLeftOuterJoinBasis();
+    void suppressInnerJoinAutoDetect();
 
+    // -----------------------------------------------------
+    //                          StructuralPossible InnerJoin
+    //                          ----------------------------
+    // one of inner-join auto-detect
     /**
-     * Does it allow to auto-detect inner-join? 
-     * @return Determination. (true or false)
-     */
-    boolean isInnerJoinAutoDetectAllowed();
-
-    /**
-     * Allow to use structure-possible inner-join. <br />
+     * Allow to auto-detect joins that can be structure-possible inner-join. <br />
      * You should call this before registrations of where clause.
      * (actually you can call before selecting but it's a fixed specification for user)
      */
-    void allowStructurePossibleInnerJoin();
+    void allowStructuralPossibleInnerJoin();
 
     /**
-     * Come back to where-used inner-join basis. <br />
+     * Suppress auto-detecting structural-possible inner-join. <br />
      * You should call this before registrations of where clause.
      */
-    void backToWhereUsedInnerJoinBasis();
+    void suppressStructuralPossibleInnerJoin();
 
     /**
-     * Does it allow to use structure-possible inner-join? 
+     * Does it allow to auto-detect structure-possible inner-join? 
      * @return Determination. (true or false)
      */
-    boolean isStructurePossibleInnerJoinAllowed();
+    boolean isStructuralPossibleInnerJoinAllowed();
+
+    // -----------------------------------------------------
+    //                                   WhereUsed InnerJoin
+    //                                   -------------------
+    // one of inner-join auto-detect
+    /**
+     * Allow to auto-detect joins that can be where-used inner-join. <br />
+     * You should call this before registrations of where clause.
+     */
+    void allowWhereUsedInnerJoin();
+
+    /**
+     * Suppress auto-detecting where-used inner-join.
+     * You should call this before registrations of where clause.
+     */
+    void suppressWhereUsedInnerJoin();
+
+    /**
+     * Does it allow to auto-detect where-used inner-join? 
+     * @return Determination. (true or false)
+     */
+    boolean isWhereUsedInnerJoinAllowed();
 
     // ===================================================================================
     //                                                                               Where

@@ -4,11 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
-import org.seasar.dbflute.dbmeta.info.ColumnInfo;
-import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
@@ -29,13 +26,24 @@ public class LeftOuterJoinInfo implements Serializable {
     protected String _foreignTableDbName;
     protected String _localAliasName;
     protected String _localTableDbName;
-    protected ForeignInfo _foreignInfo; // corresponding to this join
+
+    // join condition and info
+    protected Map<ColumnRealName, ColumnRealName> _joinOnMap;
     protected LeftOuterJoinInfo _localJoinInfo; // to be able to trace back toward base point
+
+    // foreign key info
+    protected boolean _pureFK; // has foreign key constraint (not additional, not referrer)
+    protected boolean _notNullFKColumn; // local column for foreign key has not null constraint
+
+    // query for join
     protected final List<QueryClause> _inlineWhereClauseList = new ArrayList<QueryClause>();
     protected final List<QueryClause> _additionalOnClauseList = new ArrayList<QueryClause>();
-    protected Map<ColumnRealName, ColumnRealName> _joinOnMap;
+
+    // fixed condition
     protected String _fixedCondition;
     protected transient FixedConditionResolver _fixedConditionResolver;
+
+    // additional join attribute
     protected boolean _innerJoin; // option (true if inner-join forced or auto-detected)
     protected boolean _underInnerJoin; // option (true if the join has foreign's inner-join)
     protected boolean _whereUsedJoin; // option (true if used on where clause or foreign's use)
@@ -72,19 +80,7 @@ public class LeftOuterJoinInfo implements Serializable {
         if (isInnerJoin() || isWhereUsedJoin() || hasInlineOrOnClause()) {
             return false;
         }
-        return _foreignInfo.isPureFK() && isNotNullFKColumn();
-    }
-
-    protected boolean isNotNullFKColumn() {
-        final Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap = _foreignInfo.getLocalForeignColumnInfoMap();
-        for (Entry<ColumnInfo, ColumnInfo> entry : localForeignColumnInfoMap.entrySet()) {
-            final ColumnInfo localColumnInfo = entry.getKey();
-            if (!localColumnInfo.isNotNull()) {
-                return false;
-            }
-        }
-        // FK column is not null here
-        return true;
+        return _pureFK && _notNullFKColumn;
     }
 
     // ===================================================================================
@@ -122,12 +118,12 @@ public class LeftOuterJoinInfo implements Serializable {
         _localTableDbName = localTableDbName;
     }
 
-    public ForeignInfo getForeignInfo() {
-        return _foreignInfo;
+    public Map<ColumnRealName, ColumnRealName> getJoinOnMap() {
+        return _joinOnMap;
     }
 
-    public void setForeignInfo(ForeignInfo foreignInfo) {
-        this._foreignInfo = foreignInfo;
+    public void setJoinOnMap(Map<ColumnRealName, ColumnRealName> joinOnMap) {
+        _joinOnMap = joinOnMap;
     }
 
     public LeftOuterJoinInfo getLocalJoinInfo() {
@@ -136,6 +132,22 @@ public class LeftOuterJoinInfo implements Serializable {
 
     public void setLocalJoinInfo(LeftOuterJoinInfo localJoinInfo) {
         _localJoinInfo = localJoinInfo;
+    }
+
+    public boolean getPureFK() {
+        return _pureFK;
+    }
+
+    public void setPureFK(boolean pureFK) {
+        this._pureFK = pureFK;
+    }
+
+    public boolean getNotNullFKColumn() {
+        return _notNullFKColumn;
+    }
+
+    public void setNotNullFKColumn(boolean notNullFKColumn) {
+        this._notNullFKColumn = notNullFKColumn;
     }
 
     public List<QueryClause> getInlineWhereClauseList() {
@@ -152,14 +164,6 @@ public class LeftOuterJoinInfo implements Serializable {
 
     public void addAdditionalOnClause(QueryClause additionalOnClause) {
         _additionalOnClauseList.add(additionalOnClause);
-    }
-
-    public Map<ColumnRealName, ColumnRealName> getJoinOnMap() {
-        return _joinOnMap;
-    }
-
-    public void setJoinOnMap(Map<ColumnRealName, ColumnRealName> joinOnMap) {
-        _joinOnMap = joinOnMap;
     }
 
     public String getFixedCondition() {
