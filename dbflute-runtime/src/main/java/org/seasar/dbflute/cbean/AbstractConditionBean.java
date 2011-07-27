@@ -30,9 +30,11 @@ import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinAutoDetectNoWaySpeaker;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -45,7 +47,6 @@ import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -220,7 +221,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         rightCalcSp.setLeftCalcSp(leftCalcSp);
 
         final QueryClause queryClause = xcreateColQyClause(leftColumn, operand, rightColumn, rightCalcSp);
-        xregisterColumnQueryClause(queryClause, leftCalcSp, rightCalcSp);
+        xregisterColQyClause(queryClause, leftCalcSp, rightCalcSp);
         return rightCalcSp;
     }
 
@@ -321,12 +322,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return SubQueryIndentProcessor.moveSubQueryEndToRear(columnExp + inserted);
     }
 
-    protected <CB extends ConditionBean> void xregisterColumnQueryClause(QueryClause queryClause,
-            HpCalcSpecification<CB> leftCalcSp, HpCalcSpecification<CB> rightCalcSp) {
-        final String leftAlias = leftCalcSp.getResolvedSpecifiedTableAliasName();
-        final String rightAlias = rightCalcSp.getResolvedSpecifiedTableAliasName();
-        final List<String> usedAliasNameList = DfCollectionUtil.newArrayList(leftAlias, rightAlias);
-
+    protected <CB extends ConditionBean> void xregisterColQyClause(QueryClause queryClause,
+            final HpCalcSpecification<CB> leftCalcSp, final HpCalcSpecification<CB> rightCalcSp) {
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
         // may null-revived -> no way to be inner-join
         // (DerivedReferrer or conversion's coalesce)
@@ -348,8 +345,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
         // it has a possible to be inner-join in various case
         // but it is hard to analyze in detail so simplify it
         // = = = = = = = = = =/
-        final boolean noWayInner = leftCalcSp.mayNullRevived() || rightCalcSp.mayNullRevived();
-        getSqlClause().registerWhereClause(queryClause, usedAliasNameList, noWayInner);
+        final String leftAlias = leftCalcSp.getResolvedSpecifiedTableAliasName();
+        final String rightAlias = rightCalcSp.getResolvedSpecifiedTableAliasName();
+        final QueryUsedAliasInfo leftInfo = xcreateColQyAlsInfo(leftAlias, leftCalcSp);
+        final QueryUsedAliasInfo rightInfo = xcreateColQyAlsInfo(rightAlias, rightCalcSp);
+        getSqlClause().registerWhereClause(queryClause, leftInfo, rightInfo);
+    }
+
+    protected <CB extends ConditionBean> QueryUsedAliasInfo xcreateColQyAlsInfo(final String usedAliasName,
+            final HpCalcSpecification<CB> calcSp) {
+        return new QueryUsedAliasInfo(usedAliasName, new InnerJoinAutoDetectNoWaySpeaker() {
+            public boolean isNoWayInner() {
+                return calcSp.mayNullRevived();
+            }
+        });
     }
 
     // [DBFlute-0.9.6.3]
@@ -1103,8 +1112,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     protected void xinheritInnerJoinAutoDetect(ConditionQuery mainCQ) {
-        if (mainCQ.xgetSqlClause().isInnerJoinAutoDetectAllowed()) {
-            allowInnerJoinAutoDetect(); // inherited
+        // inherited
+        if (mainCQ.xgetSqlClause().isInnerJoinAutoDetectAllowed()) { // default
+            allowInnerJoinAutoDetect();
+        } else { // e.g. if it suppresses it by DBFlute property
+            getSqlClause().backToLeftOuterJoinBasis();
         }
     }
 

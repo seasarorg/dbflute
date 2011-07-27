@@ -34,6 +34,7 @@ import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -267,12 +268,12 @@ public interface SqlClause {
     void registerWhereClause(String clause, String usedAliasName, boolean noWayInner);
 
     /**
-     * Register 'where' clause.
-     * @param clause The query clause of 'where'. (NotNull)
-     * @param usedAliasNameList The list for alias name of table used on the where clause. (NotNull, NotEmpty)
-     * @param noWayInner No way, to be inner-join for the join of the alias?
+     * Register 'where' clause. <br />
+     * You can control the inner-join possibility.
+     * @param clause The string clause of 'where'. (NotNull)
+     * @param usedAliasInfos The array of information of used alias, contains no-way-inner determination. (NotNull, NotEmpty)
      */
-    void registerWhereClause(QueryClause clause, List<String> usedAliasNameList, boolean noWayInner);
+    void registerWhereClause(QueryClause clause, QueryUsedAliasInfo... usedAliasInfos);
 
     /**
      * Exchange first The clause of 'where' for last one.

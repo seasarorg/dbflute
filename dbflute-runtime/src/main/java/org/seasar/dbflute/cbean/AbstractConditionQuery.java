@@ -811,7 +811,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final ExistsReferrer existsReferrer = new ExistsReferrer(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager);
-        final String existsOption = notExists ? "not" : "";
+        final String existsOption = notExists ? "not" : null;
         final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName, existsOption);
 
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
