@@ -203,6 +203,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().allowInnerJoinAutoDetect();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void allowStructurePossibleInnerJoin() {
+        getSqlClause().allowStructurePossibleInnerJoin();
+    }
+
     // [DBFlute-0.9.5.3]
     // ===================================================================================
     //                                                                         ColumnQuery
@@ -1098,7 +1105,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
             // all sub condition-query are target
             // (purposes not allowed to use query() also may have nested query())
             xinheritInvalidQueryInfo(mainCQ);
-            xinheritInnerJoinAutoDetect(mainCQ); // and also inherits inner-join
+
+            // and also inherits inner-join
+            xinheritInnerJoinAutoDetect(mainCQ);
+            xinheritStructurePossibleInnerJoin(mainCQ);
         }
     }
 
@@ -1117,6 +1127,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
             allowInnerJoinAutoDetect();
         } else { // e.g. if it suppresses it by DBFlute property
             getSqlClause().backToLeftOuterJoinBasis();
+        }
+    }
+
+    protected void xinheritStructurePossibleInnerJoin(ConditionQuery mainCQ) {
+        // inherited
+        if (mainCQ.xgetSqlClause().isStructurePossibleInnerJoinAllowed()) { // default
+            allowStructurePossibleInnerJoin();
+        } else { // e.g. if it suppresses it by DBFlute property
+            getSqlClause().backToWhereUsedInnerJoinBasis();
         }
     }
 

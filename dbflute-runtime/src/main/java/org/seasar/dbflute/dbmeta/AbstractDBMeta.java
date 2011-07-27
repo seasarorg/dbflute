@@ -304,9 +304,13 @@ public abstract class AbstractDBMeta implements DBMeta {
         return (ForeignInfo) DfReflectionUtil.invoke(method, this, null);
     }
 
-    protected ForeignInfo cfi(String propName, DBMeta localDbm, DBMeta foreignDbm,
-            Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relNo, boolean oneToOne, boolean bizOneToOne) { // createForeignInfo()
-        return new ForeignInfo(propName, localDbm, foreignDbm, localForeignColumnInfoMap, relNo, oneToOne, bizOneToOne);
+    // createForeignInfo()
+    protected ForeignInfo cfi(String propName // property name
+            , DBMeta localDbm, DBMeta foreignDbm // DB meta
+            , Map<ColumnInfo, ColumnInfo> locFrColMap, int relNo // relation info
+            , boolean oneToOne, boolean bizOneToOne // one-to-one info
+            , boolean additionalFK) { // additional info
+        return new ForeignInfo(propName, localDbm, foreignDbm, locFrColMap, relNo, oneToOne, bizOneToOne, additionalFK);
     }
 
     /**

@@ -36,6 +36,7 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbway.DBWay;
@@ -204,12 +205,13 @@ public interface SqlClause {
      * @param localAliasName The alias name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
      * @param localTableDbName The DB name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
      * @param joinOnMap The map of join condition on on-clause. (NotNull)
+     * @param foreignInfo The information of foreign relation corresponding to this join. (NotNull)
      * @param fixedCondition The fixed condition on on-clause. (NullAllowed: if null, means no fixed condition)
      * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
     void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
-            FixedConditionResolver fixedConditionResolver);
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
+            String fixedCondition, FixedConditionResolver fixedConditionResolver);
 
     /**
      * Change the join type for the relation to inner join manually.
@@ -234,6 +236,25 @@ public interface SqlClause {
      * @return Determination. (true or false)
      */
     boolean isInnerJoinAutoDetectAllowed();
+
+    /**
+     * Allow to use structure-possible inner-join. <br />
+     * You should call this before registrations of where clause.
+     * (actually you can call before selecting but it's a fixed specification for user)
+     */
+    void allowStructurePossibleInnerJoin();
+
+    /**
+     * Come back to where-used inner-join basis. <br />
+     * You should call this before registrations of where clause.
+     */
+    void backToWhereUsedInnerJoinBasis();
+
+    /**
+     * Does it allow to use structure-possible inner-join? 
+     * @return Determination. (true or false)
+     */
+    boolean isStructurePossibleInnerJoinAllowed();
 
     // ===================================================================================
     //                                                                               Where

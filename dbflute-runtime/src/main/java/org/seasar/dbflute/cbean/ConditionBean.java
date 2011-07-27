@@ -89,13 +89,23 @@ public interface ConditionBean extends PagingBean {
 
     /**
      * Allow to auto-detect joins that can be inner-join. <br />
-     * You can use it by default on DBFlute so you don't need to call this basically.
+     * You can use it by default on DBFlute (since 0.9.9.0A) so you don't need to call this basically.
      * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
      * You should call this before registrations of where clause. <br />
      * Union and SubQuery and other sub condition-bean inherit this. <br />
      * You should confirm your SQL on the log to be tuned by inner-join correctly.
      */
-    void allowInnerJoinAutoDetect();
+    void allowInnerJoinAutoDetect(); // DBFlute default
+
+    /**
+     * Allow to use structure-possible inner-join. <br />
+     * You can use it with inner-join auto-detect. <br />
+     * You should call this before registrations of where clause. <br />
+     * Union and SubQuery and other sub condition-bean inherit this. <br />
+     * You should confirm your SQL on the log to be tuned by inner-join correctly. <br />
+     * And it refers NotNull constraint by determination, so you should not change it without re-generating
+     */
+    void allowStructurePossibleInnerJoin(); // non default
 
     // ===================================================================================
     //                                                                        Lock Setting

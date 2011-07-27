@@ -44,12 +44,14 @@ public class ForeignInfo implements RelationInfo {
     protected final int _relationNo;
     protected final boolean _oneToOne;
     protected final boolean _bizOneToOne;
+    protected final boolean _additionalFK;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ForeignInfo(String foreignPropertyName, DBMeta localDBMeta, DBMeta foreignDBMeta,
-            Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, boolean oneToOne, boolean bizOneToOne) {
+            Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, boolean oneToOne,
+            boolean bizOneToOne, boolean additionalFK) {
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("foreignDBMeta", foreignDBMeta);
@@ -68,6 +70,7 @@ public class ForeignInfo implements RelationInfo {
         this._relationNo = relationNo;
         this._oneToOne = oneToOne;
         this._bizOneToOne = bizOneToOne;
+        this._additionalFK = additionalFK;
     }
 
     // ===================================================================================
@@ -268,5 +271,21 @@ public class ForeignInfo implements RelationInfo {
      */
     public boolean isBizOneToOne() {
         return _bizOneToOne;
+    }
+
+    /**
+     * Does the relation is from additional foreign key?
+     * @return The determination, true or false.
+     */
+    public boolean isAdditionalFK() {
+        return _additionalFK;
+    }
+
+    /**
+     * Does the relation is from pure foreign key?
+     * @return The determination, true or false.
+     */
+    public boolean isPureFK() { // derived property
+        return !_oneToOne && !_additionalFK;
     }
 }

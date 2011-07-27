@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
@@ -26,6 +29,7 @@ public class LeftOuterJoinInfo implements Serializable {
     protected String _foreignTableDbName;
     protected String _localAliasName;
     protected String _localTableDbName;
+    protected ForeignInfo _foreignInfo; // corresponding to this join
     protected LeftOuterJoinInfo _localJoinInfo; // to be able to trace back toward base point
     protected final List<QueryClause> _inlineWhereClauseList = new ArrayList<QueryClause>();
     protected final List<QueryClause> _additionalOnClauseList = new ArrayList<QueryClause>();
@@ -64,6 +68,28 @@ public class LeftOuterJoinInfo implements Serializable {
         return _innerJoin || _underInnerJoin || _whereUsedJoin;
     }
 
+    public boolean isStructurePossibleInnerJoin() {
+        if (isCountableJoin()) {
+            return false;
+        }
+        if (hasInlineOrOnClause()) {
+            return false;
+        }
+        return _foreignInfo.isPureFK() && isNotNullFKColumn();
+    }
+
+    protected boolean isNotNullFKColumn() {
+        final Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap = _foreignInfo.getLocalForeignColumnInfoMap();
+        for (Entry<ColumnInfo, ColumnInfo> entry : localForeignColumnInfoMap.entrySet()) {
+            final ColumnInfo localColumnInfo = entry.getKey();
+            if (!localColumnInfo.isNotNull()) {
+                return false;
+            }
+        }
+        // FK column is not null here
+        return true;
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -97,6 +123,14 @@ public class LeftOuterJoinInfo implements Serializable {
 
     public void setLocalTableDbName(String localTableDbName) {
         _localTableDbName = localTableDbName;
+    }
+
+    public ForeignInfo getForeignInfo() {
+        return _foreignInfo;
+    }
+
+    public void setForeignInfo(ForeignInfo foreignInfo) {
+        this._foreignInfo = foreignInfo;
     }
 
     public LeftOuterJoinInfo getLocalJoinInfo() {

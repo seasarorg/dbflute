@@ -57,6 +57,7 @@ import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -334,22 +335,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                           OuterJoin
     //                                                                           =========
     /**
-     * Register outer-join.
+     * Register outer-join. (no fixed condition)
      * @param foreignCQ The condition-query for foreign table. (NotNull)
      * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
+     * @param foreignPropertyName The property name of foreign corresponding to this join. (NotNull)
      */
-    protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap) {
-        registerOuterJoin(foreignCQ, joinOnResourceMap, null);
+    protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
+            String foreignPropertyName) {
+        registerOuterJoin(foreignCQ, joinOnResourceMap, foreignPropertyName, null);
     }
 
     /**
-     * Register outer-join.
+     * Register outer-join with fixed-condition.
      * @param foreignCQ The condition-query for foreign table. (NotNull)
      * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
-     * @param fixedCondition The plain fixed condition. (NullAllowed)
+     * @param foreignPropertyName The property name of foreign relation corresponding to this join. (NotNull)
+     * @param fixedCondition The plain fixed condition. (NullAllowed: if null, no fixed condition)
      */
     protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
-            String fixedCondition) {
+            String foreignPropertyName, String fixedCondition) {
         // translate join-on map using column real name
         final Map<ColumnRealName, ColumnRealName> joinOnMap = newLinkedHashMap();
         final Set<Entry<String, String>> entrySet = joinOnResourceMap.entrySet();
@@ -362,9 +366,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String foreignTable = foreignCQ.getTableDbName();
         final String localAlias = xgetAliasName();
         final String localTable = getTableDbName();
+        final ForeignInfo foreignInfo = findDBMeta(getTableDbName()).findForeignInfo(foreignPropertyName);
         final FixedConditionResolver resolver = createFixedConditionResolver(foreignCQ, joinOnMap);
-        xgetSqlClause().registerOuterJoin(foreignAlias, foreignTable, localAlias, localTable, joinOnMap,
-                fixedCondition, resolver);
+        xgetSqlClause().registerOuterJoin(foreignAlias, foreignTable, localAlias, localTable // basic
+                , joinOnMap, foreignInfo // join objects
+                , fixedCondition, resolver); // fixed condition
     }
 
     protected FixedConditionResolver createFixedConditionResolver(ConditionQuery foreignCQ,

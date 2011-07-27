@@ -150,6 +150,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Does it auto-detect joins that can be inner-join? */
     protected boolean _innerJoinAutoDetect;
 
+    /** Does it auto-detect joins that can be structure-possible inner-join? */
+    protected boolean _structurePossibleInnerJoin;
+
     /** The list of reflector for auto-detect of inner-join. */
     protected List<InnerJoinAutoDetectReflector> _innerJoinAutoDetectReflector;
 
@@ -874,7 +877,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
         sb.append(ln()).append("   ");
         final String joinExp;
-        if (joinInfo.isInnerJoin()) {
+        if (canBeInnerJoin(joinInfo)) {
             joinExp = " inner join ";
         } else {
             joinExp = " left outer join "; // is main!
@@ -925,6 +928,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (isJoinInParentheses()) {
             sb.append(")");
         }
+    }
+
+    protected boolean canBeInnerJoin(LeftOuterJoinInfo joinInfo) {
+        if (joinInfo.isInnerJoin()) {
+            return true;
+        }
+        if (_structurePossibleInnerJoin && joinInfo.isStructurePossibleInnerJoin()) {
+            return true;
+        }
+        return false;
     }
 
     protected boolean isJoinInParentheses() { // for DBMS that needs to join in parentheses
@@ -1108,8 +1121,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * {@inheritDoc}
      */
     public void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
-            FixedConditionResolver fixedConditionResolver) {
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
+            String fixedCondition, FixedConditionResolver fixedConditionResolver) {
         assertAlreadyOuterJoin(foreignAliasName);
         assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
         final Map<String, LeftOuterJoinInfo> outerJoinMap = getOuterJoinMap();
@@ -1123,6 +1136,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             joinInfo.setLocalJoinInfo(localJoinInfo);
         }
         joinInfo.setJoinOnMap(joinOnMap);
+        joinInfo.setForeignInfo(foreignInfo);
         joinInfo.setFixedCondition(fixedCondition);
         joinInfo.setFixedConditionResolver(fixedConditionResolver);
 
@@ -1195,6 +1209,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public boolean isInnerJoinAutoDetectAllowed() {
         return _innerJoinAutoDetect;
+    }
+
+    public void allowStructurePossibleInnerJoin() {
+        _structurePossibleInnerJoin = true;
+    }
+
+    public void backToWhereUsedInnerJoinBasis() {
+        _structurePossibleInnerJoin = false;
+    }
+
+    public boolean isStructurePossibleInnerJoinAllowed() {
+        return _structurePossibleInnerJoin;
     }
 
     protected List<InnerJoinAutoDetectReflector> getInnerJoinAutoDetectReflectorList() {

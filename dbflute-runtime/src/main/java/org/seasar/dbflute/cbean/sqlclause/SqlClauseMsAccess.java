@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbway.DBWay;
 import org.seasar.dbflute.dbway.WayOfMSAccess;
@@ -64,12 +65,12 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
     //                                                                  ==================
     @Override
     public void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
-            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, String fixedCondition,
-            FixedConditionResolver fixedConditionResolver) {
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
+            String fixedCondition, FixedConditionResolver fixedConditionResolver) {
         // MS-Access does not support additional conditions on OnClause
         // so switch it to in-line where clause
         super.registerOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName // normal 
-                , joinOnMap // normal until here
+                , joinOnMap, foreignInfo // normal until here
                 , null, null); // null set to OnClause
         if (fixedCondition != null) { // uses it instead of null set
             if (fixedConditionResolver != null) {
