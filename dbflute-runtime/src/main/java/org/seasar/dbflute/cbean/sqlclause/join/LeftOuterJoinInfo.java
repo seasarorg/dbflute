@@ -65,14 +65,11 @@ public class LeftOuterJoinInfo implements Serializable {
     }
 
     public boolean isCountableJoin() {
-        return _innerJoin || _underInnerJoin || _whereUsedJoin;
+        return isInnerJoin() || isUnderInnerJoin() || isWhereUsedJoin();
     }
 
     public boolean isStructurePossibleInnerJoin() {
-        if (isCountableJoin()) {
-            return false;
-        }
-        if (hasInlineOrOnClause()) {
+        if (isInnerJoin() || isWhereUsedJoin() || hasInlineOrOnClause()) {
             return false;
         }
         return _foreignInfo.isPureFK() && isNotNullFKColumn();

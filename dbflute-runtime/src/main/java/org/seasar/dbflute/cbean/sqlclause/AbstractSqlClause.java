@@ -934,10 +934,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (joinInfo.isInnerJoin()) {
             return true;
         }
-        if (_structurePossibleInnerJoin && joinInfo.isStructurePossibleInnerJoin()) {
-            return true;
-        }
-        return false;
+        return _innerJoinAutoDetect && _structurePossibleInnerJoin && joinInfo.isStructurePossibleInnerJoin();
     }
 
     protected boolean isJoinInParentheses() { // for DBMS that needs to join in parentheses
