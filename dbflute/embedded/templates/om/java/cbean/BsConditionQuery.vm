@@ -529,9 +529,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         joinOnMap.put("${localColumn.name}", "${foreignColumnName}");
 #end
 #if ($fk.hasFixedCondition())
-        registerOuterJoin(cq, joinOnMap, "${fk.fixedCondition}");
+        registerOuterJoin(cq, joinOnMap, "${fk.foreignPropertyName}", "${fk.fixedCondition}");
 #else
-        registerOuterJoin(cq, joinOnMap);
+        registerOuterJoin(cq, joinOnMap, "${fk.foreignPropertyName}");
 #end
     }
     public boolean hasConditionQuery${fk.ForeignPropertyNameInitCap}() {
@@ -573,9 +573,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         joinOnMap.put("${foreignColumn.name}", "${referrerColumnName}");
 #end
 #if ($referrer.hasFixedCondition())
-        registerOuterJoin(cq, joinOnMap, "${referrer.fixedCondition}");
+        registerOuterJoin(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}", "${referrer.fixedCondition}");
 #else
-        registerOuterJoin(cq, joinOnMap);
+        registerOuterJoin(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}");
 #end
     }
     public boolean hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() {
