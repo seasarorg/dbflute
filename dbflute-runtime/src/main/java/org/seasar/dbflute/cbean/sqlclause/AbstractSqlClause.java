@@ -844,10 +844,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected String getLeftOuterJoinClause() {
         final StringBuilder sb = new StringBuilder();
         reflectInnerJoinAutoDetectLazily();
+        final boolean trimmedAllowed = isTrimmedJoinAllowed();
         for (Entry<String, LeftOuterJoinInfo> outerJoinEntry : getOuterJoinMap().entrySet()) {
             final String foreignAliasName = outerJoinEntry.getKey();
             final LeftOuterJoinInfo joinInfo = outerJoinEntry.getValue();
-            if (isTrimmedJoin(joinInfo)) {
+            if (trimmedAllowed && canBeTrimmedJoin(joinInfo)) {
                 continue; // means only joined countable
             }
             buildLeftOuterJoinClause(sb, foreignAliasName, joinInfo);
@@ -866,8 +867,24 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         reflectorList.clear();
     }
 
-    protected boolean isTrimmedJoin(LeftOuterJoinInfo joinInfo) {
-        return canPagingCountLeastJoin() && isSelectClauseTypeNonUnionCount() && !joinInfo.isCountableJoin();
+    protected boolean canBeTrimmedJoin(LeftOuterJoinInfo joinInfo) {
+        return !joinInfo.isCountableJoin();
+    }
+
+    protected boolean isTrimmedJoinAllowed() {
+        if (!canPagingCountLeastJoin()) {
+            return false;
+        }
+        if (!isSelectClauseTypeNonUnionCount()) {
+            return false;
+        }
+        for (LeftOuterJoinInfo joinInfo : getOuterJoinMap().values()) {
+            if (joinInfo.hasFixedConditionOverRelation()) {
+                // because over-relation may have references of various relations
+                return false;
+            }
+        }
+        return true;
     }
 
     protected void buildLeftOuterJoinClause(StringBuilder sb, String foreignAliasName, LeftOuterJoinInfo joinInfo) {
@@ -877,7 +894,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
         sb.append(ln()).append("   ");
         final String joinExp;
-        if (canBeInnerJoin(joinInfo)) {
+        final boolean canBeInnerJoin = canBeInnerJoin(joinInfo);
+        if (canBeInnerJoin) {
             joinExp = " inner join ";
         } else {
             joinExp = " left outer join "; // is main!
@@ -895,7 +913,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 tableExp = getInlineViewClause(foreignTableSqlName, inlineWhereClauseList, tablePos);
             }
             if (joinInfo.hasFixedCondition()) {
-                sb.append(joinInfo.resolveFixedInlineView(tableExp));
+                sb.append(joinInfo.resolveFixedInlineView(tableExp, canBeInnerJoin));
             } else {
                 sb.append(tableExp);
             }

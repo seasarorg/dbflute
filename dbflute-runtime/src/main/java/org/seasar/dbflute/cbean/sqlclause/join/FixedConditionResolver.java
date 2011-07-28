@@ -16,7 +16,15 @@ public interface FixedConditionResolver {
     /**
      * Resolve fixed InlineView for fixed-condition.
      * @param foreignTable The SQL name of foreign table that has fixed-condition. (NotNull) 
+     * @param treatedAsInnerJoin Does the join treated as inner-join?
      * @return Resolved foreign table expression. (NotNull)
      */
-    String resolveFixedInlineView(String foreignTable);
+    String resolveFixedInlineView(String foreignTable, boolean treatedAsInnerJoin);
+
+    /**
+     * Does the fixed-condition have over-relation?
+     * @param fixedCondition The string of fixed-condition. (NotNull)
+     * @return Determination. (true or false)
+     */
+    boolean hasOverRelation(String fixedCondition);
 }

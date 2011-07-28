@@ -50,9 +50,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     //                                                                    Resolve Variable
     //                                                                    ================
     /**
-     * Resolve variables on fixed condition.
-     * @param fixedCondition The plain fixed condition. (NotNull: if null, this is not called)
-     * @return The resolved fixed condition. (NotNull)
+     * {@inheritDoc}
      */
     public String resolveVariable(String fixedCondition) {
         final String localAliasName = _localCQ.xgetAliasName();
@@ -211,13 +209,20 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     // ===================================================================================
     //                                                            Resolve Fixed InlineView
     //                                                            ========================
-    public String resolveFixedInlineView(String foreignTableSqlName) {
+    public String resolveFixedInlineView(String foreignTableSqlName, boolean treatedAsInnerJoin) {
         if (_inlineViewResourceMap == null || _inlineViewResourceMap.isEmpty()) {
             return foreignTableSqlName; // not uses InlineView
         }
         // alias is required because foreignTableSqlName may be (normal) InlineView
         final String baseAlias = "dffixedbase";
-        final String baseIndent = "                    ";
+        final String baseIndent;
+        if (treatedAsInnerJoin) {
+            // ----------"    inner join "
+            baseIndent = "               ";
+        } else {
+            // ----------"    left outer join "
+            baseIndent = "                    ";
+        }
         final StringBuilder joinSb = new StringBuilder();
         final Map<ForeignInfo, String> relationMap = new HashMap<ForeignInfo, String>();
         final List<String> additionalRealColumnList = new ArrayList<String>();
@@ -331,6 +336,18 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         br.addElement(_localCQ.getTableDbName());
         final String msg = br.buildExceptionMessage();
         throw new IllegalFixedConditionOverRelationException(msg, e);
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasOverRelation(String fixedCondition) {
+        final String relationBeginMark = getRelationBeginMark();
+        final String relationEndMark = getRelationEndMark();
+        return Srl.containsAll(fixedCondition, relationBeginMark, relationEndMark);
     }
 
     // ===================================================================================

@@ -42,6 +42,7 @@ public class LeftOuterJoinInfo implements Serializable {
     // fixed condition
     protected String _fixedCondition;
     protected transient FixedConditionResolver _fixedConditionResolver;
+    protected boolean _fixedConditionOverRelation; // derived by resolving
 
     // additional join attribute
     protected boolean _innerJoin; // option (true if inner-join forced or auto-detected)
@@ -67,13 +68,19 @@ public class LeftOuterJoinInfo implements Serializable {
 
     public void resolveFixedCondition() { // required before using fixed-condition
         if (hasFixedCondition() && _fixedConditionResolver != null) {
+            // over-relation should be determined before resolving
+            _fixedConditionOverRelation = _fixedConditionResolver.hasOverRelation(_fixedCondition);
             _fixedCondition = _fixedConditionResolver.resolveVariable(_fixedCondition);
         }
     }
 
-    public String resolveFixedInlineView(String foreignTableSqlName) {
+    public boolean hasFixedConditionOverRelation() { // should be called after resolving fixed-condition
+        return _fixedConditionOverRelation;
+    }
+
+    public String resolveFixedInlineView(String foreignTableSqlName, boolean canBeInnerJoin) {
         if (hasFixedCondition() && _fixedConditionResolver != null) {
-            return _fixedConditionResolver.resolveFixedInlineView(foreignTableSqlName);
+            return _fixedConditionResolver.resolveFixedInlineView(foreignTableSqlName, canBeInnerJoin);
         }
         return foreignTableSqlName.toString();
     }
