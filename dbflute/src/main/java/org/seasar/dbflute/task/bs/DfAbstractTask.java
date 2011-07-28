@@ -285,6 +285,10 @@ public abstract class DfAbstractTask extends Task {
         _mainSchema = getDatabaseProperties().getDatabaseSchema();
         _password = getDatabaseProperties().getDatabasePassword();
         _connectionProperties = getDatabaseProperties().getConnectionProperties();
+
+        final ResourceContext context = new ResourceContext();
+        context.setCurrentDBDef(getBasicProperties().getCurrentDBDef());
+        ResourceContext.setResourceContextOnThread(context); // no need to clear because of one thread
     }
 
     protected void initializeVariousEnvironment() {
