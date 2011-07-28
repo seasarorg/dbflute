@@ -21,7 +21,6 @@ import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -58,6 +57,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The implementation of xls data handler. And also of writer.
@@ -110,10 +110,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             _log.info("= = = = = = =/");
             final DfXlsReader xlsReader = createXlsReader(dataDirectory, file);
             final DfDataSet dataSet = xlsReader.read();
-
             filterValidColumn(dataSet);
             setupDefaultValue(dataDirectory, dataSet);
-
             doWriteDataSet(resource, file, dataSet);
             final boolean warned = false; // this has no warning fixedly
             loadedDataInfo.addLoadedFile(resource.getEnvType(), "xls", null, file.getName(), warned);
@@ -168,7 +166,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     preparedSql = myCreatedState.buildPreparedSql(dataRow);
                     ps = conn.prepareStatement(preparedSql);
                 }
-                doWriteDataRow(file, dataTable, dataRow // basic resources
+                doWriteDataRow(resource, file, dataTable, dataRow // basic resources
                         , columnInfoMap, columnNameList // meta data
                         , conn, ps // JDBC resources
                         , loggingInsertType, suppressBatchUpdate); // option
@@ -191,7 +189,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     for (int i = 0; i < dataTable.getRowSize(); i++) {
                         final DfDataRow dataRow = dataTable.getRow(i);
                         try {
-                            doWriteDataRow(file, dataTable, dataRow // basic resources
+                            doWriteDataRow(resource, file, dataTable, dataRow // basic resources
                                     , columnInfoMap, columnNameList // meta data
                                     , conn, retryPs // JDBC resources
                                     , LoggingInsertType.NONE, true); // option (no logging and suppress batch)
@@ -249,15 +247,19 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
-    protected void doWriteDataRow(File file, DfDataTable dataTable, DfDataRow dataRow,
+    protected void doWriteDataRow(DfXlsDataResource resource, File file, DfDataTable dataTable, DfDataRow dataRow,
             Map<String, DfColumnMeta> columnInfoMap, List<String> columnNameList, Connection conn,
             PreparedStatement ps, LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
-        final Map<String, Object> columnValueMap = columnContainer.getColumnValueMap();
-        if (columnValueMap.isEmpty()) {
-            throwXlsDataColumnDefFailureException(file, dataTable);
+        final Map<String, Object> columnValueMap;
+        {
+            Map<String, Object> plainMap = columnContainer.getColumnValueMap();
+            if (plainMap.isEmpty()) {
+                throwXlsDataColumnDefFailureException(file, dataTable);
+            }
+            columnValueMap = convertColumnValue(resource.getDataDirectory(), plainMap);
         }
 
         final int rowNumber = dataRow.getRowNumber();
@@ -449,8 +451,15 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     // ===================================================================================
-    //                                                                    Directory Option
-    //                                                                    ================
+    //                                                                Column Value Convert
+    //                                                                ====================
+    protected Map<String, Object> convertColumnValue(String dataDirectory, Map<String, Object> columnValueMap) {
+        final Map<String, Map<String, String>> convertValueMap = getConvertValueMap(dataDirectory);
+        final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectory);
+        final DfColumnValueConverter converter = new DfColumnValueConverter(convertValueMap, defaultValueMap);
+        return converter.convert(columnValueMap);
+    }
+
     protected void setupDefaultValue(String dataDirectory, final DfDataSet dataSet) {
         final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectory);
         for (int i = 0; i < dataSet.getTableSize(); i++) {
@@ -464,20 +473,21 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
 
                 if (metaInfoMap.containsKey(defaultTargetColumnName) && !table.hasColumn(defaultTargetColumnName)) {
                     final DfDtsColumnType columnType;
-                    final Object value;
+                    // *values are resolved later
+                    //final Object value;
                     if (defaultValue.equalsIgnoreCase("sysdate")) {
                         columnType = DfDtsColumnTypes.TIMESTAMP;
-                        value = new Timestamp(System.currentTimeMillis());
+                        //value = new Timestamp(System.currentTimeMillis());
                     } else {
                         columnType = DfDtsColumnTypes.STRING;
-                        value = defaultValue;
+                        //value = defaultValue;
                     }
                     table.addColumn(defaultTargetColumnName, columnType);
 
                     int rowSize = table.getRowSize();
                     for (int j = 0; j < table.getRowSize(); j++) {
                         final DfDataRow row = table.getRow(j);
-                        row.addValue(defaultTargetColumnName, value);
+                        row.addValue(defaultTargetColumnName, null); // value is set later
                         ++rowSize;
                     }
                 }
@@ -485,6 +495,66 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
+    // ===================================================================================
+    //                                                              Convert Value Property
+    //                                                              ======================
+    protected Map<String, Map<String, Map<String, String>>> _convertValueMapMap = DfCollectionUtil.newHashMap();
+
+    protected Map<String, Map<String, String>> getConvertValueMap(String dataDirectory) {
+        final Map<String, Map<String, String>> cachedMap = _convertValueMapMap.get(dataDirectory);
+        if (cachedMap != null) {
+            return cachedMap;
+        }
+        _convertValueMapMap.put(dataDirectory, doGetConvertValueMap(dataDirectory));
+        return _convertValueMapMap.get(dataDirectory);
+    }
+
+    public static Map<String, Map<String, String>> doGetConvertValueMap(String dataDirectory) {
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        String path = dataDirectory + "/convertValueMap.dataprop";
+        final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        Map<String, Map<String, String>> readMap = reader.readMapAsStringMapValue(path);
+        if (readMap != null && !readMap.isEmpty()) {
+            resultMap.putAll(readMap);
+        } else {
+            path = dataDirectory + "/convert-value.txt";
+            readMap = reader.readMapAsStringMapValue(path);
+            resultMap.putAll(readMap);
+        }
+        return resolveControlCharacter(resultMap);
+    }
+
+    protected static Map<String, Map<String, String>> resolveControlCharacter(
+            Map<String, Map<String, String>> convertValueMap) {
+        final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        for (Entry<String, Map<String, String>> entry : convertValueMap.entrySet()) {
+            final Map<String, String> elementMap = DfCollectionUtil.newLinkedHashMap();
+            for (Entry<String, String> nextEntry : entry.getValue().entrySet()) {
+                final String key = resolveControlCharacter(nextEntry.getKey());
+                final String value = resolveControlCharacter(nextEntry.getValue());
+                elementMap.put(key, value);
+            }
+            resultMap.put(entry.getKey(), elementMap);
+        }
+        return resultMap;
+    }
+
+    protected static String resolveControlCharacter(String value) {
+        if (value == null) {
+            return null;
+        }
+        final String tmp = "${df:temporaryVariable}";
+        value = Srl.replace(value, "\\\\", tmp);
+        value = Srl.replace(value, "\\r", "\r");
+        value = Srl.replace(value, "\\n", "\n");
+        value = Srl.replace(value, "\\t", "\t");
+        value = Srl.replace(value, tmp, "\\");
+        return value;
+    }
+
+    // ===================================================================================
+    //                                                              Default Value Property
+    //                                                              ======================
     // map for delimiter data is defined at the handler
     protected Map<String, Map<String, String>> _defaultValueMapMap = DfCollectionUtil.newHashMap();
 
@@ -512,6 +582,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return flmap;
     }
 
+    // ===================================================================================
+    //                                                                 Table Name Property
+    //                                                                 ===================
     protected Map<String, Map<String, String>> _tableNameMapMap = DfCollectionUtil.newHashMap();
 
     protected Map<String, String> getTableNameMap(String dataDirectory) {
@@ -532,6 +605,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return _tableNameMapMap.get(dataDirectory);
     }
 
+    // ===================================================================================
+    //                                                                   Not Trim Property
+    //                                                                   =================
     protected Map<String, Map<String, List<String>>> _notTrimTableColumnMapMap = DfCollectionUtil.newHashMap();
 
     protected Map<String, List<String>> getNotTrimTableColumnMap(String dataDirectory) {
@@ -555,6 +631,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return _notTrimTableColumnMapMap.get(dataDirectory);
     }
 
+    // ===================================================================================
+    //                                                               Empty String Property
+    //                                                               =====================
     protected Map<String, Map<String, List<String>>> _emptyStringColumnMapMap = DfCollectionUtil.newHashMap();
 
     protected Map<String, List<String>> getEmptyStringTableColumnMap(String dataDirectory) {
@@ -578,6 +657,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return _emptyStringColumnMapMap.get(dataDirectory);
     }
 
+    // ===================================================================================
+    //                                                                    Column Container
+    //                                                                    ================
     protected ColumnContainer createColumnContainer(final DfDataTable dataTable, final DfDataRow dataRow) {
         final ColumnContainer container = new ColumnContainer();
         for (int i = 0; i < dataTable.getColumnSize(); i++) {
@@ -593,9 +675,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return container;
     }
 
-    // ===================================================================================
-    //                                                                        Helper Class
-    //                                                                        ============
     protected static class ColumnContainer {
         protected Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
         protected Map<String, DfDataColumn> columnObjectMap = new LinkedHashMap<String, DfDataColumn>();
@@ -617,6 +696,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
+    // ===================================================================================
+    //                                                                     State Extension
+    //                                                                     ===============
     protected static class MyCreatedState {
         public String buildPreparedSql(final DfDataRow row) {
             final DfDtsCreatedState createdState = new DfDtsCreatedState() {
