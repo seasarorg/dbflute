@@ -49,12 +49,18 @@ public class LeftOuterJoinInfo implements Serializable {
     protected boolean _whereUsedJoin; // option (true if used on where clause or foreign's use)
 
     // ===================================================================================
-    //                                                                        Judge Status
-    //                                                                        ============
+    //                                                                       Determination
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                      In-line/OrClause
+    //                                      ----------------
     public boolean hasInlineOrOnClause() {
         return !_inlineWhereClauseList.isEmpty() || !_additionalOnClauseList.isEmpty();
     }
 
+    // -----------------------------------------------------
+    //                                        FixedCondition
+    //                                        --------------
     public boolean hasFixedCondition() {
         return _fixedCondition != null && _fixedCondition.trim().length() > 0;
     }
@@ -72,15 +78,41 @@ public class LeftOuterJoinInfo implements Serializable {
         return foreignTableSqlName.toString();
     }
 
+    // -----------------------------------------------------
+    //                                             Countable
+    //                                             ---------
     public boolean isCountableJoin() { // called when building clause
         return isInnerJoin() || isUnderInnerJoin() || isWhereUsedJoin();
     }
 
-    public boolean isStructurePossibleInnerJoin() { // called when building clause
-        if (isInnerJoin() || isWhereUsedJoin() || hasInlineOrOnClause()) {
+    // -----------------------------------------------------
+    //                                             InnerJoin
+    //                                             ---------
+    public boolean isStructuralPossibleInnerJoin() { // called when building clause
+        if (!isPureStructuralPossibleInnerJoin()) {
             return false;
         }
-        return _pureFK && _notNullFKColumn;
+        LeftOuterJoinInfo current = _localJoinInfo;
+        while (true) {
+            if (current == null) { // means first level (not nested) join
+                break;
+            }
+            // means nested join (e.g. SERVICE_RANK if MEMBER is base point)
+            if (!current.isTraceStructuralPossibleInnerJoin()) {
+                return false;
+            }
+            current = current.getLocalJoinInfo();
+        }
+        return true;
+    }
+
+    protected boolean isPureStructuralPossibleInnerJoin() {
+        return !hasInlineOrOnClause() && _pureFK && _notNullFKColumn;
+    }
+
+    protected boolean isTraceStructuralPossibleInnerJoin() {
+        // more pattern may exist but it save logic simple for safety
+        return isInnerJoin() || isPureStructuralPossibleInnerJoin();
     }
 
     // ===================================================================================
