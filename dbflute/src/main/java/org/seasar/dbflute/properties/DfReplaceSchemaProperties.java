@@ -319,6 +319,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         filterVariablesMap.put("dfprop.mainSchema", prop.getDatabaseSchema().getPureSchema());
         filterVariablesMap.put("dfprop.mainUser", prop.getDatabaseUser());
         filterVariablesMap.put("dfprop.mainPassword", prop.getDatabasePassword());
+
+        try {
+            // absolute path of DBFlute client
+            filterVariablesMap.put("sys.basedir", new File(".").getCanonicalPath());
+        } catch (IOException e) {
+            String msg = "File.getCanonicalPath() threw the exception.";
+            throw new IllegalStateException(msg, e);
+        }
     }
 
     protected String getFilterVariablesBeginMark() {
