@@ -397,7 +397,7 @@ public class DfTypeUtilTest extends PlainTestCase {
     // -----------------------------------------------------
     //                                             Timestamp
     //                                             ---------
-    public void test_toTimestamp_various() {
+    public void test_1mp_various() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 

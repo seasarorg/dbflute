@@ -844,14 +844,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected String getLeftOuterJoinClause() {
         final StringBuilder sb = new StringBuilder();
         reflectInnerJoinAutoDetectLazily();
-        final boolean trimmedAllowed = isTrimmedJoinAllowed();
+        final boolean countLeastJoinAllowed = checkCountLeastJoinAllowed();
+        final boolean structuralPossibleInnerJoinAllowed = checkStructuralPossibleInnerJoinAllowed();
         for (Entry<String, LeftOuterJoinInfo> outerJoinEntry : getOuterJoinMap().entrySet()) {
             final String foreignAliasName = outerJoinEntry.getKey();
             final LeftOuterJoinInfo joinInfo = outerJoinEntry.getValue();
-            if (trimmedAllowed && canBeTrimmedJoin(joinInfo)) {
+            if (countLeastJoinAllowed && canBeCountLeastJoin(joinInfo)) {
                 continue; // means only joined countable
             }
-            buildLeftOuterJoinClause(sb, foreignAliasName, joinInfo);
+            buildLeftOuterJoinClause(sb, foreignAliasName, joinInfo, structuralPossibleInnerJoinAllowed);
         }
         return sb.toString();
     }
@@ -867,34 +868,48 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         reflectorList.clear();
     }
 
-    protected boolean canBeTrimmedJoin(LeftOuterJoinInfo joinInfo) {
+    protected boolean canBeCountLeastJoin(LeftOuterJoinInfo joinInfo) {
         return !joinInfo.isCountableJoin();
     }
 
-    protected boolean isTrimmedJoinAllowed() {
+    protected boolean checkCountLeastJoinAllowed() {
         if (!canPagingCountLeastJoin()) {
             return false;
         }
         if (!isSelectClauseTypeNonUnionCount()) {
             return false;
         }
+        return !hasFixedConditionOverRelationJoin();
+    }
+
+    protected boolean checkStructuralPossibleInnerJoinAllowed() {
+        if (!_structuralPossibleInnerJoinAllowed) {
+            return false;
+        }
+        return !hasFixedConditionOverRelationJoin();
+    }
+
+    // to use over-relation provides very complex logic
+    // so it suppresses PagingCountLeastJoin and StructuralPossibleInnerJoin
+    protected boolean hasFixedConditionOverRelationJoin() {
         for (LeftOuterJoinInfo joinInfo : getOuterJoinMap().values()) {
             if (joinInfo.hasFixedConditionOverRelation()) {
                 // because over-relation may have references of various relations
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
-    protected void buildLeftOuterJoinClause(StringBuilder sb, String foreignAliasName, LeftOuterJoinInfo joinInfo) {
+    protected void buildLeftOuterJoinClause(StringBuilder sb, String foreignAliasName, LeftOuterJoinInfo joinInfo,
+            boolean structuralPossibleInnerJoinAllowed) {
         final String foreignTableDbName = joinInfo.getForeignTableDbName();
         final Map<ColumnRealName, ColumnRealName> joinOnMap = joinInfo.getJoinOnMap();
         assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
 
         sb.append(ln()).append("   ");
         final String joinExp;
-        final boolean canBeInnerJoin = canBeInnerJoin(joinInfo);
+        final boolean canBeInnerJoin = canBeInnerJoin(joinInfo, structuralPossibleInnerJoinAllowed);
         if (canBeInnerJoin) {
             joinExp = " inner join ";
         } else {
@@ -948,11 +963,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    protected boolean canBeInnerJoin(LeftOuterJoinInfo joinInfo) {
+    protected boolean canBeInnerJoin(LeftOuterJoinInfo joinInfo, boolean structuralPossibleInnerJoinAllowed) {
         if (joinInfo.isInnerJoin()) {
             return true;
         }
-        return _structuralPossibleInnerJoinAllowed && joinInfo.isStructuralPossibleInnerJoin();
+        if (structuralPossibleInnerJoinAllowed) {
+            return joinInfo.isStructuralPossibleInnerJoin();
+        }
+        return false;
     }
 
     protected boolean isJoinInParentheses() { // for DBMS that needs to join in parentheses
@@ -2772,8 +2790,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // -----------------------------------------------------
-    //                                        Count Trimming
-    //                                        --------------
+    //                                       Count LeastJoin
+    //                                       ---------------
     public void enablePagingCountLeastJoin() {
         _pagingCountLeastJoin = true;
     }
