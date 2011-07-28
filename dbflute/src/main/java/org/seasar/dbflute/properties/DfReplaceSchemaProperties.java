@@ -68,15 +68,17 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                      Base Directory
     //                                                                      ==============
     public String getPlaySqlDir() {
-        return getPlaySqlDirPureName(); // path relative to DBFlute client
+        return doGetPlaySqlDirectory(); // path (basically) relative from DBFlute client
     }
 
     public String getPlaySqlDirPureName() {
-        return "playsql";
+        final String playSqlDir = doGetPlaySqlDirectory();
+        return Srl.substringLastRear(playSqlDir, "/");
     }
 
-    public String getPlaySqlDirSymbol() {
-        return getPlaySqlDirPureName();
+    protected String doGetPlaySqlDirectory() {
+        final String prop = (String) getReplaceSchemaDefinitionMap().get("playSqlDirectory");
+        return Srl.is_NotNull_and_NotTrimmedEmpty(prop) ? prop : "playsql";
     }
 
     // ===================================================================================

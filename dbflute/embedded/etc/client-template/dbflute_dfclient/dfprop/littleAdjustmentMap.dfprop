@@ -177,7 +177,7 @@ map:{
     # o isInnerJoinAutoDetect: (NotRequired - Default true)
     #   [true]
     #     Joins that can be inner-join on condition-bean are auto-detected
-    #     for performance tuning.
+    #     for performance tuning. (DBFlute uses NotNull constraint info)
     #
     #   [false]
     #     Non.

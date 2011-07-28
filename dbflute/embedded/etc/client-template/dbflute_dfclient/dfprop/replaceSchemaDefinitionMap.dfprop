@@ -13,6 +13,7 @@
 # o filterVariablesMap: (NotRequired - Default map:{})
 # o additionalUserMap: (NotRequired - Default map:{})
 # o additionalDropMapList: (NotRequired - Default list:{})
+# o playSqlDirectory: (NotRequired - Default 'playsql')
 # o applicationPlaySqlDirectory: (NotRequired - Default '')
 # o arrangeBeforeRepsMap: (NotRequired - Default map:{})
 # o isSuppressTruncateTable: (NotRequired - Default false)
@@ -130,6 +131,14 @@ map:{
     #        ; objectTypeTargetList = list:{TABLE;VIEW}
     #    }
     #}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o playSqlDirectory: (NotRequired - Default 'playsql' relative to DBFlute client)
+    #  This property is relative path to (main) PlaySql directory,
+    #  You should not use this property easily.
+    #
+    #; playSqlDirectory = ../../foo-project/playsql
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

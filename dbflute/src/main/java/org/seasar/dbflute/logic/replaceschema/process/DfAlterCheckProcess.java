@@ -171,7 +171,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected List<File> copyToPreviousResource() {
         final List<File> copyToFileList = new ArrayList<File>();
         final String previousDir = getMigrationPreviousDir();
-        final String playSqlDirSymbol = getPlaySqlDir() + "/";
+        final String playSqlDirSymbol = getPlaySqlDirPureName() + "/";
         final Map<String, File> replaceSchemaSqlFileMap = getReplaceSchemaSqlFileMap();
         for (File mainFile : replaceSchemaSqlFileMap.values()) {
             doCopyToPreviousResource(mainFile, previousDir, playSqlDirSymbol, copyToFileList);
@@ -734,6 +734,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                         -------------
     protected String getPlaySqlDir() {
         return getReplaceSchemaProperties().getPlaySqlDir();
+    }
+
+    protected String getPlaySqlDirPureName() {
+        return getReplaceSchemaProperties().getPlaySqlDirPureName();
     }
 
     protected Map<String, File> getReplaceSchemaSqlFileMap() {
