@@ -320,7 +320,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     // /- - - - - - - - - - - - - - - -
                     if (line.trim().contains("#df:begin#")) {
                         inGroup = true;
-                        sql = "";
+                        if (!sql.contains("#df:checkEnv(")) { // patch for checkEnv
+                            sql = "";
+                        }
                         continue;
                     } else if (line.trim().contains("#df:end#")) {
                         inGroup = false;
@@ -334,7 +336,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     }
                     // - - - - - - - - - -/
 
-                    // Real Line Comment
+                    // real line comment
                     line = replaceCommentQuestionMarkIfNeeds(line);
 
                     if (inGroup) {
