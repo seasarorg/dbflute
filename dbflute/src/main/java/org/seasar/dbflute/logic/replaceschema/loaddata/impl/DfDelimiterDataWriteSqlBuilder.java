@@ -9,6 +9,7 @@ import java.util.Set;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
@@ -20,12 +21,13 @@ public class DfDelimiterDataWriteSqlBuilder {
     //                                                                           Attribute
     //                                                                           =========
     protected String _tableDbName;
-    protected Map<String, DfColumnMeta> _columnMap;
+    protected Map<String, DfColumnMeta> _columnMetaMap;
     protected List<String> _columnNameList;
     protected List<String> _valueList;
     protected Map<String, Set<String>> _notFoundColumnMap;
     protected Map<String, Map<String, String>> _convertValueMap;
     protected Map<String, String> _defaultValueMap;
+    protected DfColumnBindTypeProvider _bindTypeProvider;
     protected Map<String, String> _basicColumnValueMap;
     protected Map<String, String> _allColumnConvertMap;
 
@@ -53,10 +55,11 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     protected Map<String, Object> convertColumnValue(Map<String, String> columnValueMap) {
-        final DfColumnValueConverter converter = new DfColumnValueConverter(_convertValueMap, _defaultValueMap);
+        final DfColumnValueConverter converter = new DfColumnValueConverter(_convertValueMap, _defaultValueMap,
+                _bindTypeProvider);
         @SuppressWarnings("unchecked")
         final Map<String, Object> castMap = (Map<String, Object>) ((Object) columnValueMap); // Oops
-        return converter.convert(castMap);
+        return converter.convert(_tableDbName, castMap, _columnMetaMap);
     }
 
     protected String quoteTableNameIfNeeds(String tableDbName) {
@@ -80,7 +83,7 @@ public class DfDelimiterDataWriteSqlBuilder {
         int columnCount = -1;
         for (String columnName : _columnNameList) {
             columnCount++;
-            if (!_columnMap.isEmpty() && !_columnMap.containsKey(columnName)) {
+            if (!_columnMetaMap.isEmpty() && !_columnMetaMap.containsKey(columnName)) {
                 if (hasDefaultValue(columnName)) {
                     continue;
                 }
@@ -105,8 +108,8 @@ public class DfDelimiterDataWriteSqlBuilder {
                 msg = msg + " valueList=" + _valueList + " columnCount=" + columnCount;
                 throw new DfDelimiterDataRegistrationFailureException(msg, e);
             }
-            if (!_columnMap.isEmpty() && _columnMap.containsKey(columnName)) {
-                String realDbName = _columnMap.get(columnName).getColumnName();
+            if (!_columnMetaMap.isEmpty() && _columnMetaMap.containsKey(columnName)) {
+                String realDbName = _columnMetaMap.get(columnName).getColumnName();
                 _basicColumnValueMap.put(realDbName, value);
             } else {
                 _basicColumnValueMap.put(columnName, value);
@@ -125,12 +128,12 @@ public class DfDelimiterDataWriteSqlBuilder {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map<String, DfColumnMeta> getColumnMap() {
-        return _columnMap;
+    public Map<String, DfColumnMeta> getColumnMetaMap() {
+        return _columnMetaMap;
     }
 
-    public void setColumnMap(Map<String, DfColumnMeta> columnMap) {
-        this._columnMap = columnMap;
+    public void setColumnInfoMap(Map<String, DfColumnMeta> columnMetaMap) {
+        this._columnMetaMap = columnMetaMap;
     }
 
     public List<String> getColumnNameList() {
@@ -179,5 +182,13 @@ public class DfDelimiterDataWriteSqlBuilder {
 
     public void setDefaultValueMap(Map<String, String> defaultValueMap) {
         this._defaultValueMap = defaultValueMap;
+    }
+
+    public DfColumnBindTypeProvider getBindTypeProvider() {
+        return _bindTypeProvider;
+    }
+
+    public void setBindTypeProvider(DfColumnBindTypeProvider bindTypeProvider) {
+        this._bindTypeProvider = bindTypeProvider;
     }
 }

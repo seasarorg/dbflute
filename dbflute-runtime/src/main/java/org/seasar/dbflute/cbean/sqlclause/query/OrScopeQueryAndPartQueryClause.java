@@ -23,8 +23,8 @@ public class OrScopeQueryAndPartQueryClause implements QueryClause {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected QueryClause _clause;
-    protected int _identity;
+    protected final QueryClause _clause;
+    protected final int _identity;
 
     // ===================================================================================
     //                                                                         Constructor

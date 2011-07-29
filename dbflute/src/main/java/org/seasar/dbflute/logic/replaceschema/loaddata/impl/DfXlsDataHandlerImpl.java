@@ -52,6 +52,7 @@ import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
@@ -133,13 +134,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
 
         // set up columnMetaInfo
-        final Map<String, DfColumnMeta> columnInfoMap = getColumnInfoMap(tableDbName);
-        if (columnInfoMap.isEmpty()) {
+        final Map<String, DfColumnMeta> columnMetaMap = getColumnMetaMap(tableDbName);
+        if (columnMetaMap.isEmpty()) {
             throwTableNotFoundException(file, tableDbName);
         }
 
         // process before handling table
-        beforeHandlingTable(tableDbName, columnInfoMap);
+        beforeHandlingTable(tableDbName, columnMetaMap);
 
         // set up columnNameList
         final List<String> columnNameList = new ArrayList<String>();
@@ -167,7 +168,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     ps = conn.prepareStatement(preparedSql);
                 }
                 doWriteDataRow(resource, file, dataTable, dataRow // basic resources
-                        , columnInfoMap, columnNameList // meta data
+                        , columnMetaMap, columnNameList // meta data
                         , conn, ps // JDBC resources
                         , loggingInsertType, suppressBatchUpdate); // option
             }
@@ -190,7 +191,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                         final DfDataRow dataRow = dataTable.getRow(i);
                         try {
                             doWriteDataRow(resource, file, dataTable, dataRow // basic resources
-                                    , columnInfoMap, columnNameList // meta data
+                                    , columnMetaMap, columnNameList // meta data
                                     , conn, retryPs // JDBC resources
                                     , LoggingInsertType.NONE, true); // option (no logging and suppress batch)
                         } catch (SQLException rowEx) {
@@ -217,7 +218,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             closeResource(conn, ps);
 
             // process after (finally) handling table
-            finallyHandlingTable(tableDbName, columnInfoMap);
+            finallyHandlingTable(tableDbName, columnMetaMap);
         }
     }
 
@@ -248,7 +249,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     protected void doWriteDataRow(DfXlsDataResource resource, File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMeta> columnInfoMap, List<String> columnNameList, Connection conn,
+            Map<String, DfColumnMeta> columnMetaMap, List<String> columnNameList, Connection conn,
             PreparedStatement ps, LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
@@ -259,7 +260,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             if (plainMap.isEmpty()) {
                 throwXlsDataColumnDefFailureException(file, dataTable);
             }
-            columnValueMap = convertColumnValue(resource.getDataDirectory(), plainMap);
+            columnValueMap = convertColumnValue(tableDbName, resource.getDataDirectory(), plainMap, columnMetaMap);
         }
 
         final int rowNumber = dataRow.getRowNumber();
@@ -274,7 +275,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // - - - - - - - - - - - - - - - - - - -
             // Process Null (against Null Headache)
             // - - - - - - - - - - - - - - - - - - -
-            if (processNull(tableDbName, columnName, obj, ps, bindCount, columnInfoMap)) {
+            if (processNull(tableDbName, columnName, obj, ps, bindCount, columnMetaMap)) {
                 bindCount++;
                 continue;
             }
@@ -284,7 +285,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // - - - - - - - - - - - - - - -
             // If the value is not null and the value has the own type except string,
             // It registers the value to statement by the type.
-            if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnInfoMap)) {
+            if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap)) {
                 bindCount++;
                 continue;
             }
@@ -293,7 +294,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // Process NotNull and StringExpression
             // - - - - - - - - - - - - - - - - - - -
             final String value = (String) obj;
-            processNotNullString(file, tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
+            processNotNullString(file, tableDbName, columnName, value, conn, ps, bindCount, columnMetaMap);
             bindCount++;
         }
         if (suppressBatchUpdate) {
@@ -440,10 +441,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final DfDataTable table = dataSet.getTable(i);
             final String tableName = table.getTableDbName();
 
-            final Map<String, DfColumnMeta> metaInfoMap = getColumnInfoMap(tableName);
+            final Map<String, DfColumnMeta> metaMetaMap = getColumnMetaMap(tableName);
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DfDataColumn dataColumn = table.getColumn(j);
-                if (!metaInfoMap.containsKey(dataColumn.getColumnDbName())) {
+                if (!metaMetaMap.containsKey(dataColumn.getColumnDbName())) {
                     dataColumn.setWritable(false);
                 }
             }
@@ -453,11 +454,17 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                Column Value Convert
     //                                                                ====================
-    protected Map<String, Object> convertColumnValue(String dataDirectory, Map<String, Object> columnValueMap) {
+    protected Map<String, Object> convertColumnValue(String tableName, String dataDirectory,
+            Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap) {
         final Map<String, Map<String, String>> convertValueMap = getConvertValueMap(dataDirectory);
         final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectory);
-        final DfColumnValueConverter converter = new DfColumnValueConverter(convertValueMap, defaultValueMap);
-        return converter.convert(columnValueMap);
+        final DfColumnValueConverter converter = new DfColumnValueConverter(convertValueMap, defaultValueMap,
+                new DfColumnBindTypeProvider() {
+                    public Class<?> provideBindType(String tableName, DfColumnMeta columnMeta) {
+                        return getBindType(tableName, columnMeta);
+                    }
+                });
+        return converter.convert(tableName, columnValueMap, columnMetaMap);
     }
 
     protected void setupDefaultValue(String dataDirectory, final DfDataSet dataSet) {
@@ -467,11 +474,11 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableName = table.getTableDbName();
 
-            final Map<String, DfColumnMeta> metaInfoMap = getColumnInfoMap(tableName);
+            final Map<String, DfColumnMeta> metaMetaMap = getColumnMetaMap(tableName);
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 
-                if (metaInfoMap.containsKey(defaultTargetColumnName) && !table.hasColumn(defaultTargetColumnName)) {
+                if (metaMetaMap.containsKey(defaultTargetColumnName) && !table.hasColumn(defaultTargetColumnName)) {
                     final DfDtsColumnType columnType;
                     // *values are resolved later
                     //final Object value;

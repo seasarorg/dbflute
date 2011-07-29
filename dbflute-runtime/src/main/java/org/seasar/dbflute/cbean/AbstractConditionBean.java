@@ -372,6 +372,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
             String msg = "The OrScopeQuery in and-part is unsupported: " + getTableDbName();
             throw new OrScopeQueryAndPartUnsupportedOperationException(msg);
         }
+        xdoOrSQ(cb, orQuery);
+    }
+
+    protected <CB extends ConditionBean> void xdoOrSQ(CB cb, OrQuery<CB> orQuery) {
         getSqlClause().makeOrScopeQueryEffective();
         try {
             orQuery.query(cb);

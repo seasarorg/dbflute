@@ -83,6 +83,9 @@ public abstract class ConditionKey implements Serializable {
     /** The condition key of isNull. */
     public static final ConditionKey CK_IS_NULL = new ConditionKeyIsNull();
 
+    /** The condition key of isNullOrEmpty. */
+    public static final ConditionKey CK_IS_NULL_OR_EMPTY = new ConditionKeyIsNullOrEmpty();
+
     /** The condition key of isNotNull. */
     public static final ConditionKey CK_IS_NOT_NULL = new ConditionKeyIsNotNull();
 

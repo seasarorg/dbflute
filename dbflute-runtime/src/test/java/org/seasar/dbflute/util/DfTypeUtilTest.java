@@ -2,6 +2,9 @@ package org.seasar.dbflute.util;
 
 import static org.seasar.dbflute.util.DfTypeUtil.AD_ORIGIN_MILLISECOND;
 import static org.seasar.dbflute.util.DfTypeUtil.toClassTitle;
+import static org.seasar.dbflute.util.DfTypeUtil.toDate;
+import static org.seasar.dbflute.util.DfTypeUtil.toTime;
+import static org.seasar.dbflute.util.DfTypeUtil.toTimestamp;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -106,7 +109,7 @@ public class DfTypeUtilTest extends PlainTestCase {
     public void test_toDate_sameClass() {
         // ## Arrange ##
         DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date pureDate = new Date(DfTypeUtil.toDate("2009-12-13 12:34:56.123").getTime());
+        Date pureDate = new Date(toDate("2009-12-13 12:34:56.123").getTime());
 
         // ## Act ##
         Date date = DfTypeUtil.toDate(pureDate);
@@ -123,7 +126,7 @@ public class DfTypeUtilTest extends PlainTestCase {
         Timestamp timestamp = Timestamp.valueOf("2009-12-13 12:34:56.123");
 
         // ## Act ##
-        Date date = DfTypeUtil.toDate(timestamp);
+        Date date = toDate(timestamp);
 
         // ## Assert ##
         assertEquals(java.util.Date.class, date.getClass());
@@ -136,16 +139,16 @@ public class DfTypeUtilTest extends PlainTestCase {
         DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
 
         // ## Act & Assert ##
-        assertNull(DfTypeUtil.toDate(null));
-        assertNull(DfTypeUtil.toDate(""));
-        assertEquals("2008/12/30 12:34:56", df.format(DfTypeUtil.toDate(" 2008-12-30 12:34:56 ")));
+        assertNull(toDate(null));
+        assertNull(toDate(""));
+        assertEquals("2008/12/30 12:34:56", df.format(toDate(" 2008-12-30 12:34:56 ")));
     }
 
     public void test_toDate_string_instanceType() {
         // ## Arrange & Act & Assert ##
-        assertEquals(java.util.Date.class, DfTypeUtil.toDate("2008-12-30 12:34:56.789").getClass());
-        assertNotSame(java.sql.Date.class, DfTypeUtil.toDate("2008-12-30 12:34:56.789").getClass());
-        assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toDate("2008-12-30 12:34:56.789").getClass());
+        assertEquals(java.util.Date.class, toDate("2008-12-30 12:34:56.789").getClass());
+        assertNotSame(java.sql.Date.class, toDate("2008-12-30 12:34:56.789").getClass());
+        assertNotSame(java.sql.Timestamp.class, toDate("2008-12-30 12:34:56.789").getClass());
     }
 
     public void test_toDate_string_AD() {
@@ -217,7 +220,9 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2008/09/01 00:00:00", df.format(DfTypeUtil.toDate("2008-9-1")));
         assertEquals("0008/09/01 02:04:06", df.format(DfTypeUtil.toDate("8-9-1 02:04:06")));
         assertEquals("0008/09/01 02:04:06", df.format(DfTypeUtil.toDate("8-9-1 2:4:6")));
+        assertEquals("2008/12/30 12:34:56.012", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.12")));
         assertEquals("2008/12/30 12:34:56.789", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
+        assertEquals("2008/12/30 12:34:56.123", dfmil.format(DfTypeUtil.toDate("2008-12-30 12:34:56.123456")));
     }
 
     public void test_toDate_long_basic() {
@@ -404,29 +409,31 @@ public class DfTypeUtilTest extends PlainTestCase {
         // ## Act & Assert ##
         assertNull(DfTypeUtil.toTimestamp(null));
         assertNull(DfTypeUtil.toTimestamp(""));
-        assertEquals("0002/01/12 00:00:00.000", df.format(DfTypeUtil.toTimestamp("date 20112")));
-        assertEquals("0012/01/22 00:00:00.000", df.format(DfTypeUtil.toTimestamp("date 120122")));
-        assertEquals("0923/01/27 00:00:00.000", df.format(DfTypeUtil.toTimestamp("date 9230127")));
-        assertEquals("2008/12/30 00:00:00.000", df.format(DfTypeUtil.toTimestamp("date 20081230")));
-        assertEquals("2008/12/30 00:00:00.000", df.format(DfTypeUtil.toTimestamp("2008/12/30")));
-        assertEquals("2008/12/30 12:34:56.000", df.format(DfTypeUtil.toTimestamp("2008/12/30 12:34:56")));
-        assertEquals("2008/12/30 12:34:56.789", df.format(DfTypeUtil.toTimestamp("2008/12/30 12:34:56.789")));
-        assertEquals("2008/12/30 00:00:00.000", df.format(DfTypeUtil.toTimestamp("2008-12-30")));
-        assertEquals("2008/12/30 12:34:56.000", df.format(DfTypeUtil.toTimestamp("2008-12-30 12:34:56")));
-        assertEquals("2008/12/30 12:34:56.789", df.format(DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789")));
-        assertEquals("2008/09/30 12:34:56.000", df.format(DfTypeUtil.toTimestamp("2008-09-30 12:34:56")));
-        assertEquals("2008/09/30 12:34:56.000", df.format(DfTypeUtil.toTimestamp("2008-9-30 12:34:56")));
-        assertEquals("2008/09/01 12:34:56.000", df.format(DfTypeUtil.toTimestamp("2008-9-1 12:34:56")));
-        assertEquals("0008/09/01 12:34:56.000", df.format(DfTypeUtil.toTimestamp("8-9-1 12:34:56")));
-        assertEquals("2008/09/01 00:00:00.000", df.format(DfTypeUtil.toTimestamp("2008-9-1")));
-        assertEquals("0008/09/01 02:04:06.000", df.format(DfTypeUtil.toTimestamp("8-9-1 02:04:06")));
-        assertEquals("0008/09/01 02:04:06.000", df.format(DfTypeUtil.toTimestamp("8-9-1 2:4:6")));
-        assertEquals("2008/12/30 12:34:56.009", df.format(DfTypeUtil.toTimestamp("2008-12-30 12:34:56.9")));
-        assertEquals("0008/09/01 02:04:06.000", df.format(DfTypeUtil.toTimestamp("AD8-9-1 02:04:06")));
-        assertEquals("0008/09/01 02:04:06.000", df.format(DfTypeUtil.toTimestamp("A.D.8-9-1 2:4:6")));
-        assertEquals("2008/12/30 12:34:56.009", df.format(DfTypeUtil.toTimestamp(" 2008-12-30 12:34:56.9 ")));
-        assertEquals("2008/12/30 12:34:56.009", df.format(DfTypeUtil.toTimestamp(" date 2008-12-30 12:34:56.9 ")));
-        assertEquals("2008/12/30 12:34:56.009", df.format(DfTypeUtil.toTimestamp(" date A.D.2008-12-30 12:34:56.9 ")));
+        assertEquals("0002/01/12 00:00:00.000", df.format(toTimestamp("date 20112")));
+        assertEquals("0012/01/22 00:00:00.000", df.format(toTimestamp("date 120122")));
+        assertEquals("0923/01/27 00:00:00.000", df.format(toTimestamp("date 9230127")));
+        assertEquals("2008/12/30 00:00:00.000", df.format(toTimestamp("date 20081230")));
+        assertEquals("2008/12/30 00:00:00.000", df.format(toTimestamp("2008/12/30")));
+        assertEquals("2008/12/30 12:34:56.000", df.format(toTimestamp("2008/12/30 12:34:56")));
+        assertEquals("2008/12/30 12:34:56.789", df.format(toTimestamp("2008/12/30 12:34:56.789")));
+        assertEquals("2008/12/30 00:00:00.000", df.format(toTimestamp("2008-12-30")));
+        assertEquals("2008/12/30 12:34:56.000", df.format(toTimestamp("2008-12-30 12:34:56")));
+        assertEquals("2008/12/30 12:34:56.789", df.format(toTimestamp("2008-12-30 12:34:56.789")));
+        assertEquals("2008/09/30 12:34:56.000", df.format(toTimestamp("2008-09-30 12:34:56")));
+        assertEquals("2008/09/30 12:34:56.000", df.format(toTimestamp("2008-9-30 12:34:56")));
+        assertEquals("2008/09/01 12:34:56.000", df.format(toTimestamp("2008-9-1 12:34:56")));
+        assertEquals("0008/09/01 12:34:56.000", df.format(toTimestamp("8-9-1 12:34:56")));
+        assertEquals("2008/09/01 00:00:00.000", df.format(toTimestamp("2008-9-1")));
+        assertEquals("0008/09/01 02:04:06.000", df.format(toTimestamp("8-9-1 02:04:06")));
+        assertEquals("0008/09/01 02:04:06.000", df.format(toTimestamp("8-9-1 2:4:6")));
+        assertEquals("2008/12/30 12:34:56.009", df.format(toTimestamp("2008-12-30 12:34:56.9")));
+        assertEquals("0008/09/01 02:04:06.000", df.format(toTimestamp("AD8-9-1 02:04:06")));
+        assertEquals("0008/09/01 02:04:06.000", df.format(toTimestamp("A.D.8-9-1 2:4:6")));
+        assertEquals("2008/12/30 12:34:56.009", df.format(toTimestamp(" 2008-12-30 12:34:56.9 ")));
+        assertEquals("2008/12/30 12:34:56.009", df.format(toTimestamp(" date 2008-12-30 12:34:56.9 ")));
+        assertEquals("2008/12/30 12:34:56.009", df.format(toTimestamp(" date A.D.2008-12-30 12:34:56.9 ")));
+        assertEquals("2008/12/30 12:34:56.123", df.format(toTimestamp(" date A.D.2008-12-30 12:34:56.1234")));
+        assertEquals("2008/12/30 12:34:56.987", df.format(toTimestamp(" date A.D.2008-12-30 12:34:56.98765432")));
         assertNotSame(java.util.Date.class, DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789").getClass());
         assertNotSame(java.sql.Date.class, DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789").getClass());
         assertEquals(java.sql.Timestamp.class, DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789").getClass());
@@ -438,7 +445,7 @@ public class DfTypeUtilTest extends PlainTestCase {
         SimpleDateFormat fullDf = new SimpleDateFormat("Gyyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act & Assert ##
-        log(fullDf.format(DfTypeUtil.toTimestamp("-2008-09-01 02:04:06.123")));
+        log(fullDf.format(toTimestamp("-2008-09-01 02:04:06.123")));
         assertTrue(DfTypeUtil.toTimestamp("-8-9-1").getTime() < AD_ORIGIN_MILLISECOND);
         assertTrue(DfTypeUtil.toTimestamp("-1-9-1").getTime() < AD_ORIGIN_MILLISECOND);
         assertTrue(DfTypeUtil.toTimestamp("-8-9-1 2:4:6").getTime() < AD_ORIGIN_MILLISECOND);
@@ -451,11 +458,11 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertTrue(DfTypeUtil.toTimestamp("B.C.8-9-1 2:4:6").getTime() < AD_ORIGIN_MILLISECOND);
         assertTrue(DfTypeUtil.toTimestamp("B.C.2008-09-01 02:04:06.123").getTime() < AD_ORIGIN_MILLISECOND);
         assertTrue(DfTypeUtil.toTimestamp("B.C.2008-13-01 02:04:06").getTime() < AD_ORIGIN_MILLISECOND);
-        assertEquals("2008/11/01 02:04:06.123", df.format(DfTypeUtil.toTimestamp("-2008-11-01 02:04:06.123")));
-        assertEquals("0008/09/01 00:00:00.000", df.format(DfTypeUtil.toTimestamp("date -80901")));
+        assertEquals("2008/11/01 02:04:06.123", df.format(toTimestamp("-2008-11-01 02:04:06.123")));
+        assertEquals("0008/09/01 00:00:00.000", df.format(toTimestamp("date -80901")));
 
         // no calendar check when BC 
-        assertEquals("2007/01/01 02:04:06.123", df.format(DfTypeUtil.toTimestamp("-2008-13-01 02:04:06.123")));
+        assertEquals("2007/01/01 02:04:06.123", df.format(toTimestamp("-2008-13-01 02:04:06.123")));
     }
 
     public void test_toTimestamp_long_basic() {
@@ -552,14 +559,6 @@ public class DfTypeUtilTest extends PlainTestCase {
             log(e.getMessage());
         }
         try {
-            DfTypeUtil.toTimestamp("2009-12-09 12:34:36.1234");
-
-            fail();
-        } catch (ParseTimestampOutOfCalendarException e) {
-            // OK
-            log(e.getMessage());
-        }
-        try {
             DfTypeUtil.toTimestamp("0000-12-09 12:34:26.541");
 
             fail();
@@ -579,8 +578,8 @@ public class DfTypeUtilTest extends PlainTestCase {
         Date date = DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789");
 
         // ## Act & Assert ##
-        assertNull(DfTypeUtil.toTime(null));
-        assertNull(DfTypeUtil.toTime(""));
+        assertNull(toTime(null));
+        assertNull(toTime(""));
         assertEquals("1970/01/01 12:34:56.789", df.format(DfTypeUtil.toTime(date)));
     }
 

@@ -100,6 +100,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected static final ConditionKey CK_LS = ConditionKey.CK_LIKE_SEARCH;
     protected static final ConditionKey CK_NLS = ConditionKey.CK_NOT_LIKE_SEARCH;
     protected static final ConditionKey CK_ISN = ConditionKey.CK_IS_NULL;
+    protected static final ConditionKey CK_ISNOE = ConditionKey.CK_IS_NULL_OR_EMPTY;
     protected static final ConditionKey CK_ISNN = ConditionKey.CK_IS_NOT_NULL;
 
     /** Object for DUMMY. */

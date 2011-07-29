@@ -795,16 +795,17 @@ public abstract class DfAbsractDataWriter {
     //                                                                    ================
     /**
      * Get the bind type to find a value type.
-     * @param columnInfoMap The info map of column. (NotNull)
+     * @param tableName The name of table corresponding to column. (NotNull)
+     * @param columnMeta The meta info of column. (NotNull)
      * @return The type of column. (NullAllowed: However Basically NotNull)
      */
-    protected Class<?> getBindType(String tableName, DfColumnMeta columnInfoMap) {
+    protected Class<?> getBindType(String tableName, DfColumnMeta columnMeta) {
         Map<String, Class<?>> cacheMap = _bindTypeCacheMap.get(tableName);
         if (cacheMap == null) {
             cacheMap = StringKeyMap.createAsFlexibleOrdered();
             _bindTypeCacheMap.put(tableName, cacheMap);
         }
-        final String columnName = columnInfoMap.getColumnName();
+        final String columnName = columnMeta.getColumnName();
         Class<?> bindType = cacheMap.get(columnName);
         if (bindType != null) { // cache hit
             return bindType;
@@ -812,10 +813,10 @@ public abstract class DfAbsractDataWriter {
 
         // use mapped JDBC defined value if found (basically found)
         // because it has already been resolved about JDBC specification per DBMS
-        final String jdbcType = _columnHandler.getColumnJdbcType(columnInfoMap);
+        final String jdbcType = _columnHandler.getColumnJdbcType(columnMeta);
         Integer jdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
         if (jdbcDefValue == null) { // basically no way
-            jdbcDefValue = columnInfoMap.getJdbcDefValue(); // as plain
+            jdbcDefValue = columnMeta.getJdbcDefValue(); // as plain
         }
 
         // ReplaceSchema uses an own original mapping way
@@ -854,23 +855,23 @@ public abstract class DfAbsractDataWriter {
     }
 
     // ===================================================================================
-    //                                                                         Column Info
+    //                                                                         Column Meta
     //                                                                         ===========
-    protected Map<String, DfColumnMeta> getColumnInfoMap(String tableName) {
+    protected Map<String, DfColumnMeta> getColumnMetaMap(String tableName) {
         if (_columnInfoCacheMap.containsKey(tableName)) {
             return _columnInfoCacheMap.get(tableName);
         }
-        final Map<String, DfColumnMeta> columnInfoMap = StringKeyMap.createAsFlexible();
+        final Map<String, DfColumnMeta> columnMetaMap = StringKeyMap.createAsFlexible();
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
             final List<DfColumnMeta> columnList = _columnHandler.getColumnList(metaData, _unifiedSchema, tableName);
             for (DfColumnMeta columnInfo : columnList) {
-                columnInfoMap.put(columnInfo.getColumnName(), columnInfo);
+                columnMetaMap.put(columnInfo.getColumnName(), columnInfo);
             }
-            _columnInfoCacheMap.put(tableName, columnInfoMap);
-            return columnInfoMap;
+            _columnInfoCacheMap.put(tableName, columnMetaMap);
+            return columnMetaMap;
         } catch (SQLException e) {
             String msg = "Failed to get column meta informations: table=" + tableName;
             throw new IllegalStateException(msg, e);

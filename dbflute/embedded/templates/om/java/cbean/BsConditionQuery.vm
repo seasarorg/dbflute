@@ -396,12 +396,15 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 
     /** 
-     * Add order-by as ascend.
+     * Add order-by as ascend. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @return this. (NotNull)
      */
     public ${myClassName} addOrderBy_${tmpJavaName}_Asc() { regOBA("${col.name}"); return this; }
+
     /**
-     * Add order-by as descend.
+     * Add order-by as descend. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @return this. (NotNull)
      */
     public ${myClassName} addOrderBy_${tmpJavaName}_Desc() { regOBD("${col.name}"); return this; }

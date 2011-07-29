@@ -15,19 +15,15 @@
  */
 package org.seasar.dbflute.cbean.ckey;
 
-import java.util.List;
-
-import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
-import org.seasar.dbflute.cbean.coption.ConditionOption;
-import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
+import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
 /**
- * The condition-key of isNull.
+ * The condition-key of isNullOrEmpty.
  * @author jflute
  */
-public class ConditionKeyIsNull extends ConditionKey {
+public class ConditionKeyIsNullOrEmpty extends ConditionKeyIsNull {
 
     // ===================================================================================
     //                                                                          Definition
@@ -41,66 +37,25 @@ public class ConditionKeyIsNull extends ConditionKey {
     /**
      * Constructor.
      */
-    protected ConditionKeyIsNull() {
-        initializeConditionKey();
-        initializeOperand();
+    protected ConditionKeyIsNullOrEmpty() {
     }
 
+    @Override
     protected void initializeConditionKey() {
-        _conditionKey = "isNull";
+        _conditionKey = "isNullOrEmpty";
     }
 
+    @Override
     protected void initializeOperand() {
-        _operand = "is null";
+        _operand = "is null"; // added or-part later
     }
 
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
-        if (cvalue.isFixedQuery() && cvalue.hasIsNull()) {
-            noticeRegistered(callerName, value);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher) {
-        conditionList.add(buildClauseWithoutValue(columnRealName));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setIsNull(DUMMY_OBJECT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
-            ConditionOption option) {
-        throw new UnsupportedOperationException();
+    protected QueryClause buildClauseWithoutValue(ColumnRealName columnRealName) {
+        final String clause = "(" + columnRealName + " " + getOperand() + " or " + columnRealName + " = '')";
+        return new StringQueryClause(clause);
     }
 }

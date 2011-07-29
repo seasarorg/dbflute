@@ -41,6 +41,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -97,7 +98,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             }
             tableDbName = tmp;
         }
-        final Map<String, DfColumnMeta> columnInfoMap = getColumnInfoMap(tableDbName);
+        final Map<String, DfColumnMeta> columnInfoMap = getColumnMetaMap(tableDbName);
         if (columnInfoMap.isEmpty()) {
             throwTableNotFoundException(_fileName, tableDbName);
         }
@@ -195,12 +196,17 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // - - - - - - - - - -/
                 final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
                 sqlBuilder.setTableDbName(tableDbName);
-                sqlBuilder.setColumnMap(columnInfoMap);
+                sqlBuilder.setColumnInfoMap(columnInfoMap);
                 sqlBuilder.setColumnNameList(columnNameList);
                 sqlBuilder.setValueList(valueList);
                 sqlBuilder.setNotFoundColumnMap(resultInfo.getNotFoundColumnMap());
                 sqlBuilder.setConvertValueMap(_convertValueMap);
                 sqlBuilder.setDefaultValueMap(_defaultValueMap);
+                sqlBuilder.setBindTypeProvider(new DfColumnBindTypeProvider() {
+                    public Class<?> provideBindType(String tableName, DfColumnMeta columnMeta) {
+                        return getBindType(tableName, columnMeta);
+                    }
+                });
                 if (conn == null) {
                     conn = _dataSource.getConnection();
                 }

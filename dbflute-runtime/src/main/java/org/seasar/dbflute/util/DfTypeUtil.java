@@ -970,10 +970,14 @@ public final class DfTypeUtil {
         String value = hour + timeDlm + min + timeDlm + sec;
         if (includeMilli) {
             if (secEndIndex >= 0) {
-                final String milli = startsSec.substring(secEndIndex + timeMilliDlm.length());
-                resolveDateElementZeroPrefix(milli, 3 - milli.length());
-                formatDateElementAsNumber(milli, "SSS", pureStr); // check only
-                value = value + timeMilliDlm + milli; // append millisecond
+                String millis = startsSec.substring(secEndIndex + timeMilliDlm.length());
+                if (millis.length() > 3) { // truncate details
+                    millis = millis.substring(0, 3);
+                } else { // add zero prefix
+                    millis = resolveDateElementZeroPrefix(millis, 3 - millis.length());
+                }
+                formatDateElementAsNumber(millis, "SSS", pureStr); // check only
+                value = value + timeMilliDlm + millis; // append millisecond
             } else {
                 value = value + timeMilliDlm + "000";
             }
@@ -997,6 +1001,14 @@ public final class DfTypeUtil {
             sb.append("0");
         }
         return sb.toString() + str;
+    }
+
+    protected static String resolveDateElementZeroSuffix(String str, int count) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append("0");
+        }
+        return str + sb.toString();
     }
 
     public static class ParseDateException extends RuntimeException {
