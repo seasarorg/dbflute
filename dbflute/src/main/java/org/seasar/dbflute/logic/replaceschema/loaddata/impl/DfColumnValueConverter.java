@@ -129,7 +129,7 @@ public class DfColumnValueConverter {
             return processed;
         }
 
-        return filteredValue;
+        return null;
     }
 
     protected String processTimestamp(String tableName, String columnName, Map<String, DfColumnMeta> columnMetaMap,
@@ -148,9 +148,9 @@ public class DfColumnValueConverter {
                 final String front = Srl.substringLastFront(filteredValue, ".");
                 final String millis = Srl.substringLastRear(filteredValue, ".");
                 if (millis.length() == 1) {
-                    filteredValue = front + "00" + millis;
+                    filteredValue = front + ".00" + millis;
                 } else if (millis.length() == 2) {
-                    filteredValue = front + "0" + millis;
+                    filteredValue = front + ".0" + millis;
                 }
                 return filteredValue; // processed
             }
