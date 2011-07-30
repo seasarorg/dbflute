@@ -333,6 +333,10 @@ public class Column {
         return hasDbType() ? _dbType : "UnknownType";
     }
 
+    public boolean isDbTypeChar() {
+        return hasDbType() && (_dbType.startsWith("char"));
+    }
+
     public boolean isDbTypeCharOrVarchar() {
         return hasDbType() && (_dbType.startsWith("char") || _dbType.startsWith("varchar"));
     }
@@ -443,6 +447,13 @@ public class Column {
      */
     public void setNotNull(boolean status) {
         _isNotNull = status;
+    }
+
+    public boolean isMakeIsNullOrEmpty() {
+        if (isNotNull() || isPrimaryKey()) {
+            return false;
+        }
+        return isJavaNativeStringObject() && !isDbTypeChar() && !isDbTypeStringClob();
     }
 
     // -----------------------------------------------------
