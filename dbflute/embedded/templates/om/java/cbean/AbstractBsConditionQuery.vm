@@ -1110,7 +1110,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * IsNull(is null). And OnlyOnceRegistered.
      */
     public void set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DOBJ); }
-#if ($col.isJavaNativeStringObject() && !$col.isPrimaryKey())
+#if ($col.isJavaNativeStringObject() && !$col.isDbTypeStringClob() && !$col.isPrimaryKey())
 
     /**
      * IsNullOrEmpty(is null or empty). And OnlyOnceRegistered.
