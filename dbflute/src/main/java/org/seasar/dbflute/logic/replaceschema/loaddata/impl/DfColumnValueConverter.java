@@ -165,7 +165,7 @@ public class DfColumnValueConverter {
                 return filteredValue; // processed
             }
         }
-        return filteredValue;
+        return null; // no converted
     }
 
     protected String resolveVariable(String value) {

@@ -551,10 +551,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             return null;
         }
         final String tmp = "${df:temporaryVariable}";
-        value = Srl.replace(value, "\\\\", tmp);
+        value = Srl.replace(value, "\\\\", tmp); // "\\" to "\" later
+
+        // e.g. pure string "\n" to (real) line separator
         value = Srl.replace(value, "\\r", "\r");
         value = Srl.replace(value, "\\n", "\n");
         value = Srl.replace(value, "\\t", "\t");
+
         value = Srl.replace(value, tmp, "\\");
         return value;
     }
