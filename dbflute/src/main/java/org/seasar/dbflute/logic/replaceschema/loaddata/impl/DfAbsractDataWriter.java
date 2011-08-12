@@ -771,7 +771,7 @@ public abstract class DfAbsractDataWriter {
     protected void throwColumnValueBindingFailureException(String tableName, String columnName, Object value,
             Class<?> bindType, ValueType valueType, RuntimeException e) throws SQLException {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to bind the value with column type.");
+        br.addNotice("Failed to bind the value with ValueType for the column type.");
         br.addItem("Advice");
         br.addElement("Confirm the nested RuntimeException's message.");
         br.addElement("The bound value might not be to match the type.");
@@ -795,7 +795,7 @@ public abstract class DfAbsractDataWriter {
     protected void throwColumnValueBindingSQLException(String tableName, String columnName, Object value,
             Class<?> bindType, ValueType valueType, SQLException e) throws SQLException {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to bind the value with column type.");
+        br.addNotice("Failed to bind the value with ValueType for the column type.");
         br.addItem("Advice");
         br.addElement("Confirm the nested SQLException's message.");
         br.addElement("The bound value might not be to match the type.");

@@ -182,10 +182,11 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 
 #if ($database.isPmbMetaDataTypedSelectPmb($pmbClassName))
     /**
-     * {@inheritDoc}
+     * Get the type of an entity for result. (implementation)
+     * @return The type instance of an entity, ${database.getPmbMetaDataCustomizeEntityLineDisp($pmbClassName)}. (NotNull)
      */
     public Class<${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}> getEntityType() {
-        return ${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}.class; // ${database.getPmbMetaDataCustomizeEntityLineDisp($pmbClassName)}
+        return ${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}.class;
     }
 
 #end
