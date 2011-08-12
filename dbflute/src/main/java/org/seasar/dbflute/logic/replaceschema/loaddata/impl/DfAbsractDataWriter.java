@@ -761,21 +761,59 @@ public abstract class DfAbsractDataWriter {
         final ValueType valueType = TnValueTypes.getValueType(bindType);
         try {
             valueType.bindValue(conn, ps, bindCount, value);
+        } catch (RuntimeException e) {
+            throwColumnValueBindingFailureException(tableName, columnName, value, bindType, valueType, e);
         } catch (SQLException e) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-            msg = msg + "Failed to bind the value!" + ln();
-            msg = msg + ln();
-            msg = msg + "[Column]" + ln() + tableName + "." + columnName + ln();
-            msg = msg + ln();
-            msg = msg + "[Bind Type]" + ln() + bindType + ln();
-            msg = msg + ln();
-            msg = msg + "[Value Type]" + ln() + valueType + ln();
-            msg = msg + ln();
-            msg = msg + "[Bound Value]" + ln() + value + ln();
-            msg = msg + "- - - - - - - - - -/";
-            throw new DfJDBCException(msg, e);
+            throwColumnValueBindingSQLException(tableName, columnName, value, bindType, valueType, e);
         }
+    }
+
+    protected void throwColumnValueBindingFailureException(String tableName, String columnName, Object value,
+            Class<?> bindType, ValueType valueType, RuntimeException e) throws SQLException {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to bind the value with column type.");
+        br.addItem("Advice");
+        br.addElement("Confirm the nested RuntimeException's message.");
+        br.addElement("The bound value might not be to match the type.");
+        br.addItem("Table Name");
+        br.addElement(tableName);
+        br.addItem("Column Name");
+        br.addElement(columnName);
+        br.addItem("Bind Type");
+        br.addElement(bindType);
+        br.addItem("Value Type");
+        br.addElement(valueType);
+        br.addItem("Bound Value");
+        br.addElement(value);
+        br.addItem("RuntimeException");
+        br.addElement(e.getClass());
+        br.addElement(e.getMessage());
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg, e);
+    }
+
+    protected void throwColumnValueBindingSQLException(String tableName, String columnName, Object value,
+            Class<?> bindType, ValueType valueType, SQLException e) throws SQLException {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to bind the value with column type.");
+        br.addItem("Advice");
+        br.addElement("Confirm the nested SQLException's message.");
+        br.addElement("The bound value might not be to match the type.");
+        br.addItem("Table Name");
+        br.addElement(tableName);
+        br.addItem("Column Name");
+        br.addElement(columnName);
+        br.addItem("Bind Type");
+        br.addElement(bindType);
+        br.addItem("Value Type");
+        br.addElement(valueType);
+        br.addItem("Bound Value");
+        br.addElement(value);
+        br.addItem("Exception");
+        br.addElement(e.getClass());
+        br.addElement(e.getMessage());
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg, e);
     }
 
     /**
