@@ -422,6 +422,10 @@ public class Database {
         return getPmbBasicHandler().getCustomizeEntityType(className);
     }
 
+    public String getPmbMetaDataCustomizeEntityLineDisp(String className) {
+        return getPmbBasicHandler().getCustomizeEntityLineDisp(className);
+    }
+
     // -----------------------------------------------------
     //                                             Procedure
     //                                             ---------

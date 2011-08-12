@@ -54,8 +54,8 @@ public class DfEnvironmentType {
     // ===================================================================================
     //                                                                    Environment Type
     //                                                                    ================
-    public boolean isDefault() {
-        return _environmentType != null && _environmentType.equalsIgnoreCase(DEFAULT_TYPE);
+    public boolean isSpecifiedType() {
+        return _environmentType != null && !_environmentType.equalsIgnoreCase(DEFAULT_TYPE);
     }
 
     /**

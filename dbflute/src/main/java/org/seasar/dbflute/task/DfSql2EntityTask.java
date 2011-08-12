@@ -780,7 +780,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final String msg = br.buildExceptionMessage();
             throw new DfCustomizeEntityMarkInvalidException(msg);
         }
-        entityInfo.setScalarJavaNative(columnList.get(0).getJavaNative());
+        final Column column = columnList.get(0);
+        entityInfo.setScalarJavaNative(column.getJavaNative());
+        entityInfo.setScalarColumnDisp(column.getColumnDefinitionLineDisp());
     }
 
     // -----------------------------------------------------

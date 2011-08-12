@@ -323,6 +323,20 @@ public class DfPmbMetaData {
         return entityClassName;
     }
 
+    public String getCustomizeEntityLineDisp() {
+        if (!isRelatedToCustomizeEntity()) {
+            String msg = "This parameter-bean was not related to customize entity.";
+            throw new IllegalStateException(msg);
+        }
+        if (_customizeEntityInfo.isCursorHandling()) {
+            return "cursor handling";
+        }
+        if (_customizeEntityInfo.isScalarHandling()) {
+            return _customizeEntityInfo.getScalarColumnDisp();
+        }
+        return "customize entity";
+    }
+
     public String buildTypedDisp() {
         final StringBuilder logSb = new StringBuilder();
         if (isTypedParameterBean()) {

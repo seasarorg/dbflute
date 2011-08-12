@@ -185,7 +185,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * {@inheritDoc}
      */
     public Class<${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}> getEntityType() {
-        return ${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}.class;
+        return ${database.getPmbMetaDataCustomizeEntityType($pmbClassName)}.class; // ${database.getPmbMetaDataCustomizeEntityLineDisp($pmbClassName)}
     }
 
 #end

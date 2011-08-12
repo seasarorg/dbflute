@@ -161,7 +161,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     protected List<File> doGetLoadTypeDataFileList(String baseDir, String typeName) { // contains data-prop
-        return doGetAnyTypeDataFileList(baseDir, getDataLoadingType(), typeName);
+        return doGetAnyTypeDataFileList(baseDir, getRepsEnvType(), typeName);
     }
 
     protected List<File> doGetAnyTypeDataFileList(String baseDir, String loadType, String typeName) { // contains data-prop
@@ -190,7 +190,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     protected String getMainCurrentLoadTypeDataDir() {
         final String playSqlDirectory = getPlaySqlDir();
-        final String dataLoadingType = getDataLoadingType();
+        final String dataLoadingType = getRepsEnvType();
         return playSqlDirectory + "/data/" + dataLoadingType;
     }
 
@@ -257,7 +257,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         final String propString = (String) getReplaceSchemaDefinitionMap().get("repsEnvType");
         if (propString == null) {
-            if (!DfEnvironmentType.getInstance().isDefault()) {
+            final DfEnvironmentType environmentType = DfEnvironmentType.getInstance();
+            if (environmentType.isSpecifiedType()) {
                 return DfEnvironmentType.getInstance().getEnvironmentType();
             } else {
                 return "ut"; // final default

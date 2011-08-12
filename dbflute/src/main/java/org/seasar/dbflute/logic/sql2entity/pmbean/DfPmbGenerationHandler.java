@@ -235,6 +235,10 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).getCustomizeEntityType();
     }
 
+    public String getCustomizeEntityLineDisp(String className) {
+        return findPmbMetaData(className).getCustomizeEntityLineDisp();
+    }
+
     protected boolean isRelatedToBehaviorQuery(String className) {
         return findPmbMetaData(className).isRelatedToBehaviorQuery();
     }

@@ -390,7 +390,7 @@ public abstract class DfAbstractHelperProperties {
     protected String getOutsidePropString(String key) {
         final String propName = DfStringUtil.replace(key, "torque.", "");
         final DfStringFileReader reader = new DfStringFileReader();
-        if (!isEnvironmentDefault()) {
+        if (isSpecifiedEnvironmentType()) {
             final String environmentType = getEnvironmentType();
             final String path = "./dfprop/" + environmentType + "/" + propName + ".dfprop";
             final String str = reader.readString(path);
@@ -405,18 +405,18 @@ public abstract class DfAbstractHelperProperties {
         final String propName = DfStringUtil.replace(key, "torque.", "");
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         final String mainpath = "./dfprop/" + propName + ".dfprop";
-        final String envpath = "./dfprop/" + getEnvironmentType() + "/" + propName + ".dfprop";
-        if (isEnvironmentDefault()) {
-            final Map<String, Object> map = reader.readMap(mainpath);
-            setupOutsidePropExMap(reader, map, mainpath);
-            return map;
-        } else {
+        if (isSpecifiedEnvironmentType()) {
+            final String envpath = "./dfprop/" + getEnvironmentType() + "/" + propName + ".dfprop";
             Map<String, Object> map = reader.readMap(envpath);
             if (map.isEmpty()) {
                 map = reader.readMap(mainpath);
                 setupOutsidePropExMap(reader, map, mainpath);
             }
             setupOutsidePropExMap(reader, map, envpath);
+            return map;
+        } else {
+            final Map<String, Object> map = reader.readMap(mainpath);
+            setupOutsidePropExMap(reader, map, mainpath);
             return map;
         }
     }
@@ -435,7 +435,7 @@ public abstract class DfAbstractHelperProperties {
     protected List<Object> getOutsidePropList(String key) {
         final String propName = DfStringUtil.replace(key, "torque.", "");
         final DfListStringFileReader reader = new DfListStringFileReader();
-        if (!isEnvironmentDefault()) {
+        if (isSpecifiedEnvironmentType()) {
             final String environmentType = getEnvironmentType();
             final String path = "./dfprop/" + environmentType + "/" + propName + ".dfprop";
             List<Object> list = reader.readList(path);
@@ -484,8 +484,8 @@ public abstract class DfAbstractHelperProperties {
         return DfNameHintUtil.isHitByTheHint(name, hint);
     }
 
-    protected final boolean isEnvironmentDefault() {
-        return DfEnvironmentType.getInstance().isDefault();
+    protected final boolean isSpecifiedEnvironmentType() {
+        return DfEnvironmentType.getInstance().isSpecifiedType();
     }
 
     protected final String getEnvironmentType() {

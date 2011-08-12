@@ -45,7 +45,10 @@ public class DfCustomizeEntityInfo {
     protected boolean _domainHandling;
     protected DfPmbMetaData _pmbMetaData; // is a related parameter-bean
     protected String _entityClassName; // is set immediately before generation
-    protected String _scalarJavaNative; // only when scalar handling
+
+    // only when scalar handling
+    protected String _scalarJavaNative;
+    protected String _scalarColumnDisp;
 
     // additional information (procedure only)
     protected boolean _procedureHandling;
@@ -202,6 +205,14 @@ public class DfCustomizeEntityInfo {
 
     public void setScalarJavaNative(String scalarJavaNative) {
         this._scalarJavaNative = scalarJavaNative;
+    }
+
+    public String getScalarColumnDisp() {
+        return _scalarColumnDisp;
+    }
+
+    public void setScalarColumnDisp(String scalarColumnDisp) {
+        this._scalarColumnDisp = scalarColumnDisp;
     }
 
     public boolean isProcedureHandling() {

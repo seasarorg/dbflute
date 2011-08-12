@@ -116,7 +116,7 @@ map:{
     #  Elements of this map are as below:
     #   o recordLimit: The limit of records to output. Minus means no limit. (NotRequired - Default '')
     #   o isContainsCommonColumn: Does the data contain common columns? (NotRequired - Default false)
-    #   o isLoadDataReverse: Is the mode LoadDataReverse? (NotRequired - Default false)
+    #   o isOutputToPlaySql: Does it output the data to playsql? (NotRequired - Default false)
     #
     #; loadDataReverseMap = map:{
     #    ; recordLimit = 10
