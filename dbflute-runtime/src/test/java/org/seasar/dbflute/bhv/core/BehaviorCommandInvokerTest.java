@@ -379,6 +379,10 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
             throw new UnsupportedOperationException();
         }
 
+        public Object getParameterBean() {
+            return null;
+        }
+
         public Object[] getSqlExecutionArgument() {
             return new Object[] {};
         }

@@ -15,43 +15,11 @@
  */
 package org.seasar.dbflute.bhv.core;
 
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.outsidesql.OutsideSqlOption;
-
 /**
  * @author jflute
  * @param <RESULT> The type of result.
  */
-public interface BehaviorCommand<RESULT> {
-
-    // ===================================================================================
-    //                                                                   Basic Information
-    //                                                                   =================
-    String getTableDbName();
-
-    String getCommandName();
-
-    /**
-     * Get the return type of command.
-     * This type is not related to generic type because this is for conversion and check only.
-     * @return The return type of command. (NotNull)
-     */
-    Class<?> getCommandReturnType();
-
-    boolean isInitializeOnly();
-
-    // ===================================================================================
-    //                                                                  Detail Information
-    //                                                                  ==================
-    boolean isConditionBean();
-
-    boolean isOutsideSql();
-
-    boolean isProcedure();
-
-    boolean isSelect();
-
-    boolean isSelectCount();
+public interface BehaviorCommand<RESULT> extends BehaviorCommandMeta {
 
     // ===================================================================================
     //                                                                    Process Callback
@@ -68,13 +36,4 @@ public interface BehaviorCommand<RESULT> {
     SqlExecutionCreator createSqlExecutionCreator();
 
     Object[] getSqlExecutionArgument();
-
-    // ===================================================================================
-    //                                                                Argument Information
-    //                                                                ====================
-    ConditionBean getConditionBean();
-
-    String getOutsideSqlPath();
-
-    OutsideSqlOption getOutsideSqlOption();
 }

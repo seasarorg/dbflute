@@ -88,6 +88,10 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
         return null;
     }
 
+    public String getParameterBean() {
+        return null;
+    }
+
     public OutsideSqlOption getOutsideSqlOption() {
         return null;
     }

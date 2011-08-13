@@ -146,12 +146,39 @@ public class BehaviorCommandInvoker {
      * @return The result object. (NullAllowed)
      */
     public <RESULT> RESULT invoke(BehaviorCommand<RESULT> behaviorCommand) {
-        initializeContext();
+        RuntimeException cause = null;
+        RESULT result = null;
         try {
-            return dispatchInvoking(behaviorCommand);
+            initializeContext();
+            processBeforeHook(behaviorCommand);
+            result = dispatchInvoking(behaviorCommand);
+        } catch (RuntimeException e) {
+            cause = e;
         } finally {
+            processFinallyHook(behaviorCommand, cause);
             closeContext();
         }
+        if (cause != null) {
+            throw cause;
+        } else {
+            return result;
+        }
+    }
+
+    protected <RESULT> void processBeforeHook(BehaviorCommand<RESULT> behaviorCommand) {
+        if (!CallbackContext.isExistBehaviorCommandHookOnThread()) {
+            return;
+        }
+        final BehaviorCommandHook hook = CallbackContext.getCallbackContextOnThread().getBehaviorCommandHook();
+        hook.hookBefore(behaviorCommand);
+    }
+
+    protected <RESULT> void processFinallyHook(BehaviorCommand<RESULT> behaviorCommand, RuntimeException cause) {
+        if (!CallbackContext.isExistBehaviorCommandHookOnThread()) {
+            return;
+        }
+        final BehaviorCommandHook hook = CallbackContext.getCallbackContextOnThread().getBehaviorCommandHook();
+        hook.hookFinally(behaviorCommand, cause);
     }
 
     /**

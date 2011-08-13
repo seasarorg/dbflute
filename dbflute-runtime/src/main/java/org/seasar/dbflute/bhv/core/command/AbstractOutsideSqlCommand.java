@@ -80,6 +80,10 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
         return _outsideSqlPath;
     }
 
+    public Object getParameterBean() {
+        return _parameterBean;
+    }
+
     public OutsideSqlOption getOutsideSqlOption() {
         return _outsideSqlOption;
     }

@@ -114,6 +114,10 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
         return null;
     }
 
+    public String getParameterBean() {
+        return null;
+    }
+
     public OutsideSqlOption getOutsideSqlOption() {
         return null;
     }

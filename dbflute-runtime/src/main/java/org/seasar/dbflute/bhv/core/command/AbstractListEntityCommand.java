@@ -117,6 +117,10 @@ public abstract class AbstractListEntityCommand extends AbstractBehaviorCommand<
         return null;
     }
 
+    public String getParameterBean() {
+        return null;
+    }
+
     public OutsideSqlOption getOutsideSqlOption() {
         return null;
     }

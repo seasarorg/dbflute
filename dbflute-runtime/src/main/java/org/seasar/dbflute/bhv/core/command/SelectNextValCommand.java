@@ -229,6 +229,10 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         return null;
     }
 
+    public String getParameterBean() {
+        return null;
+    }
+
     public OutsideSqlOption getOutsideSqlOption() {
         return null;
     }

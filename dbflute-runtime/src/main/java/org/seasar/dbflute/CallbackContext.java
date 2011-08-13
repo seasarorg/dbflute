@@ -15,11 +15,12 @@
  */
 package org.seasar.dbflute;
 
+import org.seasar.dbflute.bhv.core.BehaviorCommandHook;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 
 /**
- * The context of callback in DBFlute internal logic.
+ * The context of call-back in DBFlute internal logic.
  * @author jflute
  */
 public class CallbackContext {
@@ -31,16 +32,17 @@ public class CallbackContext {
     private static final ThreadLocal<CallbackContext> _threadLocal = new ThreadLocal<CallbackContext>();
 
     /**
-     * Get callback-context on thread.
-     * @return The context of callback. (NullAllowed)
+     * Get call-back context on thread.
+     * @return The context of call-back. (NullAllowed)
      */
     public static CallbackContext getCallbackContextOnThread() {
-        return (CallbackContext) _threadLocal.get();
+        return _threadLocal.get();
     }
 
     /**
-     * Set callback-context on thread.
-     * @param callbackContext The context of callback. (NotNull)
+     * Set call-back context on thread. <br />
+     * You can use setting methods per interface instead of this method.
+     * @param callbackContext The context of call-back. (NotNull)
      */
     public static void setCallbackContextOnThread(CallbackContext callbackContext) {
         if (callbackContext == null) {
@@ -51,7 +53,8 @@ public class CallbackContext {
     }
 
     /**
-     * Is existing callback-context on thread?
+     * Is existing call-back context on thread? <br />
+     * You can use determination methods per interface instead of this method.
      * @return The determination, true or false.
      */
     public static boolean isExistCallbackContextOnThread() {
@@ -59,21 +62,197 @@ public class CallbackContext {
     }
 
     /**
-     * Clear callback-context on thread.
+     * Clear call-back context on thread. <br />
+     * Basically you should call other clear methods per interfaces,
+     * because this clear method clears all interfaces. 
      */
     public static void clearCallbackContextOnThread() {
         _threadLocal.set(null);
     }
 
+    // -----------------------------------------------------
+    //                                   BehaviorCommandHook
+    //                                   -------------------
+    /**
+     * Set the hook interface of behavior commands. <br />
+     * This hook interface is called back before executing behavior commands and after. 
+     * <pre>
+     * context.setBehaviorCommandHook(new BehaviorCommandHook() {
+     *     public void hookBefore(BehaviorCommandMeta meta) {
+     *         // You can implement your favorite call-back here.
+     *     }
+     *     public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+     *         // You can implement your favorite call-back here.
+     *     }
+     * });
+     * </pre>
+     * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed)
+     */
+    public static void setBehaviorCommandHookOnThread(BehaviorCommandHook behaviorCommandHook) {
+        final CallbackContext context = getOrCreateContext();
+        context.setBehaviorCommandHook(behaviorCommandHook);
+    }
+
+    /**
+     * Is existing the hook interface of behavior commands on thread?
+     * @return The determination, true or false.
+     */
+    public static boolean isExistBehaviorCommandHookOnThread() {
+        return isExistCallbackContextOnThread() && getCallbackContextOnThread().getBehaviorCommandHook() != null;
+    }
+
+    /**
+     * Clear the hook interface of behavior commands from call-back context on thread. <br />
+     * If the call-back context has had the interface only, the context will also removed from thread.
+     */
+    public static void clearBehaviorCommandHookOnThread() {
+        if (isExistCallbackContextOnThread()) {
+            final CallbackContext context = getCallbackContextOnThread();
+            context.setBehaviorCommandHook(null);
+            if (!context.hasAnyInterface()) {
+                clearCallbackContextOnThread();
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         SqlLogHandler
+    //                                         -------------
+    /**
+     * Set the handler of SQL log. <br />
+     * This handler is called back before executing the SQL. 
+     * <pre>
+     * context.setSqlLogHandler(new SqlLogHandler() {
+     *     public void handle(String executedSql, String displaySql
+     *                      , Object[] args, Class&lt;?&gt;[] argTypes) {
+     *         // You can get your SQL string here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlLogHandler The handler of SQL log. (NullAllowed)
+     */
+    public static void setSqlLogHandlerOnThread(SqlLogHandler sqlLogHandler) {
+        final CallbackContext context = getOrCreateContext();
+        context.setSqlLogHandler(sqlLogHandler);
+    }
+
+    /**
+     * Is existing the handler of SQL log on thread?
+     * @return The determination, true or false.
+     */
+    public static boolean isExistSqlLogHandlerOnThread() {
+        return isExistCallbackContextOnThread() && getCallbackContextOnThread().getSqlLogHandler() != null;
+    }
+
+    /**
+     * Clear the handler of SQL log from call-back context on thread. <br />
+     * If the call-back context has had the interface only, the context will also removed from thread.
+     */
+    public static void clearSqlLogHandlerOnThread() {
+        if (isExistCallbackContextOnThread()) {
+            final CallbackContext context = getCallbackContextOnThread();
+            context.setSqlLogHandler(null);
+            if (!context.hasAnyInterface()) {
+                clearCallbackContextOnThread();
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                      SqlResultHandler
+    //                                      ----------------
+    /**
+     * Set the handler of SQL result. <br />
+     * This handler is called back before executing the SQL. 
+     * <pre>
+     * context.setSqlResultHandler(new SqlResultHandler() {
+     *     public void handle(SqlResultInfo info) {
+     *         // You can get your SQL result information here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlResultHandler The handler of SQL result. (NullAllowed)
+     */
+    public static void setSqlResultHandlerOnThread(SqlResultHandler sqlResultHandler) {
+        final CallbackContext context = getOrCreateContext();
+        context.setSqlResultHandler(sqlResultHandler);
+    }
+
+    /**
+     * Is existing the handler of SQL result on thread?
+     * @return The determination, true or false.
+     */
+    public static boolean isExistSqlResultHandlerOnThread() {
+        return isExistCallbackContextOnThread() && getCallbackContextOnThread().getSqlResultHandler() != null;
+    }
+
+    /**
+     * Clear the handler of SQL result from call-back context on thread. <br />
+     * If the call-back context has had the interface only, the context will also removed from thread.
+     */
+    public static void clearSqlResultHandlerOnThread() {
+        if (isExistCallbackContextOnThread()) {
+            final CallbackContext context = getCallbackContextOnThread();
+            context.setSqlResultHandler(null);
+            if (!context.hasAnyInterface()) {
+                clearCallbackContextOnThread();
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
+    protected static CallbackContext getOrCreateContext() {
+        return isExistCallbackContextOnThread() ? getCallbackContextOnThread() : new CallbackContext();
+    }
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected BehaviorCommandHook _behaviorCommandHook;
     protected SqlLogHandler _sqlLogHandler;
     protected SqlResultHandler _sqlResultHandler;
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean hasAnyInterface() {
+        return _behaviorCommandHook != null || _sqlLogHandler != null || _sqlResultHandler != null;
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                   BehaviorCommandHook
+    //                                   -------------------
+    public BehaviorCommandHook getBehaviorCommandHook() {
+        return _behaviorCommandHook;
+    }
+
+    /**
+     * Set the hook interface of behavior commands. <br />
+     * This hook interface is called back before executing behavior commands and after. 
+     * <pre>
+     * context.setBehaviorCommandHook(new BehaviorCommandHook() {
+     *     public void hookBefore(BehaviorCommandMeta meta) {
+     *         // You can implement your favorite call-back here.
+     *     }
+     *     public void hookFinally(BehaviorCommandMeta meta, RuntimeException cause) {
+     *         // You can implement your favorite call-back here.
+     *     }
+     * });
+     * </pre>
+     * @param behaviorCommandHook The hook interface of behavior commands. (NullAllowed)
+     */
+    public void setBehaviorCommandHook(BehaviorCommandHook behaviorCommandHook) {
+        this._behaviorCommandHook = behaviorCommandHook;
+    }
+
+    // -----------------------------------------------------
+    //                                         SqlLogHandler
+    //                                         -------------
     public SqlLogHandler getSqlLogHandler() {
         return _sqlLogHandler;
     }
@@ -95,6 +274,9 @@ public class CallbackContext {
         this._sqlLogHandler = sqlLogHandler;
     }
 
+    // -----------------------------------------------------
+    //                                      SqlResultHandler
+    //                                      ----------------
     public SqlResultHandler getSqlResultHandler() {
         return _sqlResultHandler;
     }
