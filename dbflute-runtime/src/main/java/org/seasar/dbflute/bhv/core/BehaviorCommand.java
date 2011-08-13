@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.bhv.core;
 
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+
 /**
  * @author jflute
  * @param <RESULT> The type of result.
@@ -36,4 +39,31 @@ public interface BehaviorCommand<RESULT> extends BehaviorCommandMeta {
     SqlExecutionCreator createSqlExecutionCreator();
 
     Object[] getSqlExecutionArgument();
+
+    // ===================================================================================
+    //                                                                Argument Information
+    //                                                                ====================
+    /**
+     * Get the instance of condition-bean specified as argument if it exists.
+     * @return The instance of condition-bean. (NullAllowed)
+     */
+    ConditionBean getConditionBean();
+
+    /**
+     * Get the path of outside-SQL if it's outside-SQL.
+     * @return The path of outside-SQL. (NullAllowed)
+     */
+    String getOutsideSqlPath();
+
+    /**
+     * Get the parameter-bean for outside-SQL if it's outside-SQL.
+     * @return The parameter-bean for outside-SQL. (NullAllowed)
+     */
+    Object getParameterBean();
+
+    /**
+     * Get the option of outside-SQL if it's outside-SQL.
+     * @return The option of outside-SQL. (NullAllowed)
+     */
+    OutsideSqlOption getOutsideSqlOption();
 }
