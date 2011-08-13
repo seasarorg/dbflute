@@ -206,7 +206,13 @@ public class CallbackContext {
     //                                         Assist Helper
     //                                         -------------
     protected static CallbackContext getOrCreateContext() {
-        return isExistCallbackContextOnThread() ? getCallbackContextOnThread() : new CallbackContext();
+        if (isExistCallbackContextOnThread()) {
+            return getCallbackContextOnThread();
+        } else {
+            final CallbackContext context = new CallbackContext();
+            setCallbackContextOnThread(context);
+            return context;
+        }
     }
 
     // ===================================================================================
