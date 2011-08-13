@@ -38,10 +38,6 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final Object result = new Object();
         final Object[] args = new Object[] { "foo", "bar" };
         BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
-            @Override
-            protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
-                markList.add("setupResourceContext");
-            }
 
             @Override
             protected boolean isLogEnabled() {
@@ -103,14 +99,13 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
 
         // ## Assert ##
         assertEquals(result, actualResult);
-        assertEquals("setupResourceContext", markList.get(0));
-        assertEquals("isLogEnabled", markList.get(1));
-        assertEquals("findSqlExecution", markList.get(2));
-        assertEquals("deriveCommandBeforeAfterTimeIfNeeds", markList.get(3));
-        assertEquals("SqlExecution.execute", markList.get(4));
-        assertEquals("deriveCommandBeforeAfterTimeIfNeeds2", markList.get(5));
-        assertEquals("logReturn", markList.get(6));
-        assertEquals(7, markList.size());
+        assertEquals("isLogEnabled", markList.get(0));
+        assertEquals("findSqlExecution", markList.get(1));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds", markList.get(2));
+        assertEquals("SqlExecution.execute", markList.get(3));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds2", markList.get(4));
+        assertEquals("logReturn", markList.get(5));
+        assertEquals(6, markList.size());
     }
 
     public void test_dispatchInvoking_whitebox_logDisabled() {
@@ -119,10 +114,6 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final Object result = new Object();
         final Object[] args = new Object[] { "foo", "bar" };
         BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
-            @Override
-            protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
-                markList.add("setupResourceContext");
-            }
 
             @Override
             protected boolean isLogEnabled() {
@@ -185,13 +176,12 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
 
         // ## Assert ##
         assertEquals(result, actualResult);
-        assertEquals("setupResourceContext", markList.get(0));
-        assertEquals("isLogEnabled", markList.get(1));
-        assertEquals("findSqlExecution", markList.get(2));
-        assertEquals("deriveCommandBeforeAfterTimeIfNeeds", markList.get(3));
-        assertEquals("SqlExecution.execute", markList.get(4));
-        assertEquals("deriveCommandBeforeAfterTimeIfNeeds2", markList.get(5));
-        assertEquals(6, markList.size());
+        assertEquals("isLogEnabled", markList.get(0));
+        assertEquals("findSqlExecution", markList.get(1));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds", markList.get(2));
+        assertEquals("SqlExecution.execute", markList.get(3));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds2", markList.get(4));
+        assertEquals(5, markList.size());
     }
 
     public void test_dispatchInvoking_whitebox_logDisabled_sqlResultHandler() {
@@ -200,10 +190,6 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final Object result = new Object();
         final Object[] args = new Object[] { "foo", "bar" };
         BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
-            @Override
-            protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
-                markList.add("setupResourceContext");
-            }
 
             @Override
             protected boolean isLogEnabled() {
@@ -281,25 +267,19 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
 
         // ## Assert ##
         assertEquals(result, actualResult);
-        assertEquals("setupResourceContext", markList.get(0));
-        assertEquals("isLogEnabled", markList.get(1));
-        assertEquals("findSqlExecution", markList.get(2));
-        assertEquals("deriveCommandBeforeAfterTimeIfNeeds", markList.get(3));
-        assertEquals("SqlExecution.execute", markList.get(4));
-        assertEquals("deriveCommandBeforeAfterTimeIfNeeds2", markList.get(5));
-        assertEquals("handle", markList.get(6));
-        assertEquals(7, markList.size());
+        assertEquals("isLogEnabled", markList.get(0));
+        assertEquals("findSqlExecution", markList.get(1));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds", markList.get(2));
+        assertEquals("SqlExecution.execute", markList.get(3));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds2", markList.get(4));
+        assertEquals("handle", markList.get(5));
+        assertEquals(6, markList.size());
     }
 
     public void test_dispatchInvoking_initializeOnly() {
         // ## Arrange ##
         final List<String> markList = new ArrayList<String>();
         BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
-            @Override
-            protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
-                markList.add("setupResourceContext");
-            }
-
             @Override
             protected boolean isLogEnabled() {
                 markList.add("isLogEnabled");
@@ -338,10 +318,9 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
 
         // ## Assert ##
         assertNull(actualResult);
-        assertEquals("setupResourceContext", markList.get(0));
-        assertEquals("isLogEnabled", markList.get(1));
-        assertEquals("initializeSqlExecution", markList.get(2));
-        assertEquals(3, markList.size());
+        assertEquals("isLogEnabled", markList.get(0));
+        assertEquals("initializeSqlExecution", markList.get(1));
+        assertEquals(2, markList.size());
     }
 
     protected static class MockBehaviorCommand implements BehaviorCommand<Object> {
