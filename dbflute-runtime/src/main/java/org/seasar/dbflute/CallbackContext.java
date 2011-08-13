@@ -75,7 +75,9 @@ public class CallbackContext {
     //                                   -------------------
     /**
      * Set the hook interface of behavior commands. <br />
-     * This hook interface is called back before executing behavior commands and after. 
+     * This hook interface is called back before executing behavior commands and finally. <br /> 
+     * The hook methods may be called by nested process
+     * so you should pay attention to it when you implements this.
      * <pre>
      * context.setBehaviorCommandHook(new BehaviorCommandHook() {
      *     public void hookBefore(BehaviorCommandMeta meta) {
@@ -233,7 +235,9 @@ public class CallbackContext {
 
     /**
      * Set the hook interface of behavior commands. <br />
-     * This hook interface is called back before executing behavior commands and after. 
+     * This hook interface is called back before executing behavior commands and finally. <br /> 
+     * The hook methods may be called by nested process
+     * so you should pay attention to it when you implements this.
      * <pre>
      * context.setBehaviorCommandHook(new BehaviorCommandHook() {
      *     public void hookBefore(BehaviorCommandMeta meta) {

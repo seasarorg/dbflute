@@ -150,6 +150,7 @@ public class BehaviorCommandInvoker {
         RESULT result = null;
         try {
             initializeContext();
+            setupResourceContext(behaviorCommand);
             processBeforeHook(behaviorCommand);
             result = dispatchInvoking(behaviorCommand);
         } catch (RuntimeException e) {
@@ -163,6 +164,20 @@ public class BehaviorCommandInvoker {
         } else {
             return result;
         }
+    }
+
+    protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
+        assertInvokerAssistant();
+        final ResourceContext resourceContext = new ResourceContext();
+        resourceContext.setBehaviorCommand(behaviorCommand);
+        resourceContext.setCurrentDBDef(_invokerAssistant.assistCurrentDBDef());
+        resourceContext.setDBMetaProvider(_invokerAssistant.assistDBMetaProvider());
+        resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
+        resourceContext.setSqlAnalyzerFactory(_invokerAssistant.assistSqlAnalyzerFactory());
+        resourceContext.setSQLExceptionHandlerFactory(_invokerAssistant.assistSQLExceptionHandlerFactory());
+        resourceContext.setGearedCipherManager(_invokerAssistant.assistGearedCipherManager());
+        resourceContext.setResourceParameter(_invokerAssistant.assistResourceParameter());
+        ResourceContext.setResourceContextOnThread(resourceContext);
     }
 
     protected <RESULT> void processBeforeHook(BehaviorCommand<RESULT> behaviorCommand) {
@@ -187,7 +202,6 @@ public class BehaviorCommandInvoker {
      * @return The result object. (NullAllowed)
      */
     protected <RESULT> RESULT dispatchInvoking(BehaviorCommand<RESULT> behaviorCommand) {
-        setupResourceContext(behaviorCommand);
         final boolean logEnabled = isLogEnabled();
 
         // - - - - - - - - - - - - -
@@ -242,20 +256,6 @@ public class BehaviorCommandInvoker {
         @SuppressWarnings("unchecked")
         final RESULT result = (RESULT) ret;
         return result;
-    }
-
-    protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
-        assertInvokerAssistant();
-        final ResourceContext resourceContext = new ResourceContext();
-        resourceContext.setBehaviorCommand(behaviorCommand);
-        resourceContext.setCurrentDBDef(_invokerAssistant.assistCurrentDBDef());
-        resourceContext.setDBMetaProvider(_invokerAssistant.assistDBMetaProvider());
-        resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
-        resourceContext.setSqlAnalyzerFactory(_invokerAssistant.assistSqlAnalyzerFactory());
-        resourceContext.setSQLExceptionHandlerFactory(_invokerAssistant.assistSQLExceptionHandlerFactory());
-        resourceContext.setGearedCipherManager(_invokerAssistant.assistGearedCipherManager());
-        resourceContext.setResourceParameter(_invokerAssistant.assistResourceParameter());
-        ResourceContext.setResourceContextOnThread(resourceContext);
     }
 
     protected long deriveCommandBeforeAfterTimeIfNeeds(boolean logEnabled, boolean existsSqlResultHandler) {
