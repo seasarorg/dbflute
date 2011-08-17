@@ -47,8 +47,17 @@ public class PageRangeBean implements Serializable {
     //                                                                    ================
     /**
      * Build the list of page number link.
+     * <pre>
+     * page.setPageRangeSize(5);
+     * page.pageRange().<span style="color: #FD4747">buildPageNumberLinkList</span>(new PageNumberLinkSetupper&lt;PageNumberLink&gt;() {
+     *     public PageNumberLink setup(int pageNumberElement, boolean current) {
+     *         String href = buildPagingHref(pageNumberElement); <span style="color: #3F7E5E">// for paging navigation links</span>
+     *         return new PageNumberLink(pageNumberElement, current, href);
+     *     }
+     * });
+     * </pre>
      * @param <LINK> The type of link.
-     * @param pageNumberLinkSetupper Page number link set-upper. (NotNull and Required LINK)
+     * @param pageNumberLinkSetupper The setup interface of Page number link. (NotNull, Required LINK)
      * @return The list of Page number link. (NotNull)
      */
     public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(

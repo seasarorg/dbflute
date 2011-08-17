@@ -18,7 +18,16 @@ package org.seasar.dbflute.cbean.pagenavi;
 import java.io.Serializable;
 
 /**
- * The class of page number link.
+ * The basic DTO of page number link.
+ * <pre>
+ * page.setPageRangeSize(5);
+ * page.pageRange().<span style="color: #FD4747">buildPageNumberLinkList</span>(new PageNumberLinkSetupper&lt;PageNumberLink&gt;() {
+ *     public PageNumberLink setup(int pageNumberElement, boolean current) {
+ *         String href = buildPagingHref(pageNumberElement); <span style="color: #3F7E5E">// for paging navigation links</span>
+ *         return new PageNumberLink(pageNumberElement, current, href);
+ *     }
+ * });
+ * </pre>
  * @author jflute
  */
 public class PageNumberLink implements Serializable {
@@ -32,19 +41,35 @@ public class PageNumberLink implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The element of page number. */
     protected int _pageNumberElement;
+
+    /** Is the page number for current page? */
     protected boolean _current;
+
+    /** The 'href' string corresponding to the page number. */
     protected String _pageNumberLinkHref;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * Constructor. <br />
+     * You can initialize attributes by initialize() after this creation.
+     */
     public PageNumberLink() {
     }
 
     // ===================================================================================
     //                                                                         Initializer
     //                                                                         ===========
+    /**
+     * Initialize basic attributes.
+     * @param pageNumberElement The element of page number.
+     * @param current Is the page number for current page?
+     * @param pageNumberLinkHref The 'href' string corresponding to the page number. (NullAllowed)
+     * @return this. (NotNull)
+     */
     public PageNumberLink initialize(int pageNumberElement, boolean current, String pageNumberLinkHref) {
         setPageNumberElement(pageNumberElement);
         setCurrent(current);

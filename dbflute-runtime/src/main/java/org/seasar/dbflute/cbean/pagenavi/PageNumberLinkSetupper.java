@@ -17,6 +17,15 @@ package org.seasar.dbflute.cbean.pagenavi;
 
 /**
  * The set-upper of page number link.
+ * <pre>
+ * page.setPageRangeSize(5);
+ * page.pageRange().<span style="color: #FD4747">buildPageNumberLinkList</span>(new PageNumberLinkSetupper&lt;PageNumberLink&gt;() {
+ *     public PageNumberLink setup(int pageNumberElement, boolean current) {
+ *         String href = buildPagingHref(pageNumberElement); <span style="color: #3F7E5E">// for paging navigation links</span>
+ *         return new PageNumberLink(pageNumberElement, current, href);
+ *     }
+ * });
+ * </pre>
  * @param <LINK> The type of link.
  * @author jflute
  */
@@ -28,5 +37,5 @@ public interface PageNumberLinkSetupper<LINK extends PageNumberLink> {
      * @param current Is current page?
      * @return Page number link. (NotNull)
      */
-    public LINK setup(int pageNumberElement, boolean current);
+    LINK setup(int pageNumberElement, boolean current);
 }

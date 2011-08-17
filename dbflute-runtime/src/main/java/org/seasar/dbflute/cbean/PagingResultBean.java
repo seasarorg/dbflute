@@ -173,7 +173,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * List&lt;Integer&gt; numberList = page.<span style="color: #FD4747">pageGroup()</span>.createPageNumberList();
      * 
      * <span style="color: #3F7E5E">//  8 / 23 pages (453 records)</span>
-     * <span style="color: #3F7E5E">//</span> previous <span style="color: #FD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
+     * <span style="color: #3F7E5E">// previous</span> <span style="color: #FD4747">1 2 3 4 5 6 7 8 9 10</span> <span style="color: #3F7E5E">next</span>
      * </pre>
      * @return The value of pageGroupBean. (NotNull)
      */
