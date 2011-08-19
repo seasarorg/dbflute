@@ -1178,6 +1178,34 @@ public class ForeignKey {
     }
 
     // ===================================================================================
+    //                                                                 Implicit Conversion
+    //                                                                 ===================
+    public boolean canImplicitConversion() {
+        if (!isSimpleKeyFK()) {
+            return false;
+        }
+        final Column localColumn = getLocalColumnAsOne();
+        final Column foreignColumn = getForeignColumnAsOne();
+        if ((localColumn.isJavaNativeStringObject() || localColumn.isJavaNativeNumberObject())
+                && (foreignColumn.isJavaNativeStringObject() || foreignColumn.isJavaNativeNumberObject())) {
+            return !localColumn.getJdbcType().equals(foreignColumn.getJdbcType());
+        }
+        return false;
+    }
+
+    public boolean isConvertToForeignByToString() {
+        return getForeignColumnAsOne().isJavaNativeStringObject();
+    }
+
+    public boolean isConvertToForeignByConstructor() {
+        return getForeignColumnAsOne().isJavaNativeBigDecimal();
+    }
+
+    public boolean isConvertToForeignByValueOf() {
+        return getForeignColumnAsOne().isJavaNativeValueOfAbleObject();
+    }
+
+    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {

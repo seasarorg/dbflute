@@ -494,15 +494,31 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
         helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
-            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} e) { return e.get${localColumn.javaName}(); }
-            public void setRfLs(${myExtendedObjectClassName} e, List<${referrerEntityClassName}> ls) { e.set${referrer.referrerPropertyNameInitCap}(ls); }
+            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} e)
+#if ($referrer.canImplicitConversion())
+#if ($referrer.isConvertToForeignByToString())
+            { return e.get${localColumn.javaName}().toString(); }
+#elseif ($referrer.isConvertToForeignByConstructor())
+            { return new ${keyJavaNative}(e.get${localColumn.javaName}()); }
+#elseif ($referrer.isConvertToForeignByValueOf())
+            { return ${keyJavaNative}.valueOf(e.get${localColumn.javaName}()); }
+#else
+            { return e.get${localColumn.javaName}(); }
+#end
+#else
+            { return e.get${localColumn.javaName}(); }
+#end
+            public void setRfLs(${myExtendedObjectClassName} e, List<${referrerEntityClassName}> ls)
+            { e.set${referrer.referrerPropertyNameInitCap}(ls); }
             public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
-            public void qyFKIn(${referrerCBClassName} cb, List<${keyJavaNative}> ls) { cb.query().set${referrerColumn.javaName}_InScope(ls); }
+            public void qyFKIn(${referrerCBClassName} cb, List<${keyJavaNative}> ls)
+            { cb.query().set${referrerColumn.javaName}_InScope(ls); }
             public void qyOdFKAsc(${referrerCBClassName} cb) { cb.query().addOrderBy_${referrerColumn.javaName}_Asc(); }
             public void spFKCol(${referrerCBClassName} cb) { cb.specify().column${referrerColumn.javaName}(); }
             public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
             public ${keyJavaNative} getFKVal(${referrerEntityClassName} e) { return e.get${referrerColumn.javaName}(); }
-            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le) { re.set${referrer.foreignPropertyNameInitCap}(le); }
+            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le)
+            { re.set${referrer.foreignPropertyNameInitCap}(le); }
         });
     }
 
