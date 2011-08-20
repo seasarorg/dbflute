@@ -1193,16 +1193,16 @@ public class ForeignKey {
         return false;
     }
 
-    public boolean isConvertToForeignByToString() {
-        return getForeignColumnAsOne().isJavaNativeStringObject();
+    public boolean isConvertToReferrerByToString() {
+        return getLocalColumnAsOne().isJavaNativeStringObject(); // local is referrer
     }
 
-    public boolean isConvertToForeignByConstructor() {
-        return getForeignColumnAsOne().isJavaNativeBigDecimal();
+    public boolean isConvertToReferrerByConstructor() {
+        return getLocalColumnAsOne().isJavaNativeBigDecimal(); // local is referrer
     }
 
-    public boolean isConvertToForeignByValueOf() {
-        return getForeignColumnAsOne().isJavaNativeValueOfAbleObject();
+    public boolean isConvertToReferrerByValueOf() {
+        return getLocalColumnAsOne().isJavaNativeValueOfAbleObject(); // local is referrer
     }
 
     // ===================================================================================

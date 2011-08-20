@@ -496,14 +496,15 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
             public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} e)
 #if ($referrer.canImplicitConversion())
-#if ($referrer.isConvertToForeignByToString())
-            { return e.get${localColumn.javaName}().toString(); }
-#elseif ($referrer.isConvertToForeignByConstructor())
-            { return new ${keyJavaNative}(e.get${localColumn.javaName}()); }
-#elseif ($referrer.isConvertToForeignByValueOf())
-            { return ${keyJavaNative}.valueOf(e.get${localColumn.javaName}()); }
+            { if (e.get${localColumn.javaName}() == null) { return null; }
+#if ($referrer.isConvertToReferrerByToString())
+              return e.get${localColumn.javaName}().toString(); }
+#elseif ($referrer.isConvertToReferrerByConstructor())
+              return new ${keyJavaNative}(e.get${localColumn.javaName}().toString()); }
+#elseif ($referrer.isConvertToReferrerByValueOf())
+              return ${keyJavaNative}.valueOf(e.get${localColumn.javaName}().toString()); }
 #else
-            { return e.get${localColumn.javaName}(); }
+              return e.get${localColumn.javaName}(); }
 #end
 #else
             { return e.get${localColumn.javaName}(); }
