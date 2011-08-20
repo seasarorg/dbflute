@@ -350,7 +350,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                       ---------------
     public String getClause() {
         final StringBuilder sb = new StringBuilder(512);
-        String selectClause = getSelectClause();
+        final String selectClause = getSelectClause();
         sb.append(selectClause);
         sb.append(" ");
         buildClauseWithoutMainSelect(sb, selectClause);
@@ -365,9 +365,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append(getFromHint());
         sb.append(" ");
         buildWhereClause(sb);
-        String unionClause = prepareUnionClause(selectClause);
-        unionClause = deleteUnionWhereTemplateMark(unionClause); // required
-        sb.append(unionClause);
+        sb.append(deleteUnionWhereTemplateMark(prepareUnionClause(selectClause)));
         if (!needsUnionNormalSelectEnclosing()) {
             sb.append(prepareClauseOrderBy());
             sb.append(prepareClauseSqlSuffix());
@@ -394,7 +392,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String buildClauseFromWhereAsTemplate(boolean template) {
-        StringBuilder sb = new StringBuilder(256);
+        final StringBuilder sb = new StringBuilder(256);
         buildFromClause(sb);
         sb.append(getFromHint());
         sb.append(" ");
@@ -431,7 +429,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String prepareClauseSqlSuffix() {
-        String sqlSuffix = getSqlSuffix();
+        final String sqlSuffix = getSqlSuffix();
         if (sqlSuffix == null || sqlSuffix.trim().length() == 0) {
             return "";
         }

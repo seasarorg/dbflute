@@ -754,24 +754,24 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     protected static interface InternalLoadReferrerCallback<LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> {
         // for Base
-        public PK getPKVal(LOCAL_ENTITY entity); // getPrimaryKeyValue()
+        PK getPKVal(LOCAL_ENTITY entity); // getPrimaryKeyValue()
 
-        public void setRfLs(LOCAL_ENTITY entity, List<REFERRER_ENTITY> referrerList); // setReferrerList()
+        void setRfLs(LOCAL_ENTITY entity, List<REFERRER_ENTITY> referrerList); // setReferrerList()
 
         // for Referrer
-        public REFERRER_CB newMyCB(); // newMyConditionBean()
+        REFERRER_CB newMyCB(); // newMyConditionBean()
 
-        public void qyFKIn(REFERRER_CB cb, List<PK> pkList); // queryForeignKeyInScope()
+        void qyFKIn(REFERRER_CB cb, List<PK> pkList); // queryForeignKeyInScope()
 
-        public void qyOdFKAsc(REFERRER_CB cb); // queryAddOrderByForeignKeyAsc() 
+        void qyOdFKAsc(REFERRER_CB cb); // queryAddOrderByForeignKeyAsc() 
 
-        public void spFKCol(REFERRER_CB cb); // specifyForeignKeyColumn()
+        void spFKCol(REFERRER_CB cb); // specifyForeignKeyColumn()
 
-        public List<REFERRER_ENTITY> selRfLs(REFERRER_CB cb); // selectReferrerList() 
+        List<REFERRER_ENTITY> selRfLs(REFERRER_CB cb); // selectReferrerList() 
 
-        public PK getFKVal(REFERRER_ENTITY entity); // getForeignKeyValue()
+        PK getFKVal(REFERRER_ENTITY entity); // getForeignKeyValue()
 
-        public void setlcEt(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity); // setLocalEntity()
+        void setlcEt(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity); // setLocalEntity()
     }
 
     // assertLoadReferrerArgument() as Internal
