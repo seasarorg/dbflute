@@ -1186,6 +1186,7 @@ public class ForeignKey {
         }
         final Column localColumn = getLocalColumnAsOne();
         final Column foreignColumn = getForeignColumnAsOne();
+        // the scope is in String and Number types
         if ((localColumn.isJavaNativeStringObject() || localColumn.isJavaNativeNumberObject())
                 && (foreignColumn.isJavaNativeStringObject() || foreignColumn.isJavaNativeNumberObject())) {
             return !localColumn.getJdbcType().equals(foreignColumn.getJdbcType());
@@ -1193,16 +1194,20 @@ public class ForeignKey {
         return false;
     }
 
+    // /- - - - - - - - - - - - - -
+    // attention: local is referrer
+    // - - - - - - - - - -/
+
     public boolean isConvertToReferrerByToString() {
-        return getLocalColumnAsOne().isJavaNativeStringObject(); // local is referrer
+        return getLocalColumnAsOne().isJavaNativeStringObject();
     }
 
     public boolean isConvertToReferrerByConstructor() {
-        return getLocalColumnAsOne().isJavaNativeBigDecimal(); // local is referrer
+        return getLocalColumnAsOne().isJavaNativeBigDecimal();
     }
 
     public boolean isConvertToReferrerByValueOf() {
-        return getLocalColumnAsOne().isJavaNativeValueOfAbleObject(); // local is referrer
+        return getLocalColumnAsOne().isJavaNativeValueOfAbleObject();
     }
 
     // ===================================================================================
