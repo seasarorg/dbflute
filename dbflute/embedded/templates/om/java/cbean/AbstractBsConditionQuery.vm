@@ -1130,8 +1130,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($table.hasSinglePrimaryKey())
 
     // ===================================================================================
-    //                                                                    Scalar Condition
-    //                                                                    ================
+    //                                                                     ScalarCondition
+    //                                                                     ===============
     /**
      * Prepare ScalarCondition as equal. <br />
      * {where FOO = (select max(BAR) from ...)
@@ -1251,19 +1251,19 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keepScalarCondition(${myConditionQueryClassName} subQuery);
 
     // ===================================================================================
-    //                                                                      Myself InScope
-    //                                                                      ==============
+    //                                                                       MyselfInScope
+    //                                                                       =============
     /**
-     * Myself InScope (SubQuery). {mainly for CLOB and Union}
+     * Myself InScope (SubQuery). {mainly to avoid CLOB and Union problem or no master table}
      * @param subQuery The implementation of sub query. (NotNull)
      */
     public void myselfInScope(SubQuery<${myConditionBeanClassName}> subQuery) {
         assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForInScopeRelation(this); subQuery.query(cb);
-        String subQueryPropertyName = keepMyselfInScopeRelation(cb.query()); // for saving query-value.
-        registerInScopeRelation(cb.query(), "${table.primaryKeyAsOne.name}", "${table.primaryKeyAsOne.name}", subQueryPropertyName);
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForMyselfInScope(this); subQuery.query(cb);
+        String subQueryPropertyName = keepMyselfInScope(cb.query()); // for saving query-value.
+        registerMyselfInScope(cb.query(), subQueryPropertyName);
     }
-    public abstract String keepMyselfInScopeRelation(${myConditionQueryClassName} subQuery);
+    public abstract String keepMyselfInScope(${myConditionQueryClassName} subQuery);
 #end
 #if ($database.isAvailableDatabaseDependency())
 #if ($database.isDatabaseMySQL())

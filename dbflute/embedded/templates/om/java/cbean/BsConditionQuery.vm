@@ -30,8 +30,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     // ===================================================================================
-    //                                                                              Inline
-    //                                                                              ======
+    //                                                                 InlineView/OrClause
+    //                                                                 ===================
     /**
      * Prepare InlineView query. <br />
      * {select ... from ... left outer join (select * from ${table.name}) where FOO = [value] ...}
@@ -411,8 +411,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 
     // ===================================================================================
-    //                                                           Specified Derived OrderBy
-    //                                                           =========================
+    //                                                             SpecifiedDerivedOrderBy
+    //                                                             =======================
     /**
      * Add order-by for specified derived column as ascend.
      * <pre>
@@ -588,7 +588,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 #if ($table.hasSinglePrimaryKey())
     // ===================================================================================
-    //                                                                     Scalar SubQuery
+    //                                                                     ScalarCondition
     //                                                                     ===============
     protected Map<String, ${myConditionQueryClassName}> _scalarConditionMap;
     public Map<String, ${myConditionQueryClassName}> getScalarCondition() { return _scalarConditionMap; }
@@ -599,14 +599,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     // ===================================================================================
-    //                                                             MySelf InScope SubQuery
-    //                                                             =======================
-    protected Map<String, ${myConditionQueryClassName}> _myselfInScopeRelationMap;
-    public Map<String, ${myConditionQueryClassName}> getMyselfInScopeRelation() { return _myselfInScopeRelationMap; }
-    public String keepMyselfInScopeRelation(${myConditionQueryClassName} subQuery) {
-        if (_myselfInScopeRelationMap == null) { _myselfInScopeRelationMap = newLinkedHashMap(); }
-        String key = "subQueryMapKey" + (_myselfInScopeRelationMap.size() + 1);
-        _myselfInScopeRelationMap.put(key, subQuery); return "myselfInScopeRelation." + key;
+    //                                                                       MyselfInScope
+    //                                                                       =============
+    protected Map<String, ${myConditionQueryClassName}> _myselfInScopeMap;
+    public Map<String, ${myConditionQueryClassName}> getMyselfInScope() { return _myselfInScopeMap; }
+    public String keepMyselfInScope(${myConditionQueryClassName} subQuery) {
+        if (_myselfInScopeMap == null) { _myselfInScopeMap = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_myselfInScopeMap.size() + 1);
+        _myselfInScopeMap.put(key, subQuery); return "myselfInScope." + key;
     }
 
 #end
