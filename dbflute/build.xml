@@ -6,10 +6,10 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.9.0C"/>
-	<property name="build.version" value="${version}-01-SNAPSHOT"/>
+	<property name="build.version" value="${version}-02-SNAPSHOT"/>
 	<property name="pre.version" value="0.9.9.0B"/>
 	<property name="runtime.version" value="0.9.9.0C"/>
-	<property name="runtime.build.version" value="${runtime.version}-01-SNAPSHOT"/>
+	<property name="runtime.build.version" value="${runtime.version}-02-SNAPSHOT"/>
 	<property name="runtime.pre.version" value="0.9.9.0B"/>
 
 	<!-- Resource Directories -->

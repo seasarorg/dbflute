@@ -80,10 +80,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cdef The instance of classification definition (as ENUM type).
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
-        doSet${tmpJavaName}_Equal(cdef.code());
+        doSet${tmpJavaName}_Equal(cdef != null ? cdef.code() : null);
     }
 #foreach ($classificationMap in $col.classificationMapList)
 
@@ -134,10 +134,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cdef The instance of classification definition (as ENUM type).
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
-        doSet${tmpJavaName}_NotEqual(cdef.code());
+        doSet${tmpJavaName}_NotEqual(cdef != null ? cdef.code() : null);
     }
 #foreach ($classificationMap in $col.ClassificationMapList)
 
@@ -220,7 +220,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cdefList The list of classification definition (as ENUM type).
+     * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_InScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
         doSet${tmpJavaName}_InScope(cTStrL(cdefList));
@@ -252,7 +252,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cdefList The list of classification definition (as ENUM type).
+     * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_NotInScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
         doSet${tmpJavaName}_NotInScope(cTStrL(cdefList));
@@ -544,10 +544,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cdef The instance of classification definition (as ENUM type).
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
-        doSet${tmpJavaName}_Equal(cTNum(cdef.code(), ${col.javaNative}.class));
+        doSet${tmpJavaName}_Equal(cTNum(cdef != null ? cdef.code() : null, ${col.javaNative}.class));
     }
 #foreach ($classificationMap in $col.classificationMapList)
 
@@ -585,10 +585,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cdef The instance of classification definition (as ENUM type).
+     * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
-        doSet${tmpJavaName}_NotEqual(cTNum(cdef.code(), ${col.javaNative}.class));
+        doSet${tmpJavaName}_NotEqual(cTNum(cdef != null ? cdef.code() : null, ${col.javaNative}.class));
     }
 #foreach ($classificationMap in $col.classificationMapList)
 
@@ -667,7 +667,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cdefList The list of classification definition (as ENUM type).
+     * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_InScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
         doSet${tmpJavaName}_InScope(cTNumL(cdefList, ${col.javaNative}.class));
@@ -699,7 +699,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cdefList The list of classification definition (as ENUM type).
+     * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_NotInScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
         doSet${tmpJavaName}_NotInScope(cTNumL(cdefList, ${col.javaNative}.class));
