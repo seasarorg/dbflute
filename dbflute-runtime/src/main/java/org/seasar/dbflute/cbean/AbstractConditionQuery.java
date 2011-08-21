@@ -1631,43 +1631,59 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // ===================================================================================
     //                                                                       Convert Value
     //                                                                       =============
+    /**
+     * @param obj The object of the property. (NullAllowed)
+     * @param type The type instance of the property. (NullAllowed)
+     * @param <PROPERTY> The type of property.
+     * @return The number type result of the property. (NullAllowed: if null, returns null)
+     */
     @SuppressWarnings("unchecked")
     protected <PROPERTY extends Number> PROPERTY cTNum(Object obj, Class<PROPERTY> type) { // convert to number
         return (PROPERTY) DfTypeUtil.toNumber(obj, type);
     }
 
     /**
-     * @param col Target collection. (NullAllowed)
+     * @param col The collection of the property. (NullAllowed)
      * @param <PROPERTY> The type of property.
-     * @return List. (NullAllowed: If the argument is null, returns null.)
+     * @return The list of the property. (NullAllowed: if null, returns null)
      */
     protected <PROPERTY> List<PROPERTY> cTL(Collection<PROPERTY> col) { // convert to list
         return convertToList(col);
     }
 
     protected List<String> cTStrL(Collection<? extends Classification> col) { // convert to string list
+        if (col == null) {
+            return null;
+        }
         final List<String> list = new ArrayList<String>();
         for (Classification cls : col) {
-            list.add(cls.code());
+            if (cls != null) {
+                list.add(cls.code());
+            }
         }
         return list;
     }
 
     protected <PROPERTY extends Number> List<PROPERTY> cTNumL(Collection<? extends Classification> col,
             Class<PROPERTY> type) { // convert to number list
+        if (col == null) {
+            return null;
+        }
         final List<PROPERTY> list = new ArrayList<PROPERTY>();
         for (Classification cls : col) {
-            @SuppressWarnings("unchecked")
-            final PROPERTY value = (PROPERTY) DfTypeUtil.toNumber(cls.code(), type);
-            list.add(value);
+            if (cls != null) {
+                @SuppressWarnings("unchecked")
+                final PROPERTY value = (PROPERTY) DfTypeUtil.toNumber(cls.code(), type);
+                list.add(value);
+            }
         }
         return list;
     }
 
     /**
-     * @param col Target collection. (NullAllowed)
+     * @param col The collection of property. (NullAllowed)
      * @param <PROPERTY> The type of property.
-     * @return List. (NullAllowed: If the argument is null, returns null.)
+     * @return The list of the property. (NullAllowed: if null, returns null)
      */
     private <PROPERTY> List<PROPERTY> convertToList(Collection<PROPERTY> col) {
         if (col == null) {
