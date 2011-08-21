@@ -17,6 +17,8 @@ public enum HpCBPurpose {
             .noSpecifyDerivedReferrerTwoOrMore().noSpecifyRelation().noOrderBy()) // ScalarSelect
     , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
             .noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarCondition
+    , MYSELF_IN_SCOPE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore()
+            .noSpecifyColumnWithDerivedReferrer().noOrderBy().subQuery()) // MyselfInScope
 
     // A purpose that can specify but not allowed to query
     // needs to switch condition-bean used in specification

@@ -58,6 +58,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
+import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -999,6 +1000,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 cipherManager, mainSubQueryIdentity, operand);
         final String clause = scalarCondition.buildScalarCondition(function);
         registerWhereClause(clause);
+    }
+
+    // -----------------------------------------------------
+    //                                         MyselfInScope
+    //                                         -------------
+    protected void registerMyselfInScope(ConditionQuery subQuery, String subQueryPropertyName) {
+        final String relatedColumnDbName;
+        {
+            final String specifiedDbName = subQuery.xgetSqlClause().getSpecifiedColumnDbNameAsOne();
+            if (specifiedDbName != null) {
+                relatedColumnDbName = specifiedDbName;
+            } else { // as default
+                // this function is only allowed when only-one PK
+                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.getTableDbName()).getPrimaryUniqueInfo();
+                final ColumnInfo primaryColumnInfo = primaryUniqueInfo.getFirstColumn();
+                relatedColumnDbName = primaryColumnInfo.getColumnDbName();
+            }
+        }
+        registerInScopeRelation(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName);
     }
 
     // -----------------------------------------------------

@@ -2245,20 +2245,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public ColumnInfo getSpecifiedColumnInfoAsOne() {
         final Map<String, HpSpecifiedColumn> elementMap = getSpecifiedColumnElementMapAsOne();
-        if (elementMap == null) {
-            return null;
+        if (elementMap != null && elementMap.size() == 1) {
+            return elementMap.values().iterator().next().getColumnInfo();
         }
-        final HpSpecifiedColumn specifiedColumn = elementMap.values().iterator().next();
-        return specifiedColumn.getColumnInfo();
+        return null;
     }
 
     public ColumnRealName getSpecifiedColumnRealNameAsOne() {
         final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
-        if (columnSqlName == null) {
-            return null;
+        if (columnSqlName != null) {
+            return new ColumnRealName(getSpecifiedColumnTableAliasNameAsOne(), columnSqlName);
         }
-        final String tableAliasName = getSpecifiedColumnTableAliasNameAsOne(); // must exist
-        return new ColumnRealName(tableAliasName, columnSqlName);
+        return null;
     }
 
     public ColumnSqlName getSpecifiedColumnSqlNameAsOne() {
