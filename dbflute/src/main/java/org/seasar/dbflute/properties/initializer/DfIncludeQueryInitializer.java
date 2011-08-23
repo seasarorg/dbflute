@@ -2,12 +2,14 @@ package org.seasar.dbflute.properties.initializer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 
@@ -26,101 +28,124 @@ public class DfIncludeQueryInitializer {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DfIncludeQueryProperties includeQueryProperties;
+    protected DfIncludeQueryProperties _includeQueryProperties;
 
-    protected DfTableFinder tableFinder;
+    protected DfTableFinder _tableFinder;
 
     // ===================================================================================
     //                                                                          Initialize
     //                                                                          ==========
     public void initializeIncludeQuery() {
-        _log.info("/=============================");
-        _log.info("...Initializing include query.");
-        final Map<String, Map<String, Map<String, List<String>>>> map = includeQueryProperties.getIncludeQueryMap();
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            _log.info(key);
-            final Map<String, Map<String, List<String>>> queryElementMap = map.get(key);
-            final Set<String> queryElementKeySet = queryElementMap.keySet();
-            for (String queryElementKey : queryElementKeySet) {
-                _log.info("    " + queryElementKey);
-                final Map<String, List<String>> tableElementMap = queryElementMap.get(queryElementKey);
-                final Set<String> tableElementKeySet = tableElementMap.keySet();
+        final Map<String, Map<String, Map<String, List<String>>>> includeQueryMap = _includeQueryProperties
+                .getIncludeQueryMap();
+        if (!includeQueryMap.isEmpty()) {
+            _log.info("/=============================");
+            _log.info("...Initializing include query.");
+            checkQueryMap(includeQueryMap);
+            _log.info("========/");
+        }
+        final Map<String, Map<String, Map<String, List<String>>>> excludeQueryMap = _includeQueryProperties
+                .getExcludeQueryMap();
+        if (!excludeQueryMap.isEmpty()) {
+            _log.info("/=============================");
+            _log.info("...Initializing exclude query.");
+            checkQueryMap(excludeQueryMap);
+            _log.info("========/");
+        }
+    }
+
+    protected void checkQueryMap(Map<String, Map<String, Map<String, List<String>>>> map) {
+        final String allMark = DfIncludeQueryProperties.ALL_MARK;
+        final String commonColumnMark = DfIncludeQueryProperties.COMMON_COLUMN_MARK;
+        final String versionNoMark = DfIncludeQueryProperties.VERSION_NO_MARK;
+        for (Entry<String, Map<String, Map<String, List<String>>>> entry : map.entrySet()) {
+            final String propType = entry.getKey();
+            final Map<String, Map<String, List<String>>> ckeyMap = entry.getValue();
+            _log.info(propType);
+            for (Entry<String, Map<String, List<String>>> ckeyEntry : ckeyMap.entrySet()) {
+                final String ckey = ckeyEntry.getKey();
+                Map<String, List<String>> tableColumnMap = ckeyEntry.getValue();
+                _log.info("    " + ckey);
+                final Set<String> tableElementKeySet = tableColumnMap.keySet();
                 for (String tableName : tableElementKeySet) {
                     _log.info("        " + tableName);
-                    final Table targetTable = tableFinder.findTable(tableName);
-                    if (targetTable == null) {
-                        throwIncludeQueryTableNotFoundException(queryElementKey, tableName, map);
+                    final boolean allTable = tableName.equalsIgnoreCase(allMark);
+                    Table targetTable = null;
+                    if (!allTable) {
+                        // check existence
+                        targetTable = _tableFinder.findTable(tableName);
+                        if (targetTable == null) {
+                            throwIncludeQueryTableNotFoundException(ckey, tableName, map);
+                        }
                     }
                     List<String> columnNameList = null;
                     try {
-                        columnNameList = tableElementMap.get(tableName);
+                        columnNameList = tableColumnMap.get(tableName);
                     } catch (ClassCastException e) {
-                        throwIncludeQueryNotListColumnSpecificationException(queryElementKey, tableName, map, e);
+                        throwIncludeQueryNotListColumnSpecificationException(ckey, tableName, map, e);
                     }
                     for (String columnName : columnNameList) {
                         _log.info("            " + columnName);
-                        final Column targetColumn = targetTable.getColumn(columnName);
-                        if (targetColumn == null) {
-                            throwIncludeQueryColumnNotFoundException(queryElementKey, tableName, columnName, map);
+                        if (!allTable) {
+                            if (!columnName.equalsIgnoreCase(commonColumnMark)
+                                    && !columnName.equalsIgnoreCase(versionNoMark)) {
+                                // check existence
+                                final Column targetColumn = targetTable.getColumn(columnName);
+                                if (targetColumn == null) {
+                                    throwIncludeQueryColumnNotFoundException(ckey, tableName, columnName, map);
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-        _log.info("========/");
     }
 
-    protected void throwIncludeQueryTableNotFoundException(String queryElementKey, String tableName,
+    protected void throwIncludeQueryTableNotFoundException(String ckey, String tableName,
             Map<String, Map<String, Map<String, List<String>>>> map) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The table was Not Found in includeQueryMap!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Query Type]" + ln() + queryElementKey + ln();
-        msg = msg + ln();
-        msg = msg + "[Table Name]" + ln() + tableName + ln();
-        msg = msg + ln();
-        msg = msg + "[Include Query Map]" + ln() + map + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table in includeQueryMap was not found in the meta data.");
+        br.addItem("Condition Key");
+        br.addElement(ckey);
+        br.addItem("Table Name");
+        br.addElement(tableName);
+        br.addItem("Query Map");
+        br.addElement(map);
+        final String msg = br.buildExceptionMessage();
         throw new DfIncludeQueryTableNotFoundException(msg);
     }
 
-    protected void throwIncludeQueryNotListColumnSpecificationException(String queryElementKey, String tableName,
+    protected void throwIncludeQueryNotListColumnSpecificationException(String ckey, String tableName,
             Map<String, Map<String, Map<String, List<String>>>> map, RuntimeException e) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The column specification of the table was Not List Type in includeQueryMap!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "You shuold specify them this way:" + ln();
-        msg = msg + "    --------------------------------------------" + ln();
-        msg = msg + "    " + tableName + " = list:{XXX_ID ; XXX_NAME}" + ln();
-        msg = msg + "    --------------------------------------------" + ln();
-        msg = msg + ln();
-        msg = msg + "[Query Type]" + ln() + queryElementKey + ln();
-        msg = msg + ln();
-        msg = msg + "[Table Name]" + ln() + tableName + ln();
-        msg = msg + ln();
-        msg = msg + "[Include Query Map]" + ln() + map + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The column specification of the table was not List type in includeQueryMap.");
+        br.addItem("Advice");
+        br.addElement("You shuold specify them this way:");
+        br.addElement("  " + tableName + " = list:{ FOO_ID ; FOO_NAME }");
+        br.addItem("Condition Key");
+        br.addElement(ckey);
+        br.addItem("Table Name");
+        br.addElement(tableName);
+        br.addItem("Query Map");
+        br.addElement(map);
+        final String msg = br.buildExceptionMessage();
         throw new DfIncludeQueryNotListColumnSpecificationException(msg, e);
     }
 
-    protected void throwIncludeQueryColumnNotFoundException(String queryElementKey, String tableName,
-            String columnName, Map<String, Map<String, Map<String, List<String>>>> map) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The column was Not Found in includeQueryMap!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Query Type]" + ln() + queryElementKey + ln();
-        msg = msg + ln();
-        msg = msg + "[Table Name]" + ln() + tableName + ln();
-        msg = msg + ln();
-        msg = msg + "[Column Name]" + ln() + columnName + ln();
-        msg = msg + ln();
-        msg = msg + "[Include Query Map]" + ln() + map + ln();
-        msg = msg + "* * * * * * * * * */";
+    protected void throwIncludeQueryColumnNotFoundException(String ckey, String tableName, String columnName,
+            Map<String, Map<String, Map<String, List<String>>>> map) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The column in includeQueryMap was not found in the meta data.");
+        br.addItem("Condition Key");
+        br.addElement(ckey);
+        br.addItem("Table Name");
+        br.addElement(tableName);
+        br.addItem("Column Name");
+        br.addElement(columnName);
+        br.addItem("Query Map");
+        br.addElement(map);
+        final String msg = br.buildExceptionMessage();
         throw new DfIncludeQueryColumnNotFoundException(msg);
     }
 
@@ -159,18 +184,18 @@ public class DfIncludeQueryInitializer {
     //                                                                            Accessor
     //                                                                            ========
     public DfIncludeQueryProperties getIncludeQueryProperties() {
-        return includeQueryProperties;
+        return _includeQueryProperties;
     }
 
     public void setIncludeQueryProperties(DfIncludeQueryProperties includeQueryProperties) {
-        this.includeQueryProperties = includeQueryProperties;
+        this._includeQueryProperties = includeQueryProperties;
     }
 
     public DfTableFinder getTableFinder() {
-        return tableFinder;
+        return _tableFinder;
     }
 
     public void setTableFinder(DfTableFinder tableFinder) {
-        this.tableFinder = tableFinder;
+        this._tableFinder = tableFinder;
     }
 }
