@@ -116,42 +116,46 @@ public interface ConditionQuery {
     //                                                                 ===================
     /**
      * Invoke getting value.
-     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
-     * @return The conditionValue. (NotNull)
+     * @param columnFlexibleName The flexible name of the column. (NotNull, NotEmpty)
+     * @return The instance of condition-value object. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
     ConditionValue invokeValue(String columnFlexibleName);
 
     /**
-     * Invoke setting query. {ResolveRelation}
-     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
-     * @param conditionKeyName The name of the conditionKey. (NotNull)
-     * @param value The value of the condition. (NotNull)
+     * Invoke setting query. {RelationResolved} <br />
+     * Basically for keys that does not need a condition option.
+     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
+     * @param conditionKeyName The name of the condition-key. (NotNull)
+     * @param conditionValue The value of the condition. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
-    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
+    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue);
 
     /**
-     * Invoke setting query with option. {ResolveRelation}
-     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
-     * @param conditionKeyName The name of the conditionKey. (NotNull)
-     * @param value The value of the condition. (NotNull)
-     * @param option The option of the condition. (NotNull)
+     * Invoke setting query with option. {RelationResolved} <br />
+     * Basically for LikeSearch, NotLikeSearch. <br />
+     * And you cannot use this for FromTo, DateFromTo.
+     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
+     * @param conditionKeyName The name of the condition-key. (NotNull)
+     * @param conditionValue The value of the condition. (NotNull)
+     * @param conditionOption The option of the condition. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
-    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value, ConditionOption option);
+    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue,
+            ConditionOption conditionOption);
 
     /**
-     * Invoke setting query of equal. {ResolveRelation}
-     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
-     * @param value The value of the condition. (NotNull)
+     * Invoke setting query of equal. {RelationResolved}
+     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
+     * @param conditionValue The value of the condition. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
-    void invokeQueryEqual(String columnFlexibleName, Object value);
+    void invokeQueryEqual(String columnFlexibleName, Object conditionValue);
 
     /**
-     * Invoke adding orderBy. {ResolveRelation}
-     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
+     * Invoke adding orderBy. {RelationResolved}
+     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
      * @param isAsc Is it ascend?
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
@@ -160,7 +164,7 @@ public interface ConditionQuery {
     /**
      * Invoke getting foreign condition-query. <br />
      * A method with parameters (using fixed condition) is unsupported.
-     * @param foreignPropertyName The property name(s), can contain '.' , of the foreign relation. (NotNull and NotEmpty)
+     * @param foreignPropertyName The property name(s), can contain '.' , of the foreign relation. (NotNull, NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
@@ -169,7 +173,7 @@ public interface ConditionQuery {
     /**
      * Invoke determining foreign condition-query existence?
      * A method with parameters (using fixed condition) is unsupported.
-     * @param foreignPropertyName The property name(s), can contain '.' , of the foreign relation. (NotNull and NotEmpty)
+     * @param foreignPropertyName The property name(s), can contain '.' , of the foreign relation. (NotNull, NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */

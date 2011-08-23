@@ -1307,41 +1307,61 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String methodName = "get" + columnCapPropName;
         final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {});
         if (method == null) {
-            String msg = "Not found the method for getting value:";
-            msg = msg + " columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " methodName=" + methodName;
-            throw new ConditionInvokingFailureException(msg);
+            throwConditionInvokingGetMethodNotFoundException(columnFlexibleName, methodName);
+            return null; // unreachable
         }
         try {
             return (ConditionValue) helpInvokingCQMethod(this, method, new Object[] {});
         } catch (ReflectionFailureException e) {
-            String msg = "Failed to invoke the method for getting value:";
-            msg = msg + " columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " methodName=" + methodName;
-            throw new ConditionInvokingFailureException(msg, e);
+            throwConditionInvokingGetReflectionFailureException(columnFlexibleName, methodName, e);
+            return null; // unreachable
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value) {
-        doInvokeQuery(columnFlexibleName, conditionKeyName, value, null);
+    protected void throwConditionInvokingGetMethodNotFoundException(String columnFlexibleName, String methodName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the method for getting the condition.");
+        br.addItem("columnFlexibleName");
+        br.addElement(columnFlexibleName);
+        br.addItem("methodName");
+        br.addElement(methodName);
+        final String msg = br.buildExceptionMessage();
+        throw new ConditionInvokingFailureException(msg);
+    }
+
+    protected void throwConditionInvokingGetReflectionFailureException(String columnFlexibleName, String methodName,
+            ReflectionFailureException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to invoke the method for getting value.");
+        br.addItem("columnFlexibleName");
+        br.addElement(columnFlexibleName);
+        br.addItem("methodName");
+        br.addElement(methodName);
+        final String msg = br.buildExceptionMessage();
+        throw new ConditionInvokingFailureException(msg, e);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value, ConditionOption option) {
-        assertObjectNotNull("option", option);
-        doInvokeQuery(columnFlexibleName, conditionKeyName, value, option);
+    public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue) {
+        doInvokeQuery(columnFlexibleName, conditionKeyName, conditionValue, null);
     }
 
-    protected void doInvokeQuery(String columnFlexibleName, String conditionKeyName, Object value,
-            ConditionOption option) {
+    /**
+     * {@inheritDoc}
+     */
+    public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue,
+            ConditionOption conditionOption) {
+        assertObjectNotNull("conditionOption", conditionOption);
+        doInvokeQuery(columnFlexibleName, conditionKeyName, conditionValue, conditionOption);
+    }
+
+    protected void doInvokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue,
+            ConditionOption conditionOption) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", conditionKeyName);
-        if (value == null) {
+        if (conditionValue == null) {
             return;
         }
         final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
@@ -1350,40 +1370,67 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(flexibleName));
         final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
-        final Class<?> type = value.getClass();
+        final Class<?> type = conditionValue.getClass();
         final Class<?>[] parameterTypes;
-        if (option != null) {
-            parameterTypes = new Class<?>[] { type, option.getClass() };
+        if (conditionOption != null) {
+            parameterTypes = new Class<?>[] { type, conditionOption.getClass() };
         } else {
             parameterTypes = new Class<?>[] { type };
         }
         final Method method = helpGettingCQMethod(cq, methodName, parameterTypes);
         if (method == null) {
-            String msg = "Not found the method for setting a condition(query):";
-            msg = msg + " columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " conditionKeyName=" + conditionKeyName;
-            msg = msg + " value=" + value;
-            msg = msg + " option=" + option;
-            msg = msg + " methodName=" + methodName;
-            throw new ConditionInvokingFailureException(msg);
+            throwConditionInvokingSetMethodNotFoundException(columnFlexibleName, conditionKeyName, conditionValue,
+                    conditionOption, methodName);
         }
         try {
             final Object[] args;
-            if (option != null) {
-                args = new Object[] { value, option };
+            if (conditionOption != null) {
+                args = new Object[] { conditionValue, conditionOption };
             } else {
-                args = new Object[] { value };
+                args = new Object[] { conditionValue };
             }
             helpInvokingCQMethod(cq, method, args);
         } catch (ReflectionFailureException e) {
-            String msg = "Failed to invoke the method for setting a condition(query):";
-            msg = msg + " columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " conditionKeyName=" + conditionKeyName;
-            msg = msg + " value=" + value;
-            msg = msg + " option=" + option;
-            msg = msg + " methodName=" + methodName;
-            throw new ConditionInvokingFailureException(msg, e);
+            throwConditionInvokingSetReflectionFailureException(columnFlexibleName, conditionKeyName, conditionValue,
+                    conditionOption, methodName, e);
         }
+    }
+
+    protected void throwConditionInvokingSetMethodNotFoundException(String columnFlexibleName, String conditionKeyName,
+            Object conditionValue, ConditionOption conditionOption, String methodName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the method for setting the condition.");
+        br.addItem("columnFlexibleName");
+        br.addElement(columnFlexibleName);
+        br.addItem("conditionKeyName");
+        br.addElement(conditionKeyName);
+        br.addItem("conditionValue");
+        br.addElement(conditionValue);
+        br.addItem("conditionOption");
+        br.addElement(conditionOption);
+        br.addItem("methodName");
+        br.addElement(methodName);
+        final String msg = br.buildExceptionMessage();
+        throw new ConditionInvokingFailureException(msg);
+    }
+
+    protected void throwConditionInvokingSetReflectionFailureException(String columnFlexibleName,
+            String conditionKeyName, Object conditionValue, ConditionOption conditionOption, String methodName,
+            ReflectionFailureException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to invoke the method for setting the condition.");
+        br.addItem("columnFlexibleName");
+        br.addElement(columnFlexibleName);
+        br.addItem("conditionKeyName");
+        br.addElement(conditionKeyName);
+        br.addItem("conditionValue");
+        br.addElement(conditionValue);
+        br.addItem("conditionOption");
+        br.addElement(conditionOption);
+        br.addItem("methodName");
+        br.addElement(methodName);
+        final String msg = br.buildExceptionMessage();
+        throw new ConditionInvokingFailureException(msg, e);
     }
 
     /**
@@ -1407,22 +1454,42 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
         final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] {});
         if (method == null) {
-            String msg = "Not found the method for adding a order-by condition:";
-            msg = msg + " columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " isAsc=" + isAsc;
-            msg = msg + " methodName=" + methodName;
-            throw new ConditionInvokingFailureException(msg);
+            throwConditionInvokingOrderMethodNotFoundException(columnFlexibleName, isAsc, methodName);
         }
         helpInvokingCQMethod(cq, method, new Object[] {});
         try {
             helpInvokingCQMethod(cq, method, new Object[] {});
         } catch (ReflectionFailureException e) {
-            String msg = "Failed to invoke the method for setting a condition(query):";
-            msg = msg + " columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " isAsc=" + isAsc;
-            msg = msg + " methodName=" + methodName;
-            throw new ConditionInvokingFailureException(msg, e);
+            throwConditionInvokingOrderReflectionFailureException(columnFlexibleName, isAsc, methodName, e);
         }
+    }
+
+    protected void throwConditionInvokingOrderMethodNotFoundException(String columnFlexibleName, boolean isAsc,
+            String methodName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the method for adding the order-by condition.");
+        br.addItem("columnFlexibleName");
+        br.addElement(columnFlexibleName);
+        br.addItem("isAsc");
+        br.addElement(isAsc);
+        br.addItem("methodName");
+        br.addElement(methodName);
+        final String msg = br.buildExceptionMessage();
+        throw new ConditionInvokingFailureException(msg);
+    }
+
+    protected void throwConditionInvokingOrderReflectionFailureException(String columnFlexibleName, boolean isAsc,
+            String methodName, ReflectionFailureException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to invoke the method for setting the order-by condition.");
+        br.addItem("columnFlexibleName");
+        br.addElement(columnFlexibleName);
+        br.addItem("isAsc");
+        br.addElement(isAsc);
+        br.addItem("methodName");
+        br.addElement(methodName);
+        final String msg = br.buildExceptionMessage();
+        throw new ConditionInvokingFailureException(msg, e);
     }
 
     /**
