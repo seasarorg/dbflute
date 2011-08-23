@@ -1357,54 +1357,55 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         doInvokeQuery(columnFlexibleName, conditionKeyName, conditionValue, conditionOption);
     }
 
-    protected void doInvokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue,
-            ConditionOption conditionOption) {
-        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-        assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", conditionKeyName);
-        if (conditionValue == null) {
-            return;
+    protected void doInvokeQuery(String colName, String ckey, Object value, ConditionOption option) {
+        assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", colName);
+        assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", ckey);
+        if (value == null) {
+            return; // do nothing if the value is null when the key has arguments
         }
-        final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(columnFlexibleName);
+        final PropertyNameCQContainer container = helpExtractingPropertyNameCQContainer(colName);
         final String flexibleName = container.getFlexibleName();
         final ConditionQuery cq = container.getConditionQuery();
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(flexibleName));
-        final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
-        final boolean fromTo = Srl.equalsIgnoreCase(conditionKeyName, "FromTo", "DateFromTo");
+        final String methodName = "set" + columnCapPropName + "_" + initCap(ckey);
+        final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
+        final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
         final List<Class<?>> typeList = newArrayList();
         if (fromTo) {
             typeList.add(Date.class);
             typeList.add(Date.class);
         } else {
-            typeList.add(conditionValue.getClass());
+            if (!noArg) {
+                typeList.add(value.getClass());
+            }
         }
-        if (conditionOption != null) {
-            typeList.add(conditionOption.getClass());
+        if (option != null) {
+            typeList.add(option.getClass());
         }
         final Class<?>[] parameterTypes = typeList.toArray(new Class<?>[] {});
         final Method method = helpGettingCQMethod(cq, methodName, parameterTypes);
         if (method == null) {
-            throwConditionInvokingSetMethodNotFoundException(columnFlexibleName, conditionKeyName, conditionValue,
-                    conditionOption, methodName);
+            throwConditionInvokingSetMethodNotFoundException(colName, ckey, value, option, methodName);
         }
         try {
             final List<Object> argList = newArrayList();
             if (fromTo) {
-                if (!(conditionValue instanceof List<?>)) { // check type
-                    throwConditionInvokingDateFromToValueInvalidException(columnFlexibleName, conditionKeyName,
-                            conditionValue, conditionOption, methodName);
+                if (!(value instanceof List<?>)) { // check type
+                    throwConditionInvokingDateFromToValueInvalidException(colName, ckey, value, option, methodName);
                 }
-                argList.addAll((List<?>) conditionValue);
+                argList.addAll((List<?>) value);
             } else {
-                argList.add(conditionValue);
+                if (!noArg) {
+                    argList.add(value);
+                }
             }
-            if (conditionOption != null) {
-                argList.add(conditionOption);
+            if (option != null) {
+                argList.add(option);
             }
             helpInvokingCQMethod(cq, method, argList.toArray());
         } catch (ReflectionFailureException e) {
-            throwConditionInvokingSetReflectionFailureException(columnFlexibleName, conditionKeyName, conditionValue,
-                    conditionOption, methodName, e);
+            throwConditionInvokingSetReflectionFailureException(colName, ckey, value, option, methodName, e);
         }
     }
 
@@ -1647,16 +1648,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final Class<? extends ConditionQuery> clazz = cq.getClass();
         Method method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
         if (method == null && argTypes != null) {
-            if (argTypes.length == 1 && Collection.class.isAssignableFrom(argTypes[0])) {
+            final int argCount = argTypes.length;
+            if (argCount == 1 && Collection.class.isAssignableFrom(argTypes[0])) {
                 method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, new Class[] { Collection.class });
-            } else if (argTypes.length == 2 && ConditionOption.class.isAssignableFrom(argTypes[1])) {
+            } else if (argCount == 2 && ConditionOption.class.isAssignableFrom(argTypes[1])) {
                 Class<?> superType = argTypes[1].getSuperclass();
                 method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, new Class[] { superType });
                 if (method == null) { // only once more
                     superType = argTypes[1].getSuperclass();
                     method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, new Class[] { superType });
                 }
-            } else if (argTypes.length == 3 && ConditionOption.class.isAssignableFrom(argTypes[2])) {
+            } else if (argCount == 3 && ConditionOption.class.isAssignableFrom(argTypes[2])) {
                 Class<?> superType = argTypes[2].getSuperclass();
                 method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, new Class[] { superType });
                 if (method == null) { // only once more
