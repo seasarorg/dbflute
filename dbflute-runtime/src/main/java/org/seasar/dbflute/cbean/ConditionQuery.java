@@ -124,21 +124,22 @@ public interface ConditionQuery {
 
     /**
      * Invoke setting query. {RelationResolved} <br />
-     * Basically for keys that does not need a condition option.
+     * Basically for keys that does not need a condition option. <br />
+     * And you should set a list that has fromDate and toDate to conditionValue when DateFromTo.
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
      * @param conditionKeyName The name of the condition-key. (NotNull)
-     * @param conditionValue The value of the condition. (NotNull)
+     * @param conditionValue The value of the condition. (NullAllowed: if null, no invoking)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
     void invokeQuery(String columnFlexibleName, String conditionKeyName, Object conditionValue);
 
     /**
      * Invoke setting query with option. {RelationResolved} <br />
-     * Basically for LikeSearch, NotLikeSearch. <br />
-     * And you cannot use this for FromTo, DateFromTo.
+     * Basically for LikeSearch, NotLikeSearch, FromTo. <br />
+     * And you should set a list that has fromDate and toDate to conditionValue when FromTo.
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull, NotEmpty)
      * @param conditionKeyName The name of the condition-key. (NotNull)
-     * @param conditionValue The value of the condition. (NotNull)
+     * @param conditionValue The value of the condition. (NullAllowed: if null, no invoking)
      * @param conditionOption The option of the condition. (NotNull)
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */

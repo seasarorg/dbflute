@@ -1370,30 +1370,60 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(flexibleName));
         final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
-        final Class<?> type = conditionValue.getClass();
-        final Class<?>[] parameterTypes;
-        if (conditionOption != null) {
-            parameterTypes = new Class<?>[] { type, conditionOption.getClass() };
+        final boolean fromTo = Srl.equalsIgnoreCase(conditionKeyName, "FromTo", "DateFromTo");
+        final List<Class<?>> typeList = newArrayList();
+        if (fromTo) {
+            typeList.add(Date.class);
+            typeList.add(Date.class);
         } else {
-            parameterTypes = new Class<?>[] { type };
+            typeList.add(conditionValue.getClass());
         }
+        if (conditionOption != null) {
+            typeList.add(conditionOption.getClass());
+        }
+        final Class<?>[] parameterTypes = typeList.toArray(new Class<?>[] {});
         final Method method = helpGettingCQMethod(cq, methodName, parameterTypes);
         if (method == null) {
             throwConditionInvokingSetMethodNotFoundException(columnFlexibleName, conditionKeyName, conditionValue,
                     conditionOption, methodName);
         }
         try {
-            final Object[] args;
-            if (conditionOption != null) {
-                args = new Object[] { conditionValue, conditionOption };
+            final List<Object> argList = newArrayList();
+            if (fromTo) {
+                if (!(conditionValue instanceof List<?>)) { // check type
+                    throwConditionInvokingDateFromToValueInvalidException(columnFlexibleName, conditionKeyName,
+                            conditionValue, conditionOption, methodName);
+                }
+                argList.addAll((List<?>) conditionValue);
             } else {
-                args = new Object[] { conditionValue };
+                argList.add(conditionValue);
             }
-            helpInvokingCQMethod(cq, method, args);
+            if (conditionOption != null) {
+                argList.add(conditionOption);
+            }
+            helpInvokingCQMethod(cq, method, argList.toArray());
         } catch (ReflectionFailureException e) {
             throwConditionInvokingSetReflectionFailureException(columnFlexibleName, conditionKeyName, conditionValue,
                     conditionOption, methodName, e);
         }
+    }
+
+    protected void throwConditionInvokingDateFromToValueInvalidException(String columnFlexibleName,
+            String conditionKeyName, Object conditionValue, ConditionOption conditionOption, String methodName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The conditionValue should be List that has 2 elements, fromDate and toDate.");
+        br.addItem("columnFlexibleName");
+        br.addElement(columnFlexibleName);
+        br.addItem("conditionKeyName");
+        br.addElement(conditionKeyName);
+        br.addItem("conditionValue");
+        br.addElement(conditionValue);
+        br.addItem("conditionOption");
+        br.addElement(conditionOption);
+        br.addItem("methodName");
+        br.addElement(methodName);
+        final String msg = br.buildExceptionMessage();
+        throw new ConditionInvokingFailureException(msg);
     }
 
     protected void throwConditionInvokingSetMethodNotFoundException(String columnFlexibleName, String conditionKeyName,
@@ -1614,7 +1644,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     private Method helpGettingCQMethod(ConditionQuery cq, String methodName, Class<?>[] argTypes) {
-        Class<? extends ConditionQuery> clazz = cq.getClass();
+        final Class<? extends ConditionQuery> clazz = cq.getClass();
         Method method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
         if (method == null && argTypes != null) {
             if (argTypes.length == 1 && Collection.class.isAssignableFrom(argTypes[0])) {
