@@ -88,7 +88,7 @@ public class IfCommentEvaluator {
         return Srl.equalsPlain(target, OPERANDS);
     }
 
-    public static boolean isNotStatement(String target) {
+    public static boolean isBooleanNotStatement(String target) {
         return Srl.startsWith(target, BOOLEAN_NOT);
     }
 
@@ -97,7 +97,7 @@ public class IfCommentEvaluator {
     }
 
     public static String substringBooleanNotRear(String target) {
-        return Srl.substringFirstRear(target, BOOLEAN_NOT);
+        return isBooleanNotStatement(target) ? Srl.substringFirstRear(target, BOOLEAN_NOT) : target;
     }
 
     // ===================================================================================
