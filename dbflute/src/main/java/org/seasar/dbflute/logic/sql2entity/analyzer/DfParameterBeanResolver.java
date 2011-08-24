@@ -558,7 +558,10 @@ public class DfParameterBeanResolver {
             return; // unknown (type)
         }
         if (isPmCommentNestedProperty(expression) || !isPmCommentMethodCall(expression)) {
-            return;
+            return; // e.g. pmb.foo.bar
+        }
+        if (!isPmCommentStartsWithPmb(substringBooleanNotRear(expression))) {
+            return; // e.g. #current.isFoo()
         }
         // pmb.foo() or !pmb.foo() here
         String methodName = substringPmCommentPmbRear(expression); // -> foo()
