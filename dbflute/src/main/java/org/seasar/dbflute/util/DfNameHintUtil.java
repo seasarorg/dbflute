@@ -74,7 +74,8 @@ public class DfNameHintUtil {
                 return true;
             }
         } else {
-            if (name.equalsIgnoreCase(hint)) {
+            // equals as flexible name
+            if (Srl.replace(name, "_", "").equalsIgnoreCase(Srl.replace(hint, "_", ""))) {
                 return true;
             }
         }

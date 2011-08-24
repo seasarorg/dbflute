@@ -1,5 +1,6 @@
 package org.seasar.dbflute.properties;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,7 +9,6 @@ import java.util.Set;
 
 import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.StringSet;
 
 /**
  * @author jflute
@@ -258,21 +258,26 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             return false;
         }
         // either has a list element
-        final StringSet columnFlexibleSet = StringSet.createAsFlexible();
+        final Set<String> columnSet = new HashSet<String>();
         final List<String> pinpointList = tableFlexibleMap.get(tableName);
         if (pinpointList != null) {
-            columnFlexibleSet.addAll(pinpointList);
+            columnSet.addAll(pinpointList);
         }
         final List<String> allTableList = tableFlexibleMap.get(ALL_MARK);
         if (allTableList != null) {
-            columnFlexibleSet.addAll(allTableList);
+            columnSet.addAll(allTableList);
         }
-        if (columnFlexibleSet.contains(COMMON_COLUMN_MARK) && column.isCommonColumn()) {
+        if (columnSet.contains(COMMON_COLUMN_MARK) && column.isCommonColumn()) {
             return true;
         }
-        if (columnFlexibleSet.contains(VERSION_NO_MARK) && column.isVersionNo()) {
+        if (columnSet.contains(VERSION_NO_MARK) && column.isVersionNo()) {
             return true;
         }
-        return columnFlexibleSet.contains(columnName);
+        for (String columnExp : columnSet) {
+            if (isHitByTheHint(columnName, columnExp)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

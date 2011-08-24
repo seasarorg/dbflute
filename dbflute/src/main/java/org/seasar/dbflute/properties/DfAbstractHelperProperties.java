@@ -480,6 +480,10 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                   Assist Helper
     //                                                                   =============
+    protected boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
+        return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
+    }
+
     protected boolean isHitByTheHint(final String name, final String hint) {
         return DfNameHintUtil.isHitByTheHint(name, hint);
     }

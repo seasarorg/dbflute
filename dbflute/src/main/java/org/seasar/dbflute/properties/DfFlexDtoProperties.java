@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.seasar.dbflute.util.DfNameHintUtil;
-
 /**
  * @author jflute
  */
@@ -92,14 +90,6 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
         final List<String> targetList = getBindableTableTargetList();
         final List<String> exceptList = getBindableTableExceptList();
         return !isTargetByHint(tableName, targetList, exceptList);
-    }
-
-    protected boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
-        return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
-    }
-
-    protected boolean isHintMatchTheName(String name, String hint) {
-        return DfNameHintUtil.isHitByTheHint(name, hint);
     }
 
     // ===================================================================================

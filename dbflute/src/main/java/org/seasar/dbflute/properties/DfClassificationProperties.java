@@ -704,8 +704,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
         final String classificationName = columnClassificationMap.get(columnName);
         if (classificationName == null) {
-            final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
-            for (String columnNameHint : columnClassificationMapKeySet) {
+            for (String columnNameHint : columnClassificationMap.keySet()) {
                 if (isHitByTheHint(columnName, columnNameHint)) {
                     return true;
                 }
