@@ -13,7 +13,7 @@
 #              , EmptyString, FromTo, DateFromTo
 #              , (and prefix '!' means excluding)
 # table: table name or $$ALL$$
-# column: column name or $$CommonColumn$$ or $$VersionNo$$
+# column: column name (hint) or $$CommonColumn$$ or $$VersionNo$$
 # 
 # Example:
 # map:{
