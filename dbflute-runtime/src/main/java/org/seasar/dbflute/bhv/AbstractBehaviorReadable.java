@@ -587,7 +587,20 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // ===================================================================================
     //                                                                          OutsideSql
     //                                                                          ==========
-    protected <BEHAVIOR> OutsideSqlBasicExecutor<BEHAVIOR> doOutsideSql() {
+    /**
+     * {@inheritDoc}
+     */
+    public <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> readyOutsideSql() {
+        return doOutsideSql();
+    }
+
+    /**
+     * Prepare an outside-SQL execution by returning an instance of the executor for outside-SQL. <br />
+     * It's an extension point for your adding original customization to outside-SQL executions.
+     * @param <BEHAVIOR> The type of behavior.
+     * @return The basic executor for outside-SQL. (NotNull) 
+     */
+    protected <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> doOutsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
         return _behaviorCommandInvoker.createOutsideSqlBasicExecutor(getTableDbName());
     }

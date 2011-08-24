@@ -20,6 +20,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 
 /**
  * The interface of behavior-readable.
@@ -118,6 +119,16 @@ public interface BehaviorReadable {
      * @return The next value of sequence. (NotNull)
      */
     Number readNextVal();
+
+    // ===================================================================================
+    //                                                                          OutsideSql
+    //                                                                          ==========
+    /**
+     * Prepare an outside-SQL execution by returning an instance of the executor for outside-SQL.
+     * @param <BEHAVIOR> The type of behavior.
+     * @return The basic executor for outside-SQL. (NotNull) 
+     */
+    <BEHAVIOR extends BehaviorReadable> OutsideSqlBasicExecutor<BEHAVIOR> readyOutsideSql();
 
     // ===================================================================================
     //                                                                             Warm Up
