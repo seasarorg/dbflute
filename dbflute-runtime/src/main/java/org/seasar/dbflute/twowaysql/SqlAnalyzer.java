@@ -398,12 +398,15 @@ public class SqlAnalyzer {
         final String expr = _tokenizer.getToken();
         final String testValue = _tokenizer.skipToken(true);
         if (expr.startsWith(EmbeddedVariableNode.PREFIX_NORMAL)) {
-            if (expr.startsWith(EmbeddedVariableNode.PREFIX_REPLACE_ONLY)) {
+            if (expr.startsWith(EmbeddedVariableNode.PREFIX_REPLACE_ONLY)) { // replaceOnly
                 final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_REPLACE_ONLY.length());
-                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, true));
-            } else {
+                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, true, false));
+            } else if (expr.startsWith(EmbeddedVariableNode.PREFIX_TERMINAL_DOT)) { // terminalDot
+                final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_TERMINAL_DOT.length());
+                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, false, true));
+            } else { // normal
                 final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_NORMAL.length());
-                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, false));
+                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, false, false));
             }
         } else {
             peek().addChild(createBindVariableNode(expr, testValue));
@@ -420,9 +423,10 @@ public class SqlAnalyzer {
         return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
-    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly) {
+    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly,
+            boolean terminalDot) {
         researchIfNeeds(_researchEmbeddedVariableCommentList, expr); // for research
-        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, replaceOnly);
+        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, replaceOnly, terminalDot);
     }
 
     // -----------------------------------------------------

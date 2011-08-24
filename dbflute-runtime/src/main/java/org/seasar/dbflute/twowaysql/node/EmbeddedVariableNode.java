@@ -37,19 +37,22 @@ public class EmbeddedVariableNode extends VariableNode {
     //                                                                          ==========
     public static final String PREFIX_NORMAL = "$";
     public static final String PREFIX_REPLACE_ONLY = "$$";
+    public static final String PREFIX_TERMINAL_DOT = "$.";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final boolean _replaceOnly;
+    protected final boolean _terminalDot;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public EmbeddedVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter,
-            boolean replaceOnly) {
+            boolean replaceOnly, boolean terminalDot) {
         super(expression, testValue, specifiedSql, blockNullParameter);
         _replaceOnly = replaceOnly;
+        _terminalDot = terminalDot;
     }
 
     // ===================================================================================
@@ -99,10 +102,15 @@ public class EmbeddedVariableNode extends VariableNode {
                 }
             }
         }
-        if (_replaceOnly && _testValue != null) { // e.g. from /*$$pmb.schemaPrefix*/MEMBER
-            // actually the test value is not test value
-            // but a part of SQL statement here
-            ctx.addSql(_testValue);
+        if (_testValue != null) {
+            if (_replaceOnly) { // e.g. select ... from /*$$pmb.schema*/MEMBER
+                // actually the test value is not test value
+                // but a part of SQL statement here
+                ctx.addSql(_testValue);
+            } else if (_terminalDot) { // e.g. select ... from /*$$pmb.schema*/dev.MEMBER
+                // the real test value is until a dot character
+                ctx.addSql("." + Srl.substringFirstRear(_testValue, "."));
+            }
         }
     }
 
