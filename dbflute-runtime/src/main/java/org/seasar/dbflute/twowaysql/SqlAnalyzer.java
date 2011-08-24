@@ -397,9 +397,14 @@ public class SqlAnalyzer {
     protected void parseCommentBindVariable() {
         final String expr = _tokenizer.getToken();
         final String testValue = _tokenizer.skipToken(true);
-        if (expr.startsWith(EmbeddedVariableNode.PREFIX)) {
-            final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX.length());
-            peek().addChild(createEmbeddedVariableNode(realExpr, testValue));
+        if (expr.startsWith(EmbeddedVariableNode.PREFIX_NORMAL)) {
+            if (expr.startsWith(EmbeddedVariableNode.PREFIX_REPLACE_ONLY)) {
+                final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_REPLACE_ONLY.length());
+                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, true));
+            } else {
+                final String realExpr = expr.substring(EmbeddedVariableNode.PREFIX_NORMAL.length());
+                peek().addChild(createEmbeddedVariableNode(realExpr, testValue, false));
+            }
         } else {
             peek().addChild(createBindVariableNode(expr, testValue));
         }
@@ -415,9 +420,9 @@ public class SqlAnalyzer {
         return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
-    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue) {
+    protected EmbeddedVariableNode createEmbeddedVariableNode(String expr, String testValue, boolean replaceOnly) {
         researchIfNeeds(_researchEmbeddedVariableCommentList, expr); // for research
-        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
+        return new EmbeddedVariableNode(expr, testValue, _specifiedSql, _blockNullParameter, replaceOnly);
     }
 
     // -----------------------------------------------------

@@ -35,13 +35,21 @@ public class EmbeddedVariableNode extends VariableNode {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String PREFIX = "$";
+    public static final String PREFIX_NORMAL = "$";
+    public static final String PREFIX_REPLACE_ONLY = "$$";
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final boolean _replaceOnly;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public EmbeddedVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
+    public EmbeddedVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter,
+            boolean replaceOnly) {
         super(expression, testValue, specifiedSql, blockNullParameter);
+        _replaceOnly = replaceOnly;
     }
 
     // ===================================================================================
@@ -65,33 +73,36 @@ public class EmbeddedVariableNode extends VariableNode {
         } else {
             if (finalValue == null) {
                 ctx.addSql("null");
-                return;
-            }
-            if (!(finalValue instanceof String)) {
+            } else if (!(finalValue instanceof String)) {
                 final String embeddedValue = finalValue.toString();
                 if (isQuotedScalar()) { // basically for condition value
                     ctx.addSql(quote(embeddedValue));
                 } else { // basically for cannot-bound condition (for example, paging)
                     ctx.addSql(embeddedValue);
                 }
-                return;
-            }
-            // string type here
-            final String embeddedString = (String) finalValue;
-            assertNotContainBindSymbol(embeddedString);
-            if (isQuotedScalar()) { // basically for condition value
-                ctx.addSql(quote(embeddedString));
-                if (isAcceptableLikeSearch(loopInfo)) {
-                    setupRearOption(ctx, valueAndType);
+            } else {
+                // string type here
+                final String embeddedStr = (String) finalValue;
+                assertNotContainBindSymbol(embeddedStr);
+                if (isQuotedScalar()) { // basically for condition value
+                    ctx.addSql(quote(embeddedStr));
+                    if (isAcceptableLikeSearch(loopInfo)) {
+                        setupRearOption(ctx, valueAndType);
+                    }
+                } else {
+                    final Object firstValue = valueAndType.getFirstValue();
+                    final Class<?> firstType = valueAndType.getFirstType();
+                    final boolean bound = processDynamicBinding(ctx, firstValue, firstType, embeddedStr);
+                    if (!bound) {
+                        ctx.addSql(embeddedStr);
+                    }
                 }
-                return;
             }
-            final Object firstValue = valueAndType.getFirstValue();
-            final Class<?> firstType = valueAndType.getFirstType();
-            if (processDynamicBinding(ctx, firstValue, firstType, embeddedString)) {
-                return;
-            }
-            ctx.addSql(embeddedString);
+        }
+        if (_replaceOnly && _testValue != null) { // e.g. from /*$$pmb.schemaPrefix*/MEMBER
+            // actually the test value is not test value
+            // but a part of SQL statement here
+            ctx.addSql(_testValue);
         }
     }
 
