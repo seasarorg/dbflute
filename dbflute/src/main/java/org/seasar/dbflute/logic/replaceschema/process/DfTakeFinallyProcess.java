@@ -20,6 +20,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
 import org.seasar.dbflute.logic.replaceschema.dataassert.DfDataAssertHandler;
 import org.seasar.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
@@ -148,15 +149,15 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
             }
         };
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
-            public boolean dispatch(File sqlFile, Statement st, String sql) throws SQLException {
+            public DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException {
                 final String loadType = getReplaceSchemaProperties().getRepsEnvType();
                 final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(loadType);
                 final DfDataAssertHandler dataAssertHandler = dataAssertProvider.provideDataAssertHandler(sql);
                 if (dataAssertHandler == null) {
-                    return false;
+                    return DfRunnerDispatchResult.NONE;
                 }
                 dataAssertHandler.handle(sqlFile, st, sql);
-                return true;
+                return DfRunnerDispatchResult.DISPATCHED;
             }
         });
         return runnerExecute;

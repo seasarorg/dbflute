@@ -579,21 +579,27 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         throw new IllegalStateException(msg);
     }
 
+    protected final Map<String, Boolean> _additionalUserSkipIfNotFoundPasswordFileAndDefaultMap = newLinkedHashMap();
+
     public boolean isAdditionalUserSkipIfNotFoundPasswordFileAndDefault(String additonalUser) {
-        final Map<String, String> propertyMap = getAdditionalUserPropertyMap(additonalUser);
-        if (propertyMap == null) {
-            return false;
+        Boolean result = _additionalUserSkipIfNotFoundPasswordFileAndDefaultMap.get(additonalUser);
+        if (result != null) {
+            return result;
         }
-        if (isProperty("isSkipIfNotFoundPasswordFileAndDefault", false, propertyMap)) {
+        result = false;
+        final String key = "isSkipIfNotFoundPasswordFileAndDefault";
+        final Map<String, String> propertyMap = getAdditionalUserPropertyMap(additonalUser);
+        if (propertyMap != null && isProperty(key, false, propertyMap)) {
             final String password = propertyMap.get("password");
             if (Srl.is_NotNull_and_NotTrimmedEmpty(password)) {
                 final DfAdditionalUserPasswordInfo pwdInfo = analyzePasswordVariable(password);
-                if (!pwdInfo.getPwdFile().exists()) {
-                    return true;
+                if (!pwdInfo.getPwdFile().exists() && pwdInfo.getDefaultPwd() == null) { // both not found
+                    result = true;
                 }
             }
         }
-        return false;
+        _additionalUserSkipIfNotFoundPasswordFileAndDefaultMap.put(additonalUser, result);
+        return _additionalUserSkipIfNotFoundPasswordFileAndDefaultMap.get(additonalUser);
     }
 
     // ===================================================================================

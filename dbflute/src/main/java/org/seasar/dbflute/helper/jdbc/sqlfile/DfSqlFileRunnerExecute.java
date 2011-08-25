@@ -55,8 +55,8 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     protected void execSQL(String sql) {
         boolean lazyConnectFailed = false;
         try {
-            final boolean dispatched = dispatch(sql);
-            if (!dispatched) {
+            final DfRunnerDispatchResult dispatchResult = dispatch(sql);
+            if (DfRunnerDispatchResult.NONE.equals(dispatchResult)) {
                 try {
                     lazyConnectIfNeeds();
                 } catch (SQLException e) {
@@ -65,6 +65,8 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 }
                 processNonDispatch(sql);
             }
+            // always incremented if it was not failed (also skipped in dispatching)
+            // because failure determination depends on this count and total one
             _goodSqlCount++;
         } catch (SQLException e) {
             if (!lazyConnectFailed && _runInfo.isErrorContinue()) {
@@ -76,8 +78,15 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         }
     }
 
-    protected boolean dispatch(String sql) throws SQLException {
-        return _dispatcher != null && _dispatcher.dispatch(_sqlFile, _currentStatement, sql);
+    protected DfRunnerDispatchResult dispatch(String sql) throws SQLException {
+        if (_dispatcher == null) {
+            return DfRunnerDispatchResult.NONE;
+        }
+        return _dispatcher.dispatch(_sqlFile, _currentStatement, sql);
+    }
+
+    public enum DfRunnerDispatchResult {
+        DISPATCHED, NONE, SKIPPED
     }
 
     protected void processNonDispatch(String sql) throws SQLException {

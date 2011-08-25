@@ -25,6 +25,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
@@ -206,14 +207,16 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
         final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
         final DfSqlFileRunnerExecute execute = new DfSqlFileRunnerExecuteCreateSchema(runInfo, getDataSource());
-        final Set<String> skippedFileSet = new HashSet<String>();
         execute.setDispatcher(new DfSqlFileRunnerDispatcher() { // for additional user dispatch
-            public boolean dispatch(File sqlFile, Statement st, String sql) throws SQLException {
+            protected final Set<String> _skippedFileSet = new HashSet<String>();
+
+            public DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException {
                 if (_currentUser == null || _currentUser.trim().length() == 0) {
-                    return false;
+                    return DfRunnerDispatchResult.NONE;
                 }
+                checkSkippedUser();
                 if (isSkippedUser()) {
-                    return true;
+                    return DfRunnerDispatchResult.SKIPPED;
                 }
                 Connection conn = _changeUserConnectionMap.get(_currentUser);
                 if (conn == null) {
@@ -221,25 +224,19 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
                     conn = prop.createAdditionalUserConnection(_currentUser);
                     if (conn != null) {
                         _changeUserConnectionMap.put(_currentUser, conn);
-                    }
-                    if (conn == null) {
+                    } else {
                         final StringBuilder sb = new StringBuilder();
                         sb.append("...Saying good-bye to the user '").append(_currentUser).append("'");
                         sb.append(" because of no definition");
                         _log.info(sb.toString());
                         _goodByeUserSet.add(_currentUser);
-                        return true;
+                        return DfRunnerDispatchResult.SKIPPED;
                     }
                 }
-                Statement dispatchStmt = null;
-                try {
-                    dispatchStmt = conn.createStatement();
-                } catch (SQLException e) {
-                    throw e;
-                }
+                final Statement dispatchStmt = conn.createStatement();
                 try {
                     dispatchStmt.execute(sql);
-                    return true;
+                    return DfRunnerDispatchResult.DISPATCHED;
                 } catch (SQLException e) {
                     final List<String> argList = analyzeCheckUser(sql);
                     if (argList != null) { // means the command was found
@@ -253,7 +250,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
                         final String exmsg = e.getMessage();
                         _log.info(" -> " + (exmsg != null ? exmsg.trim() : null));
                         _goodByeUserSet.add(_currentUser);
-                        return true;
+                        return DfRunnerDispatchResult.SKIPPED;
                     }
                     throw e;
                 } finally {
@@ -263,12 +260,18 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
                 }
             }
 
-            protected boolean isSkippedUser() {
+            protected void checkSkippedUser() {
+                if (_skippedFileSet.contains(_currentUser)) {
+                    return;
+                }
                 if (prop.isAdditionalUserSkipIfNotFoundPasswordFileAndDefault(_currentUser)) {
                     _log.info("...Skipping the user since no password file: " + _currentUser);
-                    skippedFileSet.add(_currentUser);
+                    _skippedFileSet.add(_currentUser);
                 }
-                return skippedFileSet.contains(_currentUser); // skipped
+            }
+
+            protected boolean isSkippedUser() {
+                return _skippedFileSet.contains(_currentUser);
             }
         });
         return execute;

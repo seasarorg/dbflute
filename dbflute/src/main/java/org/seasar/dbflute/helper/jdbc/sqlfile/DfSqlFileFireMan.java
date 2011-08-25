@@ -74,8 +74,9 @@ public class DfSqlFileFireMan {
 
         // Result Message
         final StringBuilder resultSb = new StringBuilder();
-        resultSb.append("{").append(title).append("}: success=").append(goodSqlCount).append(" failure=")
-                .append((totalSqlCount - goodSqlCount)).append(" (in ").append(sqlFileList.size()).append(" files)");
+        resultSb.append("{").append(title).append("}: success=").append(goodSqlCount);
+        resultSb.append(" failure=").append((totalSqlCount - goodSqlCount));
+        resultSb.append(" (in ").append(sqlFileList.size()).append(" files)");
         _log.info(resultSb.toString());
         fireResult.setResultMessage(resultSb.toString());
 
@@ -83,18 +84,23 @@ public class DfSqlFileFireMan {
         fireResult.setExistsError(totalSqlCount > goodSqlCount);
 
         // Detail Message
-        final StringBuilder detailSb = new StringBuilder();
+        fireResult.setDetailMessage(buildDetailMessage(fireResult));
+        return fireResult;
+    }
+
+    protected String buildDetailMessage(DfSqlFileFireResult fireResult) {
+        final StringBuilder sb = new StringBuilder();
         final List<DfSqlFileRunnerResult> runnerResultList = fireResult.getRunnerResultList();
         for (DfSqlFileRunnerResult currentResult : runnerResultList) {
             final List<ErrorContinuedSql> errorContinuedSqlList = currentResult.getErrorContinuedSqlList();
             final String fileName = currentResult.getSqlFile().getName();
-            if (detailSb.length() > 0) {
-                detailSb.append(ln());
+            if (sb.length() > 0) {
+                sb.append(ln());
             }
-            detailSb.append(errorContinuedSqlList.isEmpty() ? "o " : "x ").append(fileName);
+            sb.append(errorContinuedSqlList.isEmpty() ? "o " : "x ").append(fileName);
             for (ErrorContinuedSql errorContinuedSql : errorContinuedSqlList) {
                 final String sql = errorContinuedSql.getSql();
-                detailSb.append(ln()).append(sql);
+                sb.append(ln()).append(sql);
                 final SQLException sqlEx = errorContinuedSql.getSqlEx();
                 String message = sqlEx.getMessage();
                 if (sqlEx != null && message != null) {
@@ -106,22 +112,21 @@ public class DfSqlFileFireMan {
                     int elementIndex = 0;
                     for (String element : tokenizedList) {
                         if (elementIndex == 0) {
-                            detailSb.append(ln()).append(" >> ").append(element);
+                            sb.append(ln()).append(" >> ").append(element);
                         } else {
-                            detailSb.append(ln()).append("    ").append(element);
+                            sb.append(ln()).append("    ").append(element);
                         }
                         ++elementIndex;
                     }
                     if (isShowSQLState(sqlEx)) {
-                        detailSb.append(ln());
-                        detailSb.append("    (SQLState=").append(sqlEx.getSQLState()).append(" ErrorCode=")
-                                .append(sqlEx.getErrorCode()).append(")");
+                        sb.append(ln());
+                        sb.append("    (SQLState=").append(sqlEx.getSQLState());
+                        sb.append(" ErrorCode=").append(sqlEx.getErrorCode()).append(")");
                     }
                 }
             }
         }
-        fireResult.setDetailMessage(detailSb.toString());
-        return fireResult;
+        return sb.toString();
     }
 
     /**
