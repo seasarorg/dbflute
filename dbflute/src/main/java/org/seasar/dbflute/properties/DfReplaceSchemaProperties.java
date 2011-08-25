@@ -485,9 +485,40 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (Srl.is_Null_or_TrimmedEmpty(password)) {
             return password;
         }
+        final DfAdditionalUserPasswordInfo pwdInfo = analyzePasswordVariable(password);
+        if (pwdInfo == null) {
+            return password;
+        }
+        final File pwdFile = pwdInfo.getPwdFile();
+        final String defaultPwd = pwdInfo.getDefaultPwd();
+        if (!pwdFile.exists()) {
+            if (defaultPwd == null) {
+                throwAdditionalUserPasswordFileNotFoundException(additonalUser, password, pwdFile);
+            }
+            return defaultPwd; // no password file
+        }
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(pwdFile), "UTF-8"));
+            final String line = br.readLine();
+            return line; // first line in the password file is password
+        } catch (Exception continued) {
+            _log.info("Failed to read the password file: " + pwdFile);
+            return defaultPwd; // no password
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    protected DfAdditionalUserPasswordInfo analyzePasswordVariable(String password) {
         final String prefix = "df:dfprop/";
         if (!password.startsWith(prefix)) {
-            return password;
+            return null;
         }
         final String fileName;
         final String defaultPwd;
@@ -502,27 +533,30 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             }
         }
         final File pwdFile = new File("./dfprop/" + fileName);
-        if (!pwdFile.exists()) {
-            if (defaultPwd == null) {
-                throwAdditionalUserPasswordFileNotFoundException(additonalUser, password, pwdFile);
-            }
-            return defaultPwd; // no password
+        final DfAdditionalUserPasswordInfo pwdInfo = new DfAdditionalUserPasswordInfo();
+        pwdInfo.setPwdFile(pwdFile);
+        pwdInfo.setDefaultPwd(defaultPwd);
+        return pwdInfo;
+    }
+
+    protected static class DfAdditionalUserPasswordInfo {
+        protected File _pwdFile;
+        protected String _defaultPwd;
+
+        public File getPwdFile() {
+            return _pwdFile;
         }
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(pwdFile), "UTF-8"));
-            final String line = br.readLine();
-            return line; // first line is password
-        } catch (Exception continued) {
-            _log.info("Failed to read the password file: " + pwdFile);
-            return defaultPwd; // no password
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
+
+        public void setPwdFile(File pwdFile) {
+            this._pwdFile = pwdFile;
+        }
+
+        public String getDefaultPwd() {
+            return _defaultPwd;
+        }
+
+        public void setDefaultPwd(String defaultPwd) {
+            this._defaultPwd = defaultPwd;
         }
     }
 
@@ -543,6 +577,23 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         br.addElement(pwdFile);
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
+    }
+
+    public boolean isAdditionalUserSkipIfNotFoundPasswordFileAndDefault(String additonalUser) {
+        final Map<String, String> propertyMap = getAdditionalUserPropertyMap(additonalUser);
+        if (propertyMap == null) {
+            return false;
+        }
+        if (isProperty("isSkipIfNotFoundPasswordFileAndDefault", false, propertyMap)) {
+            final String password = propertyMap.get("password");
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(password)) {
+                final DfAdditionalUserPasswordInfo pwdInfo = analyzePasswordVariable(password);
+                if (!pwdInfo.getPwdFile().exists()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     // ===================================================================================

@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -205,10 +206,14 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
         final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
         final DfSqlFileRunnerExecute execute = new DfSqlFileRunnerExecuteCreateSchema(runInfo, getDataSource());
-        execute.setDispatcher(new DfSqlFileRunnerDispatcher() {
+        final Set<String> skippedFileSet = new HashSet<String>();
+        execute.setDispatcher(new DfSqlFileRunnerDispatcher() { // for additional user dispatch
             public boolean dispatch(File sqlFile, Statement st, String sql) throws SQLException {
                 if (_currentUser == null || _currentUser.trim().length() == 0) {
                     return false;
+                }
+                if (isSkippedUser()) {
+                    return true;
                 }
                 Connection conn = _changeUserConnectionMap.get(_currentUser);
                 if (conn == null) {
@@ -256,6 +261,14 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
                         dispatchStmt.close();
                     }
                 }
+            }
+
+            protected boolean isSkippedUser() {
+                if (prop.isAdditionalUserSkipIfNotFoundPasswordFileAndDefault(_currentUser)) {
+                    _log.info("...Skipping the user since no password file: " + _currentUser);
+                    skippedFileSet.add(_currentUser);
+                }
+                return skippedFileSet.contains(_currentUser); // skipped
             }
         });
         return execute;

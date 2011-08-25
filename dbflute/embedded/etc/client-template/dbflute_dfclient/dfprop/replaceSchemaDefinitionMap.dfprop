@@ -98,14 +98,19 @@ map:{
     #   o url: (NotRequired - Default same as one of main schema)
     #   o schema: (NotRequired - Default treated as no schema setting)
     #   o user: (Required)
-    #   o password: (NotRequired - Default '')
+    #   o password: password plainly or path to password file (with default password)
+    #       e.g. foo or df:dfprop/system-password.txt|foo
+    #       (NotRequired - Default '')
+    #   o isSkipIfNotFoundPasswordFileAndDefault: Does it skip the user SQL statement
+    #       when using password file but not found it and also default password?
+    #       (NotRequired - Default false)
     #
     #; additionalUserMap = map:{
     #    ; system = map:{
     #        #; url = ...
     #        #; schema = ...
     #        ; user = system
-    #        ; password = system
+    #        ; password = df:dfprop/system-password.txt
     #    }
     #}
     # - - - - - - - - - -/
