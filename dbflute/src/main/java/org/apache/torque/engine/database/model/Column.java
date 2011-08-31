@@ -1975,15 +1975,16 @@ public class Column {
     protected Boolean _commonColumn;
 
     public boolean isCommonColumn() {
-        if (_commonColumn == null) {
-            _commonColumn = false;
+        if (_commonColumn != null) {
+            return _commonColumn;
+        }
+        _commonColumn = false;
+        if (getTable().hasAllCommonColumn()) {
             final List<Column> commonColumnList = getTable().getCommonColumnList();
-            if (getTable().hasAllCommonColumn()) {
-                for (Column column : commonColumnList) {
-                    if (column.getName().equals(getName())) {
-                        _commonColumn = true;
-                        break;
-                    }
+            for (Column column : commonColumnList) {
+                if (column.getName().equalsIgnoreCase(getName())) {
+                    _commonColumn = true;
+                    break;
                 }
             }
         }

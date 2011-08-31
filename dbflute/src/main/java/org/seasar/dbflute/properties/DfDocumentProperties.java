@@ -324,8 +324,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isLoadDataReverseOutputToPlaySql() {
-        final String key = "isOutputToPlaySql";
-        return isProperty(key, false, getLoadDataReverseMap());
+        return isProperty("isOutputToPlaySql", false, getLoadDataReverseMap());
     }
 
     // ===================================================================================
