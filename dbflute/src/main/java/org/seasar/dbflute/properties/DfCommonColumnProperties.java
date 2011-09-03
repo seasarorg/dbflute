@@ -23,7 +23,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.properties.assistant.DfTableListProvider;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -123,6 +126,44 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
             return commonColumnName.substring(COMMON_COLUMN_CONVERSION_PREFIX_MARK.length());
         } else {
             return commonColumnName;
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                      Check Definition
+    //                                      ----------------
+    public void checkDefinition(DfTableListProvider provider) {
+        final List<Table> tableList = provider.provideTableList();
+        boolean exists = false;
+        for (Table table : tableList) {
+            if (table.hasAllCommonColumn()) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) {
+            throwCommonColumnMapRelatedTableNotFoundException();
+        }
+    }
+
+    protected void throwCommonColumnMapRelatedTableNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table related to common columns was not found.");
+        br.addItem("Advice");
+        br.addElement("At least one table should be related to common columns.");
+        br.addElement("The definition might contain a non-existent common column.");
+        br.addElement("Make sure your definition is correct.");
+        br.addItem("Common Column");
+        br.addElement(getCommonColumnNameList());
+        final String msg = br.buildExceptionMessage();
+        throw new DfCommonColumnMapRelatedTableNotFoundException(msg);
+    }
+
+    public static class DfCommonColumnMapRelatedTableNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public DfCommonColumnMapRelatedTableNotFoundException(String msg) {
+            super(msg);
         }
     }
 

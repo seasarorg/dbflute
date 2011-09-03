@@ -7,5 +7,6 @@ import org.apache.torque.engine.database.model.Table;
  * @since 0.9.5.2 (2009/07/06 Monday)
  */
 public interface DfTableFinder {
+
     Table findTable(String tableName);
 }

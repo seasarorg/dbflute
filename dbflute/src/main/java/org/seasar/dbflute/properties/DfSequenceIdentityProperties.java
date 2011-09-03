@@ -16,10 +16,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
+import org.seasar.dbflute.properties.assistant.DfTableDeterminator;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -159,16 +161,16 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //                                      Check Definition
     //                                      ----------------
     /**
-     * @param checker The checker for call-back. (NotNull)
+     * @param determinator The checker for call-back. (NotNull)
      */
-    public void checkSequenceDefinitionMap(SequenceDefinitionMapChecker checker) {
+    public void checkDefinition(DfTableDeterminator determinator) {
         final List<String> notFoundTableNameList = new ArrayList<String>();
         {
             final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
             final Set<Entry<String, String>> entrySet = sequenceDefinitionMap.entrySet();
             for (Entry<String, String> entry : entrySet) {
                 final String tableName = entry.getKey();
-                if (!checker.hasTable(tableName)) {
+                if (!determinator.hasTable(tableName)) {
                     notFoundTableNameList.add(tableName);
                 }
             }
@@ -180,7 +182,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
                 final String key = entry.getKey();
                 final String tableName = Srl.substringFirstFront(key, ".");
                 final String columnName = Srl.substringFirstRear(key, ".");
-                if (!checker.hasTableColumn(tableName, columnName)) {
+                if (!determinator.hasTableColumn(tableName, columnName)) {
                     notFoundTableNameList.add(key);
                 }
             }
@@ -191,30 +193,22 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     protected void throwSequenceDefinitionMapNotFoundTableException(List<String> notFoundTableNameList) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The table name on the sequence definition was NOT FOUND!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Not Found Table (or Column)]" + ln();
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table name on the sequence definition was not found.");
+        br.addItem("NotFound Table (or Column)");
         for (String tableName : notFoundTableNameList) {
-            msg = msg + tableName + ln();
+            br.addElement(tableName);
         }
-        msg = msg + ln();
-        msg = msg + "[Sequence Definition]" + ln() + _sequenceDefinitionMap + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new SequenceDefinitionMapTableNotFoundException(msg);
+        br.addItem("Sequence Definition");
+        br.addElement(_sequenceDefinitionMap);
+        final String msg = br.buildExceptionMessage();
+        throw new DfSequenceDefinitionMapTableNotFoundException(msg);
     }
 
-    public static interface SequenceDefinitionMapChecker {
-        public boolean hasTable(String tableName);
-
-        public boolean hasTableColumn(String tableName, String columnName);
-    }
-
-    public static class SequenceDefinitionMapTableNotFoundException extends RuntimeException {
+    public static class DfSequenceDefinitionMapTableNotFoundException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public SequenceDefinitionMapTableNotFoundException(String msg) {
+        public DfSequenceDefinitionMapTableNotFoundException(String msg) {
             super(msg);
         }
     }

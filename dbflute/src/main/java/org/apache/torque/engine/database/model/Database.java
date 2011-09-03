@@ -97,8 +97,9 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
+import org.seasar.dbflute.properties.assistant.DfTableDeterminator;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
+import org.seasar.dbflute.properties.assistant.DfTableListProvider;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.seasar.dbflute.properties.initializer.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.properties.initializer.DfAdditionalPrimaryKeyInitializer;
@@ -669,7 +670,7 @@ public class Database {
     //                                  --------------------
     /**
      * Initialize additional foreign key. <br />
-     * This is for Generate task. (Not Sql2Entity)
+     * This is basically for Generate task. (Not Sql2Entity)
      */
     public void initializeAdditionalForeignKey() {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -724,10 +725,16 @@ public class Database {
     //                                                                    Check Properties
     //                                                                    ================
     /**
-     * Check properties as mutually related validation.
+     * Check properties as mutually related validation. <br />
+     * This is basically for Generate task. (Not Sql2Entity)
      */
     public void checkProperties() {
-        getProperties().getSequenceIdentityProperties().checkSequenceDefinitionMap(new SequenceDefinitionMapChecker() {
+        getProperties().getCommonColumnProperties().checkDefinition(new DfTableListProvider() {
+            public List<Table> provideTableList() {
+                return getTableList();
+            }
+        });
+        getProperties().getSequenceIdentityProperties().checkDefinition(new DfTableDeterminator() {
             public boolean hasTable(String tableName) {
                 return getTable(tableName) != null;
             }
@@ -739,7 +746,7 @@ public class Database {
                 return getTable(tableName).getColumn(columnName) != null;
             }
         });
-        getProperties().getBasicProperties().checkDirectoryPackage();
+        getBasicProperties().checkDirectoryPackage();
     }
 
     // ===================================================================================
