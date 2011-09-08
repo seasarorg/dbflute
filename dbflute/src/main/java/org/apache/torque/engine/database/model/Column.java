@@ -275,6 +275,9 @@ public class Column {
     }
 
     protected boolean isSqlNameUpperCase() {
+        if (getTable().isSql2EntityCustomize()) { // Sql2Entity may be on the camel case basis
+            return false;
+        }
         return getProperties().getLittleAdjustmentProperties().isColumnSqlNameUpperCase();
     }
 
