@@ -251,6 +251,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return getProperty("historyHtmlFileName", defaultName, getDocumentDefinitionMap());
     }
 
+    public boolean isCheckColumnDefOrderDiff() { // related to HistoryHTML, SchemaSyncCheck, AlterCheck, ...
+        return isProperty("isCheckColumnDefOrderDiff", false, getDocumentDefinitionMap());
+    }
+
     // ===================================================================================
     //                                                                     LoadDataReverse
     //                                                                     ===============

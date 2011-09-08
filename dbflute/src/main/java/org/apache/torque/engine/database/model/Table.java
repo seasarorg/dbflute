@@ -124,6 +124,7 @@ public class Table {
     //                                                Column
     //                                                ------
     private final List<Column> _columnList = new ArrayList<Column>();
+    private final List<String> _columnNameList = new ArrayList<String>();
     private final StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexible(); // only used as key-value
 
     // -----------------------------------------------------
@@ -488,6 +489,7 @@ public class Table {
     public void addColumn(Column col) {
         col.setTable(this);
         _columnList.add(col);
+        _columnNameList.add(col.getName());
         _columnMap.put(col.getName(), col);
         final String synonym = col.getSynonym();
         if (synonym != null) {
@@ -497,13 +499,23 @@ public class Table {
 
     /**
      * Returns a List containing all the columns in the table
+     * @return the list of column. (NotNull)
      */
     public List<Column> getColumnList() {
         return _columnList;
     }
 
     /**
+     * Returns a List containing all the names of column in the table
+     * @return the list of column name. (NotNull)
+     */
+    public List<String> getColumnNameList() {
+        return _columnNameList;
+    }
+
+    /**
      * Returns an Array containing all the columns in the table
+     * @return the array of column. (NotNull)
      */
     public Column[] getColumns() {
         return _columnList.toArray(new Column[] {});
@@ -517,12 +529,8 @@ public class Table {
      */
     public String getColumnNameCommaString() {
         final StringBuilder sb = new StringBuilder();
-
-        final List<Column> ls = _columnList;
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final Column col = (Column) ls.get(i);
-            sb.append(", ").append(col.getName());
+        for (String columnName : _columnNameList) {
+            sb.append(", ").append(columnName);
         }
         sb.delete(0, ", ".length());
         return sb.toString();
@@ -530,12 +538,8 @@ public class Table {
 
     public String getPropertyNameCommaString() {
         final StringBuilder sb = new StringBuilder();
-
-        final List<Column> ls = _columnList;
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final Column col = (Column) ls.get(i);
-            sb.append(", ").append(col.getJavaBeansRulePropertyName());
+        for (Column column : _columnList) {
+            sb.append(", ").append(column.getJavaBeansRulePropertyName());
         }
         sb.delete(0, ", ".length());
         return sb.toString();
@@ -548,6 +552,14 @@ public class Table {
      */
     public Column getColumn(String name) {
         return _columnMap.get(name);
+    }
+
+    public Integer getColumnIndex(String name) {
+        final Column column = getColumn(name);
+        if (column == null) {
+            return null;
+        }
+        return getColumnNameList().indexOf(column.getName());
     }
 
     // -----------------------------------------------------
@@ -1502,18 +1514,20 @@ public class Table {
      * @param attrib the xml attributes
      */
     public Unique addUnique(Attributes attrib) {
-        Unique unique = new Unique();
+        final Unique unique = new Unique();
         unique.loadFromXML(attrib);
         addUnique(unique);
         return unique;
     }
 
     public List<Column> getUniqueColumnList() {
-        final StringKeyMap<Column> keyMap = StringKeyMap.createAsCaseInsensitiveOrdered();
+        final List<Column> uniqueColumnList = new ArrayList<Column>();
         for (Column column : _columnList) {
-            keyMap.put(column.getName(), column);
+            if (column.isUnique()) {
+                uniqueColumnList.add(column);
+            }
         }
-        return new ArrayList<Column>(keyMap.values());
+        return uniqueColumnList;
     }
 
     // ===================================================================================

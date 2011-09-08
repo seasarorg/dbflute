@@ -73,11 +73,17 @@ public abstract class DfAbstractDiff {
         boolean isMatch(TYPE next, TYPE previous);
 
         void diff(DIFF diff, DfNextPreviousDiff nextPreviousDiff);
+
+        String disp(TYPE obj, boolean next);
     }
 
     protected abstract class StringNextPreviousDiffer<OBJECT, DIFF> implements NextPreviousDiffer<OBJECT, DIFF, String> {
         public boolean isMatch(String next, String previous) {
             return isSame(next, previous);
+        }
+
+        public String disp(String obj, boolean next) {
+            return obj.toString();
         }
     }
 
@@ -85,6 +91,10 @@ public abstract class DfAbstractDiff {
             NextPreviousDiffer<OBJECT, DIFF, Boolean> {
         public boolean isMatch(Boolean next, Boolean previous) {
             return isSame(next, previous);
+        }
+
+        public String disp(Boolean obj, boolean next) {
+            return obj.toString();
         }
     }
 

@@ -43,7 +43,7 @@
 		display: list-item;
 	}
 	h5 {
-		width: 10em;
+		width: 11em;
 		font-size: 80%;
 		border-bottom: solid 1px #333;
 		text-indent: 0.3em;
@@ -126,7 +126,7 @@
 		<h4>${tableDiff.tableName}</h4>
 #end
 		<div class="change-table-content">
-#foreach ($handler in $tableDiff.nextPreviousValidList)
+#foreach ($handler in $tableDiff.nextPreviousDiffList)
 			<h5>$handler.titleName()</h5>
 			<div class="column-content">$handler.provide().displayForHtml</div>
 #end
@@ -136,7 +136,7 @@
 			<dl class="column-content">
 #foreach ($nestDiff in $content.nestDiffList)
 				<dt>${nestDiff.keyName}</dt>
-#foreach ($handler in $nestDiff.nextPreviousValidList)
+#foreach ($handler in $nestDiff.nextPreviousDiffList)
 				<dd><span>$handler.titleName()</span>$handler.provide().displayForHtml</dd>
 #end
 #end

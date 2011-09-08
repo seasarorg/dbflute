@@ -1031,10 +1031,10 @@ public class Column {
         boolean exists = false;
         for (Unique unique : uniqueList) {
             if (unique.hasSameColumn(this)) {
-                exists = true;
                 if (!unique.isAdditional()) {
                     return false;
                 }
+                exists = true;
             }
         }
         return exists;

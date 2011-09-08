@@ -238,7 +238,7 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
     // -----------------------------------------------------
     //                                             Diff Item
     //                                             ---------
-    public List<NextPreviousHandler> getNextPreviousValidList() {
+    public List<NextPreviousHandler> getNextPreviousDiffList() {
         final List<NextPreviousHandler> previousItemList = _nextPreviousItemList;
         final List<NextPreviousHandler> validHandlerList = DfCollectionUtil.newArrayList();
         for (NextPreviousHandler handler : previousItemList) {

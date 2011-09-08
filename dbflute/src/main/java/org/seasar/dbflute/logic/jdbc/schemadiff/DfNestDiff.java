@@ -21,5 +21,5 @@ public interface DfNestDiff {
 
     void acceptDiffMap(Map<String, Object> diffMap);
 
-    List<NextPreviousHandler> getNextPreviousValidList();
+    List<NextPreviousHandler> getNextPreviousDiffList();
 }

@@ -25,6 +25,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
     //                                             ---------
     protected DfNextPreviousDiff _unifiedSchemaDiff;
     protected DfNextPreviousDiff _objectTypeDiff;
+    protected DfNextPreviousDiff _columnDefOrderDiff;
 
     protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
@@ -60,6 +61,23 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
 
             public void restore(Map<String, Object> tableDiffMap) {
                 _objectTypeDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
+            }
+        });
+        _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Column-Def Order";
+            }
+
+            public String propertyName() {
+                return "columnDefOrderDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _columnDefOrderDiff;
+            }
+
+            public void restore(Map<String, Object> tableDiffMap) {
+                _columnDefOrderDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
             }
         });
     }
@@ -323,16 +341,16 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
     // -----------------------------------------------------
     //                                             Diff Item
     //                                             ---------
-    public List<NextPreviousHandler> getNextPreviousValidList() {
+    public List<NextPreviousHandler> getNextPreviousDiffList() {
         final List<NextPreviousHandler> previousItemList = _nextPreviousItemList;
-        final List<NextPreviousHandler> validHandlerList = DfCollectionUtil.newArrayList();
+        final List<NextPreviousHandler> diffHandlerList = DfCollectionUtil.newArrayList();
         for (NextPreviousHandler handler : previousItemList) {
             final DfNextPreviousDiff nextPreviousDiff = handler.provide();
             if (nextPreviousDiff != null && nextPreviousDiff.hasDiff()) {
-                validHandlerList.add(handler);
+                diffHandlerList.add(handler);
             }
         }
-        return validHandlerList;
+        return diffHandlerList;
     }
 
     public boolean hasUnifiedSchemaDiff() {
@@ -357,6 +375,18 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
 
     public void setObjectTypeDiff(DfNextPreviousDiff objectTypeDiff) {
         _objectTypeDiff = objectTypeDiff;
+    }
+
+    public boolean hasColumnDefOrderDiff() {
+        return _columnDefOrderDiff != null;
+    }
+
+    public DfNextPreviousDiff getColumnDefOrderDiff() {
+        return _columnDefOrderDiff;
+    }
+
+    public void setColumnDefOrderDiff(DfNextPreviousDiff columnDefOrderDiff) {
+        _columnDefOrderDiff = columnDefOrderDiff;
     }
 
     public List<DfNestDiffContent> getNestDiffContentOrderedList() {
@@ -441,6 +471,10 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
     //                                           -----------
     public boolean hasColumnDiff() {
         return !_columnDiffAllList.isEmpty();
+    }
+
+    public boolean hasAddedOrDeletedColumnDiff() {
+        return !_addedColumnDiffList.isEmpty() || !_deletedColumnDiffList.isEmpty();
     }
 
     public List<DfColumnDiff> getColumnDiffAllList() {

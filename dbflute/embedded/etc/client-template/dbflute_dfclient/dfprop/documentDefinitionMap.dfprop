@@ -9,6 +9,7 @@
 # o schemaHtmlFileName (NotRequired - Default 'schema-[project-name].html')
 # o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)
 # o historyHtmlFileName (NotRequired - Default 'history-[project-name].html')
+# o isCheckColumnDefOrderDiff (NotRequired - Default false)
 # o loadDataReverseMap (NotRequired - Default map:{})
 # o schemaSyncCheckMap (NotRequired - Default map:{})
 # 
@@ -22,6 +23,7 @@
 #     ; schemaHtmlFileName = xxx.html
 #     ; isSuppressSchemaHtmlOutsideSql = false
 #     ; historyHtmlFileName = xxx.html
+#     ; isCheckColumnDefOrderDiff = true
 #     ; loadDataReverseMap = map:{
 #         ; recordLimit = 10
 #         ; isContainsCommonColumn = false
@@ -107,6 +109,14 @@ map:{
     #  (For example, when you use Application Behavior, you need this)
     # 
     #; historyHtmlFileName = xxx.html
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isCheckColumnDefOrderDiff (NotRequired - Default false)
+    #  Does it check column-def order history?
+    #  (except added or deleted columns)
+    # 
+    #; isCheckColumnDefOrderDiff = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

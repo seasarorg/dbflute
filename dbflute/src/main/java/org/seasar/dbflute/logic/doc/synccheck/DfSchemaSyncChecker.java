@@ -89,6 +89,7 @@ public class DfSchemaSyncChecker {
     protected DfSchemaXmlSerializer serializeTargetSchema() {
         final DataSource targetDs = prepareTargetDataSource();
         final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
+        targetSerializer.suppressUnifiedSchema(); // because of comparison with other schema
         targetSerializer.serialize();
         return targetSerializer;
     }

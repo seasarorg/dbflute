@@ -2,6 +2,7 @@ package org.seasar.dbflute.logic.jdbc.schemadiff;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,6 +35,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //            ; diffType = [ADD or CHANGE or DELETE]
     //            ; unifiedSchemaDiff = map:{ next = [schema] ; previous = [schema] }
     //            ; objectTypeDiff = map:{ next = [type] ; previous = [type] }
+    //            ; columnDefOrderDiff = map:{ next = [column-index-exp] ; previous = [column-index-exp] }
     //            ; columnDiff = map:{
     //                [column-name] = map:{
     //                    ; diffType = [ADD or CHANGE or DELETE]
@@ -133,6 +135,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected Date _diffDate; // not null after loading next schema
     protected String _comment; // after restoring
     protected DfNextPreviousDiff _tableCountDiff; // not null after next loading
+
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
+    protected boolean _checkColumnDefOrder; // depends on DBFlute property
+    protected boolean _suppressUnifiedSchema; // basically for SchemaSyncCheck
 
     // -----------------------------------------------------
     //                                            Table Diff
@@ -254,9 +262,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
         processDeletedTable();
     }
 
+    // ===================================================================================
+    //                                                                       Table Process
+    //                                                                       =============
     // -----------------------------------------------------
-    //                                         Table Process
-    //                                         -------------
+    //                                                 Added
+    //                                                 -----
     protected void processAddedTable() {
         final List<Table> tableList = _nextDb.getTableList();
         for (Table table : tableList) {
@@ -267,6 +278,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
+    // -----------------------------------------------------
+    //                                               Changed
+    //                                               -------
     protected void processChangedTable() {
         final List<Table> tableList = _nextDb.getTableList();
         for (Table next : tableList) {
@@ -276,35 +290,184 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             // found
             final DfTableDiff tableDiff = DfTableDiff.createChanged(next.getName());
-            diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
-                public String provide(Table obj) {
-                    return obj.getUnifiedSchema().getCatalogSchema();
-                }
 
-                public void diff(DfTableDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setUnifiedSchemaDiff(nextPreviousDiff);
-                }
-            });
-            diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
-                public String provide(Table obj) {
-                    return obj.getType();
-                }
+            // direct attributes
+            processUnifiedSchema(next, previous, tableDiff);
+            processObjectType(next, previous, tableDiff);
+            processColumnDefOrder(next, previous, tableDiff);
 
-                public void diff(DfTableDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setObjectTypeDiff(nextPreviousDiff);
-                }
-            });
+            // nested attributes
             processColumn(tableDiff, next, previous);
             processPrimaryKey(tableDiff, next, previous);
             processForeignKey(tableDiff, next, previous);
             processUniqueKey(tableDiff, next, previous);
             processIndex(tableDiff, next, previous);
+
             if (tableDiff.hasDiff()) { // changed
                 addTableDiff(tableDiff);
             }
         }
     }
 
+    protected void processUnifiedSchema(Table next, Table previous, DfTableDiff tableDiff) {
+        if (_suppressUnifiedSchema) {
+            return;
+        }
+        diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
+            public String provide(Table obj) {
+                return obj.getUnifiedSchema().getCatalogSchema();
+            }
+
+            public void diff(DfTableDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setUnifiedSchemaDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processObjectType(Table next, Table previous, DfTableDiff tableDiff) {
+        diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
+            public String provide(Table obj) {
+                return obj.getType();
+            }
+
+            public void diff(DfTableDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setObjectTypeDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processColumnDefOrder(Table next, Table previous, DfTableDiff tableDiff) {
+        if (!_checkColumnDefOrder) {
+            return;
+        }
+        diffNextPrevious(next, previous, tableDiff, new ColumnDefOrderDiffer());
+    }
+
+    protected static class ColumnDefOrderDiffer implements NextPreviousDiffer<Table, DfTableDiff, Table> {
+
+        private static final String KEY_NEXT_NAME = "nextName";
+        private static final String KEY_NEXT_NUMBER = "nextNumber";
+        private static final String KEY_PREVIOUS_NAME = "previousName";
+        private static final String KEY_PREVIOUS_NUMBER = "previousNumber";
+
+        protected final List<Map<String, Object>> _diffList = DfCollectionUtil.newArrayList();
+
+        public Table provide(Table obj) {
+            return obj;
+        }
+
+        public boolean isMatch(Table next, Table previous) {
+            // compare without added or deleted columns
+            // (and renamed columns cannot be cached by DBFlute)
+            final List<String> nextList = createCompareColumnList(next, previous);
+            final List<String> previousList = createCompareColumnList(previous, next);
+            filterCompareColumnList(next, previous, nextList, previousList);
+            while (true) {
+                final Map<String, Object> foundDiffMap = findColumnDefOrder(next, previous, nextList, previousList);
+                if (foundDiffMap == null) {
+                    break;
+                }
+                _diffList.add(foundDiffMap);
+
+                // remove the found column finished being compared
+                nextList.remove(foundDiffMap.get(KEY_NEXT_NAME));
+                previousList.remove(foundDiffMap.get(KEY_PREVIOUS_NAME));
+            }
+            return _diffList.isEmpty();
+        }
+
+        public void diff(DfTableDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+            diff.setColumnDefOrderDiff(nextPreviousDiff);
+        }
+
+        public String disp(Table obj, boolean next) {
+            if (next) {
+                return buildDisp(KEY_NEXT_NAME, KEY_NEXT_NUMBER);
+            } else {
+                return buildDisp(KEY_PREVIOUS_NAME, KEY_PREVIOUS_NUMBER);
+            }
+        }
+
+        protected String buildDisp(String nameKey, String numberKey) {
+            final StringBuilder sb = new StringBuilder();
+            for (Map<String, Object> diffMap : _diffList) {
+                final Object name = diffMap.get(nameKey);
+                final Object number = diffMap.get(numberKey);
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(name).append("(").append(number).append(")");
+            }
+            return sb.toString();
+        }
+
+        protected List<String> createCompareColumnList(Table main, Table target) {
+            final List<String> mainList = DfCollectionUtil.newArrayList();
+            for (Column column : main.getColumnList()) {
+                final Column corresponding = target.getColumn(column.getName());
+                if (corresponding == null) {
+                    continue;
+                }
+                mainList.add(column.getName());
+            }
+            return mainList;
+        }
+
+        protected void filterCompareColumnList(Table next, Table previous, List<String> nextList,
+                List<String> previousList) {
+            final List<String> removedNextList = DfCollectionUtil.newArrayList();
+            final List<String> removedPreviousList = DfCollectionUtil.newArrayList();
+            for (int i = 0; i < nextList.size(); i++) {
+                final String nextName = nextList.get(i);
+                final String previousSameOrderName = previousList.get(i);
+                if (nextName.equalsIgnoreCase(previousSameOrderName)) {
+                    removedNextList.add(nextName);
+                    removedPreviousList.add(previousSameOrderName);
+                }
+            }
+            for (String removedName : removedNextList) {
+                nextList.remove(next.getColumn(removedName).getName());
+            }
+            for (String removedName : removedPreviousList) {
+                previousList.remove(previous.getColumn(removedName).getName());
+            }
+        }
+
+        protected Map<String, Object> findColumnDefOrder(Table next, Table previous, List<String> nextList,
+                List<String> previousList) {
+            Map<String, Object> resultMap = null;
+            for (int i = 0; i < nextList.size(); i++) {
+                final String nextName = nextList.get(i);
+                final String previousSameOrderName = previousList.get(i);
+                if (nextName.equalsIgnoreCase(previousSameOrderName)) {
+                    continue; // basically no way because of filtered already
+                }
+                resultMap = new HashMap<String, Object>();
+                resultMap.put(KEY_NEXT_NAME, next.getColumn(nextName).getName());
+                resultMap.put(KEY_NEXT_NUMBER, next.getColumnIndex(nextName) + 1);
+                final String previousCorrespondingName = previous.getColumn(nextName).getName();
+                resultMap.put(KEY_PREVIOUS_NAME, previousCorrespondingName);
+                resultMap.put(KEY_PREVIOUS_NUMBER, previous.getColumnIndex(previousCorrespondingName) + 1);
+                break;
+            }
+            return resultMap;
+        }
+    }
+
+    protected <TYPE> void diffNextPrevious(Table next, Table previous, DfTableDiff diff,
+            NextPreviousDiffer<Table, DfTableDiff, TYPE> differ) {
+        final TYPE nextValue = differ.provide(next);
+        final TYPE previousValue = differ.provide(previous);
+        if (!differ.isMatch(nextValue, previousValue)) {
+            final String nextDisp = differ.disp(nextValue, true);
+            final String previousDisp = differ.disp(previousValue, false);
+            differ.diff(diff, createNextPreviousDiff(nextDisp, previousDisp));
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                               Deleted
+    //                                               -------
     protected void processDeletedTable() {
         final List<Table> tableList = _previousDb.getTableList();
         for (Table table : tableList) {
@@ -315,28 +478,28 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    protected <TYPE> void diffNextPrevious(Table next, Table previous, DfTableDiff diff,
-            NextPreviousDiffer<Table, DfTableDiff, TYPE> setupper) {
-        final TYPE nextValue = setupper.provide(next);
-        final TYPE previousValue = setupper.provide(previous);
-        if (!setupper.isMatch(nextValue, previousValue)) {
-            setupper.diff(diff, createNextPreviousDiff(nextValue.toString(), previousValue.toString()));
-        }
-    }
-
+    // -----------------------------------------------------
+    //                                           Same Helper
+    //                                           -----------
     protected boolean isSameTableName(Table next, Table previous) {
         return isSame(next.getName(), previous.getName());
     }
 
+    // ===================================================================================
+    //                                                                      Column Process
+    //                                                                      ==============
     // -----------------------------------------------------
-    //                                        Column Process
-    //                                        --------------
+    //                                                  Main
+    //                                                  ----
     protected void processColumn(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         processAddedColumn(tableDiff, nextTable, previousTable);
         processChangedColumn(tableDiff, nextTable, previousTable);
         processDeletedColumn(tableDiff, nextTable, previousTable);
     }
 
+    // -----------------------------------------------------
+    //                                                 Added
+    //                                                 -----
     protected void processAddedColumn(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         final List<Column> columnList = nextTable.getColumnList();
         for (Column column : columnList) {
@@ -347,6 +510,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
+    // -----------------------------------------------------
+    //                                               Changed
+    //                                               -------
     protected void processChangedColumn(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         final List<Column> columnList = nextTable.getColumnList();
         for (Column next : columnList) {
@@ -421,16 +587,6 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    protected void processDeletedColumn(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
-        final List<Column> columnList = previousTable.getColumnList();
-        for (Column column : columnList) {
-            final Column found = nextTable.getColumn(column.getName());
-            if (found == null || !isSameColumnName(column, found)) { // deleted
-                tableDiff.addColumnDiff(DfColumnDiff.createDeleted(column.getName()));
-            }
-        }
-    }
-
     protected <ITEM, TYPE> void diffNextPrevious(Column next, Column previous, DfColumnDiff diff,
             NextPreviousDiffer<Column, DfColumnDiff, TYPE> differ) {
         final TYPE nextValue = differ.provide(next);
@@ -442,13 +598,29 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
+    // -----------------------------------------------------
+    //                                               Deleted
+    //                                               -------
+    protected void processDeletedColumn(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
+        final List<Column> columnList = previousTable.getColumnList();
+        for (Column column : columnList) {
+            final Column found = nextTable.getColumn(column.getName());
+            if (found == null || !isSameColumnName(column, found)) { // deleted
+                tableDiff.addColumnDiff(DfColumnDiff.createDeleted(column.getName()));
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                           Same Helper
+    //                                           -----------
     protected boolean isSameColumnName(Column next, Column previous) {
         return isSame(next.getName(), previous.getName());
     }
 
-    // -----------------------------------------------------
-    //                                    PrimaryKey Process
-    //                                    ------------------
+    // ===================================================================================
+    //                                                                  PrimaryKey Process
+    //                                                                  ==================
     protected void processPrimaryKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         if (!nextTable.hasPrimaryKey() && !previousTable.hasPrimaryKey()) {
             return; // both no PK
@@ -510,9 +682,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    // -----------------------------------------------------
-    //                                    ForeignKey Process
-    //                                    ------------------
+    // ===================================================================================
+    //                                                                  ForeignKey Process
+    //                                                                  ==================
     protected void processForeignKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         processConstraintKey(nextTable, previousTable, new ForeignKeyDiffer(tableDiff));
     }
@@ -573,9 +745,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    // -----------------------------------------------------
-    //                                     UniqueKey Process
-    //                                     -----------------
+    // ===================================================================================
+    //                                                                   UniqueKey Process
+    //                                                                   =================
     protected void processUniqueKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         processConstraintKey(nextTable, previousTable, new UniqueKeyDiffer(tableDiff));
     }
@@ -617,9 +789,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    // -----------------------------------------------------
-    //                                         Index Process
-    //                                         -------------
+    // ===================================================================================
+    //                                                                       Index Process
+    //                                                                       =============
     protected void processIndex(final DfTableDiff tableDiff, Table nextTable, Table previousTable) {
         processConstraintKey(nextTable, previousTable, new IndexDiffer(tableDiff));
     }
@@ -661,9 +833,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
-    // -----------------------------------------------------
-    //                                    Constraint Process
-    //                                    ------------------
+    // ===================================================================================
+    //                                                                  Constraint Process
+    //                                                                  ==================
     protected <KEY, DIFF extends DfConstraintDiff> void processConstraintKey(Table nextTable, Table previousTable,
             ConstraintKeyDiffer<KEY, DIFF> differ) { // for except PK
         final List<KEY> keyList = differ.keyList(nextTable);
@@ -975,6 +1147,17 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void checkColumnDefOrder() {
+        _checkColumnDefOrder = true;
+    }
+
+    public void suppressUnifiedSchema() {
+        _suppressUnifiedSchema = true;
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     // -----------------------------------------------------
@@ -1038,7 +1221,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         _latest = latest;
     }
 
-    public boolean isLatest() {
+    public boolean isLatest() { // called by the template 'diffmodel.vm'
         return _latest;
     }
 }

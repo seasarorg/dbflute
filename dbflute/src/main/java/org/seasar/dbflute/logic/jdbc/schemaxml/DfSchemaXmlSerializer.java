@@ -57,6 +57,7 @@ import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.seasar.dbflute.util.Srl;
@@ -127,6 +128,10 @@ public class DfSchemaXmlSerializer {
         _schemaXml = schemaXml;
         _historyFile = historyFile;
         _schemaDiff = DfSchemaDiff.createAsFlexible(schemaXml);
+        if (getDocumentProperties().isCheckColumnDefOrderDiff()) {
+            // all diff process are depends on the DBFlute property
+            _schemaDiff.checkColumnDefOrder();
+        }
     }
 
     public static DfSchemaXmlSerializer createAsCore(DataSource dataSource, UnifiedSchema mainSchema) {
@@ -995,6 +1000,13 @@ public class DfSchemaXmlSerializer {
     }
 
     // ===================================================================================
+    //                                                                         Diff Option
+    //                                                                         ===========
+    public void suppressUnifiedSchema() {
+        _schemaDiff.suppressUnifiedSchema();
+    }
+
+    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
@@ -1017,6 +1029,10 @@ public class DfSchemaXmlSerializer {
         return getProperties().getDatabaseProperties();
     }
 
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
@@ -1031,7 +1047,7 @@ public class DfSchemaXmlSerializer {
         return _schemaXml;
     }
 
-    public DfSchemaDiff getSchemaDiff() { // not null after comparison process
+    public DfSchemaDiff getSchemaDiff() {
         return _schemaDiff;
     }
 }
