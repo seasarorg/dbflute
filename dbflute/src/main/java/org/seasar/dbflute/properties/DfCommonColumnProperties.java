@@ -76,6 +76,10 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return _commonColumnMap;
     }
 
+    public boolean hasCommonColumn() {
+        return !getCommonColumnMap().isEmpty();
+    }
+
     protected List<String> _commonColumnNameList;
 
     public List<String> getCommonColumnNameList() {
@@ -133,6 +137,9 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                      Check Definition
     //                                      ----------------
     public void checkDefinition(DfTableListProvider provider) {
+        if (!hasCommonColumn()) {
+            return;
+        }
         final List<Table> tableList = provider.provideTableList();
         boolean exists = false;
         for (Table table : tableList) {
