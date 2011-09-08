@@ -16,6 +16,8 @@
 # o isPagingCountLater: (NotRequired - Default true)
 # o isPagingCountLeastJoin: (NotRequired - Default true)
 # o isInnerJoinAutoDetect: (NotRequired - Default false)
+# o isTableSqlNameUpperCase: (NotRequired - Default false)
+# o isColumnSqlNameUpperCase: (NotRequired - Default false)
 # o isMakeDeprecated: (NotRequired - Default false)
 # o isMakeRecentlyDeprecated: (NotRequired - Default true)
 # o extendedDBFluteInitializerClass: (NotRequired - Default '')
@@ -183,6 +185,30 @@ map:{
     #     Non.
     #
     #; isInnerJoinAutoDetect = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isTableSqlNameUpperCase: (NotRequired - Default false)
+    #   [true]
+    #     Table names on SQL executed by condition-bean or behavior
+    #     are forcedly treated as upper case. (except outside-SQL)
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isTableSqlNameUpperCase = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isColumnSqlNameUpperCase: (NotRequired - Default false)
+    #   [true]
+    #     Column names on SQL executed by condition-bean or behavior
+    #     are forcedly treated as upper case. (except outside-SQL)
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isColumnSqlNameUpperCase = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

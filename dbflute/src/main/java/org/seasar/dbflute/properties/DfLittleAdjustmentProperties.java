@@ -146,6 +146,17 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                  SQL Name UpperCase
+    //                                                                  ==================
+    public boolean isTableSqlNameUpperCase() {
+        return isProperty("isTableSqlNameUpperCase", false);
+    }
+
+    public boolean isColumnSqlNameUpperCase() {
+        return isProperty("isColumnSqlNameUpperCase", false);
+    }
+
+    // ===================================================================================
     //                                                                     Make Deprecated
     //                                                                     ===============
     public boolean isMakeDeprecated() {

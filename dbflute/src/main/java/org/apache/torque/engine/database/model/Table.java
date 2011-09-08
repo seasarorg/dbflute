@@ -243,28 +243,28 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                           Custom Name
-    //                                           -----------
-    /**
-     * Get annotation table name. (for S2Dao)
-     * @return Annotation table name. (NotNull)
-     */
-    public String getAnnotationTableName() {
-        return getTableSqlName();
-    }
-
+    //                                              SQL Name
+    //                                              --------
     /**
      * Get table SQL name.
      * @return Table SQL name. (NotNull)
      */
     public String getTableSqlName() {
-        final String tableName = quoteTableNameIfNeeds(_name);
+        final String tableName = quoteTableNameIfNeeds(getResourceNameForSqlName());
         return filterSchemaSqlPrefix(tableName);
     }
 
     public String getTableSqlNameDirectUse() {
-        final String tableName = quoteTableNameIfNeedsDirectUse(_name);
+        final String tableName = quoteTableNameIfNeedsDirectUse(getResourceNameForSqlName());
         return filterSchemaSqlPrefix(tableName);
+    }
+
+    protected String getResourceNameForSqlName() {
+        return isSqlNameUpperCase() ? getName().toUpperCase() : getName();
+    }
+
+    protected boolean isSqlNameUpperCase() {
+        return getProperties().getLittleAdjustmentProperties().isTableSqlNameUpperCase();
     }
 
     protected String filterSchemaSqlPrefix(String tableName) {
@@ -282,6 +282,17 @@ public class Table {
     protected String quoteTableNameIfNeedsDirectUse(String tableName) {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
         return prop.quoteTableNameIfNeedsDirectUse(tableName);
+    }
+
+    // -----------------------------------------------------
+    //                                           Custom Name
+    //                                           -----------
+    /**
+     * Get annotation table name. (for S2Dao)
+     * @return Annotation table name. (NotNull)
+     */
+    public String getAnnotationTableName() {
+        return getTableSqlName();
     }
 
     // -----------------------------------------------------
@@ -2689,7 +2700,7 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                     Adding Schema to Table SQL-Name
+    //                                                     Adding Schema to Table SQL Name
     //                                                     ===============================
     protected boolean isAvailableAddingSchemaToTableSqlName() {
         return getProperties().getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
@@ -2698,6 +2709,10 @@ public class Table {
     protected boolean isAvailableAddingCatalogToTableSqlName() {
         return getProperties().getLittleAdjustmentProperties().isAvailableAddingCatalogToTableSqlName();
     }
+
+    // ===================================================================================
+    //                                                     Adding Schema to Table SQL-Name
+    //                                                     ===============================
 
     // ===================================================================================
     //                                                                        Empty String

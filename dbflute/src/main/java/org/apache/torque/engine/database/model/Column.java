@@ -263,13 +263,29 @@ public class Column {
     //                                              SQL Name
     //                                              --------
     public String getColumnSqlName() {
-        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        return prop.quoteColumnNameIfNeeds(getName());
+        return quoteColumnNameIfNeeds(getResourceNameForSqlName());
     }
 
     public String getColumnSqlNameDirectUse() {
+        return quoteColumnNameIfNeedsDirectUse(getResourceNameForSqlName());
+    }
+
+    protected String getResourceNameForSqlName() {
+        return isSqlNameUpperCase() ? getName().toUpperCase() : getName();
+    }
+
+    protected boolean isSqlNameUpperCase() {
+        return getProperties().getLittleAdjustmentProperties().isColumnSqlNameUpperCase();
+    }
+
+    protected String quoteColumnNameIfNeeds(String columnName) {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        return prop.quoteColumnNameIfNeedsDirectUse(getName());
+        return prop.quoteColumnNameIfNeeds(columnName);
+    }
+
+    protected String quoteColumnNameIfNeedsDirectUse(String columnName) {
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        return prop.quoteColumnNameIfNeedsDirectUse(columnName);
     }
 
     // -----------------------------------------------------
