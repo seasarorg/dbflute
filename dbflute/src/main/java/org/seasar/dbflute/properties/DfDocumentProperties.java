@@ -352,32 +352,33 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String getSchemaSyncCheckDatabaseUrl() {
-        final Map<String, String> dataXlsTemplateMap = getSchemaSyncCheckMap();
-        final String url = dataXlsTemplateMap.get("url");
+        final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
+        final String url = schemaSyncCheckMap.get("url");
         return Srl.is_NotNull_and_NotTrimmedEmpty(url) ? url : getDatabaseProperties().getDatabaseUrl();
     }
 
     public String getSchemaSyncCheckDatabaseCatalog() {
-        final Map<String, String> dataXlsTemplateMap = getSchemaSyncCheckMap();
-        final String catalog = dataXlsTemplateMap.get("catalog");
-        return getDatabaseProperties().prepareMainCatalog(catalog);
+        final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
+        final String catalog = schemaSyncCheckMap.get("catalog");
+        final String url = getSchemaSyncCheckDatabaseUrl();
+        return getDatabaseProperties().prepareMainCatalog(catalog, url);
     }
 
     public UnifiedSchema getSchemaSyncCheckDatabaseSchema() {
-        final Map<String, String> dataXlsTemplateMap = getSchemaSyncCheckMap();
-        final String schema = dataXlsTemplateMap.get("schema");
+        final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
+        final String schema = schemaSyncCheckMap.get("schema");
         final String catalog = getSchemaSyncCheckDatabaseCatalog();
         return getDatabaseProperties().prepareMainUnifiedSchema(catalog, schema);
     }
 
     public String getSchemaSyncCheckDatabaseUser() {
-        final Map<String, String> dataXlsTemplateMap = getSchemaSyncCheckMap();
-        return dataXlsTemplateMap.get("user");
+        final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
+        return schemaSyncCheckMap.get("user");
     }
 
     public String getSchemaSyncCheckDatabasePassword() {
-        final Map<String, String> dataXlsTemplateMap = getSchemaSyncCheckMap();
-        final String password = dataXlsTemplateMap.get("password");
+        final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
+        final String password = schemaSyncCheckMap.get("password");
         return password != null ? password : "";
     }
 

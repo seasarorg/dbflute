@@ -206,10 +206,9 @@ public class UnifiedSchema {
                 return getPureSchema();
             }
         }
-        // additional drop or ReplaceSchema does not use this
-        // (it uses an own connection so it does not need to qualify names)
-        throwUnknownSchemaCannotUseSQLPrefixException();
-        return null; // unreachable
+        // basically no way but, for example,
+        // SchemaSyncCheck's target schema comes here to extract auto-increment info
+        return getCatalogSchema(); // as default
     }
 
     protected void throwUnknownSchemaCannotUseSQLPrefixException() {

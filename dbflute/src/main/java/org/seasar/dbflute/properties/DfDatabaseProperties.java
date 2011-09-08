@@ -73,19 +73,19 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         _catalogDone = true;
 
         final String catalog = _databaseInfo.getDatabaseCatalog(); // It's closet!
-        _mainCatalog = prepareMainCatalog(catalog);
+        _mainCatalog = prepareMainCatalog(catalog, getDatabaseUrl());
         return _mainCatalog;
     }
 
-    public String prepareMainCatalog(String catalog) {
+    public String prepareMainCatalog(String catalog, String url) {
         if (Srl.is_Null_or_TrimmedEmpty(catalog)) {
-            catalog = extractCatalogFromUrl(); // second way
+            catalog = extractCatalogFromUrl(url); // second way
         }
         return filterDatabaseCatalog(catalog);
     }
 
-    public String extractCatalogFromUrl() {
-        final DfUrlAnalyzerFactory factory = new DfUrlAnalyzerFactory(getBasicProperties(), getDatabaseUrl());
+    public String extractCatalogFromUrl(String url) {
+        final DfUrlAnalyzerFactory factory = new DfUrlAnalyzerFactory(getBasicProperties(), url);
         final DfUrlAnalyzer analyzer = factory.createAnalyzer();
         final String extracted = analyzer.extractCatalog();
         return Srl.is_NotNull_and_NotTrimmedEmpty(extracted) ? extracted : null;
