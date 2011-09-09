@@ -3,6 +3,7 @@ package org.seasar.dbflute.logic.jdbc.schemadiff;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -402,7 +403,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
 
         protected List<String> createCompareColumnList(Table main, Table target) {
-            final List<String> mainList = DfCollectionUtil.newArrayList();
+            // *uses LinkedList because the lists are removed so many times
+            final List<String> mainList = new LinkedList<String>();
             for (Column column : main.getColumnList()) {
                 final Column corresponding = target.getColumn(column.getName());
                 if (corresponding == null) {
