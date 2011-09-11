@@ -65,10 +65,9 @@ public class DfIncludeQueryInitializer {
             for (Entry<String, Map<String, List<String>>> ckeyEntry : ckeyMap.entrySet()) {
                 final String ckey = ckeyEntry.getKey();
                 Map<String, List<String>> tableColumnMap = ckeyEntry.getValue();
-                _log.info("    " + ckey);
                 final Set<String> tableElementKeySet = tableColumnMap.keySet();
+                _log.info("  " + ckey + " -> " + tableElementKeySet);
                 for (String tableName : tableElementKeySet) {
-                    _log.info("        " + tableName);
                     final boolean allTable = tableName.equalsIgnoreCase(allMark);
                     Table targetTable = null;
                     if (!allTable) {
@@ -85,7 +84,6 @@ public class DfIncludeQueryInitializer {
                         throwIncludeQueryNotListColumnSpecificationException(ckey, tableName, map, e);
                     }
                     for (String columnName : columnNameList) {
-                        _log.info("            " + columnName);
                         if (!allTable) {
                             if (!columnName.equalsIgnoreCase(commonColumnMark)
                                     && !columnName.equalsIgnoreCase(versionNoMark)) {

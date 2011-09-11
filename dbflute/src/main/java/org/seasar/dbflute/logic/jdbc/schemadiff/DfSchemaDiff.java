@@ -297,6 +297,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             processUnifiedSchema(next, previous, tableDiff);
             processObjectType(next, previous, tableDiff);
             processColumnDefOrder(next, previous, tableDiff);
+            processTableComment(next, previous, tableDiff);
 
             // nested attributes
             processColumn(tableDiff, next, previous);
