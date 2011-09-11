@@ -2,7 +2,7 @@
 # littleAdjustmentMap: (NotRequired - Default map:{})
 #
 # The various settings about a little adjustment.
-# 
+#
 # o isAvailableAddingSchemaToTableSqlName: (NotRequired - Default false)
 # o isAvailableAddingCatalogToTableSqlName: (NotRequired - Default false)
 # o isAvailableDatabaseDependency: (NotRequired - Default false)
@@ -27,7 +27,7 @@
 # o shortCharHandlingMode: (NotRequired - Default NONE)
 # o quoteTableNameList: (NotRequired - Default list:{})
 # o quoteColumnNameList: (NotRequired - Default list:{})
-# 
+#
 # *The line that starts with '#' means comment-out.
 #
 map:{

@@ -2,7 +2,7 @@
 # outsideSqlDefinitionMap: (NotRequired - Default map:{})
 #
 # The various settings about outsideSql. 
-# 
+#
 # o isGenerateProcedureParameterBean: (NotRequired - Default false)
 # o isGenerateProcedureCustomizeEntity: (NotRequired - Default false)
 # o targetProcedureCatalogList: (NotRequired - Default list:{})
@@ -17,7 +17,7 @@
 # o sql2EntityOutputDirectory: (NotRequired - Default generateOutputDirectory)
 # o applicationOutsideSqlMap: (NotRequired - Default map:{})
 # o sqlPackage: (NotRequired - Default all packages)
-# 
+#
 # *The line that starts with '#' means comment-out.
 #
 map:{

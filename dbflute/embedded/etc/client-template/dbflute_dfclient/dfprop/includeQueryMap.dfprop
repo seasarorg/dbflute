@@ -14,7 +14,7 @@
 #              , (and prefix '!' means excluding)
 # table: table name or $$ALL$$
 # column: column name (hint) or $$CommonColumn$$ or $$VersionNo$$
-# 
+#
 # Example:
 # map:{
 #     # This means that String includes GreaterThan at MEMBER.MEMBER_ACCOUNT only
@@ -31,7 +31,7 @@
 #         ; NotEqual = map:{}
 #     }
 # }
-# 
+#
 # *The line that starts with '#' means comment-out.
 #
 map:{
