@@ -311,8 +311,8 @@ public class DfPmbGenerationHandler {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public boolean hasPropertyOptionOriginalOnlyOneSetter(String className, String propertyName) {
-        return findPmbMetaData(className).hasPropertyOptionOriginalOnlyOneSetter(propertyName);
+    public boolean hasPropertyOptionOriginalOnlyOneSetter(String className, String propertyName, AppData schemaData) {
+        return findPmbMetaData(className).hasPropertyOptionOriginalOnlyOneSetter(propertyName, schemaData);
     }
 
     // -----------------------------------------------------
@@ -364,20 +364,24 @@ public class DfPmbGenerationHandler {
     // -----------------------------------------------------
     //                                        Classification
     //                                        --------------
-    public boolean isPropertyOptionClassificationSetter(String className, String propertyName, AppData schemaData) {
-        final DfPmbMetaData pmbMetaData = findPmbMetaData(className);
-        if (pmbMetaData.isPropertyTypeList(propertyName)) {
-            return false; // not prepare setters of classification
-        }
-        return pmbMetaData.isPropertyOptionClassification(propertyName, schemaData);
-    }
-
     public boolean isPropertyOptionClassification(String className, String propertyName, AppData schemaData) {
         return findPmbMetaData(className).isPropertyOptionClassification(propertyName, schemaData);
     }
 
+    public boolean isPropertyOptionClassificationFixedElement(String className, String propertyName) {
+        return findPmbMetaData(className).isPropertyOptionClassificationFixedElement(propertyName);
+    }
+
+    public boolean isPropertyOptionClassificationSetter(String className, String propertyName, AppData schemaData) {
+        return findPmbMetaData(className).isPropertyOptionClassificationSetter(propertyName, schemaData);
+    }
+
     public String getPropertyOptionClassificationName(String className, String propertyName, AppData schemaData) {
         return findPmbMetaData(className).getPropertyOptionClassificationName(propertyName, schemaData);
+    }
+
+    public String getPropertyOptionClassificationFixedElement(String className, String propertyName) {
+        return findPmbMetaData(className).getPropertyOptionClassificationFixedElement(propertyName);
     }
 
     public List<Map<String, String>> getPropertyOptionClassificationMapList(String className, String propertyName,

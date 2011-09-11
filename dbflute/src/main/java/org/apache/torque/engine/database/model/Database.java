@@ -526,7 +526,8 @@ public class Database {
     //                                                Option
     //                                                ------
     public boolean hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter(String className, String propertyName) {
-        return getPmbBasicHandler().hasPropertyOptionOriginalOnlyOneSetter(className, propertyName);
+        return getPmbBasicHandler().hasPropertyOptionOriginalOnlyOneSetter(className, propertyName,
+                _sql2entitySchemaData);
     }
 
     // -----------------------------------------------------
@@ -578,17 +579,25 @@ public class Database {
     // -----------------------------------------------------
     //                                 Option Classification
     //                                 ---------------------
+    public boolean isPmbMetaDataPropertyOptionClassification(String className, String propertyName) {
+        return getPmbBasicHandler().isPropertyOptionClassification(className, propertyName, _sql2entitySchemaData);
+    }
+
     public boolean isPmbMetaDataPropertyOptionClassificationSetter(String className, String propertyName) {
         return getPmbBasicHandler()
                 .isPropertyOptionClassificationSetter(className, propertyName, _sql2entitySchemaData);
     }
 
-    public boolean isPmbMetaDataPropertyOptionClassification(String className, String propertyName) {
-        return getPmbBasicHandler().isPropertyOptionClassification(className, propertyName, _sql2entitySchemaData);
+    public boolean isPmbMetaDataPropertyOptionClassificationFixedElement(String className, String propertyName) {
+        return getPmbBasicHandler().isPropertyOptionClassificationFixedElement(className, propertyName);
     }
 
     public String getPmbMetaDataPropertyOptionClassificationName(String className, String propertyName) {
         return getPmbBasicHandler().getPropertyOptionClassificationName(className, propertyName, _sql2entitySchemaData);
+    }
+
+    public String getPmbMetaDataPropertyOptionClassificationFixedElement(String className, String propertyName) {
+        return getPmbBasicHandler().getPropertyOptionClassificationFixedElement(className, propertyName);
     }
 
     protected String getPmbMetaDataPropertyOptionClassificationCodeType(String className, String propertyName) {

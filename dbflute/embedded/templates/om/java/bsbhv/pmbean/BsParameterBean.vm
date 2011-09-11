@@ -114,12 +114,12 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #end
 #if ($database.needsPmbMetaDataProcedureParameterOracleArrayHandling($pmbClassName, $propertyName))
     public static final ValueType ${annotationPropName}_VALUE_TYPE
-            = new ${glPackageBaseCommon}.${glDBFluteConfig}.ImplementedOracleArrayType
+            = new ${glDBFluteConfig}.ImplementedOracleArrayType
                   ("${database.getPmbMetaDataProcedureParameterOracleArrayTypeName($pmbClassName, $propertyName)}", ${database.getPmbMetaDataProcedureParameterOracleArrayElementJavaNativeTypeLiteral($pmbClassName, $propertyName)});
 #end
 #if ($database.needsPmbMetaDataProcedureParameterOracleStructHandling($pmbClassName, $propertyName))
     public static final ValueType ${annotationPropName}_VALUE_TYPE
-            = new ${glPackageBaseCommon}.${glDBFluteConfig}.ImplementedOracleStructType
+            = new ${glDBFluteConfig}.ImplementedOracleStructType
                   ("${database.getPmbMetaDataProcedureParameterOracleStructTypeName($pmbClassName, $propertyName)}", ${database.getPmbMetaDataProcedureParameterOracleStructEntityTypeTypeLiteral($pmbClassName, $propertyName)});
 #end
 #end
@@ -131,9 +131,25 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionClassificationFixedElement($pmbClassName, $propertyName))
+#set ($classificationName = $database.getPmbMetaDataPropertyOptionClassificationName($pmbClassName, $propertyName))
+#set ($fixedElement = $database.getPmbMetaDataPropertyOptionClassificationFixedElement($pmbClassName, $propertyName))
+    /** The parameter of ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}. */
+#if ($database.isPmbMetaDataPropertyJavaNativeNumberObject($pmbClassName, $propertyName))
+    protected ${propertyType} ${variableName} = toNumber(${glCDef}.${classificationName}.${fixedElement}.code(), ${propertyType}.class);
+
+#elseif ($database.isPmbMetaDataPropertyJavaNativeBooleanObject($pmbClassName, $propertyName))
+    protected ${propertyType} ${variableName} = toBoolean(${glCDef}.${classificationName}.${fixedElement}.code());
+
+#else
+    protected ${propertyType} ${variableName} = ${glCDef}.${classificationName}.${fixedElement}.code();
+
+#end
+#else
     /** The parameter of ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}. */
     protected ${propertyType} ${variableName};
 
+#end
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
     /** The option of like-search for ${propertyName}. */
     protected LikeSearchOption ${variableName}InternalLikeSearchOption;
@@ -499,11 +515,11 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
 #if ($database.isPmbMetaDataPropertyJavaNativeNumberObject($pmbClassName, $propertyName))
-        ${variableName} = toNumber(${glPackageBaseCommon}.${glCDef}.${classificationName}.${classificationMap.get('name')}.code(), ${propertyType}.class);
+        ${variableName} = toNumber(${glCDef}.${classificationName}.${classificationMap.get('name')}.code(), ${propertyType}.class);
 #elseif ($database.isPmbMetaDataPropertyJavaNativeBooleanObject($pmbClassName, $propertyName))
-        ${variableName} = toBoolean(${glPackageBaseCommon}.${glCDef}.${classificationName}.${classificationMap.get('name')}.code());
+        ${variableName} = toBoolean(${glCDef}.${classificationName}.${classificationMap.get('name')}.code());
 #else
-        ${variableName} = ${glPackageBaseCommon}.${glCDef}.${classificationName}.${classificationMap.get('name')}.code();
+        ${variableName} = ${glCDef}.${classificationName}.${classificationMap.get('name')}.code();
 #end
     }
 #end

@@ -35,6 +35,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -72,6 +73,13 @@ public class DfPmbMetaData {
     protected Map<String, DfProcedureColumnMeta> _propertyNameColumnInfoMap;
     protected boolean _procedureCalledBySelect;
     protected boolean _procedureRefCustomizeEntity;
+
+    // -----------------------------------------------------
+    //                                          Option Cache
+    //                                          ------------
+    protected final Map<String, DfPmbPropertyOptionClassification> _optionClsMap = DfCollectionUtil.newHashMap();
+    protected final Map<String, DfPmbPropertyOptionComment> _optionCommentMap = DfCollectionUtil.newHashMap();
+    protected final Map<String, DfPmbPropertyOptionReference> _optionRefMap = DfCollectionUtil.newHashMap();
 
     // -----------------------------------------------------
     //                                         Assist Helper
@@ -373,8 +381,22 @@ public class DfPmbMetaData {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public boolean hasPropertyOptionOriginalOnlyOneSetter(String propertyName) {
-        return hasPropertyOptionAnyLikeSearch(propertyName) || hasPropertyOptionAnyFromTo(propertyName);
+    public boolean hasPropertyOptionOriginalOnlyOneSetter(String propertyName, AppData schemaData) {
+        if (hasPropertyOptionAnyLikeSearch(propertyName)) {
+            return true;
+        }
+        if (hasPropertyOptionAnyFromTo(propertyName)) {
+            return true;
+        }
+        if (isPropertyOptionClassification(propertyName, schemaData)) {
+            if (getLittleAdjustmentProperties().isForceClassificationSetting()) {
+                return true;
+            }
+        }
+        if (isPropertyOptionClassificationFixedElement(propertyName)) {
+            return true;
+        }
+        return false;
     }
 
     // -----------------------------------------------------
@@ -439,7 +461,7 @@ public class DfPmbMetaData {
     // -----------------------------------------------------
     //                                        Classification
     //                                        --------------
-    public boolean isPropertyOptionClassification(String propertyName, AppData schemaData) {
+    public boolean isPropertyOptionClassification(String propertyName, AppData schemaData) { // :cls(...) or :ref(...)
         if (isPropertyOptionSpecifiedClassification(propertyName)) {
             return true;
         }
@@ -447,26 +469,50 @@ public class DfPmbMetaData {
         return column != null && column.hasClassification();
     }
 
-    protected boolean isPropertyOptionSpecifiedClassification(String propertyName) {
+    protected boolean isPropertyOptionSpecifiedClassification(String propertyName) { // :cls(Foo)
         final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
-        return obj.isPmbMetaDataPropertyOptionClassification();
+        return obj.isPropertyOptionSpecifiedClassification();
+    }
+
+    public boolean isPropertyOptionClassificationFixedElement(String propertyName) { // :cls(Foo.Bar)
+        final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
+        return obj.isPropertyOptionClassificationFixedElement();
+    }
+
+    public boolean isPropertyOptionClassificationSetter(String propertyName, AppData schemaData) {
+        if (isPropertyTypeList(propertyName)) {
+            return false; // not prepare setters of classification
+        }
+        if (isPropertyOptionClassificationFixedElement(propertyName)) {
+            return false;
+        }
+        return isPropertyOptionClassification(propertyName, schemaData);
     }
 
     public String getPropertyOptionClassificationName(String propertyName, AppData schemaData) {
         // should be called when it has classification
         if (isPropertyOptionSpecifiedClassification(propertyName)) {
             final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
-            return obj.getPmbMetaDataPropertyOptionClassificationName();
+            return obj.getPropertyOptionClassificationName();
         }
         final Column column = getPropertyOptionClassificationColumn(propertyName, schemaData);
         return column.getClassificationName();
+    }
+
+    public String getPropertyOptionClassificationFixedElement(String propertyName) {
+        // should be called when it has classification
+        if (isPropertyOptionClassificationFixedElement(propertyName)) {
+            final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
+            return obj.getPropertyOptionClassificationFixedElement();
+        }
+        return null;
     }
 
     public List<Map<String, String>> getPropertyOptionClassificationMapList(String propertyName, AppData schemaData) {
         // should be called when it has classification
         if (isPropertyOptionSpecifiedClassification(propertyName)) {
             final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
-            return obj.getPmbMetaDataPropertyOptionClassificationMapList();
+            return obj.getPropertyOptionClassificationMapList();
         }
         final Column column = getPropertyOptionClassificationColumn(propertyName, schemaData);
         return column.getClassificationMapList();
@@ -485,6 +531,19 @@ public class DfPmbMetaData {
             throw new IllegalStateException(msg);
         }
         return column;
+    }
+
+    // -----------------------------------------------------
+    //                                               Comment
+    //                                               -------
+    public boolean hasPropertyOptionComment(String propertyName) {
+        final DfPmbPropertyOptionComment obj = createPropertyOptionComment(propertyName);
+        return obj.hasPmbMetaDataPropertyOptionComment();
+    }
+
+    public String getPropertyOptionComment(String propertyName) {
+        final DfPmbPropertyOptionComment obj = createPropertyOptionComment(propertyName);
+        return obj.extractCommentFromOption(propertyName);
     }
 
     // -----------------------------------------------------
@@ -533,19 +592,6 @@ public class DfPmbMetaData {
     protected Column getPropertyOptionReferenceColumn(String propertyName, AppData schemaData) {
         final DfPmbPropertyOptionReference reference = createPropertyOptionReference(propertyName);
         return reference.getPmbMetaDataPropertyOptionReferenceColumn(schemaData);
-    }
-
-    // -----------------------------------------------------
-    //                                               Comment
-    //                                               -------
-    public boolean hasPropertyOptionComment(String propertyName) {
-        final DfPmbPropertyOptionComment obj = createPropertyOptionComment(propertyName);
-        return obj.hasPmbMetaDataPropertyOptionComment();
-    }
-
-    public String getPropertyOptionComment(String propertyName) {
-        final DfPmbPropertyOptionComment obj = createPropertyOptionComment(propertyName);
-        return obj.extractCommentFromOption(propertyName);
     }
 
     // -----------------------------------------------------
@@ -611,19 +657,37 @@ public class DfPmbMetaData {
     }
 
     protected DfPmbPropertyOptionClassification createPropertyOptionClassification(String propertyName) {
+        DfPmbPropertyOptionClassification optionClassification = _optionClsMap.get(propertyName);
+        if (optionClassification != null) {
+            return optionClassification;
+        }
         final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(propertyName);
         final DfClassificationProperties clsProp = getClassificationProperties();
-        return new DfPmbPropertyOptionClassification(this, propertyName, clsProp, finder);
-    }
-
-    protected DfPmbPropertyOptionReference createPropertyOptionReference(String propertyName) {
-        final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(propertyName);
-        return new DfPmbPropertyOptionReference(this, propertyName, finder);
+        optionClassification = new DfPmbPropertyOptionClassification(this, propertyName, clsProp, finder);
+        _optionClsMap.put(propertyName, optionClassification);
+        return _optionClsMap.get(propertyName);
     }
 
     protected DfPmbPropertyOptionComment createPropertyOptionComment(String propertyName) {
+        DfPmbPropertyOptionComment optionClassification = _optionCommentMap.get(propertyName);
+        if (optionClassification != null) {
+            return optionClassification;
+        }
         final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(propertyName);
-        return new DfPmbPropertyOptionComment(this, propertyName, finder);
+        optionClassification = new DfPmbPropertyOptionComment(this, propertyName, finder);
+        _optionCommentMap.put(propertyName, optionClassification);
+        return _optionCommentMap.get(propertyName);
+    }
+
+    protected DfPmbPropertyOptionReference createPropertyOptionReference(String propertyName) {
+        DfPmbPropertyOptionReference optionClassification = _optionRefMap.get(propertyName);
+        if (optionClassification != null) {
+            return optionClassification;
+        }
+        final DfPmbPropertyOptionFinder finder = createPropertyOptionFinder(propertyName);
+        optionClassification = new DfPmbPropertyOptionReference(this, propertyName, finder);
+        _optionRefMap.put(propertyName, optionClassification);
+        return _optionRefMap.get(propertyName);
     }
 
     protected String findPropertyOption(String propertyName) {
