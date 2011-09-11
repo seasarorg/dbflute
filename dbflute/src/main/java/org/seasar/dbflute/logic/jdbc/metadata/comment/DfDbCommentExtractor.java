@@ -23,67 +23,66 @@ import java.util.Set;
  */
 public interface DfDbCommentExtractor {
 
-    public Map<String, UserTabComments> extractTableComment(Set<String> tableSet);
+    Map<String, UserTabComments> extractTableComment(Set<String> tableSet);
 
-    public Map<String, Map<String, UserColComments>> extractColumnComment(Set<String> tableSet);
+    Map<String, Map<String, UserColComments>> extractColumnComment(Set<String> tableSet);
 
     public static class UserTabComments {
-        protected String tableName;
-        protected String comments;
+        protected String _tableName;
+        protected String _comments;
 
         public boolean hasComments() {
-            return comments != null && comments.trim().length() > 0;
+            return _comments != null && _comments.trim().length() > 0;
         }
 
         public String getTableName() {
-            return tableName;
+            return _tableName;
         }
 
         public void setTableName(String tableName) {
-            this.tableName = tableName;
+            this._tableName = tableName;
         }
 
         public String getComments() {
-            return comments;
+            return _comments;
         }
 
         public void setComments(String comments) {
-            this.comments = comments;
+            this._comments = comments;
         }
     }
 
     public static class UserColComments {
-        protected String tableName;
-        protected String columnName;
-        protected String comments;
+        protected String _tableName;
+        protected String _columnName;
+        protected String _comments;
 
         public boolean hasComments() {
-            return comments != null && comments.trim().length() > 0;
+            return _comments != null && _comments.trim().length() > 0;
         }
 
         public String getTableName() {
-            return tableName;
+            return _tableName;
         }
 
         public void setTableName(String tableName) {
-            this.tableName = tableName;
+            this._tableName = tableName;
         }
 
         public String getColumnName() {
-            return columnName;
+            return _columnName;
         }
 
         public void setColumnName(String columnName) {
-            this.columnName = columnName;
+            this._columnName = columnName;
         }
 
         public String getComments() {
-            return comments;
+            return _comments;
         }
 
         public void setComments(String comments) {
-            this.comments = comments;
+            this._comments = comments;
         }
     }
-
 }

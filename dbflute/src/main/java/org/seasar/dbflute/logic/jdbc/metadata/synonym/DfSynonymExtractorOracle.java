@@ -415,20 +415,17 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
      * @param synonymMap The map of synonym. (NotNull)
      */
     protected void setupTableColumnComment(Map<String, DfSynonymMeta> synonymMap) {
-        final Map<String, Set<String>> ownerTabSetMap = createOwnerTableSetMap(synonymMap);
-        final Map<String, Map<String, UserTabComments>> ownerTabCommentMap = DfCollectionUtil.newLinkedHashMap();
-        final Map<String, Map<String, Map<String, UserColComments>>> ownerTabColCommentMap = DfCollectionUtil
-                .newLinkedHashMap();
-        final Set<String> ownerSet = ownerTabSetMap.keySet();
-        for (String owner : ownerSet) {
+        final Map<UnifiedSchema, Set<String>> ownerTabSetMap = createOwnerTableSetMap(synonymMap);
+        final Map<UnifiedSchema, Map<String, UserTabComments>> ownerTabCommentMap = newLinkedHashMap();
+        final Map<UnifiedSchema, Map<String, Map<String, UserColComments>>> ownerTabColCommentMap = newLinkedHashMap();
+        for (UnifiedSchema owner : ownerTabSetMap.keySet()) {
             final Set<String> tableSet = ownerTabSetMap.get(owner);
-            final DfDbCommentExtractorOracle extractor = createDbCommentExtractor(createAsDynamicSchema(null, owner));
+            final DfDbCommentExtractorOracle extractor = createDbCommentExtractor(owner);
             final Map<String, UserTabComments> tabCommentMap = extractor.extractTableComment(tableSet);
             final Map<String, Map<String, UserColComments>> tabColCommentMap = extractor.extractColumnComment(tableSet);
             ownerTabCommentMap.put(owner, tabCommentMap);
             ownerTabColCommentMap.put(owner, tabColCommentMap);
         }
-
         for (DfSynonymMeta synonym : synonymMap.values()) {
             final UnifiedSchema owner = synonym.getTableOwner();
             final String tableName = synonym.getTableName();
@@ -456,8 +453,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         return extractor;
     }
 
-    protected Map<String, Set<String>> createOwnerTableSetMap(Map<String, DfSynonymMeta> synonymMap) {
-        final Map<String, Set<String>> ownerTabSetMap = new LinkedHashMap<String, Set<String>>();
+    protected Map<UnifiedSchema, Set<String>> createOwnerTableSetMap(Map<String, DfSynonymMeta> synonymMap) {
+        final Map<UnifiedSchema, Set<String>> ownerTabSetMap = newLinkedHashMap();
         for (DfSynonymMeta synonym : synonymMap.values()) {
             final UnifiedSchema owner = synonym.getTableOwner();
             if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
@@ -466,7 +463,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             Set<String> tableSet = ownerTabSetMap.get(owner);
             if (tableSet == null) {
                 tableSet = new LinkedHashSet<String>();
-                ownerTabSetMap.put(owner.getPureSchema(), tableSet);
+                ownerTabSetMap.put(owner, tableSet);
             }
             tableSet.add(synonym.getTableName());
         }
@@ -602,6 +599,13 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
+        return DfCollectionUtil.newLinkedHashMap();
     }
 
     // ===================================================================================
