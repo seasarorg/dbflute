@@ -2,7 +2,7 @@
 # replaceSchemaDefinitionMap: (NotRequired - Default map:{})
 #
 # The various settings about replace-schema.
-# 
+#
 # o repsEnvType: (NotRequired - Default inherits or 'ut')
 # o isLoggingInsertSql: (NotRequired - Default true)
 # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
@@ -22,7 +22,7 @@
 # o isSuppressDropSequence: (NotRequired - Default false)
 # o isSuppressDropProcedure: (NotRequired - Default false)
 # o isSuppressDropDBLink: (NotRequired - Default false)
-# 
+#
 # *The line that starts with '#' means comment-out.
 #
 map:{
@@ -86,7 +86,7 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o filterVariablesMap: (NotRequired - Default map:{})
     #  You can specify the filter variables for DDL.
-    # 
+    #
     #; filterVariablesMap = map:{abc=AAA}
     # - - - - - - - - - -/
 
@@ -168,42 +168,42 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressTruncateTable: (NotRequired - Default false)
     #  You can suppress truncating tables at initializing schema.
-    # 
+    #
     #; isSuppressTruncateTable = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropForeignKey: (NotRequired - Default false)
     #  You can suppress dropping foreign keys at initializing schema.
-    # 
+    #
     #; isSuppressDropForeignKey = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropTable: (NotRequired - Default false)
     #  You can suppress dropping tables at initializing schema.
-    # 
+    #
     #; isSuppressDropTable = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropSequence: (NotRequired - Default false)
     #  You can suppress dropping sequences at initializing schema.
-    # 
+    #
     #; isSuppressDropSequence = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropProcedure: (NotRequired - Default false)
     #  You can suppress dropping procedures at initializing schema.
-    # 
+    #
     #; isSuppressDropProcedure = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropDBLink: (NotRequired - Default false)
     #  You can suppress dropping DB links at initializing schema.
-    # 
+    #
     #; isSuppressDropDBLink = false
     # - - - - - - - - - -/
 }

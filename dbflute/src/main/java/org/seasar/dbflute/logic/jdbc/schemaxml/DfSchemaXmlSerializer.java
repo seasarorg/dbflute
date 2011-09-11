@@ -128,9 +128,13 @@ public class DfSchemaXmlSerializer {
         _schemaXml = schemaXml;
         _historyFile = historyFile;
         _schemaDiff = DfSchemaDiff.createAsFlexible(schemaXml);
+
+        // all diff processes are depends on the DBFlute property
         if (getDocumentProperties().isCheckColumnDefOrderDiff()) {
-            // all diff process are depends on the DBFlute property
             _schemaDiff.checkColumnDefOrder();
+        }
+        if (getDocumentProperties().isCheckDbCommentDiff()) {
+            _schemaDiff.checkDbComment();
         }
     }
 

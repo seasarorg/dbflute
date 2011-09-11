@@ -141,6 +141,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                Option
     //                                                ------
     protected boolean _checkColumnDefOrder; // depends on DBFlute property
+    protected boolean _checkDbComment; // depends on DBFlute property
     protected boolean _suppressUnifiedSchema; // basically for SchemaSyncCheck
 
     // -----------------------------------------------------
@@ -456,6 +457,21 @@ public class DfSchemaDiff extends DfAbstractDiff {
         }
     }
 
+    protected void processTableComment(Table next, Table previous, DfTableDiff tableDiff) {
+        if (!_checkDbComment) {
+            return;
+        }
+        diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
+            public String provide(Table obj) {
+                return obj.getComment();
+            }
+
+            public void diff(DfTableDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setTableCommentDiff(nextPreviousDiff);
+            }
+        });
+    }
+
     protected <TYPE> void diffNextPrevious(Table next, Table previous, DfTableDiff diff,
             NextPreviousDiffer<Table, DfTableDiff, TYPE> differ) {
         final TYPE nextValue = differ.provide(next);
@@ -524,69 +540,105 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             // found
             final DfColumnDiff columnDiff = DfColumnDiff.createChanged(next.getName());
-            diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
-                public String provide(Column obj) {
-                    return obj.getDbType();
-                }
-
-                public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setDbTypeDiff(nextPreviousDiff);
-                }
-            });
-            diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
-                public String provide(Column obj) {
-                    return obj.getColumnSize();
-                }
-
-                public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setColumnSizeDiff(nextPreviousDiff);
-                }
-            });
-            diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
-                public String provide(Column obj) {
-                    return obj.getDefaultValue();
-                }
-
-                @Override
-                public boolean isMatch(String next, String previous) {
-                    if (super.isMatch(next, previous)) {
-                        return true;
-                    }
-                    final boolean bothValid = next != null && previous != null;
-                    if (bothValid && isDatabaseH2()) {
-                        if (Srl.hasKeywordAllIgnoreCase("SYSTEM_SEQUENCE", next, previous)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-
-                public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setDefaultValueDiff(nextPreviousDiff);
-                }
-            });
-            diffNextPrevious(next, previous, columnDiff, new BooleanNextPreviousDiffer<Column, DfColumnDiff>() {
-                public Boolean provide(Column obj) {
-                    return obj.isNotNull();
-                }
-
-                public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setNotNullDiff(nextPreviousDiff);
-                }
-            });
-            diffNextPrevious(next, previous, columnDiff, new BooleanNextPreviousDiffer<Column, DfColumnDiff>() {
-                public Boolean provide(Column obj) {
-                    return obj.isAutoIncrement();
-                }
-
-                public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                    diff.setAutoIncrementDiff(nextPreviousDiff);
-                }
-            });
+            processDbType(next, previous, columnDiff);
+            processColumnSize(next, previous, columnDiff);
+            processDefaultValue(next, previous, columnDiff);
+            processNotNull(next, previous, columnDiff);
+            processAutoIncrement(next, previous, columnDiff);
+            processColumnComment(next, previous, columnDiff);
             if (columnDiff.hasDiff()) { // changed
                 tableDiff.addColumnDiff(columnDiff);
             }
         }
+    }
+
+    protected void processDbType(Column next, Column previous, DfColumnDiff columnDiff) {
+        diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
+            public String provide(Column obj) {
+                return obj.getDbType();
+            }
+
+            public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setDbTypeDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processColumnSize(Column next, Column previous, DfColumnDiff columnDiff) {
+        diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
+            public String provide(Column obj) {
+                return obj.getColumnSize();
+            }
+
+            public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setColumnSizeDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processDefaultValue(Column next, Column previous, DfColumnDiff columnDiff) {
+        diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
+            public String provide(Column obj) {
+                return obj.getDefaultValue();
+            }
+
+            @Override
+            public boolean isMatch(String next, String previous) {
+                if (super.isMatch(next, previous)) {
+                    return true;
+                }
+                final boolean bothValid = next != null && previous != null;
+                if (bothValid && isDatabaseH2()) {
+                    if (Srl.hasKeywordAllIgnoreCase("SYSTEM_SEQUENCE", next, previous)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setDefaultValueDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processNotNull(Column next, Column previous, DfColumnDiff columnDiff) {
+        diffNextPrevious(next, previous, columnDiff, new BooleanNextPreviousDiffer<Column, DfColumnDiff>() {
+            public Boolean provide(Column obj) {
+                return obj.isNotNull();
+            }
+
+            public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setNotNullDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processAutoIncrement(Column next, Column previous, DfColumnDiff columnDiff) {
+        diffNextPrevious(next, previous, columnDiff, new BooleanNextPreviousDiffer<Column, DfColumnDiff>() {
+            public Boolean provide(Column obj) {
+                return obj.isAutoIncrement();
+            }
+
+            public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setAutoIncrementDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processColumnComment(Column next, Column previous, DfColumnDiff columnDiff) {
+        if (!_checkDbComment) {
+            return;
+        }
+        diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
+            public String provide(Column obj) {
+                return obj.getComment();
+            }
+
+            public void diff(DfColumnDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setColumnCommentDiff(nextPreviousDiff);
+            }
+        });
     }
 
     protected <ITEM, TYPE> void diffNextPrevious(Column next, Column previous, DfColumnDiff diff,
@@ -1153,6 +1205,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                              ======
     public void checkColumnDefOrder() {
         _checkColumnDefOrder = true;
+    }
+
+    public void checkDbComment() {
+        _checkDbComment = true;
     }
 
     public void suppressUnifiedSchema() {

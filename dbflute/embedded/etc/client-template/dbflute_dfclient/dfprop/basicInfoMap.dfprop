@@ -3,13 +3,13 @@
 #
 # The basic information for the tasks of DBFlute.
 # You should specify before your first generating.
-# 
+#
 # Core Properties:
 # o database: (Required)
 # o targetLanguage: (Required)
 # o targetContainer: (Required)
 # o packageBase: (Required)
-# 
+#
 # Adjustment Properties:
 # o generateOutputDirectory: (NotRequired - Default Java:'../src/main/java' CSharp:'../source')
 # o resourceOutputDirectory: (NotRequired - Default '../resources')
@@ -20,7 +20,7 @@
 # o sourceFileEncoding: (NotRequired - Default 'UTF-8')
 # o applicationBehaviorMap: (NotRequired - Default map:{})
 # o outputPackageAdjustmentMap: (NotRequired - Default map:{})
-# 
+#
 # *The line that starts with '#' means comment-out.
 #
 map:{
@@ -32,7 +32,7 @@ map:{
     #
     #    mysql, postgresql, oracle, db2, mssql,
     #    h2, derby, (sqlite, msaccess)
-    # 
+    #
     ; database = h2
     # - - - - - - - - - -/
 
@@ -40,9 +40,9 @@ map:{
     # o targetLanguage: (Required)
     #  The target language.
     #  Your possible choices are:
-    # 
+    #
     #       java, csharp
-    # 
+    #
     ; targetLanguage = java
     # - - - - - - - - - -/
 
@@ -51,9 +51,9 @@ map:{
     #  The target DI container.
     #  If your target language is 'csharp', you can specify 'seasar' only.
     #  Your possible choices are:
-    # 
+    #
     #       seasar, spring, guice, lucy, cdi
-    # 
+    #
     ; targetContainer = seasar
     # - - - - - - - - - -/
 
@@ -123,7 +123,7 @@ map:{
     #    [true]
     #      The table name is camel case.
     #      e.g. If the table name is 'OrderDetail', the class name is 'OrderDetail'.
-    # 
+    #
     #    [false]
     #      e.g. If the table name is 'ORDER_DETAIL', the class name is 'OrderDetail'.
     #      e.g. If the table name is 'OrderDetail', the class name is 'Orderdetail'.
@@ -138,7 +138,7 @@ map:{
     #    [true]
     #      The column name is camel case.
     #      e.g. If the column name is 'OrderDetailId', the class name is 'OrderDetailId'.
-    # 
+    #
     #    [false]
     #      e.g. If the column name is 'ORDER_DETAIL_ID', the class name is 'OrderDetailId'.
     #      e.g. If the column name is 'OrderDetailId',  the class name is 'Orderdetailid'.
@@ -150,7 +150,7 @@ map:{
     # o projectPrefix: (NotRequired - Default '')
     #  If the value is 'Ld', all class names are 'LdXxx'.
     #  Basically you don't need this if you don't want the common prefix of class name.
-    # 
+    #
     #; projectPrefix = Ld
     # - - - - - - - - - -/
 
@@ -158,7 +158,7 @@ map:{
     # o classAuthor: (NotRequired - Default 'DBFlute(AutoGenerator)')
     #  The value of the author tag in java-doc of generated classes.
     #  All classes are target.
-    # 
+    #
     # @JavaOnly
     #; classAuthor = DBFlute(AutoGenerator)
     # - - - - - - - - - -/
@@ -167,7 +167,7 @@ map:{
     # o sourceFileEncoding: (NotRequired - Default 'UTF-8')
     #  The value of an encoding for source files that are generated classes.
     #  If source files of your project are not UTF-8, specify your encoding here.
-    # 
+    #
     #; sourceFileEncoding = UTF-8
     # - - - - - - - - - -/
 

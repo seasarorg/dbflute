@@ -251,8 +251,14 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return getProperty("historyHtmlFileName", defaultName, getDocumentDefinitionMap());
     }
 
-    public boolean isCheckColumnDefOrderDiff() { // related to HistoryHTML, SchemaSyncCheck, AlterCheck, ...
+    // options below are related to HistoryHTML, SchemaSyncCheck, AlterCheck, ...
+
+    public boolean isCheckColumnDefOrderDiff() {
         return isProperty("isCheckColumnDefOrderDiff", false, getDocumentDefinitionMap());
+    }
+
+    public boolean isCheckDbCommentDiff() {
+        return isProperty("isCheckDbCommentDiff", false, getDocumentDefinitionMap());
     }
 
     // ===================================================================================

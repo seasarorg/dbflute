@@ -10,9 +10,10 @@
 # o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)
 # o historyHtmlFileName (NotRequired - Default 'history-[project-name].html')
 # o isCheckColumnDefOrderDiff (NotRequired - Default false)
+# o isCheckDbCommentDiff (NotRequired - Default false)
 # o loadDataReverseMap (NotRequired - Default map:{})
 # o schemaSyncCheckMap (NotRequired - Default map:{})
-# 
+#
 # Example:
 # map:{
 #     ; documentOutputDirectory = ./output/doc
@@ -24,6 +25,7 @@
 #     ; isSuppressSchemaHtmlOutsideSql = false
 #     ; historyHtmlFileName = xxx.html
 #     ; isCheckColumnDefOrderDiff = true
+#     ; isCheckDbCommentDiff = true
 #     ; loadDataReverseMap = map:{
 #         ; recordLimit = 10
 #         ; isContainsCommonColumn = false
@@ -45,7 +47,7 @@ map:{
     #  The output directory mainly for SchemaHtml and DataXlsTemplate.
     #  Basically you don't need this.
     #  It is considered of value that it always exists at same plain.
-    # 
+    #
     #; documentOutputDirectory = ./output/doc
     # - - - - - - - - - -/
 
@@ -57,7 +59,7 @@ map:{
     #  DB comment which does not have the delimiter is not treated
     #  as alias, treated as description (real comment).
     #  But you can change it by 'isDbCommentOnAliasBasis'.
-    # 
+    #
     #; aliasDelimiterInDbComment = :
     # - - - - - - - - - -/
 
@@ -66,21 +68,21 @@ map:{
     #  Is DB comment on alias basis?
     #  (Is DB comment alias name when it has no alias delimiter?)
     #  This property works with 'aliasDelimiterInDbComment'.
-    # 
+    #
     #; isDbCommentOnAliasBasis = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isEntityJavaDocDbCommentValid (NotRequired - Default false)
     #  Does it allow DB comment to be on java-doc?
-    # 
+    #
     #; isEntityJavaDocDbCommentValid = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isEntityDBMetaDbCommentValid (NotRequired - Default false)
     #  Does it allow DB comment to be on DB meta of entity?
-    # 
+    #
     #; isEntityDBMetaDbCommentValid = false
     # - - - - - - - - - -/
 
@@ -89,7 +91,7 @@ map:{
     #  The file name (not contain path) of SchemaHtml.
     #  Basically you don't need this.
     #  (For example, when you use Application Behavior, you need this)
-    # 
+    #
     #; schemaHtmlFileName = xxx.html
     # - - - - - - - - - -/
 
@@ -98,7 +100,7 @@ map:{
     #  Does it remove outsideSql information from SchemaHtml?
     #  Basically you don't need this.
     #  OutsideSql information (related to tables) is very useful.
-    # 
+    #
     #; isSuppressSchemaHtmlOutsideSql = false
     # - - - - - - - - - -/
 
@@ -107,16 +109,23 @@ map:{
     #  The file name (not contain path) of HistoryHtml.
     #  Basically you don't need this.
     #  (For example, when you use Application Behavior, you need this)
-    # 
+    #
     #; historyHtmlFileName = xxx.html
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isCheckColumnDefOrderDiff (NotRequired - Default false)
-    #  Does it check column-def order history?
+    #  Does it check differences of column-def order?
     #  (except added or deleted columns)
-    # 
+    #
     #; isCheckColumnDefOrderDiff = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isCheckDbCommentDiff (NotRequired - Default false)
+    #  Does it check differences of table or column comment?
+    #
+    #; isCheckDbCommentDiff = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

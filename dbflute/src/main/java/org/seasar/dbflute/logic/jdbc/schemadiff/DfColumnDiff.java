@@ -28,6 +28,7 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
     protected DfNextPreviousDiff _defaultValueDiff;
     protected DfNextPreviousDiff _notNullDiff;
     protected DfNextPreviousDiff _autoIncrementDiff;
+    protected DfNextPreviousDiff _columnCommentDiff;
 
     protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
@@ -114,6 +115,23 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
 
             public void restore(Map<String, Object> columnDiffMap) {
                 _autoIncrementDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
+            }
+        });
+        _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Column Comment";
+            }
+
+            public String propertyName() {
+                return "columnCommentDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _columnCommentDiff;
+            }
+
+            public void restore(Map<String, Object> columnDiffMap) {
+                _columnCommentDiff = restoreNextPreviousDiff(columnDiffMap, propertyName());
             }
         });
     }
@@ -308,5 +326,17 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
 
     public void setAutoIncrementDiff(DfNextPreviousDiff autoIncrementDiff) {
         _autoIncrementDiff = autoIncrementDiff;
+    }
+
+    public boolean hasColumnCommentDiff() {
+        return _columnCommentDiff != null;
+    }
+
+    public DfNextPreviousDiff getColumnCommentDiff() {
+        return _columnCommentDiff;
+    }
+
+    public void setColumnCommentDiff(DfNextPreviousDiff columnCommentDiff) {
+        _columnCommentDiff = columnCommentDiff;
     }
 }

@@ -26,6 +26,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
     protected DfNextPreviousDiff _unifiedSchemaDiff;
     protected DfNextPreviousDiff _objectTypeDiff;
     protected DfNextPreviousDiff _columnDefOrderDiff;
+    protected DfNextPreviousDiff _tableCommentDiff;
 
     protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
@@ -78,6 +79,23 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
 
             public void restore(Map<String, Object> tableDiffMap) {
                 _columnDefOrderDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
+            }
+        });
+        _nextPreviousItemList.add(new NextPreviousHandler() {
+            public String titleName() {
+                return "Table Comment";
+            }
+
+            public String propertyName() {
+                return "tableCommentDiff";
+            }
+
+            public DfNextPreviousDiff provide() {
+                return _tableCommentDiff;
+            }
+
+            public void restore(Map<String, Object> tableDiffMap) {
+                _tableCommentDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
             }
         });
     }
@@ -387,6 +405,18 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
 
     public void setColumnDefOrderDiff(DfNextPreviousDiff columnDefOrderDiff) {
         _columnDefOrderDiff = columnDefOrderDiff;
+    }
+
+    public boolean hasTableCommentDiff() {
+        return _tableCommentDiff != null;
+    }
+
+    public DfNextPreviousDiff getTableCommentDiff() {
+        return _tableCommentDiff;
+    }
+
+    public void setTableCommentDiff(DfNextPreviousDiff tableCommentDiff) {
+        _tableCommentDiff = tableCommentDiff;
     }
 
     public List<DfNestDiffContent> getNestDiffContentOrderedList() {
