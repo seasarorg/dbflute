@@ -83,7 +83,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
         });
         _nextPreviousItemList.add(new NextPreviousHandler() {
             public String titleName() {
-                return "Table Comment";
+                return "Comment";
             }
 
             public String propertyName() {

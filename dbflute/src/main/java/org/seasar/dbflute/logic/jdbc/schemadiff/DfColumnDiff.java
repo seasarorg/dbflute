@@ -119,7 +119,7 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
         });
         _nextPreviousItemList.add(new NextPreviousHandler() {
             public String titleName() {
-                return "Column Comment";
+                return "Comment";
             }
 
             public String propertyName() {
