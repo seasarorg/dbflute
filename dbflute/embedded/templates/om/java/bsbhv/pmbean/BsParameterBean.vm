@@ -26,6 +26,7 @@ import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
 import org.seasar.dbflute.cbean.coption.FromToOption;
 #end
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import ${glPackageBaseCommon}.*;
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))
@@ -132,19 +133,9 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionClassificationFixedElement($pmbClassName, $propertyName))
-#set ($classificationName = $database.getPmbMetaDataPropertyOptionClassificationName($pmbClassName, $propertyName))
-#set ($fixedElement = $database.getPmbMetaDataPropertyOptionClassificationFixedElement($pmbClassName, $propertyName))
     /** The parameter of ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}. */
-#if ($database.isPmbMetaDataPropertyJavaNativeNumberObject($pmbClassName, $propertyName))
-    protected ${propertyType} ${variableName} = toNumber(${glCDef}.${classificationName}.${fixedElement}.code(), ${propertyType}.class);
+    protected ${propertyType} ${variableName} = ${database.getPmbMetaDataPropertyOptionClassificationFixedElementValueExp($pmbClassName, $propertyName)};
 
-#elseif ($database.isPmbMetaDataPropertyJavaNativeBooleanObject($pmbClassName, $propertyName))
-    protected ${propertyType} ${variableName} = toBoolean(${glCDef}.${classificationName}.${fixedElement}.code());
-
-#else
-    protected ${propertyType} ${variableName} = ${glCDef}.${classificationName}.${fixedElement}.code();
-
-#end
 #else
     /** The parameter of ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}. */
     protected ${propertyType} ${variableName};
@@ -290,6 +281,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
 
     protected ShortCharHandlingMode getShortCharHandlingMode(String propertyName, String value, Integer size) {
         return ShortCharHandlingMode.${database.shortCharHandlingMode};
+    }
+
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
+        return DfCollectionUtil.newArrayList(elements);
     }
 
     @SuppressWarnings("unchecked")
@@ -503,7 +498,6 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))
-#set ($classificationName = $database.getPmbMetaDataPropertyOptionClassificationName($pmbClassName, $propertyName))
 #foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
 
     /**
@@ -514,13 +508,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
-#if ($database.isPmbMetaDataPropertyJavaNativeNumberObject($pmbClassName, $propertyName))
-        ${variableName} = toNumber(${glCDef}.${classificationName}.${classificationMap.get('name')}.code(), ${propertyType}.class);
-#elseif ($database.isPmbMetaDataPropertyJavaNativeBooleanObject($pmbClassName, $propertyName))
-        ${variableName} = toBoolean(${glCDef}.${classificationName}.${classificationMap.get('name')}.code());
-#else
-        ${variableName} = ${glCDef}.${classificationName}.${classificationMap.get('name')}.code();
-#end
+        ${variableName} = ${database.getPmbMetaDataPropertyOptionClassificationSettingElementValueExp($pmbClassName, $propertyName, $classificationMap.get('name'))};
     }
 #end
 #end

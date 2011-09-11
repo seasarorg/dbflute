@@ -23,6 +23,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
@@ -35,6 +36,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -164,8 +166,78 @@ public class DfPmbMetaData {
         return _procedureName != null;
     }
 
+    public boolean isPropertyJavaNativeStringObject(String propertyName) {
+        final String propertyType = getPropertyType(propertyName);
+        final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
+        return prop.isJavaNativeStringObject(propertyType);
+    }
+
+    public boolean isPropertyJavaNativeStringObjectIncludingListElement(String propertyName) {
+        if (isPropertyJavaNativeStringObject(propertyName)) {
+            return true;
+        }
+        if (isPropertyTypeList(propertyName)) {
+            final String propertyType = getPropertyTypeOfListElement(propertyName);
+            final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
+            return prop.isJavaNativeStringObject(propertyType);
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isPropertyJavaNativeNumberObject(String propertyName) {
+        final String propertyType = getPropertyType(propertyName);
+        final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
+        return prop.isJavaNativeNumberObject(propertyType);
+    }
+
+    public boolean isPropertyJavaNativeNumberObjectIncludingListElement(String propertyName) {
+        if (isPropertyJavaNativeNumberObject(propertyName)) {
+            return true;
+        }
+        if (isPropertyTypeList(propertyName)) {
+            final String propertyType = getPropertyTypeOfListElement(propertyName);
+            final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
+            return prop.isJavaNativeNumberObject(propertyType);
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isPropertyJavaNativeBooleanObject(String propertyName) {
+        final String propertyType = getPropertyType(propertyName);
+        final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
+        return prop.isJavaNativeBooleanObject(propertyType);
+    }
+
+    public boolean isPropertyJavaNativeBooleanObjectIncludingListElement(String propertyName) {
+        if (isPropertyJavaNativeBooleanObject(propertyName)) {
+            return true;
+        }
+        if (isPropertyTypeList(propertyName)) {
+            final String propertyType = getPropertyTypeOfListElement(propertyName);
+            final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
+            return prop.isJavaNativeBooleanObject(propertyType);
+        } else {
+            return false;
+        }
+    }
+
+    public String getPropertyType(String propertyName) {
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+        return getPropertyNameTypeMap().get(propertyName);
+    }
+
+    public String getPropertyTypeOfListElement(String propertyName) {
+        if (!isPropertyTypeList(propertyName)) {
+            return null;
+        }
+        final String propertyType = getPropertyType(propertyName);
+        return Srl.substringLastFront(Srl.substringFirstRear(propertyType, "List<"), ">");
+    }
+
     public boolean isPropertyTypeList(String propertyName) {
-        final String propertyType = getPropertyNameTypeMap().get(propertyName);
+        final String propertyType = getPropertyType(propertyName);
         return Srl.containsAll(propertyType, "List<", ">");
     }
 
@@ -479,6 +551,11 @@ public class DfPmbMetaData {
         return obj.isPropertyOptionClassificationFixedElement();
     }
 
+    public boolean isPropertyOptionClassificationFixedElementList(String propertyName) { // :cls(Foo.Bar, Baz)
+        final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
+        return obj.isPropertyOptionClassificationFixedElementList();
+    }
+
     public boolean isPropertyOptionClassificationSetter(String propertyName, AppData schemaData) {
         if (isPropertyTypeList(propertyName)) {
             return false; // not prepare setters of classification
@@ -490,7 +567,6 @@ public class DfPmbMetaData {
     }
 
     public String getPropertyOptionClassificationName(String propertyName, AppData schemaData) {
-        // should be called when it has classification
         if (isPropertyOptionSpecifiedClassification(propertyName)) {
             final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
             return obj.getPropertyOptionClassificationName();
@@ -499,13 +575,97 @@ public class DfPmbMetaData {
         return column.getClassificationName();
     }
 
-    public String getPropertyOptionClassificationFixedElement(String propertyName) {
-        // should be called when it has classification
+    public String getPropertyOptionSpecifiedClassificationName(String propertyName) {
+        if (isPropertyOptionSpecifiedClassification(propertyName)) {
+            final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
+            return obj.getPropertyOptionClassificationName();
+        }
+        return null;
+    }
+
+    public String getPropertyOptionClassificationFixedElementValueExp(String propertyName) {
+        if (!isPropertyOptionClassificationFixedElement(propertyName)) {
+            return null; // no way
+        }
+        final String classificationName = getPropertyOptionSpecifiedClassificationName(propertyName);
+        if (isPropertyTypeList(propertyName)) {
+            if (isPropertyOptionClassificationFixedElementList(propertyName)) {
+                final List<String> fixedElementList = getPropertyOptionClassificationFixedElementList(propertyName);
+                final StringBuilder sb = new StringBuilder();
+                for (String fixedElement : fixedElementList) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(buildPropertyOptionClassificationElementValueExp(propertyName, classificationName,
+                            fixedElement));
+                }
+                return "newArrayList(" + sb.toString() + ")";
+            } else { // property is list but specified one
+                final String fixedElement = getPropertyOptionClassificationFixedElement(propertyName);
+                final String valueExp = buildPropertyOptionClassificationElementValueExp(propertyName,
+                        classificationName, fixedElement);
+                return "newArrayList(" + valueExp + ")";
+            }
+        } else {
+            if (isPropertyOptionClassificationFixedElementList(propertyName)) {
+                final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                br.addNotice("Not list property but classification fixed element list.");
+                br.addItem("ParameterBean");
+                br.addElement(getClassName());
+                br.addItem("Property");
+                br.addElement(getPropertyType(propertyName) + " " + propertyName);
+                br.addItem("Classification");
+                br.addElement(classificationName);
+                final List<String> fixedElementList = getPropertyOptionClassificationFixedElementList(propertyName);
+                br.addItem("Element List");
+                br.addElement(fixedElementList);
+                final String msg = br.buildExceptionMessage();
+                throw new IllegalStateException(msg);
+            }
+            final String fixedElement = getPropertyOptionClassificationFixedElement(propertyName);
+            return buildPropertyOptionClassificationElementValueExp(propertyName, classificationName, fixedElement);
+        }
+    }
+
+    protected String getPropertyOptionClassificationFixedElement(String propertyName) {
         if (isPropertyOptionClassificationFixedElement(propertyName)) {
             final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
             return obj.getPropertyOptionClassificationFixedElement();
         }
         return null;
+    }
+
+    protected List<String> getPropertyOptionClassificationFixedElementList(String propertyName) {
+        if (isPropertyOptionClassificationFixedElementList(propertyName)) {
+            final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
+            return obj.getPropertyOptionClassificationFixedElementList();
+        }
+        return DfCollectionUtil.emptyList();
+    }
+
+    protected String buildPropertyOptionClassificationElementValueExp(String propertyName, String classificationName,
+            String element) {
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String valueType;
+        if (isPropertyTypeList(propertyName)) {
+            valueType = getPropertyTypeOfListElement(propertyName);
+        } else {
+            valueType = getPropertyType(propertyName);
+        }
+        if (getBasicProperties().isTargetLanguageJava()) {
+            final String cdefCode = projectPrefix + "CDef." + classificationName + "." + element + ".code()";
+            if (isPropertyJavaNativeNumberObjectIncludingListElement(propertyName)) {
+                return "toNumber(" + cdefCode + ", " + valueType + ".class)";
+            } else if (isPropertyJavaNativeBooleanObjectIncludingListElement(propertyName)) {
+                return "toBoolean(" + cdefCode + ")";
+            } else {
+                return cdefCode;
+            }
+        } else if (getBasicProperties().isTargetLanguageCSharp()) {
+            return null; // unsupported yet
+        } else {
+            return null;
+        }
     }
 
     public List<Map<String, String>> getPropertyOptionClassificationMapList(String propertyName, AppData schemaData) {
@@ -516,6 +676,12 @@ public class DfPmbMetaData {
         }
         final Column column = getPropertyOptionClassificationColumn(propertyName, schemaData);
         return column.getClassificationMapList();
+    }
+
+    public String getPropertyOptionClassificationSettingElementValueExp(String propertyName, String element,
+            AppData schemaData) {
+        final String classificationName = getPropertyOptionClassificationName(propertyName, schemaData);
+        return buildPropertyOptionClassificationElementValueExp(propertyName, classificationName, element);
     }
 
     protected Column getPropertyOptionClassificationColumn(String propertyName, AppData schemaData) {

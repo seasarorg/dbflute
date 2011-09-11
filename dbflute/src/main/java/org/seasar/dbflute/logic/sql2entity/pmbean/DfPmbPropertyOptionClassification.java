@@ -69,14 +69,24 @@ public class DfPmbPropertyOptionClassification {
         return classificationName != null && classificationName.contains(".");
     }
 
+    public boolean isPropertyOptionClassificationFixedElementList() {
+        final String classificationName = extractClassificationNameFromOption(false);
+        return classificationName != null && classificationName.contains(".") && classificationName.contains(",");
+    }
+
     public String getPropertyOptionClassificationName() {
         final String classificationName = extractClassificationNameFromOption(true);
         return Srl.substringFirstFront(classificationName, ".");
     }
 
-    public String getPropertyOptionClassificationFixedElement() {
+    public String getPropertyOptionClassificationFixedElement() { // returns Bar if "Foo.Bar" 
         final String classificationName = extractClassificationNameFromOption(true);
         return Srl.substringFirstRear(classificationName, ".");
+    }
+
+    public List<String> getPropertyOptionClassificationFixedElementList() { // returns [Bar. Baz] if "Foo.Bar, Baz"
+        final String fixedElement = getPropertyOptionClassificationFixedElement();
+        return Srl.splitListTrimmed(fixedElement, ",");
     }
 
     public List<Map<String, String>> getPropertyOptionClassificationMapList() {

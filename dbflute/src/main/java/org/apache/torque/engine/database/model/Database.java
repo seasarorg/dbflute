@@ -592,22 +592,28 @@ public class Database {
         return getPmbBasicHandler().isPropertyOptionClassificationFixedElement(className, propertyName);
     }
 
+    public boolean isPmbMetaDataPropertyOptionClassificationFixedElementList(String className, String propertyName) {
+        return getPmbBasicHandler().isPropertyOptionClassificationFixedElementList(className, propertyName);
+    }
+
     public String getPmbMetaDataPropertyOptionClassificationName(String className, String propertyName) {
         return getPmbBasicHandler().getPropertyOptionClassificationName(className, propertyName, _sql2entitySchemaData);
     }
 
-    public String getPmbMetaDataPropertyOptionClassificationFixedElement(String className, String propertyName) {
-        return getPmbBasicHandler().getPropertyOptionClassificationFixedElement(className, propertyName);
-    }
-
-    protected String getPmbMetaDataPropertyOptionClassificationCodeType(String className, String propertyName) {
-        return getPmbBasicHandler().getPropertyOptionClassificationName(className, propertyName, _sql2entitySchemaData);
+    public String getPmbMetaDataPropertyOptionClassificationFixedElementValueExp(String className, String propertyName) {
+        return getPmbBasicHandler().getPropertyOptionClassificationFixedElementValueExp(className, propertyName);
     }
 
     public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
             String propertyName) {
         return getPmbBasicHandler().getPropertyOptionClassificationMapList(className, propertyName,
                 _sql2entitySchemaData);
+    }
+
+    public String getPmbMetaDataPropertyOptionClassificationSettingElementValueExp(String className,
+            String propertyName, String element) {
+        return getPmbBasicHandler().getPropertyOptionClassificationSettingElementValueExp(className, propertyName,
+                element, _sql2entitySchemaData);
     }
 
     // -----------------------------------------------------

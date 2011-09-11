@@ -24,6 +24,7 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.seasar.dbflute.exception.DfTemplateParsingException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
  * The generator for DBFlute, referring to the generator of Velocity. <br />
@@ -245,13 +246,18 @@ public class DfFlutistGenerator extends DfGenerator {
 
     protected void throwTemplateParsingException(String inputTemplate, String specifiedInputEncoding, Throwable e) {
         rethrowIfNestedException(inputTemplate, specifiedInputEncoding, e);
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to parse the input template!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Input Template]" + ln() + inputTemplate + " (" + specifiedInputEncoding + ")" + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new DfTemplateParsingException(msg, e);
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to parse the input template.");
+        br.addItem("Input Template");
+        br.addElement(inputTemplate + " (" + specifiedInputEncoding + ")");
+        final Throwable cause;
+        if (e instanceof MethodInvocationException) {
+            cause = ((MethodInvocationException) e).getWrappedThrowable();
+        } else {
+            cause = e;
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfTemplateParsingException(msg, cause);
     }
 
     protected void rethrowIfNestedException(String inputTemplate, String specifiedInputEncoding, Throwable e) {

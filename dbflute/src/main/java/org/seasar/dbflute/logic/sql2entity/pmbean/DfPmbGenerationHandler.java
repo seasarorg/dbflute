@@ -32,7 +32,6 @@ import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -187,9 +186,7 @@ public class DfPmbGenerationHandler {
     }
 
     public String getPropertyType(String className, String propertyName) {
-        assertArgumentPmbMetaDataClassName(className);
-        assertArgumentPmbMetaDataPropertyName(propertyName);
-        return getPropertyNameTypeMap(className).get(propertyName);
+        return findPmbMetaData(className).getPropertyType(propertyName);
     }
 
     protected Map<String, String> getPropertyNameTypeMap(String className) {
@@ -206,21 +203,15 @@ public class DfPmbGenerationHandler {
     }
 
     public boolean isPmbMetaDataPropertyJavaNativeStringObject(String className, String propertyName) {
-        final String propertyType = getPropertyType(className, propertyName);
-        final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
-        return prop.isJavaNativeStringObject(propertyType);
+        return findPmbMetaData(className).isPropertyJavaNativeStringObject(propertyName);
     }
 
     public boolean isPmbMetaDataPropertyJavaNativeNumberObject(String className, String propertyName) {
-        final String propertyType = getPropertyType(className, propertyName);
-        final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
-        return prop.isJavaNativeNumberObject(propertyType);
+        return findPmbMetaData(className).isPropertyJavaNativeNumberObject(propertyName);
     }
 
     public boolean isPmbMetaDataPropertyJavaNativeBooleanObject(String className, String propertyName) {
-        final String propertyType = getPropertyType(className, propertyName);
-        final DfTypeMappingProperties prop = getProperties().getTypeMappingProperties();
-        return prop.isJavaNativeBooleanObject(propertyType);
+        return findPmbMetaData(className).isPropertyJavaNativeBooleanObject(propertyName);
     }
 
     public String getBehaviorClassName(String className) {
@@ -372,6 +363,10 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).isPropertyOptionClassificationFixedElement(propertyName);
     }
 
+    public boolean isPropertyOptionClassificationFixedElementList(String className, String propertyName) {
+        return findPmbMetaData(className).isPropertyOptionClassificationFixedElementList(propertyName);
+    }
+
     public boolean isPropertyOptionClassificationSetter(String className, String propertyName, AppData schemaData) {
         return findPmbMetaData(className).isPropertyOptionClassificationSetter(propertyName, schemaData);
     }
@@ -380,13 +375,19 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).getPropertyOptionClassificationName(propertyName, schemaData);
     }
 
-    public String getPropertyOptionClassificationFixedElement(String className, String propertyName) {
-        return findPmbMetaData(className).getPropertyOptionClassificationFixedElement(propertyName);
+    public String getPropertyOptionClassificationFixedElementValueExp(String className, String propertyName) {
+        return findPmbMetaData(className).getPropertyOptionClassificationFixedElementValueExp(propertyName);
     }
 
     public List<Map<String, String>> getPropertyOptionClassificationMapList(String className, String propertyName,
             AppData schemaData) {
         return findPmbMetaData(className).getPropertyOptionClassificationMapList(propertyName, schemaData);
+    }
+
+    public String getPropertyOptionClassificationSettingElementValueExp(String className, String propertyName,
+            String element, AppData schemaData) {
+        return findPmbMetaData(className).getPropertyOptionClassificationSettingElementValueExp(propertyName, element,
+                schemaData);
     }
 
     // -----------------------------------------------------
