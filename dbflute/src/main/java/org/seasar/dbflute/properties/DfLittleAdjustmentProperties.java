@@ -146,6 +146,17 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                              Display Name UpperCase
+    //                                                              ======================
+    protected boolean isTableDispNameUpperCase() {
+        return isProperty("isTableDispNameUpperCase", false);
+    }
+
+    public String filterTableDispNameIfNeeds(String tableDbName) {
+        return isTableDispNameUpperCase() ? tableDbName.toUpperCase() : tableDbName;
+    }
+
+    // ===================================================================================
     //                                                                  SQL Name UpperCase
     //                                                                  ==================
     public boolean isTableSqlNameUpperCase() {

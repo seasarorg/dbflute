@@ -3,6 +3,8 @@ package org.seasar.dbflute.logic.jdbc.schemadiff;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -338,6 +340,14 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
 
     public String getTableName() {
         return _tableName;
+    }
+
+    public String getTableDispName() {
+        // An implementation for the display name option is so easy here.
+        // The best way is to save display names on a DiffMap file,
+        // but DiffMap files are looked directly by human at AlterCheck and so on.
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        return prop.filterTableDispNameIfNeeds(_tableName);
     }
 
     public DfDiffType getDiffType() {

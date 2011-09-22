@@ -803,7 +803,7 @@ public class Column {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
-            final String foreignTableName = fk.getForeignTable().getName();
+            final String foreignTableName = fk.getForeignTable().getTableDispName();
             sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTableName, delimiter));
         }
         sb.delete(0, delimiter.length());
@@ -985,7 +985,7 @@ public class Column {
         final StringBuffer sb = new StringBuffer();
         for (ForeignKey fk : _referrerList) {
             final Table referrerTable = fk.getTable();
-            final String referrerTableName = referrerTable.getName();
+            final String referrerTableName = referrerTable.getTableDispName();
             sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTableName, delimiter));
         }
         sb.delete(0, delimiter.length());

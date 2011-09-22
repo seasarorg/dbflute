@@ -230,14 +230,16 @@ public class Table {
     //                                            Table Name
     //                                            ----------
     /**
-     * Get the name of the Table
+     * Get the DB name of the Table, which can be identity.
+     * @return The table name as String. (NotNull)
      */
     public String getName() {
         return _name;
     }
 
     /**
-     * Set the name of the Table
+     * Set the DB name of the Table, which can be identity.
+     * @param name The table name as String. (NotNull)
      */
     public void setName(String name) {
         this._name = name;
@@ -447,9 +449,18 @@ public class Table {
     // -----------------------------------------------------
     //                                               Display
     //                                               -------
+    public String getTableDispName() {
+        return filterTableDispNameIfNeeds(getName());
+    }
+
+    protected String filterTableDispNameIfNeeds(String tableName) {
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        return prop.filterTableDispNameIfNeeds(tableName);
+    }
+
     public String getBasicInfoDispString() {
         final String type = getType();
-        return getAliasExpression() + getName() + (type != null ? " as " + type : "");
+        return getAliasExpression() + getTableDispName() + (type != null ? " as " + type : "");
     }
 
     public String getTitleForSchemaHtml() {
@@ -1085,7 +1096,7 @@ public class Table {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
-            final String foreignTableName = fk.getForeignTable().getName();
+            final String foreignTableName = fk.getForeignTable().getTableDispName();
             sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTableName, delimiter));
         }
         sb.delete(0, delimiter.length());
@@ -1438,7 +1449,7 @@ public class Table {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = referrerList.get(i);
-            final String referrerTableName = fk.getTable().getName();
+            final String referrerTableName = fk.getTable().getTableDispName();
             sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTableName, delimiter));
         }
         sb.delete(0, delimiter.length());

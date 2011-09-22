@@ -260,7 +260,7 @@
 #if ($isAliasDelimiterInDbCommentValid)
 		<td class="aliascell">${table.alias}</td>
 #end
-		<td><a href="#${table.name}"${table.titleForSchemaHtml}>${table.name}</a></td>
+		<td><a href="#${table.name}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
 		<td class="typecell">${table.type}</td>
 		<td class="relcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
 		<td class="relcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
@@ -333,7 +333,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 <h2 id="outsidesql">OutsideSql List</h2>
 #foreach ($table in $database.tableDisplaySortedList)
 #if ($table.hasBehaviorQueryPath())
-<h3 id="${table.javaName}Sql"><a href="#${table.name}">${table.name}</a></h3>
+<h3 id="${table.javaName}Sql"><a href="#${table.name}">${table.tableDispName}</a></h3>
 <dl class="bqplist">
 #foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
 	<dt>$table.getBehaviorQueryPathTitleForSchemaHtml($behaviorQueryPath)$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>

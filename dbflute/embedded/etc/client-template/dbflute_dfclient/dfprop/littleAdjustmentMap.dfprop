@@ -16,6 +16,7 @@
 # o isPagingCountLater: (NotRequired - Default true)
 # o isPagingCountLeastJoin: (NotRequired - Default true)
 # o isInnerJoinAutoDetect: (NotRequired - Default false)
+# o isTableDispNameUpperCase: (NotRequired - Default false)
 # o isTableSqlNameUpperCase: (NotRequired - Default false)
 # o isColumnSqlNameUpperCase: (NotRequired - Default false)
 # o isMakeDeprecated: (NotRequired - Default false)
@@ -185,6 +186,18 @@ map:{
     #     Non.
     #
     #; isInnerJoinAutoDetect = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isTableDispNameUpperCase: (NotRequired - Default false)
+    #   [true]
+    #     Table names for display, e.g. on documents,
+    #     are forcedly treated as upper case.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isTableDispNameUpperCase = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

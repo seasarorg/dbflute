@@ -1,5 +1,5 @@
 <h2 id="${table.name}"${table.titleForSchemaHtml}>
-${table.aliasExpression}${table.name}
+${table.aliasExpression}${table.tableDispName}
 #if ($database.hasAdditionalSchema() && $table.hasSchema())
 &nbsp;<span class="tableschema">on ${table.documentSchema}</span>
 #end
@@ -10,7 +10,7 @@ ${table.aliasExpression}${table.name}
 #set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
 #set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
 #set ($hasColumnComment = $table.hasColumnComment())
-<table summary="Columns in ${table.name}">
+<table summary="Columns in ${table.tableDispName}">
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
