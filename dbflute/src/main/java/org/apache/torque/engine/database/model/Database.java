@@ -1894,6 +1894,10 @@ public class Database {
         return getProperties().getSimpleDtoProperties().isSimpleCDefTarget(classificationName);
     }
 
+    public boolean isSimpleDtoGwtDecorationSuppressJavaDependency() {
+        return getProperties().getSimpleDtoProperties().isGwtDecorationSuppressJavaDependency();
+    }
+
     // ===================================================================================
     //                                                                 Flex DTO Properties
     //                                                                 ===================

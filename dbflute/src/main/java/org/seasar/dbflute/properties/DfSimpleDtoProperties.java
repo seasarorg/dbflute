@@ -207,6 +207,30 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                                 GWT
+    //                                                                                 ===
+    protected Map<String, String> _gwtDecorationMap;
+
+    protected Map<String, String> getGwtDecorationMap() {
+        if (_gwtDecorationMap != null) {
+            return _gwtDecorationMap;
+        }
+        final String key = "gwtDecorationMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, String> map = (Map<String, String>) getSimpleDtoDefinitionMap().get(key);
+        if (map != null) {
+            _gwtDecorationMap = map;
+        } else {
+            _gwtDecorationMap = DfCollectionUtil.emptyMap();
+        }
+        return _gwtDecorationMap;
+    }
+
+    public boolean isGwtDecorationSuppressJavaDependency() {
+        return isProperty("isSuppressJavaDependency", false, getGwtDecorationMap());
+    }
+
+    // ===================================================================================
     //                                                                          Field Name
     //                                                                          ==========
     public String getFieldInitCharType() {

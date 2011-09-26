@@ -275,6 +275,7 @@ public abstract class $myClassName implements Serializable {
         return sb.toString();
     }
 #if ($table.hasUtilDateColumn())
+#if ($database.isSimpleDtoGwtDecorationSuppressJavaDependency())
     protected String xfUD(java.util.Date date) { // formatUtilDate()
         return date != null ? new java.text.SimpleDateFormat(xgDP()).format(date) : null;
     }
@@ -285,6 +286,11 @@ public abstract class $myClassName implements Serializable {
         return "yyyy-MM-dd";
 #end
     }
+#else
+    protected String xfUD(java.util.Date date) { // formatUtilDate()
+        return date != null ? date.toString() : null;
+    }
+#end
 #end
 #if ($table.hasByteArrayColumn())
     protected String xfBA(byte[] bytes) { // formatByteArray()
