@@ -44,14 +44,13 @@ public class DfLReverseOutputHandler {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfLReverseOutputHandler.class);
 
-    protected static final int XLS_LIMIT = 65000; // about
-
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final DataSource _dataSource;
     protected boolean _containsCommonColumn;
     protected boolean _managedTableOnly;
+    protected int _xlsLimit = 65000; // as default
 
     // option for large data
     protected String _delimiterDataDir;
@@ -78,7 +77,7 @@ public class DfLReverseOutputHandler {
         filterUnsupportedTable(tableInfoMap);
         final DfLReverseDataExtractor extractor = new DfLReverseDataExtractor(_dataSource);
         extractor.setExtractingLimit(limit);
-        extractor.setLargeBorder(XLS_LIMIT);
+        extractor.setLargeBorder(_xlsLimit);
         final Map<String, DfLReverseDataResult> loadDataMap = extractor.extractData(tableInfoMap);
         transferToXls(tableInfoMap, loadDataMap, limit, xlsFile);
     }
@@ -131,7 +130,7 @@ public class DfLReverseOutputHandler {
     //                                                                            ========
     protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList, int index) {
         final String tableDbName = table.getName();
-        final int xlsLimit = XLS_LIMIT;
+        final int xlsLimit = _xlsLimit;
         final List<Map<String, String>> recordList;
         {
             _log.info("  " + tableDbName + " (" + extractedList.size() + ")");
@@ -298,6 +297,10 @@ public class DfLReverseOutputHandler {
 
     public void setManagedTableOnly(boolean managedTableOnly) {
         _managedTableOnly = managedTableOnly;
+    }
+
+    public void setXlsLimit(int xlsLimit) {
+        _xlsLimit = xlsLimit;
     }
 
     public String getDelimiterDataDir() {

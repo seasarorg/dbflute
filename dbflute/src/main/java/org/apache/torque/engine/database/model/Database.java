@@ -768,30 +768,65 @@ public class Database {
     //                                                              Delete Old Table Class
     //                                                              ======================
     public void deleteOldTableClass() {
-        if (_skipDeleteOldClass) {
+        if (isSuppressDeleteOldClass()) {
             return;
         }
-        if (getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
-            final DfOldClassHandler handler = createOldClassHandler();
-            handler.deleteOldTableClass();
-        }
+        final DfOldClassHandler handler = createOldClassHandler();
+        handler.deleteOldTableClass();
     }
 
     public void deleteOldCustomizeClass() {
-        if (_skipDeleteOldClass) {
+        if (isSuppressDeleteOldClass()) {
             return;
         }
-        if (getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
-            final DfOldClassHandler handler = createOldClassHandler();
-            handler.setCustomizeTableList(getTableList());
-            handler.setPmbMetaDataMap(_pmbMetaDataMap);
-            handler.deleteOldCustomizeClass();
+        final DfOldClassHandler handler = createOldClassHandler();
+        handler.setCustomizeTableList(getTableList());
+        handler.setPmbMetaDataMap(_pmbMetaDataMap);
+        handler.deleteOldCustomizeClass();
+    }
+
+    public void deleteOldSimpleDtoTableClass() {
+        if (isSuppressDeleteOldClass()) {
+            return;
         }
+        final DfOldClassHandler handler = createOldClassHandler();
+        handler.deleteOldSimpleDtoTableClass();
+    }
+
+    public void deleteOldSimpleDtoMapperTableClass() {
+        if (isSuppressDeleteOldClass()) {
+            return;
+        }
+        final DfOldClassHandler handler = createOldClassHandler();
+        handler.deleteOldSimpleDtoMapperTableClass();
+    }
+
+    public void deleteOldSimpleDtoCustomizeClass() {
+        if (isSuppressDeleteOldClass()) {
+            return;
+        }
+        final DfOldClassHandler handler = createOldClassHandler();
+        handler.setCustomizeTableList(getTableList());
+        handler.setPmbMetaDataMap(_pmbMetaDataMap);
+        handler.deleteOldSimpleDtoCustomizeClass();
+    }
+
+    public void deleteOldSimpleDtoMapperCustomizeClass() {
+        if (isSuppressDeleteOldClass()) {
+            return;
+        }
+        final DfOldClassHandler handler = createOldClassHandler();
+        handler.setCustomizeTableList(getTableList());
+        handler.setPmbMetaDataMap(_pmbMetaDataMap);
+        handler.deleteOldSimpleDtoMapperCustomizeClass();
+    }
+
+    protected boolean isSuppressDeleteOldClass() {
+        return _skipDeleteOldClass || !getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass();
     }
 
     protected DfOldClassHandler createOldClassHandler() {
-        return new DfOldClassHandler(getGeneratorInstance(), getBasicProperties(), getProperties()
-                .getLittleAdjustmentProperties(), getTableList());
+        return new DfOldClassHandler(getGeneratorInstance(), getTableList());
     }
 
     // ===================================================================================

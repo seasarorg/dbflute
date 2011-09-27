@@ -32,7 +32,7 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfLReverseOutputHandler _lreverseGenerator;
+    protected final DfLReverseOutputHandler _outputHandler;
     protected final String _outputDir;
     protected final String _fileTitle;
     protected final int _limit;
@@ -40,8 +40,8 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfLReverseProcess(DfLReverseOutputHandler lreverseGenerator, String outputDir, String fileTitle, int limit) {
-        _lreverseGenerator = lreverseGenerator;
+    public DfLReverseProcess(DfLReverseOutputHandler outputHandler, String outputDir, String fileTitle, int limit) {
+        _outputHandler = outputHandler;
         _outputDir = outputDir;
         _fileTitle = fileTitle;
         _limit = limit;
@@ -67,10 +67,10 @@ public class DfLReverseProcess {
             final String mainName = extractMainName(tableList);
             _log.info("[Section " + sectionNo + "]: " + mainName);
             final File xlsFile = new File(buildXlsFilePath(number, mainName));
-            _lreverseGenerator.outputData(tableInfoMap, _limit, xlsFile);
+            _outputHandler.outputData(tableInfoMap, _limit, xlsFile);
             ++sectionNo;
         }
-        final Map<String, Table> tableNameMap = _lreverseGenerator.getTableNameMap();
+        final Map<String, Table> tableNameMap = _outputHandler.getTableNameMap();
         if (!tableNameMap.isEmpty()) {
             outputTableNameMap(tableNameMap);
         }
@@ -82,7 +82,7 @@ public class DfLReverseProcess {
                 return name.startsWith(_fileTitle) && name.endsWith(".xls");
             }
         });
-        final String delimiterDataDir = _lreverseGenerator.getDelimiterDataDir();
+        final String delimiterDataDir = _outputHandler.getDelimiterDataDir();
         if (delimiterDataDir != null) {
             doDeletePreviousDataFile(new File(delimiterDataDir), new FilenameFilter() {
                 public boolean accept(File dir, String name) {

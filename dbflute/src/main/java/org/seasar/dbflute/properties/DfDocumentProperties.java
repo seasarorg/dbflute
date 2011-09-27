@@ -286,10 +286,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public Integer getLoadDataReverseRecordLimit() {
-        final Map<String, String> dataXlsTemplateMap = getLoadDataReverseMap();
+        final Map<String, String> loadDataReverseMap = getLoadDataReverseMap();
         String limitExp = null;
-        if (!dataXlsTemplateMap.isEmpty()) {
-            limitExp = dataXlsTemplateMap.get("recordLimit");
+        if (!loadDataReverseMap.isEmpty()) {
+            limitExp = loadDataReverseMap.get("recordLimit");
         }
         if (limitExp == null) {
             return null;
@@ -309,6 +309,24 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public boolean isLoadDataReverseManagedTableOnly() {
         return isLoadDataReverseOutputToPlaySql();
+    }
+
+    public Integer getLoadDataReverseXlsLimit() {
+        final Map<String, String> loadDataReverseMap = getLoadDataReverseMap();
+        String limitExp = null;
+        if (!loadDataReverseMap.isEmpty()) {
+            limitExp = loadDataReverseMap.get("xlsLimit");
+        }
+        if (limitExp == null) {
+            return null; // if null, default limit
+        }
+        try {
+            return Integer.valueOf(limitExp);
+        } catch (NumberFormatException e) {
+            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_documentDefinitionMap;
+            msg = msg + " should be number but: value=" + limitExp;
+            throw new DfIllegalPropertyTypeException(msg, e);
+        }
     }
 
     public String getLoadDataReverseXlsDataDir() {

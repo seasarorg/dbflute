@@ -2772,6 +2772,11 @@ public class Table {
         return prefix + getJavaName() + suffix;
     }
 
+    public String getSimpleDtoMapperClassName() {
+        final DfSimpleDtoProperties prop = getProperties().getSimpleDtoProperties();
+        return getExtendedSimpleDtoClassName() + prop.getMapperSuffix();
+    }
+
     public boolean hasSimpleDtoJsonicDecoration() {
         final List<Column> columnList = getColumnList();
         for (Column column : columnList) {

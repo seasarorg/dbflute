@@ -158,12 +158,16 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final DfLReverseOutputHandler handler = new DfLReverseOutputHandler(getDataSource());
         handler.setContainsCommonColumn(isLoadDataReverseContainsCommonColumn());
         handler.setManagedTableOnly(isLoadDataReverseManagedTableOnly());
+        final Integer xlsLimit = getLoadDataReverseXlsLimit(); // if null, default limit
+        if (xlsLimit != null) {
+            handler.setXlsLimit(xlsLimit);
+        }
         handler.setDelimiterDataDir(getLoadDataReverseDelimiterDataDir());
         // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
         //handler.setDelimiterDataTypeCsv(true);
         final String xlsDataDir = getLoadDataReverseXlsDataDir();
         final String fileTitle = getLoadDataReverseFileTitle();
-        final int limit = getLoadDataReverseRecordLimit();
+        final int limit = getLoadDataReverseRecordLimit(); // not null here
         final DfLReverseProcess process = new DfLReverseProcess(handler, xlsDataDir, fileTitle, limit);
         process.execute(database);
     }
@@ -190,7 +194,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().isLoadDataReverseValid();
     }
 
-    protected int getLoadDataReverseRecordLimit() {
+    protected Integer getLoadDataReverseRecordLimit() {
         return getDocumentProperties().getLoadDataReverseRecordLimit();
     }
 
@@ -200,6 +204,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected boolean isLoadDataReverseManagedTableOnly() {
         return getDocumentProperties().isLoadDataReverseManagedTableOnly();
+    }
+
+    protected Integer getLoadDataReverseXlsLimit() {
+        return getDocumentProperties().getLoadDataReverseXlsLimit();
     }
 
     protected String getLoadDataReverseXlsDataDir() {

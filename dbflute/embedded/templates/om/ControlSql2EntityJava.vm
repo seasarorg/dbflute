@@ -218,13 +218,15 @@ $database.backToSql2EntityOutputDirectory()
 ##                                                                          Simple Dto
 ##                                                                          ==========
 #if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
-  $database.info("parseSimpleDto() { // mapper=$database.isSimpleDtoUseDtoMapper()")
+  $database.enableSimpleDtoOutputDirectory()
+  $database.deleteOldSimpleDtoCustomizeClass()
+  $database.info("parseSimpleDto() {")
+
   #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}.customize")
   #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}.customize")
   #set ($myExtendedEntityPackageName = "${database.simpleDtoExtendedDtoPackage}.customize")
   #set ($myDtoMapperPackageName = "${database.simpleDtoDtoMapperPackage}.customize")
 
-  $database.enableSimpleDtoOutputDirectory()
   #foreach ($table in $database.tableList)
     #if (!$table.isSql2EntityTypeSafeCursor())
       #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
@@ -250,27 +252,31 @@ $database.backToSql2EntityOutputDirectory()
       #end
     #end
   #end
+  $database.info("}")
 
   #if ($database.isSimpleDtoUseDtoMapper())
-    $database.enableDtoMapperOutputDirectory()
-    #foreach ($table in $database.tableList)
-      #if (!$table.isSql2EntityTypeSafeCursor())
-        $table.switchSql2EntityDtoMapperOutputDirectory()
-        #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
-        $database.makeDirectory($path)
+  $database.enableDtoMapperOutputDirectory()
+  $database.deleteOldSimpleDtoMapperCustomizeClass()
+  $database.info("parseSimpleDtoMapper() {")
 
-        #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
-        #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
-        #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
+  #foreach ($table in $database.tableList)
+    #if (!$table.isSql2EntityTypeSafeCursor())
+      $table.switchSql2EntityDtoMapperOutputDirectory()
+      #set ($path = $database.getPackageAsPath(${myDtoMapperPackageName}))
+      $database.makeDirectory($path)
 
-        $database.info("    parse('${myDtoMapperClassName}');")
+      #set ($myBaseObjectClassName = "${table.baseSimpleDtoClassName}")
+      #set ($myExtendedObjectClassName = "${table.extendedSimpleDtoClassName}")
+      #set ($myDtoMapperClassName = "${myExtendedObjectClassName}Mapper")
+
+      $database.info("    parse('${myDtoMapperClassName}');")
     
-        #set ( $path = "${database.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
-      #end
+      #set ( $path = "${database.getPackageAsPath(${myDtoMapperPackageName})}${myDtoMapperClassName}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/simpledto/mapper/SimpleDtoMapper.${glTemplateFileExtension}", $path, "table", $table)
     #end
   #end
   $database.info("}")
+  #end
   $database.backToSql2EntityOutputDirectory()
 #end
 

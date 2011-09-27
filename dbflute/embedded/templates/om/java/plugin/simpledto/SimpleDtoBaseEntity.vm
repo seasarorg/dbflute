@@ -72,7 +72,12 @@ public abstract class $myClassName implements Serializable {
     //                                              Internal
     //                                              --------
     /** The modified properties for this DTO. */
+## GWT does not allow to use final mark to migrate the data
+#if ($database.isSimpleDtoGwtDecorationSuppressJavaDependency())
+    protected Set<String> __modifiedProperties = new LinkedHashSet<String>();
+#else
     protected final Set<String> __modifiedProperties = new LinkedHashSet<String>();
+#end
 
     // ===================================================================================
     //                                                                         Constructor
@@ -277,6 +282,10 @@ public abstract class $myClassName implements Serializable {
 #if ($table.hasUtilDateColumn())
 #if ($database.isSimpleDtoGwtDecorationSuppressJavaDependency())
     protected String xfUD(java.util.Date date) { // formatUtilDate()
+        return date != null ? date.toString() : null;
+    }
+#else
+    protected String xfUD(java.util.Date date) { // formatUtilDate()
         return date != null ? new java.text.SimpleDateFormat(xgDP()).format(date) : null;
     }
     protected String xgDP() { // getDatePattern
@@ -285,10 +294,6 @@ public abstract class $myClassName implements Serializable {
 #else
         return "yyyy-MM-dd";
 #end
-    }
-#else
-    protected String xfUD(java.util.Date date) { // formatUtilDate()
-        return date != null ? date.toString() : null;
     }
 #end
 #end

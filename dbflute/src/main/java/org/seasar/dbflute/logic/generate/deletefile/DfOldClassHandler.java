@@ -11,12 +11,14 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 
 /**
  * @author jflute
@@ -34,8 +36,6 @@ public class DfOldClassHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected DfGenerator _generator;
-    protected DfBasicProperties _basicProperties;
-    protected DfLittleAdjustmentProperties _littleAdjustmentProperties;
     protected DfGeneratedClassPackageDefault _generatedClassPackageDefault;
     protected List<Table> _tableList;
     protected Map<String, Map<String, Table>> _cmentityLocationMap;
@@ -44,12 +44,9 @@ public class DfOldClassHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOldClassHandler(DfGenerator generator, DfBasicProperties basicProperties,
-            DfLittleAdjustmentProperties littleAdjustmentProperties, List<Table> tableList) {
+    public DfOldClassHandler(DfGenerator generator, List<Table> tableList) {
         _generator = generator;
-        _basicProperties = basicProperties;
-        _littleAdjustmentProperties = littleAdjustmentProperties;
-        _generatedClassPackageDefault = basicProperties.getLanguageDependencyInfo().getGeneratedClassPackageInfo();
+        _generatedClassPackageDefault = getBasicProperties().getLanguageDependencyInfo().getGeneratedClassPackageInfo();
         _tableList = tableList;
     }
 
@@ -83,7 +80,7 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_BaseBehavior() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (_basicProperties.isApplicationBehaviorProject()) {
+                if (getBasicProperties().isApplicationBehaviorProject()) {
                     return table.getBaseBehaviorApClassName();
                 } else {
                     return table.getBaseBehaviorClassName();
@@ -93,8 +90,8 @@ public class DfOldClassHandler {
         final String packagePath = getBaseBehaviorPackage();
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final String classSuffix;
-        if (_basicProperties.isApplicationBehaviorProject()) {
-            final String additionalSuffix = _basicProperties.getApplicationBehaviorAdditionalSuffix();
+        if (getBasicProperties().isApplicationBehaviorProject()) {
+            final String additionalSuffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
             classSuffix = "Bhv" + additionalSuffix;
         } else {
             classSuffix = "Bhv";
@@ -105,7 +102,7 @@ public class DfOldClassHandler {
     }
 
     protected String getBaseBehaviorPackage() {
-        return _basicProperties.getBaseBehaviorPackage();
+        return getBasicProperties().getBaseBehaviorPackage();
     }
 
     protected List<String> _deletedOldTableBaseDaoList;
@@ -124,7 +121,7 @@ public class DfOldClassHandler {
     }
 
     protected String getBaseDaoPackage() {
-        return _basicProperties.getBaseDaoPackage();
+        return getBasicProperties().getBaseDaoPackage();
     }
 
     protected List<String> _deletedOldTableBaseEntityList;
@@ -143,7 +140,7 @@ public class DfOldClassHandler {
     }
 
     protected String getBaseEntityPackage() {
-        return _basicProperties.getBaseEntityPackage();
+        return getBasicProperties().getBaseEntityPackage();
     }
 
     public void deleteOldTableClass_for_DBMeta() {
@@ -159,7 +156,7 @@ public class DfOldClassHandler {
     }
 
     protected String getDBMetaPackage() {
-        return _basicProperties.getDBMetaPackage();
+        return getBasicProperties().getDBMetaPackage();
     }
 
     public void deleteOldTableClass_for_BaseConditionBean() {
@@ -175,7 +172,7 @@ public class DfOldClassHandler {
     }
 
     protected String getConditionBeanPackage() {
-        return _basicProperties.getConditionBeanPackage();
+        return getBasicProperties().getConditionBeanPackage();
     }
 
     public void deleteOldTableClass_for_AbstractBaseConditionQuery() {
@@ -273,7 +270,7 @@ public class DfOldClassHandler {
     }
 
     protected String getExtendedBehaviorPackage() {
-        return _basicProperties.getExtendedBehaviorPackage();
+        return getBasicProperties().getExtendedBehaviorPackage();
     }
 
     public void deleteOldTableClass_for_ExtendedDao() {
@@ -296,7 +293,7 @@ public class DfOldClassHandler {
     }
 
     protected String getExtendedDaoPackage() {
-        return _basicProperties.getExtendedDaoPackage();
+        return getBasicProperties().getExtendedDaoPackage();
     }
 
     public void deleteOldTableClass_for_ExtendedEntity() {
@@ -319,7 +316,7 @@ public class DfOldClassHandler {
     }
 
     protected String getExtendedEntityPackage() {
-        return _basicProperties.getExtendedEntityPackage();
+        return getBasicProperties().getExtendedEntityPackage();
     }
 
     // -----------------------------------------------------
@@ -474,8 +471,7 @@ public class DfOldClassHandler {
             deletedListMap = new LinkedHashMap<String, List<String>>(); // only for logging
         }
         final String classPrefix = getProjectPrefix() + (removeBasePrefix ? "" : getBasePrefix());
-        final Set<Entry<String, Map<String, Table>>> entrySet = _cmentityLocationMap.entrySet();
-        for (Entry<String, Map<String, Table>> entry : entrySet) {
+        for (Entry<String, Map<String, Table>> entry : _cmentityLocationMap.entrySet()) {
             final String outputDirectory = entry.getKey();
             // *no need to use because tableList already exists
             //final Map<String, Table> elementMap = entry.getValue();
@@ -510,8 +506,7 @@ public class DfOldClassHandler {
         final String oldStylePackagePath = getBaseDaoPackage() + "." + parameterBeanPackageName;
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         _deletedOldCustomizeBaseParameterBeanListMap = new LinkedHashMap<String, List<String>>();
-        final Set<Entry<String, Map<String, DfPmbMetaData>>> entrySet = _pmbLocationMap.entrySet();
-        for (Entry<String, Map<String, DfPmbMetaData>> entry : entrySet) { // loop per location
+        for (Entry<String, Map<String, DfPmbMetaData>> entry : _pmbLocationMap.entrySet()) { // loop per location
             final String outputDirectory = entry.getKey();
             final Map<String, DfPmbMetaData> elementMap = entry.getValue();
             final Set<String> notDeleteClassNameSet = new HashSet<String>();
@@ -584,7 +579,7 @@ public class DfOldClassHandler {
 
     protected DfOldTableClassDeletor createCCD(String outputDirectory, String packagePath, String classPrefix,
             String classSuffix, Set<String> notDeleteClassNameSet) { // createOldCustomizeClassDeletor()
-        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_basicProperties);
+        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
         final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(outputDirectory, packagePathHandler);
         deletor.addPackagePath(packagePath);
         deletor.setClassPrefix(classPrefix);
@@ -621,22 +616,191 @@ public class DfOldClassHandler {
     }
 
     // ===================================================================================
+    //                                                                 Old SimpleDTO Class
+    //                                                                 ===================
+    public void deleteOldSimpleDtoTableClass() {
+        if (getSimpleDtoProperties().hasSimpleDtoDefinition()) {
+            info("public void deleteOldSimpleDtoTableClass() {");
+            deleteOldTableClass_for_SimpleDtoBaseEntity();
+            deleteOldTableClass_for_SimpleDtoExtendedEntity();
+            info("}");
+        }
+    }
+
+    public void deleteOldSimpleDtoMapperTableClass() {
+        if (getSimpleDtoProperties().hasSimpleDtoDefinition()) {
+            if (getSimpleDtoProperties().isUseDtoMapper()) {
+                info("public void deleteOldSimpleDtoMapperTableClass() {");
+                deleteOldTableClass_for_SimpleDtoMapper();
+                info("}");
+            }
+        }
+    }
+
+    public void deleteOldSimpleDtoCustomizeClass() {
+        if (getSimpleDtoProperties().hasSimpleDtoDefinition()) {
+            info("public void deleteOldSimpleDtoCustomizeClass() {");
+            deleteOldCustomizeClass_for_SimpleDtoBaseEntity();
+            deleteOldCustomizeClass_for_SimpleDtoExtendedDto();
+            info("}");
+        }
+    }
+
+    public void deleteOldSimpleDtoMapperCustomizeClass() {
+        if (getSimpleDtoProperties().hasSimpleDtoDefinition()) {
+            if (getSimpleDtoProperties().isUseDtoMapper()) {
+                info("public void deleteOldSimpleDtoMapperTableClass() {");
+                deleteOldCustomizeClass_for_SimpleDtoMapper();
+                info("}");
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                           Table Class
+    //                                           -----------
+    protected List<String> _deletedOldTableSimpleDtoBaseDtoList;
+
+    public void deleteOldTableClass_for_SimpleDtoBaseEntity() {
+        final String packagePath = getSimpleDtoBaseDtoPackage();
+        _deletedOldTableSimpleDtoBaseDtoList = doDeleteOldTableClass_for_SimpleDtoBaseEntity(packagePath);
+    }
+
+    public List<String> doDeleteOldTableClass_for_SimpleDtoBaseEntity(String packagePath) {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
+            public String setup(Table table) {
+                return table.getBaseSimpleDtoClassName();
+            }
+        };
+        final String classPrefix = getSimpleDtoBaseDtoPrefix();
+        final String classSuffix = getSimpleDtoBaseDtoSuffix();
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, classSuffix, setupper);
+        List<String> deletedOldTableSimpleDtoBaseDtoList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(deletedOldTableSimpleDtoBaseDtoList);
+        return deletedOldTableSimpleDtoBaseDtoList;
+    }
+
+    protected String getSimpleDtoBaseDtoPackage() {
+        return getSimpleDtoProperties().getBaseDtoPackage();
+    }
+
+    protected String getSimpleDtoBaseDtoPrefix() {
+        return getSimpleDtoProperties().getBaseDtoPrefix();
+    }
+
+    protected String getSimpleDtoBaseDtoSuffix() {
+        return getSimpleDtoProperties().getBaseDtoSuffix();
+    }
+
+    public void deleteOldTableClass_for_SimpleDtoExtendedEntity() {
+        if (_deletedOldTableSimpleDtoBaseDtoList == null || _deletedOldTableSimpleDtoBaseDtoList.isEmpty()) {
+            return;
+        }
+        final String packagePath = getSimpleDtoExtendedDtoPackage();
+        doDeleteOldTableClass_for_SimpleDtoExtendedEntity(packagePath, _deletedOldTableSimpleDtoBaseDtoList);
+    }
+
+    public void doDeleteOldTableClass_for_SimpleDtoExtendedEntity(String packagePath, List<String> deletedList) {
+        final String outputPath = _generator.getOutputPath();
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
+        final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
+        for (String baseDtoClassName : deletedList) {
+            final String extendedDtoClassName = deriveSimpleDtoExtendedDtoClassName(baseDtoClassName);
+            final File file = new File(dirPath + "/" + extendedDtoClassName + "." + getClassFileExtension());
+            if (file.exists()) {
+                file.delete();
+                info("    delete('" + extendedDtoClassName + "');");
+            }
+        }
+    }
+
+    protected String deriveSimpleDtoExtendedDtoClassName(String baseDtoClassName) {
+        return getSimpleDtoProperties().deriveExtendedDtoClassName(baseDtoClassName);
+    }
+
+    protected String getSimpleDtoExtendedDtoPackage() {
+        return getSimpleDtoProperties().getExtendedDtoPackage();
+    }
+
+    public void deleteOldTableClass_for_SimpleDtoMapper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
+            public String setup(Table table) {
+                return table.getSimpleDtoMapperClassName();
+            }
+        };
+        final String packagePath = getSimpleDtoMapperPackage();
+        final String classPrefix = getSimpleDtoMapperPrefix();
+        final String classSuffix = getSimpleDtoMapperSuffix();
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, classSuffix, setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    protected String getSimpleDtoMapperPackage() {
+        return getSimpleDtoProperties().getMapperPackage();
+    }
+
+    protected String getSimpleDtoMapperPrefix() {
+        return getSimpleDtoProperties().getMapperPrefix();
+    }
+
+    protected String getSimpleDtoMapperSuffix() {
+        return getSimpleDtoProperties().getMapperSuffix();
+    }
+
+    // -----------------------------------------------------
+    //                                             Customize
+    //                                             ---------
+    protected List<String> _deletedOldCustomizeSimpleDtoBaseDtoList;
+
+    public void deleteOldCustomizeClass_for_SimpleDtoBaseEntity() {
+        if (!getSimpleDtoProperties().hasSimpleDtoDefinition()) {
+            return;
+        }
+        final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
+        final String packagePath = getSimpleDtoBaseDtoPackage() + "." + customizePackageName;
+        _deletedOldCustomizeSimpleDtoBaseDtoList = doDeleteOldTableClass_for_SimpleDtoBaseEntity(packagePath);
+    }
+
+    public void deleteOldCustomizeClass_for_SimpleDtoExtendedDto() {
+        if (_deletedOldCustomizeSimpleDtoBaseDtoList == null || _deletedOldCustomizeSimpleDtoBaseDtoList.isEmpty()) {
+            return;
+        }
+        final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
+        final String packagePath = getSimpleDtoExtendedDtoPackage() + "." + customizePackageName;
+        doDeleteOldTableClass_for_SimpleDtoExtendedEntity(packagePath, _deletedOldCustomizeSimpleDtoBaseDtoList);
+    }
+
+    public void deleteOldCustomizeClass_for_SimpleDtoMapper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
+            public String setup(Table table) {
+                return table.getSimpleDtoMapperClassName();
+            }
+        };
+        final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
+        final String packagePath = getSimpleDtoMapperPackage() + "." + customizePackageName;
+        final String classPrefix = getSimpleDtoMapperPrefix();
+        final String classSuffix = getSimpleDtoMapperSuffix();
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, classSuffix, setupper);
+        showDeleteOldTableFile(deletor.deleteOldTableClass());
+    }
+
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected DfPackagePathHandler createPackagePathHandler() {
-        return new DfPackagePathHandler(_basicProperties);
+        return new DfPackagePathHandler(getBasicProperties());
     }
 
     protected String getProjectPrefix() {
-        return _basicProperties.getProjectPrefix();
+        return getBasicProperties().getProjectPrefix();
     }
 
     protected String getBasePrefix() {
-        return _basicProperties.getBasePrefix();
+        return getBasicProperties().getBasePrefix();
     }
 
     protected String getClassFileExtension() {
-        return _basicProperties.getClassFileExtension();
+        return getBasicProperties().getClassFileExtension();
     }
 
     protected List<Table> getTableList() {
@@ -652,6 +816,25 @@ public class DfOldClassHandler {
 
     public void debug(String msg) {
         _log.debug(msg);
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+    }
+
+    protected DfSimpleDtoProperties getSimpleDtoProperties() {
+        return DfBuildProperties.getInstance().getSimpleDtoProperties();
     }
 
     // ===================================================================================

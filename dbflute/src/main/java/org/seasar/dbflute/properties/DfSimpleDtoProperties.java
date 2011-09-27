@@ -110,6 +110,14 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         return getPropertyIfNullEmpty("extendedDtoSuffix");
     }
 
+    public String deriveExtendedDtoClassName(String baseDtoClassName) {
+        String name = Srl.substringFirstRear(baseDtoClassName, getBaseDtoPrefix());
+        name = Srl.substringLastFront(name, getBaseDtoSuffix());
+        final String prefix = getExtendedDtoPrefix();
+        final String suffix = getExtendedDtoSuffix();
+        return prefix + name + suffix;
+    }
+
     // ===================================================================================
     //                                                                              Mapper
     //                                                                              ======
@@ -120,6 +128,14 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     public boolean isUseDtoMapper() {
         final String dtoMapperPackage = getMapperPackage();
         return dtoMapperPackage != null && dtoMapperPackage.trim().length() > 0;
+    }
+
+    public String getMapperPrefix() { // basically only for old class delete determination
+        return getExtendedDtoPrefix(); // mapper name is based on extended DTO name
+    }
+
+    public String getMapperSuffix() { // used for building class name
+        return "Mapper";
     }
 
     // ===================================================================================
