@@ -131,19 +131,42 @@ public class SqlAnalyzer {
     protected void processSqlConnectorAdjustable(Node node, String sql) {
         final SqlTokenizer st = new SqlTokenizer(sql);
         st.skipWhitespace();
-        final String token = st.skipToken();
+        final String skippedToken = st.skipToken(); // determination for and/or (also skip process)
         st.skipWhitespace();
-        if (sql.startsWith(",")) { // is connector
-            if (sql.startsWith(", ")) {
-                node.addChild(createSqlConnectorNode(node, ", ", sql.substring(2)));
-            } else {
-                node.addChild(createSqlConnectorNode(node, ",", sql.substring(1)));
-            }
-        } else if ("and".equalsIgnoreCase(token) || "or".equalsIgnoreCase(token)) { // is connector
-            node.addChild(createSqlConnectorNode(node, st.getBefore(), st.getAfter()));
-        } else { // is not connector
-            node.addChild(createSqlPartsNodeThroughConnector(node, sql));
+        if (processSqlConnectorMark(node, sql)) { // comma, ...
+            return;
         }
+        if (processSqlConnectorCondition(node, st, skippedToken)) { // and/or
+            return;
+        }
+        // is not connector
+        node.addChild(createSqlPartsNodeThroughConnector(node, sql));
+    }
+
+    protected boolean processSqlConnectorMark(Node node, String sql) {
+        if (doProcessSqlConnectorMark(node, sql, ",")) { // comma
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean doProcessSqlConnectorMark(Node node, String sql, String mark) {
+        final String ltrimmedSql = Srl.ltrim(sql); // for mark
+        if (ltrimmedSql.startsWith(mark)) { // is connector
+            final String markSpace = mark + " ";
+            final String realMark = ltrimmedSql.startsWith(markSpace) ? markSpace : mark;
+            node.addChild(createSqlConnectorNode(node, realMark, ltrimmedSql.substring(realMark.length())));
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean processSqlConnectorCondition(Node node, SqlTokenizer st, String skippedToken) {
+        if ("and".equalsIgnoreCase(skippedToken) || "or".equalsIgnoreCase(skippedToken)) { // is connector
+            node.addChild(createSqlConnectorNode(node, st.getBefore(), st.getAfter()));
+            return true;
+        }
+        return false;
     }
 
     protected boolean isSqlConnectorAdjustable(Node node) {

@@ -187,7 +187,7 @@ public class BeginNodeTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
-    public void test_parse_BEGIN_not_adjustConnector() {
+    public void test_parse_BEGIN_not_adjustConnector_direct() {
         // ## Arrange ##
         String sql = "select /*BEGIN*/, ";
         sql = sql + "/*IF pmb.memberId != null*/member.MEMBER_ID as c1/*END*/";
@@ -205,6 +205,27 @@ public class BeginNodeTest extends PlainTestCase {
         rootNode.accept(ctx);
         log("ctx:" + ctx);
         String expected = "select , member.MEMBER_NAME as c2";
+        assertEquals(expected, ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_not_adjustConnector_space() {
+        // ## Arrange ##
+        String sql = "select /*BEGIN*/foo ";
+        sql = sql + "/*IF pmb.memberId != null*/member.MEMBER_ID as c1/*END*/";
+        sql = sql + "/*IF pmb.memberName != null*/" + ln() + " , member.MEMBER_NAME as c2/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.analyze();
+
+        // ## Assert ##
+        MockMemberPmb pmb = new MockMemberPmb();
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "select foo member.MEMBER_NAME as c2";
         assertEquals(expected, ctx.getSql());
     }
 
