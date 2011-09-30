@@ -23,6 +23,20 @@ public final class DfAdditionalTableProperties extends DfAbstractHelperPropertie
     // ===================================================================================
     //                                                                  additionalTableMap
     //                                                                  ==================
+    // # map: {
+    // #     [table-name] = map:{
+    // #         columnMap = map:{
+    // #             [column-name] = map:{
+    // #                 type = [column JDBC type] ; dbType = [column DB type]
+    // #                 ; required = [true or false] ; size = [column size: e.g. 60 / 5, 3]
+    // #                 ; primaryKey = [true or false] ; pkName = [PK constraint name]
+    // #                 ; autoIncrement = [true or false]
+    // #                 ; default = [default value] ; comment = [column comment]
+    // #             }
+    // #         }
+    // #         ; comment = [table comment]
+    // #     }
+    // # }
     public static final String KEY_additionalTableMap = "additionalTableMap";
     protected Map<String, Object> _additionalTableMap;
 

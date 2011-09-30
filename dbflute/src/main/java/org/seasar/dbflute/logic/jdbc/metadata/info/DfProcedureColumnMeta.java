@@ -18,15 +18,15 @@ public class DfProcedureColumnMeta {
     protected String _dbTypeName;
     protected Integer _columnSize;
     protected Integer _decimalDigits;
-    protected Integer _overloadNo; // for example, Oracle's package procedure
+    protected Integer _overloadNo; // for example, Oracle's package procedure (by supplement meta)
     protected String _columnComment;
     protected DfProcedureColumnType _procedureColumnType;
 
     // if the informations can be extracted
     // (if these attributes are null, it's not always true that these are other types)
-    protected Map<String, DfColumnMeta> _resultSetColumnInfoMap; // when ResultSet type
-    protected DfTypeArrayInfo _typeArrayInfo; // when ARRAY type 
-    protected DfTypeStructInfo _typeStructInfo; // when STRUCT type
+    protected Map<String, DfColumnMeta> _resultSetColumnInfoMap; // when ResultSet type (by execution meta)
+    protected DfTypeArrayInfo _typeArrayInfo; // when ARRAY type (by supplement meta)
+    protected DfTypeStructInfo _typeStructInfo; // when STRUCT type (by supplement meta)
 
     protected final DfColumnExtractor _columnHandler = new DfColumnExtractor(); // for type determination
 

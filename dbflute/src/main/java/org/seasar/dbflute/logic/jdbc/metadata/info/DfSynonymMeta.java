@@ -44,8 +44,6 @@ public class DfSynonymMeta {
     protected String _dbLinkName;
     protected List<DfColumnMeta> _columnMetaInfoList4DBLink;
     protected boolean _selectable;
-    protected boolean _procedureSynonym;
-    protected boolean _sequenceSynonym;
     protected String _tableComment;
     protected Map<String, UserColComments> _columnCommentMap;
 

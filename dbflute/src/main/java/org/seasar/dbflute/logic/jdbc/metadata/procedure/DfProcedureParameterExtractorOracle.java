@@ -61,12 +61,45 @@ public class DfProcedureParameterExtractorOracle {
         return selectProcedureArgumentInfoList(unifiedSchema);
     }
 
+    public List<ProcedureArgumentInfo> extractProcedureArgumentInfoList4DBLink(UnifiedSchema unifiedSchema,
+            String dbLinkName) { // Oracle dependency (unused at 2011/09/30, implemented for the future)
+        return selectProcedureArgumentInfoList4DBLink(unifiedSchema, dbLinkName);
+    }
+
     // ===================================================================================
     //                                                                       Argument Info
     //                                                                       =============
     protected List<ProcedureArgumentInfo> selectProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildProcedureArgumentSql(unifiedSchema);
+        return doSelectProcedureArgumentInfoList(sql);
+    }
+
+    protected String buildProcedureArgumentSql(UnifiedSchema unifiedSchema) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select *");
+        sb.append(" from ALL_ARGUMENTS");
+        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" order by PACKAGE_NAME, OBJECT_NAME, OVERLOAD, SEQUENCE");
+        return sb.toString();
+    }
+
+    protected List<ProcedureArgumentInfo> selectProcedureArgumentInfoList4DBLink(UnifiedSchema unifiedSchema,
+            String dbLinkName) {
+        final String sql = buildProcedureArgumentSql4DBLink(unifiedSchema, dbLinkName);
+        return doSelectProcedureArgumentInfoList(sql);
+    }
+
+    protected String buildProcedureArgumentSql4DBLink(UnifiedSchema unifiedSchema, String dbLinkName) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select *");
+        sb.append(" from ALL_ARGUMENTS@").append(dbLinkName);
+        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" order by PACKAGE_NAME, OBJECT_NAME, OVERLOAD, SEQUENCE");
+        return sb.toString();
+    }
+
+    protected List<ProcedureArgumentInfo> doSelectProcedureArgumentInfoList(String sql) {
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("PACKAGE_NAME");
         columnList.add("OBJECT_NAME");
@@ -105,15 +138,6 @@ public class DfProcedureParameterExtractorOracle {
             infoList.add(info);
         }
         return infoList;
-    }
-
-    protected String buildProcedureArgumentSql(UnifiedSchema unifiedSchema) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("select *");
-        sb.append(" from ALL_ARGUMENTS");
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
-        sb.append(" order by PACKAGE_NAME, OBJECT_NAME, OVERLOAD, SEQUENCE");
-        return sb.toString();
     }
 
     public static class ProcedureArgumentInfo {

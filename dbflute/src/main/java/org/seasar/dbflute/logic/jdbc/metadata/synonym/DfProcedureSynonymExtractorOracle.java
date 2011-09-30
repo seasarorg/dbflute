@@ -108,10 +108,12 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                     continue; // select-able synonyms are out of target
                 }
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {
-                    continue; // It's a DB Link Synonym!
+                    // it's too difficult to build meta...
+                    // so this is unsupported here but you can use additionalTable as procedure.
+                    continue; // it's a DB link synonym
                 }
                 if (!tableOwner.hasSchema()) {
-                    continue; // basically no way because it may be for DB Link Synonym
+                    continue; // basically no way (if not exists, it should be a DB link synonym
                 }
 
                 final String procedureKey = tableOwner.buildSchemaQualifiedName(tableName);

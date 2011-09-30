@@ -241,6 +241,9 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     }
 
     protected DfSynonymMeta setupDBLinkSynonym(Connection conn, DfSynonymMeta info) throws SQLException {
+        if (!info.isSelectable()) { // e.g. procedure synonym
+            return info;
+        }
         final UnifiedSchema synonymOwner = info.getSynonymOwner();
         final String synonymName = info.getSynonymName();
         final String tableName = info.getTableName();
