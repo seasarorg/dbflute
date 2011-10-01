@@ -116,7 +116,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                     continue; // select-able synonyms are out of target
                 }
                 final DfProcedureMeta procedureMeta;
-                if (dbLinkName != null && dbLinkName.trim().length() > 0) {
+                if (dbLinkName != null && dbLinkName.trim().length() > 0) { // synonym for DB link
                     if (dbLinkProcedureNativeMap == null) { // lazy load
                         dbLinkProcedureNativeMap = extractDBLinkProcedureNativeMap();
                     }

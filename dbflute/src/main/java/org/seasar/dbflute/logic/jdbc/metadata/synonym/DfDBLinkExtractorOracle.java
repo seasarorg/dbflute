@@ -86,7 +86,6 @@ public class DfDBLinkExtractorOracle {
     protected Map<String, DBLinkInfo> doSelectDBLinkInfoMap(String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
-        columnList.add("OWNER");
         columnList.add("DB_LINK");
         columnList.add("USERNAME");
         columnList.add("HOST");
@@ -102,7 +101,6 @@ public class DfDBLinkExtractorOracle {
         final Map<String, DBLinkInfo> infoMap = DfCollectionUtil.newLinkedHashMap();
         for (Map<String, String> map : resultList) {
             final DBLinkInfo info = new DBLinkInfo();
-            info.setOwner(map.get("OWNER"));
             info.setDbLink(map.get("DB_LINK"));
             info.setUserName(map.get("USERNAME"));
             info.setHost(map.get("HOST"));
