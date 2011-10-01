@@ -15,19 +15,26 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 
+import java.sql.Types;
 import java.util.List;
 
+import org.apache.torque.engine.database.model.TypeMap;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeExtractorOracle.ProcedureNativeInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle.ProcedureArgumentInfo;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  * @since 0.9.9.1A (2011/09/30 Friday)
  */
 public class DfProcedureNativeTranslatorOracle {
+
+    protected final DfColumnExtractor _columnExtractor = new DfColumnExtractor();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -49,9 +56,37 @@ public class DfProcedureNativeTranslatorOracle {
         procedureMeta.setProcedureType(DfProcedureType.procedureResultUnknown);
         final List<ProcedureArgumentInfo> argInfoList = nativeInfo.getArgInfoList();
         for (ProcedureArgumentInfo argInfo : argInfoList) {
-            // TODO impl
             final DfProcedureColumnMeta columnMeta = new DfProcedureColumnMeta();
             columnMeta.setColumnName(argInfo.getArgumentName());
+
+            final String dataType = argInfo.getDataType();
+            columnMeta.setDbTypeName(dataType);
+            final String jdbcType = _columnExtractor.getColumnJdbcType(Types.OTHER, dataType);
+            final Integer jdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
+            columnMeta.setJdbcDefType(jdbcDefValue);
+            columnMeta.setOverloadNo(Integer.valueOf(argInfo.getOverload()));
+
+            final String inOut = argInfo.getInOut();
+            if ("in".equalsIgnoreCase(inOut)) {
+                columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnIn);
+            } else if ("out".equalsIgnoreCase(inOut)) {
+                columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnOut);
+            } else if ("inout".equalsIgnoreCase(inOut) || "in/out".equalsIgnoreCase(inOut)) {
+                // two pattern condition just in case
+                columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnInOut);
+            } else {
+                columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnUnknown);
+            }
+
+            final String dataLength = argInfo.getDataLength();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(dataLength)) {
+                columnMeta.setColumnSize(Integer.valueOf(dataLength));
+            }
+            final String dataScale = argInfo.getDataScale();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(dataScale)) {
+                columnMeta.setDecimalDigits(Integer.valueOf(dataScale));
+            }
+            procedureMeta.addProcedureColumn(columnMeta);
         }
         return procedureMeta;
     }

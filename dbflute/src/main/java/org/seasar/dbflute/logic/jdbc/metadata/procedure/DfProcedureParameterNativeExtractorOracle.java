@@ -103,7 +103,11 @@ public class DfProcedureParameterNativeExtractorOracle {
         columnList.add("OVERLOAD");
         columnList.add("SEQUENCE");
         columnList.add("ARGUMENT_NAME");
+        columnList.add("IN_OUT");
         columnList.add("DATA_TYPE");
+        columnList.add("DATA_LENGTH");
+        columnList.add("DATA_PRECISION");
+        columnList.add("DATA_SCALE");
         columnList.add("TYPE_OWNER");
         columnList.add("TYPE_NAME");
         columnList.add("TYPE_SUBNAME");
@@ -124,7 +128,11 @@ public class DfProcedureParameterNativeExtractorOracle {
             info.setOverload(map.get("OVERLOAD"));
             info.setSequence(map.get("SEQUENCE"));
             info.setArgumentName(map.get("ARGUMENT_NAME"));
+            info.setInOut(map.get("IN_OUT"));
             info.setDataType(map.get("DATA_TYPE"));
+            info.setDataLength(map.get("DATA_LENGTH"));
+            info.setDataPrecision(map.get("DATA_PRECISION"));
+            info.setDataScale(map.get("DATA_SCALE"));
             final String typeOwner = map.get("TYPE_OWNER"); // ARRAY and STRUCT only
             info.setTypeOwner(typeOwner);
             final String typeName = map.get("TYPE_NAME"); // nullable
@@ -143,7 +151,11 @@ public class DfProcedureParameterNativeExtractorOracle {
         protected String _overload;
         protected String _sequence;
         protected String _argumentName;
+        protected String _inOut;
         protected String _dataType;
+        protected String _dataLength;
+        protected String _dataPrecision;
+        protected String _dataScale;
         protected String _typeOwner;
         protected String _typeName;
         protected String _typeSubName;
@@ -201,12 +213,44 @@ public class DfProcedureParameterNativeExtractorOracle {
             this._argumentName = argumentName;
         }
 
+        public String getInOut() {
+            return _inOut;
+        }
+
+        public void setInOut(String inOut) {
+            this._inOut = inOut;
+        }
+
         public String getDataType() {
             return _dataType;
         }
 
         public void setDataType(String dataType) {
             this._dataType = dataType;
+        }
+
+        public String getDataLength() {
+            return _dataLength;
+        }
+
+        public void setDataLength(String dataLength) {
+            this._dataLength = dataLength;
+        }
+
+        public String getDataPrecision() {
+            return _dataPrecision;
+        }
+
+        public void setDataPrecision(String dataPrecision) {
+            this._dataPrecision = dataPrecision;
+        }
+
+        public String getDataScale() {
+            return _dataScale;
+        }
+
+        public void setDataScale(String dataScale) {
+            this._dataScale = dataScale;
         }
 
         public String getTypeName() {

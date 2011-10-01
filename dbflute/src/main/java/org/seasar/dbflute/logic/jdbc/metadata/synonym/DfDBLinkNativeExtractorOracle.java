@@ -110,18 +110,9 @@ public class DfDBLinkNativeExtractorOracle {
     }
 
     public static class DBLinkNativeInfo {
-        protected String _owner;
         protected String _dbLink;
         protected String _userName;
         protected String _host;
-
-        public String getOwner() {
-            return _owner;
-        }
-
-        public void setOwner(String owner) {
-            this._owner = owner;
-        }
 
         public String getDbLink() {
             return _dbLink;

@@ -264,10 +264,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         final Map<String, Map<Integer, String>> uniqueKeyMap = getDBLinkSynonymUQMap(conn, realTableName, dbLinkName);
         info.setUniqueKeyMap(uniqueKeyMap);
 
-        // It does not support Foreign Key of DBLink.
+        // Foreign Key and Index of DBLink are unsupported.
         info.setForeignKeyMap(new LinkedHashMap<String, DfForeignKeyMeta>());
-
-        // It does not support Index of DBLink.
         info.setIndexMap(new LinkedHashMap<String, Map<Integer, String>>());
 
         return info;
