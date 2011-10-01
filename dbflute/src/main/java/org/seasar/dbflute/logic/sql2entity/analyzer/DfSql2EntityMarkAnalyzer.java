@@ -104,8 +104,8 @@ public class DfSql2EntityMarkAnalyzer {
     }
 
     // ===================================================================================
-    //                                                                       ParameterBean
-    //                                                                       =============
+    //                                                                   Title/Description
+    //                                                                   =================
     public String getTitle(String sql) {
         final String titleMark = TITLE_MARK;
         final String descriptionMark = DESCRIPTION_MARK;
@@ -134,9 +134,6 @@ public class DfSql2EntityMarkAnalyzer {
         return peace.trim();
     }
 
-    // ===================================================================================
-    //                                                                             Comment
-    //                                                                             =======
     public String getDescription(String sql) {
         final String descriptionMark = DESCRIPTION_MARK;
         final int markIndex = sql.indexOf(descriptionMark);
@@ -163,6 +160,9 @@ public class DfSql2EntityMarkAnalyzer {
         return DfStringUtil.rtrim(peace);
     }
 
+    // ===================================================================================
+    //                                                                 SelectColumnComment
+    //                                                                 ===================
     public Map<String, String> getSelectColumnCommentMap(String sql) {
         final Map<String, String> commentMap = StringKeyMap.createAsFlexible();
         final List<String> splitList = Srl.splitList(sql, "\n");
@@ -179,6 +179,9 @@ public class DfSql2EntityMarkAnalyzer {
             final String clause = Srl.substringFirstFront(lowerLine, lineCommentMark);
             final String column;
             if (!clause.contains(asMark)) {
+                if (clause.contains("(") || clause.contains(")")) {
+                    continue; // e.g. max(member.BIRTHDATE)
+                }
                 if (clause.contains(dot)) { // "." exists
                     column = Srl.substringLastRear(clause, dot);
                 } else if (clause.contains(comma)) { // "," exists
@@ -186,6 +189,8 @@ public class DfSql2EntityMarkAnalyzer {
                 } else { // all nothing
                     continue;
                 }
+                // small noises are allowed
+                // because this map is merely for reference
             } else { // "as" exists 
                 column = Srl.substringLastRear(clause, asMark);
             }
