@@ -92,6 +92,10 @@ public class DfProcedureNativeTranslatorOracle {
             }
             procedureMeta.addProcedureColumn(columnMeta);
         }
+
+        // Overload, Array, Struct are unsupported for DBLink
+        // you should refactor the process if you support them
+
         return procedureMeta;
     }
 }

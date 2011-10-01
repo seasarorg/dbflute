@@ -362,11 +362,11 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 }
             }
         }
-        resolveAssitInfo(dataSource, unifiedSchema, metaInfoList);
+        resolveAssistInfo(dataSource, unifiedSchema, metaInfoList);
         return metaInfoList;
     }
 
-    protected void resolveAssitInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
+    protected void resolveAssistInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
             List<DfProcedureMeta> metaInfoList) {
         if (isDatabaseOracle()) {
             doResolveAssistInfoOracle(dataSource, unifiedSchema, metaInfoList);
