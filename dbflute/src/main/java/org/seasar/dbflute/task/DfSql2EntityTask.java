@@ -534,7 +534,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             return;
         }
         final String plainComment = relatedColumn.getPlainComment();
-        column.setPlainComment(plainComment);
+        final String columnComment = metaInfo.getColumnComment();
+        final StringBuilder sb = new StringBuilder();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(plainComment)) {
+            sb.append(plainComment);
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(columnComment)) {
+                sb.append(ln()).append("// ").append(columnComment);
+            }
+        } else {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(columnComment)) {
+                sb.append("// ").append(columnComment);
+            }
+        }
+        column.setPlainComment(sb.toString());
     }
 
     protected void setupSql2EntityElement(String entityName, Map<String, DfColumnMeta> metaMap, String columnName,

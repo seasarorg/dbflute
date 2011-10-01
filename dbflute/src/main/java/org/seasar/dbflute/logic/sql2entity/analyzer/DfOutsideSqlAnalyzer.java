@@ -112,53 +112,18 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
             DfCustomizeEntityInfo customizeEntityInfo = null;
             boolean alreadyIncrementGoodSqlCount = false;
             if (isTargetEntityMakingSql(sql)) {
-                final String executedActuallySql;
                 {
-                    // the timing to remove comments is here
-                    String filtered = sql;
-                    if (!_currentDBDef.dbway().isBlockCommentSupported()) {
-                        filtered = removeBlockComment(filtered);
-                    }
-                    if (!_currentDBDef.dbway().isLineCommentSupported()) {
-                        filtered = removeLineComment(filtered);
-                    }
-                    executedActuallySql = filtered;
+                    final String executedSql = buildExecutedSql(sql);
+                    checkStatement(executedSql);
+                    rs = _currentStatement.executeQuery(executedSql);
                 }
-                checkStatement(executedActuallySql);
-                rs = _currentStatement.executeQuery(executedActuallySql);
 
                 _goodSqlCount++;
                 alreadyIncrementGoodSqlCount = true;
 
-                final Map<String, String> columnForcedJavaNativeMap = createColumnForcedJavaNativeMap(sql);
-                final DfCustomizeEntityMetaExtractor customizeEntityMetaExtractor = new DfCustomizeEntityMetaExtractor();
-                final Map<String, DfColumnMeta> columnMetaInfoMap = customizeEntityMetaExtractor
-                        .extractColumnMetaInfoMap(rs, sql, new DfForcedJavaNativeProvider() {
-                            public String provide(String columnName) {
-                                return columnForcedJavaNativeMap.get(columnName);
-                            }
-                        });
-
                 // for Customize Entity
-                String entityName = getCustomizeEntityName(sql);
-                if (entityName != null) {
-                    entityName = resolveEntityNameIfNeeds(entityName, _sqlFile);
-                    assertDuplicateEntity(entityName, _sqlFile);
-                    // saves for setting to pmbMetaData
-                    customizeEntityInfo = new DfCustomizeEntityInfo(entityName, columnMetaInfoMap);
-                    customizeEntityInfo.setSqlFile(_sqlFile);
-                    if (isDomain(sql)) {
-                        customizeEntityInfo.setDomainHandling(true);
-                    } else if (isCursor(sql)) {
-                        customizeEntityInfo.setCursorHandling(true);
-                    } else if (isScalar(sql)) {
-                        customizeEntityInfo.setScalarHandling(true);
-                    }
-                    customizeEntityInfo.setPrimaryKeyList(getPrimaryKeyColumnNameList(sql));
-                    customizeEntityInfo.setOutsideSqlFile(getCurrentOutsideSqlFile());
-                    customizeEntityInfo.acceptSupplementaryComment(getSelectColumnCommentMap(sql));
-                    _sql2entityMeta.addEntityInfo(entityName, customizeEntityInfo);
-                }
+                final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(sql, rs);
+                customizeEntityInfo = processCustomizeEntity(sql, columnMetaInfoMap);
             }
             if (isTargetParameterBeanMakingSql(sql)) {
                 if (!alreadyIncrementGoodSqlCount) {
@@ -166,17 +131,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                 }
 
                 // for Parameter Bean
-                final DfParameterBeanResolver resolver = createParameterBeanResolver();
-                final DfPmbMetaData pmbMetaData = resolver.extractPmbMetaData(sql);
-                if (pmbMetaData != null) {
-                    if (customizeEntityInfo != null) {
-                        pmbMetaData.setCustomizeEntityInfo(customizeEntityInfo);
-                        customizeEntityInfo.setPmbMetaData(pmbMetaData); // reverse reference
-                    }
-                    final String pmbName = pmbMetaData.getClassName();
-                    assertDuplicateParameterBean(pmbName, _sqlFile);
-                    _sql2entityMeta.addPmbMetaData(pmbName, pmbMetaData);
-                }
+                processParameterBean(sql, customizeEntityInfo);
             }
         } catch (SQLException e) {
             if (_runInfo.isErrorContinue()) {
@@ -194,6 +149,34 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                 }
             }
         }
+    }
+
+    // -----------------------------------------------------
+    //                                          Executed SQL
+    //                                          ------------
+    protected String buildExecutedSql(String sql) {
+        // the timing to remove comments is here
+        String filtered = sql;
+        if (!_currentDBDef.dbway().isBlockCommentSupported()) {
+            filtered = removeBlockComment(filtered);
+        }
+        if (!_currentDBDef.dbway().isLineCommentSupported()) {
+            filtered = removeLineComment(filtered);
+        }
+        return filtered;
+    }
+
+    // -----------------------------------------------------
+    //                                       CustomizeEntity
+    //                                       ---------------
+    protected Map<String, DfColumnMeta> extractColumnMetaInfoMap(String sql, ResultSet rs) throws SQLException {
+        final Map<String, String> columnForcedJavaNativeMap = createColumnForcedJavaNativeMap(sql);
+        final DfCustomizeEntityMetaExtractor extractor = new DfCustomizeEntityMetaExtractor();
+        return extractor.extractColumnMetaInfoMap(rs, sql, new DfForcedJavaNativeProvider() {
+            public String provide(String columnName) {
+                return columnForcedJavaNativeMap.get(columnName);
+            }
+        });
     }
 
     protected Map<String, String> createColumnForcedJavaNativeMap(String sql) {
@@ -219,6 +202,48 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
     protected String resolvePackageName(String typeName) { // [DBFLUTE-271]
         return _propertyTypePackageResolver.resolvePackageName(typeName);
+    }
+
+    protected DfCustomizeEntityInfo processCustomizeEntity(String sql, Map<String, DfColumnMeta> columnMetaInfoMap) {
+        String entityName = getCustomizeEntityName(sql);
+        if (entityName == null) {
+            return null;
+        }
+        entityName = resolveEntityNameIfNeeds(entityName, _sqlFile);
+        assertDuplicateEntity(entityName, _sqlFile);
+        // saves for setting to pmbMetaData
+        DfCustomizeEntityInfo customizeEntityInfo = new DfCustomizeEntityInfo(entityName, columnMetaInfoMap);
+        customizeEntityInfo.setSqlFile(_sqlFile);
+        if (isDomain(sql)) {
+            customizeEntityInfo.setDomainHandling(true);
+        } else if (isCursor(sql)) {
+            customizeEntityInfo.setCursorHandling(true);
+        } else if (isScalar(sql)) {
+            customizeEntityInfo.setScalarHandling(true);
+        }
+        customizeEntityInfo.setPrimaryKeyList(getPrimaryKeyColumnNameList(sql));
+        customizeEntityInfo.setOutsideSqlFile(getCurrentOutsideSqlFile());
+        customizeEntityInfo.acceptSelectColumnComment(getSelectColumnCommentMap(sql));
+        _sql2entityMeta.addEntityInfo(entityName, customizeEntityInfo);
+        return customizeEntityInfo;
+    }
+
+    // -----------------------------------------------------
+    //                                         ParameterBean
+    //                                         -------------
+    protected void processParameterBean(String sql, DfCustomizeEntityInfo customizeEntityInfo) {
+        final DfParameterBeanResolver resolver = createParameterBeanResolver();
+        final DfPmbMetaData pmbMetaData = resolver.extractPmbMetaData(sql);
+        if (pmbMetaData == null) {
+            return;
+        }
+        if (customizeEntityInfo != null) {
+            pmbMetaData.setCustomizeEntityInfo(customizeEntityInfo);
+            customizeEntityInfo.setPmbMetaData(pmbMetaData); // reverse reference
+        }
+        final String pmbName = pmbMetaData.getClassName();
+        assertDuplicateParameterBean(pmbName, _sqlFile);
+        _sql2entityMeta.addPmbMetaData(pmbName, pmbMetaData);
     }
 
     protected DfParameterBeanResolver createParameterBeanResolver() {

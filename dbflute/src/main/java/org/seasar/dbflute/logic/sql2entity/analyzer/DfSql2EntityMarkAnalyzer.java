@@ -169,16 +169,26 @@ public class DfSql2EntityMarkAnalyzer {
         final String lineCommentMark = " --";
         final String columnCommentMark = " //";
         final String asMark = " as ";
+        final String dot = ".";
+        final String comma = ",";
         for (String line : splitList) {
             final String lowerLine = line.toLowerCase();
             if (!lowerLine.contains(lineCommentMark) || !lowerLine.contains(columnCommentMark)) {
                 continue;
             }
             final String clause = Srl.substringFirstFront(lowerLine, lineCommentMark);
+            final String column;
             if (!clause.contains(asMark)) {
-                continue;
+                if (clause.contains(dot)) { // "." exists
+                    column = Srl.substringLastRear(clause, dot);
+                } else if (clause.contains(comma)) { // "," exists
+                    column = Srl.substringLastRear(clause, comma);
+                } else { // all nothing
+                    continue;
+                }
+            } else { // "as" exists 
+                column = Srl.substringLastRear(clause, asMark);
             }
-            final String column = Srl.substringLastRear(clause, asMark);
             if (Srl.is_Null_or_TrimmedEmpty(column)) {
                 continue;
             }

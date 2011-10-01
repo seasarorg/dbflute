@@ -94,6 +94,9 @@ public class DfCustomizeEntityMetaExtractor {
                 metaInfo.setSql2EntityForcedJavaNative(sql2entityForcedJavaNative);
             }
 
+            // column comment is not set here (no comment on meta data)
+            // if select column comment is specified, comment will be set later
+
             columnMetaInfoMap.put(columnName, metaInfo);
         }
         return columnMetaInfoMap;

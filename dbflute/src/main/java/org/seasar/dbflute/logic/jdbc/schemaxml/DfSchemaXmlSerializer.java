@@ -291,28 +291,28 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                                 Table
     //                                                 -----
-    protected boolean processTable(Connection conn, DatabaseMetaData metaData, DfTableMeta tableInfo)
+    protected boolean processTable(Connection conn, DatabaseMetaData metaData, DfTableMeta tableMeta)
             throws SQLException {
-        if (tableInfo.isOutOfGenerateTarget()) {
+        if (tableMeta.isOutOfGenerateTarget()) {
             // for example, sequence synonym and so on...
-            _log.info("$ " + tableInfo.buildTableFullQualifiedName() + " is out of generation target!");
+            _log.info("$ " + tableMeta.buildTableFullQualifiedName() + " is out of generation target!");
             return false;
         }
-        _log.info("$ " + tableInfo.toString());
+        _log.info("$ " + tableMeta.toString());
 
         final Element tableElement = _doc.createElement("table");
-        tableElement.setAttribute("name", tableInfo.getTableName());
-        tableElement.setAttribute("type", tableInfo.getTableType());
-        final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
+        tableElement.setAttribute("name", tableMeta.getTableName());
+        tableElement.setAttribute("type", tableMeta.getTableType());
+        final UnifiedSchema unifiedSchema = tableMeta.getUnifiedSchema();
         if (unifiedSchema.hasSchema()) {
             tableElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
         }
-        final String tableComment = tableInfo.getTableComment();
+        final String tableComment = tableMeta.getTableComment();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(tableComment)) {
             tableElement.setAttribute("comment", tableComment);
         }
-        final DfPrimaryKeyMeta pkInfo = getPrimaryColumnMetaInfo(metaData, tableInfo);
-        final List<DfColumnMeta> columns = getColumns(metaData, tableInfo);
+        final DfPrimaryKeyMeta pkInfo = getPrimaryColumnMetaInfo(metaData, tableMeta);
+        final List<DfColumnMeta> columns = getColumns(metaData, tableMeta);
         for (int j = 0; j < columns.size(); j++) {
             final DfColumnMeta columnInfo = columns.get(j);
             final Element columnElement = _doc.createElement("column");
@@ -326,14 +326,14 @@ public class DfSchemaXmlSerializer {
             processPrimaryKey(columnInfo, pkInfo, columnElement);
             processColumnComment(columnInfo, columnElement);
             processDefaultValue(columnInfo, columnElement);
-            processAutoIncrement(tableInfo, columnInfo, pkInfo, conn, columnElement);
+            processAutoIncrement(tableMeta, columnInfo, pkInfo, conn, columnElement);
 
             tableElement.appendChild(columnElement);
         }
 
-        processForeignKey(metaData, tableInfo, tableElement);
-        final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKey(metaData, tableInfo, tableElement);
-        processIndex(metaData, tableInfo, tableElement, uniqueKeyMap);
+        processForeignKey(metaData, tableMeta, tableElement);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKey(metaData, tableMeta, tableElement);
+        processIndex(metaData, tableMeta, tableElement, uniqueKeyMap);
 
         _databaseNode.appendChild(tableElement);
         return true;
@@ -342,34 +342,34 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                                Column
     //                                                ------
-    protected void processColumnName(final DfColumnMeta columnInfo, final Element columnElement) {
-        final String columnName = columnInfo.getColumnName();
+    protected void processColumnName(final DfColumnMeta columnMeta, final Element columnElement) {
+        final String columnName = columnMeta.getColumnName();
         columnElement.setAttribute("name", columnName);
     }
 
-    protected void processColumnType(final DfColumnMeta columnInfo, final Element columnElement) {
-        columnElement.setAttribute("type", getColumnJdbcType(columnInfo));
+    protected void processColumnType(final DfColumnMeta columnMeta, final Element columnElement) {
+        columnElement.setAttribute("type", getColumnJdbcType(columnMeta));
     }
 
-    protected void processColumnDbType(final DfColumnMeta columnInfo, final Element columnElement) {
-        columnElement.setAttribute("dbType", columnInfo.getDbTypeName());
+    protected void processColumnDbType(final DfColumnMeta columnMeta, final Element columnElement) {
+        columnElement.setAttribute("dbType", columnMeta.getDbTypeName());
     }
 
-    protected void processColumnJavaType(final DfColumnMeta columnInfo, final Element columnElement) {
-        final String jdbcType = getColumnJdbcType(columnInfo);
-        final int columnSize = columnInfo.getColumnSize();
-        final int decimalDigits = columnInfo.getDecimalDigits();
+    protected void processColumnJavaType(final DfColumnMeta columnMeta, final Element columnElement) {
+        final String jdbcType = getColumnJdbcType(columnMeta);
+        final int columnSize = columnMeta.getColumnSize();
+        final int decimalDigits = columnMeta.getDecimalDigits();
         final String javaNative = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
         columnElement.setAttribute("javaType", javaNative);
     }
 
-    protected String getColumnJdbcType(DfColumnMeta columnInfo) {
-        return _columnExtractor.getColumnJdbcType(columnInfo);
+    protected String getColumnJdbcType(DfColumnMeta columnMeta) {
+        return _columnExtractor.getColumnJdbcType(columnMeta);
     }
 
-    protected void processColumnSize(DfColumnMeta columnInfo, Element columnElement) {
-        final int columnSize = columnInfo.getColumnSize();
-        final int decimalDigits = columnInfo.getDecimalDigits();
+    protected void processColumnSize(DfColumnMeta columnMeta, Element columnElement) {
+        final int columnSize = columnMeta.getColumnSize();
+        final int decimalDigits = columnMeta.getDecimalDigits();
         if (DfColumnExtractor.isColumnSizeValid(columnSize)) {
             if (DfColumnExtractor.isDecimalDigitsValid(decimalDigits)) {
                 columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
@@ -379,14 +379,14 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void processRequired(DfColumnMeta columnInfo, Element columnElement) {
-        if (columnInfo.isRequired()) {
+    protected void processRequired(DfColumnMeta columnMeta, Element columnElement) {
+        if (columnMeta.isRequired()) {
             columnElement.setAttribute("required", "true");
         }
     }
 
-    protected void processPrimaryKey(DfColumnMeta columnInfo, DfPrimaryKeyMeta pkInfo, Element columnElement) {
-        final String columnName = columnInfo.getColumnName();
+    protected void processPrimaryKey(DfColumnMeta columnMeta, DfPrimaryKeyMeta pkInfo, Element columnElement) {
+        final String columnName = columnMeta.getColumnName();
         if (pkInfo.containsColumn(columnName)) {
             columnElement.setAttribute("primaryKey", "true");
             final String pkName = pkInfo.getPrimaryKeyName(columnName);
@@ -396,15 +396,15 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void processColumnComment(DfColumnMeta columnInfo, Element columnElement) {
-        final String columnComment = columnInfo.getColumnComment();
+    protected void processColumnComment(DfColumnMeta columnMeta, Element columnElement) {
+        final String columnComment = columnMeta.getColumnComment();
         if (columnComment != null) {
             columnElement.setAttribute("comment", columnComment);
         }
     }
 
-    protected void processDefaultValue(DfColumnMeta columnInfo, Element columnElement) {
-        String defaultValue = columnInfo.getDefaultValue();
+    protected void processDefaultValue(DfColumnMeta columnMeta, Element columnElement) {
+        String defaultValue = columnMeta.getDefaultValue();
         if (defaultValue != null) {
             // trim out parens & quotes out of default value.
             // makes sense for MSSQL. not sure about others.
@@ -420,11 +420,11 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void processAutoIncrement(DfTableMeta tableInfo, DfColumnMeta columnInfo, DfPrimaryKeyMeta pkInfo,
+    protected void processAutoIncrement(DfTableMeta tableMeta, DfColumnMeta columnMeta, DfPrimaryKeyMeta pkMeta,
             Connection conn, Element columnElement) throws SQLException {
-        final String columnName = columnInfo.getColumnName();
-        if (pkInfo.containsColumn(columnName)) {
-            if (isAutoIncrementColumn(conn, tableInfo, columnInfo)) {
+        final String columnName = columnMeta.getColumnName();
+        if (pkMeta.containsColumn(columnName)) {
+            if (isAutoIncrementColumn(conn, tableMeta, columnMeta)) {
                 columnElement.setAttribute("autoIncrement", "true");
             }
         }
@@ -433,9 +433,9 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                            Constraint
     //                                            ----------
-    protected void processForeignKey(DatabaseMetaData metaData, DfTableMeta tableInfo, Element tableElement)
+    protected void processForeignKey(DatabaseMetaData metaData, DfTableMeta tableMeta, Element tableElement)
             throws SQLException {
-        final Map<String, DfForeignKeyMeta> foreignKeyMap = getForeignKeys(metaData, tableInfo);
+        final Map<String, DfForeignKeyMeta> foreignKeyMap = getForeignKeys(metaData, tableMeta);
         final Set<String> foreignKeyKeySet = foreignKeyMap.keySet();
         for (String foreignKeyName : foreignKeyKeySet) {
             final DfForeignKeyMeta foreignKeyMetaInfo = foreignKeyMap.get(foreignKeyName);
@@ -455,9 +455,9 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected Map<String, Map<Integer, String>> processUniqueKey(DatabaseMetaData metaData, DfTableMeta tableInfo,
+    protected Map<String, Map<Integer, String>> processUniqueKey(DatabaseMetaData metaData, DfTableMeta tableMeta,
             Element tableElement) throws SQLException {
-        final Map<String, Map<Integer, String>> uniqueMap = getUniqueKeyMap(metaData, tableInfo);
+        final Map<String, Map<Integer, String>> uniqueMap = getUniqueKeyMap(metaData, tableMeta);
         final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
         for (final String uniqueIndexName : uniqueKeySet) {
             final Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueIndexName);
@@ -480,9 +480,9 @@ public class DfSchemaXmlSerializer {
         return uniqueMap;
     }
 
-    protected void processIndex(DatabaseMetaData metaData, DfTableMeta tableInfo, Element tableElement,
+    protected void processIndex(DatabaseMetaData metaData, DfTableMeta tableMeta, Element tableElement,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
-        final Map<String, Map<Integer, String>> indexMap = getIndexMap(metaData, tableInfo, uniqueKeyMap);
+        final Map<String, Map<Integer, String>> indexMap = getIndexMap(metaData, tableMeta, uniqueKeyMap);
         final java.util.Set<String> indexKeySet = indexMap.keySet();
         for (final String indexName : indexKeySet) {
             final Map<Integer, String> indexElementMap = indexMap.get(indexName);

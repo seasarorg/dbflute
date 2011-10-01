@@ -106,23 +106,18 @@ public class DfCustomizeEntityInfo {
     }
 
     // ===================================================================================
-    //                                                               Supplementary Comment
+    //                                                               Select Column Comment
     //                                                               =====================
-    public void acceptSupplementaryComment(Map<String, String> commentMap) {
+    public void acceptSelectColumnComment(Map<String, String> commentMap) {
         if (commentMap == null || commentMap.isEmpty()) {
             return;
         }
         for (Entry<String, DfColumnMeta> entry : _columnMap.entrySet()) {
             final String columnName = entry.getKey();
-            final String supplementaryComment = commentMap.get(columnName); // commentMap should be flexible
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(supplementaryComment)) {
+            final String selectColumnComment = commentMap.get(columnName); // commentMap should be flexible
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(selectColumnComment)) {
                 final DfColumnMeta meta = entry.getValue();
-                final String currentComment = meta.getColumnComment();
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(currentComment)) {
-                    meta.setColumnComment(currentComment + "\n// " + supplementaryComment);
-                } else {
-                    meta.setColumnComment(supplementaryComment);
-                }
+                meta.setColumnComment(selectColumnComment); // override here
             }
         }
     }
