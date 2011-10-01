@@ -65,8 +65,8 @@ public class DfProcedurePmbSetupper {
     protected final Map<String, DfCustomizeEntityInfo> _entityInfoMap;
     protected final Map<String, DfPmbMetaData> _pmbMetaDataMap;
     protected final Database _database;
-    protected final DfColumnExtractor _columnHandler = new DfColumnExtractor();
-    protected final DfProcedureExtractor _procedureHandler = new DfProcedureExtractor();
+    protected final DfColumnExtractor _columnExtractor = new DfColumnExtractor();
+    protected final DfProcedureExtractor _procedureExtractor = new DfProcedureExtractor();
     protected final Map<String, String> _continuedFailureMessageMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
@@ -189,8 +189,8 @@ public class DfProcedurePmbSetupper {
     //                                                                      Procedure List
     //                                                                      ==============
     protected List<DfProcedureMeta> getAvailableProcedureList() throws SQLException {
-        _procedureHandler.includeProcedureSynonym(_dataSource);
-        final List<DfProcedureMeta> procedureList = _procedureHandler.getAvailableProcedureList(_dataSource);
+        _procedureExtractor.includeProcedureSynonym(_dataSource);
+        final List<DfProcedureMeta> procedureList = _procedureExtractor.getAvailableProcedureList(_dataSource);
         if (getOutsideSqlProperties().isGenerateProcedureCustomizeEntity()) {
             final DfProcedureExecutionMetaExtractor executionMetaHandler = new DfProcedureExecutionMetaExtractor();
             executionMetaHandler.extractExecutionMetaData(_dataSource, procedureList);
@@ -412,8 +412,8 @@ public class DfProcedurePmbSetupper {
     //                                         Assist Helper
     //                                         -------------
     protected String findPlainPropertyType(int jdbcDefType, String dbTypeName, Integer columnSize, Integer decimalDigits) {
-        if (_columnHandler.hasMappingJdbcType(jdbcDefType, dbTypeName)) {
-            final String torqueType = _columnHandler.getColumnJdbcType(jdbcDefType, dbTypeName);
+        if (_columnExtractor.hasMappingJdbcType(jdbcDefType, dbTypeName)) {
+            final String torqueType = _columnExtractor.getColumnJdbcType(jdbcDefType, dbTypeName);
             return TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
         } else {
             return "Object"; // procedure has many-many types so it uses Object type (not String)
