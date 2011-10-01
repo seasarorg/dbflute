@@ -61,9 +61,8 @@ public class DfProcedureParameterExtractorOracle {
         return selectProcedureArgumentInfoList(unifiedSchema);
     }
 
-    public List<ProcedureArgumentInfo> extractProcedureArgumentInfoList4DBLink(UnifiedSchema unifiedSchema,
-            String dbLinkName) { // Oracle dependency (unused at 2011/09/30, implemented for the future)
-        return selectProcedureArgumentInfoList4DBLink(unifiedSchema, dbLinkName);
+    public List<ProcedureArgumentInfo> extractDBLinkProcedureArgumentInfoList(String dbLinkName) { // Oracle dependency
+        return selectDBLinkProcedureArgumentInfoList(dbLinkName);
     }
 
     // ===================================================================================
@@ -83,17 +82,15 @@ public class DfProcedureParameterExtractorOracle {
         return sb.toString();
     }
 
-    protected List<ProcedureArgumentInfo> selectProcedureArgumentInfoList4DBLink(UnifiedSchema unifiedSchema,
-            String dbLinkName) {
-        final String sql = buildProcedureArgumentSql4DBLink(unifiedSchema, dbLinkName);
+    protected List<ProcedureArgumentInfo> selectDBLinkProcedureArgumentInfoList(String dbLinkName) {
+        final String sql = buildDBLinkProcedureArgumentSql(dbLinkName);
         return doSelectProcedureArgumentInfoList(sql);
     }
 
-    protected String buildProcedureArgumentSql4DBLink(UnifiedSchema unifiedSchema, String dbLinkName) {
+    protected String buildDBLinkProcedureArgumentSql(String dbLinkName) {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
-        sb.append(" from ALL_ARGUMENTS@").append(dbLinkName);
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" from USER_ARGUMENTS@").append(dbLinkName);
         sb.append(" order by PACKAGE_NAME, OBJECT_NAME, OVERLOAD, SEQUENCE");
         return sb.toString();
     }

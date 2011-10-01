@@ -29,7 +29,10 @@ public class DfProcedureMeta {
     protected boolean _procedureSynonym;
     protected boolean _packageProcedure;
 
+    // procedure parameters
     protected final List<DfProcedureColumnMeta> _procedureColumnList = new ArrayList<DfProcedureColumnMeta>();
+
+    // by execution meta
     protected final List<DfProcedureNotParamResultMeta> _notParamResultList = new ArrayList<DfProcedureNotParamResultMeta>();
 
     // ===================================================================================
@@ -242,7 +245,7 @@ public class DfProcedureMeta {
         this._procedureSchemaQualifiedName = procedureSchemaQualifiedName;
     }
 
-    protected void setProcedureSqlName(String procedureSqlName) { // basically for procedure synonym
+    public void setProcedureSqlName(String procedureSqlName) { // basically for procedure synonym
         this._procedureSqlName = procedureSqlName;
     }
 
