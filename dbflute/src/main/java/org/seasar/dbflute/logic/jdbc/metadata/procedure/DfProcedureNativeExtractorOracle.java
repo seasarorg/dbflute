@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterExtractorOracle.ProcedureArgumentInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle.ProcedureArgumentInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -85,7 +85,7 @@ public class DfProcedureNativeExtractorOracle {
         sb.append("select OBJECT_NAME as PKG, PROCEDURE_NAME as NAME, null as OL");
         sb.append(" from ALL_PROCEDURES");
         sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
-        sb.append(" union");
+        sb.append(" union"); // because ALL_PROCEDURES table on Oracle 10g does not have OVERLOAD
         sb.append(" select PACKAGE_NAME as PKG, OBJECT_NAME as NAME, OVERLOAD as OL");
         sb.append(" from ALL_ARGUMENTS");
         sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
@@ -107,7 +107,7 @@ public class DfProcedureNativeExtractorOracle {
         final StringBuilder sb = new StringBuilder();
         sb.append("select OBJECT_NAME as PKG, PROCEDURE_NAME as NAME, null as OL");
         sb.append(" from USER_PROCEDURES@").append(dbLinkName);
-        sb.append(" union");
+        sb.append(" union"); // same reason as ALL_PROCEDURES
         sb.append(" select PACKAGE_NAME as PKG, OBJECT_NAME as NAME, OVERLOAD as OL");
         sb.append(" from ALL_ARGUMENTS");
         sb.append(" order by PKG, NAME, OL");
@@ -200,14 +200,14 @@ public class DfProcedureNativeExtractorOracle {
     //                                                                       Argument Info
     //                                                                       =============
     protected Map<String, List<ProcedureArgumentInfo>> selectProcedureArgumentInfoMap(UnifiedSchema unifiedSchema) {
-        final DfProcedureParameterExtractorOracle extractor = new DfProcedureParameterExtractorOracle(_dataSource,
+        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(_dataSource,
                 _suppressLogging);
         final List<ProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
         return arrangeProcedureArgumentInfoMap(allArgList);
     }
 
     protected Map<String, List<ProcedureArgumentInfo>> selectDBLinkProcedureArgumentInfoMap(String dbLinkName) {
-        final DfProcedureParameterExtractorOracle extractor = new DfProcedureParameterExtractorOracle(_dataSource,
+        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(_dataSource,
                 _suppressLogging);
         final List<ProcedureArgumentInfo> allArgList = extractor.extractDBLinkProcedureArgumentInfoList(dbLinkName);
         return arrangeProcedureArgumentInfoMap(allArgList);

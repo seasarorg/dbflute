@@ -189,9 +189,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             throw new IllegalStateException(msg);
         }
         log("...Adding procedure synonyms as procedure: count=" + procedureSynonymMap.size());
-        final Set<Entry<String, DfProcedureSynonymMeta>> entrySet = procedureSynonymMap.entrySet();
         final List<DfProcedureMeta> procedureSynonymList = new ArrayList<DfProcedureMeta>();
-        for (Entry<String, DfProcedureSynonymMeta> entry : entrySet) {
+        for (Entry<String, DfProcedureSynonymMeta> entry : procedureSynonymMap.entrySet()) {
             final DfProcedureSynonymMeta metaInfo = entry.getValue();
             if (!isSynonymAllowedSchema(metaInfo)) {
                 continue;

@@ -35,15 +35,14 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeExtractorOracle.ProcedureNativeInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterExtractorOracle.ProcedureArgumentInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfDBLinkExtractorOracle.DBLinkInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeTranslatorOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfDBLinkNativeExtractorOracle.DBLinkNativeInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymNativeExtractorOracle.SynonymNativeInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -90,6 +89,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                 procedureMap.put(procedureKeyName, metaInfo);
             }
             Map<String, Map<String, ProcedureNativeInfo>> dbLinkProcedureNativeMap = null;
+            Map<String, Map<String, SynonymNativeInfo>> dbLinkSynonymNativeMap = null;
             st = conn.createStatement();
             _log.info(sql);
             rs = st.executeQuery(sql);
@@ -120,7 +120,11 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                     if (dbLinkProcedureNativeMap == null) { // lazy load
                         dbLinkProcedureNativeMap = extractDBLinkProcedureNativeMap();
                     }
-                    procedureMeta = prepareDBLinkProcedureNative(tableName, dbLinkName, dbLinkProcedureNativeMap);
+                    if (dbLinkSynonymNativeMap == null) { // lazy load
+                        dbLinkSynonymNativeMap = extractDBLinkSynonymNativeMap();
+                    }
+                    procedureMeta = prepareDBLinkProcedureNative(tableName, dbLinkName, dbLinkProcedureNativeMap,
+                            dbLinkSynonymNativeMap);
                     if (procedureMeta == null) {
                         continue;
                     }
@@ -208,12 +212,10 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         }
     }
 
-    protected Map<String, Map<String, ProcedureNativeInfo>> extractDBLinkProcedureNativeMap() {
-        final boolean logging = false;
-        final DfDBLinkExtractorOracle dbLinkExtractor = new DfDBLinkExtractorOracle(_dataSource, logging);
-        final Map<String, DBLinkInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap(); // main schema's only
-        final DfProcedureNativeExtractorOracle nativeExtractor = new DfProcedureNativeExtractorOracle(_dataSource,
-                logging);
+    protected Map<String, Map<String, ProcedureNativeInfo>> extractDBLinkProcedureNativeMap() { // main schema's DB link only
+        final DfDBLinkNativeExtractorOracle dbLinkExtractor = createDBLinkNativeExtractor();
+        final Map<String, DBLinkNativeInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap();
+        final DfProcedureNativeExtractorOracle nativeExtractor = createProcedureNativeExtractor();
         final Map<String, Map<String, ProcedureNativeInfo>> map = DfCollectionUtil.newLinkedHashMap();
         for (String dbLinkName : dbLinkInfoMap.keySet()) {
             map.put(dbLinkName, nativeExtractor.extractDBLinkProcedureNativeInfoList(dbLinkName));
@@ -221,33 +223,62 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         return map;
     }
 
+    protected DfDBLinkNativeExtractorOracle createDBLinkNativeExtractor() {
+        return new DfDBLinkNativeExtractorOracle(_dataSource, false);
+    }
+
+    protected DfProcedureNativeExtractorOracle createProcedureNativeExtractor() {
+        return new DfProcedureNativeExtractorOracle(_dataSource, false);
+    }
+
+    protected Map<String, Map<String, SynonymNativeInfo>> extractDBLinkSynonymNativeMap() { // main schema's DB link only
+        final DfDBLinkNativeExtractorOracle dbLinkExtractor = createDBLinkNativeExtractor();
+        final Map<String, DBLinkNativeInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap();
+        final DfSynonymNativeExtractorOracle nativeExtractor = createSynonymNativeExtractor();
+        final Map<String, Map<String, SynonymNativeInfo>> map = DfCollectionUtil.newLinkedHashMap();
+        for (String dbLinkName : dbLinkInfoMap.keySet()) {
+            map.put(dbLinkName, nativeExtractor.selectDBLinkSynonymInfoMap(dbLinkName));
+        }
+        return map;
+    }
+
+    protected DfSynonymNativeExtractorOracle createSynonymNativeExtractor() {
+        return new DfSynonymNativeExtractorOracle(_dataSource, false);
+    }
+
     protected DfProcedureMeta prepareDBLinkProcedureNative(String tableName, String dbLinkName,
-            Map<String, Map<String, ProcedureNativeInfo>> dbLinkProcedureNativeMap) {
+            Map<String, Map<String, ProcedureNativeInfo>> dbLinkProcedureNativeMap,
+            Map<String, Map<String, SynonymNativeInfo>> dbLinkSynonymNativeMap) {
         final Map<String, ProcedureNativeInfo> nativeMap = dbLinkProcedureNativeMap.get(dbLinkName);
         if (nativeMap == null) {
             return null; // it might be next schema DB link
         }
         // Synonym for Package Procedure has several problems.
+        //  o Synonym meta data does not have its package info (needs to trace more)
+        //  o Oracle cannot execute Synonym for Package Procedure *fundamental problem
         // So it is not supported here.
         final String nativeInfoMapKey = generateNativeInfoMapKey(null, tableName, null);
-        final ProcedureNativeInfo nativeInfo = nativeMap.get(nativeInfoMapKey);
+        ProcedureNativeInfo nativeInfo = nativeMap.get(nativeInfoMapKey);
         if (nativeInfo == null) {
-            return null; // it might be package procedures
+            Map<String, SynonymNativeInfo> synonymNativeMap = dbLinkSynonymNativeMap.get(dbLinkName);
+            final SynonymNativeInfo synonymNativeInfo = synonymNativeMap.get(tableName);
+            if (synonymNativeInfo == null) { // means the name is not synonym
+                return null; // it might be package procedures
+            }
+            // it's a synonym in the another world
+            final String retryKey = generateNativeInfoMapKey(null, synonymNativeInfo.getTableName(), null);
+            final ProcedureNativeInfo retryInfo = nativeMap.get(retryKey);
+            if (retryInfo == null) {
+                return null;
+            }
+            nativeInfo = retryInfo; // found
         }
-        final DfProcedureMeta procedureMeta = new DfProcedureMeta();
-        procedureMeta.setProcedureCatalog(nativeInfo.getObjectName());
-        procedureMeta.setProcedureName(nativeInfo.getProcedureName());
-        final String linkedName = nativeInfo.getProcedureName() + "@" + dbLinkName;
-        procedureMeta.setProcedureFullQualifiedName(linkedName);
-        procedureMeta.setProcedureSqlName(linkedName);
-        procedureMeta.setProcedureType(DfProcedureType.procedureResultUnknown);
-        final List<ProcedureArgumentInfo> argInfoList = nativeInfo.getArgInfoList();
-        for (ProcedureArgumentInfo argInfo : argInfoList) {
-            // TODO impl
-            final DfProcedureColumnMeta columnMeta = new DfProcedureColumnMeta();
-            columnMeta.setColumnName(argInfo.getArgumentName());
-        }
-        return procedureMeta;
+        return createDBLinkProcedureMeta(nativeInfo, dbLinkName);
+    }
+
+    protected DfProcedureMeta createDBLinkProcedureMeta(ProcedureNativeInfo nativeInfo, String dbLinkName) {
+        final DfProcedureNativeTranslatorOracle translator = new DfProcedureNativeTranslatorOracle();
+        return translator.createDBLinkProcedureMeta(nativeInfo, dbLinkName);
     }
 
     protected String generateNativeInfoMapKey(String packageName, String procedureName, String overload) {

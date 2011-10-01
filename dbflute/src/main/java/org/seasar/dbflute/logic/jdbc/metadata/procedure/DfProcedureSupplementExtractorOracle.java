@@ -30,7 +30,7 @@ import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterExtractorOracle.ProcedureArgumentInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle.ProcedureArgumentInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.various.array.DfArrayExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.various.struct.DfStructExtractorOracle;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -320,14 +320,14 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (argInfoList != null) {
             return argInfoList;
         }
-        final DfProcedureParameterExtractorOracle extractor = createProcedureParameterExtractorOracle();
+        final DfProcedureParameterNativeExtractorOracle extractor = createProcedureParameterExtractorOracle();
         argInfoList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
         _argumentInfoListMap.put(unifiedSchema, argInfoList);
         return _argumentInfoListMap.get(unifiedSchema);
     }
 
-    protected DfProcedureParameterExtractorOracle createProcedureParameterExtractorOracle() {
-        return new DfProcedureParameterExtractorOracle(_dataSource, _suppressLogging);
+    protected DfProcedureParameterNativeExtractorOracle createProcedureParameterExtractorOracle() {
+        return new DfProcedureParameterNativeExtractorOracle(_dataSource, _suppressLogging);
     }
 
     // ===================================================================================

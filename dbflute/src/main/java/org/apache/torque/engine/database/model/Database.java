@@ -77,6 +77,7 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseNameMapping;
 import org.seasar.dbflute.exception.DfColumnNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
@@ -269,10 +270,7 @@ public class Database {
                     // note we do not prevent the npe as there is nothing
                     // that we can do, if it is to occur.
                     if (localColumn == null) {
-                        String msg = "Not found the column in the table:";
-                        msg = msg + " fk=" + fk.getName() + " foreignTableName=" + foreignTableName;
-                        msg = msg + " table=" + table + " localColumn=" + localColumnName;
-                        throw new DfColumnNotFoundException(msg);
+                        throwForeignKeyLocalColumnNotFoundException(table, fk, localColumn);
                     }
                     // column has no information of its foreign keys
                 }
@@ -284,16 +282,43 @@ public class Database {
                     // if the foreign column does not exist, we may have an
                     // external reference or a misspelling
                     if (foreignColumn == null) {
-                        String msg = "Not found the column in the table:";
-                        msg = msg + " fk=" + fk.getName() + " foreignTableName=" + foreignTableName;
-                        msg = msg + " table=" + table + " foreignColumn=" + foreignColumnName;
-                        throw new DfColumnNotFoundException(msg);
+                        throwForeignKeyForeignColumnNotFoundException(table, fk, foreignColumn);
                     } else {
                         foreignColumn.addReferrer(fk);
                     }
                 }
             }
         }
+    }
+
+    protected void throwForeignKeyLocalColumnNotFoundException(Table table, ForeignKey fk, Column localColumn) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the local column of the foreign key in the table.");
+        br.addItem("Foreign Key");
+        br.addElement(fk.getName());
+        br.addItem("Local Table");
+        br.addElement(table.getName());
+        br.addItem("Foreign Table");
+        br.addElement(fk.getForeignTableName());
+        br.addItem("Local Column");
+        br.addElement(localColumn.getName());
+        final String msg = br.buildExceptionMessage();
+        throw new DfColumnNotFoundException(msg);
+    }
+
+    protected void throwForeignKeyForeignColumnNotFoundException(Table table, ForeignKey fk, Column foreignColumn) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the foreign column of the foreign key in the table.");
+        br.addItem("Foreign Key");
+        br.addElement(fk.getName());
+        br.addItem("Local Table");
+        br.addElement(table.getName());
+        br.addItem("Foreign Table");
+        br.addElement(fk.getForeignTableName());
+        br.addItem("Foreign Column");
+        br.addElement(foreignColumn.getName());
+        final String msg = br.buildExceptionMessage();
+        throw new DfColumnNotFoundException(msg);
     }
 
     // -----------------------------------------------------

@@ -25,19 +25,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterExtractorOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 0.9.9.1A (2011/09/30 Friday)
  */
-public class DfDBLinkExtractorOracle {
+public class DfDBLinkNativeExtractorOracle {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfProcedureParameterExtractorOracle.class);
+    private static final Log _log = LogFactory.getLog(DfProcedureParameterNativeExtractorOracle.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -48,7 +48,7 @@ public class DfDBLinkExtractorOracle {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDBLinkExtractorOracle(DataSource dataSource, boolean suppressLogging) {
+    public DfDBLinkNativeExtractorOracle(DataSource dataSource, boolean suppressLogging) {
         _dataSource = dataSource;
         _suppressLogging = suppressLogging;
     }
@@ -56,12 +56,12 @@ public class DfDBLinkExtractorOracle {
     // ===================================================================================
     //                                                                         DBLink Info
     //                                                                         ===========
-    public Map<String, DBLinkInfo> selectDBLinkInfoMap() { // main schema
+    public Map<String, DBLinkNativeInfo> selectDBLinkInfoMap() { // main schema
         final String sql = buildDBLinkSql();
         return doSelectDBLinkInfoMap(sql);
     }
 
-    public Map<String, DBLinkInfo> selectDBLinkInfoMap(UnifiedSchema unifiedSchema) {
+    public Map<String, DBLinkNativeInfo> selectDBLinkInfoMap(UnifiedSchema unifiedSchema) {
         final String sql = buildDBLinkSql(unifiedSchema);
         return doSelectDBLinkInfoMap(sql);
     }
@@ -83,7 +83,7 @@ public class DfDBLinkExtractorOracle {
         return sb.toString();
     }
 
-    protected Map<String, DBLinkInfo> doSelectDBLinkInfoMap(String sql) {
+    protected Map<String, DBLinkNativeInfo> doSelectDBLinkInfoMap(String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("DB_LINK");
@@ -98,9 +98,9 @@ public class DfDBLinkExtractorOracle {
             log("Failed to select DB link info: " + continued.getMessage());
             return DfCollectionUtil.emptyMap();
         }
-        final Map<String, DBLinkInfo> infoMap = DfCollectionUtil.newLinkedHashMap();
+        final Map<String, DBLinkNativeInfo> infoMap = DfCollectionUtil.newLinkedHashMap();
         for (Map<String, String> map : resultList) {
-            final DBLinkInfo info = new DBLinkInfo();
+            final DBLinkNativeInfo info = new DBLinkNativeInfo();
             info.setDbLink(map.get("DB_LINK"));
             info.setUserName(map.get("USERNAME"));
             info.setHost(map.get("HOST"));
@@ -109,7 +109,7 @@ public class DfDBLinkExtractorOracle {
         return infoMap;
     }
 
-    public static class DBLinkInfo {
+    public static class DBLinkNativeInfo {
         protected String _owner;
         protected String _dbLink;
         protected String _userName;

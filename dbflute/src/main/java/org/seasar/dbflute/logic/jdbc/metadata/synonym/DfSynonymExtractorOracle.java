@@ -50,6 +50,8 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfDBLinkNativeExtractorOracle.DBLinkNativeInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymNativeExtractorOracle.SynonymNativeInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -89,6 +91,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     //                                                                             =======
     public Map<String, DfSynonymMeta> extractSynonymMap() {
         final Map<String, DfSynonymMeta> synonymMap = StringKeyMap.createAsFlexibleOrdered();
+        Map<String, Map<String, SynonymNativeInfo>> dbLinkSynonymNativeMap = null;
         final String sql = buildSynonymSelect();
         Connection conn = null;
         Statement statement = null;
@@ -123,12 +126,15 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 judgeSynonymSelectable(info);
 
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {
+                    if (dbLinkSynonymNativeMap == null) { // lazy load
+                        dbLinkSynonymNativeMap = extractDBLinkSynonymNativeMap();
+                    }
                     // = = = = = = = = = = = = 
                     // It's a DB Link Synonym!
                     // = = = = = = = = = = = = 
                     try {
                         final String synonymKey = buildSynonymMapKey(synonymOwner, synonymName);
-                        synonymMap.put(synonymKey, setupDBLinkSynonym(conn, info));
+                        synonymMap.put(synonymKey, setupDBLinkSynonym(conn, info, dbLinkSynonymNativeMap));
                     } catch (Exception continued) {
                         _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
                     }
@@ -240,7 +246,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected DfSynonymMeta setupDBLinkSynonym(Connection conn, DfSynonymMeta info) throws SQLException {
+    protected DfSynonymMeta setupDBLinkSynonym(Connection conn, DfSynonymMeta info,
+            Map<String, Map<String, SynonymNativeInfo>> dbLinkSynonymNativeMap) throws SQLException {
         if (!info.isSelectable()) { // e.g. procedure synonym
             return info;
         }
@@ -250,9 +257,11 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         final String dbLinkName = info.getDBLinkName();
         final List<DfColumnMeta> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymOwner, synonymName);
         info.setColumnMetaInfoList4DBLink(columnMetaInfoList);
-        final DfPrimaryKeyMeta pkInfo = getDBLinkSynonymPKInfo(conn, tableName, dbLinkName);
+
+        final String realTableName = translateTableName(tableName, dbLinkName, dbLinkSynonymNativeMap);
+        final DfPrimaryKeyMeta pkInfo = getDBLinkSynonymPKInfo(conn, realTableName, dbLinkName);
         info.setPrimaryKey(pkInfo);
-        final Map<String, Map<Integer, String>> uniqueKeyMap = getDBLinkSynonymUQMap(conn, tableName, dbLinkName);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = getDBLinkSynonymUQMap(conn, realTableName, dbLinkName);
         info.setUniqueKeyMap(uniqueKeyMap);
 
         // It does not support Foreign Key of DBLink.
@@ -262,6 +271,20 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         info.setIndexMap(new LinkedHashMap<String, Map<Integer, String>>());
 
         return info;
+    }
+
+    protected String translateTableName(String basicName, String dbLinkName,
+            Map<String, Map<String, SynonymNativeInfo>> dbLinkSynonymNativeMap) {
+        final Map<String, SynonymNativeInfo> synonymNativeMap = dbLinkSynonymNativeMap.get(dbLinkName);
+        if (synonymNativeMap == null) {
+            return basicName;
+        }
+        final SynonymNativeInfo synonymNativeInfo = synonymNativeMap.get(basicName);
+        if (synonymNativeInfo == null) { // not synonym at least
+            return basicName;
+        }
+        // it's a synonym (but nested synonyms are unsupported)
+        return synonymNativeInfo.getTableName();
     }
 
     // ===================================================================================
@@ -602,6 +625,25 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 }
             }
         }
+    }
+
+    protected Map<String, Map<String, SynonymNativeInfo>> extractDBLinkSynonymNativeMap() { // main schema's DB link only
+        final DfDBLinkNativeExtractorOracle dbLinkExtractor = createDBLinkNativeExtractor();
+        final Map<String, DBLinkNativeInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap();
+        final DfSynonymNativeExtractorOracle nativeExtractor = createSynonymNativeExtractor();
+        final Map<String, Map<String, SynonymNativeInfo>> map = DfCollectionUtil.newLinkedHashMap();
+        for (String dbLinkName : dbLinkInfoMap.keySet()) {
+            map.put(dbLinkName, nativeExtractor.selectDBLinkSynonymInfoMap(dbLinkName));
+        }
+        return map;
+    }
+
+    protected DfDBLinkNativeExtractorOracle createDBLinkNativeExtractor() {
+        return new DfDBLinkNativeExtractorOracle(_dataSource, false);
+    }
+
+    protected DfSynonymNativeExtractorOracle createSynonymNativeExtractor() {
+        return new DfSynonymNativeExtractorOracle(_dataSource, false);
     }
 
     // ===================================================================================

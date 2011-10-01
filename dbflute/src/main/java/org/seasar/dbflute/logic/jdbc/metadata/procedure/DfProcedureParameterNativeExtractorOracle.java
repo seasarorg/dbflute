@@ -32,12 +32,12 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.7.6 (2010/11/29 Monday)
  */
-public class DfProcedureParameterExtractorOracle {
+public class DfProcedureParameterNativeExtractorOracle {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfProcedureParameterExtractorOracle.class);
+    private static final Log _log = LogFactory.getLog(DfProcedureParameterNativeExtractorOracle.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -49,7 +49,7 @@ public class DfProcedureParameterExtractorOracle {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfProcedureParameterExtractorOracle(DataSource dataSource, boolean suppressLogging) {
+    public DfProcedureParameterNativeExtractorOracle(DataSource dataSource, boolean suppressLogging) {
         _dataSource = dataSource;
         _suppressLogging = suppressLogging;
     }
