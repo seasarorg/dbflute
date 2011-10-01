@@ -82,10 +82,14 @@ public class DfProcedureNativeExtractorOracle {
 
     protected String buildProcedureNativeSql(UnifiedSchema unifiedSchema) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select *");
+        sb.append("select OBJECT_NAME as PKG, PROCEDURE_NAME as NAME, null as OL");
         sb.append(" from ALL_PROCEDURES");
         sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
-        sb.append(" order by OBJECT_NAME, PROCEDURE_NAME");
+        sb.append(" union");
+        sb.append(" select PACKAGE_NAME as PKG, OBJECT_NAME as NAME, OVERLOAD as OL");
+        sb.append(" from ALL_ARGUMENTS");
+        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" order by PKG, NAME, OL");
         return sb.toString();
     }
 
@@ -101,18 +105,21 @@ public class DfProcedureNativeExtractorOracle {
 
     protected String buildDBLinkProcedureNativeSql(String dbLinkName) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select *");
+        sb.append("select OBJECT_NAME as PKG, PROCEDURE_NAME as NAME, null as OL");
         sb.append(" from USER_PROCEDURES@").append(dbLinkName);
-        sb.append(" order by OBJECT_NAME, PROCEDURE_NAME");
+        sb.append(" union");
+        sb.append(" select PACKAGE_NAME as PKG, OBJECT_NAME as NAME, OVERLOAD as OL");
+        sb.append(" from ALL_ARGUMENTS");
+        sb.append(" order by PKG, NAME, OL");
         return sb.toString();
     }
 
     protected Map<String, ProcedureNativeInfo> doSelectProcedureNativeInfoMap(String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
-        columnList.add("OBJECT_NAME");
-        columnList.add("PROCEDURE_NAME");
-        columnList.add("OVERLOAD");
+        columnList.add("PKG");
+        columnList.add("NAME");
+        columnList.add("OL");
         final List<Map<String, String>> resultList;
         try {
             log(sql);
@@ -125,13 +132,13 @@ public class DfProcedureNativeExtractorOracle {
         final Map<String, ProcedureNativeInfo> infoMap = DfCollectionUtil.newLinkedHashMap();
         for (Map<String, String> map : resultList) {
             final ProcedureNativeInfo info = new ProcedureNativeInfo();
-            final String objectName = map.get("OBJECT_NAME");
+            final String objectName = map.get("PKG");
             info.setObjectName(objectName);
-            final String procedureName = map.get("PROCEDURE_NAME");
+            final String procedureName = map.get("NAME");
             info.setProcedureName(procedureName);
-            final String overload = map.get("OVERLOAD");
+            final String overload = map.get("OL");
             info.setOverload(overload);
-            infoMap.put(generateNativeInfoMapKey(objectName, procedureName, overload), info);
+            infoMap.put(generateNativeInfoMapKey(objectName, procedureName, null), info);
         }
         return infoMap;
     }
