@@ -85,7 +85,7 @@ public class DfProcedureNativeExtractorOracle {
         sb.append("select *");
         sb.append(" from ALL_PROCEDURES");
         sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
-        sb.append(" order by OBJECT_NAME, PROCEDURE_NAME, OVERLOAD");
+        sb.append(" order by OBJECT_NAME, PROCEDURE_NAME");
         return sb.toString();
     }
 
@@ -103,7 +103,7 @@ public class DfProcedureNativeExtractorOracle {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
         sb.append(" from USER_PROCEDURES@").append(dbLinkName);
-        sb.append(" order by OBJECT_NAME, PROCEDURE_NAME, OVERLOAD");
+        sb.append(" order by OBJECT_NAME, PROCEDURE_NAME");
         return sb.toString();
     }
 
