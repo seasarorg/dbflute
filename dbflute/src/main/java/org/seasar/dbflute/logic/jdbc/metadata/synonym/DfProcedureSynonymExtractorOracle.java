@@ -209,9 +209,11 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     }
 
     protected Map<String, Map<String, ProcedureNativeInfo>> extractDBLinkProcedureNativeMap() {
-        final DfDBLinkExtractorOracle dbLinkExtractor = new DfDBLinkExtractorOracle(_dataSource, true);
+        final boolean logging = false;
+        final DfDBLinkExtractorOracle dbLinkExtractor = new DfDBLinkExtractorOracle(_dataSource, logging);
         final Map<String, DBLinkInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap(); // main schema's only
-        final DfProcedureNativeExtractorOracle nativeExtractor = new DfProcedureNativeExtractorOracle(_dataSource, true);
+        final DfProcedureNativeExtractorOracle nativeExtractor = new DfProcedureNativeExtractorOracle(_dataSource,
+                logging);
         final Map<String, Map<String, ProcedureNativeInfo>> map = DfCollectionUtil.newLinkedHashMap();
         for (String dbLinkName : dbLinkInfoMap.keySet()) {
             map.put(dbLinkName, nativeExtractor.extractDBLinkProcedureNativeInfoList(dbLinkName));
