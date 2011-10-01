@@ -156,6 +156,7 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                     }
                     customizeEntityInfo.setPrimaryKeyList(getPrimaryKeyColumnNameList(sql));
                     customizeEntityInfo.setOutsideSqlFile(getCurrentOutsideSqlFile());
+                    customizeEntityInfo.acceptSupplementaryComment(getSelectColumnCommentMap(sql));
                     _sql2entityMeta.addEntityInfo(entityName, customizeEntityInfo);
                 }
             }
@@ -356,6 +357,10 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
     protected List<DfSql2EntityMark> getEntityPropertyTypeList(final String sql) {
         return _outsideSqlMarkAnalyzer.getCustomizeEntityPropertyTypeList(sql);
+    }
+
+    protected Map<String, String> getSelectColumnCommentMap(final String sql) {
+        return _outsideSqlMarkAnalyzer.getSelectColumnCommentMap(sql);
     }
 
     protected String getParameterBeanName(final String sql) {

@@ -64,7 +64,11 @@ public class DfProcedureNativeTranslatorOracle {
             final String jdbcType = _columnExtractor.getColumnJdbcType(Types.OTHER, dataType);
             final Integer jdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
             columnMeta.setJdbcDefType(jdbcDefValue);
-            columnMeta.setOverloadNo(Integer.valueOf(argInfo.getOverload()));
+
+            final String overload = argInfo.getOverload();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(overload)) {
+                columnMeta.setOverloadNo(Integer.valueOf(overload));
+            }
 
             final String inOut = argInfo.getInOut();
             if ("in".equalsIgnoreCase(inOut)) {

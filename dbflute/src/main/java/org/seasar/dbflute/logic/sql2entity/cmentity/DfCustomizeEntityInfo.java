@@ -18,12 +18,14 @@ package org.seasar.dbflute.logic.sql2entity.cmentity;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -56,6 +58,9 @@ public class DfCustomizeEntityInfo {
     // SQL file defined at
     protected DfOutsideSqlFile _outsideSqlFile;
 
+    // supplementary comment
+    protected Map<String, String> _selectColumnCommentMap;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -77,16 +82,6 @@ public class DfCustomizeEntityInfo {
         return !_cursorHandling;
     }
 
-    // ===================================================================================
-    //                                                                   Additional Schema
-    //                                                                   =================
-    public UnifiedSchema getAdditionalSchema() {
-        return hasTypeStructInfo() ? _typeStructInfo.getOwner() : null;
-    }
-
-    // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
     public boolean hasTypeStructInfo() {
         return _typeStructInfo != null;
     }
@@ -101,6 +96,35 @@ public class DfCustomizeEntityInfo {
 
     public boolean isAdditionalSchema() {
         return hasTypeStructInfo() && _typeStructInfo.isAdditinalSchema();
+    }
+
+    // ===================================================================================
+    //                                                                   Additional Schema
+    //                                                                   =================
+    public UnifiedSchema getAdditionalSchema() {
+        return hasTypeStructInfo() ? _typeStructInfo.getOwner() : null;
+    }
+
+    // ===================================================================================
+    //                                                               Supplementary Comment
+    //                                                               =====================
+    public void acceptSupplementaryComment(Map<String, String> commentMap) {
+        if (commentMap == null || commentMap.isEmpty()) {
+            return;
+        }
+        for (Entry<String, DfColumnMeta> entry : _columnMap.entrySet()) {
+            final String columnName = entry.getKey();
+            final String supplementaryComment = commentMap.get(columnName); // commentMap should be flexible
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(supplementaryComment)) {
+                final DfColumnMeta meta = entry.getValue();
+                final String currentComment = meta.getColumnComment();
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(currentComment)) {
+                    meta.setColumnComment(currentComment + "\n// " + supplementaryComment);
+                } else {
+                    meta.setColumnComment(supplementaryComment);
+                }
+            }
+        }
     }
 
     // ===================================================================================
@@ -229,5 +253,13 @@ public class DfCustomizeEntityInfo {
 
     public void setOutsideSqlFile(DfOutsideSqlFile outsideSqlFile) {
         this._outsideSqlFile = outsideSqlFile;
+    }
+
+    public Map<String, String> getSelectColumnCommentMap() {
+        return _selectColumnCommentMap;
+    }
+
+    public void setSelectColumnCommentMap(Map<String, String> selectColumnCommentMap) {
+        this._selectColumnCommentMap = selectColumnCommentMap;
     }
 }

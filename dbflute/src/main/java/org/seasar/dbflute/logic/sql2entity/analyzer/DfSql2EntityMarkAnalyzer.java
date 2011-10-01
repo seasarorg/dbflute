@@ -17,8 +17,10 @@ package org.seasar.dbflute.logic.sql2entity.analyzer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
@@ -36,8 +38,8 @@ public class DfSql2EntityMarkAnalyzer {
     protected static final String DESCRIPTION_MARK = "[df:description]";
 
     // ===================================================================================
-    //                                                                           Analyzing
-    //                                                                           =========
+    //                                                                     CustomizeEntity
+    //                                                                     ===============
     /**
      * @param sql The string of SQL. (NotNull)
      * @return The name of entity. (NullAllowed: If it's not found, this returns null)
@@ -66,18 +68,6 @@ public class DfSql2EntityMarkAnalyzer {
         return getMarkList(sql, "##");
     }
 
-    /**
-     * @param sql The string of SQL. (NotNull)
-     * @return The name of parameter-bean. (NullAllowed: If it's not found, this returns null)
-     */
-    public String getParameterBeanName(final String sql) {
-        return getMarkString(sql, "!");
-    }
-
-    public List<DfSql2EntityMark> getParameterBeanPropertyTypeList(final String sql) {
-        return getMarkList(sql, "!!");
-    }
-
     public List<String> getPrimaryKeyColumnNameList(final String sql) {
         if (sql == null || sql.trim().length() == 0) {
             String msg = "The sql is invalid: " + sql;
@@ -98,6 +88,24 @@ public class DfSql2EntityMarkAnalyzer {
         return retLs;
     }
 
+    // ===================================================================================
+    //                                                                       ParameterBean
+    //                                                                       =============
+    /**
+     * @param sql The string of SQL. (NotNull)
+     * @return The name of parameter-bean. (NullAllowed: If it's not found, this returns null)
+     */
+    public String getParameterBeanName(final String sql) {
+        return getMarkString(sql, "!");
+    }
+
+    public List<DfSql2EntityMark> getParameterBeanPropertyTypeList(final String sql) {
+        return getMarkList(sql, "!!");
+    }
+
+    // ===================================================================================
+    //                                                                       ParameterBean
+    //                                                                       =============
     public String getTitle(String sql) {
         final String titleMark = TITLE_MARK;
         final String descriptionMark = DESCRIPTION_MARK;
@@ -126,6 +134,9 @@ public class DfSql2EntityMarkAnalyzer {
         return peace.trim();
     }
 
+    // ===================================================================================
+    //                                                                             Comment
+    //                                                                             =======
     public String getDescription(String sql) {
         final String descriptionMark = DESCRIPTION_MARK;
         final int markIndex = sql.indexOf(descriptionMark);
@@ -150,6 +161,38 @@ public class DfSql2EntityMarkAnalyzer {
             peace = peace.substring(firstLnIndex + "\n".length());
         }
         return DfStringUtil.rtrim(peace);
+    }
+
+    public Map<String, String> getSelectColumnCommentMap(String sql) {
+        final Map<String, String> commentMap = StringKeyMap.createAsFlexible();
+        final List<String> splitList = Srl.splitList(sql, "\n");
+        final String lineCommentMark = " --";
+        final String columnCommentMark = " //";
+        final String asMark = " as ";
+        for (String line : splitList) {
+            final String lowerLine = line.toLowerCase();
+            if (!lowerLine.contains(lineCommentMark) || !lowerLine.contains(columnCommentMark)) {
+                continue;
+            }
+            final String clause = Srl.substringFirstFront(lowerLine, lineCommentMark);
+            if (!clause.contains(asMark)) {
+                continue;
+            }
+            final String column = Srl.substringLastRear(clause, asMark);
+            if (Srl.is_Null_or_TrimmedEmpty(column)) {
+                continue;
+            }
+            final String lineComment = Srl.substringFirstRear(lowerLine, lineCommentMark);
+            if (!lineComment.contains(columnCommentMark)) {
+                continue;
+            }
+            final String columnComment = Srl.substringFirstRear(lineComment, columnCommentMark);
+            if (Srl.is_Null_or_TrimmedEmpty(columnComment)) {
+                continue;
+            }
+            commentMap.put(column.trim(), columnComment.trim());
+        }
+        return commentMap;
     }
 
     // ===================================================================================
