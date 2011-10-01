@@ -36,31 +36,31 @@ public class SqlTokenizer {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String sql;
-    protected int position = 0;
-    protected String token;
-    protected int tokenType = SQL;
-    protected int nextTokenType = SQL;
-    protected int bindVariableNum = 0;
+    protected final String _sql;
+    protected int _position = 0;
+    protected String _token;
+    protected int _tokenType = SQL;
+    protected int _nextTokenType = SQL;
+    protected int _bindVariableNum = 0;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public SqlTokenizer(String sql) {
-        this.sql = sql;
+        this._sql = sql;
     }
 
     // ===================================================================================
-    //                                                                            Tokenize
-    //                                                                            ========
+    //                                                                                Next
+    //                                                                                ====
     public int next() {
-        if (position >= sql.length()) {
-            token = null;
-            tokenType = EOF;
-            nextTokenType = EOF;
-            return tokenType;
+        if (_position >= _sql.length()) {
+            _token = null;
+            _tokenType = EOF;
+            _nextTokenType = EOF;
+            return _tokenType;
         }
-        switch (nextTokenType) {
+        switch (_nextTokenType) {
         case SQL:
             parseSql();
             break;
@@ -77,45 +77,57 @@ public class SqlTokenizer {
             parseEof();
             break;
         }
-        return tokenType;
+        return _tokenType;
     }
 
+    // ===================================================================================
+    //                                                                           Parse SQL
+    //                                                                           =========
     protected void parseSql() {
-        int commentStartPos = sql.indexOf("/*", position);
-        int commentStartPos2 = sql.indexOf("#*", position);
+        int commentStartPos = _sql.indexOf("/*", _position);
+        int commentStartPos2 = _sql.indexOf("#*", _position);
         if (0 < commentStartPos2 && commentStartPos2 < commentStartPos) {
             commentStartPos = commentStartPos2;
         }
-        int lineCommentStartPos = sql.indexOf("--", position);
-        int bindVariableStartPos = sql.indexOf("?", position);
+        int bindVariableStartPos = _sql.indexOf("?", _position);
         int elseCommentStartPos = -1;
         int elseCommentLength = -1;
-        if (lineCommentStartPos >= 0) {
+        int elseCommentSearchCurrentPosition = _position;
+        while (true) { // searching nearest next ELSE comment
+            final int lineCommentStartPos = _sql.indexOf("--", elseCommentSearchCurrentPosition);
+            if (lineCommentStartPos < 0) {
+                break;
+            }
+            if (calculateNextStartPos(commentStartPos, bindVariableStartPos, -1) < lineCommentStartPos) {
+                break;
+            }
             int skipPos = skipWhitespace(lineCommentStartPos + 2);
-            if (skipPos + 4 < sql.length() && "ELSE".equals(sql.substring(skipPos, skipPos + 4))) {
+            if (skipPos + 4 < _sql.length() && "ELSE".equals(_sql.substring(skipPos, skipPos + 4))) {
                 elseCommentStartPos = lineCommentStartPos;
                 elseCommentLength = skipPos + 4 - lineCommentStartPos;
+                break;
             }
+            elseCommentSearchCurrentPosition = skipPos;
         }
-        int nextStartPos = getNextStartPos(commentStartPos, elseCommentStartPos, bindVariableStartPos);
+        int nextStartPos = calculateNextStartPos(commentStartPos, bindVariableStartPos, elseCommentStartPos);
         if (nextStartPos < 0) {
-            token = sql.substring(position);
-            nextTokenType = EOF;
-            position = sql.length();
-            tokenType = SQL;
+            _token = _sql.substring(_position);
+            _nextTokenType = EOF;
+            _position = _sql.length();
+            _tokenType = SQL;
         } else {
-            token = sql.substring(position, nextStartPos);
-            tokenType = SQL;
-            boolean needNext = nextStartPos == position;
+            _token = _sql.substring(_position, nextStartPos);
+            _tokenType = SQL;
+            boolean needNext = nextStartPos == _position;
             if (nextStartPos == commentStartPos) {
-                nextTokenType = COMMENT;
-                position = commentStartPos + 2;
+                _nextTokenType = COMMENT;
+                _position = commentStartPos + 2;
             } else if (nextStartPos == elseCommentStartPos) {
-                nextTokenType = ELSE;
-                position = elseCommentStartPos + elseCommentLength;
+                _nextTokenType = ELSE;
+                _position = elseCommentStartPos + elseCommentLength;
             } else if (nextStartPos == bindVariableStartPos) {
-                nextTokenType = BIND_VARIABLE;
-                position = bindVariableStartPos;
+                _nextTokenType = BIND_VARIABLE;
+                _position = bindVariableStartPos;
             }
             if (needNext) {
                 next();
@@ -123,37 +135,40 @@ public class SqlTokenizer {
         }
     }
 
-    protected int getNextStartPos(int commentStartPos, int elseCommentStartPos, int bindVariableStartPos) {
+    protected int calculateNextStartPos(int commentStartPos, int bindVariableStartPos, int elseCommentStartPos) {
         int nextStartPos = -1;
         if (commentStartPos >= 0) {
             nextStartPos = commentStartPos;
         }
-        if (elseCommentStartPos >= 0 && (nextStartPos < 0 || elseCommentStartPos < nextStartPos)) {
-            nextStartPos = elseCommentStartPos;
-        }
         if (bindVariableStartPos >= 0 && (nextStartPos < 0 || bindVariableStartPos < nextStartPos)) {
             nextStartPos = bindVariableStartPos;
+        }
+        if (elseCommentStartPos >= 0 && (nextStartPos < 0 || elseCommentStartPos < nextStartPos)) {
+            nextStartPos = elseCommentStartPos;
         }
         return nextStartPos;
     }
 
     protected String nextBindVariableName() {
-        return "$" + ++bindVariableNum;
+        return "$" + ++_bindVariableNum;
     }
 
+    // ===================================================================================
+    //                                                                       Parse Comment
+    //                                                                       =============
     protected void parseComment() {
-        int commentEndPos = sql.indexOf("*/", position);
-        int commentEndPos2 = sql.indexOf("*#", position);
+        int commentEndPos = _sql.indexOf("*/", _position);
+        int commentEndPos2 = _sql.indexOf("*#", _position);
         if (0 < commentEndPos2 && commentEndPos2 < commentEndPos) {
             commentEndPos = commentEndPos2;
         }
         if (commentEndPos < 0) {
-            throwCommentTerminatorNotFoundException(sql.substring(position));
+            throwCommentTerminatorNotFoundException(_sql.substring(_position));
         }
-        token = sql.substring(position, commentEndPos);
-        nextTokenType = SQL;
-        position = commentEndPos + 2;
-        tokenType = COMMENT;
+        _token = _sql.substring(_position, commentEndPos);
+        _nextTokenType = SQL;
+        _position = commentEndPos + 2;
+        _tokenType = COMMENT;
     }
 
     protected void throwCommentTerminatorNotFoundException(String expression) {
@@ -168,76 +183,82 @@ public class SqlTokenizer {
         br.addItem("Specified SQL");
         br.addElement(expression);
         br.addItem("Comment Expression");
-        br.addElement(sql);
+        br.addElement(_sql);
         final String msg = br.buildExceptionMessage();
         throw new CommentTerminatorNotFoundException(msg);
     }
 
+    // ===================================================================================
+    //                                                                     Parse Parameter
+    //                                                                     ===============
     protected void parseBindVariable() {
-        token = nextBindVariableName();
-        nextTokenType = SQL;
-        position += 1;
-        tokenType = BIND_VARIABLE;
+        _token = nextBindVariableName();
+        _nextTokenType = SQL;
+        _position += 1;
+        _tokenType = BIND_VARIABLE;
     }
 
     protected void parseElse() {
-        token = null;
-        nextTokenType = SQL;
-        tokenType = ELSE;
+        _token = null;
+        _nextTokenType = SQL;
+        _tokenType = ELSE;
     }
 
     protected void parseEof() {
-        token = null;
-        tokenType = EOF;
-        nextTokenType = EOF;
+        _token = null;
+        _tokenType = EOF;
+        _nextTokenType = EOF;
     }
 
+    // ===================================================================================
+    //                                                                      Skip Character
+    //                                                                      ==============
     public String skipToken() {
         return skipToken(false);
     }
 
     public String skipToken(boolean testValue) {
-        int index = sql.length(); // last index as default
+        int index = _sql.length(); // last index as default
 
-        final String dateLiteralPrefix = extractDateLiteralPrefix(testValue, sql, position);
+        final String dateLiteralPrefix = extractDateLiteralPrefix(testValue, _sql, _position);
         if (dateLiteralPrefix != null) {
-            position = position + dateLiteralPrefix.length();
+            _position = _position + dateLiteralPrefix.length();
         }
 
         final char quote;
         {
-            final char firstChar = (position < sql.length() ? sql.charAt(position) : '\0');
+            final char firstChar = (_position < _sql.length() ? _sql.charAt(_position) : '\0');
             quote = (firstChar == '(' ? ')' : firstChar);
         }
         final boolean quoting = quote == '\'' || quote == ')';
 
-        for (int i = quoting ? position + 1 : position; i < sql.length(); ++i) {
-            final char c = sql.charAt(i);
+        for (int i = quoting ? _position + 1 : _position; i < _sql.length(); ++i) {
+            final char c = _sql.charAt(i);
             if (isNotQuoteEndPoint(quoting, c)) {
                 index = i;
                 break;
-            } else if (isBlockCommentBeginPoint(sql, c, i)) {
+            } else if (isBlockCommentBeginPoint(_sql, c, i)) {
                 index = i;
                 break;
-            } else if (isLineCommentBeginPoint(sql, c, i)) {
+            } else if (isLineCommentBeginPoint(_sql, c, i)) {
                 index = i;
                 break;
-            } else if (quoting && isSingleQuoteEndPoint(sql, quote, c, i)) {
+            } else if (quoting && isSingleQuoteEndPoint(_sql, quote, c, i)) {
                 index = i + 1;
                 break;
-            } else if (quoting && isQuoteEndPoint(sql, quote, c, i)) {
+            } else if (quoting && isQuoteEndPoint(_sql, quote, c, i)) {
                 index = i + 1;
                 break;
             }
         }
-        token = sql.substring(position, index);
+        _token = _sql.substring(_position, index);
         if (dateLiteralPrefix != null) {
-            token = dateLiteralPrefix + token;
+            _token = dateLiteralPrefix + _token;
         }
-        tokenType = SQL;
-        nextTokenType = SQL;
-        position = index;
-        return token;
+        _tokenType = SQL;
+        _nextTokenType = SQL;
+        _position = index;
+        return _token;
     }
 
     protected String extractDateLiteralPrefix(boolean testValue, String currentSql, int position) {
@@ -303,16 +324,16 @@ public class SqlTokenizer {
     }
 
     public String skipWhitespace() {
-        int index = skipWhitespace(position);
-        token = sql.substring(position, index);
-        position = index;
-        return token;
+        int index = skipWhitespace(_position);
+        _token = _sql.substring(_position, index);
+        _position = index;
+        return _token;
     }
 
     protected int skipWhitespace(int position) {
-        int index = sql.length();
-        for (int i = position; i < sql.length(); ++i) {
-            char c = sql.charAt(i);
+        int index = _sql.length();
+        for (int i = position; i < _sql.length(); ++i) {
+            char c = _sql.charAt(i);
             if (!Character.isWhitespace(c)) {
                 index = i;
                 break;
@@ -332,26 +353,26 @@ public class SqlTokenizer {
     //                                                                            Accessor
     //                                                                            ========
     public int getPosition() {
-        return position;
+        return _position;
     }
 
     public String getToken() {
-        return token;
+        return _token;
     }
 
     public String getBefore() {
-        return sql.substring(0, position);
+        return _sql.substring(0, _position);
     }
 
     public String getAfter() {
-        return sql.substring(position);
+        return _sql.substring(_position);
     }
 
     public int getTokenType() {
-        return tokenType;
+        return _tokenType;
     }
 
     public int getNextTokenType() {
-        return nextTokenType;
+        return _nextTokenType;
     }
 }

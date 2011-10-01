@@ -215,33 +215,33 @@ public class SqlTokenizerTest extends PlainTestCase {
         sql = sql + " /*END*/";
         SqlTokenizer tokenizer = new SqlTokenizer(sql);
 
-        log("01: " + tokenizer.token);
+        log("01: " + tokenizer._token);
         tokenizer.next();
-        log("02: " + tokenizer.token);
+        log("02: " + tokenizer._token);
         tokenizer.next();
-        log("03: " + tokenizer.token);
+        log("03: " + tokenizer._token);
         tokenizer.next();
-        log("04: " + tokenizer.token);
+        log("04: " + tokenizer._token);
         tokenizer.next();
-        log("05: " + tokenizer.token);
+        log("05: " + tokenizer._token);
         tokenizer.next();
-        log("06: " + tokenizer.token);
+        log("06: " + tokenizer._token);
         tokenizer.next();
-        log("07: " + tokenizer.token);
+        log("07: " + tokenizer._token);
         tokenizer.next();
-        log("08: " + tokenizer.token);
+        log("08: " + tokenizer._token);
         tokenizer.next();
-        log("09: " + tokenizer.token);
+        log("09: " + tokenizer._token);
         tokenizer.next();
-        log("10: " + tokenizer.token);
+        log("10: " + tokenizer._token);
         tokenizer.next();
-        log("11: " + tokenizer.token);
+        log("11: " + tokenizer._token);
         tokenizer.next();
-        log("12: " + tokenizer.token);
+        log("12: " + tokenizer._token);
         tokenizer.next();
-        log("13: " + tokenizer.token);
+        log("13: " + tokenizer._token);
         tokenizer.next();
-        log("14: " + tokenizer.token);
+        log("14: " + tokenizer._token);
     }
 
     public void test_show_next_without_BEGIN_comment() {
@@ -251,33 +251,33 @@ public class SqlTokenizerTest extends PlainTestCase {
         sql = sql + "   /*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/";
         SqlTokenizer tokenizer = new SqlTokenizer(sql);
 
-        log("01: " + tokenizer.token);
+        log("01: " + tokenizer._token);
         tokenizer.next();
-        log("02: " + tokenizer.token);
+        log("02: " + tokenizer._token);
         tokenizer.next();
-        log("03: " + tokenizer.token);
+        log("03: " + tokenizer._token);
         tokenizer.next();
-        log("04: " + tokenizer.token);
+        log("04: " + tokenizer._token);
         tokenizer.next();
-        log("05: " + tokenizer.token);
+        log("05: " + tokenizer._token);
         tokenizer.next();
-        log("06: " + tokenizer.token);
+        log("06: " + tokenizer._token);
         tokenizer.next();
-        log("07: " + tokenizer.token);
+        log("07: " + tokenizer._token);
         tokenizer.next();
-        log("08: " + tokenizer.token);
+        log("08: " + tokenizer._token);
         tokenizer.next();
-        log("09: " + tokenizer.token);
+        log("09: " + tokenizer._token);
         tokenizer.next();
-        log("10: " + tokenizer.token);
+        log("10: " + tokenizer._token);
         tokenizer.next();
-        log("11: " + tokenizer.token);
+        log("11: " + tokenizer._token);
         tokenizer.next();
-        log("12: " + tokenizer.token);
+        log("12: " + tokenizer._token);
         tokenizer.next();
-        log("13: " + tokenizer.token);
+        log("13: " + tokenizer._token);
         tokenizer.next();
-        log("14: " + tokenizer.token);
+        log("14: " + tokenizer._token);
     }
 
     // ===================================================================================
