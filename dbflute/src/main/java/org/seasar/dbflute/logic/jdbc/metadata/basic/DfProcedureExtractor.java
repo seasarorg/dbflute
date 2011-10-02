@@ -270,11 +270,30 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             final DfProcedureMeta meta = translator.translateProcedureToDBLink(packageName, procedureName, dbLinkName,
                     this);
             if (meta == null) {
-                String msg = "Failed to setup the procedure to DB link: " + propertyName;
-                throw new DfIllegalPropertySettingException(msg);
+                throwProcedureToDBLinkTranslationFailureException(propertyName, packageName, procedureName, dbLinkName);
             }
+            meta.setIncludedProcedureToDBLink(true);
             procedureList.add(meta);
         }
+    }
+
+    protected void throwProcedureToDBLinkTranslationFailureException(String propertyName, String packageName,
+            String procedureName, String dbLinkName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to translate the procedure to DB link.");
+        br.addItem("Advice");
+        br.addElement("Make sure your procedure name is correct.");
+        br.addElement("Does the DBLink name exist on the schema?");
+        br.addItem("Specified Property");
+        br.addElement(propertyName);
+        br.addItem("Package Name");
+        br.addElement(packageName);
+        br.addItem("Procedure Name");
+        br.addElement(procedureName);
+        br.addItem("DBLink Name");
+        br.addElement(dbLinkName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     // -----------------------------------------------------
@@ -288,23 +307,26 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         final List<DfProcedureMeta> resultList = new ArrayList<DfProcedureMeta>();
         log("...Filtering procedures by the property: before=" + procedureList.size());
         int passedCount = 0;
-        for (DfProcedureMeta metaInfo : procedureList) {
-            final String procedureLoggingName = metaInfo.buildProcedureLoggingName();
-            final String procedureCatalog = metaInfo.getProcedureCatalog();
+        for (DfProcedureMeta meta : procedureList) {
+            if (meta.isIncludedProcedureToDBLink()) { // is fixed setting
+                continue;
+            }
+            final String procedureLoggingName = meta.buildProcedureLoggingName();
+            final String procedureCatalog = meta.getProcedureCatalog();
             if (!prop.isTargetProcedureCatalog(procedureCatalog)) {
                 log("  passed: non-target catalog - " + procedureLoggingName);
                 ++passedCount;
                 continue;
             }
-            final UnifiedSchema procedureSchema = metaInfo.getProcedureSchema();
+            final UnifiedSchema procedureSchema = meta.getProcedureSchema();
             if (!prop.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
                 log("  passed: non-target schema - " + procedureLoggingName);
                 ++passedCount;
                 continue;
             }
-            final String procedureFullQualifiedName = metaInfo.getProcedureFullQualifiedName();
+            final String procedureFullQualifiedName = meta.getProcedureFullQualifiedName();
             final String procedureSchemaQualifiedName = Srl.substringFirstFront(procedureFullQualifiedName, ".");
-            final String procedureName = metaInfo.getProcedureName();
+            final String procedureName = meta.getProcedureName();
             if (!prop.isTargetProcedureName(procedureFullQualifiedName)
                     && !prop.isTargetProcedureName(procedureSchemaQualifiedName)
                     && !prop.isTargetProcedureName(procedureName)) {
@@ -312,7 +334,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 ++passedCount;
                 continue;
             }
-            resultList.add(metaInfo);
+            resultList.add(meta);
         }
         if (passedCount == 0) {
             log(" -> All procedures are target: count=" + procedureList.size());

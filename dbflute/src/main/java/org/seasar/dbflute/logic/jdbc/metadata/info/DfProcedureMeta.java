@@ -27,7 +27,7 @@ public class DfProcedureMeta {
     protected String _procedureComment;
     protected String _procedurePackage; // basically for dropping procedure
     protected boolean _procedureSynonym;
-    protected boolean _packageProcedure;
+    protected boolean _includedProcedureToDBLink;
 
     // procedure parameters
     protected final List<DfProcedureColumnMeta> _procedureColumnList = new ArrayList<DfProcedureColumnMeta>();
@@ -271,6 +271,14 @@ public class DfProcedureMeta {
 
     public void setProcedureSynonym(boolean procedureSynonym) {
         this._procedureSynonym = procedureSynonym;
+    }
+    
+    public boolean isIncludedProcedureToDBLink() {
+        return _includedProcedureToDBLink;
+    }
+    
+    public void setIncludedProcedureToDBLink(boolean includedProcedureToDBLink) {
+        this._includedProcedureToDBLink = includedProcedureToDBLink;
     }
 
     public List<DfProcedureColumnMeta> getProcedureColumnList() {
