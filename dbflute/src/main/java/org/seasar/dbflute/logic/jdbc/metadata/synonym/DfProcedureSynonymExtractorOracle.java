@@ -16,7 +16,6 @@
 package org.seasar.dbflute.logic.jdbc.metadata.synonym;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -38,12 +37,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeExtractorOracle;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeExtractorOracle.ProcedureNativeInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeTranslatorOracle;
-import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfDBLinkNativeExtractorOracle.DBLinkNativeInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymNativeExtractorOracle.SynonymNativeInfo;
-import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -75,21 +69,18 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         ResultSet rs = null;
         try {
             conn = _dataSource.getConnection();
-            final DatabaseMetaData metaData = conn.getMetaData();
             final Map<String, DfProcedureMeta> procedureMap = new LinkedHashMap<String, DfProcedureMeta>();
             final List<DfProcedureMeta> procedureList = new ArrayList<DfProcedureMeta>();
             final DfProcedureExtractor procedureExtractor = new DfProcedureExtractor();
             procedureExtractor.suppressLogging();
             for (UnifiedSchema unifiedSchema : _targetSchemaList) {
                 // get new procedure list because different instances is needed at this process
-                procedureList.addAll(procedureExtractor.getPlainProcedureList(_dataSource, metaData, unifiedSchema));
+                procedureList.addAll(procedureExtractor.getPlainProcedureList(_dataSource, unifiedSchema));
             }
             for (DfProcedureMeta metaInfo : procedureList) {
                 final String procedureKeyName = metaInfo.getProcedureFullQualifiedName();
                 procedureMap.put(procedureKeyName, metaInfo);
             }
-            Map<String, Map<String, ProcedureNativeInfo>> dbLinkProcedureNativeMap = null;
-            Map<String, Map<String, SynonymNativeInfo>> dbLinkSynonymNativeMap = null;
             st = conn.createStatement();
             _log.info(sql);
             rs = st.executeQuery(sql);
@@ -117,14 +108,10 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                 }
                 final DfProcedureMeta procedureMeta;
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) { // synonym for DB link
-                    if (dbLinkProcedureNativeMap == null) { // lazy load
-                        dbLinkProcedureNativeMap = extractDBLinkProcedureNativeMap();
-                    }
-                    if (dbLinkSynonymNativeMap == null) { // lazy load
-                        dbLinkSynonymNativeMap = extractDBLinkSynonymNativeMap();
-                    }
-                    procedureMeta = prepareDBLinkProcedureNative(tableName, dbLinkName, dbLinkProcedureNativeMap,
-                            dbLinkSynonymNativeMap);
+                    // Synonym for Package Procedure has several problems. (so unsupported)
+                    //  o Synonym meta data does not have its schema info
+                    //  o Oracle cannot execute Synonym for Package Procedure *fundamental problem
+                    procedureMeta = prepareDBLinkProcedureNative(tableOwner, tableName, dbLinkName, procedureExtractor);
                     if (procedureMeta == null) {
                         continue;
                     }
@@ -132,10 +119,9 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                     final String procedureKey = tableOwner.buildSchemaQualifiedName(tableName);
                     procedureMeta = procedureMap.get(procedureKey);
                     if (procedureMeta == null) {
-                        // Synonym for Package Procedure has several problems.
-                        //  o Synonym meta data does not have its package info (needs to trace more)
+                        // Synonym for Package Procedure has several problems. (so unsupported)
+                        //  o Synonym meta data does not have its schema info
                         //  o Oracle cannot execute Synonym for Package Procedure *fundamental problem
-                        // So it is not supported here.
                         //for (String schemaName : _schemaList) {
                         //    procedureMetaInfo = procedureMap.get(schemaName + "." + procedureKey);
                         //    if (procedureMetaInfo != null) {
@@ -212,77 +198,14 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         }
     }
 
-    protected Map<String, Map<String, ProcedureNativeInfo>> extractDBLinkProcedureNativeMap() { // main schema's DB link only
-        final DfDBLinkNativeExtractorOracle dbLinkExtractor = createDBLinkNativeExtractor();
-        final Map<String, DBLinkNativeInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap();
-        final DfProcedureNativeExtractorOracle nativeExtractor = createProcedureNativeExtractor();
-        final Map<String, Map<String, ProcedureNativeInfo>> map = DfCollectionUtil.newLinkedHashMap();
-        for (String dbLinkName : dbLinkInfoMap.keySet()) {
-            map.put(dbLinkName, nativeExtractor.extractDBLinkProcedureNativeInfoList(dbLinkName));
-        }
-        return map;
-    }
-
-    protected DfDBLinkNativeExtractorOracle createDBLinkNativeExtractor() {
-        return new DfDBLinkNativeExtractorOracle(_dataSource, false);
-    }
-
-    protected DfProcedureNativeExtractorOracle createProcedureNativeExtractor() {
-        return new DfProcedureNativeExtractorOracle(_dataSource, false);
-    }
-
-    protected Map<String, Map<String, SynonymNativeInfo>> extractDBLinkSynonymNativeMap() { // main schema's DB link only
-        final DfDBLinkNativeExtractorOracle dbLinkExtractor = createDBLinkNativeExtractor();
-        final Map<String, DBLinkNativeInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap();
-        final DfSynonymNativeExtractorOracle nativeExtractor = createSynonymNativeExtractor();
-        final Map<String, Map<String, SynonymNativeInfo>> map = DfCollectionUtil.newLinkedHashMap();
-        for (String dbLinkName : dbLinkInfoMap.keySet()) {
-            map.put(dbLinkName, nativeExtractor.selectDBLinkSynonymInfoMap(dbLinkName));
-        }
-        return map;
-    }
-
-    protected DfSynonymNativeExtractorOracle createSynonymNativeExtractor() {
-        return new DfSynonymNativeExtractorOracle(_dataSource, false);
-    }
-
-    protected DfProcedureMeta prepareDBLinkProcedureNative(String tableName, String dbLinkName,
-            Map<String, Map<String, ProcedureNativeInfo>> dbLinkProcedureNativeMap,
-            Map<String, Map<String, SynonymNativeInfo>> dbLinkSynonymNativeMap) {
-        final Map<String, ProcedureNativeInfo> nativeMap = dbLinkProcedureNativeMap.get(dbLinkName);
-        if (nativeMap == null) {
-            return null; // it might be next schema DB link
-        }
-        // Synonym for Package Procedure has several problems.
-        //  o Synonym meta data does not have its package info (needs to trace more)
-        //  o Oracle cannot execute Synonym for Package Procedure *fundamental problem
-        // So it is not supported here.
-        final String nativeInfoMapKey = generateNativeInfoMapKey(null, tableName, null);
-        ProcedureNativeInfo nativeInfo = nativeMap.get(nativeInfoMapKey);
-        if (nativeInfo == null) {
-            Map<String, SynonymNativeInfo> synonymNativeMap = dbLinkSynonymNativeMap.get(dbLinkName);
-            final SynonymNativeInfo synonymNativeInfo = synonymNativeMap.get(tableName);
-            if (synonymNativeInfo == null) { // means the name is not synonym
-                return null; // it might be package procedures
-            }
-            // it's a synonym in the another world
-            final String retryKey = generateNativeInfoMapKey(null, synonymNativeInfo.getTableName(), null);
-            final ProcedureNativeInfo retryInfo = nativeMap.get(retryKey);
-            if (retryInfo == null) {
-                return null;
-            }
-            nativeInfo = retryInfo; // found
-        }
-        return createDBLinkProcedureMeta(nativeInfo, dbLinkName);
-    }
-
-    protected DfProcedureMeta createDBLinkProcedureMeta(ProcedureNativeInfo nativeInfo, String dbLinkName) {
-        final DfProcedureNativeTranslatorOracle translator = new DfProcedureNativeTranslatorOracle();
-        return translator.createDBLinkProcedureMeta(nativeInfo, dbLinkName);
-    }
-
-    protected String generateNativeInfoMapKey(String packageName, String procedureName, String overload) {
-        return DfProcedureNativeExtractorOracle.generateNativeInfoMapKey(packageName, procedureName, overload);
+    // ===================================================================================
+    //                                                                              DBLink
+    //                                                                              ======
+    protected DfProcedureMeta prepareDBLinkProcedureNative(UnifiedSchema tableOwner, String tableName,
+            String dbLinkName, DfProcedureExtractor procedureExtractor) {
+        final DfProcedureNativeTranslatorOracle translator = new DfProcedureNativeTranslatorOracle(_dataSource);
+        final String packageName = tableOwner.getPureSchema();
+        return translator.translateProcedureToDBLink(packageName, tableName, dbLinkName, procedureExtractor);
     }
 
     // ===================================================================================

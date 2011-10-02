@@ -17,6 +17,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
@@ -29,24 +30,27 @@ public interface DfProcedureSupplementExtractor {
 
     /**
      * Extract the map of overload info. <br />
-     * Same name and different type parameters of overload are unsupported. 
-     * @return The map of array info. (NotNull)
+     * Same name and different type parameters of overload are unsupported.
+     * @param unifiedSchema The unified schema to extract. (NotNull)
+     * @return The map of parameter's overload info. (NotNull)
      */
-    public Map<String, Integer> extractParameterOverloadInfoMap();
+    Map<String, Integer> extractParameterOverloadInfoMap(UnifiedSchema unifiedSchema);
 
     /**
      * Extract the map of array info. <br />
-     * Same name and different type parameters of overload are unsupported. 
+     * Same name and different type parameters of overload are unsupported.
+     * @param unifiedSchema The unified schema to extract. (NotNull)
      * @return The map of array info. (NotNull)
      */
-    public Map<String, DfTypeArrayInfo> extractParameterArrayInfoMap();
+    Map<String, DfTypeArrayInfo> extractParameterArrayInfoMap(UnifiedSchema unifiedSchema);
 
     /**
      * Extract the map of struct info for procedure. <br />
      * (but it contains structs that are not defined as procedure parameters)
+     * @param unifiedSchema The unified schema to extract. (NotNull)
      * @return The map of array info. (NotNull)
      */
-    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap();
+    StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema);
 
     /**
      * @param catalog The catalog for procedure. (NullAllowed)
@@ -54,5 +58,5 @@ public interface DfProcedureSupplementExtractor {
      * @param parameterName The name of parameter. (NotNull)
      * @return The map key for parameter info. (NotNull)
      */
-    public String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName);
+    String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName);
 }

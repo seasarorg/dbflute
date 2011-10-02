@@ -190,6 +190,7 @@ public class DfProcedurePmbSetupper {
     //                                                                      ==============
     protected List<DfProcedureMeta> getAvailableProcedureList() throws SQLException {
         _procedureExtractor.includeProcedureSynonym(_dataSource);
+        _procedureExtractor.includeProcedureToDBLink(_dataSource);
         final List<DfProcedureMeta> procedureList = _procedureExtractor.getAvailableProcedureList(_dataSource);
         if (getOutsideSqlProperties().isGenerateProcedureCustomizeEntity()) {
             final DfProcedureExecutionMetaExtractor executionMetaHandler = new DfProcedureExecutionMetaExtractor();

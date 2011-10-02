@@ -2301,6 +2301,7 @@ public class Database {
         _log.info("...Setting up procedures for documents");
         final DfProcedureExtractor handler = new DfProcedureExtractor();
         handler.includeProcedureSynonym(getDataSource());
+        handler.includeProcedureToDBLink(getDataSource());
         final DataSource dataSource = getDataSource();
         _procedureMetaInfoList = handler.getAvailableProcedureList(dataSource);
         return _procedureMetaInfoList;

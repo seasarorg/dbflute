@@ -17,15 +17,24 @@ package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 
 import java.sql.Types;
 import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeExtractorOracle.ProcedureNativeInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle.ProcedureArgumentInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfDBLinkNativeExtractorOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfDBLinkNativeExtractorOracle.DBLinkNativeInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymNativeExtractorOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymNativeExtractorOracle.SynonymNativeInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -34,20 +43,66 @@ import org.seasar.dbflute.util.Srl;
  */
 public class DfProcedureNativeTranslatorOracle {
 
+    protected final DataSource _dataSource;
     protected final DfColumnExtractor _columnExtractor = new DfColumnExtractor();
+    protected Map<String, Map<String, ProcedureNativeInfo>> _dbLinkProcedureNativeMap;
+    protected Map<String, Map<String, SynonymNativeInfo>> _dbLinkSynonymNativeMap;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfProcedureNativeTranslatorOracle() {
+    public DfProcedureNativeTranslatorOracle(DataSource dataSource) {
+        _dataSource = dataSource;
     }
 
     // ===================================================================================
-    //                                                                      Procedure Meta
-    //                                                                      ==============
-    public DfProcedureMeta createDBLinkProcedureMeta(ProcedureNativeInfo nativeInfo, String dbLinkName) {
+    //                                                                    DBLink Procedure
+    //                                                                    ================
+    public DfProcedureMeta translateProcedureToDBLink(String packageName, String procedureName, String dbLinkName,
+            DfProcedureExtractor procedureExtractor) {
+        if (_dbLinkProcedureNativeMap == null) { // lazy load
+            _dbLinkProcedureNativeMap = extractDBLinkProcedureNativeMap();
+        }
+        if (_dbLinkSynonymNativeMap == null) { // lazy load
+            _dbLinkSynonymNativeMap = extractDBLinkSynonymNativeMap();
+        }
+        final Map<String, ProcedureNativeInfo> nativeMap = _dbLinkProcedureNativeMap.get(dbLinkName);
+        if (nativeMap == null) {
+            return null; // it might be next schema DB link
+        }
+        // Synonym for Package Procedure has several problems. (so unsupported)
+        //  o Synonym meta data does not have its schema info
+        //  o Oracle cannot execute Synonym for Package Procedure *fundamental problem
+        final String nativeInfoMapKey = generateNativeInfoMapKey(packageName, procedureName);
+        ProcedureNativeInfo nativeInfo = nativeMap.get(nativeInfoMapKey);
+        if (nativeInfo == null) {
+            final Map<String, SynonymNativeInfo> synonymNativeMap = _dbLinkSynonymNativeMap.get(dbLinkName);
+            final SynonymNativeInfo synonymNativeInfo = synonymNativeMap.get(procedureName);
+            if (synonymNativeInfo == null) { // means the name is not synonym
+                return null; // it might be package procedures
+            }
+            // it's a synonym in the another world
+            final String retryKey = generateNativeInfoMapKey(null, synonymNativeInfo.getTableName());
+            final ProcedureNativeInfo retryInfo = nativeMap.get(retryKey);
+            if (retryInfo == null) {
+                return null;
+            }
+            nativeInfo = retryInfo; // found
+        }
+        // adding assist info (e.g. mainly GreatWall)
+        final DfProcedureMeta procedureMeta = createDBLinkProcedureMeta(nativeInfo, dbLinkName);
+        final List<DfProcedureMeta> metaInfoList = DfCollectionUtil.newArrayList(procedureMeta);
+        procedureExtractor.resolveAssistInfoToDBLink(_dataSource, metaInfoList, dbLinkName);
+        return procedureMeta;
+    }
+
+    protected String generateNativeInfoMapKey(String packageName, String procedureName) {
+        return DfProcedureNativeExtractorOracle.generateNativeInfoMapKey(packageName, procedureName);
+    }
+
+    protected DfProcedureMeta createDBLinkProcedureMeta(ProcedureNativeInfo nativeInfo, String dbLinkName) {
         final DfProcedureMeta procedureMeta = new DfProcedureMeta();
-        procedureMeta.setProcedureCatalog(nativeInfo.getObjectName());
+        procedureMeta.setProcedureCatalog(nativeInfo.getPackageName()); // package name treated as catalog in JDBC
         procedureMeta.setProcedureName(nativeInfo.getProcedureName());
         final String linkedName = nativeInfo.getProcedureName() + "@" + dbLinkName;
         procedureMeta.setProcedureFullQualifiedName(linkedName);
@@ -97,5 +152,42 @@ public class DfProcedureNativeTranslatorOracle {
         // you should refactor the process if you support them
 
         return procedureMeta;
+    }
+
+    // ===================================================================================
+    //                                                                  DBLink Native Info
+    //                                                                  ==================
+    protected Map<String, Map<String, ProcedureNativeInfo>> extractDBLinkProcedureNativeMap() { // main schema's DB link only
+        final DfDBLinkNativeExtractorOracle dbLinkExtractor = createDBLinkNativeExtractor();
+        final Map<String, DBLinkNativeInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap();
+        final DfProcedureNativeExtractorOracle nativeExtractor = createProcedureNativeExtractor();
+        final Map<String, Map<String, ProcedureNativeInfo>> map = DfCollectionUtil.newLinkedHashMap();
+        for (String dbLinkName : dbLinkInfoMap.keySet()) {
+            map.put(dbLinkName, nativeExtractor.extractDBLinkProcedureNativeInfoList(dbLinkName));
+        }
+        return map;
+    }
+
+    protected DfDBLinkNativeExtractorOracle createDBLinkNativeExtractor() {
+        return new DfDBLinkNativeExtractorOracle(_dataSource, false);
+    }
+
+    protected DfProcedureNativeExtractorOracle createProcedureNativeExtractor() {
+        return new DfProcedureNativeExtractorOracle(_dataSource, false);
+    }
+
+    protected Map<String, Map<String, SynonymNativeInfo>> extractDBLinkSynonymNativeMap() { // main schema's DB link only
+        final DfDBLinkNativeExtractorOracle dbLinkExtractor = createDBLinkNativeExtractor();
+        final Map<String, DBLinkNativeInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap();
+        final DfSynonymNativeExtractorOracle nativeExtractor = createSynonymNativeExtractor();
+        final Map<String, Map<String, SynonymNativeInfo>> map = DfCollectionUtil.newLinkedHashMap();
+        for (String dbLinkName : dbLinkInfoMap.keySet()) {
+            map.put(dbLinkName, nativeExtractor.selectDBLinkSynonymInfoMap(dbLinkName));
+        }
+        return map;
+    }
+
+    protected DfSynonymNativeExtractorOracle createSynonymNativeExtractor() {
+        return new DfSynonymNativeExtractorOracle(_dataSource, false);
     }
 }

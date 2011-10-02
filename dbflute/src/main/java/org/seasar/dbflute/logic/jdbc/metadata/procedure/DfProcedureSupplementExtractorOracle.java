@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,26 +53,65 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     protected final DataSource _dataSource;
 
+    // -----------------------------------------------------
+    //                                       Basic GreatWall
+    //                                       ---------------
     /** The info map of ARRAY for cache. */
-    protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _arrayInfoMapMap = DfCollectionUtil.newHashMap();
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _arrayInfoMapMap = newHashMap();
 
     /** The info map of ARRAY as flat for cache. */
-    protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _flatArrayInfoMapMap = DfCollectionUtil
-            .newHashMap();
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _flatArrayInfoMapMap = newHashMap();
 
     /** The info map of STRUCT type for cache. */
-    protected final Map<UnifiedSchema, StringKeyMap<DfTypeStructInfo>> _structInfoMapMap = DfCollectionUtil
-            .newHashMap();
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeStructInfo>> _structInfoMapMap = newHashMap();
 
     /** The info map of ARRAY set for cache. */
-    protected final Map<UnifiedSchema, StringSet> _arrayTypeSetMap = DfCollectionUtil.newHashMap();
+    protected final Map<UnifiedSchema, StringSet> _arrayTypeSetMap = newHashMap();
 
+    // -----------------------------------------------------
+    //                                      DBLink GreatWall
+    //                                      ----------------
+    /** The info map of ARRAY to DB link for cache. */
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _arrayInfoMapToDBLinkMap = newHashMap();
+
+    /** The info map of ARRAY as flat to DB link for cache. */
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _flatArrayInfoMapToDBLinkMap = newHashMap();
+
+    /** The info map of STRUCT type to DB link for cache. */
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeStructInfo>> _structInfoMapToDBLinkMap = newHashMap();
+
+    /** The info map of ARRAY set to DB link for cache. */
+    protected final Map<UnifiedSchema, StringSet> _arrayTypeSetToDBLinkMap = newHashMap();
+
+    // -----------------------------------------------------
+    //                                         Argument Info
+    //                                         -------------
     /** The info map of procedure argument for cache. */
-    protected final Map<UnifiedSchema, List<ProcedureArgumentInfo>> _argumentInfoListMap = DfCollectionUtil
-            .newHashMap();
+    protected final Map<UnifiedSchema, List<ProcedureArgumentInfo>> _argumentInfoListMap = newHashMap();
 
+    /** The info map of procedure argument to DB link for cache. */
+    protected final Map<String, List<ProcedureArgumentInfo>> _argumentInfoListToDBLinkMap = newHashMap();
+
+    // -----------------------------------------------------
+    //                                       ResultMap Cache
+    //                                       ---------------
+    protected final Map<UnifiedSchema, StringKeyMap<Integer>> _parameterOverloadResultMapMap = newHashMap();
+    protected final Map<String, StringKeyMap<Integer>> _parameterOverloadToDBLinkResultMapMap = newHashMap();
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _parameterArrayResultMapMap = newHashMap();
+    protected final Map<UnifiedSchema, StringKeyMap<DfTypeStructInfo>> _structResultMapMap = newHashMap();
+
+    // DBLink procedure's GreatWalls are unsupported yet
+    //protected final Map<String, StringKeyMap<DfTypeArrayInfo>> _parameterArrayInfoToDBLinkResultMapMap = newHashMap();
+    //protected final Map<String, StringKeyMap<DfTypeStructInfo>> _structInfoToDBLinkResultMapMap = newHashMap();
+
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
     protected boolean _suppressLogging;
 
     // ===================================================================================
@@ -85,23 +125,40 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     //                                                                            Overload
     //                                                                            ========
     /**
-     * Extract the map of parameter's overload info. <br />
-     * Same name and different type parameters of overload are unsupported. 
-     * @return The map of parameter's array info. {key = (packageName.)procedureName.columnName, value = overloadNo} (NotNull)
+     * {@inheritDoc}
      */
-    public StringKeyMap<Integer> extractParameterOverloadInfoMap() {
-        final UnifiedSchema mainSchema = getMainSchema();
-        final List<UnifiedSchema> additionalSchemaList = getAdditionalSchemaList();
-        final StringKeyMap<Integer> resultMap = findParameterOverloadInfoMap(mainSchema);
-        for (UnifiedSchema additionalSchema : additionalSchemaList) {
-            final StringKeyMap<Integer> additionalMap = findParameterOverloadInfoMap(additionalSchema);
-            resultMap.putAll(additionalMap);
+    public StringKeyMap<Integer> extractParameterOverloadInfoMap(UnifiedSchema unifiedSchema) {
+        final StringKeyMap<Integer> overloadInfoToDBLinkMap = _parameterOverloadResultMapMap.get(unifiedSchema);
+        if (overloadInfoToDBLinkMap == null) {
+            _parameterOverloadResultMapMap.put(unifiedSchema, findParameterOverloadInfoMap(unifiedSchema));
         }
-        return resultMap;
+        // {key = (packageName.)procedureName.columnName, value = overloadNo}
+        return _parameterOverloadResultMapMap.get(unifiedSchema);
     }
 
-    public StringKeyMap<Integer> findParameterOverloadInfoMap(UnifiedSchema unifiedSchema) {
-        final List<ProcedureArgumentInfo> infoList = findProcedureArgumentInfoList(unifiedSchema);
+    /**
+     * Extract the map of parameter's overload info for DB link. <br />
+     * Same name and different type parameters of overload are unsupported. 
+     * @param dbLinkName The name of DB link to extract. (NotNull)
+     * @return The map of parameter's array info. {key = (packageName.)procedureName.columnName, value = overloadNo} (NotNull)
+     */
+    public StringKeyMap<Integer> extractParameterOverloadInfoToDBLinkMap(String dbLinkName) {
+        final StringKeyMap<Integer> overloadInfoToDBLinkMap = _parameterOverloadToDBLinkResultMapMap.get(dbLinkName);
+        if (overloadInfoToDBLinkMap == null) {
+            _parameterOverloadToDBLinkResultMapMap.put(dbLinkName, findParameterOverloadInfoToDBLinkMap(dbLinkName));
+        }
+        return _parameterOverloadToDBLinkResultMapMap.get(dbLinkName);
+    }
+
+    protected StringKeyMap<Integer> findParameterOverloadInfoMap(UnifiedSchema unifiedSchema) {
+        return doFindParameterOverloadInfoMap(findProcedureArgumentInfoList(unifiedSchema));
+    }
+
+    protected StringKeyMap<Integer> findParameterOverloadInfoToDBLinkMap(String dbLinkName) {
+        return doFindParameterOverloadInfoMap(findProcedureArgumentInfoToDBLinkList(dbLinkName));
+    }
+
+    protected StringKeyMap<Integer> doFindParameterOverloadInfoMap(List<ProcedureArgumentInfo> infoList) {
         final StringKeyMap<Integer> infoMap = StringKeyMap.createAsFlexibleOrdered();
         for (int i = 0; i < infoList.size(); i++) {
             final ProcedureArgumentInfo info = infoList.get(i);
@@ -110,6 +167,8 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             if (Srl.is_Null_or_TrimmedEmpty(argumentName) || Srl.is_Null_or_TrimmedEmpty(overload)) {
                 continue;
             }
+            // this is not correct but DBFlute treats overload methods as one method
+            // (overload info is only referred to determinate whether the procedure has overload methods)
             final String key = generateParameterInfoMapKey(info.getPackageName(), info.getObjectName(), argumentName);
             infoMap.put(key, DfTypeUtil.toInteger(overload));
         }
@@ -120,19 +179,14 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     //                                                                               Array
     //                                                                               =====
     /**
-     * Extract the map of parameter's array info. <br />
-     * Same name and different type parameters of overload are unsupported. 
-     * @return The map of parameter's array info. {key = (packageName.)procedureName.columnName} (NotNull)
+     * {@inheritDoc}
      */
-    public StringKeyMap<DfTypeArrayInfo> extractParameterArrayInfoMap() {
-        final UnifiedSchema mainSchema = getMainSchema();
-        final List<UnifiedSchema> additionalSchemaList = getAdditionalSchemaList();
-        final StringKeyMap<DfTypeArrayInfo> resultMap = findParameterArrayInfoMap(mainSchema);
-        for (UnifiedSchema additionalSchema : additionalSchemaList) {
-            final StringKeyMap<DfTypeArrayInfo> additionalMap = findParameterArrayInfoMap(additionalSchema);
-            resultMap.putAll(additionalMap);
+    public StringKeyMap<DfTypeArrayInfo> extractParameterArrayInfoMap(UnifiedSchema unifiedSchema) {
+        final StringKeyMap<DfTypeArrayInfo> overloadInfoToDBLinkMap = _parameterArrayResultMapMap.get(unifiedSchema);
+        if (overloadInfoToDBLinkMap == null) {
+            _parameterArrayResultMapMap.put(unifiedSchema, findParameterArrayInfoMap(unifiedSchema));
         }
-        return resultMap;
+        return _parameterArrayResultMapMap.get(unifiedSchema);
     }
 
     protected StringKeyMap<DfTypeArrayInfo> findParameterArrayInfoMap(UnifiedSchema unifiedSchema) {
@@ -183,7 +237,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             // *ARRAY type of additional schema is unsupported for now
         }
         // STRUCT element
-        final StringKeyMap<DfTypeStructInfo> structInfoMap = findStructInfoMap(unifiedSchema);
+        final StringKeyMap<DfTypeStructInfo> structInfoMap = findParameterStructInfoMap(unifiedSchema);
         final DfTypeStructInfo structInfo = structInfoMap.get(arrayInfo.getElementType());
         if (structInfo != null) {
             // the structInfo has already been resolved about nested objects
@@ -200,21 +254,17 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     //                                                                              Struct
     //                                                                              ======
     /**
-     * Extract the map of struct info with nested info.
-     * @return The map of struct info. {key = schema.struct-type-name} (NotNull)
+     * {@inheritDoc}
      */
-    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap() {
-        final UnifiedSchema mainSchema = getMainSchema();
-        final List<UnifiedSchema> additionalSchemaList = getAdditionalSchemaList();
-        final StringKeyMap<DfTypeStructInfo> resultMap = findStructInfoMap(mainSchema);
-        for (UnifiedSchema additionalSchema : additionalSchemaList) {
-            final StringKeyMap<DfTypeStructInfo> additionalMap = findStructInfoMap(additionalSchema);
-            resultMap.putAll(additionalMap);
+    public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema) {
+        final StringKeyMap<DfTypeStructInfo> structInfoToDBLinkMap = _structResultMapMap.get(unifiedSchema);
+        if (structInfoToDBLinkMap == null) {
+            _structResultMapMap.put(unifiedSchema, findParameterStructInfoMap(unifiedSchema));
         }
-        return resultMap;
+        return _structResultMapMap.get(unifiedSchema);
     }
 
-    protected StringKeyMap<DfTypeStructInfo> findStructInfoMap(UnifiedSchema unifiedSchema) {
+    protected StringKeyMap<DfTypeStructInfo> findParameterStructInfoMap(UnifiedSchema unifiedSchema) {
         StringKeyMap<DfTypeStructInfo> structInfoMap = _structInfoMapMap.get(unifiedSchema);
         if (structInfoMap != null) {
             return structInfoMap;
@@ -290,12 +340,8 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     //                                                                       Key Generator
     //                                                                       =============
     public String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName) {
-        final StringBuilder keySb = new StringBuilder();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(catalog)) {
-            keySb.append(catalog).append(".");
-        }
-        keySb.append(procedureName).append(".").append(parameterName);
-        return keySb.toString();
+        return DfProcedureParameterNativeExtractorOracle.generateParameterInfoMapKey(catalog, procedureName,
+                parameterName);
     }
 
     // ===================================================================================
@@ -324,6 +370,17 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         argInfoList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
         _argumentInfoListMap.put(unifiedSchema, argInfoList);
         return _argumentInfoListMap.get(unifiedSchema);
+    }
+
+    protected List<ProcedureArgumentInfo> findProcedureArgumentInfoToDBLinkList(String dbLinkName) {
+        List<ProcedureArgumentInfo> argInfoList = _argumentInfoListToDBLinkMap.get(dbLinkName);
+        if (argInfoList != null) {
+            return argInfoList;
+        }
+        final DfProcedureParameterNativeExtractorOracle extractor = createProcedureParameterExtractorOracle();
+        argInfoList = extractor.extractProcedureArgumentInfoToDBLinkList(dbLinkName);
+        _argumentInfoListToDBLinkMap.put(dbLinkName, argInfoList);
+        return _argumentInfoListToDBLinkMap.get(dbLinkName);
     }
 
     protected DfProcedureParameterNativeExtractorOracle createProcedureParameterExtractorOracle() {
@@ -357,5 +414,12 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
 
     public void suppressLogging() {
         _suppressLogging = true;
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return DfCollectionUtil.newHashMap();
     }
 }

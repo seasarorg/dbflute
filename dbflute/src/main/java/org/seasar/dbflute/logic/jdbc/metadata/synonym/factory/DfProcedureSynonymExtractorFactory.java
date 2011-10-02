@@ -16,9 +16,9 @@ import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
  */
 public class DfProcedureSynonymExtractorFactory {
 
-    protected DataSource _dataSource;
-    protected DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
-    protected DfDatabaseProperties _databaseProperties;
+    protected final DataSource _dataSource;
+    protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
+    protected final DfDatabaseProperties _databaseProperties;
 
     /**
      * @param dataSource The data source. (NotNull)
@@ -27,8 +27,8 @@ public class DfProcedureSynonymExtractorFactory {
      */
     public DfProcedureSynonymExtractorFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
             DfDatabaseProperties databaseProperties) {
-        _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _dataSource = dataSource;
+        _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _databaseProperties = databaseProperties;
     }
 

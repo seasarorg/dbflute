@@ -358,17 +358,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final DfProcedureExtractor handler = new DfProcedureExtractor();
         handler.suppressAdditionalSchema();
         handler.suppressLogging();
-        DatabaseMetaData metaData;
-        try {
-            metaData = conn.getMetaData();
-        } catch (SQLException e) {
-            String msg = "Failed to get meta data of the connection:";
-            msg = msg + " connection=" + conn;
-            throw new SQLFailureException(msg, e);
-        }
         final List<DfProcedureMeta> procedureList;
         try {
-            procedureList = handler.getPlainProcedureList(_dataSource, metaData, _unifiedSchema);
+            procedureList = handler.getPlainProcedureList(_dataSource, _unifiedSchema);
         } catch (SQLException e) {
             String msg = "Failed to get procedure meta data: " + _unifiedSchema;
             throw new SQLFailureException(msg, e);

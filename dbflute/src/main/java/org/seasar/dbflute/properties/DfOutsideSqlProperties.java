@@ -130,14 +130,26 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     protected List<String> _targetProcedureNameList;
+    protected List<String> _targetProcedureNameToDBLinkList;
 
     protected List<String> getTargetProcedureNameList() {
         if (_targetProcedureNameList != null) {
             return _targetProcedureNameList;
         }
-        _targetProcedureNameList = getOutsideSqlPropertyAsList("targetProcedureNameList");
-        if (_targetProcedureNameList == null) {
+        final List<String> propertyList = getOutsideSqlPropertyAsList("targetProcedureNameList");
+        if (propertyList != null) {
+            _targetProcedureNameList = DfCollectionUtil.newArrayList();
+            _targetProcedureNameToDBLinkList = DfCollectionUtil.newArrayList();
+            for (String property : propertyList) {
+                if (isTargetProcedureToDBLink(property)) {
+                    _targetProcedureNameToDBLinkList.add(property);
+                } else {
+                    _targetProcedureNameList.add(property);
+                }
+            }
+        } else {
             _targetProcedureNameList = DfCollectionUtil.emptyList();
+            _targetProcedureNameToDBLinkList = DfCollectionUtil.emptyList();
         }
         return _targetProcedureNameList;
     }
@@ -151,6 +163,18 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             if (isHitByTheHint(procedureName, procedureNameHint)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public List<String> getTargetProcedureNameToDBLinkList() {
+        getTargetProcedureNameList(); // initialize
+        return _targetProcedureNameToDBLinkList;
+    }
+
+    protected boolean isTargetProcedureToDBLink(String name) {
+        if (getBasicProperties().isDatabaseOracle()) {
+            return name.contains("@") && !name.startsWith("@") && !name.endsWith("@");
         }
         return false;
     }

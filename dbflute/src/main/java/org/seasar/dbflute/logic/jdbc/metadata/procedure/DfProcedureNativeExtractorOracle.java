@@ -82,14 +82,10 @@ public class DfProcedureNativeExtractorOracle {
 
     protected String buildProcedureNativeSql(UnifiedSchema unifiedSchema) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select OBJECT_NAME as PKG, PROCEDURE_NAME as NAME, null as OL");
+        sb.append("select OBJECT_NAME, PROCEDURE_NAME");
         sb.append(" from ALL_PROCEDURES");
         sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
-        sb.append(" union"); // because ALL_PROCEDURES table on Oracle 10g does not have OVERLOAD
-        sb.append(" select PACKAGE_NAME as PKG, OBJECT_NAME as NAME, OVERLOAD as OL");
-        sb.append(" from ALL_ARGUMENTS");
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
-        sb.append(" order by PKG, NAME, OL");
+        sb.append(" order by OBJECT_NAME, PROCEDURE_NAME");
         return sb.toString();
     }
 
@@ -105,21 +101,17 @@ public class DfProcedureNativeExtractorOracle {
 
     protected String buildDBLinkProcedureNativeSql(String dbLinkName) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select OBJECT_NAME as PKG, PROCEDURE_NAME as NAME, null as OL");
+        sb.append("select OBJECT_NAME, PROCEDURE_NAME");
         sb.append(" from USER_PROCEDURES@").append(dbLinkName);
-        sb.append(" union"); // same reason as ALL_PROCEDURES
-        sb.append(" select PACKAGE_NAME as PKG, OBJECT_NAME as NAME, OVERLOAD as OL");
-        sb.append(" from ALL_ARGUMENTS");
-        sb.append(" order by PKG, NAME, OL");
+        sb.append(" order by OBJECT_NAME, PROCEDURE_NAME");
         return sb.toString();
     }
 
     protected Map<String, ProcedureNativeInfo> doSelectProcedureNativeInfoMap(String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
-        columnList.add("PKG");
-        columnList.add("NAME");
-        columnList.add("OL");
+        columnList.add("OBJECT_NAME");
+        columnList.add("PROCEDURE_NAME");
         final List<Map<String, String>> resultList;
         try {
             log(sql);
@@ -132,18 +124,21 @@ public class DfProcedureNativeExtractorOracle {
         final Map<String, ProcedureNativeInfo> infoMap = DfCollectionUtil.newLinkedHashMap();
         for (Map<String, String> map : resultList) {
             final ProcedureNativeInfo info = new ProcedureNativeInfo();
-            final String objectName = map.get("PKG");
-            info.setObjectName(objectName);
-            final String procedureName = map.get("NAME");
-            info.setProcedureName(procedureName);
-            final String overload = map.get("OL");
-            info.setOverload(overload);
-            infoMap.put(generateNativeInfoMapKey(objectName, procedureName, null), info);
+            final String objectName = map.get("OBJECT_NAME");
+            final String procedureName = map.get("PROCEDURE_NAME");
+            // translate Oracle's strange data structure
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureName)) {
+                info.setPackageName(objectName); // objectName is packageName here
+                info.setProcedureName(procedureName);
+            } else {
+                info.setProcedureName(objectName); // objectName is procedureName here
+            }
+            infoMap.put(generateNativeInfoMapKey(objectName, procedureName), info);
         }
         return infoMap;
     }
 
-    public static String generateNativeInfoMapKey(String packageName, String procedureName, String overload) {
+    public static String generateNativeInfoMapKey(String packageName, String procedureName) {
         final StringBuilder keySb = new StringBuilder();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) {
             keySb.append(packageName).append(".");
@@ -151,24 +146,24 @@ public class DfProcedureNativeExtractorOracle {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureName)) {
             keySb.append(procedureName).append(".");
         }
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(overload)) {
-            keySb.append(overload).append(".");
-        }
+        // DBFlute treats overload methods as one method
+        //if (Srl.is_NotNull_and_NotTrimmedEmpty(overload)) {
+        //    keySb.append(overload).append(".");
+        //}
         return keySb.toString();
     }
 
     public static class ProcedureNativeInfo {
-        protected String _objectName;
+        protected String _packageName;
         protected String _procedureName;
-        protected String _overload;
         protected List<ProcedureArgumentInfo> _argInfoList;
 
-        public String getObjectName() {
-            return _objectName;
+        public String getPackageName() {
+            return _packageName;
         }
 
-        public void setObjectName(String objectName) {
-            this._objectName = objectName;
+        public void setPackageName(String packageName) {
+            this._packageName = packageName;
         }
 
         public String getProcedureName() {
@@ -177,14 +172,6 @@ public class DfProcedureNativeExtractorOracle {
 
         public void setProcedureName(String procedureName) {
             this._procedureName = procedureName;
-        }
-
-        public String getOverload() {
-            return _overload;
-        }
-
-        public void setOverload(String overload) {
-            this._overload = overload;
         }
 
         public List<ProcedureArgumentInfo> getArgInfoList() {
@@ -200,16 +187,16 @@ public class DfProcedureNativeExtractorOracle {
     //                                                                       Argument Info
     //                                                                       =============
     protected Map<String, List<ProcedureArgumentInfo>> selectProcedureArgumentInfoMap(UnifiedSchema unifiedSchema) {
-        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(_dataSource,
-                _suppressLogging);
+        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(
+                _dataSource, _suppressLogging);
         final List<ProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
         return arrangeProcedureArgumentInfoMap(allArgList);
     }
 
     protected Map<String, List<ProcedureArgumentInfo>> selectDBLinkProcedureArgumentInfoMap(String dbLinkName) {
-        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(_dataSource,
-                _suppressLogging);
-        final List<ProcedureArgumentInfo> allArgList = extractor.extractDBLinkProcedureArgumentInfoList(dbLinkName);
+        final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(
+                _dataSource, _suppressLogging);
+        final List<ProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoToDBLinkList(dbLinkName);
         return arrangeProcedureArgumentInfoMap(allArgList);
     }
 
@@ -219,8 +206,9 @@ public class DfProcedureNativeExtractorOracle {
         for (ProcedureArgumentInfo currentArgInfo : allArgList) {
             final String packageName = currentArgInfo.getPackageName();
             final String procedureName = currentArgInfo.getObjectName();
-            final String overload = currentArgInfo.getOverload();
-            final String key = generateNativeInfoMapKey(packageName, procedureName, overload);
+            // DBFlute treats overload methods as one method
+            //final String overload = currentArgInfo.getOverload();
+            final String key = generateNativeInfoMapKey(packageName, procedureName);
             List<ProcedureArgumentInfo> argList = map.get(key);
             if (argList == null) {
                 argList = DfCollectionUtil.newArrayList();

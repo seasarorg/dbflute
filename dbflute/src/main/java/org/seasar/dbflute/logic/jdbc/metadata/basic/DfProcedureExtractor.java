@@ -15,11 +15,13 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.basic;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -45,6 +47,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeTranslatorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.factory.DfProcedureSynonymExtractorFactory;
@@ -52,6 +55,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties.ProcedureSynonymHandlingType;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -72,6 +76,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     protected boolean _suppressFilterByProperty;
     protected boolean _suppressLogging;
     protected DataSource _procedureSynonymDataSource;
+    protected DataSource _procedureToDBLinkDataSource;
+    protected final Map<Integer, DfProcedureSupplementExtractorOracle> _supplementExtractorOracleMap = newHashMap();
 
     // ===================================================================================
     //                                                                 Available Procedure
@@ -96,20 +102,21 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     public Map<String, DfProcedureMeta> getAvailableProcedureMap(DataSource dataSource) throws SQLException {
         final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
         final UnifiedSchema mainSchema = databaseProperties.getDatabaseSchema();
-        final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
+        final DfOutsideSqlProperties outsideSqlProperties = getOutsideSqlProperties();
         if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
             return newLinkedHashMap();
         }
-        final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-
         // main schema
-        final List<DfProcedureMeta> procedureList = getPlainProcedureList(dataSource, metaData, mainSchema);
+        final List<DfProcedureMeta> procedureList = getPlainProcedureList(dataSource, mainSchema);
 
         // additional schema
-        setupAdditionalSchemaProcedure(dataSource, metaData, procedureList);
+        setupAdditionalSchemaProcedure(dataSource, procedureList);
 
         // procedure synonym
         setupProcedureSynonym(procedureList);
+
+        // procedure to DB link
+        setupProcedureToDBLink(procedureList);
 
         // filter by property
         final List<DfProcedureMeta> filteredList = filterByProperty(procedureList);
@@ -144,8 +151,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                     Additional Schema
     //                                     -----------------
-    protected void setupAdditionalSchemaProcedure(DataSource dataSource, DatabaseMetaData metaData,
-            List<DfProcedureMeta> procedureList) throws SQLException {
+    protected void setupAdditionalSchemaProcedure(DataSource dataSource, List<DfProcedureMeta> procedureList)
+            throws SQLException {
         if (_suppressAdditionalSchema) {
             return;
         }
@@ -156,8 +163,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             if (schemaInfo.isSuppressProcedure()) {
                 continue;
             }
-            final List<DfProcedureMeta> additionalProcedureList = getPlainProcedureList(dataSource, metaData,
-                    additionalSchema);
+            final List<DfProcedureMeta> additionalProcedureList = getPlainProcedureList(dataSource, additionalSchema);
             procedureList.addAll(additionalProcedureList);
         }
     }
@@ -169,7 +175,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         if (_procedureSynonymDataSource == null) {
             return;
         }
-        final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
+        final DfOutsideSqlProperties prop = getOutsideSqlProperties();
         final ProcedureSynonymHandlingType handlingType = prop.getProcedureSynonymHandlingType();
         if (handlingType.equals(ProcedureSynonymHandlingType.NONE)) {
             return;
@@ -233,26 +239,55 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     // -----------------------------------------------------
+    //                                   Procedure to DBLink
+    //                                   -------------------
+    protected void setupProcedureToDBLink(List<DfProcedureMeta> procedureList) {
+        if (_procedureToDBLinkDataSource == null) {
+            return;
+        }
+        final DfProcedureNativeTranslatorOracle translator = new DfProcedureNativeTranslatorOracle(
+                _procedureToDBLinkDataSource);
+        final DfOutsideSqlProperties prop = getOutsideSqlProperties();
+        final List<String> procedureNameToDBLinkList = prop.getTargetProcedureNameToDBLinkList();
+        for (String propertyName : procedureNameToDBLinkList) {
+            final String packageName;
+            final String procedureName;
+            final String dbLinkName;
+            final String nameResource;
+            if (propertyName.contains(".")) {
+                packageName = Srl.substringLastFront(propertyName, ".");
+                nameResource = Srl.substringLastRear(propertyName, ".");
+            } else {
+                packageName = null;
+                nameResource = propertyName;
+            }
+            procedureName = Srl.substringLastFront(nameResource, "@");
+            dbLinkName = Srl.substringLastRear(nameResource, "@");
+            procedureList.add(translator.translateProcedureToDBLink(packageName, procedureName, dbLinkName, this));
+        }
+    }
+
+    // -----------------------------------------------------
     //                                    Filter by Property
     //                                    ------------------
     protected List<DfProcedureMeta> filterByProperty(List<DfProcedureMeta> procedureList) {
         if (_suppressFilterByProperty) {
             return procedureList;
         }
-        final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
+        final DfOutsideSqlProperties prop = getOutsideSqlProperties();
         final List<DfProcedureMeta> resultList = new ArrayList<DfProcedureMeta>();
         log("...Filtering procedures by the property: before=" + procedureList.size());
         int passedCount = 0;
         for (DfProcedureMeta metaInfo : procedureList) {
             final String procedureLoggingName = metaInfo.buildProcedureLoggingName();
             final String procedureCatalog = metaInfo.getProcedureCatalog();
-            if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
+            if (!prop.isTargetProcedureCatalog(procedureCatalog)) {
                 log("  passed: non-target catalog - " + procedureLoggingName);
                 ++passedCount;
                 continue;
             }
             final UnifiedSchema procedureSchema = metaInfo.getProcedureSchema();
-            if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
+            if (!prop.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
                 log("  passed: non-target schema - " + procedureLoggingName);
                 ++passedCount;
                 continue;
@@ -260,9 +295,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             final String procedureFullQualifiedName = metaInfo.getProcedureFullQualifiedName();
             final String procedureSchemaQualifiedName = Srl.substringFirstFront(procedureFullQualifiedName, ".");
             final String procedureName = metaInfo.getProcedureName();
-            if (!outsideSqlProperties.isTargetProcedureName(procedureFullQualifiedName)
-                    && !outsideSqlProperties.isTargetProcedureName(procedureSchemaQualifiedName)
-                    && !outsideSqlProperties.isTargetProcedureName(procedureName)) {
+            if (!prop.isTargetProcedureName(procedureFullQualifiedName)
+                    && !prop.isTargetProcedureName(procedureSchemaQualifiedName)
+                    && !prop.isTargetProcedureName(procedureName)) {
                 log("  passed: non-target name - " + procedureLoggingName);
                 ++passedCount;
                 continue;
@@ -331,16 +366,18 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * Get the list of plain procedures. <br />
      * It selects procedures of specified schema only.
      * @param dataSource Data source. (NotNull)
-     * @param metaData The meta data of database. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
      * @return The list of procedure meta information. (NotNull)
      */
-    public List<DfProcedureMeta> getPlainProcedureList(DataSource dataSource, DatabaseMetaData metaData,
-            UnifiedSchema unifiedSchema) throws SQLException {
+    public List<DfProcedureMeta> getPlainProcedureList(DataSource dataSource, UnifiedSchema unifiedSchema)
+            throws SQLException {
         final List<DfProcedureMeta> metaInfoList = new ArrayList<DfProcedureMeta>();
         String procedureName = null;
         ResultSet columnResultSet = null;
+        Connection conn = null;
         try {
+            conn = dataSource.getConnection();
+            final DatabaseMetaData metaData = conn.getMetaData();
             final ResultSet procedureRs = doGetProcedures(metaData, unifiedSchema);
             setupProcedureMetaInfo(metaInfoList, procedureRs, unifiedSchema);
             for (DfProcedureMeta metaInfo : metaInfoList) {
@@ -361,72 +398,15 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 } catch (SQLException ignored) {
                 }
             }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
         }
-        resolveAssistInfo(dataSource, unifiedSchema, metaInfoList);
+        resolveAssistInfo(dataSource, metaInfoList, unifiedSchema);
         return metaInfoList;
-    }
-
-    protected void resolveAssistInfo(DataSource dataSource, UnifiedSchema unifiedSchema,
-            List<DfProcedureMeta> metaInfoList) {
-        if (isDatabaseOracle()) {
-            doResolveAssistInfoOracle(dataSource, unifiedSchema, metaInfoList);
-        }
-    }
-
-    protected void doResolveAssistInfoOracle(DataSource dataSource, UnifiedSchema unifiedSchema,
-            List<DfProcedureMeta> metaInfoList) {
-        final DfProcedureSupplementExtractorOracle extractor = new DfProcedureSupplementExtractorOracle(dataSource);
-        if (_suppressLogging || unifiedSchema.isAdditionalSchema()) {
-            // contains additional schema because it has no change
-            extractor.suppressLogging();
-        }
-        final Map<String, Integer> parameterOverloadInfoMap = extractor.extractParameterOverloadInfoMap();
-        final StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap = extractor.extractParameterArrayInfoMap();
-        final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap();
-        final Set<String> resolvedArrayDispSet = new LinkedHashSet<String>();
-        final Set<String> resolvedStructDispSet = new LinkedHashSet<String>();
-        for (DfProcedureMeta metaInfo : metaInfoList) {
-            final String catalog = metaInfo.getProcedureCatalog();
-            final String procedureName = metaInfo.getProcedureName();
-            final List<DfProcedureColumnMeta> columnList = metaInfo.getProcedureColumnList();
-            for (DfProcedureColumnMeta columnInfo : columnList) {
-                final String columnName = columnInfo.getColumnName();
-                final String key = extractor.generateParameterInfoMapKey(catalog, procedureName, columnName);
-
-                // Overload
-                final Integer overloadNo = parameterOverloadInfoMap.get(key);
-                if (overloadNo != null) {
-                    columnInfo.setOverloadNo(overloadNo);
-                }
-
-                // Array
-                final DfTypeArrayInfo arrayInfo = parameterArrayInfoMap.get(key);
-                if (arrayInfo != null) {
-                    resolvedArrayDispSet.add(arrayInfo.toString());
-                    columnInfo.setTypeArrayInfo(arrayInfo);
-                }
-
-                // Struct
-                final String dbTypeName = columnInfo.getDbTypeName();
-                final DfTypeStructInfo structInfo = structInfoMap.get(dbTypeName);
-                if (structInfo != null) {
-                    resolvedStructDispSet.add(structInfo.toString());
-                    columnInfo.setTypeStructInfo(structInfo);
-                }
-            }
-        }
-        if (!resolvedArrayDispSet.isEmpty()) {
-            log("Array related to parameter: " + resolvedArrayDispSet.size());
-            for (String arrayInfo : resolvedArrayDispSet) {
-                log("  " + arrayInfo);
-            }
-        }
-        if (!resolvedStructDispSet.isEmpty()) {
-            log("Struct related to parameter: " + resolvedStructDispSet.size());
-            for (String structInfo : resolvedStructDispSet) {
-                log("  " + structInfo);
-            }
-        }
     }
 
     protected ResultSet doGetProcedures(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) throws SQLException {
@@ -699,11 +679,133 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
+    // ===================================================================================
+    //                                                                         Assist Info
+    //                                                                         ===========
+    public void resolveAssistInfo(DataSource dataSource, List<DfProcedureMeta> metaInfoList, UnifiedSchema unifiedSchema) {
+        if (isDatabaseOracle()) {
+            doResolveAssistInfoOracle(dataSource, metaInfoList, unifiedSchema);
+        }
+    }
+
+    protected void doResolveAssistInfoOracle(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
+            UnifiedSchema unifiedSchema) {
+        final DfProcedureSupplementExtractorOracle extractor = getSupplementExtractorOracle(dataSource);
+        final Map<String, Integer> overloadInfoMap = extractor.extractParameterOverloadInfoMap(unifiedSchema);
+        final StringKeyMap<DfTypeArrayInfo> arrayInfoMap = extractor.extractParameterArrayInfoMap(unifiedSchema);
+        final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
+        doSetupAssistInfoOracle(overloadInfoMap, arrayInfoMap, structInfoMap, metaInfoList, extractor);
+    }
+
+    public void resolveAssistInfoToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList, String dbLinkName) {
+        if (isDatabaseOracle()) {
+            doResolveAssistInfoOracleToDBLink(dataSource, metaInfoList, dbLinkName);
+        }
+    }
+
+    protected void doResolveAssistInfoOracleToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
+            String dbLinkName) {
+        final DfProcedureSupplementExtractorOracle extractor = getSupplementExtractorOracle(dataSource);
+        final Map<String, Integer> parameterOverloadInfoMap = extractor
+                .extractParameterOverloadInfoToDBLinkMap(dbLinkName);
+        // DBLink procedure's GreatWalls are unsupported yet
+        //final StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap = extractor.extractParameterArrayInfoToDBLinkMap();
+        //final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoToDBLinkMap();
+        final StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap = StringKeyMap.createAsFlexible(); // empty
+        final StringKeyMap<DfTypeStructInfo> structInfoMap = StringKeyMap.createAsFlexible(); // empty
+        doSetupAssistInfoOracle(parameterOverloadInfoMap, parameterArrayInfoMap, structInfoMap, metaInfoList, extractor);
+    }
+
+    protected void doSetupAssistInfoOracle(Map<String, Integer> parameterOverloadInfoMap,
+            StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap, StringKeyMap<DfTypeStructInfo> structInfoMap,
+            List<DfProcedureMeta> metaInfoList, DfProcedureSupplementExtractorOracle extractor) {
+        final Set<String> resolvedArrayDispSet = new LinkedHashSet<String>();
+        final Set<String> resolvedStructDispSet = new LinkedHashSet<String>();
+        for (DfProcedureMeta metaInfo : metaInfoList) {
+            final String catalog = metaInfo.getProcedureCatalog();
+            final String procedureName = metaInfo.getProcedureName();
+            final List<DfProcedureColumnMeta> columnList = metaInfo.getProcedureColumnList();
+            for (DfProcedureColumnMeta columnInfo : columnList) {
+                final String columnName = columnInfo.getColumnName();
+                final String key = extractor.generateParameterInfoMapKey(catalog, procedureName, columnName);
+
+                // Overload
+                if (columnInfo.getOverloadNo() == null) { // if not exists (it might be set by other processes)
+                    final Integer overloadNo = parameterOverloadInfoMap.get(key);
+                    if (overloadNo != null) {
+                        columnInfo.setOverloadNo(overloadNo);
+                    }
+                }
+
+                // Array
+                final DfTypeArrayInfo arrayInfo = parameterArrayInfoMap.get(key);
+                if (arrayInfo != null) {
+                    resolvedArrayDispSet.add(arrayInfo.toString());
+                    columnInfo.setTypeArrayInfo(arrayInfo);
+                }
+
+                // Struct
+                final String dbTypeName = columnInfo.getDbTypeName();
+                final DfTypeStructInfo structInfo = structInfoMap.get(dbTypeName);
+                if (structInfo != null) {
+                    resolvedStructDispSet.add(structInfo.toString());
+                    columnInfo.setTypeStructInfo(structInfo);
+                }
+            }
+        }
+        if (!resolvedArrayDispSet.isEmpty()) {
+            log("Array related to parameter: " + resolvedArrayDispSet.size());
+            for (String arrayInfo : resolvedArrayDispSet) {
+                log("  " + arrayInfo);
+            }
+        }
+        if (!resolvedStructDispSet.isEmpty()) {
+            log("Struct related to parameter: " + resolvedStructDispSet.size());
+            for (String structInfo : resolvedStructDispSet) {
+                log("  " + structInfo);
+            }
+        }
+    }
+
+    protected DfProcedureSupplementExtractorOracle getSupplementExtractorOracle(DataSource dataSource) {
+        final int key = dataSource.hashCode();
+        DfProcedureSupplementExtractorOracle extractorOracle = _supplementExtractorOracleMap.get(key);
+        if (extractorOracle == null) {
+            _supplementExtractorOracleMap.put(key, new DfProcedureSupplementExtractorOracle(dataSource));
+        }
+        extractorOracle = _supplementExtractorOracleMap.get(key);
+        if (_suppressLogging) {
+            extractorOracle.suppressLogging();
+        }
+        return extractorOracle;
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfOutsideSqlProperties getOutsideSqlProperties() {
+        return getProperties().getOutsideSqlProperties();
+    }
+
+    // ===================================================================================
+    //                                                                             Logging
+    //                                                                             =======
     protected void log(String msg) {
         if (_suppressLogging) {
             return;
         }
         _log.info(msg);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
+        return DfCollectionUtil.newArrayList();
+    }
+
+    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return DfCollectionUtil.newHashMap();
     }
 
     // ===================================================================================
@@ -723,5 +825,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
 
     public void includeProcedureSynonym(DataSource dataSource) {
         _procedureSynonymDataSource = dataSource;
+    }
+
+    public void includeProcedureToDBLink(DataSource dataSource) {
+        _procedureToDBLinkDataSource = dataSource;
     }
 }

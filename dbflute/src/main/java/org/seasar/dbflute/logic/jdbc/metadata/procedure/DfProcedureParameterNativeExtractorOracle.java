@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -61,8 +62,8 @@ public class DfProcedureParameterNativeExtractorOracle {
         return selectProcedureArgumentInfoList(unifiedSchema);
     }
 
-    public List<ProcedureArgumentInfo> extractDBLinkProcedureArgumentInfoList(String dbLinkName) { // Oracle dependency
-        return selectDBLinkProcedureArgumentInfoList(dbLinkName);
+    public List<ProcedureArgumentInfo> extractProcedureArgumentInfoToDBLinkList(String dbLinkName) { // Oracle dependency
+        return selectProcedureArgumentInfoToDBLinkList(dbLinkName);
     }
 
     // ===================================================================================
@@ -70,7 +71,7 @@ public class DfProcedureParameterNativeExtractorOracle {
     //                                                                       =============
     protected List<ProcedureArgumentInfo> selectProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
         final String sql = buildProcedureArgumentSql(unifiedSchema);
-        return doSelectProcedureArgumentInfoList(sql);
+        return filterParameterArgumentInfoList(doSelectProcedureArgumentInfoList(sql));
     }
 
     protected String buildProcedureArgumentSql(UnifiedSchema unifiedSchema) {
@@ -82,12 +83,12 @@ public class DfProcedureParameterNativeExtractorOracle {
         return sb.toString();
     }
 
-    protected List<ProcedureArgumentInfo> selectDBLinkProcedureArgumentInfoList(String dbLinkName) {
-        final String sql = buildDBLinkProcedureArgumentSql(dbLinkName);
-        return doSelectProcedureArgumentInfoList(sql);
+    protected List<ProcedureArgumentInfo> selectProcedureArgumentInfoToDBLinkList(String dbLinkName) {
+        final String sql = buildProcedureArgumentToDBLinkSql(dbLinkName);
+        return filterParameterArgumentInfoList(doSelectProcedureArgumentInfoList(sql));
     }
 
-    protected String buildDBLinkProcedureArgumentSql(String dbLinkName) {
+    protected String buildProcedureArgumentToDBLinkSql(String dbLinkName) {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
         sb.append(" from USER_ARGUMENTS@").append(dbLinkName);
@@ -143,6 +144,32 @@ public class DfProcedureParameterNativeExtractorOracle {
             infoList.add(info);
         }
         return infoList;
+    }
+
+    protected List<ProcedureArgumentInfo> filterParameterArgumentInfoList(List<ProcedureArgumentInfo> infoList) {
+        final StringKeyMap<ProcedureArgumentInfo> infoMap = StringKeyMap.createAsFlexibleOrdered();
+        for (int i = 0; i < infoList.size(); i++) {
+            final ProcedureArgumentInfo info = infoList.get(i);
+            final String argumentName = info.getArgumentName();
+            final String key = generateParameterInfoMapKey(info.getPackageName(), info.getObjectName(), argumentName);
+            final ProcedureArgumentInfo alreadyRegistered = infoMap.get(key);
+            if (alreadyRegistered != null) { // means overload argument
+                continue; // overload should be ordered by ascend
+            }
+            infoMap.put(key, info);
+        }
+        return DfCollectionUtil.newArrayList(infoMap.values());
+    }
+
+    // DBFlute treats overload methods as one method
+    // (overload info is only referred to determinate whether the procedure has overload methods)
+    public static String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName) {
+        final StringBuilder keySb = new StringBuilder();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(catalog)) {
+            keySb.append(catalog).append(".");
+        }
+        keySb.append(procedureName).append(".").append(parameterName);
+        return keySb.toString();
     }
 
     public static class ProcedureArgumentInfo {
