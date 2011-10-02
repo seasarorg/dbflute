@@ -101,13 +101,22 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * @throws SQLException
      */
     public Map<String, DfProcedureMeta> getAvailableProcedureMap(DataSource dataSource) throws SQLException {
-        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
-        final UnifiedSchema mainSchema = databaseProperties.getDatabaseSchema();
         final DfOutsideSqlProperties outsideSqlProperties = getOutsideSqlProperties();
         if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
             return newLinkedHashMap();
         }
+        final List<DfProcedureMeta> procedureList = setupAvailableProcedureList(dataSource);
+
+        // arrange handling (also duplicate check)
+        final Map<String, DfProcedureMeta> procedureHandilngMap = arrangeProcedureHandilng(procedureList);
+
+        // arrange order (additional schema after main schema)
+        return arrangeProcedureOrder(procedureHandilngMap);
+    }
+
+    protected List<DfProcedureMeta> setupAvailableProcedureList(DataSource dataSource) throws SQLException {
         // main schema
+        final UnifiedSchema mainSchema = getProperties().getDatabaseProperties().getDatabaseSchema();
         final List<DfProcedureMeta> procedureList = getPlainProcedureList(dataSource, mainSchema);
 
         // additional schema
@@ -123,19 +132,23 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         resolveAssistInfo(dataSource, procedureList);
 
         // filter by property
-        final List<DfProcedureMeta> filteredList = filterByProperty(procedureList);
+        return filterByProperty(procedureList);
+    }
 
-        // create available procedure map
+    protected Map<String, DfProcedureMeta> arrangeProcedureHandilng(List<DfProcedureMeta> procedureList) {
         final Map<String, DfProcedureMeta> procedureHandlingMap = newLinkedHashMap();
-        for (DfProcedureMeta metaInfo : filteredList) {
+        final UnifiedSchema mainSchema = getProperties().getDatabaseProperties().getDatabaseSchema();
+        for (DfProcedureMeta metaInfo : procedureList) {
             // handle duplicate
             if (handleDuplicateProcedure(metaInfo, procedureHandlingMap, mainSchema)) {
                 continue;
             }
             procedureHandlingMap.put(metaInfo.buildProcedureKeyName(), metaInfo);
         }
+        return procedureHandlingMap;
+    }
 
-        // arrange order (additional schema after main schema)
+    protected Map<String, DfProcedureMeta> arrangeProcedureOrder(Map<String, DfProcedureMeta> procedureHandlingMap) {
         final Map<String, DfProcedureMeta> procedureOrderedMap = newLinkedHashMap();
         final Map<String, DfProcedureMeta> additionalSchemaProcedureMap = newLinkedHashMap();
         final Set<Entry<String, DfProcedureMeta>> entrySet = procedureHandlingMap.entrySet();
@@ -308,38 +321,43 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         log("...Filtering procedures by the property: before=" + procedureList.size());
         int passedCount = 0;
         for (DfProcedureMeta meta : procedureList) {
-            if (meta.isIncludedProcedureToDBLink()) { // is fixed setting
-                continue;
-            }
-            final String procedureLoggingName = meta.buildProcedureLoggingName();
-            final String procedureCatalog = meta.getProcedureCatalog();
-            if (!prop.isTargetProcedureCatalog(procedureCatalog)) {
-                log("  passed: non-target catalog - " + procedureLoggingName);
+            if (isTargetByProperty(meta, prop)) {
+                resultList.add(meta);
+            } else {
                 ++passedCount;
-                continue;
             }
-            final UnifiedSchema procedureSchema = meta.getProcedureSchema();
-            if (!prop.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
-                log("  passed: non-target schema - " + procedureLoggingName);
-                ++passedCount;
-                continue;
-            }
-            final String procedureFullQualifiedName = meta.getProcedureFullQualifiedName();
-            final String procedureSchemaQualifiedName = Srl.substringFirstFront(procedureFullQualifiedName, ".");
-            final String procedureName = meta.getProcedureName();
-            if (!prop.isTargetProcedureName(procedureFullQualifiedName)
-                    && !prop.isTargetProcedureName(procedureSchemaQualifiedName)
-                    && !prop.isTargetProcedureName(procedureName)) {
-                log("  passed: non-target name - " + procedureLoggingName);
-                ++passedCount;
-                continue;
-            }
-            resultList.add(meta);
         }
         if (passedCount == 0) {
             log(" -> All procedures are target: count=" + procedureList.size());
         }
         return resultList;
+    }
+
+    protected boolean isTargetByProperty(DfProcedureMeta meta, DfOutsideSqlProperties prop) {
+        if (meta.isIncludedProcedureToDBLink()) { // is fixed setting
+            return true;
+        }
+        final String procedureLoggingName = meta.buildProcedureLoggingName();
+        final String procedureCatalog = meta.getProcedureCatalog();
+        if (!prop.isTargetProcedureCatalog(procedureCatalog)) {
+            log("  passed: non-target catalog - " + procedureLoggingName);
+            return false;
+        }
+        final UnifiedSchema procedureSchema = meta.getProcedureSchema();
+        if (!prop.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
+            log("  passed: non-target schema - " + procedureLoggingName);
+            return false;
+        }
+        final String procedureFullQualifiedName = meta.getProcedureFullQualifiedName();
+        final String procedureSchemaQualifiedName = Srl.substringFirstFront(procedureFullQualifiedName, ".");
+        final String procedureName = meta.getProcedureName();
+        if (!prop.isTargetProcedureName(procedureFullQualifiedName)
+                && !prop.isTargetProcedureName(procedureSchemaQualifiedName)
+                && !prop.isTargetProcedureName(procedureName)) {
+            log("  passed: non-target name - " + procedureLoggingName);
+            return false;
+        }
+        return true;
     }
 
     // -----------------------------------------------------
