@@ -125,13 +125,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         // procedure synonym
         setupProcedureSynonym(procedureList);
 
-        // procedure to DB link
+        // included procedure to DB link
         setupProcedureToDBLinkIncluded(procedureList);
 
         // resolve overload and great walls...
         resolveAssistInfo(dataSource, procedureList);
 
-        // filter by property
+        // filter the list of procedure by DBFlute property
         return filterByProperty(procedureList);
     }
 
