@@ -94,8 +94,23 @@ public class DfProcedureNativeTranslatorOracle {
     }
 
     protected DfProcedureMeta createDBLinkProcedureMeta(ProcedureNativeInfo nativeInfo, String dbLinkName) {
-        // catalog
         final DfProcedureMeta procedureMeta = new DfProcedureMeta();
+        setupProcedureName(nativeInfo, procedureMeta, dbLinkName);
+        final List<ProcedureArgumentInfo> argInfoList = nativeInfo.getArgInfoList();
+        for (ProcedureArgumentInfo argInfo : argInfoList) {
+            final DfProcedureColumnMeta columnMeta = new DfProcedureColumnMeta();
+            columnMeta.setColumnName(argInfo.getArgumentName());
+            setupProcedureColumnDataType(argInfo, columnMeta);
+            setupProcedureColumnInOutType(argInfo, columnMeta);
+            setupProcedureColumnSize(argInfo, columnMeta);
+            procedureMeta.addProcedureColumn(columnMeta);
+        }
+        // assist info (e.g. great walls) is not set here (set later)
+        return procedureMeta;
+    }
+
+    protected void setupProcedureName(ProcedureNativeInfo nativeInfo, DfProcedureMeta procedureMeta, String dbLinkName) {
+        // catalog
         procedureMeta.setProcedureCatalog(null); // because of Oracle
 
         // schema (only used as identity)
@@ -117,53 +132,48 @@ public class DfProcedureNativeTranslatorOracle {
         procedureMeta.setProcedureSchemaQualifiedName(linkedName);
         procedureMeta.setProcedureSqlName(linkedName);
         procedureMeta.setProcedureType(DfProcedureType.procedureResultUnknown);
+    }
 
-        final List<ProcedureArgumentInfo> argInfoList = nativeInfo.getArgInfoList();
-        for (ProcedureArgumentInfo argInfo : argInfoList) {
-            final DfProcedureColumnMeta columnMeta = new DfProcedureColumnMeta();
-            columnMeta.setColumnName(argInfo.getArgumentName());
-
-            final String dataType = argInfo.getDataType();
-            columnMeta.setDbTypeName(dataType);
-            final String jdbcType = _columnExtractor.getColumnJdbcType(Types.OTHER, dataType);
-            final Integer jdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
-            columnMeta.setJdbcDefType(jdbcDefValue);
-
-            final String overload = argInfo.getOverload();
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(overload)) {
-                columnMeta.setOverloadNo(Integer.valueOf(overload));
-            }
-
-            final String inOut = argInfo.getInOut();
-            if ("in".equalsIgnoreCase(inOut)) {
-                columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnIn);
-            } else if ("out".equalsIgnoreCase(inOut)) {
-                columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnOut);
-            } else if ("inout".equalsIgnoreCase(inOut) || "in/out".equalsIgnoreCase(inOut)) {
-                // two pattern condition just in case
-                columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnInOut);
-            } else {
-                columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnUnknown);
-            }
-
-            final String dataLength = argInfo.getDataLength();
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(dataLength)) {
-                columnMeta.setColumnSize(Integer.valueOf(dataLength));
-            } else {
-                final String dataPrecision = argInfo.getDataPrecision();
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(dataPrecision)) {
-                    columnMeta.setColumnSize(Integer.valueOf(dataPrecision));
-                }
-            }
-            final String dataScale = argInfo.getDataScale();
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(dataScale)) {
-                columnMeta.setDecimalDigits(Integer.valueOf(dataScale));
-            }
-            procedureMeta.addProcedureColumn(columnMeta);
+    protected void setupProcedureColumnDataType(ProcedureArgumentInfo argInfo, DfProcedureColumnMeta columnMeta) {
+        final String dataType = argInfo.getDataType();
+        columnMeta.setDbTypeName(dataType);
+        final String jdbcType = _columnExtractor.getColumnJdbcType(Types.OTHER, dataType);
+        final Integer jdbcDefValue = TypeMap.getJdbcDefValueByJdbcType(jdbcType);
+        columnMeta.setJdbcDefType(jdbcDefValue);
+        final String overload = argInfo.getOverload();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(overload)) {
+            columnMeta.setOverloadNo(Integer.valueOf(overload));
         }
-        // assist info (e.g. great walls) is not set here (set later)
+    }
 
-        return procedureMeta;
+    protected void setupProcedureColumnInOutType(ProcedureArgumentInfo argInfo, DfProcedureColumnMeta columnMeta) {
+        final String inOut = argInfo.getInOut();
+        if ("in".equalsIgnoreCase(inOut)) {
+            columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnIn);
+        } else if ("out".equalsIgnoreCase(inOut)) {
+            columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnOut);
+        } else if ("inout".equalsIgnoreCase(inOut) || "in/out".equalsIgnoreCase(inOut)) {
+            // two pattern condition just in case
+            columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnInOut);
+        } else {
+            columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnUnknown);
+        }
+    }
+
+    protected void setupProcedureColumnSize(ProcedureArgumentInfo argInfo, DfProcedureColumnMeta columnMeta) {
+        final String dataLength = argInfo.getDataLength();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(dataLength)) {
+            columnMeta.setColumnSize(Integer.valueOf(dataLength));
+        } else {
+            final String dataPrecision = argInfo.getDataPrecision();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(dataPrecision)) {
+                columnMeta.setColumnSize(Integer.valueOf(dataPrecision));
+            }
+        }
+        final String dataScale = argInfo.getDataScale();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(dataScale)) {
+            columnMeta.setDecimalDigits(Integer.valueOf(dataScale));
+        }
     }
 
     // ===================================================================================
