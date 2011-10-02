@@ -117,7 +117,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         setupProcedureSynonym(procedureList);
 
         // procedure to DB link
-        setupProcedureToDBLink(procedureList);
+        setupProcedureToDBLinkIncluded(procedureList);
 
         // resolve overload and great walls...
         resolveAssistInfo(dataSource, procedureList);
@@ -243,9 +243,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     // -----------------------------------------------------
-    //                                   Procedure to DBLink
-    //                                   -------------------
-    protected void setupProcedureToDBLink(List<DfProcedureMeta> procedureList) {
+    //                          Included Procedure to DBLink
+    //                          ----------------------------
+    protected void setupProcedureToDBLinkIncluded(List<DfProcedureMeta> procedureList) {
         if (_procedureToDBLinkDataSource == null) {
             return;
         }
@@ -297,10 +297,12 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 continue;
             }
             final UnifiedSchema procedureSchema = metaInfo.getProcedureSchema();
-            if (!prop.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
-                log("  passed: non-target schema - " + procedureLoggingName);
-                ++passedCount;
-                continue;
+            if (procedureSchema != null) { // e.g. included procedure to DB link has no schema
+                if (!prop.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
+                    log("  passed: non-target schema - " + procedureLoggingName);
+                    ++passedCount;
+                    continue;
+                }
             }
             final String procedureFullQualifiedName = metaInfo.getProcedureFullQualifiedName();
             final String procedureSchemaQualifiedName = Srl.substringFirstFront(procedureFullQualifiedName, ".");
