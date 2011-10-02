@@ -467,6 +467,7 @@ public class DfProcedurePmbSetupper {
         // here you do not need to handle project prefix
         // because the prefix is resolved at table object
         procedureName = Srl.replace(procedureName, ".", "_");
+        procedureName = Srl.replace(procedureName, "@", "_"); // e.g. Oracle's DBLink
         procedureName = resolveVendorProcedureNameHeadache(procedureName);
         return Srl.camelize(procedureName) + "Pmb";
     }
