@@ -71,16 +71,17 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
             conn = _dataSource.getConnection();
             final Map<String, DfProcedureMeta> procedureMap = new LinkedHashMap<String, DfProcedureMeta>();
             final List<DfProcedureMeta> procedureList = new ArrayList<DfProcedureMeta>();
-            final DfProcedureExtractor procedureExtractor = new DfProcedureExtractor();
-            procedureExtractor.suppressLogging();
+            final DfProcedureExtractor extractor = new DfProcedureExtractor();
+            extractor.suppressLogging();
             for (UnifiedSchema unifiedSchema : _targetSchemaList) {
                 // get new procedure list because different instances is needed at this process
-                procedureList.addAll(procedureExtractor.getPlainProcedureList(_dataSource, unifiedSchema));
+                procedureList.addAll(extractor.getPlainProcedureList(_dataSource, unifiedSchema));
             }
             for (DfProcedureMeta metaInfo : procedureList) {
                 final String procedureKeyName = metaInfo.getProcedureFullQualifiedName();
                 procedureMap.put(procedureKeyName, metaInfo);
             }
+            DfProcedureNativeTranslatorOracle translator = null;
             st = conn.createStatement();
             _log.info(sql);
             rs = st.executeQuery(sql);
@@ -108,7 +109,10 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                 }
                 DfProcedureMeta procedureMeta = null;
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) { // synonym for DB link
-                    procedureMeta = prepareDBLinkProcedureNative(tableOwner, tableName, dbLinkName, procedureExtractor);
+                    if (translator == null) {
+                        translator = new DfProcedureNativeTranslatorOracle(_dataSource);
+                    }
+                    procedureMeta = prepareProcedureToDBLink(tableOwner, tableName, dbLinkName, extractor, translator);
                 } else {
                     procedureMeta = findProcedureMeta(tableOwner, tableName, procedureMap);
                 }
@@ -201,9 +205,8 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     // ===================================================================================
     //                                                                              DBLink
     //                                                                              ======
-    protected DfProcedureMeta prepareDBLinkProcedureNative(UnifiedSchema tableOwner, String tableName,
-            String dbLinkName, DfProcedureExtractor procedureExtractor) {
-        final DfProcedureNativeTranslatorOracle translator = new DfProcedureNativeTranslatorOracle(_dataSource);
+    protected DfProcedureMeta prepareProcedureToDBLink(UnifiedSchema tableOwner, String tableName, String dbLinkName,
+            DfProcedureExtractor procedureExtractor, DfProcedureNativeTranslatorOracle translator) {
         final String packageName = tableOwner.getPureSchema();
         return translator.translateProcedureToDBLink(packageName, tableName, dbLinkName, procedureExtractor);
     }
