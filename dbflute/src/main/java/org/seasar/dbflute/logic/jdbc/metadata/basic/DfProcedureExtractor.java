@@ -35,6 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfProcedureListGettingFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -117,6 +118,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
 
         // procedure to DB link
         setupProcedureToDBLink(procedureList);
+
+        // resolve overload and great walls...
+        resolveAssistInfo(dataSource, procedureList);
 
         // filter by property
         final List<DfProcedureMeta> filteredList = filterByProperty(procedureList);
@@ -263,7 +267,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             }
             procedureName = Srl.substringLastFront(nameResource, "@");
             dbLinkName = Srl.substringLastRear(nameResource, "@");
-            procedureList.add(translator.translateProcedureToDBLink(packageName, procedureName, dbLinkName, this));
+            final DfProcedureMeta meta = translator.translateProcedureToDBLink(packageName, procedureName, dbLinkName,
+                    this);
+            if (meta == null) {
+                String msg = "Failed to setup the procedure to DB link: " + propertyName;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+            procedureList.add(meta);
         }
     }
 
@@ -405,7 +415,6 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 }
             }
         }
-        resolveAssistInfo(dataSource, metaInfoList, unifiedSchema);
         return metaInfoList;
     }
 
@@ -682,22 +691,63 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                         Assist Info
     //                                                                         ===========
-    public void resolveAssistInfo(DataSource dataSource, List<DfProcedureMeta> metaInfoList, UnifiedSchema unifiedSchema) {
+    protected void resolveAssistInfo(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
         if (isDatabaseOracle()) {
-            doResolveAssistInfoOracle(dataSource, metaInfoList, unifiedSchema);
+            doResolveAssistInfoOracle(dataSource, metaInfoList);
         }
     }
 
-    protected void doResolveAssistInfoOracle(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
-            UnifiedSchema unifiedSchema) {
+    protected void doResolveAssistInfoOracle(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
+
         final DfProcedureSupplementExtractorOracle extractor = getSupplementExtractorOracle(dataSource);
-        final Map<String, Integer> overloadInfoMap = extractor.extractParameterOverloadInfoMap(unifiedSchema);
-        final StringKeyMap<DfTypeArrayInfo> arrayInfoMap = extractor.extractParameterArrayInfoMap(unifiedSchema);
-        final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap(unifiedSchema);
-        doSetupAssistInfoOracle(overloadInfoMap, arrayInfoMap, structInfoMap, metaInfoList, extractor);
+        final Map<UnifiedSchema, Map<String, Integer>> overloadInfoMapMap = newHashMap();
+        overloadInfoMapMap.put(mainSchema, extractor.extractParameterOverloadInfoMap(mainSchema));
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            overloadInfoMapMap.put(additionalSchema, extractor.extractParameterOverloadInfoMap(additionalSchema));
+        }
+        doSetupOverloadInfoOracle(overloadInfoMapMap, metaInfoList, extractor);
+
+        // get all available schema's info to use other schema's type
+        final StringKeyMap<DfTypeArrayInfo> arrayInfoMap = extractor.extractParameterArrayInfoMap(mainSchema);
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            arrayInfoMap.putAll(extractor.extractParameterArrayInfoMap(additionalSchema));
+        }
+        final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoMap(mainSchema);
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            structInfoMap.putAll(extractor.extractStructInfoMap(additionalSchema));
+        }
+        doSetupAssistInfoOracle(arrayInfoMap, structInfoMap, metaInfoList, extractor);
     }
 
-    public void resolveAssistInfoToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList, String dbLinkName) {
+    protected void doSetupOverloadInfoOracle(Map<UnifiedSchema, Map<String, Integer>> parameterOverloadInfoMapMap,
+            List<DfProcedureMeta> metaInfoList, DfProcedureSupplementExtractorOracle extractor) {
+        for (DfProcedureMeta metaInfo : metaInfoList) {
+            final String catalog = metaInfo.getProcedureCatalog();
+            final String procedureName = metaInfo.getProcedureName();
+            final List<DfProcedureColumnMeta> columnList = metaInfo.getProcedureColumnList();
+            for (DfProcedureColumnMeta columnInfo : columnList) {
+                final String columnName = columnInfo.getColumnName();
+                final String key = extractor.generateParameterInfoMapKey(catalog, procedureName, columnName);
+
+                // Overload
+                if (columnInfo.getOverloadNo() == null) { // if not exists (it might be set by other processes)
+                    final UnifiedSchema procedureSchema = metaInfo.getProcedureSchema();
+                    final Map<String, Integer> overloadMap = parameterOverloadInfoMapMap.get(procedureSchema);
+                    if (overloadMap != null) {
+                        final Integer overloadNo = overloadMap.get(key);
+                        if (overloadNo != null) {
+                            columnInfo.setOverloadNo(overloadNo);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected void resolveAssistInfoToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
+            String dbLinkName) {
         if (isDatabaseOracle()) {
             doResolveAssistInfoOracleToDBLink(dataSource, metaInfoList, dbLinkName);
         }
@@ -706,21 +756,19 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     protected void doResolveAssistInfoOracleToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
             String dbLinkName) {
         final DfProcedureSupplementExtractorOracle extractor = getSupplementExtractorOracle(dataSource);
-        final Map<String, Integer> parameterOverloadInfoMap = extractor
-                .extractParameterOverloadInfoToDBLinkMap(dbLinkName);
+        final Map<String, Integer> overloadInfoMapMap = extractor.extractParameterOverloadInfoToDBLinkMap(dbLinkName);
+        doSetupOverloadInfoOracleToDBLink(overloadInfoMapMap, metaInfoList, extractor);
+
         // DBLink procedure's GreatWalls are unsupported yet
         //final StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap = extractor.extractParameterArrayInfoToDBLinkMap();
         //final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoToDBLinkMap();
         final StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap = StringKeyMap.createAsFlexible(); // empty
         final StringKeyMap<DfTypeStructInfo> structInfoMap = StringKeyMap.createAsFlexible(); // empty
-        doSetupAssistInfoOracle(parameterOverloadInfoMap, parameterArrayInfoMap, structInfoMap, metaInfoList, extractor);
+        doSetupAssistInfoOracle(parameterArrayInfoMap, structInfoMap, metaInfoList, extractor);
     }
 
-    protected void doSetupAssistInfoOracle(Map<String, Integer> parameterOverloadInfoMap,
-            StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap, StringKeyMap<DfTypeStructInfo> structInfoMap,
+    protected void doSetupOverloadInfoOracleToDBLink(Map<String, Integer> parameterOverloadInfoMap,
             List<DfProcedureMeta> metaInfoList, DfProcedureSupplementExtractorOracle extractor) {
-        final Set<String> resolvedArrayDispSet = new LinkedHashSet<String>();
-        final Set<String> resolvedStructDispSet = new LinkedHashSet<String>();
         for (DfProcedureMeta metaInfo : metaInfoList) {
             final String catalog = metaInfo.getProcedureCatalog();
             final String procedureName = metaInfo.getProcedureName();
@@ -736,6 +784,22 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                         columnInfo.setOverloadNo(overloadNo);
                     }
                 }
+            }
+        }
+    }
+
+    protected void doSetupAssistInfoOracle(StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap,
+            StringKeyMap<DfTypeStructInfo> structInfoMap, List<DfProcedureMeta> metaInfoList,
+            DfProcedureSupplementExtractorOracle extractor) {
+        final Set<String> resolvedArrayDispSet = new LinkedHashSet<String>();
+        final Set<String> resolvedStructDispSet = new LinkedHashSet<String>();
+        for (DfProcedureMeta metaInfo : metaInfoList) {
+            final String catalog = metaInfo.getProcedureCatalog();
+            final String procedureName = metaInfo.getProcedureName();
+            final List<DfProcedureColumnMeta> columnList = metaInfo.getProcedureColumnList();
+            for (DfProcedureColumnMeta columnInfo : columnList) {
+                final String columnName = columnInfo.getColumnName();
+                final String key = extractor.generateParameterInfoMapKey(catalog, procedureName, columnName);
 
                 // Array
                 final DfTypeArrayInfo arrayInfo = parameterArrayInfoMap.get(key);

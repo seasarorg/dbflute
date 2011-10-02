@@ -89,11 +89,7 @@ public class DfProcedureNativeTranslatorOracle {
             }
             nativeInfo = retryInfo; // found
         }
-        // adding assist info (e.g. mainly GreatWall)
-        final DfProcedureMeta procedureMeta = createDBLinkProcedureMeta(nativeInfo, dbLinkName);
-        final List<DfProcedureMeta> metaInfoList = DfCollectionUtil.newArrayList(procedureMeta);
-        procedureExtractor.resolveAssistInfoToDBLink(_dataSource, metaInfoList, dbLinkName);
-        return procedureMeta;
+        return createDBLinkProcedureMeta(nativeInfo, dbLinkName);
     }
 
     protected String generateNativeInfoMapKey(String packageName, String procedureName) {
