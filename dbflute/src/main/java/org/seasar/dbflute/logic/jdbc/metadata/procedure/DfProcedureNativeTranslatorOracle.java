@@ -99,9 +99,7 @@ public class DfProcedureNativeTranslatorOracle {
         procedureMeta.setProcedureCatalog(null); // because of Oracle
 
         // schema (only used as identity)
-        final DBLinkNativeInfo dbLinkNativeInfo = _dbLinkInfoMap.get(dbLinkName);
-        final String userName = dbLinkNativeInfo.getUserName();
-        procedureMeta.setProcedureSchema(UnifiedSchema.createAsDynamicSchema(null, userName));
+        procedureMeta.setProcedureSchema(UnifiedSchema.createAsDynamicSchema(null, dbLinkName));
 
         // procedure name
         final String packageName = nativeInfo.getPackageName();
