@@ -385,6 +385,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
+        // procedure has complex rule to call
+        // so it uses SQL name despite whether it uses an own connection
         return metaInfo.buildProcedureSqlName();
     }
 
@@ -465,7 +467,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         //if (_useFullQualifiedTableName && _unifiedSchema.hasSchema()) {
         //    tableName = _unifiedSchema.buildFullQualifiedName(tableName);
         //}
-        DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         tableName = prop.quoteTableNameIfNeedsDirectUse(tableName);
         return tableName;
     }
