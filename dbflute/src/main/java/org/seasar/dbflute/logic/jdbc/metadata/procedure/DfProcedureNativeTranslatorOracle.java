@@ -98,9 +98,16 @@ public class DfProcedureNativeTranslatorOracle {
 
     protected DfProcedureMeta createDBLinkProcedureMeta(ProcedureNativeInfo nativeInfo, String dbLinkName) {
         final DfProcedureMeta procedureMeta = new DfProcedureMeta();
-        procedureMeta.setProcedureCatalog(nativeInfo.getPackageName()); // package name treated as catalog in JDBC
-        procedureMeta.setProcedureName(nativeInfo.getProcedureName());
-        final String linkedName = nativeInfo.getProcedureName() + "@" + dbLinkName;
+        procedureMeta.setProcedureCatalog(null); // because of Oracle
+        final String packageName = nativeInfo.getPackageName();
+        final String procedureName;
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) { // package
+            procedureName = packageName + "." + nativeInfo.getProcedureName();
+        } else {
+            procedureName = nativeInfo.getProcedureName();
+        }
+        procedureMeta.setProcedureName(procedureName);
+        final String linkedName = procedureName + "@" + dbLinkName;
         procedureMeta.setProcedureFullQualifiedName(linkedName);
         procedureMeta.setProcedureSchemaQualifiedName(linkedName);
         procedureMeta.setProcedureSqlName(linkedName);
@@ -143,9 +150,7 @@ public class DfProcedureNativeTranslatorOracle {
             }
             procedureMeta.addProcedureColumn(columnMeta);
         }
-
-        // Overload, Array, Struct are unsupported for DBLink
-        // you should refactor the process if you support them
+        // assist info (e.g. great walls) is not set here (set later)
 
         return procedureMeta;
     }

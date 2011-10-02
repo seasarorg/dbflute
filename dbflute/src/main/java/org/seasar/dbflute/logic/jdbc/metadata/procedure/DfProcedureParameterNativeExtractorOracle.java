@@ -79,6 +79,7 @@ public class DfProcedureParameterNativeExtractorOracle {
         sb.append("select *");
         sb.append(" from ALL_ARGUMENTS");
         sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" and ARGUMENT_NAME is not null"); // the table has no-parameter records
         sb.append(" order by PACKAGE_NAME, OBJECT_NAME, OVERLOAD, SEQUENCE");
         return sb.toString();
     }
@@ -92,6 +93,7 @@ public class DfProcedureParameterNativeExtractorOracle {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
         sb.append(" from USER_ARGUMENTS@").append(dbLinkName);
+        sb.append(" where ARGUMENT_NAME is not null"); // the table has no-parameter records
         sb.append(" order by PACKAGE_NAME, OBJECT_NAME, OVERLOAD, SEQUENCE");
         return sb.toString();
     }

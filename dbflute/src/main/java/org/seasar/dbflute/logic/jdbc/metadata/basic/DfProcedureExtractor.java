@@ -691,6 +691,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                         Assist Info
     //                                                                         ===========
+    // -----------------------------------------------------
+    //                                             Available
+    //                                             ---------
     protected void resolveAssistInfo(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
         if (isDatabaseOracle()) {
             doResolveAssistInfoOracle(dataSource, metaInfoList);
@@ -698,9 +701,11 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     protected void doResolveAssistInfoOracle(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
+        // available schema
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
 
+        // Overload
         final DfProcedureSupplementExtractorOracle extractor = getSupplementExtractorOracle(dataSource);
         final Map<UnifiedSchema, Map<String, Integer>> overloadInfoMapMap = newHashMap();
         overloadInfoMapMap.put(mainSchema, extractor.extractParameterOverloadInfoMap(mainSchema));
@@ -709,7 +714,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
         doSetupOverloadInfoOracle(overloadInfoMapMap, metaInfoList, extractor);
 
+        // GreatWall
         // get all available schema's info to use other schema's type
+        // same-name type between schema is unsupported
         final StringKeyMap<DfTypeArrayInfo> arrayInfoMap = extractor.extractParameterArrayInfoMap(mainSchema);
         for (UnifiedSchema additionalSchema : additionalSchemaList) {
             arrayInfoMap.putAll(extractor.extractParameterArrayInfoMap(additionalSchema));
@@ -746,6 +753,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                DBLink
+    //                                                ------
     protected void resolveAssistInfoToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
             String dbLinkName) {
         if (isDatabaseOracle()) {
@@ -756,9 +766,12 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     protected void doResolveAssistInfoOracleToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
             String dbLinkName) {
         final DfProcedureSupplementExtractorOracle extractor = getSupplementExtractorOracle(dataSource);
+
+        // Overload
         final Map<String, Integer> overloadInfoMapMap = extractor.extractParameterOverloadInfoToDBLinkMap(dbLinkName);
         doSetupOverloadInfoOracleToDBLink(overloadInfoMapMap, metaInfoList, extractor);
 
+        // GreatWall
         // DBLink procedure's GreatWalls are unsupported yet
         //final StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap = extractor.extractParameterArrayInfoToDBLinkMap();
         //final StringKeyMap<DfTypeStructInfo> structInfoMap = extractor.extractStructInfoToDBLinkMap();
@@ -788,6 +801,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
+    // -----------------------------------------------------
+    //                                            Great Wall
+    //                                            ----------
     protected void doSetupAssistInfoOracle(StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap,
             StringKeyMap<DfTypeStructInfo> structInfoMap, List<DfProcedureMeta> metaInfoList,
             DfProcedureSupplementExtractorOracle extractor) {

@@ -106,32 +106,14 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                 if (synonymMetaInfo.isSelectable()) {
                     continue; // select-able synonyms are out of target
                 }
-                final DfProcedureMeta procedureMeta;
+                DfProcedureMeta procedureMeta = null;
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) { // synonym for DB link
-                    // Synonym for Package Procedure has several problems. (so unsupported)
-                    //  o Synonym meta data does not have its schema info
-                    //  o Oracle cannot execute Synonym for Package Procedure *fundamental problem
                     procedureMeta = prepareDBLinkProcedureNative(tableOwner, tableName, dbLinkName, procedureExtractor);
-                    if (procedureMeta == null) {
-                        continue;
-                    }
                 } else {
-                    final String procedureKey = tableOwner.buildSchemaQualifiedName(tableName);
-                    procedureMeta = procedureMap.get(procedureKey);
-                    if (procedureMeta == null) {
-                        // Synonym for Package Procedure has several problems. (so unsupported)
-                        //  o Synonym meta data does not have its schema info
-                        //  o Oracle cannot execute Synonym for Package Procedure *fundamental problem
-                        //for (String schemaName : _schemaList) {
-                        //    procedureMetaInfo = procedureMap.get(schemaName + "." + procedureKey);
-                        //    if (procedureMetaInfo != null) {
-                        //        break; // comes first  
-                        //    }
-                        //}
-                        //if (procedureMetaInfo == null) {
-                        continue;
-                        //}
-                    }
+                    procedureMeta = findProcedureMeta(tableOwner, tableName, procedureMap);
+                }
+                if (procedureMeta == null) {
+                    continue; // not found
                 }
                 procedureMeta.setProcedureSynonym(true);
                 final DfProcedureSynonymMeta procedureSynonymMetaInfo = new DfProcedureSynonymMeta();
@@ -196,6 +178,24 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         } catch (RuntimeException ignored) {
             info.setSelectable(false);
         }
+    }
+
+    protected DfProcedureMeta findProcedureMeta(UnifiedSchema tableOwner, String tableName,
+            Map<String, DfProcedureMeta> procedureMap) {
+        final String procedureKey = tableOwner.buildSchemaQualifiedName(tableName);
+        DfProcedureMeta procedureMeta = procedureMap.get(procedureKey);
+        if (procedureMeta == null) { // it may be package procedure
+            // searching on available schemas as package procedure
+            // (Synonym meta data does not have its schema info)
+            for (UnifiedSchema schema : _targetSchemaList) {
+                procedureMeta = procedureMap.get(schema.getPureSchema() + "." + procedureKey);
+                if (procedureMeta != null) {
+                    break; // comes first  
+                }
+            }
+            // but Oracle cannot execute Synonym for Package Procedure *fundamental problem
+        }
+        return procedureMeta;
     }
 
     // ===================================================================================
