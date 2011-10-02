@@ -169,7 +169,7 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     protected void judgeSynonymSelectable(DfSynonymMeta info) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String synonymSqlName = info.buildSynonymSqlName();
-        final String sql = "select * from " + synonymSqlName + " where 0 = 1";
+        final String sql = "select * from " + synonymSqlName + " where 0=1";
         try {
             final List<String> columnList = new ArrayList<String>();
             columnList.add("dummy");

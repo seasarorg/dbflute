@@ -75,7 +75,10 @@ public class DfProcedureNativeExtractorOracle {
         final Map<String, ProcedureNativeInfo> nativeInfoMap = doSelectProcedureNativeInfoMap(sql);
         final Map<String, List<ProcedureArgumentInfo>> argInfoMap = selectProcedureArgumentInfoMap(unifiedSchema);
         for (Entry<String, ProcedureNativeInfo> entry : nativeInfoMap.entrySet()) {
-            entry.getValue().setArgInfoList(argInfoMap.get(entry.getKey()));
+            final List<ProcedureArgumentInfo> argInfoList = argInfoMap.get(entry.getKey());
+            if (argInfoList != null) { // found (means the procedure has parameters)
+                entry.getValue().acceptArgInfoList(argInfoList);
+            }
         }
         return nativeInfoMap;
     }
@@ -94,7 +97,10 @@ public class DfProcedureNativeExtractorOracle {
         final Map<String, ProcedureNativeInfo> nativeInfoMap = doSelectProcedureNativeInfoMap(sql);
         final Map<String, List<ProcedureArgumentInfo>> argInfoMap = selectDBLinkProcedureArgumentInfoMap(dbLinkName);
         for (Entry<String, ProcedureNativeInfo> entry : nativeInfoMap.entrySet()) {
-            entry.getValue().setArgInfoList(argInfoMap.get(entry.getKey()));
+            final List<ProcedureArgumentInfo> argInfoList = argInfoMap.get(entry.getKey());
+            if (argInfoList != null) { // found (means the procedure has parameters)
+                entry.getValue().acceptArgInfoList(argInfoList);
+            }
         }
         return nativeInfoMap;
     }
@@ -156,7 +162,13 @@ public class DfProcedureNativeExtractorOracle {
     public static class ProcedureNativeInfo {
         protected String _packageName;
         protected String _procedureName;
-        protected List<ProcedureArgumentInfo> _argInfoList;
+        protected final List<ProcedureArgumentInfo> _argInfoList = DfCollectionUtil.newArrayList();
+
+        public void acceptArgInfoList(List<ProcedureArgumentInfo> argInfoList) {
+            for (ProcedureArgumentInfo argInfo : argInfoList) {
+                addArgInfo(argInfo);
+            }
+        }
 
         public String getPackageName() {
             return _packageName;
@@ -178,8 +190,8 @@ public class DfProcedureNativeExtractorOracle {
             return _argInfoList;
         }
 
-        public void setArgInfoList(List<ProcedureArgumentInfo> argInfoList) {
-            this._argInfoList = argInfoList;
+        public void addArgInfo(ProcedureArgumentInfo argInfo) {
+            this._argInfoList.add(argInfo);
         }
     }
 

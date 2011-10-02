@@ -143,6 +143,11 @@ public class DfProcedureNativeTranslatorOracle {
             final String dataLength = argInfo.getDataLength();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(dataLength)) {
                 columnMeta.setColumnSize(Integer.valueOf(dataLength));
+            } else {
+                final String dataPrecision = argInfo.getDataPrecision();
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(dataPrecision)) {
+                    columnMeta.setColumnSize(Integer.valueOf(dataPrecision));
+                }
             }
             final String dataScale = argInfo.getDataScale();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(dataScale)) {
