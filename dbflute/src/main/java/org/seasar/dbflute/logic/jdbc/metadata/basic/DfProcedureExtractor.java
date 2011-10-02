@@ -297,12 +297,10 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
                 continue;
             }
             final UnifiedSchema procedureSchema = metaInfo.getProcedureSchema();
-            if (procedureSchema != null) { // e.g. included procedure to DB link has no schema
-                if (!prop.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
-                    log("  passed: non-target schema - " + procedureLoggingName);
-                    ++passedCount;
-                    continue;
-                }
+            if (!prop.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
+                log("  passed: non-target schema - " + procedureLoggingName);
+                ++passedCount;
+                continue;
             }
             final String procedureFullQualifiedName = metaInfo.getProcedureFullQualifiedName();
             final String procedureSchemaQualifiedName = Srl.substringFirstFront(procedureFullQualifiedName, ".");

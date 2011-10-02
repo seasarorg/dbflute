@@ -385,8 +385,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
-        // same reason as table, see filterTableName()
-        return metaInfo.getProcedureName();
+        return metaInfo.buildProcedureSqlName();
     }
 
     public static interface DfDropProcedureByJdbcCallback {

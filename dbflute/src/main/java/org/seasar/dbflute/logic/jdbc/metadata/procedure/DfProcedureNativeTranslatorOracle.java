@@ -118,19 +118,20 @@ public class DfProcedureNativeTranslatorOracle {
 
         // procedure name
         final String packageName = nativeInfo.getPackageName();
-        final String procedureName;
+        final StringBuilder sb = new StringBuilder();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) { // package
-            procedureName = packageName + "." + nativeInfo.getProcedureName();
+            sb.append(packageName).append(".").append(nativeInfo.getProcedureName());
         } else {
-            procedureName = nativeInfo.getProcedureName();
+            sb.append(nativeInfo.getProcedureName());
         }
+        sb.append("@").append(dbLinkName);
+        final String procedureName = sb.toString();
         procedureMeta.setProcedureName(procedureName);
 
         // various names
-        final String linkedName = procedureName + "@" + dbLinkName;
-        procedureMeta.setProcedureFullQualifiedName(linkedName);
-        procedureMeta.setProcedureSchemaQualifiedName(linkedName);
-        procedureMeta.setProcedureSqlName(linkedName);
+        procedureMeta.setProcedureFullQualifiedName(procedureName);
+        procedureMeta.setProcedureSchemaQualifiedName(procedureName);
+        procedureMeta.setProcedureSqlName(procedureName);
         procedureMeta.setProcedureType(DfProcedureType.procedureResultUnknown);
     }
 

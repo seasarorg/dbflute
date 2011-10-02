@@ -17,9 +17,9 @@ public class DfProcedureMeta {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _procedureCatalog;
-    protected UnifiedSchema _procedureSchema;
-    protected String _procedureName; // contains package prefix
+    protected String _procedureCatalog; // not required
+    protected UnifiedSchema _procedureSchema; // required (if DBLink, DBLink name)
+    protected String _procedureName; // contains package prefix and DBLink mark (e.g. MAIN_PKG.FOO, FOO@BAR_LINK)
     protected DfProcedureType _procedureType;
     protected String _procedureFullQualifiedName;
     protected String _procedureSchemaQualifiedName;
