@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.TypeMap;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
@@ -47,6 +48,7 @@ public class DfProcedureNativeTranslatorOracle {
     protected final DfColumnExtractor _columnExtractor = new DfColumnExtractor();
     protected Map<String, Map<String, ProcedureNativeInfo>> _dbLinkProcedureNativeMap;
     protected Map<String, Map<String, SynonymNativeInfo>> _dbLinkSynonymNativeMap;
+    protected Map<String, DBLinkNativeInfo> _dbLinkInfoMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -60,12 +62,7 @@ public class DfProcedureNativeTranslatorOracle {
     //                                                                    ================
     public DfProcedureMeta translateProcedureToDBLink(String packageName, String procedureName, String dbLinkName,
             DfProcedureExtractor procedureExtractor) {
-        if (_dbLinkProcedureNativeMap == null) { // lazy load
-            _dbLinkProcedureNativeMap = extractDBLinkProcedureNativeMap();
-        }
-        if (_dbLinkSynonymNativeMap == null) { // lazy load
-            _dbLinkSynonymNativeMap = extractDBLinkSynonymNativeMap();
-        }
+        initializeIfNeeds();
         final Map<String, ProcedureNativeInfo> nativeMap = _dbLinkProcedureNativeMap.get(dbLinkName);
         if (nativeMap == null) {
             return null; // it might be next schema DB link
@@ -97,8 +94,16 @@ public class DfProcedureNativeTranslatorOracle {
     }
 
     protected DfProcedureMeta createDBLinkProcedureMeta(ProcedureNativeInfo nativeInfo, String dbLinkName) {
+        // catalog
         final DfProcedureMeta procedureMeta = new DfProcedureMeta();
         procedureMeta.setProcedureCatalog(null); // because of Oracle
+
+        // schema (only used as identity)
+        final DBLinkNativeInfo dbLinkNativeInfo = _dbLinkInfoMap.get(dbLinkName);
+        final String userName = dbLinkNativeInfo.getUserName();
+        procedureMeta.setProcedureSchema(UnifiedSchema.createAsDynamicSchema(null, userName));
+
+        // procedure name
         final String packageName = nativeInfo.getPackageName();
         final String procedureName;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(packageName)) { // package
@@ -107,11 +112,14 @@ public class DfProcedureNativeTranslatorOracle {
             procedureName = nativeInfo.getProcedureName();
         }
         procedureMeta.setProcedureName(procedureName);
+
+        // various names
         final String linkedName = procedureName + "@" + dbLinkName;
         procedureMeta.setProcedureFullQualifiedName(linkedName);
         procedureMeta.setProcedureSchemaQualifiedName(linkedName);
         procedureMeta.setProcedureSqlName(linkedName);
         procedureMeta.setProcedureType(DfProcedureType.procedureResultUnknown);
+
         final List<ProcedureArgumentInfo> argInfoList = nativeInfo.getArgInfoList();
         for (ProcedureArgumentInfo argInfo : argInfoList) {
             final DfProcedureColumnMeta columnMeta = new DfProcedureColumnMeta();
@@ -163,12 +171,27 @@ public class DfProcedureNativeTranslatorOracle {
     // ===================================================================================
     //                                                                  DBLink Native Info
     //                                                                  ==================
-    protected Map<String, Map<String, ProcedureNativeInfo>> extractDBLinkProcedureNativeMap() { // main schema's DB link only
+    protected void initializeIfNeeds() { // lazy load
+        if (_dbLinkInfoMap == null) {
+            _dbLinkInfoMap = extractDBLinkNative(); // should be called first
+        }
+        if (_dbLinkProcedureNativeMap == null) {
+            _dbLinkProcedureNativeMap = extractDBLinkProcedureNativeMap();
+        }
+        if (_dbLinkSynonymNativeMap == null) {
+            _dbLinkSynonymNativeMap = extractDBLinkSynonymNativeMap();
+        }
+    }
+
+    protected Map<String, DBLinkNativeInfo> extractDBLinkNative() { // main schema's
         final DfDBLinkNativeExtractorOracle dbLinkExtractor = createDBLinkNativeExtractor();
-        final Map<String, DBLinkNativeInfo> dbLinkInfoMap = dbLinkExtractor.selectDBLinkInfoMap();
+        return dbLinkExtractor.selectDBLinkInfoMap();
+    }
+
+    protected Map<String, Map<String, ProcedureNativeInfo>> extractDBLinkProcedureNativeMap() { // main schema's DB link only
         final DfProcedureNativeExtractorOracle nativeExtractor = createProcedureNativeExtractor();
         final Map<String, Map<String, ProcedureNativeInfo>> map = DfCollectionUtil.newLinkedHashMap();
-        for (String dbLinkName : dbLinkInfoMap.keySet()) {
+        for (String dbLinkName : _dbLinkInfoMap.keySet()) {
             map.put(dbLinkName, nativeExtractor.extractDBLinkProcedureNativeInfoList(dbLinkName));
         }
         return map;
