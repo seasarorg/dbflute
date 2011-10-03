@@ -1,16 +1,14 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
+#if ($table.hasReferrerAsMany())
+import java.util.List;
+#end
 import java.io.Serializable;
 import javax.persistence.*;
 
-#foreach ($foreignKeys in $table.ForeignKeys)
-#set ($foreignEntityClassName = "${foreignKeys.foreignTable.javaName}")
-import ${myExtendedEntityPackageName}.${foreignEntityClassName};
-#end
-#foreach ($referrer in $table.referrers)
-#set ($referrerEntityClassName = "${referrer.table.javaName}")
-import ${myExtendedEntityPackageName}.${referrerEntityClassName};
+#if ($table.hasRelation())
+import ${myExtendedEntityPackageName}.*;
 #end
 
 /**
@@ -61,7 +59,12 @@ public abstract class ${myClassName} implements Serializable {
     //                                                                           Attribute
     //                                                                           =========
 #foreach ($col in $table.columns)
-    /** Property for ${col.javaBeansRulePropertyName} column. {${col.columnDefinitionLineDisp}} */
+    /**
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+     */
 #if ($col.isPrimaryKey())
     @Id
 #end
@@ -91,7 +94,9 @@ public abstract class ${myClassName} implements Serializable {
     //                                                                       =============
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignEntityClassName = "${foreignKey.foreignTable.javaName}")
-    /** Foreign property for ${foreignKey.foreignTable.name} table. */
+    /**
+     * ${fk.foreignDispForJavaDoc}
+     */
     @ManyToOne
 #if ($foreignKey.isSimpleKeyFK())
     @JoinColumn(name="${foreignKey.localColumnNameAsOne}")
@@ -103,7 +108,9 @@ public abstract class ${myClassName} implements Serializable {
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.table.javaName}")
 #if (${referrer.isOneToOne()})
-    /** Foreign property(referrer-as-one) for ${referrerTable.name} table. */
+    /**
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     */
     @OneToOne(mappedBy = "${referrer.foreignPropertyName}")
     public ${referrerEntityClassName} ${referrer.referrerPropertyNameAsOneS2Jdbc};
 
@@ -116,9 +123,11 @@ public abstract class ${myClassName} implements Serializable {
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.table.javaName}")
 #if (!${referrer.isOneToOne()})
-    /** Referrer property for ${referrerTable.name} table. */
+    /**
+     * ${referrer.referrerDispForJavaDoc}
+     */
     @OneToMany(mappedBy = "${referrer.foreignPropertyName}")
-    public java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName};
+    public List<${referrerEntityClassName}> ${referrer.referrerPropertyName};
 
 #end
 #end
