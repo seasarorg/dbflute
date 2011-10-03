@@ -12,7 +12,12 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                           =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-    /** The parameter of ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}. */
+    /**
+     * ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     */
     public ${propertyType} ${propertyName};
 
 #end
