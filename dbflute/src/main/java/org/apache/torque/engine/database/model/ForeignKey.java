@@ -120,6 +120,13 @@ public class ForeignKey {
     protected final Map<String, String> _foreignLocalMap = StringKeyMap.createAsFlexibleOrdered();
     protected final Map<String, String> _dynamicFixedConditionMap = DfCollectionUtil.newLinkedHashMap();
 
+    // -----------------------------------------------------
+    //                                    Lazy Determination
+    //                                    ------------------
+    protected Boolean _oneToOne;
+    protected Boolean _bizOneToOne;
+    protected Boolean _bizManyToOne;
+
     // ===================================================================================
     //                                                                       Load from XML
     //                                                                       =============
@@ -996,23 +1003,36 @@ public class ForeignKey {
      * @return The determination, true or false.
      */
     public boolean isOneToOne() {
-        final List<Column> localColumnList = getLocalColumnList();
-        final List<Column> localPrimaryColumnList = getTable().getPrimaryKey();
-        if (localColumnList.equals(localPrimaryColumnList)) {
-            return true;
-        } else {
-            final List<Unique> uniqueList = getTable().getUniqueList();
-            for (final Unique unique : uniqueList) {
-                if (unique.hasSameColumnSet(localColumnList)) {
-                    return true;
+        if (_oneToOne == null) {
+            _oneToOne = false;
+            final List<Column> localColumnList = getLocalColumnList();
+            final List<Column> localPrimaryColumnList = getTable().getPrimaryKey();
+            if (localColumnList.equals(localPrimaryColumnList)) {
+                _oneToOne = true;
+            } else {
+                final List<Unique> uniqueList = getTable().getUniqueList();
+                for (final Unique unique : uniqueList) {
+                    if (unique.hasSameColumnSet(localColumnList)) {
+                        _oneToOne = true;
+                    }
                 }
             }
         }
-        return false;
+        return _oneToOne;
     }
 
     public boolean isBizOneToOne() {
-        return isOneToOne() && hasFixedCondition();
+        if (_bizOneToOne == null) {
+            _bizOneToOne = isOneToOne() && hasFixedCondition();
+        }
+        return _bizOneToOne;
+    }
+
+    public boolean isBizManyToOne() {
+        if (_bizManyToOne == null) {
+            _bizManyToOne = !isOneToOne() && hasFixedCondition();
+        }
+        return _bizManyToOne;
     }
 
     public boolean isSimpleKeyFK() {

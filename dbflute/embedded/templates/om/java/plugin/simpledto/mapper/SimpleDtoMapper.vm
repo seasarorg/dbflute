@@ -1,7 +1,11 @@
 ${database.allClassCopyright}package ${myDtoMapperPackageName};
 #set ($myClassName = "${myDtoMapperClassName}")
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
 
 import org.seasar.dbflute.Entity;
 #if ($table.hasClassification())
@@ -123,15 +127,16 @@ public class ${myClassName} {
                 dto.set${fk.foreignJavaBeansRulePropertyNameInitCap}((${foreignDtoClassName})cachedDto);
             } else {
                 ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
-#if (!$fk.isBizOneToOne())
                 if (oneWayReference) {
+## the 'if' statement of one-way reference is not deleted to suppress no-use warning
+#if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
                     mapper.suppress${fk.referrerJavaBeansRulePropertyNameAsOneInitCap}();
 #else
                     mapper.suppress${fk.referrerJavaBeansRulePropertyNameInitCap}();
 #end
-                }
 #end
+                }
                 dto.set${fk.foreignJavaBeansRulePropertyNameInitCap}(mapper.mappingToDto(relationEntity));
                 if (relationEntity.hasPrimaryKeyValue()) {
                     _relationDtoMap.put(relationKey, dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}());
