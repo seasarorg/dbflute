@@ -525,15 +525,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final DfColumnMeta metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
         final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
-        if (relatedTable == null) {
-            return;
+        String plainComment = null;
+        if (relatedTable != null) {
+            final String relatedColumnName = metaInfo.getSql2EntityRelatedColumnName();
+            final Column relatedColumn = relatedTable.getColumn(relatedColumnName);
+            if (relatedColumn != null) {
+                plainComment = relatedColumn.getPlainComment();
+            }
         }
-        final String relatedColumnName = metaInfo.getSql2EntityRelatedColumnName();
-        final Column relatedColumn = relatedTable.getColumn(relatedColumnName);
-        if (relatedColumn == null) {
-            return;
-        }
-        final String plainComment = relatedColumn.getPlainComment();
         final String columnComment = metaInfo.getColumnComment();
         final StringBuilder sb = new StringBuilder();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(plainComment)) {

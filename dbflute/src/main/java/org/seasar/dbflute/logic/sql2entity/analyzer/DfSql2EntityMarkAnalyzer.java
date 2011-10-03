@@ -171,33 +171,62 @@ public class DfSql2EntityMarkAnalyzer {
         final String asMark = " as ";
         final String dot = ".";
         final String comma = ",";
+        final String selectMark = "select ";
         for (String line : splitList) {
-            final String lowerLine = line.toLowerCase();
-            if (!lowerLine.contains(lineCommentMark) || !lowerLine.contains(columnCommentMark)) {
+            if (!line.contains(lineCommentMark) || !line.contains(columnCommentMark)) {
                 continue;
             }
-            final String clause = Srl.substringFirstFront(lowerLine, lineCommentMark);
-            final String column;
-            if (!clause.contains(asMark)) {
-                if (clause.contains("(") || clause.contains(")")) {
+            final String clause = Srl.substringFirstFront(line, lineCommentMark);
+            final String column; // space check is later
+            if (Srl.containsIgnoreCase(clause, asMark)) { // "as" exists
+                // ... as MEMBER_NAME -- // ...
+                // ... as MEMBER_NAME, -- // ...
+                // 0 as DUMMY, -- // ...
+                column = Srl.substringFirstFront(Srl.substringLastRearIgnoreCase(clause, asMark), ",");
+            } else {
+                if (Srl.containsAny(clause, "(", ")")) {
                     continue; // e.g. max(member.BIRTHDATE)
                 }
+                if (Srl.containsAny(clause, "--", "//", "/*", "*/")) {
+                    continue; // irregular comment
+                }
                 if (clause.contains(dot)) { // "." exists
-                    column = Srl.substringLastRear(clause, dot);
+                    // , member.MEMBER_NAME -- // ...
+                    // member.MEMBER_NAME, -- // ...
+                    // member.MEMBER_NAME , -- // ...
+                    column = Srl.substringFirstFront(Srl.substringLastRear(clause, dot), ",");
                 } else if (clause.contains(comma)) { // "," exists
-                    column = Srl.substringLastRear(clause, comma);
-                } else { // all nothing
-                    continue;
+                    final String candidate = Srl.substringLastRear(clause, comma);
+                    if (Srl.is_NotNull_and_NotTrimmedEmpty(candidate)) {
+                        // , MEMBER_NAME -- // ...
+                        column = candidate;
+                    } else {
+                        // /- - - - - - - - - - - - -
+                        // , MEMBER_NAME, -- // ...
+                        //  MEMBER_NAME, -- // ...
+                        // - - - - - - - - - -/
+
+                        // , MEMBER_NAME
+                        //  MEMBER_NAME
+                        final String removedLastComma = Srl.rtrim(Srl.substringLastFront(clause, comma));
+
+                        // MEMBER_NAME
+                        column = Srl.substringLastRear(removedLastComma, ",", " ");
+                    }
+                } else if (Srl.containsIgnoreCase(clause, selectMark)) { // first column
+                    // select MEMBER_NAME -- // ...
+                    column = Srl.substringLastRearIgnoreCase(clause, selectMark);
+                } else { // may be last column
+                    // MEMBER_NAME -- // ...
+                    column = clause;
                 }
                 // small noises are allowed
                 // because this map is merely for reference
-            } else { // "as" exists 
-                column = Srl.substringLastRear(clause, asMark);
             }
             if (Srl.is_Null_or_TrimmedEmpty(column)) {
                 continue;
             }
-            final String lineComment = Srl.substringFirstRear(lowerLine, lineCommentMark);
+            final String lineComment = Srl.substringFirstRear(line, lineCommentMark);
             if (!lineComment.contains(columnCommentMark)) {
                 continue;
             }
@@ -205,7 +234,10 @@ public class DfSql2EntityMarkAnalyzer {
             if (Srl.is_Null_or_TrimmedEmpty(columnComment)) {
                 continue;
             }
-            commentMap.put(column.trim(), columnComment.trim());
+            final String trimmedColumn = column.trim();
+            if (!trimmedColumn.contains(" ")) { // last check
+                commentMap.put(column.trim(), columnComment.trim());
+            }
         }
         return commentMap;
     }

@@ -14,6 +14,9 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class DfSql2EntityMarkAnalyzerTest extends PlainTestCase {
 
+    // ===================================================================================
+    //                                                                   Title/Description
+    //                                                                   =================
     @Test
     public void test_getDescription_basic() {
         // ## Arrange ##
@@ -28,23 +31,26 @@ public class DfSql2EntityMarkAnalyzerTest extends PlainTestCase {
         assertEquals(" foo", description);
     }
 
+    // ===================================================================================
+    //                                                                 SelectColumnComment
+    //                                                                 ===================
     @Test
     public void test_getSelectColumnCommentMap_basic() {
         // ## Arrange ##
         DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
         StringBuilder sb = new StringBuilder();
-        sb.append("select FOO as FOO_ID -- // comment1");
-        sb.append(ln()).append(" , foo.BAR_NAME -- // comment2");
-        sb.append(ln()).append(" , BAZ_DATE -- // comment3");
+        sb.append("select FOO as FOO_ID -- // Comment1");
+        sb.append(ln()).append(" , foo.BAR_NAME -- // Comment2");
+        sb.append(ln()).append(" , BAZ_DATE -- // Comment3");
 
         // ## Act ##
         Map<String, String> commentMap = analyzer.getSelectColumnCommentMap(sb.toString());
 
         // ## Assert ##
         log(commentMap);
-        assertEquals("comment1", commentMap.get("FOO_ID"));
-        assertEquals("comment2", commentMap.get("BAR_NAME"));
-        assertEquals("comment3", commentMap.get("BAZ_DATE"));
+        assertEquals("Comment1", commentMap.get("FOO_ID"));
+        assertEquals("Comment2", commentMap.get("BAR_NAME"));
+        assertEquals("Comment3", commentMap.get("BAZ_DATE"));
     }
 
     @Test
@@ -52,17 +58,50 @@ public class DfSql2EntityMarkAnalyzerTest extends PlainTestCase {
         // ## Arrange ##
         DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
         StringBuilder sb = new StringBuilder();
-        sb.append("select FOO AS FOO_ID -- //comment1");
-        sb.append(ln()).append(" , foo.BAR_NAME -- abc // comment2");
-        sb.append(ln()).append(" BAZ_DATE -- // comment3");
+        sb.append("SELECT FOO_ID -- //Comment1");
+        sb.append(ln()).append(" , foo.BAR_NAME -- abc //Comment2");
+        sb.append(ln()).append(" BAZ_DATE -- // Comment3");
+        sb.append(ln()).append(" QUX_DATE, -- // Comment4");
+        sb.append(ln()).append(" , 0 as QUUX_DATE -- // Comment5");
+        sb.append(ln()).append(" max(foo) as CORGE_DATE, -- // Comment6");
 
         // ## Act ##
         Map<String, String> commentMap = analyzer.getSelectColumnCommentMap(sb.toString());
 
         // ## Assert ##
         log(commentMap);
-        assertEquals("comment1", commentMap.get("FOO_ID"));
-        assertEquals("comment2", commentMap.get("BAR_NAME"));
-        assertEquals(null, commentMap.get("BAZ_DATE"));
+        assertEquals("Comment1", commentMap.get("FOO_ID"));
+        assertEquals("Comment2", commentMap.get("BAR_NAME"));
+        assertEquals("Comment3", commentMap.get("BAZ_DATE"));
+        assertEquals("Comment4", commentMap.get("QUX_DATE"));
+        assertEquals("Comment5", commentMap.get("QUUX_DATE"));
+        assertEquals("Comment6", commentMap.get("CORGE_DATE"));
+    }
+
+    @Test
+    public void test_getSelectColumnCommentMap_real() {
+        // ## Arrange ##
+        DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
+        StringBuilder sb = new StringBuilder();
+        sb.append("select member.MEMBER_ID");
+        sb.append(ln()).append(" , member.MEMBER_NAME");
+        sb.append(ln()).append(" , member.BIRTHDATE -- // select column comment here (no as)");
+        sb.append(ln()).append(
+                " , member.FORMALIZED_DATETIME as FORMALIZED_DATETIME -- // select column comment here (using as)");
+        sb.append(ln()).append(" , member.MEMBER_STATUS_CODE -- for Classification Test of Sql2Entity");
+        sb.append(ln()).append(" , memberStatus.MEMBER_STATUS_NAME");
+        sb.append(ln()).append(" , memberStatus.DISPLAY_ORDER as STATUS_DISPLAY_ORDER -- for Alias Name Test");
+        sb.append(ln()).append(" , 0 as DUMMY_FLG -- // for Classification Test of Sql2Entity");
+        sb.append(ln()).append(" , 0 as DUMMY_NOFLG -- // for Classification Test of Sql2Entity");
+
+        // ## Act ##
+        Map<String, String> commentMap = analyzer.getSelectColumnCommentMap(sb.toString());
+
+        // ## Assert ##
+        log(commentMap);
+        assertEquals("select column comment here (no as)", commentMap.get("BIRTHDATE"));
+        assertEquals("select column comment here (using as)", commentMap.get("FORMALIZED_DATETIME"));
+        assertEquals("for Classification Test of Sql2Entity", commentMap.get("DUMMY_FLG"));
+        assertEquals("for Classification Test of Sql2Entity", commentMap.get("DUMMY_NOFLG"));
     }
 }
