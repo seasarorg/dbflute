@@ -49,6 +49,17 @@ public final class DfS2jdbcProperties extends DfAbstractHelperProperties {
         return getEntityPropertyIfNullEmpty("baseEntityPrefix");
     }
 
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public boolean isSuppressPublicField() {
+        final String prop = getEntityProperty("isSuppressPublicField");
+        return prop != null && prop.trim().equalsIgnoreCase("true");
+    }
+
+    // ===================================================================================
+    //                                                                     Property Helper
+    //                                                                     ===============
     protected String getEntityPropertyRequired(String key) {
         final String value = getEntityProperty(key);
         if (value == null || value.trim().length() == 0) {
@@ -68,7 +79,6 @@ public final class DfS2jdbcProperties extends DfAbstractHelperProperties {
     }
 
     protected String getEntityProperty(String key) {
-        final String value = (String) getS2JdbcDefinitionMap().get(key);
-        return value;
+        return (String) getS2JdbcDefinitionMap().get(key);
     }
 }

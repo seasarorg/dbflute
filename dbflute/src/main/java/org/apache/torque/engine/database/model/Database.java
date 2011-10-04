@@ -2043,6 +2043,10 @@ public class Database {
         return getProperties().getS2jdbcProperties().getBaseEntityPrefix();
     }
 
+    public boolean isSuppressPublicField() {
+        return getProperties().getS2jdbcProperties().isSuppressPublicField();
+    }
+
     // ===================================================================================
     //                                                  Component Name Helper for Template
     //                                                  ==================================

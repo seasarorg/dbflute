@@ -3,6 +3,9 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 
 #if ($table.hasReferrerAsMany())
 import java.util.List;
+#if ($database.isSuppressPublicField())
+import java.util.ArrayList;
+#end
 #end
 import java.io.Serializable;
 import javax.persistence.*;
@@ -59,12 +62,16 @@ public abstract class ${myClassName} implements Serializable {
     //                                                                           Attribute
     //                                                                           =========
 #foreach ($col in $table.columns)
+#if ($database.isSuppressPublicField())
+    /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
+#else
     /**
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
      */
+#end
 #if ($col.isPrimaryKey())
     @Id
 #end
@@ -86,28 +93,82 @@ public abstract class ${myClassName} implements Serializable {
 #if ($table.isUseVersionNo() && $col.isVersionNo())
     @Version
 #end
+#if ($database.isSuppressPublicField())
+    protected ${col.javaNative} _${col.uncapitalisedJavaName};
+#else
     public ${col.javaNative} ${col.uncapitalisedJavaName};
-    
+#end
+
 #end
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignEntityClassName = "${foreignKey.foreignTable.javaName}")
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignTable = $fk.foreignTable)
+#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
+#set ($foreignVariableName = "_${fk.foreignPropertyName}")
+#if ($database.isSuppressPublicField())
+    /** ${fk.foreignSimpleDisp}. */
+    protected ${foreignEntityClassName} ${foreignVariableName};
+
+    /**
+     * ${fk.foreignDispForJavaDoc}
+     * @return The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NullAllowed: If the foreign key does not have 'NotNull' constraint, please check null.)
+     */
+    @ManyToOne
+#if ($fk.isSimpleKeyFK())
+    @JoinColumn(name="${fk.localColumnNameAsOne}")
+#end
+    public ${foreignEntityClassName} get${fk.foreignJavaBeansRulePropertyNameInitCap}() {
+        return ${foreignVariableName};
+    }
+
+    /**
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${fk.foreignPropertyName} The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NullAllowed)
+     */
+    public void set${fk.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${fk.foreignPropertyName}) {
+        ${foreignVariableName} = ${fk.foreignPropertyName};
+    }
+
+#else
     /**
      * ${fk.foreignDispForJavaDoc}
      */
     @ManyToOne
-#if ($foreignKey.isSimpleKeyFK())
-    @JoinColumn(name="${foreignKey.localColumnNameAsOne}")
+#if ($fk.isSimpleKeyFK())
+    @JoinColumn(name="${fk.localColumnNameAsOne}")
 #end
-    public ${foreignEntityClassName} ${foreignKey.foreignPropertyName};
+    public ${foreignEntityClassName} ${fk.foreignPropertyName};
 
 #end
-#foreach ($referrer in $table.referrers)
+#end
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${referrer.table.javaName}")
-#if (${referrer.isOneToOne()})
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+#if ($database.isSuppressPublicField())
+    /** ${referrer.referrerSimpleDispAsOne}. */
+    protected ${referrerEntityClassName} ${referrerVariableName};
+
+    /**
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed: If the foreign key does not have 'NotNull' constraint, please check null.)
+     */
+    @OneToOne(mappedBy = "${referrer.foreignPropertyName}")
+    public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+        return ${referrerVariableName};
+    }
+
+    /**
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed)
+     */
+    public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
+        ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
+    }
+
+#else
     /**
      * ${referrer.referrerDispAsOneForJavaDoc}
      */
@@ -119,10 +180,33 @@ public abstract class ${myClassName} implements Serializable {
     // ===================================================================================
     //                                                                      Referrer Table
     //                                                                      ==============
-#foreach ($referrer in $table.referrers)
+#foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${referrer.table.javaName}")
-#if (!${referrer.isOneToOne()})
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+#if ($database.isSuppressPublicField())
+    /** ${referrer.referrerSimpleDisp}. */
+    protected List<${referrerEntityClassName}> $referrerVariableName;
+
+    /**
+     * ${referrer.referrerDispForJavaDoc}
+     * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
+     */
+    @OneToMany(mappedBy = "${referrer.foreignPropertyName}")
+    public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
+        if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
+        return ${referrerVariableName};
+    }
+
+    /**
+     * ${referrer.referrerDispForJavaDoc}
+     * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NullAllowed)
+     */
+    public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
+        ${referrerVariableName} = ${referrer.referrerPropertyName};
+    }
+
+#else
     /**
      * ${referrer.referrerDispForJavaDoc}
      */
@@ -144,7 +228,11 @@ public abstract class ${myClassName} implements Serializable {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.primaryKey)
+#if ($database.isSuppressPublicField())
+        if (!helpComparingValue(get${col.javaName}(), otherEntity.get${col.javaName}())) { return false; }
+#else
         if (!helpComparingValue(${col.uncapitalisedJavaName}, otherEntity.${col.uncapitalisedJavaName})) { return false; }
+#end
 #end
         return true;
     }
@@ -161,7 +249,11 @@ public abstract class ${myClassName} implements Serializable {
     public int hashCode() {
         int result = 17;
 #foreach ($col in $table.primaryKey)
+#if ($database.isSuppressPublicField())
+        if (get${col.javaName}() != null) { result = (31*result) + get${col.javaName}().hashCode(); }
+#else
         if (${col.uncapitalisedJavaName} != null) { result = (31*result) + ${col.uncapitalisedJavaName}.hashCode(); }
+#end
 #end
         return result;
     }
@@ -174,10 +266,59 @@ public abstract class ${myClassName} implements Serializable {
         String delimiter = ",";
         StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
+#if ($database.isSuppressPublicField())
+        sb.append(delimiter).append(get${col.javaName}());
+#else
         sb.append(delimiter).append(${col.uncapitalisedJavaName});
+#end
 #end
         if (sb.length() > 0) { sb.delete(0, delimiter.length()); }
         sb.insert(0, "{").append("}");
         return sb.toString();
     }
+#if ($database.isSuppressPublicField())
+
+#set ($propertyLoopIndex = 0)
+#foreach ($col in $table.columns)
+#if ($propertyLoopIndex == 0)
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#else
+
+#end
+    /**
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+     * @return The value of the column '${col.name}'. (NullAllowed)
+     */
+    public ${col.javaNative} get${col.javaName}() {
+#if ($col.isEntityConvertEmptyStringToNull())
+        return convertEmptyToNull(_${col.uncapitalisedJavaName});
+#else
+        return _${col.uncapitalisedJavaName};
+#end
+    }
+
+    /**
+     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (NullAllowed)
+     */
+    ${col.propertySettingModifier} void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
+        this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
+    }
+#end
+#if ($table.hasEntityConvertEmptyStringToNull())
+
+    protected String convertEmptyToNull(String value) {
+        return "".equals(value) ? null : value;
+    }
+#end
+#set ($propertyLoopIndex = $propertyLoopIndex + 1)
+#end
 }

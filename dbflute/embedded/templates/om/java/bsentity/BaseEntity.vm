@@ -278,7 +278,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     // ===================================================================================
     //                                                                    Foreign Property
     //                                                                    ================
-#set ($foreignKeyIndex = 0)
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignTable = $fk.foreignTable)
 #set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
@@ -308,7 +307,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 #end
 
-#set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerTable = $referrer.table)
@@ -339,7 +337,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 #end
 
-#set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
     // ===================================================================================
     //                                                                   Referrer Property
