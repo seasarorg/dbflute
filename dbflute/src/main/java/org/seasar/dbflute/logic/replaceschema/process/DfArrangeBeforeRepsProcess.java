@@ -3,6 +3,7 @@ package org.seasar.dbflute.logic.replaceschema.process;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -11,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -32,6 +34,9 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
     public void arrangeBeforeReps() {
         final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
         final Map<String, String> copyMap = prop.getArrangeBeforeRepsCopyMap();
+        if (!copyMap.isEmpty()) {
+            _log.info("...Arranging resource files for ReplaceSchema");
+        }
         for (Entry<String, String> entry : copyMap.entrySet()) {
             final String src = entry.getKey();
             final String dest = entry.getValue();
@@ -44,46 +49,66 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                                ====
     protected void arrangeCopy(String src, String dest) {
         final File destFile = new File(dest);
-        if (destFile.exists() && destFile.isDirectory()) {
-            throwRepsArrangeCopyDestDirectoryException(src, dest);
-        }
         if (!src.contains("/")) {
             throwRepsArrangeCopySrcNotPathException(src, dest);
         }
         final String pureName = Srl.substringLastRear(src, "/");
-        if (pureName.startsWith("*.")) {
+        if (pureName.startsWith("*.")) { // e.g. ./foo/*.sql
             final String ext = Srl.substringFirstRear(pureName, "*.");
             final File baseDir = new File(Srl.substringLastFront(src, "/*."));
-            if (!baseDir.exists()) {
-                _log.info("*Not existing the copy src directory: " + baseDir.getPath());
-                return;
-            }
+            final List<String> elementList = extractElementList(src, pureName, ext, baseDir);
             final String extSuffix = "." + ext;
-            final String[] elementList = baseDir.list(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return Srl.endsWith(name, extSuffix);
+            if (isDestDirectory(destFile)) { // copy to all files
+                // /- - - - - - - - - - - - - - - - - - - - -
+                // src=./foo/*.sql, dest=./bar/ (dest=./bar)
+                // - - - - - - - - - -/
+                if (!destFile.exists()) {
+                    destFile.mkdirs();
                 }
-            });
-            if (elementList == null) { // no file in the directory
-                _log.info("*Not found the file in the copy src directory: " + baseDir.getPath());
-                return;
-            }
-            String targetElement = null;
-            for (String element : elementList) {
-                if (element.endsWith(extSuffix)) {
-                    if (targetElement == null) {
-                        targetElement = element; // found the only one file
+                final String destBaseDir;
+                if (dest.endsWith("/")) {
+                    destBaseDir = Srl.substringLastFront(dest, "/");
+                } else {
+                    destBaseDir = dest;
+                }
+                if (!elementList.isEmpty()) {
+                    for (String element : elementList) {
+                        if (!element.endsWith(extSuffix)) { // just in case
+                            continue;
+                        }
+                        final String srcPath = baseDir.getPath() + "/" + element;
+                        final String destPath = destBaseDir + "/" + element;
+                        copyFile(new File(srcPath), new File(destPath));
+                    }
+                } else {
+                    _log.info("*Not found the correspoinding copy src file: " + src);
+                }
+            } else { // copy to only one file
+                // /- - - - - - - - - - - - - - - - - - - - -
+                // src=./foo/*.sql, dest=./bar/baz.sql
+                // - - - - - - - - - -/
+                String onlyOneElement = null;
+                for (String element : elementList) {
+                    if (!element.endsWith(extSuffix)) { // just in case
+                        continue;
+                    }
+                    if (onlyOneElement == null) {
+                        onlyOneElement = element; // found the only one file
                     } else { // duplicate
-                        throwRepsArrangeCopySrcDuplicateFileException(src, dest, targetElement, element);
+                        throwRepsArrangeCopySrcDuplicateFileException(src, dest, onlyOneElement, element);
                     }
                 }
-            }
-            if (targetElement != null) {
-                copyFile(new File(baseDir.getPath() + "/" + targetElement), destFile);
-            } else {
-                _log.info("*Not found the corresponding copy src file: " + src);
+                if (onlyOneElement != null) {
+                    final String srcPath = baseDir.getPath() + "/" + onlyOneElement;
+                    copyFile(new File(srcPath), destFile);
+                } else {
+                    _log.info("*Not found the corresponding copy src file: " + src);
+                }
             }
         } else {
+            // /- - - - - - - - - - - - - - - - - - - - -
+            // src=./foo/bar.sql, dest=./baz/qux.sql
+            // - - - - - - - - - -/
             final File srcFile = new File(src);
             if (!srcFile.exists()) {
                 _log.info("*Not existing the copy src file: " + src);
@@ -93,8 +118,37 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
         }
     }
 
+    protected boolean isDestDirectory(File destFile) {
+        if (destFile.exists() && destFile.isDirectory()) {
+            return true;
+        }
+        final String path = destFile.getPath();
+        if (path.endsWith("/")) {
+            return true;
+        }
+        final String pureName = Srl.substringLastRear(path, "/");
+        if (!pureName.contains(".")) {
+            return true;
+        }
+        return false;
+    }
+
+    protected List<String> extractElementList(String src, String pureName, String ext, File baseDir) {
+        final String extSuffix = "." + ext;
+        final String[] elementList = baseDir.list(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return Srl.endsWith(name, extSuffix);
+            }
+        });
+        if (elementList == null) { // no file in the directory
+            _log.info("*Not found the file in the copy src directory: " + baseDir.getPath());
+            return DfCollectionUtil.emptyList();
+        }
+        return DfCollectionUtil.newArrayList(elementList);
+    }
+
     protected void copyFile(File src, File dest) {
-        _log.info("...Copying " + src.getPath() + " to " + dest.getPath());
+        _log.info("  copy " + src.getPath() + " to " + dest.getPath());
         if (dest.exists()) {
             dest.delete();
         }
@@ -104,19 +158,6 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
             String msg = "Failed to copy file: " + src + " to " + dest;
             throw new IllegalStateException(msg, e);
         }
-    }
-
-    protected void throwRepsArrangeCopyDestDirectoryException(String src, String dest) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The path in dest was directory.");
-        br.addItem("Advice");
-        br.addElement("The path in copy dest should be a file.");
-        br.addItem("Source");
-        br.addElement(src);
-        br.addItem("Destination");
-        br.addElement(dest);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
     }
 
     protected void throwRepsArrangeCopySrcNotPathException(String src, String dest) {

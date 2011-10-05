@@ -116,8 +116,8 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                 } else {
                     procedureMeta = findProcedureMeta(tableOwner, tableName, procedureMap);
                 }
-                if (procedureMeta == null) {
-                    continue; // not found
+                if (procedureMeta == null) { // not found
+                    continue; // may be package procedure or other schema's one
                 }
                 procedureMeta.setProcedureSynonym(true);
                 final DfProcedureSynonymMeta procedureSynonymMetaInfo = new DfProcedureSynonymMeta();

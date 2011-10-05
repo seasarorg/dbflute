@@ -63,15 +63,15 @@ public class DfProcedureNativeTranslatorOracle {
     public DfProcedureMeta translateProcedureToDBLink(String packageName, String procedureName, String dbLinkName,
             DfProcedureExtractor procedureExtractor) {
         initializeIfNeeds();
-        final Map<String, ProcedureNativeInfo> nativeMap = _dbLinkProcedureNativeMap.get(dbLinkName);
-        if (nativeMap == null) {
+        final Map<String, ProcedureNativeInfo> procedureNativeMap = _dbLinkProcedureNativeMap.get(dbLinkName);
+        if (procedureNativeMap == null) {
             return null; // it might be next schema DB link
         }
         // Synonym for Package Procedure has several problems. (so unsupported)
         //  o Synonym meta data does not have its schema info
         //  o Oracle cannot execute Synonym for Package Procedure *fundamental problem
         final String nativeInfoMapKey = generateNativeInfoMapKey(packageName, procedureName);
-        ProcedureNativeInfo nativeInfo = nativeMap.get(nativeInfoMapKey);
+        ProcedureNativeInfo nativeInfo = procedureNativeMap.get(nativeInfoMapKey);
         if (nativeInfo == null) {
             final Map<String, SynonymNativeInfo> synonymNativeMap = _dbLinkSynonymNativeMap.get(dbLinkName);
             final SynonymNativeInfo synonymNativeInfo = synonymNativeMap.get(procedureName);
@@ -80,9 +80,9 @@ public class DfProcedureNativeTranslatorOracle {
             }
             // it's a synonym in the another world
             final String retryKey = generateNativeInfoMapKey(null, synonymNativeInfo.getTableName());
-            final ProcedureNativeInfo retryInfo = nativeMap.get(retryKey);
-            if (retryInfo == null) {
-                return null;
+            final ProcedureNativeInfo retryInfo = procedureNativeMap.get(retryKey);
+            if (retryInfo == null) { // not found
+                return null; // may be package procedure or other schema's one in the another world
             }
             nativeInfo = retryInfo; // found
         }
