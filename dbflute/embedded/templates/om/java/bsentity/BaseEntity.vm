@@ -2,7 +2,12 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+#if ($table.hasUtilDateColumn())
+import java.util.Date;
+#end
 
 import org.seasar.dbflute.dbmeta.DBMeta;
 #if (!$table.hasAllCommonColumn() || $table.hasRelation())
@@ -590,18 +595,27 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return sb.toString();
     }
     protected String buildColumnString() {
-        String c = ", ";
-        StringBuilder sb = new StringBuilder();
+##
+## it uses List to be able to specify detail import clause
+##
+        List<Object> valueList = new ArrayList<Object>();
 #foreach ($col in $table.columns)
 #if ($col.isJavaNativeUtilDate())
-        sb.append(c).append(xfUD(get${col.javaName}()));
+        valueList.add(xfUD(get${col.javaName}()));
 #elseif ($col.isJavaNativeByteArray())
-        sb.append(c).append(xfBA(get${col.javaName}()));
+        valueList.add(xfBA(get${col.javaName}()));
 #else
-        sb.append(c).append(get${col.javaName}());
+        valueList.add(get${col.javaName}());
 #end
 #end
-        if (sb.length() > 0) { sb.delete(0, c.length()); }
+        StringBuilder sb = new StringBuilder();
+        String delimiter = ", ";
+        for (Object value : valueList) {
+            sb.append(delimiter).append(value);
+        }
+        if (sb.length() > delimiter.length()) {
+            sb.delete(0, delimiter.length());
+        }
         sb.insert(0, "{").append("}");
         return sb.toString();
     }
@@ -643,7 +657,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         { sb.append(c).append("${referrer.referrerPropertyName}"); }
 #end
 #end
-        if (sb.length() > 0) { sb.delete(0, c.length()).insert(0, "(").append(")"); }
+        if (sb.length() > c.length()) {
+            sb.delete(0, c.length()).insert(0, "(").append(")");
+        }
         return sb.toString();
 #else
         return "";
