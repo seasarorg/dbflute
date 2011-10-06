@@ -428,7 +428,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected void throwPrimaryKeyNotFoundException(String entityName, StringKeyMap<String> pkMap,
             Set<String> columnNameSet) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The primary keys are not found in selected columns.");
+        br.addNotice("The primary keys were not found in selected columns.");
+        br.addItem("Advice");
+        br.addElement("Make sure your primary key settings in the Sql2Entity mark.");
+        br.addElement("For example:");
+        br.addElement("  (x): -- *MEMBER_IT*");
+        br.addElement("  (o): -- *MEMBER_ID*");
+        br.addElement("Or '--*', '-- *' may be on your SQL comment.");
+        br.addElement("The mark is reserved by DBFlute as Sql2Entity mark.");
         br.addItem("Entity");
         br.addElement(entityName);
         br.addItem("Selected Column");

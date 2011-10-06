@@ -71,6 +71,8 @@
     classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
   <taskdef name="df-refresh" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.manage.DfRefreshTask"/>
+  <taskdef name="df-take-assert" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfTakeAssertTask"/>
 
   <!--
     for Ant-Contrib
@@ -215,6 +217,14 @@
         environmentType="${dfenv}"
         refreshProject="${dfprj}">
     </df-refresh>
+  </target>
+
+  <target name="take-assert" description="TakeAssert task">
+    <df-take-assert
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        sqlRootDir="${dfdir}">
+    </df-take-assert>
   </target>
 
 </project>

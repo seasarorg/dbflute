@@ -31,10 +31,19 @@ public class DfAbstractReplaceSchemaProcess {
         runInfo.setUser(prop.getDatabaseUser());
         runInfo.setPassword(prop.getDatabasePassword());
         runInfo.setEncoding(getReplaceSchemaProperties().getSqlFileEncoding());
-        runInfo.setAutoCommit(true); // fixed
         runInfo.setErrorContinue(true); // fixed
-        runInfo.setRollbackOnly(false);
+        if (isRollbackTransaction()) { // basically take-assert
+            runInfo.setAutoCommit(false);
+            runInfo.setRollbackOnly(true);
+        } else { // mainly here
+            runInfo.setAutoCommit(true);
+            runInfo.setRollbackOnly(false);
+        }
         return runInfo;
+    }
+
+    protected boolean isRollbackTransaction() {
+        return false; // as default
     }
 
     protected String resolveTerminater4Tool() {

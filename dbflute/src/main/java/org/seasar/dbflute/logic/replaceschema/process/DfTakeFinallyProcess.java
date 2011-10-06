@@ -51,22 +51,29 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     protected final String _sqlRootDir;
     protected final DataSource _dataSource;
     protected final UnifiedSchema _mainSchema;
+    protected final boolean _takeAssert;
 
     protected Timestamp _beforeTimestamp; // is set through its property
-    protected DfSqlFileFireResult _takeFinallyFireResult;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfTakeFinallyProcess(String sqlRootDir, DataSource dataSource, UnifiedSchema mainSchema) {
+    protected DfTakeFinallyProcess(String sqlRootDir, DataSource dataSource, UnifiedSchema mainSchema,
+            boolean takeAssert) {
         _sqlRootDir = sqlRootDir;
         _dataSource = dataSource;
         _mainSchema = mainSchema;
+        _takeAssert = takeAssert;
     }
 
     public static DfTakeFinallyProcess createAsCore(String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema);
+        return new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, false);
+    }
+
+    public static DfTakeFinallyProcess createAsTakeAssert(String sqlRootDir, DataSource dataSource) {
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        return new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, true);
     }
 
     // ===================================================================================
@@ -79,18 +86,26 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         try {
             fireResult = takeFinally(runInfo);
         } catch (DfTakeFinallyAssertionFailureException e) {
-            _takeFinallyFireResult = new DfSqlFileFireResult();
-            _takeFinallyFireResult.setExistsError(true);
-            _takeFinallyFireResult.setResultMessage("{Take Finally}: *asserted");
+            fireResult = new DfSqlFileFireResult();
+            fireResult.setExistsError(true);
+            fireResult.setResultMessage("{Take Finally}: *asserted");
             final StringBuilder sb = new StringBuilder();
             sb.append(" >> ").append(DfTypeUtil.toClassTitle(e));
             sb.append(ln()).append(" (Look at the exception message: console or dbflute.log)");
-            _takeFinallyFireResult.setDetailMessage(sb.toString());
+            fireResult.setDetailMessage(sb.toString());
             assertionEx = e;
         }
         final DfTakeFinallyFinalInfo finalInfo = createFinalInfo(fireResult, assertionEx);
         incrementSequenceToDataMax();
         return finalInfo;
+    }
+
+    @Override
+    protected boolean isRollbackTransaction() {
+        // take-assert task should not update data
+        // the task cannot execute update statement basically
+        // but it uses a safety connection the task uses just in case
+        return _takeAssert;
     }
 
     // --------------------------------------------
@@ -154,7 +169,16 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
                 final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(loadType);
                 final DfDataAssertHandler dataAssertHandler = dataAssertProvider.provideDataAssertHandler(sql);
                 if (dataAssertHandler == null) {
-                    return DfRunnerDispatchResult.NONE;
+                    if (_takeAssert) {
+                        _log.info("*Skipped the statement because of not assertion SQL");
+                        return DfRunnerDispatchResult.SKIPPED;
+                    } else {
+                        return DfRunnerDispatchResult.NONE;
+                    }
+                }
+                if (st == null) {
+                    String msg = "The statement was null: sqlFile=" + sqlFile;
+                    throw new IllegalStateException(msg);
                 }
                 dataAssertHandler.handle(sqlFile, st, sql);
                 return DfRunnerDispatchResult.DISPATCHED;
@@ -175,6 +199,9 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     //                           ------------------
     protected void incrementSequenceToDataMax() {
         if (!getReplaceSchemaProperties().isIncrementSequenceToDataMax()) {
+            return;
+        }
+        if (_takeAssert) {
             return;
         }
         _log.info("");

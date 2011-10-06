@@ -64,10 +64,12 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                     throw e;
                 }
                 processNonDispatch(sql);
+                _goodSqlCount++; // success (mainly here)
+            } else if (DfRunnerDispatchResult.SKIPPED.equals(dispatchResult)) {
+                _skippedSqlCount++;
+            } else { // means dispatched successfully
+                _goodSqlCount++;
             }
-            // always incremented if it was not failed (also skipped in dispatching)
-            // because failure determination depends on this count and total one
-            _goodSqlCount++;
         } catch (SQLException e) {
             if (!lazyConnectFailed && _runInfo.isErrorContinue()) {
                 showContinueWarnLog(sql, e);

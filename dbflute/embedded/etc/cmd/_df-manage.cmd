@@ -26,3 +26,10 @@ if "%FIRST_ARG%"=="refresh" (
   echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-refresh.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 )
+
+if "%FIRST_ARG%"=="take-assert" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the TakeAssert task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-take-assert.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+)

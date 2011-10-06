@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
@@ -74,11 +75,8 @@ public class DfSql2EntityMarkAnalyzer {
             throw new IllegalArgumentException(msg);
         }
         final List<String> retLs = new ArrayList<String>();
-        String primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "--*", "*");
-        if (primaryKeyColumnNameSeparatedString == null || primaryKeyColumnNameSeparatedString.trim().length() == 0) {
-            primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "-- *", "*"); // for MySQL.
-        }
-        if (primaryKeyColumnNameSeparatedString != null && primaryKeyColumnNameSeparatedString.trim().length() != 0) {
+        final String primaryKeyColumnNameSeparatedString = getMarkString(sql, "*");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(primaryKeyColumnNameSeparatedString)) {
             final StringTokenizer st = new StringTokenizer(primaryKeyColumnNameSeparatedString, ",;/\t");
             while (st.hasMoreTokens()) {
                 final String nextToken = st.nextToken();
@@ -264,23 +262,22 @@ public class DfSql2EntityMarkAnalyzer {
         }
     }
 
-    protected String getStringBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-        final ScopeInfo scope = Srl.extractScopeFirst(targetStr, beginMark, endMark);
-        return scope != null ? scope.getContent() : null;
-    }
-
     protected List<DfSql2EntityMark> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-        final List<ScopeInfo> scopeList = Srl.extractScopeList(targetStr, beginMark, endMark);
-        final List<DfSql2EntityMark> markList = new ArrayList<DfSql2EntityMark>();
-        for (ScopeInfo scopeInfo : scopeList) {
+        final List<DfSql2EntityMark> markList = DfCollectionUtil.newArrayList();
+        final List<String> lineList = Srl.splitListTrimmed(targetStr, "\n");
+        final String outsideCommentMark = "//";
+        for (String line : lineList) {
+            final ScopeInfo scopeInfo = Srl.extractScopeFirst(line, beginMark, endMark);
+            if (scopeInfo == null) {
+                continue;
+            }
             final DfSql2EntityMark markInfo = new DfSql2EntityMark();
             markInfo.setContent(scopeInfo.getContent());
             final int endIndex = scopeInfo.getEndIndex();
             String outsideComment = null;
-            final String rearAll = targetStr.substring(endIndex);
-            final String rearLine = Srl.substringFirstFront(rearAll, "\n");
-            if (rearLine.contains("//")) {
-                outsideComment = Srl.substringFirstRear(rearLine, "//");
+            final String rearAll = line.substring(endIndex);
+            if (rearAll.contains(outsideCommentMark)) {
+                outsideComment = Srl.substringFirstRear(rearAll, outsideCommentMark);
             }
             markInfo.setComment(outsideComment);
             markList.add(markInfo);

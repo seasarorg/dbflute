@@ -39,23 +39,23 @@ public class DfDataAssertProvider {
     protected final Map<String, DfDataAssertHandler> _assertHandlerMap = new LinkedHashMap<String, DfDataAssertHandler>();
     {
         _assertHandlerMap.put("assertCountZero", new DfDataAssertHandler() {
-            public void handle(File sqlFile, Statement statement, String sql) throws SQLException {
-                assertCountZero(sqlFile, statement, sql);
+            public void handle(File sqlFile, Statement st, String sql) throws SQLException {
+                assertCountZero(sqlFile, st, sql);
             }
         });
         _assertHandlerMap.put("assertCountExists", new DfDataAssertHandler() {
-            public void handle(File sqlFile, Statement statement, String sql) throws SQLException {
-                assertCountExists(sqlFile, statement, sql);
+            public void handle(File sqlFile, Statement st, String sql) throws SQLException {
+                assertCountExists(sqlFile, st, sql);
             }
         });
         _assertHandlerMap.put("assertListZero", new DfDataAssertHandler() {
-            public void handle(File sqlFile, Statement statement, String sql) throws SQLException {
-                assertListZero(sqlFile, statement, sql);
+            public void handle(File sqlFile, Statement st, String sql) throws SQLException {
+                assertListZero(sqlFile, st, sql);
             }
         });
         _assertHandlerMap.put("assertListExists", new DfDataAssertHandler() {
-            public void handle(File sqlFile, Statement statement, String sql) throws SQLException {
-                assertListExists(sqlFile, statement, sql);
+            public void handle(File sqlFile, Statement st, String sql) throws SQLException {
+                assertListExists(sqlFile, st, sql);
             }
         });
     }
@@ -120,7 +120,7 @@ public class DfDataAssertProvider {
             final String option = rearString.substring(0, rearString.indexOf(terminator));
             if (option.startsWith(typeAtMark)) {
                 defaultHandler = new DfDataAssertHandler() {
-                    public void handle(File sqlFile, Statement stmt, String sql) throws SQLException {
+                    public void handle(File sqlFile, Statement st, String sql) throws SQLException {
                         String msg = "...Skipping for the different dataLoadingType:";
                         msg = msg + " " + thirdMark + option + terminator;
                         _log.info(msg);

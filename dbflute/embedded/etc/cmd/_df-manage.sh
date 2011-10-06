@@ -30,6 +30,14 @@ if [ "$FIRST_ARG" = "refresh" ];then
   taskReturnCode=$?
 fi
 
+if [ "$FIRST_ARG" = "take-assert" ];then
+  echo "/nnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+  echo "...Calling the TakeAssert task"
+  echo "nnnnnnnnnn/"
+  sh $DBFLUTE_HOME/etc/cmd/_df-take-assert.sh $NATIVE_PROPERTIES_PATH $SECOND_ARG
+  taskReturnCode=$?
+fi
+
 if [ $taskReturnCode -ne 0 ];then
   exit $taskReturnCode;
 fi

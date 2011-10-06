@@ -62,6 +62,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
+    protected int _skippedSqlCount = 0;
 
     // for sub-class process use
     protected Connection _currentConnection;
@@ -86,6 +87,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     public DfSqlFileRunnerResult runTransaction() {
         _goodSqlCount = 0;
         _totalSqlCount = 0;
+        _skippedSqlCount = 0;
         if (_sqlFile == null) {
             String msg = "The attribute '_srcFile' should not be null.";
             throw new IllegalStateException(msg);
@@ -127,6 +129,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             closeConnection();
             closeReader(reader);
         }
+        // re-calculate total count with skipped count
+        _totalSqlCount = _totalSqlCount - _skippedSqlCount;
+
         traceResult(_goodSqlCount, _totalSqlCount);
         _result.setGoodSqlCount(_goodSqlCount);
         _result.setTotalSqlCount(_totalSqlCount);
