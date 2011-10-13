@@ -1,27 +1,28 @@
 package org.seasar.dbflute.helper.language.properties;
 
 public interface DfGeneratedClassPackageDefault {
-    public String getBaseCommonPackage();
 
-    public String getBaseBehaviorPackage();
+    String getBaseCommonPackage();
 
-    public String getBaseDaoPackage();
+    String getBaseBehaviorPackage();
 
-    public String getCursorSimplePackageName();
+    String getBaseDaoPackage();
 
-    public String getParameterBeanSimplePackageName();
+    String getCursorSimplePackageName();
 
-    public String getBaseEntityPackage();
+    String getParameterBeanSimplePackageName();
 
-    public String getCustomizeEntitySimplePackageName();
+    String getBaseEntityPackage();
 
-    public String getDBMetaSimplePackageName();
+    String getCustomizeEntitySimplePackageName();
 
-    public String getConditionBeanPackage();
+    String getDBMetaSimplePackageName();
 
-    public String getExtendedBehaviorPackage();
+    String getConditionBeanPackage();
 
-    public String getExtendedDaoPackage();
+    String getExtendedBehaviorPackage();
 
-    public String getExtendedEntityPackage();
+    String getExtendedDaoPackage();
+
+    String getExtendedEntityPackage();
 }

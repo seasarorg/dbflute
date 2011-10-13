@@ -121,21 +121,33 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                              Mapper
     //                                                                              ======
-    public String getMapperPackage() {
-        return getPropertyIfNullEmpty("dtoMapperPackage");
+    public String getBaseMapperPackage() {
+        final String prop = getProperty("baseMapperPackage");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(prop)) {
+            return prop;
+        }
+        return getExtendedMapperPackage() + ".bs"; // compatible
+    }
+
+    public String getExtendedMapperPackage() {
+        final String prop = getProperty("extendedMapperPackage");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(prop)) {
+            return prop;
+        }
+        return getPropertyIfNullEmpty("dtoMapperPackage"); // old style
     }
 
     public boolean isUseDtoMapper() {
-        final String dtoMapperPackage = getMapperPackage();
+        final String dtoMapperPackage = getExtendedMapperPackage();
         return dtoMapperPackage != null && dtoMapperPackage.trim().length() > 0;
     }
 
-    public String getMapperPrefix() { // basically only for old class delete determination
-        return getExtendedDtoPrefix(); // mapper name is based on extended DTO name
+    public String getMapperSuffix() { // used for building class name
+        return "Mapper"; // however NOT uniform management
     }
 
-    public String getMapperSuffix() { // used for building class name
-        return "Mapper";
+    public String deriveExtendedMapperClassName(String baseMapperClassName) {
+        return Srl.substringFirstRear(baseMapperClassName, getBaseDtoPrefix());
     }
 
     // ===================================================================================

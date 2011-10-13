@@ -2794,23 +2794,28 @@ public class Table {
     // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
-    public String getBaseSimpleDtoClassName() {
+    public String getSimpleDtoBaseDtoClassName() {
         final DfSimpleDtoProperties prop = getProperties().getSimpleDtoProperties();
         final String prefix = prop.getBaseDtoPrefix();
         final String suffix = prop.getBaseDtoSuffix();
         return prefix + getJavaName() + suffix;
     }
 
-    public String getExtendedSimpleDtoClassName() {
+    public String getSimpleDtoExtendedDtoClassName() {
         final DfSimpleDtoProperties prop = getProperties().getSimpleDtoProperties();
         final String prefix = prop.getExtendedDtoPrefix();
         final String suffix = prop.getExtendedDtoSuffix();
         return prefix + getJavaName() + suffix;
     }
 
-    public String getSimpleDtoMapperClassName() {
+    public String getSimpleDtoBaseMapperClassName() {
         final DfSimpleDtoProperties prop = getProperties().getSimpleDtoProperties();
-        return getExtendedSimpleDtoClassName() + prop.getMapperSuffix();
+        return getSimpleDtoBaseDtoClassName() + prop.getMapperSuffix();
+    }
+
+    public String getSimpleDtoExtendedMapperClassName() {
+        final DfSimpleDtoProperties prop = getProperties().getSimpleDtoProperties();
+        return getSimpleDtoExtendedDtoClassName() + prop.getMapperSuffix();
     }
 
     public boolean hasSimpleDtoJsonicDecoration() {

@@ -957,7 +957,7 @@ public class ForeignKey {
     }
 
     public String getForeignTableExtendedSimpleDtoClassName() {
-        return getForeignTable().getExtendedSimpleDtoClassName();
+        return getForeignTable().getSimpleDtoExtendedDtoClassName();
     }
 
     // -----------------------------------------------------
@@ -992,7 +992,7 @@ public class ForeignKey {
     }
 
     public String getReferrerTableExtendedSimpleDtoClassName() {
-        return getTable().getExtendedSimpleDtoClassName();
+        return getTable().getSimpleDtoExtendedDtoClassName();
     }
 
     // ===================================================================================

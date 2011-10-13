@@ -37,6 +37,10 @@ public class DfPackagePathHandler {
     //                                                                                Main
     //                                                                                ====
     public String getPackageAsPath(String pckge) {
+        if (pckge == null) {
+            String msg = "The argument 'pckge' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
         final String omitDirectoryPackage = _basicProperties.getOmitDirectoryPackage();
         if (omitDirectoryPackage != null && omitDirectoryPackage.trim().length() > 0) {
             pckge = removeOmitPackage(pckge, omitDirectoryPackage);

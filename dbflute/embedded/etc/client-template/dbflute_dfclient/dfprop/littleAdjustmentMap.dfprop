@@ -28,6 +28,7 @@
 # o shortCharHandlingMode: (NotRequired - Default NONE)
 # o quoteTableNameList: (NotRequired - Default list:{})
 # o quoteColumnNameList: (NotRequired - Default list:{})
+# o relationalNullObjectMap: (NotRequired - Default map:{})
 #
 # *The line that starts with '#' means comment-out.
 #
@@ -317,6 +318,19 @@ map:{
     #  Specified columns is quoted on auto-generated SQL.
     #
     #; quoteColumnNameList = list:{}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o relationalNullObjectMap: (NotRequired - Default map:{})
+    #  You can get a null object when the relation is null.
+    #
+    #; relationalNullObjectMap = map:{
+    #    ; providerPackage = $$packageBase$$.nogen.cache
+    #    ; foreignMap = map:{
+    #        ; MEMBER_STATUS = CachedMemberStatus.get($$PrimaryKey$$)
+    #        ; MEMBER_SECURITY = CachedMemberSecurity.get($$PrimaryKey$$)
+    #    }
+    #}
     # - - - - - - - - - -/
 }
 # ----------------/

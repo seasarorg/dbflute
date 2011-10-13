@@ -1,7 +1,9 @@
 ${database.allClassCopyright}package ${myExtendedDtoMapperPackageName};
 #set ($myClassName = "${myExtendedDtoMapperClassName}")
 
-import ${myBaseMapperPackageName}.${myBaseMapperClassName};
+import java.util.Map;
+import org.seasar.dbflute.Entity;
+import ${myBaseDtoMapperPackageName}.${myBaseDtoMapperClassName};
 
 /**
  * The DTO mapper of ${table.name}.
@@ -11,8 +13,15 @@ import ${myBaseMapperPackageName}.${myBaseMapperClassName};
  * </p>
  * @author ${database.classAuthor}
  */
-public class $myClassName extends ${myBaseMapperClassName} {
+public class $myClassName extends ${myBaseDtoMapperClassName} {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+
+    public ${myClassName}() {
+    }
+
+    public ${myClassName}(Map<Entity, Object> relationDtoMap, Map<Object, Entity> relationEntityMap) {
+        super(relationDtoMap, relationEntityMap);
+    }
 }

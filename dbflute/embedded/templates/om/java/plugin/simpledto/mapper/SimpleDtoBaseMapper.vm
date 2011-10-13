@@ -1,5 +1,5 @@
-${database.allClassCopyright}package ${myDtoMapperPackageName};
-#set ($myClassName = "${myDtoMapperClassName}")
+${database.allClassCopyright}package ${myBaseDtoMapperPackageName};
+#set ($myClassName = "${myBaseDtoMapperClassName}")
 
 import java.util.List;
 import java.util.ArrayList;
@@ -13,6 +13,9 @@ import ${glPackageBaseCommon}.${glCDef};
 #end
 import ${myDomainEntityPackageName}.*;
 import ${myExtendedEntityPackageName}.*;
+#if ($table.hasRelation())
+import ${myExtendedDtoMapperPackageName}.*;
+#end
 
 /**
  * The DTO mapper of ${table.basicInfoDispString}. <br />
@@ -49,7 +52,7 @@ import ${myExtendedEntityPackageName}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public class ${myClassName} {
+public abstract class ${myClassName} {
 
     // ===================================================================================
     //                                                                          Definition

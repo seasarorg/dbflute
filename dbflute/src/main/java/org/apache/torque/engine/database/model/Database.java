@@ -1926,8 +1926,12 @@ public class Database {
         return getProperties().getSimpleDtoProperties().getExtendedDtoSuffix();
     }
 
-    public String getSimpleDtoDtoMapperPackage() {
-        return getProperties().getSimpleDtoProperties().getMapperPackage();
+    public String getSimpleDtoBaseMapperPackage() {
+        return getProperties().getSimpleDtoProperties().getBaseMapperPackage();
+    }
+
+    public String getSimpleDtoExtendedMapperPackage() {
+        return getProperties().getSimpleDtoProperties().getExtendedMapperPackage();
     }
 
     public boolean isSimpleDtoUseDtoMapper() {

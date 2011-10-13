@@ -621,8 +621,8 @@ public class DfOldClassHandler {
     public void deleteOldSimpleDtoTableClass() {
         if (getSimpleDtoProperties().hasSimpleDtoDefinition()) {
             info("public void deleteOldSimpleDtoTableClass() {");
-            deleteOldTableClass_for_SimpleDtoBaseEntity();
-            deleteOldTableClass_for_SimpleDtoExtendedEntity();
+            deleteOldTableClass_for_SimpleDtoBaseDto();
+            deleteOldTableClass_for_SimpleDtoExtendedDto();
             info("}");
         }
     }
@@ -631,7 +631,8 @@ public class DfOldClassHandler {
         if (getSimpleDtoProperties().hasSimpleDtoDefinition()) {
             if (getSimpleDtoProperties().isUseDtoMapper()) {
                 info("public void deleteOldSimpleDtoMapperTableClass() {");
-                deleteOldTableClass_for_SimpleDtoMapper();
+                deleteOldTableClass_for_SimpleDtoBaseMapper();
+                deleteOldTableClass_for_SimpleDtoExtendedMapper();
                 info("}");
             }
         }
@@ -650,7 +651,8 @@ public class DfOldClassHandler {
         if (getSimpleDtoProperties().hasSimpleDtoDefinition()) {
             if (getSimpleDtoProperties().isUseDtoMapper()) {
                 info("public void deleteOldSimpleDtoMapperTableClass() {");
-                deleteOldCustomizeClass_for_SimpleDtoMapper();
+                deleteOldCustomizeClass_for_SimpleDtoBaseMapper();
+                deleteOldCustomizeClass_for_SimpleDtoExtendedMapper();
                 info("}");
             }
         }
@@ -661,21 +663,21 @@ public class DfOldClassHandler {
     //                                           -----------
     protected List<String> _deletedOldTableSimpleDtoBaseDtoList;
 
-    public void deleteOldTableClass_for_SimpleDtoBaseEntity() {
+    public void deleteOldTableClass_for_SimpleDtoBaseDto() {
         final String packagePath = getSimpleDtoBaseDtoPackage();
-        _deletedOldTableSimpleDtoBaseDtoList = doDeleteOldTableClass_for_SimpleDtoBaseEntity(packagePath);
+        _deletedOldTableSimpleDtoBaseDtoList = doDeleteOldTableClass_for_SimpleDtoBaseDto(packagePath);
     }
 
-    public List<String> doDeleteOldTableClass_for_SimpleDtoBaseEntity(String packagePath) {
+    public List<String> doDeleteOldTableClass_for_SimpleDtoBaseDto(String packagePath) {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                return table.getBaseSimpleDtoClassName();
+                return table.getSimpleDtoBaseDtoClassName();
             }
         };
         final String classPrefix = getSimpleDtoBaseDtoPrefix();
         final String classSuffix = getSimpleDtoBaseDtoSuffix();
         final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, classSuffix, setupper);
-        List<String> deletedOldTableSimpleDtoBaseDtoList = deletor.deleteOldTableClass();
+        final List<String> deletedOldTableSimpleDtoBaseDtoList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(deletedOldTableSimpleDtoBaseDtoList);
         return deletedOldTableSimpleDtoBaseDtoList;
     }
@@ -692,15 +694,15 @@ public class DfOldClassHandler {
         return getSimpleDtoProperties().getBaseDtoSuffix();
     }
 
-    public void deleteOldTableClass_for_SimpleDtoExtendedEntity() {
+    public void deleteOldTableClass_for_SimpleDtoExtendedDto() {
         if (_deletedOldTableSimpleDtoBaseDtoList == null || _deletedOldTableSimpleDtoBaseDtoList.isEmpty()) {
             return;
         }
         final String packagePath = getSimpleDtoExtendedDtoPackage();
-        doDeleteOldTableClass_for_SimpleDtoExtendedEntity(packagePath, _deletedOldTableSimpleDtoBaseDtoList);
+        doDeleteOldTableClass_for_SimpleDtoExtendedDto(packagePath, _deletedOldTableSimpleDtoBaseDtoList);
     }
 
-    public void doDeleteOldTableClass_for_SimpleDtoExtendedEntity(String packagePath, List<String> deletedList) {
+    public void doDeleteOldTableClass_for_SimpleDtoExtendedDto(String packagePath, List<String> deletedList) {
         final String outputPath = _generator.getOutputPath();
         final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
         final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
@@ -722,25 +724,59 @@ public class DfOldClassHandler {
         return getSimpleDtoProperties().getExtendedDtoPackage();
     }
 
-    public void deleteOldTableClass_for_SimpleDtoMapper() {
+    protected List<String> _deletedOldTableSimpleDtoBaseMapperList;
+
+    public void deleteOldTableClass_for_SimpleDtoBaseMapper() {
+        final String packagePath = getSimpleDtoBaseMapperPackage();
+        _deletedOldTableSimpleDtoBaseMapperList = doDeleteOldTableClass_for_SimpleDtoBaseMapper(packagePath);
+    }
+
+    public List<String> doDeleteOldTableClass_for_SimpleDtoBaseMapper(String packagePath) {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                return table.getSimpleDtoMapperClassName();
+                return table.getSimpleDtoBaseMapperClassName();
             }
         };
-        final String packagePath = getSimpleDtoMapperPackage();
-        final String classPrefix = getSimpleDtoMapperPrefix();
+        final String classPrefix = getSimpleDtoBaseDtoPrefix();
         final String classSuffix = getSimpleDtoMapperSuffix();
         final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, classSuffix, setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
+        final List<String> deletedOldTableSimpleDtoBaseMapperList = deletor.deleteOldTableClass();
+        showDeleteOldTableFile(deletedOldTableSimpleDtoBaseMapperList);
+        return deletedOldTableSimpleDtoBaseMapperList;
     }
 
-    protected String getSimpleDtoMapperPackage() {
-        return getSimpleDtoProperties().getMapperPackage();
+    public void deleteOldTableClass_for_SimpleDtoExtendedMapper() {
+        if (_deletedOldTableSimpleDtoBaseMapperList == null || _deletedOldTableSimpleDtoBaseMapperList.isEmpty()) {
+            return;
+        }
+        final String packagePath = getSimpleDtoExtendedMapperPackage();
+        doDeleteOldTableClass_for_SimpleDtoExtendedMapper(packagePath, _deletedOldTableSimpleDtoBaseMapperList);
     }
 
-    protected String getSimpleDtoMapperPrefix() {
-        return getSimpleDtoProperties().getMapperPrefix();
+    public void doDeleteOldTableClass_for_SimpleDtoExtendedMapper(String packagePath, List<String> deletedList) {
+        final String outputPath = _generator.getOutputPath();
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
+        final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
+        for (String baseMapperClassName : deletedList) {
+            final String extendedMapperClassName = deriveSimpleDtoExtendedMapperClassName(baseMapperClassName);
+            final File file = new File(dirPath + "/" + extendedMapperClassName + "." + getClassFileExtension());
+            if (file.exists()) {
+                file.delete();
+                info("    delete('" + extendedMapperClassName + "');");
+            }
+        }
+    }
+
+    protected String deriveSimpleDtoExtendedMapperClassName(String baseMapperClassName) {
+        return getSimpleDtoProperties().deriveExtendedMapperClassName(baseMapperClassName);
+    }
+
+    protected String getSimpleDtoBaseMapperPackage() {
+        return getSimpleDtoProperties().getBaseMapperPackage();
+    }
+
+    protected String getSimpleDtoExtendedMapperPackage() {
+        return getSimpleDtoProperties().getExtendedMapperPackage();
     }
 
     protected String getSimpleDtoMapperSuffix() {
@@ -758,7 +794,7 @@ public class DfOldClassHandler {
         }
         final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
         final String packagePath = getSimpleDtoBaseDtoPackage() + "." + customizePackageName;
-        _deletedOldCustomizeSimpleDtoBaseDtoList = doDeleteOldTableClass_for_SimpleDtoBaseEntity(packagePath);
+        _deletedOldCustomizeSimpleDtoBaseDtoList = doDeleteOldTableClass_for_SimpleDtoBaseDto(packagePath);
     }
 
     public void deleteOldCustomizeClass_for_SimpleDtoExtendedDto() {
@@ -767,21 +803,28 @@ public class DfOldClassHandler {
         }
         final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
         final String packagePath = getSimpleDtoExtendedDtoPackage() + "." + customizePackageName;
-        doDeleteOldTableClass_for_SimpleDtoExtendedEntity(packagePath, _deletedOldCustomizeSimpleDtoBaseDtoList);
+        doDeleteOldTableClass_for_SimpleDtoExtendedDto(packagePath, _deletedOldCustomizeSimpleDtoBaseDtoList);
     }
 
-    public void deleteOldCustomizeClass_for_SimpleDtoMapper() {
-        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
-            public String setup(Table table) {
-                return table.getSimpleDtoMapperClassName();
-            }
-        };
+    protected List<String> _deletedOldCustomizeSimpleDtoBaseMapperList;
+
+    public void deleteOldCustomizeClass_for_SimpleDtoBaseMapper() {
+        if (!getSimpleDtoProperties().hasSimpleDtoDefinition()) {
+            return;
+        }
         final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
-        final String packagePath = getSimpleDtoMapperPackage() + "." + customizePackageName;
-        final String classPrefix = getSimpleDtoMapperPrefix();
-        final String classSuffix = getSimpleDtoMapperSuffix();
-        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, classSuffix, setupper);
-        showDeleteOldTableFile(deletor.deleteOldTableClass());
+        final String packagePath = getSimpleDtoBaseMapperPackage() + "." + customizePackageName;
+        _deletedOldCustomizeSimpleDtoBaseMapperList = doDeleteOldTableClass_for_SimpleDtoBaseMapper(packagePath);
+    }
+
+    public void deleteOldCustomizeClass_for_SimpleDtoExtendedMapper() {
+        if (_deletedOldCustomizeSimpleDtoBaseMapperList == null
+                || _deletedOldCustomizeSimpleDtoBaseMapperList.isEmpty()) {
+            return;
+        }
+        final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
+        final String packagePath = getSimpleDtoExtendedMapperPackage() + "." + customizePackageName;
+        doDeleteOldTableClass_for_SimpleDtoExtendedMapper(packagePath, _deletedOldCustomizeSimpleDtoBaseMapperList);
     }
 
     // ===================================================================================
