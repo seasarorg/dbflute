@@ -2057,6 +2057,10 @@ public class Table {
         return getProperties().getCommonColumnProperties();
     }
 
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
+    }
+
     protected DfSequenceIdentityProperties getSequenceIdentityProperties() {
         return getProperties().getSequenceIdentityProperties();
     }
@@ -2724,31 +2728,63 @@ public class Table {
         if (hasPrimaryKey()) {
             return false;
         }
-        return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
+        return getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
     // ===================================================================================
-    //                                                     Adding Schema to Table SQL Name
-    //                                                     ===============================
+    //                                                               Adding Schema/Catalog
+    //                                                               =====================
     protected boolean isAvailableAddingSchemaToTableSqlName() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
+        return getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
     }
 
     protected boolean isAvailableAddingCatalogToTableSqlName() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableAddingCatalogToTableSqlName();
+        return getLittleAdjustmentProperties().isAvailableAddingCatalogToTableSqlName();
     }
 
     // ===================================================================================
-    //                                                     Adding Schema to Table SQL-Name
-    //                                                     ===============================
-
-    // ===================================================================================
-    //                                                                        Empty String
-    //                                                                        ============
+    //                                                                Convert Empty String
+    //                                                                ====================
     public boolean hasEntityConvertEmptyStringToNull() {
         final List<Column> columnList = getColumnList();
         for (Column column : columnList) {
             if (column.isEntityConvertEmptyStringToNull()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                              Relational Null Object
+    //                                                              ======================
+    public boolean canBeRelationalNullObjectForeign() {
+        return getLittleAdjustmentProperties().hasRelationalNullObjectForeign(getName());
+    }
+
+    public String getRelationalNullObjectProviderForeignExp() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.getRelationalNullObjectProviderForeignExp(getName());
+    }
+
+    public boolean hasRelationalNullObjectProviderImport() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final String providerPackage = prop.getNullObjectProviderPackage();
+        return providerPackage != null && hasRelationalNullObjectForeignKey();
+    }
+
+    public String getRelationalNullObjectProviderPackage() {
+        return getLittleAdjustmentProperties().getNullObjectProviderPackage();
+    }
+
+    protected boolean hasRelationalNullObjectForeignKey() {
+        for (ForeignKey fk : getForeignKeyList()) {
+            if (fk.getForeignTable().canBeRelationalNullObjectForeign()) {
+                return true;
+            }
+        }
+        for (ForeignKey referrer : getReferrerAsOneList()) {
+            if (referrer.getTable().canBeRelationalNullObjectForeign()) {
                 return true;
             }
         }

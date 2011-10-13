@@ -37,6 +37,9 @@ import ${glPackageExtendedEntity}.*;
 #else
   #set ($myEntityInterfaceName = "Entity")
 #end
+#if ($table.hasRelationalNullObjectProviderImport())
+import ${table.relationalNullObjectProviderPackage}.*;
+#end
 
 /**
  * The entity of ${table.basicInfoDispString}. <br />
@@ -295,6 +298,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NullAllowed: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${foreignEntityClassName} get${fk.foreignJavaBeansRulePropertyNameInitCap}() {
+#if ($foreignTable.canBeRelationalNullObjectForeign())
+        if (${foreignVariableName} == null) {
+            ${foreignVariableName} = ${fk.relationalNullObjectProviderForeignExp};
+        }
+#end
         return ${foreignVariableName};
     }
 
@@ -325,6 +333,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+#if ($referrerTable.canBeRelationalNullObjectForeign())
+        if (${referrerVariableName} == null) {
+            ${referrerVariableName} = ${referrer.relationalNullObjectProviderReferrerExp};
+        }
+#end
         return ${referrerVariableName};
     }
 

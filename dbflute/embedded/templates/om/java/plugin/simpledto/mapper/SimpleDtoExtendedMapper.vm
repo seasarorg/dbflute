@@ -1,0 +1,18 @@
+${database.allClassCopyright}package ${myExtendedDtoMapperPackageName};
+#set ($myClassName = "${myExtendedDtoMapperClassName}")
+
+import ${myBaseMapperPackageName}.${myBaseMapperClassName};
+
+/**
+ * The DTO mapper of ${table.name}.
+ * <p>
+ * You can implement your original methods here.
+ * This class remains when re-generating.
+ * </p>
+ * @author ${database.classAuthor}
+ */
+public class $myClassName extends ${myBaseMapperClassName} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+}

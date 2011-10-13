@@ -1231,6 +1231,23 @@ public class ForeignKey {
     }
 
     // ===================================================================================
+    //                                                              Relational Null Object
+    //                                                              ======================
+    public String getRelationalNullObjectProviderForeignExp() {
+        return doGetRelationalNullObjectProviderExp(getForeignTable(), getLocalColumnGetterCommaString());
+    }
+
+    public String getRelationalNullObjectProviderReferrerExp() {
+        return doGetRelationalNullObjectProviderExp(getTable(), getForeignColumnGetterCommaString());
+    }
+
+    protected String doGetRelationalNullObjectProviderExp(Table table, String getterCommaString) {
+        final String exp = table.getRelationalNullObjectProviderForeignExp();
+        final String resolvedExp = replace(exp, "$$PrimaryKey$$", getterCommaString);
+        return resolvedExp;
+    }
+
+    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {

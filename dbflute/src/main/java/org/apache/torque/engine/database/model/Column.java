@@ -194,7 +194,7 @@ public class Column {
     }
 
     protected void handleProgramReservationWord() {
-        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         if (prop.isPgReservColumn(_name)) {
             _synonym = prop.resolvePgReservColumn(_name);
             _plainComment = _plainComment + " (using DBFlute synonym)";
@@ -278,16 +278,16 @@ public class Column {
         if (getTable().isSql2EntityCustomize()) { // Sql2Entity may be on the camel case basis
             return false;
         }
-        return getProperties().getLittleAdjustmentProperties().isColumnSqlNameUpperCase();
+        return getLittleAdjustmentProperties().isColumnSqlNameUpperCase();
     }
 
     protected String quoteColumnNameIfNeeds(String columnName) {
-        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.quoteColumnNameIfNeeds(columnName);
     }
 
     protected String quoteColumnNameIfNeedsDirectUse(String columnName) {
-        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.quoteColumnNameIfNeedsDirectUse(columnName);
     }
 
@@ -1266,7 +1266,7 @@ public class Column {
     }
 
     protected String filterJavaNameNonCompilableConnector(String javaName) {
-        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.filterJavaNameNonCompilableConnector(javaName, new NonCompilableChecker() {
             public String name() {
                 return getName();
@@ -1597,6 +1597,10 @@ public class Column {
         return getProperties().getBasicProperties();
     }
 
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
+    }
+
     protected DfSequenceIdentityProperties getSequenceIdentityProperties() {
         return getProperties().getSequenceIdentityProperties();
     }
@@ -1883,12 +1887,12 @@ public class Column {
     }
 
     public boolean isCheckSelectedClassification() {
-        final DfLittleAdjustmentProperties littleProp = getProperties().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
         return littleProp.isCheckSelectedClassification() && hasClassification();
     }
 
     public boolean isForceClassificationSetting() {
-        final DfLittleAdjustmentProperties littleProp = getProperties().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
         return littleProp.isForceClassificationSetting() && hasClassification();
     }
 
@@ -2054,7 +2058,7 @@ public class Column {
         if (!isJavaNativeStringObject()) {
             return false;
         }
-        return getProperties().getLittleAdjustmentProperties().isEntityConvertEmptyStringToNull();
+        return getLittleAdjustmentProperties().isEntityConvertEmptyStringToNull();
     }
 
     // ===================================================================================

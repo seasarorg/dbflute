@@ -567,6 +567,16 @@ public abstract class DfAbstractHelperProperties {
         }
         return (List<ELEMENT>) obj;
     }
+    
+    @SuppressWarnings("unchecked")
+    protected <KEY, VALUE> Map<KEY, VALUE> castToMap(Object obj, String property) {
+        if (!(obj instanceof Map<?, ?>)) {
+            String msg = "The type of the property '" + property + "' should be Map:";
+            msg = msg + " obj=" + obj + " type=" + (obj != null ? obj.getClass() : null);
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        return (Map<KEY, VALUE>) obj;
+    }
 
     // ===============================================================================
     //                                                                  General Helper

@@ -1,0 +1,368 @@
+${database.allClassCopyright}package ${myBaseDtoMapperPackageName};
+#set ($myClassName = "${myBaseDtoMapperClassName}")
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+
+import org.seasar.dbflute.Entity;
+#if ($table.hasClassification())
+import ${glPackageBaseCommon}.${glCDef};
+#end
+import ${myDomainEntityPackageName}.*;
+import ${myExtendedEntityPackageName}.*;
+
+/**
+ * The DTO mapper of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ * 
+ * [column]
+ *     ${table.columnNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.definedSequenceName}
+ * 
+ * [identity]
+ *     ${table.identityColumnName}
+ * 
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ * 
+ * [foreign-table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer-table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
+ * </pre>
+ * @author ${database.classAuthor}
+ */
+public abstract class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final Map<Entity, Object> _relationDtoMap;
+    protected final Map<Object, Entity> _relationEntityMap;
+#foreach ($fk in $table.foreignKeys)
+    protected boolean _suppress${fk.foreignJavaBeansRulePropertyNameInitCap};
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+    protected boolean _suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap};
+#else
+    protected boolean _suppress${referrer.referrerJavaBeansRulePropertyNameInitCap};
+#end
+#end
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}() {
+        _relationDtoMap = new HashMap<Entity, Object>();
+        _relationEntityMap = new HashMap<Object, Entity>();
+    }
+
+    public ${myClassName}(Map<Entity, Object> relationDtoMap, Map<Object, Entity> relationEntityMap) {
+        _relationDtoMap = relationDtoMap;
+        _relationEntityMap = relationEntityMap;
+    }
+
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
+    // -----------------------------------------------------
+    //                                                to DTO
+    //                                                ------
+    /**
+     * Do mapping from an entity to a DTO with relation data.
+     * @param entity The entity as mapping resource. (NullAllowed: if null, returns null)
+     * @return The mapped DTO. (NotNull)
+     */
+    public ${myExtendedObjectClassName} mappingToDto(${table.extendedEntityClassName} entity) {
+        if (entity == null) {
+            return null;
+        }
+#if ($table.hasRelation())
+        Entity localKey = entity;
+        Object cachedLocalDto = _relationDtoMap.get(localKey);
+        if (cachedLocalDto != null) {
+            return (${myExtendedObjectClassName})cachedLocalDto;
+        }
+#end
+        ${myExtendedObjectClassName} dto = new ${myExtendedObjectClassName}();
+#foreach ($col in $table.columns)
+        dto.set${col.javaName}(entity.get${col.javaName}());
+#end
+#if ($table.hasRelation())
+        if (entity.hasPrimaryKeyValue()) { // caches only a DTO that has a primary key value
+            _relationDtoMap.put(localKey, dto);
+        }
+        boolean oneWayReference = isMappingToDtoOneWayReference();
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
+        if (!_suppress${fk.foreignJavaBeansRulePropertyNameInitCap} && entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
+            ${fk.foreignTableExtendedEntityClassName} relationEntity = entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}();
+            Entity relationKey = relationEntity;
+            Object cachedDto = _relationDtoMap.get(relationKey);
+            if (cachedDto != null) {
+                dto.set${fk.foreignJavaBeansRulePropertyNameInitCap}((${foreignDtoClassName})cachedDto);
+            } else {
+                ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                if (oneWayReference) {
+## the 'if' statement of one-way reference is not deleted to suppress no-use warning
+#if ($fk.canBeReferrer())
+#if ($fk.isOneToOne())
+                    mapper.suppress${fk.referrerJavaBeansRulePropertyNameAsOneInitCap}();
+#else
+                    mapper.suppress${fk.referrerJavaBeansRulePropertyNameInitCap}();
+#end
+#end
+                }
+                dto.set${fk.foreignJavaBeansRulePropertyNameInitCap}(mapper.mappingToDto(relationEntity));
+                if (relationEntity.hasPrimaryKeyValue()) {
+                    _relationDtoMap.put(relationKey, dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}());
+                }
+            }
+        };
+#end
+#foreach ($referrer in $table.referrers)
+#set ($referrerDtoClassName = "${referrer.referrerTableExtendedSimpleDtoClassName}")
+#if ($referrer.isOneToOne())
+        if (!_suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} && entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() != null) {
+            ${referrer.referrerTableExtendedEntityClassName} relationEntity = entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}();
+            Entity relationKey = relationEntity;
+            Object cachedDto = _relationDtoMap.get(relationKey);
+            if (cachedDto != null) {
+                dto.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}((${referrerDtoClassName})cachedDto);
+            } else {
+                ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                if (oneWayReference) {
+                    mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
+                }
+                dto.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(mapper.mappingToDto(relationEntity));
+                if (relationEntity.hasPrimaryKeyValue()) {
+                    _relationDtoMap.put(relationKey, dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
+                }
+            }
+        };
+#else
+        if (!_suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} && !entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
+            ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+            if (oneWayReference) {
+                mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
+            }
+            dto.set${referrer.referrerJavaBeansRulePropertyNameInitCap}(mapper.mappingToDtoList(entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}()));
+        };
+#end
+#end
+#end
+        return dto;
+    }
+
+    /**
+     * Do mapping from an entity list to a DTO list with relation data. <br />
+     * This calls this.mappingToDto() in a loop of the list.
+     * @param entityList The list of entity as mapping resource. (NotNull: null elements are inherited)
+     * @return The mapped DTO. (NotNull)
+     */
+    public List<${myExtendedObjectClassName}> mappingToDtoList(List<${table.extendedEntityClassName}> entityList) {
+        if (entityList == null) {
+            throw new IllegalArgumentException("The argument 'entityList' should not be null.");
+        }
+        List<${myExtendedObjectClassName}> dtoList = new ArrayList<${myExtendedObjectClassName}>();
+        for (${table.extendedEntityClassName} entity : entityList) {
+            ${myExtendedObjectClassName} dto = mappingToDto(entity);
+            if (dto != null) {
+                dtoList.add(dto);
+            } else {
+                if (isAcceptNullElementOnList()) {
+                    dtoList.add(null);
+                }
+            }
+        }
+        return dtoList;
+    }
+
+    // -----------------------------------------------------
+    //                                             to Entity
+    //                                             ---------
+    /**
+     * Do mapping from a DTO to an entity with relation data. <br />
+     * A setter of an entity is called under the rule of this.needsMapping().
+     * @param dto The DTO as mapping resource. (NullAllowed: if null, returns null)
+     * @return The mapped entity. (NotNull)
+     */
+    public ${table.extendedEntityClassName} mappingToEntity(${myExtendedObjectClassName} dto) {
+        if (dto == null) {
+            return null;
+        }
+#if ($table.hasRelation())
+        Object localKey = dto;
+        Entity cachedLocalEntity = _relationEntityMap.get(localKey);
+        if (cachedLocalEntity != null) {
+            return (${table.extendedEntityClassName})cachedLocalEntity;
+        }
+#end
+        ${table.extendedEntityClassName} entity = new ${table.extendedEntityClassName}();
+#foreach ($col in $table.columns)
+        if (needsMapping(dto, dto.get${col.javaName}(), "${col.javaBeansRulePropertyName}")) {
+#if ($col.hasClassification())
+            entity.set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(dto.get${col.javaName}()));
+#else
+            entity.set${col.javaName}(dto.get${col.javaName}());
+#end
+        }
+#end
+#if ($table.hasRelation())
+        if (entity.hasPrimaryKeyValue()) { // caches only an entity that has a primary key value
+            _relationEntityMap.put(localKey, entity);
+        }
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
+        if (!_suppress${fk.foreignJavaBeansRulePropertyNameInitCap} && dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
+            ${foreignDtoClassName} relationDto = dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}();
+            Object relationKey = relationDto;
+            Entity cachedEntity = _relationEntityMap.get(relationKey);
+            if (cachedEntity != null) {
+                entity.set${fk.foreignJavaBeansRulePropertyNameInitCap}((${fk.foreignTableExtendedEntityClassName})cachedEntity);
+            } else {
+                ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                entity.set${fk.foreignJavaBeansRulePropertyNameInitCap}(mapper.mappingToEntity(relationDto));
+                if (entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}().hasPrimaryKeyValue()) {
+                    _relationEntityMap.put(relationKey, entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}());
+                }
+            }
+        };
+#end
+#foreach ($referrer in $table.referrers)
+#set ($referrerDtoClassName = "${referrer.referrerTableExtendedSimpleDtoClassName}")
+#if (${referrer.isOneToOne()})
+        if (!_suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} && dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() != null) {
+            ${referrerDtoClassName} relationDto = dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}();
+            Object relationKey = relationDto;
+            Entity cachedEntity = _relationEntityMap.get(relationKey);
+            if (cachedEntity != null) {
+                entity.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}((${referrer.referrerTableExtendedEntityClassName})cachedEntity);
+            } else {
+                ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                entity.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(mapper.mappingToEntity(relationDto));
+                if (entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}().hasPrimaryKeyValue()) {
+                    _relationEntityMap.put(relationKey, entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
+                }
+            }
+        };
+#else
+        if (!_suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} && !dto.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
+            ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+            entity.set${referrer.referrerJavaBeansRulePropertyNameInitCap}(mapper.mappingToEntityList(dto.get${referrer.referrerJavaBeansRulePropertyNameInitCap}()));
+        };
+#end
+#end
+#end
+        return entity;
+    }
+
+    /**
+     * Does the property need to be mapped to an entity? <br />
+     * If modified info of DTO has at least one property, only modified properties are mapped.
+     * And if no property is modified, all properties are mapped (but the other option exists).
+     * @param dto The instance of DTO. (NotNull)
+     * @param value The value of DTO's property. (NotNull)
+     * @param propName The property name of DTO. (NotNull)
+     * @return The determination, true or false.
+     */
+    protected boolean needsMapping(${myExtendedObjectClassName} dto, Object value, String propName) {
+        Set<String> modifiedProperties = dto.modifiedProperties();
+        if (modifiedProperties.isEmpty()) {
+            return isMappingToEntityContainsNull() || value != null;
+        } else {
+            return modifiedProperties.contains(propName);
+        }
+    }
+
+    /**
+     * Does the mapping to an entity contain null values? (when no property is modified) <br />
+     * Default is true that means a setter is called if the value is null.
+     * But this method is valid only when no property is modified. 
+     * @return The determination, true or false.
+     */
+    protected boolean isMappingToEntityContainsNull() { // for extension
+        return true; // as default
+    }
+
+    /**
+     * Does the mapping to a DTO comply the one-way reference policy? <br />
+     * Default is true that means no reverse reference between base point and relation.
+     * @return The determination, true or false.
+     */
+    protected boolean isMappingToDtoOneWayReference() { // for extension
+        return true; // as default
+    }
+
+    /**
+     * Do mapping from a DTO list to an entity list with relation data. <br />
+     * This calls this.mappingToEntity() in loop of the list.
+     * @param dtoList The list of DTO as mapping resource. (NotNull: null elements are inherited)
+     * @return The mapped entity. (NotNull)
+     */
+    public List<${table.extendedEntityClassName}> mappingToEntityList(List<${myExtendedObjectClassName}> dtoList) {
+        if (dtoList == null) {
+            throw new IllegalArgumentException("The argument 'dtoList' should not be null.");
+        }
+        List<${table.extendedEntityClassName}> entityList = new ArrayList<${table.extendedEntityClassName}>();
+        for (${myExtendedObjectClassName} dto : dtoList) {
+            ${table.extendedEntityClassName} entity = mappingToEntity(dto);
+            if (entity != null) {
+                entityList.add(entity);
+            } else {
+                if (isAcceptNullElementOnList()) {
+                    entityList.add(null);
+                }
+            }
+        }
+        return entityList;
+    }
+
+    protected boolean isAcceptNullElementOnList() {
+        return true; // as default
+    }
+
+    // ===================================================================================
+    //                                                                   Suppress Relation
+    //                                                                   =================
+#foreach ($fk in $table.foreignKeys)
+    public void suppress${fk.foreignJavaBeansRulePropertyNameInitCap}() {
+        _suppress${fk.foreignJavaBeansRulePropertyNameInitCap} = true;
+    }
+#end
+#foreach ($referrer in $table.referrers)
+#if ($referrer.isOneToOne())
+    public void suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+        _suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} = true;
+    }
+#else
+    public void suppress${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
+        _suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} = true;
+    }
+#end
+#end
+}

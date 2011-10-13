@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.exception.DfTableColumnNameNonCompilableConnectorException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -359,6 +360,63 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                              Relational Null Object
+    //                                                              ======================
+    protected Map<String, Object> _relationalNullObjectMap;
+
+    protected Map<String, Object> getRelationalNullObjectMap() {
+        if (_relationalNullObjectMap != null) {
+            return _relationalNullObjectMap;
+        }
+        final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
+        final Object obj = littleAdjustmentMap.get("relationalNullObjectMap");
+        if (obj != null) {
+            _relationalNullObjectMap = castToMap(obj, "littleAdjustmentMap.relationalNullObjectMap");
+        } else {
+            _relationalNullObjectMap = newLinkedHashMap();
+        }
+        return _relationalNullObjectMap;
+    }
+
+    // foreignMap is only supported now (2011/11/13)
+
+    public boolean hasRelationalNullObjectForeign(String tableName) {
+        return getRelationalNullObjectProviderForeignMap().get(tableName) != null;
+    }
+
+    public String getNullObjectProviderPackage() {
+        final String pkg = (String) getRelationalNullObjectMap().get("providerPackage");
+        if (pkg == null) {
+            return null;
+        }
+        final String packageBase = getBasicProperties().getPackageBase();
+        return Srl.replace(pkg, "$$packageBase$$", packageBase);
+    }
+
+    protected Map<String, String> _relationalNullObjectProviderForeignMap;
+
+    protected Map<String, String> getRelationalNullObjectProviderForeignMap() {
+        if (_relationalNullObjectProviderForeignMap != null) {
+            return _relationalNullObjectProviderForeignMap;
+        }
+        final Map<String, Object> nullObjectMap = getRelationalNullObjectMap();
+        final Object obj = nullObjectMap.get("foreignMap");
+        final Map<String, String> plainMap;
+        if (obj != null) {
+            plainMap = castToMap(obj, "littleAdjustmentMap.relationalNullObjectMap.foreignMap");
+        } else {
+            plainMap = newLinkedHashMap();
+        }
+        _relationalNullObjectProviderForeignMap = StringKeyMap.createAsFlexibleOrdered();
+        _relationalNullObjectProviderForeignMap.putAll(plainMap);
+        return _relationalNullObjectProviderForeignMap;
+    }
+
+    public String getRelationalNullObjectProviderForeignExp(String tableName) {
+        return getRelationalNullObjectProviderForeignMap().get(tableName);
+    }
+
+    // ===================================================================================
     //                                                                 PG Reservation Word
     //                                                                 ===================
     protected List<String> _pgReservColumnList;
@@ -413,7 +471,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                            Non Compilable Connector
     //                                                            ========================
-    public boolean isSuppressNonCompilableConnectorLimiter() { // It's closet
+    public boolean isSuppressNonCompilableConnectorLimiter() { // closet
         return isProperty("isSuppressNonCompilableConnectorLimiter", false);
     }
 
