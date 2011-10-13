@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -343,13 +342,29 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     public String resolveFilterVariablesIfNeeds(String sql) {
         final String beginMark = getFilterVariablesBeginMark();
         final String endMark = getFilterVariablesEndMark();
+        final String directMark = "direct:";
         final Map<String, String> filterVariablesMap = getFilterVariablesMap();
-        if (!filterVariablesMap.isEmpty() && sql.contains(beginMark) && sql.contains(endMark)) {
-            final Set<Entry<String, String>> entrySet = filterVariablesMap.entrySet();
-            for (Entry<String, String> entry : entrySet) {
-                final String variableMark = beginMark + entry.getKey() + endMark;
-                if (sql.contains(variableMark)) {
-                    sql = replaceString(sql, variableMark, entry.getValue());
+        if (filterVariablesMap.isEmpty()) {
+            return sql;
+        }
+        boolean existsDirect = false;
+        for (String key : filterVariablesMap.keySet()) {
+            if (Srl.startsWithIgnoreCase(key, directMark)) {
+                existsDirect = true;
+                break;
+            }
+        }
+        if (existsDirect || (sql.contains(beginMark) && sql.contains(endMark))) {
+            for (Entry<String, String> entry : filterVariablesMap.entrySet()) {
+                final String key = entry.getKey();
+                if (Srl.startsWithIgnoreCase(key, directMark)) { // direct
+                    final String fromText = Srl.substringFirstRearIgnoreCase(key, directMark);
+                    sql = replaceString(sql, fromText, entry.getValue());
+                } else { // embedded
+                    final String variableMark = beginMark + key + endMark;
+                    if (sql.contains(variableMark)) {
+                        sql = replaceString(sql, variableMark, entry.getValue());
+                    }
                 }
             }
         }
@@ -773,15 +788,29 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     protected void checkArrangeUnsupportedManupulation(Map<String, Map<String, Object>> arrangeMap) {
-        if (arrangeMap.size() >= 2) { // may support other manipulations
-            String msg = "The arrangeBeforeReps supports only 'copy' now: " + arrangeMap.keySet();
+        if (arrangeMap.size() >= 3) { // may support other manipulations
+            String msg = "The arrangeBeforeReps supports only 'define' and 'copy' now: " + arrangeMap.keySet();
             throw new DfIllegalPropertySettingException(msg);
         }
     }
 
     public Map<String, String> getArrangeBeforeRepsCopyMap() {
+        final Map<String, String> defineMap = getArrangeBeforeRepsDefineMap();
         final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
         final Map<String, Object> elementMap = repsMap.get("copy");
+        if (elementMap == null) {
+            return DfCollectionUtil.emptyMap();
+        }
+        final Map<String, String> copyMap = new LinkedHashMap<String, String>();
+        for (Entry<String, Object> entry : elementMap.entrySet()) {
+            copyMap.put(entry.getKey(), Srl.replaceBy((String) entry.getValue(), defineMap));
+        }
+        return copyMap;
+    }
+
+    protected Map<String, String> getArrangeBeforeRepsDefineMap() {
+        final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
+        final Map<String, Object> elementMap = repsMap.get("define");
         if (elementMap == null) {
             return DfCollectionUtil.emptyMap();
         }
