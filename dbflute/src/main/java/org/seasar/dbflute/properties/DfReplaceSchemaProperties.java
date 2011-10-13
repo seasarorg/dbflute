@@ -803,7 +803,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         final Map<String, String> copyMap = new LinkedHashMap<String, String>();
         for (Entry<String, Object> entry : elementMap.entrySet()) {
-            copyMap.put(entry.getKey(), Srl.replaceBy((String) entry.getValue(), defineMap));
+            final String key = Srl.replaceBy(entry.getKey(), defineMap);
+            final String value = Srl.replaceBy((String) entry.getValue(), defineMap);
+            copyMap.put(key, value);
         }
         return copyMap;
     }
