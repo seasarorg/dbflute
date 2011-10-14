@@ -2,6 +2,9 @@ package org.seasar.dbflute.properties.assistant.classification;
 
 import java.util.Map;
 
+import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+
 /**
  * Temporary DTO when classification initializing.
  * @author jflute
@@ -39,8 +42,7 @@ public class DfClassificationElement {
             String commentKey) {
         final String code = (String) elementMap.get(codeKey);
         if (code == null) {
-            String msg = "The elementMap should have " + codeKey + ".";
-            throw new IllegalStateException(msg);
+            throwClassificationRequiredAttributeNotFoundException(elementMap);
         }
         this._code = code;
 
@@ -57,6 +59,24 @@ public class DfClassificationElement {
         // comment
         final String comment = (String) elementMap.get(commentKey);
         this._comment = comment;
+    }
+
+    protected void throwClassificationRequiredAttributeNotFoundException(Map<?, ?> elementMap) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The element map did not have a 'code' attribute.");
+        br.addItem("Advice");
+        br.addElement("An element map requires 'code' attribute like this:");
+        br.addElement("  (o): map:{table=MEMBER_STATUS; code=MEMBER_STATUS_CODE; ...}");
+        br.addItem("Classification");
+        br.addElement(_classificationName);
+        if (_table != null) {
+            br.addItem("Table");
+            br.addElement(_table);
+        }
+        br.addItem("ElementMap");
+        br.addElement(elementMap);
+        final String msg = br.buildExceptionMessage();
+        throw new DfClassificationRequiredAttributeNotFoundException(msg);
     }
 
     // ===================================================================================
