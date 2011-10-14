@@ -769,6 +769,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                 Arrange before Reps
     //                                                                 ===================
+    // #; arrangeBeforeRepsMap = map:{
+    // #    ; define = map:{
+    // #        ; $$SrcDir$$ = ../../foo/dbflute_foodb/playsql/
+    // #    }
+    // #    ; copy = map:{
+    // #        ; ../erd/*.ddl = ./playsql/replace-schema-10-basic.sql
+    // #        ; $$SrcDir$$/data/common/xls/*.xls = ./playsql/data/common/xls
+    // #        ; $$SrcDir$$/data/ut/xls/*.xls = ./playsql/data/ut/xls df:clean
+    // #    }
+    // #}
     protected Map<String, Map<String, Object>> _arrangeBeforeRepsMap;
 
     protected Map<String, Map<String, Object>> getArrangeBeforeRepsMap() {
@@ -794,6 +804,19 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
     }
 
+    protected Map<String, String> getArrangeBeforeRepsDefineMap() {
+        final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
+        final Map<String, Object> elementMap = repsMap.get("define");
+        if (elementMap == null) {
+            return DfCollectionUtil.emptyMap();
+        }
+        final Map<String, String> defineMap = new LinkedHashMap<String, String>();
+        for (Entry<String, Object> entry : elementMap.entrySet()) {
+            defineMap.put(entry.getKey(), (String) entry.getValue());
+        }
+        return defineMap;
+    }
+
     public Map<String, String> getArrangeBeforeRepsCopyMap() {
         final Map<String, String> defineMap = getArrangeBeforeRepsDefineMap();
         final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
@@ -806,19 +829,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             final String key = Srl.replaceBy(entry.getKey(), defineMap);
             final String value = Srl.replaceBy((String) entry.getValue(), defineMap);
             copyMap.put(key, value);
-        }
-        return copyMap;
-    }
-
-    protected Map<String, String> getArrangeBeforeRepsDefineMap() {
-        final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
-        final Map<String, Object> elementMap = repsMap.get("define");
-        if (elementMap == null) {
-            return DfCollectionUtil.emptyMap();
-        }
-        final Map<String, String> copyMap = new LinkedHashMap<String, String>();
-        for (Entry<String, Object> entry : elementMap.entrySet()) {
-            copyMap.put(entry.getKey(), (String) entry.getValue());
         }
         return copyMap;
     }

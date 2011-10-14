@@ -48,6 +48,11 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                                Copy
     //                                                                                ====
     protected void arrangeCopy(String src, String dest) {
+        boolean cleanOption = false;
+        if (dest.contains("df:clean")) {
+            dest = Srl.replace(dest, "df:clean", "").trim();
+            cleanOption = true;
+        }
         final File destFile = new File(dest);
         if (!src.contains("/")) {
             throwRepsArrangeCopySrcNotPathException(src, dest);
@@ -55,8 +60,8 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
         final String pureName = Srl.substringLastRear(src, "/");
         if (pureName.startsWith("*.")) { // e.g. ./foo/*.sql
             final String ext = Srl.substringFirstRear(pureName, "*.");
-            final File baseDir = new File(Srl.substringLastFront(src, "/*."));
-            final List<String> elementList = extractElementList(src, pureName, ext, baseDir);
+            final File srcDir = new File(Srl.substringLastFront(src, "/*."));
+            final List<String> elementList = extractElementList(ext, srcDir);
             final String extSuffix = "." + ext;
             if (isDestDirectory(destFile)) { // copy to all files
                 // /- - - - - - - - - - - - - - - - - - - - -
@@ -71,12 +76,15 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
                 } else {
                     destBaseDir = dest;
                 }
+                if (cleanOption) {
+                    deleteFile(ext, new File(destBaseDir));
+                }
                 if (!elementList.isEmpty()) {
                     for (String element : elementList) {
                         if (!element.endsWith(extSuffix)) { // just in case
                             continue;
                         }
-                        final String srcPath = baseDir.getPath() + "/" + element;
+                        final String srcPath = srcDir.getPath() + "/" + element;
                         final String destPath = destBaseDir + "/" + element;
                         copyFile(new File(srcPath), new File(destPath));
                     }
@@ -99,7 +107,7 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
                     }
                 }
                 if (onlyOneElement != null) {
-                    final String srcPath = baseDir.getPath() + "/" + onlyOneElement;
+                    final String srcPath = srcDir.getPath() + "/" + onlyOneElement;
                     copyFile(new File(srcPath), destFile);
                 } else {
                     _log.info("*Not found the corresponding copy src file: " + src);
@@ -133,7 +141,7 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
         return false;
     }
 
-    protected List<String> extractElementList(String src, String pureName, String ext, File baseDir) {
+    protected List<String> extractElementList(String ext, File baseDir) {
         final String extSuffix = "." + ext;
         final String[] elementList = baseDir.list(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -145,6 +153,20 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
             return DfCollectionUtil.emptyList();
         }
         return DfCollectionUtil.newArrayList(elementList);
+    }
+
+    protected void deleteFile(String ext, File baseDir) {
+        final String extSuffix = "." + ext;
+        final File[] elementList = baseDir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return Srl.endsWith(name, extSuffix);
+            }
+        });
+        if (elementList != null) {
+            for (File file : elementList) {
+                file.delete();
+            }
+        }
     }
 
     protected void copyFile(File src, File dest) {
