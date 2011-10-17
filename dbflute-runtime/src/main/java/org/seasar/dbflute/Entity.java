@@ -21,6 +21,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.exception.IllegalClassificationCodeException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -223,6 +226,23 @@ public interface Entity {
 
         public static String toString(byte[] bytes) {
             return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
+        }
+
+        public static void checkImplicitSet(Entity entity, String columnDbName, ClassificationMeta meta, Object code) {
+            if (code != null && meta.codeOf(code) == null) {
+                final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                br.addNotice("The set value was not found in the classification of the column.");
+                br.addItem("Table");
+                br.addElement(entity.getTableDbName());
+                br.addItem("Column");
+                br.addElement(columnDbName);
+                br.addItem("Classification");
+                br.addElement(meta);
+                br.addItem("Set Value");
+                br.addElement(code);
+                String msg = br.buildExceptionMessage();
+                throw new IllegalClassificationCodeException(msg);
+            }
         }
     }
 }
