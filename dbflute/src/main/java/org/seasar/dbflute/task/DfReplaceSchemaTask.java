@@ -24,6 +24,7 @@ import org.seasar.dbflute.logic.replaceschema.process.DfCreateSchemaProcess.Crea
 import org.seasar.dbflute.logic.replaceschema.process.DfLoadDataProcess;
 import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 
 /**
@@ -58,6 +59,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         _log.info("|              ReplaceSchema               |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
+        DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.ReplaceSchema);
     }
 
     // ===================================================================================

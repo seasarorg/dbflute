@@ -28,6 +28,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.outsidesqltest.DfOutsideSqlChecker;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -60,6 +61,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         _log.info("|              OutsideSqlTest              |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
+        DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.OutsideSqlTest);
     }
 
     // ===================================================================================

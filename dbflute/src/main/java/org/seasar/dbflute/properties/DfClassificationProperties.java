@@ -30,6 +30,8 @@ import org.seasar.dbflute.properties.assistant.classification.DfClassificationLi
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -61,27 +63,31 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                                           =========================
     public static final String KEY_classificationDefinitionMap = "classificationDefinitionMap";
 
-    protected Map<String, Map<String, String>> _classificationTopDefinitionMap;
+    protected Map<String, DfClassificationTop> _classificationTopMap;
     protected Map<String, List<Map<String, String>>> _classificationDefinitionMap;
 
-    public boolean hasClassificationTopDefinitionMap() {
-        return !getClassificationTopDefinitionMap().isEmpty();
+    public boolean hasClassificationTop() {
+        return !getClassificationTopMap().isEmpty();
     }
 
-    public boolean hasClassificationTopDefinitionMap(String classificationName) {
-        return getClassificationTopDefinitionMap().containsKey(classificationName);
+    public boolean hasClassificationTop(String classificationName) {
+        return getClassificationTopMap().containsKey(classificationName);
+    }
+
+    public DfClassificationTop getClassificationTop(String classificationName) {
+        return getClassificationTopMap().get(classificationName);
     }
 
     /**
-     * Get the map of classification TOP definition.
-     * @return The map of classification TOP definition. (NotNull)
+     * Get the map of classification TOP info.
+     * @return The classification TOP info. (NotNull)
      */
-    public Map<String, Map<String, String>> getClassificationTopDefinitionMap() {
-        if (_classificationTopDefinitionMap != null) {
-            return _classificationTopDefinitionMap;
+    public Map<String, DfClassificationTop> getClassificationTopMap() {
+        if (_classificationTopMap != null) {
+            return _classificationTopMap;
         }
         getClassificationDefinitionMap();// Initialize!
-        return _classificationTopDefinitionMap;
+        return _classificationTopMap;
     }
 
     public boolean hasClassificationDefinitionMap() {
@@ -100,15 +106,16 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (_classificationDefinitionMap != null) {
             return _classificationDefinitionMap;
         }
-        _classificationTopDefinitionMap = new LinkedHashMap<String, Map<String, String>>();
+        _classificationTopMap = new LinkedHashMap<String, DfClassificationTop>();
         _classificationDefinitionMap = new LinkedHashMap<String, List<Map<String, String>>>();
 
         final String key = "torque." + KEY_classificationDefinitionMap;
         final Map<String, Object> plainClassificationDefinitionMap = mapProp(key, DEFAULT_EMPTY_MAP);
         final Set<String> classificationNameSet = plainClassificationDefinitionMap.keySet();
         final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
+        final boolean docTask = TaskType.Doc.equals(DfDBFluteTaskStatus.getInstance().getTaskType());
 
-        for (String classificationName : classificationNameSet) {
+        clsLoop: for (String classificationName : classificationNameSet) {
             // - - - - - - - - - - - - - - - - -
             // Check a duplicate classification.
             // - - - - - - - - - - - - - - - - -
@@ -154,8 +161,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 // - - - - - - -
                 // from Literal
                 // - - - - - - -
-                if (isElementMapClassificationTop(elementMap)) {
+                if (isElementMapClassificationTop(elementMap)) { // top definition
                     processClassificationTopFromLiteralIfNeeds(classificationName, elementMap);
+                    if (!docTask && isUseDocumentOnly(classificationName)) {
+                        continue clsLoop;
+                    }
                 } else {
                     literalArranger.arrange(classificationName, elementMap, elementList);
                 }
@@ -170,15 +180,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         // The topComment is main mark.
         final String classificationTopComment = (String) elementMap.get(DfClassificationTop.KEY_TOP_COMMENT);
         return classificationTopComment != null;
-    }
-
-    protected boolean isTableClassificationSuppressAutoDeploy(Map<?, ?> elementMap) {
-        final String suppressAutoDeploy = (String) elementMap.get("suppressAutoDeploy");
-        return suppressAutoDeploy != null && suppressAutoDeploy.equalsIgnoreCase("true");
-    }
-
-    public boolean isTableClassification(String classificationName) {
-        return _tableClassificationMap.containsKey(classificationName);
     }
 
     protected void throwClassificationMapValueIllegalListTypeException(Object value) {
@@ -224,68 +225,92 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         getClassificationDefinitionMap(); // Initialize
     }
 
-    // -----------------------------------------------------
-    //                       All-in-One Table Classification
-    //                       -------------------------------
-    protected void processAllInOneTableClassification(String sql) {
-        final DfClassificationAllInOneSqlExecutor executor = new DfClassificationAllInOneSqlExecutor();
-        final Connection conn = getDatabaseProperties().createMainSchemaConnection();
-        final List<Map<String, String>> resultList = executor.executeAllInOneSql(conn, sql);
-
-        for (Map<String, String> map : resultList) {
-            final String classificationName = map.get("classificationName");
-
-            final String code = map.get(DfClassificationElement.KEY_CODE);
-            final String name = map.get(DfClassificationElement.KEY_NAME);
-            final String alias = map.get(DfClassificationElement.KEY_ALIAS);
-            final String comment = map.get(DfClassificationElement.KEY_COMMENT);
-            final List<Map<String, String>> elementList;
-            {
-                List<Map<String, String>> tmpElementList = _classificationDefinitionMap.get(classificationName);
-                if (tmpElementList == null) {
-                    tmpElementList = new ArrayList<Map<String, String>>();
-                    _classificationDefinitionMap.put(classificationName, tmpElementList);
-                }
-                elementList = tmpElementList;
-            }
-            final Map<String, String> elementMap = newLinkedHashMap();
-            elementMap.put(DfClassificationElement.KEY_CODE, code);
-            elementMap.put(DfClassificationElement.KEY_NAME, name);
-            elementMap.put(DfClassificationElement.KEY_ALIAS, alias);
-            if (comment != null) {
-                elementMap.put(DfClassificationElement.KEY_COMMENT, comment);
-            }
-            elementList.add(elementMap);
-
-            final String topComment = map.get(DfClassificationTop.KEY_TOP_COMMENT);
-            final String codeType;
-            {
-                String tmpType = map.get(DfClassificationTop.KEY_CODE_TYPE);
-                if (Srl.is_Null_or_TrimmedEmpty(tmpType)) {
-                    // for compatibility
-                    tmpType = map.get(DfClassificationTop.KEY_DATA_TYPE);
-                }
-                codeType = tmpType;
-            }
-            if (!_classificationTopDefinitionMap.containsKey(classificationName)) {
-                final Map<String, String> topElementMap = new LinkedHashMap<String, String>();
-                topElementMap.put("classificationName", classificationName);
-                if (topComment != null) {
-                    topElementMap.put(DfClassificationTop.KEY_TOP_COMMENT, topComment);
-                }
-                if (codeType != null) {
-                    topElementMap.put(DfClassificationTop.KEY_CODE_TYPE, codeType);
-                }
-                if (topComment != null) { // The topComment is main mark.
-                    _classificationTopDefinitionMap.put(classificationName, topElementMap);
-                }
-            }
+    // ===================================================================================
+    //                                                                  Classification Top
+    //                                                                  ==================
+    protected void processClassificationTopFromLiteralIfNeeds(String classificationName, Map<?, ?> elementMap) {
+        if (_classificationTopMap.containsKey(classificationName)) {
+            return;
+        }
+        final DfClassificationTop classificationTop = new DfClassificationTop();
+        classificationTop.acceptClassificationTopElementMap(elementMap);
+        classificationTop.setCheckImplicitSet(isClassificationCheckImplicitSet(elementMap));
+        classificationTop.setUseDocumentOnly(isClassificationUseDocumentOnly(elementMap));
+        classificationTop.setSuppressAutoDeploy(isClassificationSuppressAutoDeploy(elementMap));
+        final Map<String, String> topElementMap = new LinkedHashMap<String, String>();
+        topElementMap.put("classificationName", classificationName);
+        if (classificationTop.isValidTop()) {
+            _classificationTopMap.put(classificationName, classificationTop);
         }
     }
 
+    @SuppressWarnings("unchecked")
+    protected boolean isClassificationCheckImplicitSet(Map<?, ?> elementMap) {
+        return isProperty("isCheckImplicitSet", false, (Map<String, ? extends Object>) elementMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isClassificationUseDocumentOnly(Map<?, ?> elementMap) {
+        return isProperty("isUseDocumentOnly", false, (Map<String, ? extends Object>) elementMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isClassificationSuppressAutoDeploy(Map<?, ?> elementMap) {
+        return isProperty("isSuppressAutoDeploy", false, (Map<String, ? extends Object>) elementMap);
+    }
+
+    public boolean isCheckImplicitSet(String classificationName) {
+        final DfClassificationTop classificationTop = getClassificationTop(classificationName);
+        return classificationTop != null && classificationTop.isCheckImplicitSet();
+    }
+
+    public boolean isUseDocumentOnly(String classificationName) {
+        final DfClassificationTop classificationTop = getClassificationTop(classificationName);
+        return classificationTop != null && classificationTop.isUseDocumentOnly();
+    }
+
+    public boolean isSuppressAutoDeploy(String classificationName) {
+        final DfClassificationTop classificationTop = getClassificationTop(classificationName);
+        return classificationTop != null && classificationTop.isSuppressAutoDeploy();
+    }
+
+    protected Boolean _hasImplicitSetCheck; // cached for performance
+
+    public boolean hasImplicitSetCheck() {
+        if (_hasImplicitSetCheck != null) {
+            return _hasImplicitSetCheck;
+        }
+        _hasImplicitSetCheck = false;
+        for (Entry<String, DfClassificationTop> entry : getClassificationTopMap().entrySet()) {
+            if (entry.getValue().isCheckImplicitSet()) {
+                _hasImplicitSetCheck = true;
+            }
+        }
+        return _hasImplicitSetCheck;
+    }
+
+    public boolean isCodeTypeNeedsQuoted(String classificationName) {
+        final DfClassificationTop classificationTop = getClassificationTop(classificationName);
+        if (classificationTop == null) {
+            return false;
+        }
+        final String codeType = classificationTop.getCodeType();
+        if (codeType == null) {
+            return false;
+        }
+        return codeType.equalsIgnoreCase(DfClassificationTop.CODE_TYPE_STRING);
+    }
+
+    // ===================================================================================
+    //                                                                Table Classification
+    //                                                                ====================
     // -----------------------------------------------------
-    //                                  Table Classification
-    //                                  --------------------
+    //                            Basic Table Classification
+    //                            --------------------------
+    public boolean isTableClassification(String classificationName) {
+        return _tableClassificationMap.containsKey(classificationName);
+    }
+
     protected void processTableClassification(String classificationName, Map<?, ?> elementMap, String table,
             List<Map<String, String>> elementList) {
         final DfClassificationElement element = new DfClassificationElement();
@@ -298,10 +323,19 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final Set<String> exceptCodeSet = extractExceptCodeSet(elementMap);
         setupTableClassification(classificationName, elementList, sql, element, exceptCodeSet);
 
-        // save for auto deployment if it is NOT suppressAutoDeploy.
-        if (!isTableClassificationSuppressAutoDeploy(elementMap)) {
-            _tableClassificationMap.put(classificationName, element);
+        // save for auto deployment if it is NOT suppressAutoDeploy
+        doProcessTableClassificationAutoDeploy(classificationName, elementMap, table, elementList, element);
+    }
+
+    protected void doProcessTableClassificationAutoDeploy(String classificationName, Map<?, ?> elementMap,
+            String table, List<Map<String, String>> elementList, DfClassificationElement element) {
+        if (isSuppressAutoDeploy(classificationName)) {
+            return;
         }
+        if (isClassificationSuppressAutoDeploy(elementMap)) { // for compatible
+            return;
+        }
+        _tableClassificationMap.put(classificationName, element);
     }
 
     protected String buildTableClassificationSql(DfClassificationElement element, String table, String where,
@@ -427,29 +461,69 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return Srl.camelize(name, " ", "_", "-"); // for method name
     }
 
-    protected void processClassificationTopFromLiteralIfNeeds(String classificationName, Map<?, ?> elementMap) {
-        if (_classificationTopDefinitionMap.containsKey(classificationName)) {
-            return;
-        }
-        final DfClassificationTop classificationTop = new DfClassificationTop();
-        classificationTop.acceptClassificationTopElementMap(elementMap);
-        final Map<String, String> topElementMap = new LinkedHashMap<String, String>();
-        topElementMap.put("classificationName", classificationName);
-        if (classificationTop.getTopComment() != null) {
-            topElementMap.put(DfClassificationTop.KEY_TOP_COMMENT, classificationTop.getTopComment());
-        }
-        if (classificationTop.getCodeType() != null) {
-            topElementMap.put(DfClassificationTop.KEY_CODE_TYPE, classificationTop.getCodeType());
-        }
-        if (classificationTop.getTopComment() != null) { // The topComment is main mark.
-            _classificationTopDefinitionMap.put(classificationName, topElementMap);
+    // -----------------------------------------------------
+    //                       All-in-One Table Classification
+    //                       -------------------------------
+    protected void processAllInOneTableClassification(String sql) {
+        final DfClassificationAllInOneSqlExecutor executor = new DfClassificationAllInOneSqlExecutor();
+        final Connection conn = getDatabaseProperties().createMainSchemaConnection();
+        final List<Map<String, String>> resultList = executor.executeAllInOneSql(conn, sql);
+
+        for (Map<String, String> map : resultList) {
+            final String classificationName = map.get("classificationName");
+
+            final String code = map.get(DfClassificationElement.KEY_CODE);
+            final String name = map.get(DfClassificationElement.KEY_NAME);
+            final String alias = map.get(DfClassificationElement.KEY_ALIAS);
+            final String comment = map.get(DfClassificationElement.KEY_COMMENT);
+            final List<Map<String, String>> elementList;
+            {
+                List<Map<String, String>> tmpElementList = _classificationDefinitionMap.get(classificationName);
+                if (tmpElementList == null) {
+                    tmpElementList = new ArrayList<Map<String, String>>();
+                    _classificationDefinitionMap.put(classificationName, tmpElementList);
+                }
+                elementList = tmpElementList;
+            }
+            final Map<String, String> elementMap = newLinkedHashMap();
+            elementMap.put(DfClassificationElement.KEY_CODE, code);
+            elementMap.put(DfClassificationElement.KEY_NAME, name);
+            elementMap.put(DfClassificationElement.KEY_ALIAS, alias);
+            if (comment != null) {
+                elementMap.put(DfClassificationElement.KEY_COMMENT, comment);
+            }
+            elementList.add(elementMap);
+
+            final String topComment = map.get(DfClassificationTop.KEY_TOP_COMMENT);
+            final String codeType;
+            {
+                String tmpType = map.get(DfClassificationTop.KEY_CODE_TYPE);
+                if (Srl.is_Null_or_TrimmedEmpty(tmpType)) {
+                    // for compatibility
+                    tmpType = map.get(DfClassificationTop.KEY_DATA_TYPE);
+                }
+                codeType = tmpType;
+            }
+            if (!_classificationTopMap.containsKey(classificationName)) {
+                final DfClassificationTop classificationTop = new DfClassificationTop();
+                classificationTop.setClassificationName(classificationName);
+                if (topComment != null) {
+                    classificationTop.setTopComment(topComment);
+                }
+                if (codeType != null) {
+                    classificationTop.setCodeType(codeType);
+                }
+                if (topComment != null) { // The topComment is main mark.
+                    _classificationTopMap.put(classificationName, classificationTop);
+                }
+            }
         }
     }
 
-    // -----------------------------------------------------
-    //                               Deriving Classification
-    //                               -----------------------
-    public List<String> getClassificationNameList() {
+    // ===================================================================================
+    //                                                              Derived Classification
+    //                                                              ======================
+    public List<String> getClassificationNameList() { // all classifications
         return new ArrayList<String>(getClassificationDefinitionMap().keySet());
     }
 
@@ -514,8 +588,18 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return filterDoubleQuotation(removeLineSeparator(property));
     }
 
-    public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
+    public List<Map<String, String>> getClassificationMapList(String classificationName) {
         return getClassificationDefinitionMap().get(classificationName);
+    }
+
+    public List<String> getClassificationElementCodeList(String classificationName) {
+        final List<Map<String, String>> classificationMapList = getClassificationMapList(classificationName);
+        final List<String> codeList = DfCollectionUtil.newArrayList();
+        for (Map<String, String> elementMap : classificationMapList) {
+            final String code = elementMap.get(DfClassificationElement.KEY_CODE);
+            codeList.add(code);
+        }
+        return codeList;
     }
 
     public String buildClassificationApplicationComment(Map<String, String> classificationMap) {
@@ -568,9 +652,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     public static final String MARK_allColumnClassification = "$$ALL$$";
     protected Map<String, Map<String, String>> _classificationDeploymentMap;
 
-    // --------------------------------------
-    //                                 Getter
-    //                                 ------
     public Map<String, Map<String, String>> getClassificationDeploymentMap() {
         if (_classificationDeploymentMap != null) {
             return _classificationDeploymentMap;
@@ -619,9 +700,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         throw new DfClassificationIllegalPropertyTypeException(msg);
     }
 
-    // --------------------------------------
-    //                             Initialize
-    //                             ----------
+    // -----------------------------------------------------
+    //                                            Initialize
+    //                                            ----------
     /**
      * Initialize classification deployment. <br />
      * Resolving all column classifications and table classifications. <br />
@@ -693,25 +774,21 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return filterDoubleQuotation(removeLineSeparator(property));
     }
 
-    // --------------------------------------
-    //                Classification Handling
-    //                -----------------------
+    // ===================================================================================
+    //                                                               Column Classification
+    //                                                               =====================
     public boolean hasClassification(String tableName, String columnName) {
-        final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
-        if (columnClassificationMap == null) {
-            return false;
-        }
-        final String classificationName = columnClassificationMap.get(columnName);
-        if (classificationName == null) {
-            for (String columnNameHint : columnClassificationMap.keySet()) {
-                if (isHitByTheHint(columnName, columnNameHint)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        return true;
+        return getClassificationName(tableName, columnName) != null;
+    }
+
+    public boolean hasTableClassification(String tableName, String columnName) {
+        final String classificationName = getClassificationName(tableName, columnName);
+        return classificationName != null && isTableClassification(classificationName);
+    }
+
+    public boolean hasImplicitClassification(String tableName, String columnName) {
+        final String classificationName = getClassificationName(tableName, columnName);
+        return classificationName != null && !isTableClassification(classificationName);
     }
 
     protected final Map<String, StringKeyMap<String>> _fkeyColumnClassificationMap = StringKeyMap.createAsFlexible();
@@ -724,7 +801,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
         final String classificationName;
         {
-            // Because columnClassificationMap is not flexible map.
+            // because columnClassificationMap is not flexible map
             StringKeyMap<String> columnClassificationMap = _fkeyColumnClassificationMap.get(tableName);
             if (columnClassificationMap == null) {
                 columnClassificationMap = StringKeyMap.createAsFlexible();
@@ -733,17 +810,15 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             }
             classificationName = columnClassificationMap.get(columnName);
         }
-
-        if (classificationName == null) {
-            for (String columnNameHint : plainMap.keySet()) {
-                if (isHitByTheHint(columnName, columnNameHint)) {
-                    return plainMap.get(columnNameHint);
-                }
-            }
-            return null;
-        } else {
+        if (classificationName != null) {
             return classificationName;
         }
+        for (String columnNameHint : plainMap.keySet()) {
+            if (isHitByTheHint(columnName, columnNameHint)) {
+                return plainMap.get(columnNameHint);
+            }
+        }
+        return null;
     }
 
     public boolean hasClassificationName(String tableName, String columnName) {
@@ -766,9 +841,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return getClassificationValidAliasOnlyList().contains(classificationName);
     }
 
-    // --------------------------------------
-    //              All Column Classification
-    //              -------------------------
+    // ===================================================================================
+    //                                                           All Column Classification
+    //                                                           =========================
     /**
      * Get the map of all column classification.
      * @return The map of all column classification. (NullAllowed: If the mark would be not found)
@@ -865,9 +940,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             }
 
             // Reflect to classification top definition.
-            final Map<String, String> topElementMap = new LinkedHashMap<String, String>();
-            topElementMap.put(DfClassificationTop.KEY_TOP_COMMENT, classificationTop.getTopComment());
-            _classificationTopDefinitionMap.put(classificationName, topElementMap);
+            _classificationTopMap.put(classificationName, classificationTop);
 
             // Reflect to classification definition.
             final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();

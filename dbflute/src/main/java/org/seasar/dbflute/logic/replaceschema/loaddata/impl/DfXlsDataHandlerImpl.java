@@ -212,6 +212,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 }
             }
             noticeLoadedRowSize(tableDbName, dataTable.getRowSize());
+            checkImplicitClassification(file, tableDbName, columnNameList, conn);
         } catch (SQLException e) {
             handleWriteTableException(file, dataTable, e, retryEx, retryDataRow, columnNameList);
         } finally {

@@ -65,6 +65,8 @@ import org.seasar.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.seasar.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
@@ -89,6 +91,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("|                   Doc                    |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
+        DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.Doc);
     }
 
     // ===================================================================================

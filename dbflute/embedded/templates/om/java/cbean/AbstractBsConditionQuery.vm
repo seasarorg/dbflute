@@ -70,15 +70,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #if ($col.hasClassification())
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
 
     /**
      * Equal(=). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -124,15 +124,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #if ($col.hasClassification())
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
 
     /**
      * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -210,15 +210,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #if ($col.hasClassification())
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
 
     /**
      * InScope(in ('a', 'b')). As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -242,15 +242,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #if ($col.hasClassification())
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
 
     /**
      * NotInScope(not in ('a', 'b')). As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -534,15 +534,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #if ($col.hasClassification())
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
 
     /**
      * Equal(=). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -575,15 +575,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #if ($col.hasClassification())
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
 
     /**
      * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -657,15 +657,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #if ($col.hasClassification())
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
 
     /**
      * InScope(in (1, 2)). As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -689,15 +689,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #if ($col.hasClassification())
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
 
     /**
      * NotInScope(not in (1, 2)). As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */

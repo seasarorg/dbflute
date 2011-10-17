@@ -20,6 +20,8 @@ import java.util.List;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.generate.refresh.DfRefreshResourceProcess;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -47,6 +49,7 @@ public class DfRefreshTask extends DfAbstractTask {
         //_log.info("|                 Refresh                  |");
         //_log.info("|                                          |");
         //_log.info("+------------------------------------------+");
+        DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.Refresh);
     }
 
     // ===================================================================================

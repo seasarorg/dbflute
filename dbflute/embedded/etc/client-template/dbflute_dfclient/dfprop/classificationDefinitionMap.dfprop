@@ -6,7 +6,11 @@
 # Specification:
 # map: {
 #     [classification-name] = list:{
-#         ; map:{topComment=[comment]; codeType=[String(default) or Number or Boolean]}
+#         ; map:{
+#             ; topComment=[comment]; codeType=[String(default) or Number or Boolean]}
+#             ; isCheckImplicitSet=[true or false(default)]
+#             ; isUseDocumentOnly=[true or false(default)]
+#             ; isSuppressAutoDeploy=[true or false(default)]
 #         ; map:{code=[code]; name=[name]; alias=[alias]; comment=[comment]}
 #         ; map:{
 #             ; table=[table-name]
@@ -14,7 +18,6 @@
 #             ; alias=[column-name for alias]; comment=[column-name for comment]}
 #             ; where=[condition for select]; orderBy=[column-name for ordering]
 #             ; exceptCodeList=[the list of except code]
-#             ; suppressAutoDeploy=[true or false(default)]
 #         }
 #     }
 # }

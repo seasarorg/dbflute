@@ -115,14 +115,14 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+  #set ($classificationTop = $database.getClassificationTop($col.classificationName))
   #set ($existTop = true)
 #end
     /**
      * Classify the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NullAllowed)
      */
@@ -166,14 +166,14 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+  #set ($classificationTop = $database.getClassificationTop($col.classificationName))
   #set ($existTop = true)
 #end
     /**
      * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NullAllowed)
      */

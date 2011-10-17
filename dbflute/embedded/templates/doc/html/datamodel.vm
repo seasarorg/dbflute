@@ -292,15 +292,15 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
-  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#if ($database.hasClassificationTop($classificationName))
+  #set ($classificationTop = $database.getClassificationTop($classificationName))
   #set ($existTop = true)
 #else
   #set ($existTop = false)
 #end
 	<tr>
 		<td>${classificationName}</td>
-		<td>#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
+		<td>#if ($existTop && $classificationTop.hasTopComment())${classificationTop.topComment}#else &nbsp;#end</td>
 		<td>
 			<table class="child">
 			<tr>

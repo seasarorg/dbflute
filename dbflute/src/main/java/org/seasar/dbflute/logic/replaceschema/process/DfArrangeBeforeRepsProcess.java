@@ -163,6 +163,7 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
             }
         });
         if (elementList != null) {
+            _log.info("  clean " + baseDir.getPath() + "/*" + extSuffix);
             for (File file : elementList) {
                 file.delete();
             }

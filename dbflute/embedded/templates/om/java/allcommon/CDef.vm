@@ -17,15 +17,15 @@ public interface ${glCDef} extends Classification {
 #set ($count = 0)
 #foreach ($classificationName in $database.classificationNameList)
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#if ($database.hasClassificationTop($classificationName))
+#set ($classificationTop = $database.getClassificationTop($classificationName))
 #set ($existTop = true)
 #end
 #if ($count != 0)
         ,
 #end
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-        /** $classificationTopMap.get('topComment') */
+#if ($existTop && $classificationTop.hasTopComment())
+        /** $classificationTop.topComment */
 #end
         ${classificationName}
 #set ($count = $count + 1)
@@ -41,12 +41,12 @@ public interface ${glCDef} extends Classification {
         public ClassificationCodeType codeType() {
 #foreach ($classificationName in $database.classificationNameList)
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#if ($database.hasClassificationTop($classificationName))
+#set ($classificationTop = $database.getClassificationTop($classificationName))
 #set ($existTop = true)
 #end
-#if ($existTop && $classificationTopMap.containsKey('codeType'))
-            if ("${classificationName}".equals(name())) { return ClassificationCodeType.${classificationTopMap.get('codeType')}; }
+#if ($existTop && $classificationTop.hasCodeType())
+            if ("${classificationName}".equals(name())) { return ClassificationCodeType.${classificationTop.codeType}; }
 #end
 #end
             return ClassificationCodeType.String; // as default
@@ -56,13 +56,13 @@ public interface ${glCDef} extends Classification {
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#if ($database.hasClassificationTop($classificationName))
+#set ($classificationTop = $database.getClassificationTop($classificationName))
 #set ($existTop = true)
 #end
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
+#if ($existTop && $classificationTop.hasTopComment())
     /**
-     * $classificationTopMap.get('topComment')
+     * $classificationTop.topComment
      */
 #end
     public enum ${classificationName} implements ${glCDef} {

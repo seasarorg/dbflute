@@ -840,10 +840,9 @@ public class ForeignKey {
             msg = msg + " elementMapList=" + elementMapList;
             throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
         }
-        final Map<String, Map<String, String>> topMap = getClassificationProperties()
-                .getClassificationTopDefinitionMap();
-        final Map<String, String> map = topMap.get(classificationName);
-        final String codeType = map.get(DfClassificationTop.KEY_CODE_TYPE);
+        final Map<String, DfClassificationTop> topMap = getClassificationProperties().getClassificationTopMap();
+        final DfClassificationTop top = topMap.get(classificationName);
+        final String codeType = top.getCodeType();
         if (codeType == null || !codeType.equals(DfClassificationTop.CODE_TYPE_NUMBER)) {
             code = "'" + code + "'";
         }

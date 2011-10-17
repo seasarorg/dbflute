@@ -101,6 +101,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.assistant.DfTableDeterminator;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.DfTableListProvider;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.seasar.dbflute.properties.initializer.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.properties.initializer.DfAdditionalPrimaryKeyInitializer;
@@ -1525,12 +1526,24 @@ public class Database {
     // --------------------------------------
     //                             Definition
     //                             ----------
-    public Map<String, Map<String, String>> getClassificationTopDefinitionMap() {
-        return getClassificationProperties().getClassificationTopDefinitionMap();
-    }
-
     public boolean hasClassificationDefinitionMap() {
         return getClassificationProperties().hasClassificationDefinitionMap();
+    }
+
+    public Map<String, DfClassificationTop> getClassificationTopMap() {
+        return getClassificationProperties().getClassificationTopMap();
+    }
+
+    public boolean hasClassificationTop(String classificationName) {
+        return getClassificationProperties().hasClassificationTop(classificationName);
+    }
+
+    public DfClassificationTop getClassificationTop(String classificationName) {
+        return getClassificationProperties().getClassificationTop(classificationName);
+    }
+
+    public boolean isCheckImplicitSetClassification(String classificationName) {
+        return getClassificationProperties().isCheckImplicitSet(classificationName);
     }
 
     public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {

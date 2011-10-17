@@ -69,6 +69,7 @@ import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
+import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -1597,6 +1598,10 @@ public class Column {
         return getProperties().getBasicProperties();
     }
 
+    protected DfClassificationProperties getClassificationProperties() {
+        return getProperties().getClassificationProperties();
+    }
+
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return getProperties().getLittleAdjustmentProperties();
     }
@@ -1824,11 +1829,11 @@ public class Column {
     //                                                                      Classification
     //                                                                      ==============
     public Map<String, Map<String, String>> getClassificationDeploymentMap() {
-        return getTable().getDatabase().getClassificationDeploymentMap();
+        return getClassificationProperties().getClassificationDeploymentMap();
     }
 
     public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
-        return getTable().getDatabase().getClassificationDefinitionMap();
+        return getClassificationProperties().getClassificationDefinitionMap();
     }
 
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1837,44 +1842,39 @@ public class Column {
     // - - - - - - - - - -/
 
     public boolean hasClassification() {
-        final Database database = getTable().getDatabase();
         if (hasSql2EntityRelatedTableClassification()) {
             return true;
         }
-        return database.hasClassification(getTableName(), getName());
+        return getClassificationProperties().hasClassification(getTableName(), getName());
     }
 
     public boolean isTableClassification() {
         if (!hasClassification()) {
             return false;
         }
-        final Database database = getTable().getDatabase();
-        return database.isTableClassification(getClassificationName());
+        return getClassificationProperties().isTableClassification(getClassificationName());
     }
 
     public boolean hasClassificationName() {
-        final Database database = getTable().getDatabase();
         if (hasSql2EntityRelatedTableClassificationName()) {
             return true;
         }
-        return database.hasClassificationName(getTableName(), getName());
+        return getClassificationProperties().hasClassificationName(getTableName(), getName());
     }
 
     public boolean hasClassificationAlias() {
-        final Database database = getTable().getDatabase();
         if (hasSql2EntityRelatedTableClassificationAlias()) {
             return true;
         }
-        return database.hasClassificationAlias(getTableName(), getName());
+        return getClassificationProperties().hasClassificationAlias(getTableName(), getName());
     }
 
     public String getClassificationName() {
-        final Database database = getTable().getDatabase();
         final String classificationName = getSql2EntityRelatedTableClassificationName();
         if (classificationName != null) {
             return classificationName;
         }
-        return database.getClassificationName(getTableName(), getName());
+        return getClassificationProperties().getClassificationName(getTableName(), getName());
     }
 
     public String getClassificationMetaSettingExpression() { // for DBMeta
@@ -1932,32 +1932,43 @@ public class Column {
         if (!hasSql2EntityRelatedTable()) {
             return false;
         }
-        final Database database = getTable().getDatabase();
-        return database.hasClassification(getSql2EntityRelatedTable().getName(), getName());
+        final String tableName = getSql2EntityRelatedTable().getName();
+        return getClassificationProperties().hasClassification(tableName, getName());
     }
 
     protected boolean hasSql2EntityRelatedTableClassificationName() {
         if (!hasSql2EntityRelatedTable()) {
             return false;
         }
-        final Database database = getTable().getDatabase();
-        return database.hasClassificationName(getSql2EntityRelatedTable().getName(), getName());
+        final String tableName = getSql2EntityRelatedTable().getName();
+        return getClassificationProperties().hasClassificationName(tableName, getName());
     }
 
     protected boolean hasSql2EntityRelatedTableClassificationAlias() {
         if (!hasSql2EntityRelatedTable()) {
             return false;
         }
-        final Database database = getTable().getDatabase();
-        return database.hasClassificationAlias(getSql2EntityRelatedTable().getName(), getName());
+        final String tableName = getSql2EntityRelatedTable().getName();
+        return getClassificationProperties().hasClassificationAlias(tableName, getName());
     }
 
     protected String getSql2EntityRelatedTableClassificationName() {
         if (!hasSql2EntityRelatedTable()) {
             return null;
         }
-        final Database database = getTable().getDatabase();
-        return database.getClassificationName(getSql2EntityRelatedTable().getName(), getName());
+        final String tableName = getSql2EntityRelatedTable().getName();
+        return getClassificationProperties().getClassificationName(tableName, getName());
+    }
+
+    public boolean hasCheckImplicitSetClassification() {
+        if (!hasClassification()) {
+            return false;
+        }
+        final String classificationName = getClassificationName();
+        if (classificationName == null) {
+            return false;
+        }
+        return getClassificationProperties().isCheckImplicitSet(classificationName);
     }
 
     // ===================================================================================

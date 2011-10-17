@@ -11,13 +11,13 @@ namespace ${glPackageBaseCommon} {
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
-  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#if ($database.hasClassificationTop($classificationName))
+  #set ($classificationTop = $database.getClassificationTop($classificationName))
   #set ($existTop = true)
 #end
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
+#if ($existTop && $classificationTop.hasTopComment())
         /**
-         * $classificationTopMap.get('topComment')
+         * $classificationTop.topComment
          */
 #end
         public class ${classificationName} {

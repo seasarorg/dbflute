@@ -92,14 +92,14 @@ public abstract class $myClassName implements Serializable {
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
     /**
      * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed)
      */
@@ -115,8 +115,8 @@ public abstract class $myClassName implements Serializable {
 
     /**
      * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
+#if ($existTop && $classificationTop.hasTopComment())
+     * $classificationTop.topComment
 #end
      * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
      * @return The instance of classification definition (as ENUM type). (NullAllowed)

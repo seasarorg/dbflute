@@ -111,8 +111,8 @@ namespace ${myExtendedEntityPackageName} {
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
 #set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#if ($database.hasClassificationTop($col.classificationName))
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
 #set ($existTop = true)
 #end
         public ${glCDef}.${col.classificationName} ${col.javaName}As${col.classificationName} { get {

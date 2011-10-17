@@ -35,6 +35,9 @@ public class DfClassificationTop {
     protected String _codeType;
     protected String _relatedColumnName;
     protected List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
+    protected boolean _checkImplicitSet;
+    protected boolean _useDocumentOnly;
+    protected boolean _suppressAutoDeploy;
 
     // ===================================================================================
     //                                                                              Accept
@@ -79,6 +82,21 @@ public class DfClassificationTop {
     }
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isValidTop() {
+        return hasTopComment(); // top comment is a key element
+    }
+
+    public boolean hasTopComment() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_topComment);
+    }
+
+    public boolean hasCodeType() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_codeType);
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
@@ -99,7 +117,11 @@ public class DfClassificationTop {
     }
 
     public String getTopComment() {
-        return _topComment;
+        if (_useDocumentOnly) {
+            return _topComment + " // document only";
+        } else {
+            return _topComment;
+        }
     }
 
     public void setTopComment(String topComment) {
@@ -128,5 +150,29 @@ public class DfClassificationTop {
 
     public void addClassificationElement(DfClassificationElement classificationElement) {
         this._elementList.add(classificationElement);
+    }
+
+    public boolean isCheckImplicitSet() {
+        return _checkImplicitSet;
+    }
+
+    public void setCheckImplicitSet(boolean checkImplicitSet) {
+        this._checkImplicitSet = checkImplicitSet;
+    }
+
+    public boolean isUseDocumentOnly() {
+        return _useDocumentOnly;
+    }
+
+    public void setUseDocumentOnly(boolean useDocumentOnly) {
+        this._useDocumentOnly = useDocumentOnly;
+    }
+
+    public boolean isSuppressAutoDeploy() {
+        return _suppressAutoDeploy;
+    }
+
+    public void setSuppressAutoDeploy(boolean suppressAutoDeploy) {
+        this._suppressAutoDeploy = suppressAutoDeploy;
     }
 }

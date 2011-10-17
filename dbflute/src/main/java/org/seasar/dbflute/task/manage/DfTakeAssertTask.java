@@ -27,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.seasar.dbflute.util.Srl;
 
@@ -57,6 +59,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
         _log.info("|               Take Assert                |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
+        DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.TakeAssert);
     }
 
     // ===================================================================================

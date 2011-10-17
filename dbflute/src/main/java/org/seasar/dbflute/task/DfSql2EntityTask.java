@@ -61,6 +61,7 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.IndexOfInfo;
@@ -101,6 +102,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         _log.info("|                Sql2Entity                |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
+        DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.Sql2Entity);
     }
 
     // ===================================================================================
