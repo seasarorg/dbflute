@@ -135,4 +135,12 @@ public class DfMapStringFileReader {
         final String msg = br.buildExceptionMessage();
         throw new DfMapStringFileReadFailureException(msg, e);
     }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public DfMapStringFileReader saveLine() {
+        _dfpropFile.saveLine();
+        return this;
+    }
 }

@@ -7,7 +7,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -82,6 +83,11 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return _additionalForeignKeyMap;
     }
 
+    @Override
+    protected DfMapStringFileReader createMapStringFileReader() {
+        return super.createMapStringFileReader().saveLine();
+    }
+
     // ===================================================================================
     //                                                                      Finding Helper
     //                                                                      ==============
@@ -110,9 +116,10 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         String fixedCondition = componentMap.get(KEY_FIXED_CONDITION);
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
             // adjust a little about camel case
-            fixedCondition = DfStringUtil.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
-            fixedCondition = DfStringUtil.replace(fixedCondition, "$$ForeignAlias$$", "$$foreignAlias$$");
-            fixedCondition = DfStringUtil.replace(fixedCondition, "$$LocalAlias$$", "$$localAlias$$");
+            fixedCondition = Srl.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
+            fixedCondition = Srl.replace(fixedCondition, "$$ForeignAlias$$", "$$foreignAlias$$");
+            fixedCondition = Srl.replace(fixedCondition, "$$LocalAlias$$", "$$localAlias$$");
+            fixedCondition = Srl.replace(fixedCondition, "\n", "\\n");
         }
         return fixedCondition;
     }
