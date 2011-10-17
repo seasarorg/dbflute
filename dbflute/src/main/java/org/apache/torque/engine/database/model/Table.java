@@ -2108,6 +2108,16 @@ public class Table {
         return false;
     }
 
+    public boolean hasCheckImplicitSetClassification() {
+        final Column[] columns = getColumns();
+        for (Column column : columns) {
+            if (column.hasCheckImplicitSetClassification()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                            Sequence
     //                                                                            ========
