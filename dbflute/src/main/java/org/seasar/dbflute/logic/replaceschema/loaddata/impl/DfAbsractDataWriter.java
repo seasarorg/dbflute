@@ -1036,14 +1036,16 @@ public abstract class DfAbsractDataWriter {
 
     protected void doCheckImplicitClassification(File file, String tableDbName, String columnDbName, Connection conn)
             throws SQLException {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("select distinct " + columnDbName + " from ").append(tableDbName);
-        sb.append(" where ").append(columnDbName).append(" not in ");
         final DfClassificationProperties prop = getClassificationProperties();
         final String classificationName = prop.getClassificationName(tableDbName, columnDbName);
         if (!prop.isCheckImplicitSet(classificationName)) {
             return;
         }
+        final String titleName = classificationName + " for " + tableDbName + "." + columnDbName;
+        _log.info("...Checking implicit set: " + titleName);
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select distinct " + columnDbName + " from ").append(tableDbName);
+        sb.append(" where ").append(columnDbName).append(" not in ");
         final boolean quote = prop.isCodeTypeNeedsQuoted(classificationName);
         final List<String> codeList = prop.getClassificationElementCodeList(classificationName);
         sb.append("(");
@@ -1053,14 +1055,14 @@ public abstract class DfAbsractDataWriter {
                 sb.append(", ");
             }
             sb.append(quote ? "'" : "").append(code).append(quote ? "'" : "");
+            ++index;
         }
         sb.append(")");
         final String sql = sb.toString();
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            final String titleName = classificationName + " for " + tableDbName + "." + columnDbName;
-            _log.info("...Checking implicit set: " + titleName);
+            _log.info(sql);
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
             final List<String> illegalCodeList = new ArrayList<String>();

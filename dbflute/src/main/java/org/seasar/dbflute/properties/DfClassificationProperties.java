@@ -49,7 +49,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, DfClassificationElement> _tableClassificationMap = new LinkedHashMap<String, DfClassificationElement>();
+    protected final Map<String, DfClassificationElement> _tableClassificationMap = newLinkedHashMap();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -86,7 +86,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (_classificationTopMap != null) {
             return _classificationTopMap;
         }
-        getClassificationDefinitionMap();// Initialize!
+        getClassificationDefinitionMap(); // initialize
         return _classificationTopMap;
     }
 
@@ -222,7 +222,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                            Initialize
     //                                            ----------
     public void initializeClassificationDefinition() {
-        getClassificationDefinitionMap(); // Initialize
+        getClassificationDefinitionMap(); // initialize
     }
 
     // ===================================================================================
@@ -454,10 +454,24 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
     }
 
+    protected final Map<String, String> _nameFromToMap = newLinkedHashMap();
+    {
+        _nameFromToMap.put("%", "_PERCENT_");
+        _nameFromToMap.put("&", "_AND_");
+        _nameFromToMap.put("(", "_");
+        _nameFromToMap.put(")", "_");
+        _nameFromToMap.put("\uff05", "_PERCENT_");
+        _nameFromToMap.put("\uff06", "_AND_");
+        _nameFromToMap.put("\uff08", "_");
+        _nameFromToMap.put("\uff09", "_");
+        _nameFromToMap.put("\u3000", "_");
+    }
+
     protected String filterTableClassificationName(String name) {
         if (Srl.is_Null_or_TrimmedEmpty(name)) {
             return name;
         }
+        name = Srl.replaceBy(name, _nameFromToMap);
         return Srl.camelize(name, " ", "_", "-"); // for method name
     }
 
@@ -710,7 +724,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
      * This method calls initializeClassificationDefinition() internally.
      * @param database The database object. (NotNull)
      */
-    public void initializeClassificationDeployment(Database database) { // This should be called when the task start.
+    public void initializeClassificationDeployment(Database database) { // this should be called when the task start
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
         if (allColumnClassificationMap != null) {
@@ -795,9 +809,15 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public String getClassificationName(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final Map<String, String> plainMap = deploymentMap.get(tableName);
+        Map<String, String> plainMap = deploymentMap.get(tableName);
         if (plainMap == null) {
-            return null;
+            final String allMark = MARK_allColumnClassification;
+            if (deploymentMap.containsKey(allMark)) {
+                // because the mark is unresolved when ReplaceSchema task
+                plainMap = deploymentMap.get(allMark);
+            } else {
+                return null;
+            }
         }
         final String classificationName;
         {
