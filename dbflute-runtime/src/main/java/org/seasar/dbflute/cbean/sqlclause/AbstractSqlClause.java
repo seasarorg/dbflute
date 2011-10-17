@@ -123,7 +123,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (NullAllowed: This is lazy-loaded) */
     protected Map<String, Map<String, HpSpecifiedColumn>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
-    /** Specified derive sub-query map. A null key is acceptable. (NullAllowed: This is lazy-loaded) */
+    /** Specified derive sub-query map. A null key is acceptable. (NullAllowed: lazy-load) */
     protected Map<String, HpDerivingSubQueryInfo> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
 
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
@@ -135,10 +135,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The previous type of select clause. (NullAllowed: The default is null) */
     protected SelectClauseType _previousSelectClauseType;
 
-    /** The map of select index. {key:selectColumnKeyName, value:selectIndex} (NullAllowed) */
+    /** The map of select index. {key:selectColumnKeyName, value:selectIndex} (NullAllowed: lazy-load) */
     protected Map<String, Integer> _selectIndexMap;
 
-    /** The reverse map of select index. {key:indexedOnQueryName, value:selectColumnKeyName} (NullAllowed) */
+    /** The reverse map of select index. {key:indexedOnQueryName, value:selectColumnKeyName} (NullAllowed: lazy-load) */
     protected Map<String, String> _selectIndexReverseMap;
 
     /** Is use select index? Default value is true. */
@@ -776,11 +776,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void registerSelectIndex(String keyName, String onQueryName, Integer selectIndex) {
-        if (_selectIndexMap == null) {
+        if (_selectIndexMap == null) { // lazy load
             _selectIndexMap = createSelectIndexMap();
         }
         _selectIndexMap.put(keyName, selectIndex);
-        if (_selectIndexReverseMap == null) {
+        if (_selectIndexReverseMap == null) { // lazy load
             _selectIndexReverseMap = createSelectIndexMap();
         }
         _selectIndexReverseMap.put(onQueryName, keyName);
@@ -792,12 +792,18 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return StringKeyMap.createAsFlexible();
     }
 
-    protected String buildSelectIndexAliasName(String keyName, Integer selectIndex) {
-        if (keyName.length() > 30) { // the least limit size in DBMSs is Oracle's 30
-            return Srl.substring(keyName, 0, 24) + "_c" + selectIndex;
+    protected String buildSelectIndexAliasName(String sqlName, Integer selectIndex) {
+        final int aliasNameLimitSize = getAliasNameLimitSize();
+        if (sqlName.length() > aliasNameLimitSize) {
+            final int aliasNameBaseSize = aliasNameLimitSize - 10;
+            return Srl.substring(sqlName, 0, aliasNameBaseSize) + "_c" + selectIndex;
         } else {
-            return keyName;
+            return sqlName;
         }
+    }
+
+    protected int getAliasNameLimitSize() {
+        return 30; // default is the least limit size in DBMSs (Oracle)
     }
 
     public void disableSelectIndex() {
