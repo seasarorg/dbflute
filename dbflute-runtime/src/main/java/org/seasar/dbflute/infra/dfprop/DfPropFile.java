@@ -29,6 +29,11 @@ import org.seasar.dbflute.helper.mapstring.MapListFile;
 public class DfPropFile {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _saveLine;
+
+    // ===================================================================================
     //                                                                                 Map
     //                                                                                 ===
     // -----------------------------------------------------
@@ -51,7 +56,7 @@ public class DfPropFile {
      * @return The read map. (NotNull)
      */
     public Map<String, Object> readMap(InputStream ins) {
-        return createMapListFileAsSkipLn().readMap(ins);
+        return createMapListFileStructural().readMap(ins);
     }
 
     /**
@@ -59,7 +64,7 @@ public class DfPropFile {
      * If the type of all values is string type, this method is available. <br />
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
-     * ex)
+     * e.g.
      * map:{
      *     ; key1 = string-value1
      *     ; key2 = string-value2
@@ -70,7 +75,7 @@ public class DfPropFile {
      * @return The read map whose values is string. (NotNull)
      */
     public Map<String, String> readMapAsStringValue(InputStream ins) {
-        return createMapListFileAsSkipLn().readMapAsStringValue(ins);
+        return createMapListFileStructural().readMapAsStringValue(ins);
     }
 
     /**
@@ -78,7 +83,7 @@ public class DfPropFile {
      * If the type of all values is string list type, this method is available. <br />
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
-     * ex)
+     * e.g.
      * map:{
      *     ; key1 = list:{string-element1 ; string-element2 ; ...}
      *     ; key2 = list:{string-element1 ; string-element2 ; ...}
@@ -89,7 +94,7 @@ public class DfPropFile {
      * @return The read map whose values is string list. (NotNull)
      */
     public Map<String, List<String>> readMapAsStringListValue(InputStream ins) {
-        return createMapListFileAsSkipLn().readMapAsStringListValue(ins);
+        return createMapListFileStructural().readMapAsStringListValue(ins);
     }
 
     /**
@@ -97,7 +102,7 @@ public class DfPropFile {
      * If the type of all values is string map type, this method is available. <br />
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
-     * ex)
+     * e.g.
      * map:{
      *     ; key1 = map:{string-key1 = string-value1 ; string-key2 = string-value2 }
      *     ; key2 = map:{string-key1 = string-value1 ; string-key2 = string-value2 }
@@ -108,7 +113,7 @@ public class DfPropFile {
      * @return The read map whose values is string map. (NotNull)
      */
     public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) {
-        return createMapListFileAsSkipLn().readMapAsStringMapValue(ins);
+        return createMapListFileStructural().readMapAsStringMapValue(ins);
     }
 
     // ===================================================================================
@@ -133,7 +138,7 @@ public class DfPropFile {
      * @return The read list. (NotNull)
      */
     public List<Object> readList(InputStream ins) {
-        return createMapListFileAsSkipLn().readList(ins);
+        return createMapListFileStructural().readList(ins);
     }
 
     // ===================================================================================
@@ -149,17 +154,33 @@ public class DfPropFile {
      * @return The read string. (NotNull)
      */
     public String readString(InputStream ins) {
-        return createMapListFile().readString(ins);
+        return createMapListFilePlain().readString(ins);
     }
 
     // ===================================================================================
     //                                                                       Map List File
     //                                                                       =============
-    protected MapListFile createMapListFile() {
+    protected MapListFile createMapListFilePlain() {
+        return newMapListFile();
+    }
+
+    protected MapListFile createMapListFileStructural() {
+        if (_saveLine) {
+            return newMapListFile();
+        } else {
+            return newMapListFile().skipLineSeparator();
+        }
+    }
+
+    protected MapListFile newMapListFile() {
         return new MapListFile();
     }
 
-    protected MapListFile createMapListFileAsSkipLn() {
-        return createMapListFile().skipLineSeparator();
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public DfPropFile saveLine() {
+        _saveLine = true;
+        return this;
     }
 }

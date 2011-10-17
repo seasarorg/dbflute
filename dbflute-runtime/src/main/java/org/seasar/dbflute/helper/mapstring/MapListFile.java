@@ -94,7 +94,7 @@ public class MapListFile {
      * If the type of all values is string type, this method is available. <br />
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
-     * ex)
+     * e.g.
      * map:{
      *     ; key1 = string-value1
      *     ; key2 = string-value2
@@ -119,7 +119,7 @@ public class MapListFile {
      * If the type of all values is string list type, this method is available. <br />
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
-     * ex)
+     * e.g.
      * map:{
      *     ; key1 = list:{string-element1 ; string-element2 ; ...}
      *     ; key2 = list:{string-element1 ; string-element2 ; ...}
@@ -145,7 +145,7 @@ public class MapListFile {
      * If the type of all values is string map type, this method is available. <br />
      * A trimmed line that starts with '#' is treated as line comment.
      * <pre>
-     * ex)
+     * e.g.
      * map:{
      *     ; key1 = map:{string-key1 = string-value1 ; string-key2 = string-value2 }
      *     ; key2 = map:{string-key1 = string-value1 ; string-key2 = string-value2 }
