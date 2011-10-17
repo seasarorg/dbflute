@@ -135,10 +135,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The previous type of select clause. (NullAllowed: The default is null) */
     protected SelectClauseType _previousSelectClauseType;
 
-    /** The map of select index. {key:columnAliasName, value:selectIndex} (NullAllowed) */
+    /** The map of select index. {key:selectColumnKeyName, value:selectIndex} (NullAllowed) */
     protected Map<String, Integer> _selectIndexMap;
 
-    /** The reverse map of select index. {key:selectIndex, value:columnAliasName} (NullAllowed) */
+    /** The reverse map of select index. {key:indexedOnQueryName, value:selectColumnKeyName} (NullAllowed) */
     protected Map<String, String> _selectIndexReverseMap;
 
     /** Is use select index? Default value is true. */
@@ -571,8 +571,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final String onQueryName;
             ++selectIndex;
             if (_useSelectIndex) {
-                _selectIndexMap.put(columnDbName, selectIndex);
-                onQueryName = buildSelectIndexAliasName(selectIndex);
+                onQueryName = buildSelectIndexAliasName(columnSqlName.toString(), selectIndex);
+                registerSelectIndex(columnDbName, onQueryName, selectIndex);
             } else {
                 onQueryName = columnSqlName.toString();
             }
@@ -610,8 +610,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 final String onQueryName;
                 ++selectIndex;
                 if (_useSelectIndex) {
-                    _selectIndexMap.put(columnAliasName, selectIndex);
-                    onQueryName = buildSelectIndexAliasName(selectIndex);
+                    onQueryName = buildSelectIndexAliasName(columnAliasName, selectIndex);
+                    registerSelectIndex(columnAliasName, onQueryName, selectIndex);
                 } else {
                     onQueryName = columnAliasName;
                 }
@@ -761,25 +761,29 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                          Select Index
     //                                          ------------
+    /**
+     * {@inheritDoc}
+     */
     public Map<String, Integer> getSelectIndexMap() {
-        return _selectIndexMap;
+        return _selectIndexMap; // NullAllowed
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Map<String, String> getSelectIndexReverseMap() {
-        if (_selectIndexReverseMap != null) {
-            return _selectIndexReverseMap;
-        }
+        return _selectIndexReverseMap; // NullAllowed
+    }
+
+    protected void registerSelectIndex(String keyName, String onQueryName, Integer selectIndex) {
         if (_selectIndexMap == null) {
-            return null;
+            _selectIndexMap = createSelectIndexMap();
         }
-        _selectIndexReverseMap = createSelectIndexMap(); // same style as select index map
-        final Set<Entry<String, Integer>> entrySet = _selectIndexMap.entrySet();
-        for (Entry<String, Integer> entry : entrySet) {
-            final String columnName = entry.getKey();
-            final Integer selectIndex = entry.getValue();
-            _selectIndexReverseMap.put(buildSelectIndexAliasName(selectIndex), columnName);
+        _selectIndexMap.put(keyName, selectIndex);
+        if (_selectIndexReverseMap == null) {
+            _selectIndexReverseMap = createSelectIndexMap();
         }
-        return _selectIndexReverseMap;
+        _selectIndexReverseMap.put(onQueryName, keyName);
     }
 
     protected <VALUE> Map<String, VALUE> createSelectIndexMap() {
@@ -788,8 +792,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return StringKeyMap.createAsFlexible();
     }
 
-    protected String buildSelectIndexAliasName(Integer selectIndex) {
-        return "c" + selectIndex;
+    protected String buildSelectIndexAliasName(String keyName, Integer selectIndex) {
+        if (keyName.length() > 30) { // the least limit size in DBMSs is Oracle's 30
+            return Srl.substring(keyName, 0, 24) + "_c" + selectIndex;
+        } else {
+            return keyName;
+        }
     }
 
     public void disableSelectIndex() {

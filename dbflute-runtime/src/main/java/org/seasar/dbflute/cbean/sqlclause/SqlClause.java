@@ -119,13 +119,13 @@ public interface SqlClause {
     String getSelectClause();
 
     /**
-     * Get the map of select index. map:{columnAliasName = selectIndex(AliasName)}
+     * Get the map of select index. map:{selectColumnKeyName = selectIndex}
      * @return The map of select index. (NullAllowed: null means select index is disabled)
      */
     Map<String, Integer> getSelectIndexMap();
 
     /**
-     * Get the reverse map of select index. map:{selectIndex(AliasName) = columnAliasName}
+     * Get the reverse map of select index. map:{indexedOnQueryName = selectColumnKeyName}
      * @return The reverse map of select index. (NullAllowed: null means select index is disabled)
      */
     Map<String, String> getSelectIndexReverseMap();
