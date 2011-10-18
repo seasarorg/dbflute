@@ -76,7 +76,7 @@ import ${table.relationalNullObjectProviderPackage}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class $myClassName implements ${myEntityInterfaceName}, Serializable {
+public abstract class $myClassName implements ${myEntityInterfaceName}, Serializable, Cloneable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -518,6 +518,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                                                      Basic Override
     //                                                                      ==============
     /**
+     * Determine the object is equal with this. <br />
      * If primary-keys or columns of the other are same as this one, returns true.
      * @param other The other entity. (NullAllowed)
      * @return Comparing result.
@@ -535,7 +536,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
-     * Calculates the hash-code from primary-keys or columns.
+     * Calculate the hash-code from primary-keys or columns.
      * @return The hash-code from primary-key or columns.
      */
     public int hashCode() {
@@ -551,6 +552,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
+     * Convert to display string of entity's data. (no relation data)
      * @return The display string of all columns and relation existences. (NotNull)
      */
     public String toString() {
@@ -558,6 +560,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
+     * Convert to display string of entity's data with relation data.
      * @return The display string of basic informations with one-nested relation values. (NotNull)
      */
     public String toStringWithRelation() {
@@ -594,6 +597,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
 
     /**
+     * Build display string with custom options.
      * @param name The name for display. (NullAllowed: If it's null, it does not have a name)
      * @param column Does it contains column values or not?
      * @param relation Does it contains relation existences or not?
@@ -677,6 +681,18 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #else
         return "";
 #end
+    }
+
+    /**
+     * Clone entity instance using super.clone(). 
+     * @return The cloned instance of this entity. (NotNull)
+     */
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Failed to clone the entity: " + toString(), e);
+        }
     }
 
 #set ($propertyLoopIndex = 0)

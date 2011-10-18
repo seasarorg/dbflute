@@ -277,6 +277,8 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                     ===============  
     public void acceptPrimaryKeyMap(Entity e, Map<String, ? extends Object> m)
     { doAcceptPrimaryKeyMap((${myExtendedObjectClassName})e, m, _epsMap); }
+    public void acceptAllColumnMap(Entity e, Map<String, ? extends Object> m)
+    { doAcceptAllColumnMap((${myExtendedObjectClassName})e, m, _epsMap); }
     public Map<String, Object> extractPrimaryKeyMap(Entity e) { return doExtractPrimaryKeyMap(e); }
     public Map<String, Object> extractAllColumnMap(Entity e) { return doExtractAllColumnMap(e); }
 
