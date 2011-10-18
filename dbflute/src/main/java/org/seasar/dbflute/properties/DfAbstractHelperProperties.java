@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -20,6 +21,7 @@ import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfStringFileReader;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.task.DfDBFluteTaskStatus;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
@@ -508,6 +510,10 @@ public abstract class DfAbstractHelperProperties {
         return DfEnvironmentType.getInstance().getEnvironmentType();
     }
 
+    protected boolean isDocTask() {
+        return DfDBFluteTaskStatus.getInstance().isDocTask();
+    }
+
     protected Connection createConnection(String driver, String url, UnifiedSchema unifiedSchema, Properties info) {
         setupConnectionDriver(driver);
         try {
@@ -599,6 +605,10 @@ public abstract class DfAbstractHelperProperties {
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
+    }
+
+    protected <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet() {
+        return new LinkedHashSet<ELEMENT>();
     }
 
     protected String filterDoubleQuotation(String str) {

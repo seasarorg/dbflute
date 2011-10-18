@@ -6,23 +6,42 @@ package org.seasar.dbflute.task;
  */
 public class DfDBFluteTaskStatus {
 
+    // ===================================================================================
+    //                                                                           Singleton
+    //                                                                           =========
     private static final DfDBFluteTaskStatus _instance = new DfDBFluteTaskStatus();
 
     public static final DfDBFluteTaskStatus getInstance() {
         return _instance;
     }
 
-    protected TaskType taskType;
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected TaskType _taskType;
 
+    // ===================================================================================
+    //                                                                        Determination
+    //                                                                        ============
+    public boolean isDocTask() {
+        return TaskType.Doc.equals(_taskType);
+    }
+
+    // ===================================================================================
+    //                                                                           Task Type
+    //                                                                           =========
+    public enum TaskType {
+        JDBC, Doc, Generate, Sql2Entity, OutsideSqlTest, ReplaceSchema, Refresh, TakeAssert
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public TaskType getTaskType() {
-        return taskType;
+        return _taskType;
     }
 
     public void setTaskType(TaskType taskType) {
-        this.taskType = taskType;
-    }
-
-    public enum TaskType {
-        JDBC, Doc, Generate, Sql2Entity, OutsideSqlTest, ReplaceSchema, Refresh, TakeAssert
+        this._taskType = taskType;
     }
 }

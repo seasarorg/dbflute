@@ -118,7 +118,7 @@ public class DfClassificationTop {
 
     public String getTopComment() {
         if (_useDocumentOnly) {
-            return _topComment + " // document only";
+            return _topComment + " (document only)";
         } else {
             return _topComment;
         }

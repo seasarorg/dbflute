@@ -29,14 +29,14 @@ public class DfClassificationAllInOneSqlExecutor {
     //                                                                             Execute
     //                                                                             =======
     public List<Map<String, String>> executeAllInOneSql(Connection conn, String sql) {
-        Statement stmt = null;
+        Statement st = null;
         ResultSet rs = null;
         final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();
         try {
-            stmt = conn.createStatement();
+            st = conn.createStatement();
             _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             _log.debug("The classification sql: " + sql);
-            rs = stmt.executeQuery(sql);
+            rs = st.executeQuery(sql);
             while (rs.next()) {
                 final String tmpClassificationNameValue = rs.getString("classificationName");
                 final String tmpCodeValue = rs.getString(DfClassificationElement.KEY_CODE);
@@ -73,7 +73,7 @@ public class DfClassificationAllInOneSqlExecutor {
         } catch (SQLException e) {
             throw new SQLFailureException("Failed to execute the SQL:" + ln() + sql, e);
         } finally {
-            new DfClassificationSqlResourceCloser().closeSqlResource(conn, stmt, rs);
+            new DfClassificationSqlResourceCloser().closeSqlResource(conn, st, rs);
         }
         return elementList;
     }

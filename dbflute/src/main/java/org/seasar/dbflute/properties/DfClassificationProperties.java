@@ -30,8 +30,6 @@ import org.seasar.dbflute.properties.assistant.classification.DfClassificationLi
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus;
-import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -65,6 +63,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     protected Map<String, DfClassificationTop> _classificationTopMap;
     protected Map<String, List<Map<String, String>>> _classificationDefinitionMap;
+    protected final Set<String> _documentOnlyClassificationSet = newLinkedHashSet();
 
     public boolean hasClassificationTop() {
         return !getClassificationTopMap().isEmpty();
@@ -113,7 +112,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final Map<String, Object> plainClassificationDefinitionMap = mapProp(key, DEFAULT_EMPTY_MAP);
         final Set<String> classificationNameSet = plainClassificationDefinitionMap.keySet();
         final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
-        final boolean docTask = TaskType.Doc.equals(DfDBFluteTaskStatus.getInstance().getTaskType());
+        final boolean docTask = isDocTask();
 
         clsLoop: for (String classificationName : classificationNameSet) {
             // - - - - - - - - - - - - - - - - -
@@ -164,6 +163,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 if (isElementMapClassificationTop(elementMap)) { // top definition
                     processClassificationTopFromLiteralIfNeeds(classificationName, elementMap);
                     if (!docTask && isUseDocumentOnly(classificationName)) {
+                        // e.g. Generate or Sql2Entity, and document-only classification
+                        _documentOnlyClassificationSet.add(classificationName);
+                        _log.info("...Skipping document-only classification: " + classificationName);
                         continue clsLoop;
                     }
                 } else {
@@ -819,7 +821,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 return null;
             }
         }
-        final String classificationName;
+        final String foundClassificationName;
         {
             // because columnClassificationMap is not flexible map
             StringKeyMap<String> columnClassificationMap = _fkeyColumnClassificationMap.get(tableName);
@@ -828,17 +830,25 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 columnClassificationMap.putAll(plainMap);
                 _fkeyColumnClassificationMap.put(tableName, columnClassificationMap);
             }
-            classificationName = columnClassificationMap.get(columnName);
+            foundClassificationName = columnClassificationMap.get(columnName);
         }
-        if (classificationName != null) {
-            return classificationName;
-        }
-        for (String columnNameHint : plainMap.keySet()) {
-            if (isHitByTheHint(columnName, columnNameHint)) {
-                return plainMap.get(columnNameHint);
+        String classificationName = null;
+        if (foundClassificationName != null) {
+            classificationName = foundClassificationName;
+        } else {
+            for (String columnNameHint : plainMap.keySet()) {
+                if (isHitByTheHint(columnName, columnNameHint)) {
+                    classificationName = plainMap.get(columnNameHint);
+                }
             }
         }
-        return null;
+        if (classificationName != null) {
+            if (!isDocTask() && _documentOnlyClassificationSet.contains(classificationName)) {
+                // e.g. Generate or Sql2Entity, and document-only classification
+                classificationName = null; // the classification is invalid at this task
+            }
+        }
+        return classificationName;
     }
 
     public boolean hasClassificationName(String tableName, String columnName) {
