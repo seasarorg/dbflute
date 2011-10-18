@@ -22,9 +22,6 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
-    public void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap) {
-    }
-
     public String findDbName(String flexibleName) {
         return null;
     }
@@ -117,6 +114,12 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
+    public void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap) {
+    }
+
+    public void acceptAllColumnMap(Entity entity, Map<String, ? extends Object> allColumnMap) {
+    }
+
     public Map<String, Object> extractPrimaryKeyMap(Entity entity) {
         return null;
     }
@@ -124,4 +127,5 @@ public class MockDBMeta extends AbstractDBMeta {
     public Map<String, Object> extractAllColumnMap(Entity entity) {
         return null;
     }
+
 }

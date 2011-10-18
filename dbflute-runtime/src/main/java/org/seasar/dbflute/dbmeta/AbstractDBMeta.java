@@ -666,9 +666,25 @@ public abstract class AbstractDBMeta implements DBMeta {
             msg = msg + " primaryKeyMap=" + primaryKeyMap;
             throw new IllegalArgumentException(msg);
         }
+        final List<ColumnInfo> uniqueColumnList = getPrimaryUniqueInfo().getUniqueColumnList();
+        doConvertToEntity(entity, primaryKeyMap, uniqueColumnList, entityPropertySetupperMap);
+    }
+
+    protected <ENTITY extends Entity> void doAcceptAllColumnMap(ENTITY entity,
+            Map<String, ? extends Object> allColumnMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+        if (allColumnMap == null || allColumnMap.isEmpty()) {
+            String msg = "The argument 'allColumnMap' should not be null or empty:";
+            msg = msg + " allColumnMap=" + allColumnMap;
+            throw new IllegalArgumentException(msg);
+        }
+        final List<ColumnInfo> uniqueColumnList = getColumnInfoList();
+        doConvertToEntity(entity, allColumnMap, uniqueColumnList, entityPropertySetupperMap);
+    }
+
+    protected <ENTITY extends Entity> void doConvertToEntity(ENTITY entity, Map<String, ? extends Object> columnMap,
+            List<ColumnInfo> columnInfoList, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         entity.clearModifiedInfo();
-        final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(primaryKeyMap);
-        final List<ColumnInfo> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
+        final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnMap);
         for (ColumnInfo columnInfo : columnInfoList) {
             final String columnName = columnInfo.getColumnDbName();
             final String propertyName = columnInfo.getPropertyName();
@@ -700,10 +716,12 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                               Extract
     //                                               -------
     protected Map<String, Object> doExtractPrimaryKeyMap(Entity entity) {
+        assertObjectNotNull("entity", entity);
         return doConvertToColumnValueMap(entity, true);
     }
 
     protected Map<String, Object> doExtractAllColumnMap(Entity entity) {
+        assertObjectNotNull("entity", entity);
         return doConvertToColumnValueMap(entity, false);
     }
 
@@ -736,13 +754,13 @@ public abstract class AbstractDBMeta implements DBMeta {
         protected String _propertyName;
 
         public MapStringValueAnalyzer(Map<String, ? extends Object> valueMap) {
-            this._valueMap = valueMap;
+            _valueMap = valueMap;
         }
 
         public boolean init(String columnName, String uncapPropName, String propertyName) {
-            this._columnName = columnName;
-            this._uncapPropName = uncapPropName;
-            this._propertyName = propertyName;
+            _columnName = columnName;
+            _uncapPropName = uncapPropName;
+            _propertyName = propertyName;
             return _valueMap.containsKey(_columnName);
         }
 

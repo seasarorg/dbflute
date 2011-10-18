@@ -426,6 +426,14 @@ public interface DBMeta {
      */
     void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap);
 
+    /**
+     * Accept the map of all columns. map:{[column-name] = [value]}<br />
+     * Derived columns are not accepted, physical columns only.
+     * @param entity The instance of entity to accept the map data. (NotNull)
+     * @param allColumnMap The value map of all columns. (NotNull and NotEmpty)
+     */
+    void acceptAllColumnMap(Entity entity, Map<String, ? extends Object> allColumnMap);
+
     // -----------------------------------------------------
     //                                               Extract
     //                                               -------
@@ -437,7 +445,8 @@ public interface DBMeta {
     Map<String, Object> extractPrimaryKeyMap(Entity entity);
 
     /**
-     * Extract The map of all columns. map:{[column-name] = [value]}
+     * Extract The map of all columns. map:{[column-name] = [value]}<br />
+     * Derived columns are not extracted, physical columns only.
      * @param entity Target entity. (NotNull)
      * @return The map of all columns. (NotNull)
      */
