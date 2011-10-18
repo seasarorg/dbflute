@@ -571,7 +571,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final String onQueryName;
             ++selectIndex;
             if (_useSelectIndex) {
-                onQueryName = buildSelectIndexAliasName(columnSqlName.toString(), selectIndex);
+                onQueryName = buildSelectIndexAlias(columnSqlName, null, selectIndex);
                 registerSelectIndex(columnDbName, onQueryName, selectIndex);
             } else {
                 onQueryName = columnSqlName.toString();
@@ -610,7 +610,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 final String onQueryName;
                 ++selectIndex;
                 if (_useSelectIndex) {
-                    onQueryName = buildSelectIndexAliasName(columnAliasName, selectIndex);
+                    onQueryName = buildSelectIndexAlias(columnInfo.getColumnSqlName(), columnAliasName, selectIndex);
                     registerSelectIndex(columnAliasName, onQueryName, selectIndex);
                 } else {
                     onQueryName = columnAliasName;
@@ -792,14 +792,28 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return StringKeyMap.createAsFlexible();
     }
 
-    protected String buildSelectIndexAliasName(String sqlName, Integer selectIndex) {
-        final int aliasNameLimitSize = getAliasNameLimitSize();
-        if (sqlName.length() > aliasNameLimitSize) {
-            final int aliasNameBaseSize = aliasNameLimitSize - 10;
-            return Srl.substring(sqlName, 0, aliasNameBaseSize) + "_c" + selectIndex;
-        } else {
-            return sqlName;
+    protected String buildSelectIndexAlias(ColumnSqlName sqlName, String aliasName, Integer selectIndex) {
+        if (shouldBeSafeAlias(sqlName)) {
+            return "c" + selectIndex; // no use alias for safety
         }
+        final String baseName;
+        if (aliasName != null) { // relation column
+            baseName = aliasName;
+        } else { // local column
+            baseName = sqlName.toString();
+        }
+        final int aliasNameLimitSize = getAliasNameLimitSize();
+        if (baseName.length() > aliasNameLimitSize) {
+            final int aliasNameBaseSize = aliasNameLimitSize - 10;
+            return Srl.substring(baseName, 0, aliasNameBaseSize) + "_c" + selectIndex;
+        } else {
+            return baseName;
+        }
+    }
+
+    protected boolean shouldBeSafeAlias(ColumnSqlName sqlName) {
+        // '"' is for many DBMSs, '[' is for SQLServer, '`' is for MySQL
+        return Srl.containsAny(sqlName.toString(), "\"", "[", "`"); // might be quoted
     }
 
     protected int getAliasNameLimitSize() {
