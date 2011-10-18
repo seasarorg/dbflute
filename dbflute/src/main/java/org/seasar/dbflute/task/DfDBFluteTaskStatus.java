@@ -21,10 +21,14 @@ public class DfDBFluteTaskStatus {
     protected TaskType _taskType;
 
     // ===================================================================================
-    //                                                                        Determination
-    //                                                                        ============
+    //                                                                       Determination
+    //                                                                       =============
     public boolean isDocTask() {
         return TaskType.Doc.equals(_taskType);
+    }
+
+    public boolean isReplaceSchema() {
+        return TaskType.ReplaceSchema.equals(_taskType);
     }
 
     // ===================================================================================

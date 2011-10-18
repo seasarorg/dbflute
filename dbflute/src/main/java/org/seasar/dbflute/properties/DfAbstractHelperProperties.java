@@ -510,8 +510,9 @@ public abstract class DfAbstractHelperProperties {
         return DfEnvironmentType.getInstance().getEnvironmentType();
     }
 
-    protected boolean isDocTask() {
-        return DfDBFluteTaskStatus.getInstance().isDocTask();
+    protected boolean isDocOnlyTask() {
+        final DfDBFluteTaskStatus instance = DfDBFluteTaskStatus.getInstance();
+        return instance.isDocTask() || instance.isReplaceSchema();
     }
 
     protected Connection createConnection(String driver, String url, UnifiedSchema unifiedSchema, Properties info) {

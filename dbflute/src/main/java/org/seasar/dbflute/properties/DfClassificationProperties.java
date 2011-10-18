@@ -112,7 +112,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final Map<String, Object> plainClassificationDefinitionMap = mapProp(key, DEFAULT_EMPTY_MAP);
         final Set<String> classificationNameSet = plainClassificationDefinitionMap.keySet();
         final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
-        final boolean docTask = isDocTask();
+        final boolean docOnlyTask = isDocOnlyTask();
 
         clsLoop: for (String classificationName : classificationNameSet) {
             // - - - - - - - - - - - - - - - - -
@@ -162,7 +162,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 // - - - - - - -
                 if (isElementMapClassificationTop(elementMap)) { // top definition
                     processClassificationTopFromLiteralIfNeeds(classificationName, elementMap);
-                    if (!docTask && isUseDocumentOnly(classificationName)) {
+                    if (!docOnlyTask && isUseDocumentOnly(classificationName)) {
                         // e.g. Generate or Sql2Entity, and document-only classification
                         _documentOnlyClassificationSet.add(classificationName);
                         _log.info("...Skipping document-only classification: " + classificationName);
@@ -843,7 +843,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             }
         }
         if (classificationName != null) {
-            if (!isDocTask() && _documentOnlyClassificationSet.contains(classificationName)) {
+            if (!isDocOnlyTask() && _documentOnlyClassificationSet.contains(classificationName)) {
                 // e.g. Generate or Sql2Entity, and document-only classification
                 classificationName = null; // the classification is invalid at this task
             }
