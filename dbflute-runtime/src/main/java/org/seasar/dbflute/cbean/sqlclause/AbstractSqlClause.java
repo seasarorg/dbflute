@@ -793,11 +793,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String buildSelectIndexAlias(ColumnSqlName sqlName, String aliasName, Integer selectIndex) {
-        if (shouldBeSafeAlias(sqlName)) {
-            return "c" + selectIndex; // no use alias for safety
-        }
         final String baseName;
         if (aliasName != null) { // relation column
+            if (shouldBeSafeAlias(sqlName)) { // means the alias might be dangerous
+                return "c" + selectIndex; // no use alias for safety
+            }
             baseName = aliasName;
         } else { // local column
             baseName = sqlName.toString();
