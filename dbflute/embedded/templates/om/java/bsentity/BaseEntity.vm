@@ -25,9 +25,7 @@ import ${glPackageBaseCommon}.${glCDef};
 #if ($table.isBuriTarget())
 import ${glPackagePluginBuri}.${glBuriDef};
 #end
-#if ($table.hasRelation() || $table.isSql2EntityCustomizeHasNested())
 import ${myExtendedEntityPackageName}.*;
-#end
 #if ($table.isLoadableCustomizeEntity())
 import ${glPackageExtendedEntity}.*;
 #end
@@ -687,9 +685,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * Clone entity instance using super.clone(). 
      * @return The cloned instance of this entity. (NotNull)
      */
-    public Object clone() {
+    public ${myExtendedObjectClassName} clone() {
         try {
-            return super.clone();
+            return (${myExtendedObjectClassName})super.clone();
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("Failed to clone the entity: " + toString(), e);
         }

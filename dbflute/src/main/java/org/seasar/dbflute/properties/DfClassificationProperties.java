@@ -458,15 +458,26 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     protected final Map<String, String> _nameFromToMap = newLinkedHashMap();
     {
+        // basic unexpected marks
         _nameFromToMap.put("%", "_PERCENT_");
         _nameFromToMap.put("&", "_AND_");
         _nameFromToMap.put("(", "_");
         _nameFromToMap.put(")", "_");
+
+        // basic full-width marks
         _nameFromToMap.put("\uff05", "_PERCENT_");
         _nameFromToMap.put("\uff06", "_AND_");
         _nameFromToMap.put("\uff08", "_");
         _nameFromToMap.put("\uff09", "_");
+
+        // full-width space
         _nameFromToMap.put("\u3000", "_");
+
+        // hyphens
+        _nameFromToMap.put("\u2010", "_");
+        _nameFromToMap.put("\u2212", "_");
+        _nameFromToMap.put("\u30fc", "_");
+        _nameFromToMap.put("\uff0d", "_");
     }
 
     protected String filterTableClassificationName(String name) {
