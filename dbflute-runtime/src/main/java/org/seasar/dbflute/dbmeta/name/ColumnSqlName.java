@@ -27,6 +27,7 @@ public class ColumnSqlName {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // using concurrent one just in case 
     private static final Map<Character, Object> _basicCharMap = new ConcurrentHashMap<Character, Object>();
     {
         final StringBuilder sb = new StringBuilder();
