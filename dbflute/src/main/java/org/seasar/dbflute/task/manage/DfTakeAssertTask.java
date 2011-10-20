@@ -24,7 +24,10 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfTakeAssertAssertionFailureException;
+import org.seasar.dbflute.exception.DfTakeAssertFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
@@ -84,18 +87,37 @@ public class DfTakeAssertTask extends DfAbstractTask {
         // (then the finalInfo does not have an exception)
         _takeAssertExList = process.getTakeAssertExList();
 
-        handleException(sqlRootDir, _takeAssertExList);
+        handleSQLFailure();
+        handleAssertionFailure(sqlRootDir);
     }
 
-    protected void handleException(String sqlRootDir, List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
-        if (takeAssertExList.isEmpty()) {
+    protected void handleSQLFailure() {
+        if (_takeAssertExList.isEmpty() && _finalInfo.isFailure()) { // means SQL failure
+            String msg = "Failed to take assert (Look at the final info)";
+            throw new DfTakeAssertFailureException(msg);
+        }
+    }
+
+    protected void handleAssertionFailure(String sqlRootDir) {
+        if (_takeAssertExList.isEmpty()) {
             _log.info("*All assertions are successful");
             return;
         }
-        dumpAssertionFailure(takeAssertExList);
+        dumpAssertionFailure(_takeAssertExList);
+        throwTakeAssertAssertionFailureException(_takeAssertExList);
+    }
 
-        // here it throws the first exception to stop the DBFlute task as failure
-        throw takeAssertExList.get(0);
+    protected void throwTakeAssertAssertionFailureException(
+            List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Assertion failures were found.");
+        br.addItem("Advice");
+        br.addElement("Look at the take-assert.log in the log directory of the DBFlute client.");
+        br.addElement("The log file has detail messages about the failures.");
+        br.addItem("Failure Count");
+        br.addElement(takeAssertExList.size());
+        final String msg = br.buildExceptionMessage();
+        throw new DfTakeAssertAssertionFailureException(msg);
     }
 
     protected void dumpAssertionFailure(List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
@@ -108,6 +130,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dumpFile), "UTF-8"));
             for (DfTakeFinallyAssertionFailureException assertionEx : takeAssertExList) {
                 bw.write(assertionEx.getMessage());
+                bw.write(ln() + ln());
             }
             bw.flush();
         } catch (IOException e) {
