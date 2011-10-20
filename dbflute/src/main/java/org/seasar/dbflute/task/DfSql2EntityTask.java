@@ -534,27 +534,57 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final DfColumnMeta metaInfo = metaMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
         final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
-        String plainComment = null;
+        String relatedComment = null;
         if (relatedTable != null) {
             final String relatedColumnName = metaInfo.getSql2EntityRelatedColumnName();
             final Column relatedColumn = relatedTable.getColumn(relatedColumnName);
             if (relatedColumn != null) {
-                plainComment = relatedColumn.getPlainComment();
+                relatedComment = relatedColumn.getPlainComment();
             }
         }
-        final String columnComment = metaInfo.getColumnComment();
+        // the meta has its select column comment
+        final String selectColumnComment = metaInfo.getColumnComment();
+        final String commentMark = "// ";
+        final String delimiter = getAliasDelimiterInDbComment();
         final StringBuilder sb = new StringBuilder();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(plainComment)) {
-            sb.append(plainComment);
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(columnComment)) {
-                sb.append(ln()).append("// ").append(columnComment);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(relatedComment)) {
+            sb.append(relatedComment);
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(selectColumnComment)) { // both exist
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(delimiter)) { // use alias option
+                    if (relatedComment.contains(delimiter)) { // resolved in related comment
+                        sb.append(ln()).append(commentMark).append(selectColumnComment);
+                    } else { // unresolved yet
+                        if (isDbCommentOnAliasBasis()) { // related comment is alias
+                            sb.append(delimiter);
+                        } else { // related comment is description
+                            sb.append(ln());
+                        }
+                        sb.append(commentMark).append(selectColumnComment);
+                    }
+                } else { // no alias option
+                    sb.append(ln()).append(commentMark).append(selectColumnComment);
+                }
             }
-        } else {
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(columnComment)) {
-                sb.append("// ").append(columnComment);
+        } else { // not found related comment
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(selectColumnComment)) {
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(delimiter)) { // use alias option
+                    if (isDbCommentOnAliasBasis()) {
+                        // select column comment is treated as description
+                        sb.append(delimiter);
+                    }
+                }
+                sb.append(commentMark).append(selectColumnComment);
             }
         }
         column.setPlainComment(sb.toString());
+    }
+
+    protected String getAliasDelimiterInDbComment() {
+        return getDocumentProperties().getAliasDelimiterInDbComment();
+    }
+
+    protected boolean isDbCommentOnAliasBasis() {
+        return getDocumentProperties().isDbCommentOnAliasBasis();
     }
 
     protected void setupSql2EntityElement(String entityName, Map<String, DfColumnMeta> metaMap, String columnName,

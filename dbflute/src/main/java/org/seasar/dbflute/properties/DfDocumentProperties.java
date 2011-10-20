@@ -60,7 +60,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return delimiter != null && delimiter.trim().length() > 0 && !delimiter.trim().equalsIgnoreCase("null");
     }
 
-    protected String getAliasDelimiterInDbComment() {
+    public String getAliasDelimiterInDbComment() {
         String delimiter = (String) getDocumentDefinitionMap().get("aliasDelimiterInDbComment");
         if (delimiter == null || delimiter.trim().length() == 0) {
             delimiter = null;
@@ -114,7 +114,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return comment.contains(delimiter);
     }
 
-    protected boolean isDbCommentOnAliasBasis() {
+    public boolean isDbCommentOnAliasBasis() {
         return isProperty("isDbCommentOnAliasBasis", false, getDocumentDefinitionMap());
     }
 
