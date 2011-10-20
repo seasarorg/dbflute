@@ -8,7 +8,10 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
- * The cursor of ${table.name}.
+ * The cursor of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
  * @author ${database.classAuthor}
  */
 public class ${myClassName} {
@@ -91,7 +94,10 @@ public class ${myClassName} {
     //                                                                  ==================
 #foreach ($col in $table.columns)
     /**
-     * Get the value of ${col.uncapitalisedJavaName}.
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
      * @return The value of ${col.uncapitalisedJavaName}. (NullAllowed)
      * @throws java.sql.SQLException
      */
