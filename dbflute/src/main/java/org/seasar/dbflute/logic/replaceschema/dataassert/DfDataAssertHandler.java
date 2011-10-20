@@ -13,9 +13,9 @@ public interface DfDataAssertHandler {
     /**
      * Handle asserting.
      * @param sqlFile The SQL file that contains the SQL. (NotNull)
-     * @param stmt Statement. (NotNull)
+     * @param st Statement. (NotNull)
      * @param sql SQL string. (NotNull)
      * @throws SQLException
      */
-    void handle(File sqlFile, Statement stmt, String sql) throws SQLException;
+    void handle(File sqlFile, Statement st, String sql) throws SQLException;
 }

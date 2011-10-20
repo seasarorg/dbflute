@@ -3,7 +3,6 @@ package org.seasar.dbflute.logic.replaceschema.process;
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,7 @@ import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHan
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.factory.DfSequenceHandlerFactory;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -53,7 +53,8 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     protected final UnifiedSchema _mainSchema;
     protected final boolean _takeAssert;
 
-    protected Timestamp _beforeTimestamp; // is set through its property
+    /** The list of assertion failure exception for take-assert. */
+    protected final List<DfTakeFinallyAssertionFailureException> _takeAssertExList = DfCollectionUtil.newArrayList();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -85,19 +86,30 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         DfTakeFinallyAssertionFailureException assertionEx = null;
         try {
             fireResult = takeFinally(runInfo);
+            if (_takeAssert && !_takeAssertExList.isEmpty()) {
+                // override result with saved exceptions
+                // this message uses the first exception
+                fireResult = createFailureFireResult(_takeAssertExList.get(0));
+            }
         } catch (DfTakeFinallyAssertionFailureException e) {
-            fireResult = new DfSqlFileFireResult();
-            fireResult.setExistsError(true);
-            fireResult.setResultMessage("{Take Finally}: *asserted");
-            final StringBuilder sb = new StringBuilder();
-            sb.append(" >> ").append(DfTypeUtil.toClassTitle(e));
-            sb.append(ln()).append(" (Look at the exception message: console or dbflute.log)");
-            fireResult.setDetailMessage(sb.toString());
+            // if take-assert, the exception does not thrown
+            fireResult = createFailureFireResult(e);
             assertionEx = e;
         }
         final DfTakeFinallyFinalInfo finalInfo = createFinalInfo(fireResult, assertionEx);
         incrementSequenceToDataMax();
         return finalInfo;
+    }
+
+    protected DfSqlFileFireResult createFailureFireResult(DfTakeFinallyAssertionFailureException e) {
+        final DfSqlFileFireResult fireResult = new DfSqlFileFireResult();
+        fireResult.setExistsError(true);
+        fireResult.setResultMessage("{Take Finally}: *asserted");
+        final StringBuilder sb = new StringBuilder();
+        sb.append(" >> ").append(DfTypeUtil.toClassTitle(e));
+        sb.append(ln()).append(" (Look at the exception message: console or dbflute.log)");
+        fireResult.setDetailMessage(sb.toString());
+        return fireResult;
     }
 
     @Override
@@ -180,11 +192,23 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
                     String msg = "The statement was null: sqlFile=" + sqlFile;
                     throw new IllegalStateException(msg);
                 }
-                dataAssertHandler.handle(sqlFile, st, sql);
+                try {
+                    dataAssertHandler.handle(sqlFile, st, sql);
+                } catch (DfTakeFinallyAssertionFailureException e) {
+                    handleAssertionFailureException(e);
+                }
                 return DfRunnerDispatchResult.DISPATCHED;
             }
         });
         return runnerExecute;
+    }
+
+    protected void handleAssertionFailureException(DfTakeFinallyAssertionFailureException e) {
+        if (_takeAssert) { // save for final message
+            _takeAssertExList.add(e);
+        } else {
+            throw e;
+        }
     }
 
     protected List<File> getTakeFinallySqlFileList() {
@@ -239,5 +263,12 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         }
         finalInfo.setAssertionEx(assertionEx);
         return finalInfo;
+    }
+
+    // ===================================================================================
+    //                                                                     Batch Assertion
+    //                                                                     ===============
+    public List<DfTakeFinallyAssertionFailureException> getTakeAssertExList() {
+        return _takeAssertExList;
     }
 }

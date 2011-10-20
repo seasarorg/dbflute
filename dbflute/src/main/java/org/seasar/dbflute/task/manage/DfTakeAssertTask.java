@@ -46,8 +46,9 @@ public class DfTakeAssertTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _sqlRootDir;
-    protected DfTakeFinallyFinalInfo _finalInfo;
+    protected String _sqlRootDir; // is set by its property (option)
+    protected DfTakeFinallyFinalInfo _finalInfo; // is set after execution
+    protected List<DfTakeFinallyAssertionFailureException> _takeAssertExList; // is set after execution
 
     // ===================================================================================
     //                                                                           Beginning
@@ -78,20 +79,26 @@ public class DfTakeAssertTask extends DfAbstractTask {
         final String sqlRootDir = Srl.is_NotNull_and_NotTrimmedEmpty(_sqlRootDir) ? _sqlRootDir : "./playsql";
         final DfTakeFinallyProcess process = DfTakeFinallyProcess.createAsTakeAssert(sqlRootDir, getDataSource());
         _finalInfo = process.execute();
-        handleFinalInfo(_finalInfo, sqlRootDir);
+
+        // get exceptions from this method when take-assert
+        // (then the finalInfo does not have an exception)
+        _takeAssertExList = process.getTakeAssertExList();
+
+        handleException(sqlRootDir, _takeAssertExList);
     }
 
-    protected void handleFinalInfo(DfTakeFinallyFinalInfo finalInfo, String sqlRootDir) {
-        final DfTakeFinallyAssertionFailureException assertionEx = finalInfo.getAssertionEx();
-        if (assertionEx == null) {
+    protected void handleException(String sqlRootDir, List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
+        if (takeAssertExList.isEmpty()) {
             _log.info("*All assertions are successful");
             return;
         }
-        dumpAssertionFailure(assertionEx);
-        throw assertionEx;
+        dumpAssertionFailure(takeAssertExList);
+
+        // here it throws the first exception to stop the DBFlute task as failure
+        throw takeAssertExList.get(0);
     }
 
-    protected void dumpAssertionFailure(DfTakeFinallyAssertionFailureException assertionEx) {
+    protected void dumpAssertionFailure(List<DfTakeFinallyAssertionFailureException> takeAssertExList) {
         final File dumpFile = new File("./log/take-assert.log");
         if (dumpFile.exists()) {
             dumpFile.delete();
@@ -99,7 +106,9 @@ public class DfTakeAssertTask extends DfAbstractTask {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dumpFile), "UTF-8"));
-            bw.write(assertionEx.getMessage());
+            for (DfTakeFinallyAssertionFailureException assertionEx : takeAssertExList) {
+                bw.write(assertionEx.getMessage());
+            }
             bw.flush();
         } catch (IOException e) {
             if (bw != null) {
@@ -120,15 +129,15 @@ public class DfTakeAssertTask extends DfAbstractTask {
     }
 
     protected String buildFinalMessage() {
-        final DfTakeFinallyFinalInfo finalInfo = _finalInfo; // null allowed
+        final DfTakeFinallyFinalInfo finalInfo = _finalInfo; // might be null
+        final List<DfTakeFinallyAssertionFailureException> takeAssertExList = _takeAssertExList;
         final StringBuilder sb = new StringBuilder();
 
-        // TakeFinally
         if (finalInfo != null) {
             if (finalInfo.isValidInfo()) {
                 buildSchemaTaskContents(sb, finalInfo);
             }
-            if (finalInfo.getAssertionEx() != null) {
+            if (takeAssertExList != null && !takeAssertExList.isEmpty()) {
                 sb.append(ln()).append("    * * * * * * * * * * *");
                 sb.append(ln()).append("    * Assertion Failure *");
                 sb.append(ln()).append("    * * * * * * * * * * *");
