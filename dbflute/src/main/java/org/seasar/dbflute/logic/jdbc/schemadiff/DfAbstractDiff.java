@@ -83,7 +83,22 @@ public abstract class DfAbstractDiff {
         }
 
         public String disp(String obj, boolean next) {
-            return obj.toString();
+            return obj;
+        }
+    }
+
+    protected abstract class TrimmedStringNextPreviousDiffer<OBJECT, DIFF> extends
+            StringNextPreviousDiffer<OBJECT, DIFF> {
+        @Override
+        public boolean isMatch(String next, String previous) {
+            next = next != null ? next.trim() : null;
+            previous = previous != null ? previous.trim() : null;
+            return super.isMatch(next, previous);
+        }
+
+        @Override
+        public String disp(String obj, boolean next) {
+            return obj != null ? obj.trim() : null;
         }
     }
 
@@ -94,7 +109,7 @@ public abstract class DfAbstractDiff {
         }
 
         public String disp(Boolean obj, boolean next) {
-            return obj.toString();
+            return obj != null ? obj.toString() : null;
         }
     }
 
