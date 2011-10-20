@@ -793,11 +793,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String buildSelectIndexAlias(ColumnSqlName sqlName, String aliasName, Integer selectIndex) {
+        if (sqlName.hasIrregularChar()) {
+            return "c" + selectIndex; // use index only for safety
+        }
+        // regular case only here
         final String baseName;
         if (aliasName != null) { // relation column
-            if (shouldBeSafeAlias(sqlName)) { // means the alias might be dangerous
-                return "c" + selectIndex; // no use alias for safety
-            }
             baseName = aliasName;
         } else { // local column
             baseName = sqlName.toString();
@@ -811,12 +812,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    protected boolean shouldBeSafeAlias(ColumnSqlName sqlName) {
-        // '"' is for many DBMSs, '[' is for SQLServer, '`' is for MySQL
-        return Srl.containsAny(sqlName.toString(), "\"", "[", "`"); // might be quoted
-    }
-
-    protected int getAliasNameLimitSize() {
+    protected int getAliasNameLimitSize() { // used only when regular case
         return 30; // default is the least limit size in DBMSs (Oracle)
     }
 

@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.dbmeta.name;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * The value class for the SQL name of column.
  * @author jflute
@@ -24,13 +27,50 @@ public class ColumnSqlName {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    private static final Map<Character, Object> _basicCharMap = new ConcurrentHashMap<Character, Object>();
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("abcdefghijklmnopqrstuvwxyz");
+        sb.append("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        sb.append("0123456789");
+        sb.append("_");
+        final String basicCharStr = sb.toString();
+        final Object dummyObj = new Object();
+        for (int i = 0; i < basicCharStr.length(); i++) {
+            final char ch = basicCharStr.charAt(i);
+            _basicCharMap.put(ch, dummyObj);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final String _columnSqlName;
+    protected final boolean _irregularChar;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ColumnSqlName(String columnSqlName) {
-        this._columnSqlName = columnSqlName;
+        _columnSqlName = columnSqlName;
+        _irregularChar = analyzeIrregularChar(columnSqlName);
+    }
+
+    protected boolean analyzeIrregularChar(String columnSqlName) {
+        for (int i = 0; i < columnSqlName.length(); i++) {
+            final char ch = columnSqlName.charAt(i);
+            if (!_basicCharMap.containsKey(ch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                      Irregular Char
+    //                                                                      ==============
+    public boolean hasIrregularChar() {
+        return _irregularChar;
     }
 
     // ===================================================================================
