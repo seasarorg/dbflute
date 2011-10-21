@@ -462,7 +462,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         if (!_checkDbComment) {
             return;
         }
-        diffNextPrevious(next, previous, tableDiff, new TrimmedStringNextPreviousDiffer<Table, DfTableDiff>() {
+        diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
             public String provide(Table obj) {
                 return obj.getPlainComment();
             }
@@ -631,7 +631,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         if (!_checkDbComment) {
             return;
         }
-        diffNextPrevious(next, previous, columnDiff, new TrimmedStringNextPreviousDiffer<Column, DfColumnDiff>() {
+        diffNextPrevious(next, previous, columnDiff, new StringNextPreviousDiffer<Column, DfColumnDiff>() {
             public String provide(Column obj) {
                 return obj.getPlainComment();
             }

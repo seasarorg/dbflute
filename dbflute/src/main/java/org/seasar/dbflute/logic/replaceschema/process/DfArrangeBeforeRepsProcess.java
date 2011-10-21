@@ -89,7 +89,11 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
                         copyFile(new File(srcPath), new File(destPath));
                     }
                 } else {
-                    _log.info("*Not found the correspoinding copy src file: " + src);
+                    if (cleanOption) { // exception if clean option
+                        throwRepsArrangeCleanCopySrcNotFoundException(src, dest);
+                    } else {
+                        _log.info("*Not found the correspoinding copy src file: " + src);
+                    }
                 }
             } else { // copy to only one file
                 // /- - - - - - - - - - - - - - - - - - - - -
@@ -189,6 +193,20 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
         br.addItem("Advice");
         br.addElement("The path in src should be a path expression.");
         br.addElement("For example, './foo.txt' (should contain '/')");
+        br.addItem("Source");
+        br.addElement(src);
+        br.addItem("Destination");
+        br.addElement(dest);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    protected void throwRepsArrangeCleanCopySrcNotFoundException(String src, String dest) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The src directory or file was not found in spite of clean copy.");
+        br.addItem("Advice");
+        br.addElement("The src directory or file should exist if clean copy.");
+        br.addElement("Make sure your src path setting.");
         br.addItem("Source");
         br.addElement(src);
         br.addItem("Destination");
