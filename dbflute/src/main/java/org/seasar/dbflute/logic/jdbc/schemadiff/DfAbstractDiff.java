@@ -194,13 +194,7 @@ public abstract class DfAbstractDiff {
     //                                                                         Same Helper
     //                                                                         ===========
     protected boolean isSame(Object next, Object previous) {
-        if (next == null && previous == null) {
-            return true;
-        }
-        if (next == null || previous == null) {
-            return false;
-        }
-        return next.equals(previous);
+        return DfDiffAssist.isSame(next, previous);
     }
 
     // ===================================================================================
