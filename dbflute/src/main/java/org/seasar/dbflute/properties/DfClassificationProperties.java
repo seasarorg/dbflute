@@ -473,10 +473,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         // full-width space
         _nameFromToMap.put("\u3000", "_");
 
-        // hyphens
+        // non-compilable hyphens
         _nameFromToMap.put("\u2010", "_");
         _nameFromToMap.put("\u2212", "_");
-        _nameFromToMap.put("\u30fc", "_");
         _nameFromToMap.put("\uff0d", "_");
     }
 

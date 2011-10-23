@@ -10,9 +10,9 @@ import org.seasar.dbflute.logic.jdbc.schemadiff.DfTableDiff;
 /**
  * @author jflute
  */
-public class IndexDiffer extends BasicConstraintKeyDiffer<Index, DfIndexDiff> {
+public class DfIndexDiffer extends DfBasicConstraintKeyDiffer<Index, DfIndexDiff> {
 
-    public IndexDiffer(DfTableDiff tableDiff) {
+    public DfIndexDiffer(DfTableDiff tableDiff) {
         super(tableDiff);
     }
 

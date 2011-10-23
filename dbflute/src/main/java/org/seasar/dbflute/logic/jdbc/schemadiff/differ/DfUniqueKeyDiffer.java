@@ -10,9 +10,9 @@ import org.seasar.dbflute.logic.jdbc.schemadiff.DfUniqueKeyDiff;
 /**
  * @author jflute
  */
-public class UniqueKeyDiffer extends BasicConstraintKeyDiffer<Unique, DfUniqueKeyDiff> {
+public class DfUniqueKeyDiffer extends DfBasicConstraintKeyDiffer<Unique, DfUniqueKeyDiff> {
 
-    public UniqueKeyDiffer(DfTableDiff tableDiff) {
+    public DfUniqueKeyDiffer(DfTableDiff tableDiff) {
         super(tableDiff);
     }
 

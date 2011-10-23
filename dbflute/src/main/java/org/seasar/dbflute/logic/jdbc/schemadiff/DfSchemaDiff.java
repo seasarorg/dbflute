@@ -12,10 +12,10 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.logic.jdbc.schemadiff.differ.ConstraintKeyDiffer;
-import org.seasar.dbflute.logic.jdbc.schemadiff.differ.ForeignKeyDiffer;
-import org.seasar.dbflute.logic.jdbc.schemadiff.differ.IndexDiffer;
-import org.seasar.dbflute.logic.jdbc.schemadiff.differ.UniqueKeyDiffer;
+import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfConstraintKeyDiffer;
+import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfForeignKeyDiffer;
+import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfIndexDiffer;
+import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfUniqueKeyDiffer;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -741,28 +741,28 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                                  ForeignKey Process
     //                                                                  ==================
     protected void processForeignKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
-        processConstraintKey(nextTable, previousTable, new ForeignKeyDiffer(tableDiff));
+        processConstraintKey(nextTable, previousTable, new DfForeignKeyDiffer(tableDiff));
     }
 
     // ===================================================================================
     //                                                                   UniqueKey Process
     //                                                                   =================
     protected void processUniqueKey(DfTableDiff tableDiff, Table nextTable, Table previousTable) {
-        processConstraintKey(nextTable, previousTable, new UniqueKeyDiffer(tableDiff));
+        processConstraintKey(nextTable, previousTable, new DfUniqueKeyDiffer(tableDiff));
     }
 
     // ===================================================================================
     //                                                                       Index Process
     //                                                                       =============
     protected void processIndex(final DfTableDiff tableDiff, Table nextTable, Table previousTable) {
-        processConstraintKey(nextTable, previousTable, new IndexDiffer(tableDiff));
+        processConstraintKey(nextTable, previousTable, new DfIndexDiffer(tableDiff));
     }
 
     // ===================================================================================
     //                                                                  Constraint Process
     //                                                                  ==================
     protected <KEY, DIFF extends DfConstraintDiff> void processConstraintKey(Table nextTable, Table previousTable,
-            ConstraintKeyDiffer<KEY, DIFF> differ) { // for except PK
+            DfConstraintKeyDiffer<KEY, DIFF> differ) { // for except PK
         final List<KEY> keyList = differ.keyList(nextTable);
         final Set<String> sameStructureNextSet = DfCollectionUtil.newHashSet();
         final Map<String, KEY> nextPreviousMap = DfCollectionUtil.newLinkedHashMap();
@@ -775,6 +775,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             for (KEY previousKey : differ.keyList(previousTable)) {
                 final String previousName = differ.constraintName(previousKey);
                 if (differ.isSameConstraintName(nextName, previousName)) { // found
+                    // auto-generated names are not here
                     nextPreviousMap.put(nextName, previousKey);
                     previousNextMap.put(previousName, nextKey);
                     continue nextLoop;
@@ -799,8 +800,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 }
             }
         }
-        final Set<Entry<String, KEY>> entrySet = nextPreviousMap.entrySet();
-        for (Entry<String, KEY> entry : entrySet) {
+        for (Entry<String, KEY> entry : nextPreviousMap.entrySet()) {
             final String nextName = entry.getKey();
             if (sameStructureNextSet.contains(nextName)) {
                 // treated as no changed because only a name-change means nothing for developers
@@ -817,7 +817,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected <KEY, DIFF extends DfConstraintDiff> void processChangedConstraintKeyDiff(KEY nextKey, KEY previousKey,
-            String nextName, String previousName, ConstraintKeyDiffer<KEY, DIFF> differ) {
+            String nextName, String previousName, DfConstraintKeyDiffer<KEY, DIFF> differ) {
         if (differ.isSameConstraintName(nextName, previousName)) { // same name, different structure
             final String nextColumn = differ.column(nextKey);
             final String previousColumn = differ.column(previousKey);
@@ -837,7 +837,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected <KEY, DIFF extends DfConstraintDiff> void processAddedConstraintKey(Table nextTable,
-            ConstraintKeyDiffer<KEY, DIFF> differ, Map<String, KEY> nextPreviousMap) {
+            DfConstraintKeyDiffer<KEY, DIFF> differ, Map<String, KEY> nextPreviousMap) {
         final List<KEY> keyList = differ.keyList(nextTable);
         for (KEY nextKey : keyList) {
             final String nextName = differ.constraintName(nextKey);
@@ -845,13 +845,20 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 continue;
             }
             // added
-            final DIFF diff = differ.createAddedDiff(nextName);
+            final String registeredName;
+            if (differ.isAutoGeneratedName(nextName)) {
+                // to identity with deleted one
+                registeredName = nextName + "(new)";
+            } else {
+                registeredName = nextName;
+            }
+            final DIFF diff = differ.createAddedDiff(registeredName);
             differ.diff(diff, nextKey, null);
         }
     }
 
     protected <KEY, DIFF extends DfConstraintDiff> void processDeletedConstraintKey(Table previousTable,
-            ConstraintKeyDiffer<KEY, DIFF> differ, Map<String, KEY> previousNextMap) { // for except PK
+            DfConstraintKeyDiffer<KEY, DIFF> differ, Map<String, KEY> previousNextMap) { // for except PK
         final List<KEY> keyList = differ.keyList(previousTable);
         for (KEY previousKey : keyList) {
             final String previousName = differ.constraintName(previousKey);
@@ -859,7 +866,14 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 continue;
             }
             // deleted
-            final DIFF diff = differ.createDeletedDiff(previousName);
+            final String registeredName;
+            if (differ.isAutoGeneratedName(previousName)) {
+                // to identity with deleted one
+                registeredName = previousName + "(old)";
+            } else {
+                registeredName = previousName;
+            }
+            final DIFF diff = differ.createDeletedDiff(registeredName);
             differ.diff(diff, null, previousKey);
         }
     }
