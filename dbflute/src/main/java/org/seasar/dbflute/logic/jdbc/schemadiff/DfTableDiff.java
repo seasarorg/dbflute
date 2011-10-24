@@ -32,7 +32,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
 
     protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
-        _nextPreviousItemList.add(new NextPreviousHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
                 return "Schema";
             }
@@ -49,7 +49,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
                 _unifiedSchemaDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
             }
         });
-        _nextPreviousItemList.add(new NextPreviousHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
                 return "Object Type";
             }
@@ -66,7 +66,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
                 _objectTypeDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
             }
         });
-        _nextPreviousItemList.add(new NextPreviousHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
                 return "Column-Def Order";
             }
@@ -83,7 +83,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
                 _columnDefOrderDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
             }
         });
-        _nextPreviousItemList.add(new NextPreviousHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
                 return "Comment";
             }
@@ -96,8 +96,14 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
                 return _tableCommentDiff;
             }
 
+            @Override
+            protected Map<String, String> createSavedNextPreviousDiffMap() {
+                return provide().createNextPreviousDiffQuotedMap();
+            }
+
             public void restore(Map<String, Object> tableDiffMap) {
-                _tableCommentDiff = restoreNextPreviousDiff(tableDiffMap, propertyName());
+                _tableCommentDiff = restoreNextPreviousDiffUnquote(tableDiffMap, propertyName());
+                quoteDispIfNeeds();
             }
         });
     }
@@ -266,30 +272,27 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
     //                                                                            Diff Map
     //                                                                            ========
     public Map<String, Object> createDiffMap() {
-        final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
-        map.put("tableName", _tableName);
-        map.put("diffType", _diffType.toString());
+        final Map<String, Object> diffMap = DfCollectionUtil.newLinkedHashMap();
+        diffMap.put("tableName", _tableName);
+        diffMap.put("diffType", _diffType.toString());
         final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
-        for (NextPreviousHandler provider : nextPreviousItemList) {
-            final DfNextPreviousDiff nextPreviousDiff = provider.provide();
-            if (nextPreviousDiff != null) {
-                map.put(provider.propertyName(), nextPreviousDiff.createNextPreviousDiffMap());
-            }
+        for (NextPreviousHandler handler : nextPreviousItemList) {
+            handler.save(diffMap);
         }
         final List<NestDiffSetupper> nestDiffList = _nestDiffList;
         for (NestDiffSetupper setupper : nestDiffList) {
             final List<? extends DfNestDiff> diffAllList = setupper.provide();
             if (!diffAllList.isEmpty()) {
-                final Map<String, Map<String, Object>> diffMap = DfCollectionUtil.newLinkedHashMap();
+                final Map<String, Map<String, Object>> nestMap = DfCollectionUtil.newLinkedHashMap();
                 for (DfNestDiff nestDiff : diffAllList) {
                     if (nestDiff.hasDiff()) {
-                        diffMap.put(nestDiff.getKeyName(), nestDiff.createDiffMap());
+                        nestMap.put(nestDiff.getKeyName(), nestDiff.createDiffMap());
                     }
                 }
-                map.put(setupper.propertyName(), diffMap);
+                diffMap.put(setupper.propertyName(), nestMap);
             }
         }
-        return map;
+        return diffMap;
     }
 
     public void acceptDiffMap(Map<String, Object> tableDiffMap) {

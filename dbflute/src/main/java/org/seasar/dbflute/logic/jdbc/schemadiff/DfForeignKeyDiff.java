@@ -17,7 +17,7 @@ public class DfForeignKeyDiff extends DfConstraintDiff {
     protected DfNextPreviousDiff _foreignTableDiff;
 
     {
-        _nextPreviousItemList.add(new NextPreviousHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
                 return "FK Table";
             }

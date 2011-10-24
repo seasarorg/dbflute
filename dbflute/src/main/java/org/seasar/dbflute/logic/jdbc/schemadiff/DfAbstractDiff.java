@@ -57,6 +57,14 @@ public abstract class DfAbstractDiff {
     }
 
     protected DfNextPreviousDiff restoreNextPreviousDiff(Map<String, Object> diffMap, String key) {
+        return doRestoreNextPreviousDiff(diffMap, key, false);
+    }
+
+    protected DfNextPreviousDiff restoreNextPreviousDiffUnquote(Map<String, Object> diffMap, String key) {
+        return doRestoreNextPreviousDiff(diffMap, key, true);
+    }
+
+    protected DfNextPreviousDiff doRestoreNextPreviousDiff(Map<String, Object> diffMap, String key, boolean unquote) {
         final Object value = diffMap.get(key);
         if (value == null) {
             return null;
@@ -64,7 +72,11 @@ public abstract class DfAbstractDiff {
         assertElementValueMap(key, value, diffMap);
         @SuppressWarnings("unchecked")
         final Map<String, Object> nextPreviousDiffMap = (Map<String, Object>) value;
-        return DfNextPreviousDiff.create(nextPreviousDiffMap);
+        if (unquote) {
+            return DfNextPreviousDiff.createUnquote(nextPreviousDiffMap);
+        } else {
+            return DfNextPreviousDiff.create(nextPreviousDiffMap);
+        }
     }
 
     protected static interface NextPreviousDiffer<OBJECT, DIFF, TYPE> {
@@ -121,7 +133,31 @@ public abstract class DfAbstractDiff {
 
         DfNextPreviousDiff provide();
 
+        void save(Map<String, Object> diffMap);
+
         void restore(Map<String, Object> diffMap);
+    }
+
+    public static abstract class NextPreviousHandlerBase implements NextPreviousHandler {
+        public void save(Map<String, Object> diffMap) {
+            if (provide() != null) {
+                doSave(diffMap);
+            }
+        }
+
+        protected void doSave(Map<String, Object> diffMap) {
+            diffMap.put(propertyName(), createSavedNextPreviousDiffMap());
+        }
+
+        protected Map<String, String> createSavedNextPreviousDiffMap() {
+            return provide().createNextPreviousDiffMap();
+        }
+
+        protected void quoteDispIfNeeds() {
+            if (provide() != null) {
+                provide().quoteDispIfNeeds();
+            }
+        }
     }
 
     // ===================================================================================

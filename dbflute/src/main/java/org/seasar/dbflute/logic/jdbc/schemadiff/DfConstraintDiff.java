@@ -28,7 +28,7 @@ public abstract class DfConstraintDiff extends DfAbstractDiff implements DfNestD
 
     protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
-        _nextPreviousItemList.add(new NextPreviousHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
                 return "Name";
             }
@@ -45,7 +45,7 @@ public abstract class DfConstraintDiff extends DfAbstractDiff implements DfNestD
                 _nameDiff = restoreNextPreviousDiff(diffMap, propertyName());
             }
         });
-        _nextPreviousItemList.add(new NextPreviousHandler() {
+        _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
                 return "Column";
             }
