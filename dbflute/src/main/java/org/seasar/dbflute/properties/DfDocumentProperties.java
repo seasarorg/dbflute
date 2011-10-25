@@ -67,38 +67,36 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return delimiter;
     }
 
-    public String extractAliasFromDbComment(String comment) {
-        if (!isAliasHandling(comment)) {
-            // alias does not exist everywhere
-            // if alias handling is not valid
-            return null;
-        }
-        if (hasAliasDelimiter(comment)) {
-            final String delimiter = getAliasDelimiterInDbComment();
-            return comment.substring(0, comment.indexOf(delimiter)).trim();
-        } else {
-            if (isDbCommentOnAliasBasis()) {
-                return comment; // because the comment is for alias
+    public String extractAliasFromDbComment(String comment) { // alias is trimmed
+        if (isAliasHandling(comment)) {
+            if (hasAliasDelimiter(comment)) {
+                final String delimiter = getAliasDelimiterInDbComment();
+                return comment.substring(0, comment.indexOf(delimiter)).trim();
             } else {
-                return null;
+                if (isDbCommentOnAliasBasis()) {
+                    // because the comment is for alias
+                    return comment != null ? comment.trim() : null;
+                }
             }
         }
+        // alias does not exist everywhere
+        // if alias handling is not valid
+        return null;
     }
 
-    public String extractCommentFromDbComment(String comment) {
-        if (!isAliasHandling(comment)) {
-            return comment;
-        }
-        if (hasAliasDelimiter(comment)) {
-            final String delimiter = getAliasDelimiterInDbComment();
-            return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
-        } else {
-            if (isDbCommentOnAliasBasis()) {
-                return null; // because the comment is for alias
+    public String extractCommentFromDbComment(String comment) { // comment is trimmed
+        if (isAliasHandling(comment)) {
+            if (hasAliasDelimiter(comment)) {
+                final String delimiter = getAliasDelimiterInDbComment();
+                return comment.substring(comment.indexOf(delimiter) + delimiter.length()).trim();
             } else {
-                return comment;
+                if (isDbCommentOnAliasBasis()) {
+                    // because the comment is for alias
+                    return null;
+                }
             }
         }
+        return comment != null ? comment.trim() : null;
     }
 
     protected boolean isAliasHandling(String comment) {
