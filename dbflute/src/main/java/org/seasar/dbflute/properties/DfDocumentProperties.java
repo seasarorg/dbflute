@@ -8,7 +8,6 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -130,8 +129,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return null;
         }
         // escape
-        text = DfStringUtil.replace(text, "<", "&lt;");
-        text = DfStringUtil.replace(text, ">", "&gt;");
+        text = Srl.replace(text, "<", "&lt;");
+        text = Srl.replace(text, ">", "&gt;");
+        text = Srl.replace(text, " ", "&nbsp;");
 
         // line separator
         text = removeCR(text);
@@ -150,9 +150,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return null;
         }
         // escape
-        text = DfStringUtil.replace(text, "<", "&lt;");
-        text = DfStringUtil.replace(text, ">", "&gt;");
-        text = DfStringUtil.replace(text, "\"", "&quot;");
+        text = Srl.replace(text, "<", "&lt;");
+        text = Srl.replace(text, ">", "&gt;");
+        text = Srl.replace(text, "\"", "&quot;");
 
         // line separator
         text = removeCR(text);
@@ -164,8 +164,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return null;
         }
         // escape
-        text = DfStringUtil.replace(text, "<", "&lt;");
-        text = DfStringUtil.replace(text, ">", "&gt;");
+        text = Srl.replace(text, "<", "&lt;");
+        text = Srl.replace(text, ">", "&gt;");
 
         // line separator
         text = removeCR(text);
@@ -179,8 +179,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (text == null || text.trim().length() == 0) {
             return null;
         }
-        text = DfStringUtil.replace(text, "<", "&lt;");
-        text = DfStringUtil.replace(text, ">", "&gt;");
+        text = Srl.replace(text, "<", "&lt;");
+        text = Srl.replace(text, ">", "&gt;");
         text = removeCR(text);
         final String javaDocLineSeparator = "<br />" + NORMAL_LINE_SEPARATOR + indent + " * ";
         if (text.contains(NORMAL_LINE_SEPARATOR)) {
@@ -219,7 +219,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return null;
         }
         text = removeCR(text);
-        text = DfStringUtil.replace(text, "\"", "\\\""); // escape double quotation
+        text = Srl.replace(text, "\"", "\\\""); // escape double quotation
 
         final String literalLineSeparator = "\\\\n";
         if (text.contains(NORMAL_LINE_SEPARATOR)) {

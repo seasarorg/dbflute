@@ -79,6 +79,10 @@ public class DfColumnDiff extends DfAbstractDiff implements DfNestDiff {
                 return "defaultValueDiff";
             }
 
+            // trimmed-string process here
+            // but DBFlute gets default values with trimming
+            // so it does not work
+
             @Override
             protected Map<String, String> createSavedNextPreviousDiffMap() {
                 return provide().createNextPreviousDiffQuotedMap();
