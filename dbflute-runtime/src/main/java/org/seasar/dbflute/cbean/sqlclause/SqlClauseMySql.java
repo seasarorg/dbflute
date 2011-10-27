@@ -18,7 +18,9 @@ package org.seasar.dbflute.cbean.sqlclause;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbway.DBWay;
 import org.seasar.dbflute.dbway.WayOfMySQL;
@@ -168,6 +170,16 @@ public class SqlClauseMySql extends AbstractSqlClause {
     @Override
     protected boolean isUpdateSubQueryUseLocalTableSupported() {
         return false;
+    }
+
+    // [DBFlute-0.9.9.1C]
+    // ===================================================================================
+    //                                                                      Collate Clause
+    //                                                                      ==============
+    public static class CollateUTF8UnicodeArranger implements QueryClauseArranger {
+        public String arrange(ColumnRealName columnRealName, String operand, String bindExpression, String rearOption) {
+            return columnRealName + " collate utf8_unicode_ci " + operand + " " + bindExpression + rearOption;
+        }
     }
 
     // [DBFlute-0.9.5]
