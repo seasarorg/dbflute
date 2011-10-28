@@ -256,12 +256,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     if (addedBatchSize == 100000) {
                         // this is supported in only delimiter data writer
                         // because delimiter data can treat large data
-                        conn.setAutoCommit(false);
                         ps.executeBatch(); // to avoid OutOfMemory
-                        System.out.println("/*****************************************");
-                        System.out.println("commit()");
-                        System.out.println("**********/");
-                        conn.commit();
                         ps.clearBatch(); // for next batch
                         addedBatchSize = 0;
                     }
@@ -275,12 +270,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 preContinueString = null;
             }
             if (ps != null && addedBatchSize > 0) {
-                conn.setAutoCommit(false);
                 ps.executeBatch();
-                System.out.println("/*****************************************");
-                System.out.println("commit()");
-                System.out.println("**********/");
-                conn.commit();
             }
             noticeLoadedRowSize(tableDbName, rowNumber);
             checkImplicitClassification(dataFile, tableDbName, columnNameList, conn);
@@ -289,11 +279,6 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
         } catch (IOException e) {
             throw e;
         } catch (SQLException e) {
-            try {
-                conn.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
             final SQLException nextEx = e.getNextException();
             if (nextEx != null && !e.equals(nextEx)) { // focus on next exception
                 _log.warn("*Failed to register: " + e.getMessage());
