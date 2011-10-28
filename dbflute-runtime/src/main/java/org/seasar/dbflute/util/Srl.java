@@ -431,12 +431,42 @@ public class Srl {
     //                                                                           =========
     public static String substring(final String str, final int beginIndex) {
         assertStringNotNull(str);
+        if (str.length() < beginIndex) {
+            String msg = "The length of the string was smaller than the begin index:";
+            msg = msg + " str=" + str + ", beginIndex=" + beginIndex;
+            throw new StringIndexOutOfBoundsException(msg);
+        }
         return str.substring(beginIndex);
     }
 
     public static String substring(final String str, final int beginIndex, final int endIndex) {
         assertStringNotNull(str);
+        if (str.length() < beginIndex) {
+            String msg = "The length of the string was smaller than the begin index:";
+            msg = msg + " str=" + str + " beginIndex=" + beginIndex + " endIndex=" + endIndex;
+            throw new StringIndexOutOfBoundsException(msg);
+        }
+        if (str.length() < endIndex) {
+            String msg = "The length of the string was smaller than the end index:";
+            msg = msg + " str=" + str + " beginIndex=" + beginIndex + " endIndex=" + endIndex;
+            throw new StringIndexOutOfBoundsException(msg);
+        }
+        if (beginIndex > endIndex) {
+            String msg = "The begin index was larger than the end index:";
+            msg = msg + " str=" + str + " beginIndex=" + beginIndex + " endIndex=" + endIndex;
+            throw new StringIndexOutOfBoundsException(msg);
+        }
         return str.substring(beginIndex, endIndex);
+    }
+
+    public static String rearstring(final String str, final int reverseIndex) {
+        assertStringNotNull(str);
+        if (str.length() < reverseIndex) {
+            String msg = "The length of the string was smaller than the index:";
+            msg = msg + " str=" + str + " reverseIndex=" + reverseIndex;
+            throw new StringIndexOutOfBoundsException(msg);
+        }
+        return str.substring(str.length() - reverseIndex, str.length());
     }
 
     /**

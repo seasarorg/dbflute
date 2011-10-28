@@ -67,6 +67,7 @@ import static org.seasar.dbflute.util.Srl.length;
 import static org.seasar.dbflute.util.Srl.ltrim;
 import static org.seasar.dbflute.util.Srl.quoteDouble;
 import static org.seasar.dbflute.util.Srl.quoteSingle;
+import static org.seasar.dbflute.util.Srl.rearstring;
 import static org.seasar.dbflute.util.Srl.removeBlockComment;
 import static org.seasar.dbflute.util.Srl.removeEmptyLine;
 import static org.seasar.dbflute.util.Srl.removeLineComment;
@@ -77,6 +78,7 @@ import static org.seasar.dbflute.util.Srl.splitList;
 import static org.seasar.dbflute.util.Srl.splitListTrimmed;
 import static org.seasar.dbflute.util.Srl.startsWith;
 import static org.seasar.dbflute.util.Srl.startsWithIgnoreCase;
+import static org.seasar.dbflute.util.Srl.substring;
 import static org.seasar.dbflute.util.Srl.substringFirstFront;
 import static org.seasar.dbflute.util.Srl.substringFirstFrontIgnoreCase;
 import static org.seasar.dbflute.util.Srl.substringFirstRear;
@@ -261,6 +263,65 @@ public class DfStringUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                           SubString
     //                                                                           =========
+    public void test_substring_basic() {
+        assertEquals("456", substring("123456", 3));
+        assertEquals("123", substring("123456", 0, 3));
+        assertEquals("4", substring("123456", 3, 4));
+        assertEquals("456", substring("123456", 3, 6));
+        assertEquals("123456", substring("123456", 0));
+        assertEquals("123456", substring("123456", 0, 6));
+        assertEquals("", substring("123456", 0, 0));
+        assertEquals("", substring("123456", 3, 3));
+    }
+
+    public void test_substring_illegal() {
+        try {
+            substring("123456", 7);
+            fail();
+        } catch (StringIndexOutOfBoundsException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            substring("123456", 7, 8);
+            fail();
+        } catch (StringIndexOutOfBoundsException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            substring("123456", 1, 8);
+            fail();
+        } catch (StringIndexOutOfBoundsException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            substring("123456", 3, 2);
+            fail();
+        } catch (StringIndexOutOfBoundsException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_rearstring_basic() {
+        assertEquals("456", rearstring("123456", 3));
+        assertEquals("6", rearstring("123456", 1));
+        assertEquals("123456", rearstring("123456", 6));
+        assertEquals("", rearstring("123456", 0));
+    }
+
+    public void test_rearstring_illegal() {
+        try {
+            rearstring("123456", 7);
+            fail();
+        } catch (StringIndexOutOfBoundsException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
     public void test_substringFirstFront_basic() {
         assertEquals("foo", substringFirstFront("foo.bar", "."));
         assertEquals("foo", substringFirstFront("foo.bar.don", "."));
