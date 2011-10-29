@@ -429,6 +429,16 @@ public class Srl {
     // ===================================================================================
     //                                                                           SubString
     //                                                                           =========
+    /**
+     * Extract sub-string by begin index. (skip front string)
+     * <pre>
+     * substring("flute", 2)
+     * returns "ute"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param beginIndex The from-index. 
+     * @return The part of string. (NotNull)
+     */
     public static String substring(final String str, final int beginIndex) {
         assertStringNotNull(str);
         if (str.length() < beginIndex) {
@@ -439,6 +449,17 @@ public class Srl {
         return str.substring(beginIndex);
     }
 
+    /**
+     * Extract sub-string by begin and end index. (get scope string)
+     * <pre>
+     * substring("flute", 1, 3)
+     * returns "lu"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param beginIndex The from-index.
+     * @param endIndex The to-index.
+     * @return The part of string. (NotNull)
+     */
     public static String substring(final String str, final int beginIndex, final int endIndex) {
         assertStringNotNull(str);
         if (str.length() < beginIndex) {
@@ -459,6 +480,16 @@ public class Srl {
         return str.substring(beginIndex, endIndex);
     }
 
+    /**
+     * Extract rear sub-string by reverse index.
+     * <pre>
+     * rearstring("flute", 2)
+     * returns "te"
+     * </pre>
+     * @param str The target string. (NotNull)
+     * @param reverseIndex The index from rear. 
+     * @return The rear string. (NotNull)
+     */
     public static String rearstring(final String str, final int reverseIndex) {
         assertStringNotNull(str);
         if (str.length() < reverseIndex) {
