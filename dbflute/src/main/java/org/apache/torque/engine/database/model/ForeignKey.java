@@ -777,7 +777,7 @@ public class ForeignKey {
             }
 
             String parameterType = peace.substring(typeStartIndex + "(".length(), typeEndIndex);
-            if (peace.startsWith("$cls")) {
+            if (peace.startsWith("$cls")) { // embedded classification
                 // Not Dynamic (Embedded)
                 final String code = extractFixedConditionEmbeddedCommentClassification(peace, parameterType);
                 final String expression = "/*" + peace + "*/";
@@ -788,14 +788,20 @@ public class ForeignKey {
                 fixedConditionReplacementMap.put(expression + "NULL", expression);
 
                 fixedConditionReplacementMap.put(expression, code);
-            } else {
-                // Really Dynamic (Bind)
+            } else { // dynamic binding
                 parameterType = filterDynamicFixedConditionParameterType(parameterType);
                 final String parameterName = peace.substring(0, typeStartIndex);
                 _dynamicFixedConditionMap.put(parameterName, parameterType);
                 final String parameterMapName = "parameterMap" + getForeignPropertyNameInitCap();
-                final String after = "/*$$locationBase$$." + parameterMapName + "." + parameterName + "*/";
-                fixedConditionReplacementMap.put("/*" + peace + "*/", after);
+                final String parameterBase = "$$locationBase$$." + parameterMapName;
+                final String bindVariableExp = "/*" + parameterBase + "." + parameterName + "*/";
+                fixedConditionReplacementMap.put("/*" + peace + "*/", bindVariableExp);
+
+                // e.g. /*IF $$parameterBase$$.foo != null*/
+                final String parameterBaseKey = "$$parameterBase$$";
+                if (fixedConditionReplacementMap.containsKey(parameterBaseKey)) {
+                    fixedConditionReplacementMap.put(parameterBaseKey, parameterBase);
+                }
             }
         }
         if (fixedConditionReplacementMap.isEmpty()) {
