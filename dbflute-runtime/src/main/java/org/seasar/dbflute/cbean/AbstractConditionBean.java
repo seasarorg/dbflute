@@ -1201,11 +1201,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         final String titleName = DfTypeUtil.toClassTitle(this);
-        sb.append(titleName).append(":").append(ln());
+        sb.append(titleName).append(":");
         try {
-            sb.append(toDisplaySql());
+            final String displaySql = toDisplaySql();
+            sb.append(ln()).append(displaySql);
         } catch (RuntimeException e) {
-            sb.append(getSqlClause().getClause());
+            sb.append("{toDisplaySql() failed}");
         }
         return sb.toString();
     }
