@@ -799,7 +799,7 @@ public class ForeignKey {
 
                 // e.g. /*IF $$parameterBase$$.foo != null*/
                 final String parameterBaseKey = "$$parameterBase$$";
-                if (fixedConditionReplacementMap.containsKey(parameterBaseKey)) {
+                if (!fixedConditionReplacementMap.containsKey(parameterBaseKey)) {
                     fixedConditionReplacementMap.put(parameterBaseKey, parameterBase);
                 }
             }
