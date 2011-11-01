@@ -108,13 +108,7 @@ public class InvokeNameExtractor {
         final InvokeNameResult result = new InvokeNameResult();
         result.setSimpleClassName(simpleClassName);
         result.setMethodName(methodName);
-        final String invokeName;
-        if (lineNumber > 0) {
-            invokeName = simpleClassName + "." + methodName + "():" + lineNumber + " -> ";
-        } else {
-            invokeName = simpleClassName + "." + methodName + "() -> ";
-        }
-        result.setInvokeName(invokeName);
+        result.setLineNumber(lineNumber);
         result.setFoundIndex(foundIndex);
         result.setFoundFirstIndex(foundFirstIndex);
         return result;

@@ -127,6 +127,16 @@ public interface InvokerAssistant {
     ResourceParameter assistResourceParameter();
 
     /**
+     * @return The array of client invoke names. (NotNull)
+     */
+    String[] assistClientInvokeNames();
+
+    /**
+     * @return The array of by-pass invoke names. (NotNull)
+     */
+    String[] assistByPassInvokeNames();
+
+    /**
      * To be disposable.
      * @param callerProcess The disposable process for the caller. (NotNull)
      */

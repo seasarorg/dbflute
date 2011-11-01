@@ -497,7 +497,7 @@ public class Srl {
             msg = msg + " str=" + str + " reverseIndex=" + reverseIndex;
             throw new StringIndexOutOfBoundsException(msg);
         }
-        return str.substring(str.length() - reverseIndex, str.length());
+        return str.substring(str.length() - reverseIndex);
     }
 
     /**

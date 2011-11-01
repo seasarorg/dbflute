@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.helper.stacktrace;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  */
@@ -25,9 +27,43 @@ public class InvokeNameResult {
     //                                                                                  =========
     protected String _simpleClassName;
     protected String _methodName;
-    protected String _invokeName;
+    protected int _lineNumber;
     protected int _foundIndex;
     protected int _foundFirstIndex;
+
+    // ==========================================================================================
+    //                                                                                Invoke Name
+    //                                                                                ===========
+    public String buildInvokeName(boolean hasBoth) {
+        final String methodName = needsToFilterMethodName(hasBoth) ? buildFilterMethodName() : _methodName;
+        final String baseName = _simpleClassName + "." + methodName + "()";
+        final String invokeName;
+        if (_lineNumber > 0) {
+            invokeName = baseName + ":" + _lineNumber + " -> ";
+        } else {
+            invokeName = baseName + " -> ";
+        }
+        return invokeName;
+    }
+
+    protected boolean needsToFilterMethodName(boolean hasBoth) {
+        return hasBoth && _simpleClassName != null && _simpleClassName.endsWith("Test");
+    }
+
+    protected String buildFilterMethodName() {
+        final int limitSize = 10;
+        final int reversePointSize = 20;
+        final int reverseIndex = 5;
+        String methodName = _methodName;
+        if (_methodName != null && _methodName.length() > limitSize) {
+            String suffix = "";
+            if (_methodName.length() > reversePointSize) {
+                suffix = Srl.rearstring(_methodName, reverseIndex);
+            }
+            methodName = _methodName.substring(0, limitSize) + "..." + suffix;
+        }
+        return methodName;
+    }
 
     // ==========================================================================================
     //                                                                               Manipulation
@@ -62,12 +98,12 @@ public class InvokeNameResult {
         _methodName = methodName;
     }
 
-    public String getInvokeName() {
-        return _invokeName;
+    public int getLineNumber() {
+        return _lineNumber;
     }
 
-    public void setInvokeName(String invokeName) {
-        _invokeName = invokeName;
+    public void setLineNumber(int lineNumber) {
+        this._lineNumber = lineNumber;
     }
 
     public int getFoundIndex() {

@@ -473,9 +473,10 @@ public class BehaviorCommandInvoker {
         if (headClientResult == null && headByPassResult == null) { // when both are not found
             return null;
         }
+        final boolean hasBoth = headClientResult != null && headByPassResult != null;
 
-        final String clientInvokeName = headClientResult != null ? headClientResult.getInvokeName() : "";
-        final String byPassInvokeName = headByPassResult != null ? headByPassResult.getInvokeName() : "";
+        final String clientInvokeName = headClientResult != null ? headClientResult.buildInvokeName(hasBoth) : "";
+        final String byPassInvokeName = headByPassResult != null ? headByPassResult.buildInvokeName(hasBoth) : "";
 
         // Save client invoke name for error message.
         if (clientInvokeName.trim().length() > 0) {
@@ -489,9 +490,9 @@ public class BehaviorCommandInvoker {
 
         final StringBuilder sb = new StringBuilder();
         sb.append(clientInvokeName);
-        sb.append(findTailInvokeName(clientResultList));
+        sb.append(findTailInvokeName(clientResultList, hasBoth));
         sb.append(byPassInvokeName);
-        sb.append(findTailInvokeName(byPassResultList));
+        sb.append(findTailInvokeName(byPassResultList, hasBoth));
         sb.append("...");
         return sb.toString();
     }
@@ -504,9 +505,9 @@ public class BehaviorCommandInvoker {
         return null;
     }
 
-    protected String findTailInvokeName(List<InvokeNameResult> resultList) {
+    protected String findTailInvokeName(List<InvokeNameResult> resultList, boolean hasBoth) {
         if (resultList.size() > 1) {
-            return resultList.get(0).getInvokeName();
+            return resultList.get(0).buildInvokeName(hasBoth);
         }
         return "";
     }
@@ -577,7 +578,7 @@ public class BehaviorCommandInvoker {
     }
 
     protected List<InvokeNameResult> extractClientInvoke(StackTraceElement[] stackTrace, final int startIndex) {
-        final String[] names = new String[] { "Page", "Action", "Test" };
+        final String[] names = _invokerAssistant.assistClientInvokeNames();
         final List<String> suffixList = Arrays.asList(names);
         final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
             public boolean isTargetElement(String className, String methodName) {
@@ -605,7 +606,7 @@ public class BehaviorCommandInvoker {
 
     protected List<InvokeNameResult> extractByPassInvoke(StackTraceElement[] stackTrace, final int startIndex,
             final int loopSize) {
-        final String[] names = new String[] { "Service", "ServiceImpl", "Facade", "FacadeImpl", "Logic", "LogicImpl" };
+        final String[] names = _invokerAssistant.assistByPassInvokeNames();
         final List<String> suffixList = Arrays.asList(names);
         final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
             public boolean isTargetElement(String className, String methodName) {
