@@ -47,6 +47,15 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected static final String[] DEFAULT_CLIENT_INVOKE_NAMES
+        = new String[] { "Page", "Action", "Controller", "ControllerImpl", "Task", "Test" };
+
+    protected static final String[] DEFAULT_BYPASS_INVOKE_NAMES
+        = new String[] { "Service", "ServiceImpl", "Facade", "FacadeImpl", "Logic", "LogicImpl" };
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     // -----------------------------------------------------
     //                                          DI Component
     //                                          ------------
@@ -331,6 +340,17 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         resourceParameter.setLogTimestampFormat(${glDBFluteConfig}.getInstance().getLogTimestampFormat());
         resourceParameter.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return resourceParameter;
+    }
+
+    // -----------------------------------------------------
+    //                                          Invoke Names
+    //                                          ------------
+    public String[] assistClientInvokeNames() {
+        return DEFAULT_CLIENT_INVOKE_NAMES;
+    }
+
+    public String[] assistByPassInvokeNames() {
+        return DEFAULT_BYPASS_INVOKE_NAMES;
     }
 
     // ===================================================================================
