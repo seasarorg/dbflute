@@ -176,7 +176,7 @@ public class DfAdditionalForeignKeyInitializer {
     protected void processImplicitReverseForeignKey(Table table, Table foreignTable, List<String> localColumnNameList,
             List<String> foreignColumnNameList) { // called only when a fixed condition exists 
         // name is "FK_ + foreign + local" because it's reversed
-        final String reverseName = "FK_" + foreignTable.getName() + table.getName();
+        final String reverseName = "FK_" + foreignTable.getName() + "_" + table.getName() + "_IMPLICIT";
         final ForeignKey fk = createAdditionalForeignKey(reverseName, table.getName(), foreignColumnNameList,
                 localColumnNameList, null, null, null);
         final List<Column> primaryKey = table.getPrimaryKey();
