@@ -177,8 +177,9 @@ public class DfAdditionalForeignKeyInitializer {
             List<String> foreignColumnNameList) { // called only when a fixed condition exists 
         // name is "FK_ + foreign + local" because it's reversed
         final String reverseName = "FK_" + foreignTable.getName() + "_" + table.getName() + "_IMPLICIT";
+        final String comment = "This relation is auto-detected as implicit reverse FK.";
         final ForeignKey fk = createAdditionalForeignKey(reverseName, table.getName(), foreignColumnNameList,
-                localColumnNameList, null, null, null);
+                localColumnNameList, null, null, comment);
         final List<Column> primaryKey = table.getPrimaryKey();
         if (localColumnNameList.size() != primaryKey.size()) {
             return; // may be biz-many-to-one (not biz-one-to-one)
