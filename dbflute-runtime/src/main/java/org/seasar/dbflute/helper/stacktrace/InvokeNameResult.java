@@ -34,8 +34,13 @@ public class InvokeNameResult {
     // ==========================================================================================
     //                                                                                Invoke Name
     //                                                                                ===========
-    public String buildInvokeName(boolean hasBoth) {
-        final String methodName = needsToFilterMethodName(hasBoth) ? buildFilterMethodName() : _methodName;
+    public String buildInvokeName(boolean useTestShortName) {
+        final String methodName;
+        if (useTestShortName && hasTestSuffix()) {
+            methodName = buildFilterMethodName();
+        } else {
+            methodName = _methodName;
+        }
         final String baseName = _simpleClassName + "." + methodName + "()";
         final String invokeName;
         if (_lineNumber > 0) {
@@ -46,8 +51,8 @@ public class InvokeNameResult {
         return invokeName;
     }
 
-    protected boolean needsToFilterMethodName(boolean hasBoth) {
-        return hasBoth && _simpleClassName != null && _simpleClassName.endsWith("Test");
+    public boolean hasTestSuffix() {
+        return _simpleClassName != null && _simpleClassName.endsWith("Test");
     }
 
     protected String buildFilterMethodName() {

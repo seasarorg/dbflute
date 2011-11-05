@@ -89,6 +89,9 @@ public class DfCollectionUtil {
         return (List<ELEMENT>) EMPTY_LIST;
     }
 
+    // -----------------------------------------------------
+    //                                               Utility
+    //                                               -------
     public static <ELEMENT extends Object> List<List<ELEMENT>> splitByLimit(List<ELEMENT> elementList, int limit) {
         final List<List<ELEMENT>> valueList = newArrayList();
         final int valueSize = elementList.size();
@@ -256,12 +259,52 @@ public class DfCollectionUtil {
         return new HashMap<KEY, VALUE>();
     }
 
+    public static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap(KEY key, VALUE value) {
+        final HashMap<KEY, VALUE> map = newHashMap();
+        map.put(key, value);
+        return map;
+    }
+
+    public static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap(KEY key1, VALUE value1, KEY key2, VALUE value2) {
+        final HashMap<KEY, VALUE> map = newHashMap();
+        map.put(key1, value1);
+        map.put(key2, value2);
+        return map;
+    }
+
     public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }
 
+    public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key, VALUE value) {
+        final LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
+        map.put(key, value);
+        return map;
+    }
+
+    public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key1, VALUE value1, KEY key2, VALUE value2) {
+        final LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
+        map.put(key1, value1);
+        map.put(key2, value2);
+        return map;
+    }
+
     public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
         return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
+    public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key, VALUE value) {
+        final ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMap();
+        map.put(key, value);
+        return map;
+    }
+
+    public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key1, VALUE value1, KEY key2,
+            VALUE value2) {
+        final ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMap();
+        map.put(key1, value1);
+        map.put(key2, value2);
+        return map;
     }
 
     @SuppressWarnings("unchecked")

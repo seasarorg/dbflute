@@ -1,6 +1,7 @@
 package org.seasar.dbflute.util;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -346,5 +347,17 @@ public class DfCollectionUtilTest extends PlainTestCase {
         assertEquals("baz", movedList.get(3));
         assertEquals("quux", movedList.get(4));
         assertEquals(list.size(), movedList.size());
+    }
+
+    // ===================================================================================
+    //                                                                                 Map
+    //                                                                                 ===
+    public void test_newLinkedHashMap_dynamicArg() {
+        // ## Arrange & Act ##
+        LinkedHashMap<String, String> map = DfCollectionUtil.newLinkedHashMap("foo", "bar");
+
+        // ## Assert ##
+        assertEquals(1, map.size());
+        assertEquals("bar", map.get("foo"));
     }
 }

@@ -51,6 +51,7 @@ import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
+import org.seasar.dbflute.exception.EntityPrimaryKeyNotFoundException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
 import org.seasar.dbflute.exception.PagingOverSafetySizeException;
@@ -1146,15 +1147,41 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
-     * Assert that the entity has primary-key value.
+     * Assert that the entity has primary-key value. e.g. insert(), update()
      * @param entity Entity. (NotNull)
      */
     protected void assertEntityNotNullAndHasPrimaryKeyValue(Entity entity) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
-            String msg = "The entity must should primary-key: entity=" + entity;
-            throw new IllegalArgumentException(msg + entity);
+            throwEntityPrimaryKeyNotFoundException(entity);
         }
+    }
+
+    protected void throwEntityPrimaryKeyNotFoundException(Entity entity) {
+        final String classTitle = DfTypeUtil.toClassTitle(entity);
+        final String behaviorName = Srl.substringLastRear(entity.getDBMeta().getBehaviorTypeName(), ".");
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The primary-key value in the entity was not found.");
+        br.addItem("Advice");
+        br.addElement("An entity should have its primary-key value when e.g. insert(), update().");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    " + classTitle + " entiity = new " + classTitle + "();");
+        br.addElement("    entity.setFooName(...);");
+        br.addElement("    entity.setFooDate(...);");
+        br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
+        br.addElement("  (o):");
+        br.addElement("    " + classTitle + " entiity = new " + classTitle + "();");
+        br.addElement("    entity.setFooId(...); // *Point");
+        br.addElement("    entity.setFooName(...);");
+        br.addElement("    entity.setFooDate(...);");
+        br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
+        br.addElement("Or if your process is insert(), you might expect identity.");
+        br.addElement("Confirm the primary-key's identity setting.");
+        br.addItem("Entity");
+        br.addElement(entity);
+        final String msg = br.buildExceptionMessage();
+        throw new EntityPrimaryKeyNotFoundException(msg);
     }
 
     // -----------------------------------------------------

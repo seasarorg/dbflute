@@ -50,6 +50,7 @@ import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.util.DfTraceViewUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The invoker of behavior command.
@@ -430,7 +431,9 @@ public class BehaviorCommandInvoker {
         log(spaceBase + callerExpression);
         log(spaceBase + equalBorder + "=/");
         final String invokePath = buildInvokePath(behaviorCommand, stackTrace, headBehaviorResult);
-        log(invokePath);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(invokePath)) {
+            log(invokePath);
+        }
 
         if (behaviorCommand.isOutsideSql() && !behaviorCommand.isProcedure()) {
             final OutsideSqlContext outsideSqlContext = getOutsideSqlContext();
@@ -473,10 +476,15 @@ public class BehaviorCommandInvoker {
         if (headClientResult == null && headByPassResult == null) { // when both are not found
             return null;
         }
-        final boolean hasBoth = headClientResult != null && headByPassResult != null;
+        final boolean useTestShortName;
+        if (isClientResultMainExists(clientResultList)) {
+            useTestShortName = true;
+        } else {
+            useTestShortName = headClientResult != null && headByPassResult != null;
+        }
 
-        final String clientInvokeName = headClientResult != null ? headClientResult.buildInvokeName(hasBoth) : "";
-        final String byPassInvokeName = headByPassResult != null ? headByPassResult.buildInvokeName(hasBoth) : "";
+        final String clientInvokeName = buildInvokeName(headClientResult, useTestShortName);
+        final String byPassInvokeName = buildInvokeName(headByPassResult, useTestShortName);
 
         // Save client invoke name for error message.
         if (clientInvokeName.trim().length() > 0) {
@@ -490,11 +498,22 @@ public class BehaviorCommandInvoker {
 
         final StringBuilder sb = new StringBuilder();
         sb.append(clientInvokeName);
-        sb.append(findTailInvokeName(clientResultList, hasBoth));
+        sb.append(findTailInvokeName(clientResultList, useTestShortName));
         sb.append(byPassInvokeName);
-        sb.append(findTailInvokeName(byPassResultList, hasBoth));
+        sb.append(findTailInvokeName(byPassResultList, useTestShortName));
         sb.append("...");
         return sb.toString();
+    }
+
+    protected boolean isClientResultMainExists(List<InvokeNameResult> clientResultList) {
+        boolean mainExists = false;
+        for (InvokeNameResult invokeNameResult : clientResultList) {
+            if (!invokeNameResult.hasTestSuffix()) {
+                mainExists = true;
+                break;
+            }
+        }
+        return mainExists;
     }
 
     protected InvokeNameResult findHeadInvokeResult(List<InvokeNameResult> resultList) {
@@ -503,6 +522,10 @@ public class BehaviorCommandInvoker {
             return resultList.get(resultList.size() - 1);
         }
         return null;
+    }
+
+    protected String buildInvokeName(InvokeNameResult invokeNameResult, boolean useTestShortName) {
+        return invokeNameResult != null ? invokeNameResult.buildInvokeName(useTestShortName) : "";
     }
 
     protected String findTailInvokeName(List<InvokeNameResult> resultList, boolean hasBoth) {
