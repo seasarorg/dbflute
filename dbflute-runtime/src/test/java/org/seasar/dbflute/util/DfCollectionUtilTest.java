@@ -352,12 +352,22 @@ public class DfCollectionUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                                 Map
     //                                                                                 ===
-    public void test_newLinkedHashMap_dynamicArg() {
+    public void test_newLinkedHashMap_dynamicArgOne() {
         // ## Arrange & Act ##
         LinkedHashMap<String, String> map = DfCollectionUtil.newLinkedHashMap("foo", "bar");
 
         // ## Assert ##
         assertEquals(1, map.size());
         assertEquals("bar", map.get("foo"));
+    }
+
+    public void test_newLinkedHashMap_dynamicArgTwo() {
+        // ## Arrange & Act ##
+        LinkedHashMap<String, String> map = DfCollectionUtil.newLinkedHashMap("foo", "bar", "baz", "qux");
+
+        // ## Assert ##
+        assertEquals(2, map.size());
+        assertEquals("bar", map.get("foo"));
+        assertEquals("qux", map.get("baz"));
     }
 }
