@@ -351,30 +351,108 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals(GregorianCalendar.AD, DfTypeUtil.toCalendar(after).get(Calendar.ERA));
     }
 
-    public void test_setDateFirstDateOfMonth() {
+    // -----------------------------------------------------
+    //                                          Move-to Date
+    //                                          ------------
+    public void test_Date_moveToDateMonthBegin() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
-        DfTypeUtil.setDateFirstDateOfMonth(date);
+        DfTypeUtil.moveToDateMonthBegin(date);
 
         // ## Assert ##
-        assertEquals("2008/12/01 12:34:56.789", df.format(date));
+        assertEquals("2008/12/01 00:00:00.000", df.format(date));
     }
 
-    public void test_setDateLastDateOfMonth() {
+    public void test_Date_moveToDateMonthEnd() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-02-06 12:34:56.789");
 
         // ## Act ##
-        DfTypeUtil.setDateLastDateOfMonth(date);
+        DfTypeUtil.moveToDateMonthEnd(date);
 
         // ## Assert ##
-        assertEquals("2008/02/29 12:34:56.789", df.format(date));
+        assertEquals("2008/02/29 23:59:59.999", df.format(date));
     }
 
+    public void test_Date_moveToDateWeekBegin_basic() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
+
+        // ## Act ##
+        DfTypeUtil.moveToDateWeekBegin(date, Calendar.SUNDAY);
+
+        // ## Assert ##
+        assertEquals("2011/11/13 00:00:00.000", df.format(date));
+    }
+
+    public void test_Date_moveToDateWeekBegin_just_day() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
+
+        // ## Act ##
+        DfTypeUtil.moveToDateWeekBegin(date, Calendar.THURSDAY);
+
+        // ## Assert ##
+        assertEquals("2011/11/17 00:00:00.000", df.format(date));
+    }
+
+    public void test_Date_moveToDateWeekBegin_Friday() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789"); // Sunday
+
+        // ## Act ##
+        DfTypeUtil.moveToDateWeekBegin(date, Calendar.FRIDAY);
+
+        // ## Assert ##
+        assertEquals("2011/11/18 00:00:00.000", df.format(date));
+    }
+
+    public void test_Date_moveToDateWeekEnd_basic() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
+
+        // ## Act ##
+        DfTypeUtil.moveToDateWeekEnd(date, Calendar.SUNDAY);
+
+        // ## Assert ##
+        assertEquals("2011/11/19 23:59:59.999", df.format(date));
+    }
+
+    public void test_Date_moveToDateWeekEnd_just_day() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
+
+        // ## Act ##
+        DfTypeUtil.moveToDateWeekEnd(date, Calendar.THURSDAY);
+
+        // ## Assert ##
+        assertEquals("2011/11/23 23:59:59.999", df.format(date));
+    }
+
+    public void test_Date_moveToDateWeekEnd_Friday() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789"); // Sunday
+
+        // ## Act ##
+        DfTypeUtil.moveToDateWeekEnd(date, Calendar.FRIDAY);
+
+        // ## Assert ##
+        assertEquals("2011/11/24 23:59:59.999", df.format(date));
+    }
+
+    // -----------------------------------------------------
+    //                                            Clear Date
+    //                                            ----------
     public void test_clearDateTimeParts() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");

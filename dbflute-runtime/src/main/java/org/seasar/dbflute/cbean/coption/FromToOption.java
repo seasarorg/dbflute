@@ -120,15 +120,15 @@ public class FromToOption implements ConditionOption, Serializable {
      * <pre>
      * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
      * 
-     *   new FromToOption().compareAsDate();
+     *   new FromToOption().compareAsHour();
      *     --&gt; column &gt;= '2007/04/10 08:00:00'
      *     and column &lt; '2007/04/16 15:00:00'
      * </pre>
      * @return this. (NotNull)
      */
     public FromToOption compareAsHour() {
-        fromPatternDayStart();
-        toPatternNextDayStart();
+        fromPatternHourStart();
+        toPatternNextHourStart();
         clearOperand();
         lessThan();
         _usePattern = true;
@@ -454,15 +454,15 @@ public class FromToOption implements ConditionOption, Serializable {
         cal.setTimeInMillis(fromDate.getTime());
 
         if (_fromPatternHourStart) {
-            moveToCalendarHourStart(cal);
+            moveToCalendarHourBegin(cal);
         } else if (_fromPatternDayStart) {
-            moveToCalendarDayStart(cal);
+            moveToCalendarDayBegin(cal);
         } else if (_fromPatternMonthStart) {
-            moveToCalendarMonthStart(cal);
+            moveToCalendarMonthBegin(cal);
         } else if (_fromPatternYearStart) {
-            moveToCalendarYearStart(cal);
+            moveToCalendarYearBegin(cal);
         } else if (_fromPatternWeekStart) {
-            moveToCalendarWeekStart(cal);
+            moveToCalendarWeekBegin(cal);
         }
         if (_fromDateWithNoon) {
             moveToCalendarHourNoon(cal);
@@ -490,15 +490,15 @@ public class FromToOption implements ConditionOption, Serializable {
         cal.setTimeInMillis(toDate.getTime());
 
         if (_toPatternNextHourStart) {
-            moveToCalendarNextHourStart(cal);
+            moveToCalendarNextHourBegin(cal);
         } else if (_toPatternNextDayStart) {
-            moveToCalendarNextDayStart(cal);
+            moveToCalendarNextDayBegin(cal);
         } else if (_toPatternNextMonthStart) {
-            moveToCalendarNextMonthStart(cal);
+            moveToCalendarNextMonthBegin(cal);
         } else if (_toPatternNextYearStart) {
-            moveToCalendarNextYearStart(cal);
+            moveToCalendarNextYearBegin(cal);
         } else if (_toPatternNextWeekStart) {
-            moveToCalendarNextWeekStart(cal);
+            moveToCalendarNextWeekBegin(cal);
         }
         if (_toDateWithNoon) {
             moveToCalendarHourNoon(cal);
@@ -553,53 +553,53 @@ public class FromToOption implements ConditionOption, Serializable {
         DfTypeUtil.moveToCalendarHour(cal, hourOfDay);
     }
 
+    protected void moveToCalendarHourBegin(Calendar cal) {
+        DfTypeUtil.moveToCalendarHourBegin(cal);
+    }
+
     protected void moveToCalendarHourNoon(Calendar cal) {
         DfTypeUtil.moveToCalendarHourNoon(cal);
     }
 
-    protected void moveToCalendarHourStart(Calendar cal) {
-        DfTypeUtil.moveToCalendarHourStart(cal);
+    protected void moveToCalendarDayBegin(Calendar cal) {
+        DfTypeUtil.moveToCalendarDayBegin(cal);
     }
 
-    protected void moveToCalendarDayStart(Calendar cal) {
-        DfTypeUtil.moveToCalendarDayStart(cal);
+    protected void moveToCalendarMonthBegin(Calendar cal) {
+        DfTypeUtil.moveToCalendarMonthBegin(cal);
     }
 
-    protected void moveToCalendarMonthStart(Calendar cal) {
-        DfTypeUtil.moveToCalendarMonthStart(cal);
+    protected void moveToCalendarYearBegin(Calendar cal) {
+        DfTypeUtil.moveToCalendarYearBegin(cal);
     }
 
-    protected void moveToCalendarYearStart(Calendar cal) {
-        DfTypeUtil.moveToCalendarYearStart(cal);
+    protected void moveToCalendarWeekBegin(Calendar cal) {
+        DfTypeUtil.moveToCalendarWeekBegin(cal, _weekStartDay);
     }
 
-    protected void moveToCalendarWeekStart(Calendar cal) {
-        DfTypeUtil.moveToCalendarWeekStart(cal, _weekStartDay);
-    }
-
-    protected void moveToCalendarNextHourStart(Calendar cal) {
+    protected void moveToCalendarNextHourBegin(Calendar cal) {
         DfTypeUtil.addCalendarHourOfDay(cal, 1);
-        moveToCalendarHourStart(cal);
+        moveToCalendarHourBegin(cal);
     }
 
-    protected void moveToCalendarNextDayStart(Calendar cal) {
+    protected void moveToCalendarNextDayBegin(Calendar cal) {
         DfTypeUtil.addCalendarDayOfMonth(cal, 1);
-        moveToCalendarDayStart(cal);
+        moveToCalendarDayBegin(cal);
     }
 
-    protected void moveToCalendarNextMonthStart(Calendar cal) {
+    protected void moveToCalendarNextMonthBegin(Calendar cal) {
         DfTypeUtil.addCalendarMonth(cal, 1);
-        moveToCalendarMonthStart(cal);
+        moveToCalendarMonthBegin(cal);
     }
 
-    protected void moveToCalendarNextYearStart(Calendar cal) {
+    protected void moveToCalendarNextYearBegin(Calendar cal) {
         DfTypeUtil.addCalendarYear(cal, 1);
-        moveToCalendarYearStart(cal);
+        moveToCalendarYearBegin(cal);
     }
 
-    protected void moveToCalendarNextWeekStart(Calendar cal) {
+    protected void moveToCalendarNextWeekBegin(Calendar cal) {
         DfTypeUtil.addCalendarWeekOfMonth(cal, 1);
-        moveToCalendarWeekStart(cal);
+        moveToCalendarWeekBegin(cal);
     }
 
     // ===================================================================================

@@ -1047,8 +1047,8 @@ public final class DfTypeUtil {
     }
 
     // -----------------------------------------------------
-    //                                          Manipulation
-    //                                          ------------
+    //                                              Add Date
+    //                                              --------
     public static void addDateYear(Date date, int year) {
         final Calendar cal = toCalendar(date);
         addCalendarYear(cal, year);
@@ -1091,27 +1091,99 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void setDateFirstDateOfMonth(Date date) {
+    public static void addDateWeekOfMonth(Date date, int weekOfMonth) {
         final Calendar cal = toCalendar(date);
-        setCalendarFirstDateOfMonth(cal);
+        addCalendarWeekOfMonth(cal, weekOfMonth);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void setDateLastDateOfMonth(Date date) {
+    // -----------------------------------------------------
+    //                                          Move-to Date
+    //                                          ------------
+    public static void moveToDateHour(Date date, int hourOfDay) {
         final Calendar cal = toCalendar(date);
-        setCalendarLastDateOfMonth(cal);
+        moveToCalendarHour(cal, hourOfDay);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void setDateTimePartsFully(Date date) {
+    public static void moveToDateHourBegin(Date date) {
         final Calendar cal = toCalendar(date);
-        setCalendarTimePartsFully(cal);
+        moveToCalendarHourBegin(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
+    public static void moveToDateHourEnd(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarHourEnd(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateHourNoon(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarHourNoon(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateDayBegin(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarDayBegin(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateDayEnd(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarDayEnd(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMonthBegin(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMonthBegin(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMonthEnd(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMonthEnd(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateYearBegin(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarYearBegin(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateYearEnd(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarYearEnd(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateWeekBegin(Date date, int weekStartDay) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarWeekBegin(cal, weekStartDay);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateWeekEnd(Date date, int weekStartDay) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarWeekEnd(cal, weekStartDay);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    // -----------------------------------------------------
+    //                                            Clear Date
+    //                                            ----------
     public static void clearDateTimeParts(Date date) {
         final Calendar cal = toCalendar(date);
         clearCalendarTimeParts(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void clearDateMinuteWithRear(Date date) {
+        final Calendar cal = toCalendar(date);
+        clearCalendarMinuteWithRear(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1602,50 +1674,69 @@ public final class DfTypeUtil {
         clearCalendarMinuteWithRear(cal);
     }
 
+    public static void moveToCalendarHourBegin(Calendar cal) {
+        clearCalendarMinuteWithRear(cal);
+    }
+
+    public static void moveToCalendarHourEnd(Calendar cal) {
+        cal.set(Calendar.MINUTE, cal.getActualMaximum(Calendar.MINUTE));
+        cal.set(Calendar.SECOND, cal.getActualMaximum(Calendar.SECOND));
+        cal.set(Calendar.MILLISECOND, cal.getActualMaximum(Calendar.MILLISECOND));
+    }
+
     public static void moveToCalendarHourNoon(Calendar cal) {
         moveToCalendarHour(cal, 12);
     }
 
-    public static void moveToCalendarHourStart(Calendar cal) {
-        clearCalendarMinuteWithRear(cal);
-    }
-
-    public static void moveToCalendarDayStart(Calendar cal) {
+    public static void moveToCalendarDayBegin(Calendar cal) {
         clearCalendarTimeParts(cal);
     }
 
-    public static void moveToCalendarMonthStart(Calendar cal) {
+    public static void moveToCalendarDayEnd(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, cal.getActualMaximum(Calendar.HOUR_OF_DAY));
+        moveToCalendarHourEnd(cal);
+    }
+
+    public static void moveToCalendarMonthBegin(Calendar cal) {
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
         clearCalendarTimeParts(cal);
     }
 
-    public static void moveToCalendarYearStart(Calendar cal) {
+    public static void moveToCalendarMonthEnd(Calendar cal) {
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        moveToCalendarDayEnd(cal);
+    }
+
+    public static void moveToCalendarYearBegin(Calendar cal) {
         cal.set(Calendar.MONTH, cal.getActualMinimum(Calendar.MONTH));
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
         clearCalendarTimeParts(cal);
     }
 
-    public static void moveToCalendarWeekStart(Calendar cal, int weekStartDay) {
-        cal.set(Calendar.DAY_OF_WEEK, weekStartDay);
+    public static void moveToCalendarYearEnd(Calendar cal) {
+        cal.set(Calendar.MONTH, cal.getActualMaximum(Calendar.MONTH));
+        moveToCalendarMonthEnd(cal);
+    }
+
+    public static void moveToCalendarWeekBegin(Calendar cal, int weekStartDay) {
+        final int dayOfWeekDef = Calendar.DAY_OF_WEEK;
+        final int currentDayOfWeek = cal.get(dayOfWeekDef);
+        cal.set(dayOfWeekDef, weekStartDay);
+        if (currentDayOfWeek < weekStartDay) {
+            addCalendarWeekOfMonth(cal, -1);
+        }
         clearCalendarTimeParts(cal);
     }
 
-    // -----------------------------------------------------
-    //                                          Set Calendar
-    //                                          ------------
-    public static void setCalendarFirstDateOfMonth(Calendar cal) {
-        cal.set(Calendar.DATE, cal.getActualMinimum(Calendar.DATE));
-    }
-
-    public static void setCalendarLastDateOfMonth(Calendar cal) {
-        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
-    }
-
-    public static void setCalendarTimePartsFully(Calendar cal) {
-        cal.set(Calendar.HOUR_OF_DAY, cal.getActualMaximum(Calendar.HOUR_OF_DAY));
-        cal.set(Calendar.MINUTE, cal.getActualMaximum(Calendar.MINUTE));
-        cal.set(Calendar.SECOND, cal.getActualMaximum(Calendar.SECOND));
-        cal.set(Calendar.MILLISECOND, cal.getActualMaximum(Calendar.MILLISECOND));
+    public static void moveToCalendarWeekEnd(Calendar cal, int weekStartDay) {
+        final int dayOfWeekDef = Calendar.DAY_OF_WEEK;
+        final int currentDayOfWeek = cal.get(dayOfWeekDef);
+        cal.set(dayOfWeekDef, weekStartDay);
+        if (currentDayOfWeek >= weekStartDay) {
+            addCalendarWeekOfMonth(cal, 1);
+        }
+        addCalendarDayOfMonth(cal, -1);
+        moveToCalendarDayEnd(cal);
     }
 
     // -----------------------------------------------------
