@@ -1187,6 +1187,12 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
+    public static void clearDateSecondWithRear(Date date) {
+        final Calendar cal = toCalendar(date);
+        clearCalendarSecondWithRear(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
     public static void clearDateMillisecond(Date date) {
         final Calendar cal = toCalendar(date);
         clearCalendarMillisecond(cal);
@@ -1745,11 +1751,14 @@ public final class DfTypeUtil {
     public static void clearCalendarTimeParts(Calendar cal) {
         cal.set(Calendar.HOUR_OF_DAY, cal.getActualMinimum(Calendar.HOUR_OF_DAY));
         clearCalendarMinuteWithRear(cal);
-        clearCalendarMillisecond(cal);
     }
 
     public static void clearCalendarMinuteWithRear(Calendar cal) {
         cal.set(Calendar.MINUTE, cal.getActualMinimum(Calendar.MINUTE));
+        clearCalendarSecondWithRear(cal);
+    }
+
+    public static void clearCalendarSecondWithRear(Calendar cal) {
         cal.set(Calendar.SECOND, cal.getActualMinimum(Calendar.SECOND));
         clearCalendarMillisecond(cal);
     }
