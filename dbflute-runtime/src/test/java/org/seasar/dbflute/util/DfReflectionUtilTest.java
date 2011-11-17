@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

@@ -1,6 +1,6 @@
 package org.seasar.dbflute.s2dao.sqlcommand;
 
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

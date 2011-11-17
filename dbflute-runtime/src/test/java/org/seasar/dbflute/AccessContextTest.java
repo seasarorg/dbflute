@@ -5,7 +5,7 @@ import java.util.Date;
 
 import org.seasar.dbflute.exception.AccessContextNoValueException;
 import org.seasar.dbflute.exception.AccessContextNotFoundException;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

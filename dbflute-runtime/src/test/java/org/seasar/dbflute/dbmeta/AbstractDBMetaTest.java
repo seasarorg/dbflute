@@ -6,7 +6,7 @@ import java.util.Map;
 import org.seasar.dbflute.dbmeta.AbstractDBMeta.MapStringValueAnalyzer;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

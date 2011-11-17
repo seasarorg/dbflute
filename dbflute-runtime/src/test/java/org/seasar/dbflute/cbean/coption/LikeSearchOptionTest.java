@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean.coption;
 import java.util.Arrays;
 import java.util.List;
 
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**

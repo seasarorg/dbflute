@@ -4,11 +4,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>0.9.9.1G-RC1</version><!-- Latest RC version is 00-SNAPSHOT -->
+	<version>0.9.9.1G</version><!-- Latest RC version is 00-SNAPSHOT -->
 	<packaging>jar</packaging>
 
 	<name>DBFlute Runtime</name>
 	<description>The runtime library of DBFlute</description>
+
+	<properties>
+		<commons.logging.version>1.1.1</commons.logging.version>
+		<utflute.version>0.1.4</utflute.version>
+		<junit.version>3.8.2</junit.version>
+	</properties>
 
 	<url>http://dbflute.sandbox.seasar.org/</url>
 	<inceptionYear>2006</inceptionYear>
@@ -172,7 +178,7 @@
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
+			<version>${commons.logging.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>avalon-framework</artifactId>
@@ -206,10 +212,16 @@
 		<!-- ============ -->
 		<!-- |   test   | -->
 		<!-- ============ -->
+        <dependency>
+            <groupId>org.seasar.dbflute</groupId>
+            <artifactId>utflute-spring</artifactId>
+            <version>${utflute.version}</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.2</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

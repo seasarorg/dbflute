@@ -6,7 +6,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentContainsBindSymbolException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentInScopeNotListException;
 import org.seasar.dbflute.twowaysql.exception.EmbeddedVariableCommentParameterNullValueException;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**

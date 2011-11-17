@@ -1,7 +1,7 @@
 package org.seasar.dbflute;
 
 import org.seasar.dbflute.Entity.InternalUtil;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

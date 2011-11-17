@@ -8,7 +8,7 @@ import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.resource.InternalMapContext;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.pagenavi.group.PageGroupBean;
 import org.seasar.dbflute.cbean.pagenavi.range.PageRangeBean;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**

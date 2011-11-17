@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 import org.seasar.dbflute.twowaysql.DisplaySqlBuilder.DateFormatResource;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 

@@ -1,6 +1,6 @@
 package org.seasar.dbflute.dbmeta.name;
 
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

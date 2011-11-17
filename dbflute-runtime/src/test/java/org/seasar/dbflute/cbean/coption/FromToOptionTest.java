@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean.coption;
 import java.util.Date;
 
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -156,14 +156,14 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals("2011-11-27 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
     }
 
-    public void test_compareAsWeek_asWeekStartMonday() {
+    public void test_compareAsWeek_asWeekBeginMonday() {
         // ## Arrange ##
         String fromRes = "2011-11-14 12:34:56"; // Monday
         String toRes = "2011-11-23 18:34:56"; // Wednesday
         FromToOption option = createOption();
 
         // ## Act ##
-        option.compareAsWeek().asWeekStartMonday();
+        option.compareAsWeek().asWeekBeginMonday();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
 
@@ -174,14 +174,14 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals("2011-11-28 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
     }
 
-    public void test_compareAsWeek_asWeekStartFriday() {
+    public void test_compareAsWeek_asWeekBeginFriday() {
         // ## Arrange ##
         String fromRes = "2011-11-14 12:34:56"; // Monday
         String toRes = "2011-11-23 18:34:56"; // Wednesday
         FromToOption option = createOption();
 
         // ## Act ##
-        option.compareAsWeek().asWeekStartFriday();
+        option.compareAsWeek().asWeekBeginFriday();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
 
@@ -333,7 +333,7 @@ public class FromToOptionTest extends PlainTestCase {
         FromToOption option = createOption();
 
         // ## Act ##
-        option.toDateWithNoon().fromPatternDayStart().clearAll();
+        option.toDateWithNoon().fromPatternDayBegin().clearAll();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
 

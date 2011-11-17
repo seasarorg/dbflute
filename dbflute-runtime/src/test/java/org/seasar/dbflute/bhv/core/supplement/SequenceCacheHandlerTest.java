@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**

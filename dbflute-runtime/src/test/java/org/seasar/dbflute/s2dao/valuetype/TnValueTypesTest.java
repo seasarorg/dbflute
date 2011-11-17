@@ -29,7 +29,7 @@ import org.seasar.dbflute.s2dao.valuetype.basic.LongType;
 import org.seasar.dbflute.s2dao.valuetype.basic.ObjectType;
 import org.seasar.dbflute.s2dao.valuetype.basic.SqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

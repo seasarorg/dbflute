@@ -22,7 +22,7 @@ import org.seasar.dbflute.twowaysql.exception.IfCommentPropertyReadFailureExcept
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedTypeComparisonException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.seasar.dbflute.util.DfTypeUtil;
 

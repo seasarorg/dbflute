@@ -74,8 +74,6 @@ import static org.seasar.dbflute.util.Srl.removeLineComment;
 import static org.seasar.dbflute.util.Srl.replaceScopeContent;
 import static org.seasar.dbflute.util.Srl.replaceScopeInterspace;
 import static org.seasar.dbflute.util.Srl.rtrim;
-import static org.seasar.dbflute.util.Srl.splitList;
-import static org.seasar.dbflute.util.Srl.splitListTrimmed;
 import static org.seasar.dbflute.util.Srl.startsWith;
 import static org.seasar.dbflute.util.Srl.startsWithIgnoreCase;
 import static org.seasar.dbflute.util.Srl.substring;
@@ -98,7 +96,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.Srl.DelimiterInfo;
 import org.seasar.dbflute.util.Srl.IndexOfInfo;
 import org.seasar.dbflute.util.Srl.ScopeInfo;

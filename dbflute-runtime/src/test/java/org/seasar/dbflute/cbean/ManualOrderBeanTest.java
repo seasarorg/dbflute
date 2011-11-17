@@ -6,7 +6,7 @@ import java.util.List;
 import org.seasar.dbflute.cbean.ManualOrderBean.CaseWhenElement;
 import org.seasar.dbflute.cbean.ManualOrderBean.FreeParameterManualOrderThemeListHandler;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**

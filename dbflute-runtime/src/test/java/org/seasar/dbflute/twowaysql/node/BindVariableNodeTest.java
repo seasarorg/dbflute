@@ -6,7 +6,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentInScopeNotListException;
 import org.seasar.dbflute.twowaysql.exception.BindVariableCommentParameterNullValueException;
 import org.seasar.dbflute.twowaysql.exception.InLoopOptionOutOfLoopException;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**

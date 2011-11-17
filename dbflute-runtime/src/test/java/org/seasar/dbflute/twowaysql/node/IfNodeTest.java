@@ -6,7 +6,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.seasar.dbflute.twowaysql.exception.IfCommentConditionEmptyException;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

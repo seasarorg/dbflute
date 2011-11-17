@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.mock.MockResultSet;
 import org.seasar.dbflute.mock.MockValueType;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

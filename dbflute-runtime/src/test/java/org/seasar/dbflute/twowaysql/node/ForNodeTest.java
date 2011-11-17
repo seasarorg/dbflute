@@ -11,7 +11,7 @@ import org.seasar.dbflute.twowaysql.exception.EndCommentNotFoundException;
 import org.seasar.dbflute.twowaysql.exception.ForCommentParameterNullElementException;
 import org.seasar.dbflute.twowaysql.exception.LoopCurrentVariableOutOfForCommentException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 

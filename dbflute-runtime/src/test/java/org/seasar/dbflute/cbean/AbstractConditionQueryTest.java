@@ -1,7 +1,7 @@
 package org.seasar.dbflute.cbean;
 
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

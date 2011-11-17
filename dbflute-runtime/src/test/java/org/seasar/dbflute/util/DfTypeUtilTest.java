@@ -2,9 +2,7 @@ package org.seasar.dbflute.util;
 
 import static org.seasar.dbflute.util.DfTypeUtil.AD_ORIGIN_MILLISECOND;
 import static org.seasar.dbflute.util.DfTypeUtil.toClassTitle;
-import static org.seasar.dbflute.util.DfTypeUtil.toDate;
 import static org.seasar.dbflute.util.DfTypeUtil.toTime;
-import static org.seasar.dbflute.util.DfTypeUtil.toTimestamp;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -16,7 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil.ParseDateException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseDateNumberFormatException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseDateOutOfCalendarException;

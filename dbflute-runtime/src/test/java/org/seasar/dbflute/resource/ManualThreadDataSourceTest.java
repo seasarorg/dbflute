@@ -17,7 +17,7 @@ import java.util.concurrent.Future;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute

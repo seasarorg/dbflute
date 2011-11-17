@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute
