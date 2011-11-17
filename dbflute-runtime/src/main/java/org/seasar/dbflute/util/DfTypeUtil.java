@@ -1103,6 +1103,12 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
+    public static void setDateTimePartsFully(Date date) {
+        final Calendar cal = toCalendar(date);
+        setCalendarTimePartsFully(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
     public static void clearDateTimeParts(Date date) {
         final Calendar cal = toCalendar(date);
         clearCalendarTimeParts(cal);
@@ -1550,7 +1556,7 @@ public final class DfTypeUtil {
     }
 
     // -----------------------------------------------------
-    //                                          Manipulation
+    //                                          Add Calendar
     //                                          ------------
     public static void addCalendarYear(Calendar cal, int year) {
         cal.add(Calendar.YEAR, year);
@@ -1562,6 +1568,10 @@ public final class DfTypeUtil {
 
     public static void addCalendarDate(Calendar cal, int date) {
         cal.add(Calendar.DATE, date);
+    }
+
+    public static void addCalendarDayOfMonth(Calendar cal, int date) {
+        cal.add(Calendar.DAY_OF_MONTH, date);
     }
 
     public static void addCalendarHourOfDay(Calendar cal, int hourOfDay) {
@@ -1580,6 +1590,49 @@ public final class DfTypeUtil {
         cal.add(Calendar.MILLISECOND, millisecond);
     }
 
+    public static void addCalendarWeekOfMonth(Calendar cal, int weekOfMonth) {
+        cal.add(Calendar.WEEK_OF_MONTH, weekOfMonth);
+    }
+
+    // -----------------------------------------------------
+    //                                      Move-to Calendar
+    //                                      ----------------
+    public static void moveToCalendarHour(Calendar cal, int hourOfDay) {
+        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        clearCalendarMinuteWithRear(cal);
+    }
+
+    public static void moveToCalendarHourNoon(Calendar cal) {
+        moveToCalendarHour(cal, 12);
+    }
+
+    public static void moveToCalendarHourStart(Calendar cal) {
+        clearCalendarMinuteWithRear(cal);
+    }
+
+    public static void moveToCalendarDayStart(Calendar cal) {
+        clearCalendarTimeParts(cal);
+    }
+
+    public static void moveToCalendarMonthStart(Calendar cal) {
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+        clearCalendarTimeParts(cal);
+    }
+
+    public static void moveToCalendarYearStart(Calendar cal) {
+        cal.set(Calendar.MONTH, cal.getActualMinimum(Calendar.MONTH));
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+        clearCalendarTimeParts(cal);
+    }
+
+    public static void moveToCalendarWeekStart(Calendar cal, int weekStartDay) {
+        cal.set(Calendar.DAY_OF_WEEK, weekStartDay);
+        clearCalendarTimeParts(cal);
+    }
+
+    // -----------------------------------------------------
+    //                                          Set Calendar
+    //                                          ------------
     public static void setCalendarFirstDateOfMonth(Calendar cal) {
         cal.set(Calendar.DATE, cal.getActualMinimum(Calendar.DATE));
     }
@@ -1588,18 +1641,30 @@ public final class DfTypeUtil {
         cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
     }
 
+    public static void setCalendarTimePartsFully(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, cal.getActualMaximum(Calendar.HOUR_OF_DAY));
+        cal.set(Calendar.MINUTE, cal.getActualMaximum(Calendar.MINUTE));
+        cal.set(Calendar.SECOND, cal.getActualMaximum(Calendar.SECOND));
+        cal.set(Calendar.MILLISECOND, cal.getActualMaximum(Calendar.MILLISECOND));
+    }
+
     // -----------------------------------------------------
     //                                           Clear Parts
     //                                           -----------
     public static void clearCalendarTimeParts(Calendar cal) {
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.HOUR_OF_DAY, cal.getActualMinimum(Calendar.HOUR_OF_DAY));
+        clearCalendarMinuteWithRear(cal);
+        clearCalendarMillisecond(cal);
+    }
+
+    public static void clearCalendarMinuteWithRear(Calendar cal) {
+        cal.set(Calendar.MINUTE, cal.getActualMinimum(Calendar.MINUTE));
+        cal.set(Calendar.SECOND, cal.getActualMinimum(Calendar.SECOND));
         clearCalendarMillisecond(cal);
     }
 
     public static void clearCalendarMillisecond(Calendar cal) {
-        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.MILLISECOND, cal.getActualMinimum(Calendar.MILLISECOND));
     }
 
     // -----------------------------------------------------

@@ -28,6 +28,10 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
  * 
  * [Comparison Pattern]
+ *   new FromToOption().compareAsHour(); 
+ *     --&gt; column &gt;= '2007/04/10 08:00:00'
+ *     and column &lt; '2007/04/16 15:00:00'
+ * 
  *   new FromToOption().compareAsDate(); 
  *     --&gt; column &gt;= '2007/04/10 00:00:00'
  *     and column &lt; '2007/04/17 00:00:00'
@@ -39,6 +43,10 @@ import org.seasar.dbflute.util.DfTypeUtil;
  *   new FromToOption().compareAsYear(); 
  *     --&gt; column &gt;= '2007/01/01 00:00:00'
  *     and column &lt; '2008/01/01 00:00:00'
+ * 
+ *   new FromToOption().compareAsWeek().asWeekStartSunday(); 
+ *     --&gt; column &gt;= '2007/04/08 00:00:00'
+ *     and column &lt; '2008/04/22 00:00:00'
  * 
  * [Manual Adjustment]
  *   new FromToOption().greaterThan(); 
@@ -76,31 +84,57 @@ public class FromToOption implements ConditionOption, Serializable {
     protected boolean _greaterThan;
     protected boolean _lessThan;
 
+    protected boolean _fromPatternHourStart;
     protected boolean _fromPatternDayStart;
     protected boolean _fromPatternMonthStart;
     protected boolean _fromPatternYearStart;
+    protected boolean _fromPatternWeekStart;
     protected boolean _fromDateWithNoon;
     protected Integer _fromDateWithHour;
 
+    protected boolean _toPatternNextHourStart;
     protected boolean _toPatternNextDayStart;
     protected boolean _toPatternNextMonthStart;
     protected boolean _toPatternNextYearStart;
+    protected boolean _toPatternNextWeekStart;
     protected boolean _toDateWithNoon;
     protected Integer _toDateWithHour;
 
+    protected Integer _weekStartDay = Calendar.SUNDAY; // as default
     protected boolean _usePattern;
 
     // ===================================================================================
     //                                                            Interface Implementation
     //                                                            ========================
     public String getRearOption() {
-        String msg = "Thie option does not use getRearOption()!";
+        String msg = "Thie option does not use getRearOption().";
         throw new UnsupportedOperationException(msg);
     }
 
     // ===================================================================================
     //                                                                  Comparison Pattern
     //                                                                  ==================
+    /**
+     * Compare as hour. <br />
+     * This method ignores operand adjustments and other patterns.
+     * <pre>
+     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     * 
+     *   new FromToOption().compareAsDate();
+     *     --&gt; column &gt;= '2007/04/10 08:00:00'
+     *     and column &lt; '2007/04/16 15:00:00'
+     * </pre>
+     * @return this. (NotNull)
+     */
+    public FromToOption compareAsHour() {
+        fromPatternDayStart();
+        toPatternNextDayStart();
+        clearOperand();
+        lessThan();
+        _usePattern = true;
+        return this;
+    }
+
     /**
      * Compare as date. <br />
      * This method ignores operand adjustments and other patterns.
@@ -164,6 +198,74 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    /**
+     * Compare as week. <br />
+     * This method ignores operand adjustments and other patterns.
+     * <pre>
+     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     * 
+     *   new FromToOption().compareAsWeek().asWeekStartSunday();
+     *     --&gt; column &gt;= '2007/04/08 00:00:00'
+     *     and column &lt; '2007/04/22 00:00:00'
+     * </pre>
+     * @return this. (NotNull)
+     */
+    public FromToOption compareAsWeek() {
+        fromPatternWeekStart();
+        toPatternNextWeekStart();
+        clearOperand();
+        lessThan();
+        _usePattern = true;
+        return this;
+    }
+
+    // -----------------------------------------------------
+    //                                            Week Start
+    //                                            ----------
+    public FromToOption asWeekStart(Date date) {
+        if (date == null) {
+            String msg = "The argument 'date' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        final int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+        return doAsWeekStartMonday(dayOfWeek);
+    }
+
+    public FromToOption asWeekStartSunday() {
+        return doAsWeekStartMonday(Calendar.SUNDAY);
+    }
+
+    public FromToOption asWeekStartMonday() {
+        return doAsWeekStartMonday(Calendar.MONDAY);
+    }
+
+    public FromToOption asWeekStartTuesday() {
+        return doAsWeekStartMonday(Calendar.TUESDAY);
+    }
+
+    public FromToOption asWeekStartWednesday() {
+        return doAsWeekStartMonday(Calendar.WEDNESDAY);
+    }
+
+    public FromToOption asWeekStartThursday() {
+        return doAsWeekStartMonday(Calendar.THURSDAY);
+    }
+
+    public FromToOption asWeekStartFriday() {
+        return doAsWeekStartMonday(Calendar.FRIDAY);
+    }
+
+    public FromToOption asWeekStartSaturday() {
+        return doAsWeekStartMonday(Calendar.SATURDAY);
+    }
+
+    protected FromToOption doAsWeekStartMonday(int dayOfWeek) {
+        _weekStartDay = dayOfWeek;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                   Manual Adjustment
     //                                                                   =================
@@ -202,6 +304,13 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                             From Date
     //                                             ---------
+    public FromToOption fromPatternHourStart() {
+        assertNotAdjustmentAfterPattern("fromPatternHourStart");
+        clearFromPattern();
+        _fromPatternHourStart = true;
+        return this;
+    }
+
     public FromToOption fromPatternDayStart() {
         assertNotAdjustmentAfterPattern("fromPatternDayStart");
         clearFromPattern();
@@ -223,10 +332,19 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    public FromToOption fromPatternWeekStart() {
+        assertNotAdjustmentAfterPattern("fromPatternWeekStart");
+        clearFromPattern();
+        _fromPatternWeekStart = true;
+        return this;
+    }
+
     protected void clearFromPattern() {
+        _fromPatternHourStart = false;
         _fromPatternDayStart = false;
         _fromPatternMonthStart = false;
         _fromPatternYearStart = false;
+        _fromPatternWeekStart = false;
     }
 
     public FromToOption fromDateWithNoon() {
@@ -249,6 +367,13 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                               To Date
     //                                               -------
+    public FromToOption toPatternNextHourStart() {
+        assertNotAdjustmentAfterPattern("toPatternNextHourStart");
+        clearToPattern();
+        _toPatternNextHourStart = true;
+        return this;
+    }
+
     public FromToOption toPatternNextDayStart() {
         assertNotAdjustmentAfterPattern("toPatternNextDayStart");
         clearToPattern();
@@ -270,10 +395,19 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    public FromToOption toPatternNextWeekStart() {
+        assertNotAdjustmentAfterPattern("toPatternNextWeekStart");
+        clearToPattern();
+        _toPatternNextWeekStart = true;
+        return this;
+    }
+
     protected void clearToPattern() {
+        _toPatternNextHourStart = false;
         _toPatternNextDayStart = false;
         _toPatternNextMonthStart = false;
         _toPatternNextYearStart = false;
+        _toPatternNextWeekStart = false;
     }
 
     public FromToOption toDateWithNoon() {
@@ -319,18 +453,22 @@ public class FromToOption implements ConditionOption, Serializable {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(fromDate.getTime());
 
-        if (_fromPatternDayStart) {
+        if (_fromPatternHourStart) {
+            moveToCalendarHourStart(cal);
+        } else if (_fromPatternDayStart) {
             moveToCalendarDayStart(cal);
         } else if (_fromPatternMonthStart) {
             moveToCalendarMonthStart(cal);
         } else if (_fromPatternYearStart) {
             moveToCalendarYearStart(cal);
+        } else if (_fromPatternWeekStart) {
+            moveToCalendarWeekStart(cal);
         }
         if (_fromDateWithNoon) {
-            moveToNoon(cal);
+            moveToCalendarHourNoon(cal);
         }
         if (_fromDateWithHour != null) {
-            moveToHour(cal, _fromDateWithHour);
+            moveToCalendarHour(cal, _fromDateWithHour);
         }
 
         final Date cloneDate = (Date) fromDate.clone();
@@ -351,18 +489,22 @@ public class FromToOption implements ConditionOption, Serializable {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(toDate.getTime());
 
-        if (_toPatternNextDayStart) {
+        if (_toPatternNextHourStart) {
+            moveToCalendarNextHourStart(cal);
+        } else if (_toPatternNextDayStart) {
             moveToCalendarNextDayStart(cal);
         } else if (_toPatternNextMonthStart) {
             moveToCalendarNextMonthStart(cal);
         } else if (_toPatternNextYearStart) {
             moveToCalendarNextYearStart(cal);
+        } else if (_toPatternNextWeekStart) {
+            moveToCalendarNextWeekStart(cal);
         }
         if (_toDateWithNoon) {
-            moveToNoon(cal);
+            moveToCalendarHourNoon(cal);
         }
         if (_toDateWithHour != null) {
-            moveToHour(cal, _toDateWithHour);
+            moveToCalendarHour(cal, _toDateWithHour);
         }
 
         final Date cloneDate = (Date) toDate.clone();
@@ -374,7 +516,7 @@ public class FromToOption implements ConditionOption, Serializable {
     protected Date filterNoon(Date date) {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(date.getTime());
-        moveToNoon(cal);
+        moveToCalendarHourNoon(cal);
         final Date cloneDate = (Date) date.clone();
         cloneDate.setTime(cal.getTimeInMillis());
         return cloneDate;
@@ -407,67 +549,57 @@ public class FromToOption implements ConditionOption, Serializable {
     // ===================================================================================
     //                                                                     Calendar Helper
     //                                                                     ===============
-    protected void addCalendarNextDay(Calendar cal) {
-        cal.add(Calendar.DAY_OF_MONTH, 1);
+    protected void moveToCalendarHour(Calendar cal, int hourOfDay) {
+        DfTypeUtil.moveToCalendarHour(cal, hourOfDay);
     }
 
-    protected void addCalendarNextMonth(Calendar cal) {
-        cal.add(Calendar.MONTH, 1);
+    protected void moveToCalendarHourNoon(Calendar cal) {
+        DfTypeUtil.moveToCalendarHourNoon(cal);
     }
 
-    protected void addCalendarNextYear(Calendar cal) {
-        cal.add(Calendar.YEAR, 1);
+    protected void moveToCalendarHourStart(Calendar cal) {
+        DfTypeUtil.moveToCalendarHourStart(cal);
     }
 
     protected void moveToCalendarDayStart(Calendar cal) {
-        clearCalendarHourMinuteSecondMilli(cal);
-    }
-
-    protected void moveToCalendarNextDayStart(Calendar cal) {
-        addCalendarNextDay(cal);
-        moveToCalendarDayStart(cal);
+        DfTypeUtil.moveToCalendarDayStart(cal);
     }
 
     protected void moveToCalendarMonthStart(Calendar cal) {
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-        clearCalendarHourMinuteSecondMilli(cal);
-    }
-
-    protected void moveToCalendarNextMonthStart(Calendar cal) {
-        addCalendarNextMonth(cal);
-        moveToCalendarMonthStart(cal);
+        DfTypeUtil.moveToCalendarMonthStart(cal);
     }
 
     protected void moveToCalendarYearStart(Calendar cal) {
-        cal.set(Calendar.MONTH, cal.getActualMinimum(Calendar.MONTH));
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-        clearCalendarHourMinuteSecondMilli(cal);
+        DfTypeUtil.moveToCalendarYearStart(cal);
+    }
+
+    protected void moveToCalendarWeekStart(Calendar cal) {
+        DfTypeUtil.moveToCalendarWeekStart(cal, _weekStartDay);
+    }
+
+    protected void moveToCalendarNextHourStart(Calendar cal) {
+        DfTypeUtil.addCalendarHourOfDay(cal, 1);
+        moveToCalendarHourStart(cal);
+    }
+
+    protected void moveToCalendarNextDayStart(Calendar cal) {
+        DfTypeUtil.addCalendarDayOfMonth(cal, 1);
+        moveToCalendarDayStart(cal);
+    }
+
+    protected void moveToCalendarNextMonthStart(Calendar cal) {
+        DfTypeUtil.addCalendarMonth(cal, 1);
+        moveToCalendarMonthStart(cal);
     }
 
     protected void moveToCalendarNextYearStart(Calendar cal) {
-        addCalendarNextYear(cal);
+        DfTypeUtil.addCalendarYear(cal, 1);
         moveToCalendarYearStart(cal);
     }
 
-    protected void moveToNoon(Calendar cal) {
-        cal.clear(Calendar.MILLISECOND);
-        cal.clear(Calendar.SECOND);
-        cal.clear(Calendar.MINUTE);
-        cal.set(Calendar.HOUR_OF_DAY, 12);
-    }
-
-    protected void moveToHour(Calendar cal, int hourOfDay) {
-        cal.clear(Calendar.MILLISECOND);
-        cal.clear(Calendar.SECOND);
-        cal.clear(Calendar.MINUTE);
-        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-    }
-
-    protected void clearCalendarHourMinuteSecondMilli(Calendar cal) {
-        cal.clear(Calendar.MILLISECOND);
-        cal.clear(Calendar.SECOND);
-        cal.clear(Calendar.MINUTE);
-        cal.set(Calendar.HOUR_OF_DAY, cal.getActualMinimum(Calendar.HOUR_OF_DAY));
+    protected void moveToCalendarNextWeekStart(Calendar cal) {
+        DfTypeUtil.addCalendarWeekOfMonth(cal, 1);
+        moveToCalendarWeekStart(cal);
     }
 
     // ===================================================================================

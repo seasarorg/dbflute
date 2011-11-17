@@ -18,6 +18,7 @@ package org.seasar.dbflute.exception.handler;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.exception.EntityAlreadyExistsException;
@@ -32,6 +33,11 @@ import org.seasar.dbflute.resource.ResourceContext;
  * @author jflute
  */
 public class SQLExceptionHandler {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final SQLExceptionAdviser _adviser = new SQLExceptionAdviser();
 
     // ===================================================================================
     //                                                                              Handle
@@ -96,18 +102,26 @@ public class SQLExceptionHandler {
         throw new EntityAlreadyExistsException(msg, e);
     }
 
-    protected void throwSQLFailureException(SQLException e, Statement st, String executedSql, String displaySql) {
+    protected void throwSQLFailureException(SQLException sqlEx, Statement st, String executedSql, String displaySql) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
         br.addNotice("The SQL failed to execute!");
         br.addItem("Advice");
         br.addElement("Please confirm the SQLException message.");
-        setupCommonElement(br, e, st, executedSql, displaySql);
+        final String advice = askAdvice(sqlEx, ResourceContext.currentDBDef());
+        if (advice != null && advice.trim().length() > 0) {
+            br.addElement("*" + advice);
+        }
+        setupCommonElement(br, sqlEx, st, executedSql, displaySql);
         final String msg = br.buildExceptionMessage();
-        throw new SQLFailureException(msg, e);
+        throw new SQLFailureException(msg, sqlEx);
     }
 
     protected ExceptionMessageBuilder createExceptionMessageBuilder() {
         return new ExceptionMessageBuilder();
+    }
+
+    protected String askAdvice(SQLException sqlEx, DBDef dbdef) {
+        return _adviser.askAdvice(sqlEx, dbdef);
     }
 
     // ===================================================================================
