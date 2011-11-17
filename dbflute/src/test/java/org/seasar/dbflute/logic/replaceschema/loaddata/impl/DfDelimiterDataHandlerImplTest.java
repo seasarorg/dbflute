@@ -2,7 +2,6 @@ package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
 
 /**
  * @author jflute

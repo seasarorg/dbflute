@@ -3,8 +3,6 @@ package org.seasar.dbflute.logic.jdbc.urlanalyzer;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
-import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzerDerby;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 public class DfUrlAnalyzerDerbyTest extends PlainTestCase {

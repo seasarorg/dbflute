@@ -37,10 +37,12 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.exception.DfXlsDataColumnDefFailureException;
 import org.seasar.dbflute.exception.DfXlsDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfXlsDataTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.exception.handler.SQLExceptionAdviser;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.DfDataColumn;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
@@ -77,6 +79,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     //                                                                           =========
     /** The pattern of skip sheet. (NullAllowed) */
     protected Pattern _skipSheetPattern;
+
+    protected final SQLExceptionAdviser _adviser = new SQLExceptionAdviser();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -349,6 +353,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             , List<String> columnNameList) { // supplement
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to register the table data.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the SQLException message.");
+        final String advice = askAdvice(mainEx, getBasicProperties().getCurrentDBDef());
+        if (advice != null && advice.trim().length() > 0) {
+            br.addElement("*" + advice);
+        }
         br.addItem("Xls File");
         br.addElement(file);
         br.addItem("Table");
@@ -381,6 +391,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             }
         }
         return br.buildExceptionMessage();
+    }
+
+    protected String askAdvice(SQLException sqlEx, DBDef dbdef) {
+        return _adviser.askAdvice(sqlEx, dbdef);
     }
 
     protected void closeResource(Connection conn, PreparedStatement ps) {

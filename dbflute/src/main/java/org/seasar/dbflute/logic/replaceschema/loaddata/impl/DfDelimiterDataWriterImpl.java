@@ -284,9 +284,10 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 _log.warn("*Failed to register: " + e.getMessage());
                 String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, nextEx);
                 throw new DfDelimiterDataRegistrationFailureException(msg, nextEx); // switch!
+            } else {
+                String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, e);
+                throw new DfDelimiterDataRegistrationFailureException(msg, e);
             }
-            String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, e);
-            throw new DfDelimiterDataRegistrationFailureException(msg, e);
         } catch (RuntimeException e) {
             String msg = buildRegExpMessage(_fileName, tableDbName, executedSql, valueList, e);
             throw new DfDelimiterDataRegistrationFailureException(msg, e);
