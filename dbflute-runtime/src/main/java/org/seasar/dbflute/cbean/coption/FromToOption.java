@@ -104,6 +104,7 @@ public class FromToOption implements ConditionOption, Serializable {
     protected Integer _monthBeginDay = 1; // as default
     protected Integer _dayBeginHour = 0; // as default
     protected Integer _weekBeginDay = Calendar.SUNDAY; // as default
+    protected Integer _moveToScope;
     protected boolean _usePattern;
 
     // ===================================================================================
@@ -226,12 +227,14 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                            Begin Year
     //                                            ----------
     public FromToOption beginYear_Month(int yearBeginMonth) {
+        assertPatternOptionValid("beginYear_Month");
         assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
         _yearBeginMonth = yearBeginMonth;
         return this;
     }
 
     public FromToOption beginYear_PreviousMonth(int yearBeginMonth) {
+        assertPatternOptionValid("beginYear_PreviousMonth");
         assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
         _yearBeginMonth = -yearBeginMonth; // to be minus
         return this;
@@ -241,12 +244,14 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                           Begin Month
     //                                           -----------
     public FromToOption beginMonth_Day(int monthBeginDay) {
+        assertPatternOptionValid("beginMonth_Day");
         assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
         _monthBeginDay = monthBeginDay;
         return this;
     }
 
     public FromToOption beginMonth_PreviousDay(int monthBeginDay) {
+        assertPatternOptionValid("beginMonth_PreviousDay");
         assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
         _monthBeginDay = -monthBeginDay; // to be minus
         return this;
@@ -256,12 +261,14 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                             Begin Day
     //                                             ---------
     public FromToOption beginDay_Hour(int dayBeginHour) {
+        assertPatternOptionValid("beginDay_Hour");
         assertNotMinusNotOver("dayBeginHour", dayBeginHour, 23);
         _dayBeginHour = dayBeginHour;
         return this;
     }
 
     public FromToOption beginDay_PreviousHour(int dayBeginHour) {
+        assertPatternOptionValid("beginDay_PreviousHour");
         assertNotMinusNotOver("dayBeginHour", dayBeginHour, 23);
         _dayBeginHour = -dayBeginHour; // to be minus
         return this;
@@ -271,8 +278,9 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                            Begin Week
     //                                            ----------
     public FromToOption beginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
+        assertPatternOptionValid("beginWeek_DayOfWeek");
         if (weekBeginDayOfWeek == null) {
-            String msg = "The argument 'date' should not be null.";
+            String msg = "The argument 'weekBeginDayOfWeek' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         final Calendar cal = Calendar.getInstance();
@@ -282,35 +290,51 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     public FromToOption beginWeek_DayOfWeek1st_Sunday() {
+        assertPatternOptionValid("beginWeek_DayOfWeek1st_Sunday");
         return doBeginWeek(Calendar.SUNDAY);
     }
 
     public FromToOption beginWeek_DayOfWeek2nd_Monday() {
+        assertPatternOptionValid("beginWeek_DayOfWeek2nd_Monday");
         return doBeginWeek(Calendar.MONDAY);
     }
 
     public FromToOption beginWeek_DayOfWeek3rd_Tuesday() {
+        assertPatternOptionValid("beginWeek_DayOfWeek3rd_Tuesday");
         return doBeginWeek(Calendar.TUESDAY);
     }
 
     public FromToOption beginWeek_DayOfWeek4th_Wednesday() {
+        assertPatternOptionValid("beginWeek_DayOfWeek4th_Wednesday");
         return doBeginWeek(Calendar.WEDNESDAY);
     }
 
     public FromToOption beginWeek_DayOfWeek5th_Thursday() {
+        assertPatternOptionValid("beginWeek_DayOfWeek5th_Thursday");
         return doBeginWeek(Calendar.THURSDAY);
     }
 
     public FromToOption beginWeek_DayOfWeek6th_Friday() {
+        assertPatternOptionValid("beginWeek_DayOfWeek6th_Friday");
         return doBeginWeek(Calendar.FRIDAY);
     }
 
     public FromToOption beginWeek_DayOfWeek7th_Saturday() {
+        assertPatternOptionValid("beginWeek_DayOfWeek7th_Saturday");
         return doBeginWeek(Calendar.SATURDAY);
     }
 
     protected FromToOption doBeginWeek(int weekBeginDayOfWeek) {
         _weekBeginDay = weekBeginDayOfWeek;
+        return this;
+    }
+
+    // -----------------------------------------------------
+    //                                         Move-to Scope
+    //                                         -------------
+    public FromToOption moveToScope(int moveToCount) {
+        assertPatternOptionValid("moveToScope");
+        _moveToScope = moveToCount;
         return this;
     }
 
@@ -539,17 +563,6 @@ public class FromToOption implements ConditionOption, Serializable {
         _toDateWithHour = null;
     }
 
-    // -----------------------------------------------------
-    //                                                Assert
-    //                                                ------
-    protected void assertNotAdjustmentAfterPattern(String option) {
-        if (_usePattern) {
-            String msg = "The option should not be call after pattern setting:";
-            msg = msg + " option=" + option + "()";
-            throw new IllegalStateException(msg);
-        }
-    }
-
     // ===================================================================================
     //                                                                       Internal Main
     //                                                                       =============
@@ -565,16 +578,21 @@ public class FromToOption implements ConditionOption, Serializable {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(fromDate.getTime());
 
-        if (_fromPatternHourJust) {
-            moveToCalendarHourJust(cal);
-        } else if (_fromPatternDayJust) {
-            moveToCalendarDayJust(cal);
+        if (_fromPatternYearJust) {
+            moveToCalendarYearJust(cal);
+            moveToScopeYear(cal);
         } else if (_fromPatternMonthJust) {
             moveToCalendarMonthJust(cal);
-        } else if (_fromPatternYearJust) {
-            moveToCalendarYearJust(cal);
+            moveToScopeMonth(cal);
+        } else if (_fromPatternDayJust) {
+            moveToCalendarDayJust(cal);
+            moveToScopeDay(cal);
+        } else if (_fromPatternHourJust) {
+            moveToCalendarHourJust(cal);
+            moveToScopeHour(cal);
         } else if (_fromPatternWeekJust) {
             moveToCalendarWeekJust(cal);
+            moveToScopeWeek(cal);
         }
         if (_fromDateWithNoon) {
             moveToCalendarHourJustNoon(cal);
@@ -601,16 +619,21 @@ public class FromToOption implements ConditionOption, Serializable {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(toDate.getTime());
 
-        if (_toPatternNextHourJust) {
-            moveToCalendarNextHourJust(cal);
-        } else if (_toPatternNextDayJust) {
-            moveToCalendarNextDayJust(cal);
+        if (_toPatternNextYearJust) {
+            moveToCalendarNextYearJust(cal);
+            moveToScopeYear(cal);
         } else if (_toPatternNextMonthJust) {
             moveToCalendarNextMonthJust(cal);
-        } else if (_toPatternNextYearJust) {
-            moveToCalendarNextYearJust(cal);
+            moveToScopeMonth(cal);
+        } else if (_toPatternNextDayJust) {
+            moveToCalendarNextDayJust(cal);
+            moveToScopeDay(cal);
+        } else if (_toPatternNextHourJust) {
+            moveToCalendarNextHourJust(cal);
+            moveToScopeHour(cal);
         } else if (_toPatternNextWeekJust) {
             moveToCalendarNextWeekJust(cal);
+            moveToScopeWeek(cal);
         }
         if (_toDateWithNoon) {
             moveToCalendarHourJustNoon(cal);
@@ -714,6 +737,36 @@ public class FromToOption implements ConditionOption, Serializable {
         DfTypeUtil.addCalendarMillisecond(cal, 1);
     }
 
+    protected void moveToScopeYear(Calendar cal) {
+        if (_moveToScope != null) {
+            DfTypeUtil.addCalendarYear(cal, _moveToScope);
+        }
+    }
+
+    protected void moveToScopeMonth(Calendar cal) {
+        if (_moveToScope != null) {
+            DfTypeUtil.addCalendarMonth(cal, _moveToScope);
+        }
+    }
+
+    protected void moveToScopeDay(Calendar cal) {
+        if (_moveToScope != null) {
+            DfTypeUtil.addCalendarDay(cal, _moveToScope);
+        }
+    }
+
+    protected void moveToScopeHour(Calendar cal) {
+        if (_moveToScope != null) {
+            DfTypeUtil.addCalendarHour(cal, _moveToScope);
+        }
+    }
+
+    protected void moveToScopeWeek(Calendar cal) {
+        if (_moveToScope != null) {
+            DfTypeUtil.addCalendarWeek(cal, _moveToScope);
+        }
+    }
+
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
@@ -725,6 +778,20 @@ public class FromToOption implements ConditionOption, Serializable {
         if (value > max) {
             String msg = "The argument '" + name + "' should not be over: value=" + value + " max=" + max;
             throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertPatternOptionValid(String option) {
+        if (!_usePattern) {
+            String msg = "The option '" + option + "()' should be called after pattern setting.";
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void assertNotAdjustmentAfterPattern(String option) {
+        if (_usePattern) {
+            String msg = "The option '" + option + "()' should not be call after pattern setting.";
+            throw new IllegalStateException(msg);
         }
     }
 

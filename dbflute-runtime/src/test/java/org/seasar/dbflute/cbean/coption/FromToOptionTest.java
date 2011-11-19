@@ -164,6 +164,30 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals("2008-11-25 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
     }
 
+    public void test_compareAsMonth_moveToScope_previous() {
+        // ## Arrange ##
+        FromToOption option = createOption();
+        String fmt = "yyyy-MM-dd HH:mm:ss";
+
+        // ## Act ##
+        option.compareAsMonth().beginMonth_Day(3).moveToScope(-1);
+
+        // ## Assert ##
+        // from date
+        assertEquals("2011-10-03 00:00:00", toString(option.filterFromDate(toDate("2011-11-01 00:34:56")), fmt));
+        assertEquals("2011-10-03 00:00:00", toString(option.filterFromDate(toDate("2011-11-01 12:34:56")), fmt));
+        assertEquals("2011-10-03 00:00:00", toString(option.filterFromDate(toDate("2011-11-01 23:34:56")), fmt));
+        assertEquals("2011-10-03 00:00:00", toString(option.filterFromDate(toDate("2011-11-04 23:34:56")), fmt));
+        assertEquals("2011-10-03 00:00:00", toString(option.filterFromDate(toDate("2011-11-29 23:34:56")), fmt));
+
+        // to date
+        assertEquals("2011-11-03 00:00:00", toString(option.filterToDate(toDate("2011-11-01 00:34:56")), fmt));
+        assertEquals("2011-11-03 00:00:00", toString(option.filterToDate(toDate("2011-11-01 12:34:56")), fmt));
+        assertEquals("2011-11-03 00:00:00", toString(option.filterToDate(toDate("2011-11-01 23:34:56")), fmt));
+        assertEquals("2011-11-03 00:00:00", toString(option.filterToDate(toDate("2011-11-04 23:34:56")), fmt));
+        assertEquals("2011-11-03 00:00:00", toString(option.filterToDate(toDate("2011-11-29 23:34:56")), fmt));
+    }
+
     // -----------------------------------------------------
     //                                                  Date
     //                                                  ----
@@ -276,6 +300,28 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals("2008-12-19 12:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
     }
 
+    public void test_compareAsDate_moveToScope__previous() {
+        // ## Arrange ##
+        FromToOption option = createOption();
+        String fmt = "yyyy-MM-dd HH:mm:ss";
+
+        // ## Act ##
+        option.compareAsDate().beginDay_PreviousHour(22).moveToScope(-2);
+
+        // ## Assert ##
+        // from date
+        assertEquals("2011-10-29 22:00:00", toString(option.filterFromDate(toDate("2011-11-01 00:34:56")), fmt));
+        assertEquals("2011-10-29 22:00:00", toString(option.filterFromDate(toDate("2011-11-01 12:34:56")), fmt));
+        assertEquals("2011-10-29 22:00:00", toString(option.filterFromDate(toDate("2011-11-01 23:34:56")), fmt));
+        assertEquals("2011-10-30 22:00:00", toString(option.filterFromDate(toDate("2011-11-02 23:34:56")), fmt));
+
+        // to date
+        assertEquals("2011-10-30 22:00:00", toString(option.filterToDate(toDate("2011-11-01 00:34:56")), fmt));
+        assertEquals("2011-10-30 22:00:00", toString(option.filterToDate(toDate("2011-11-01 12:34:56")), fmt));
+        assertEquals("2011-10-30 22:00:00", toString(option.filterToDate(toDate("2011-11-01 23:34:56")), fmt));
+        assertEquals("2011-10-31 22:00:00", toString(option.filterToDate(toDate("2011-11-02 23:34:56")), fmt));
+    }
+
     // -----------------------------------------------------
     //                                                  Hour
     //                                                  ----
@@ -295,6 +341,28 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
         assertEquals("2008-12-14 12:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
         assertEquals("2008-12-18 19:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_compareAsHour_moveToScope_previous() {
+        // ## Arrange ##
+        FromToOption option = createOption();
+        String fmt = "yyyy-MM-dd HH:mm:ss";
+
+        // ## Act ##
+        option.compareAsHour().moveToScope(-2);
+
+        // ## Assert ##
+        // from date
+        assertEquals("2011-11-08 22:00:00", toString(option.filterFromDate(toDate("2011-11-09 00:34:56")), fmt));
+        assertEquals("2011-11-09 10:00:00", toString(option.filterFromDate(toDate("2011-11-09 12:34:56")), fmt));
+        assertEquals("2011-11-09 11:00:00", toString(option.filterFromDate(toDate("2011-11-09 13:34:56")), fmt));
+        assertEquals("2011-11-09 21:00:00", toString(option.filterFromDate(toDate("2011-11-09 23:34:56")), fmt));
+
+        // to date
+        assertEquals("2011-11-08 23:00:00", toString(option.filterToDate(toDate("2011-11-09 00:34:56")), fmt));
+        assertEquals("2011-11-09 11:00:00", toString(option.filterToDate(toDate("2011-11-09 12:34:56")), fmt));
+        assertEquals("2011-11-09 12:00:00", toString(option.filterToDate(toDate("2011-11-09 13:34:56")), fmt));
+        assertEquals("2011-11-09 22:00:00", toString(option.filterToDate(toDate("2011-11-09 23:34:56")), fmt));
     }
 
     // -----------------------------------------------------
@@ -370,6 +438,46 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
         assertEquals("2011-11-14 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
         assertEquals("2011-11-21 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void test_compareAsWeek_moveToScope_previous() {
+        // ## Arrange ##
+        FromToOption option = createOption();
+        String fmt = "yyyy-MM-dd HH:mm:ss";
+
+        // ## Act ##
+        option.compareAsWeek().beginWeek_DayOfWeek2nd_Monday().moveToScope(-1);
+
+        // ## Assert ##
+        // from date (11/09 is Wednesday)
+        assertEquals("2011-10-31 00:00:00", toString(option.filterFromDate(toDate("2011-11-09 12:34:56")), fmt));
+        assertEquals("2011-10-31 00:00:00", toString(option.filterFromDate(toDate("2011-11-10 12:34:56")), fmt));
+        assertEquals("2011-10-31 00:00:00", toString(option.filterFromDate(toDate("2011-11-11 12:34:56")), fmt));
+        assertEquals("2011-10-31 00:00:00", toString(option.filterFromDate(toDate("2011-11-12 12:34:56")), fmt));
+        assertEquals("2011-10-31 00:00:00", toString(option.filterFromDate(toDate("2011-11-13 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterFromDate(toDate("2011-11-14 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterFromDate(toDate("2011-11-15 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterFromDate(toDate("2011-11-16 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterFromDate(toDate("2011-11-17 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterFromDate(toDate("2011-11-18 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterFromDate(toDate("2011-11-19 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterFromDate(toDate("2011-11-20 12:34:56")), fmt));
+        assertEquals("2011-11-14 00:00:00", toString(option.filterFromDate(toDate("2011-11-21 12:34:56")), fmt));
+
+        // to date
+        assertEquals("2011-11-07 00:00:00", toString(option.filterToDate(toDate("2011-11-09 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterToDate(toDate("2011-11-10 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterToDate(toDate("2011-11-11 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterToDate(toDate("2011-11-12 12:34:56")), fmt));
+        assertEquals("2011-11-07 00:00:00", toString(option.filterToDate(toDate("2011-11-13 12:34:56")), fmt));
+        assertEquals("2011-11-14 00:00:00", toString(option.filterToDate(toDate("2011-11-14 12:34:56")), fmt));
+        assertEquals("2011-11-14 00:00:00", toString(option.filterToDate(toDate("2011-11-15 12:34:56")), fmt));
+        assertEquals("2011-11-14 00:00:00", toString(option.filterToDate(toDate("2011-11-16 12:34:56")), fmt));
+        assertEquals("2011-11-14 00:00:00", toString(option.filterToDate(toDate("2011-11-17 12:34:56")), fmt));
+        assertEquals("2011-11-14 00:00:00", toString(option.filterToDate(toDate("2011-11-18 12:34:56")), fmt));
+        assertEquals("2011-11-14 00:00:00", toString(option.filterToDate(toDate("2011-11-19 12:34:56")), fmt));
+        assertEquals("2011-11-14 00:00:00", toString(option.filterToDate(toDate("2011-11-20 12:34:56")), fmt));
+        assertEquals("2011-11-21 00:00:00", toString(option.filterToDate(toDate("2011-11-21 12:34:56")), fmt));
     }
 
     // ===================================================================================

@@ -1636,36 +1636,36 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                          Add Calendar
     //                                          ------------
-    public static void addCalendarYear(Calendar cal, int addedYear) {
-        cal.add(Calendar.YEAR, addedYear);
+    public static void addCalendarYear(Calendar cal, int year) {
+        cal.add(Calendar.YEAR, year);
     }
 
-    public static void addCalendarMonth(Calendar cal, int addedMonth) {
-        cal.add(Calendar.MONTH, addedMonth);
+    public static void addCalendarMonth(Calendar cal, int month) {
+        cal.add(Calendar.MONTH, month);
     }
 
-    public static void addCalendarDay(Calendar cal, int addedDay) {
-        cal.add(Calendar.DAY_OF_MONTH, addedDay);
+    public static void addCalendarDay(Calendar cal, int day) {
+        cal.add(Calendar.DAY_OF_MONTH, day);
     }
 
-    public static void addCalendarHour(Calendar cal, int addedHour) {
-        cal.add(Calendar.HOUR_OF_DAY, addedHour);
+    public static void addCalendarHour(Calendar cal, int hour) {
+        cal.add(Calendar.HOUR_OF_DAY, hour);
     }
 
-    public static void addCalendarMinute(Calendar cal, int addedMinute) {
-        cal.add(Calendar.MINUTE, addedMinute);
+    public static void addCalendarMinute(Calendar cal, int minute) {
+        cal.add(Calendar.MINUTE, minute);
     }
 
-    public static void addCalendarSecond(Calendar cal, int addedSecond) {
-        cal.add(Calendar.SECOND, addedSecond);
+    public static void addCalendarSecond(Calendar cal, int second) {
+        cal.add(Calendar.SECOND, second);
     }
 
-    public static void addCalendarMillisecond(Calendar cal, int addedMillisecond) {
-        cal.add(Calendar.MILLISECOND, addedMillisecond);
+    public static void addCalendarMillisecond(Calendar cal, int millisecond) {
+        cal.add(Calendar.MILLISECOND, millisecond);
     }
 
-    public static void addCalendarWeek(Calendar cal, int addedWeek) {
-        cal.add(Calendar.WEEK_OF_MONTH, addedWeek);
+    public static void addCalendarWeek(Calendar cal, int week) {
+        cal.add(Calendar.WEEK_OF_MONTH, week);
     }
 
     /**
