@@ -352,97 +352,170 @@ public class DfTypeUtilTest extends PlainTestCase {
     // -----------------------------------------------------
     //                                          Move-to Date
     //                                          ------------
-    public void test_Date_moveToDateMonthBegin() {
+    // here is only for basic tests, detail tests are implemented HandyDateTest
+    public void test_Date_moveToDateYearJust() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
-        DfTypeUtil.moveToDateMonthBegin(date);
+        DfTypeUtil.moveToDateYearJust(date);
+
+        // ## Assert ##
+        assertEquals("2008/01/01 00:00:00.000", df.format(date));
+    }
+
+    public void test_Date_moveToDateYearTerminal() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateYearTerminal(date);
+
+        // ## Assert ##
+        assertEquals("2008/12/31 23:59:59.999", df.format(date));
+    }
+
+    public void test_Date_moveToDateMonthJust() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateMonthJust(date);
 
         // ## Assert ##
         assertEquals("2008/12/01 00:00:00.000", df.format(date));
     }
 
-    public void test_Date_moveToDateMonthEnd() {
+    public void test_Date_moveToDateMonthTerminal() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-02-06 12:34:56.789");
 
         // ## Act ##
-        DfTypeUtil.moveToDateMonthEnd(date);
+        DfTypeUtil.moveToDateMonthTerminal(date);
 
         // ## Assert ##
         assertEquals("2008/02/29 23:59:59.999", df.format(date));
     }
 
-    public void test_Date_moveToDateWeekBegin_basic() {
+    public void test_Date_moveToDateDayJust() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateDayJust(date);
+
+        // ## Assert ##
+        assertEquals("2008/12/30 00:00:00.000", df.format(date));
+    }
+
+    public void test_Date_moveToDateDayTerminal() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-02-06 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateDayTerminal(date);
+
+        // ## Assert ##
+        assertEquals("2008/02/06 23:59:59.999", df.format(date));
+    }
+
+    public void test_Date_moveToDateHourJust() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateHourJust(date);
+
+        // ## Assert ##
+        assertEquals("2008/12/30 12:00:00.000", df.format(date));
+    }
+
+    public void test_Date_moveToDateHourTerminal() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-02-06 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateHourTerminal(date);
+
+        // ## Assert ##
+        assertEquals("2008/02/06 12:59:59.999", df.format(date));
+    }
+
+    public void test_Date_moveToDateWeekJust_basic() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
 
         // ## Act ##
-        DfTypeUtil.moveToDateWeekBegin(date, Calendar.SUNDAY);
+        DfTypeUtil.moveToDateWeekJust(date, Calendar.SUNDAY);
 
         // ## Assert ##
         assertEquals("2011/11/13 00:00:00.000", df.format(date));
     }
 
-    public void test_Date_moveToDateWeekBegin_just_day() {
+    public void test_Date_moveToDateWeekJust_just_day() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
 
         // ## Act ##
-        DfTypeUtil.moveToDateWeekBegin(date, Calendar.THURSDAY);
+        DfTypeUtil.moveToDateWeekJust(date, Calendar.THURSDAY);
 
         // ## Assert ##
         assertEquals("2011/11/17 00:00:00.000", df.format(date));
     }
 
-    public void test_Date_moveToDateWeekBegin_Friday() {
+    public void test_Date_moveToDateWeekJust_Friday() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789"); // Sunday
 
         // ## Act ##
-        DfTypeUtil.moveToDateWeekBegin(date, Calendar.FRIDAY);
+        DfTypeUtil.moveToDateWeekJust(date, Calendar.FRIDAY);
 
         // ## Assert ##
         assertEquals("2011/11/18 00:00:00.000", df.format(date));
     }
 
-    public void test_Date_moveToDateWeekEnd_basic() {
+    public void test_Date_moveToDateWeekTerminal_basic() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
 
         // ## Act ##
-        DfTypeUtil.moveToDateWeekEnd(date, Calendar.SUNDAY);
+        DfTypeUtil.moveToDateWeekTerminal(date, Calendar.SUNDAY);
 
         // ## Assert ##
         assertEquals("2011/11/19 23:59:59.999", df.format(date));
     }
 
-    public void test_Date_moveToDateWeekEnd_just_day() {
+    public void test_Date_moveToDateWeekTerminal_just_day() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-17 12:34:56.789"); // Thursday
 
         // ## Act ##
-        DfTypeUtil.moveToDateWeekEnd(date, Calendar.THURSDAY);
+        DfTypeUtil.moveToDateWeekTerminal(date, Calendar.THURSDAY);
 
         // ## Assert ##
         assertEquals("2011/11/23 23:59:59.999", df.format(date));
     }
 
-    public void test_Date_moveToDateWeekEnd_Friday() {
+    public void test_Date_moveToDateWeekTerminal_Friday() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789"); // Sunday
 
         // ## Act ##
-        DfTypeUtil.moveToDateWeekEnd(date, Calendar.FRIDAY);
+        DfTypeUtil.moveToDateWeekTerminal(date, Calendar.FRIDAY);
 
         // ## Assert ##
         assertEquals("2011/11/24 23:59:59.999", df.format(date));

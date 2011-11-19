@@ -1093,82 +1093,82 @@ public final class DfTypeUtil {
 
     public static void addDateWeekOfMonth(Date date, int weekOfMonth) {
         final Calendar cal = toCalendar(date);
-        addCalendarWeekOfMonth(cal, weekOfMonth);
+        addCalendarWeek(cal, weekOfMonth);
         date.setTime(cal.getTimeInMillis());
     }
 
     // -----------------------------------------------------
     //                                          Move-to Date
     //                                          ------------
-    public static void moveToDateHour(Date date, int hourOfDay) {
+    public static void moveToDateYearJust(Date date) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarHour(cal, hourOfDay);
+        moveToCalendarYearJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourBegin(Date date) {
+    public static void moveToDateYearTerminal(Date date) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarHourBegin(cal);
+        moveToCalendarYearTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourEnd(Date date) {
+    public static void moveToDateMonthJust(Date date) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarHourEnd(cal);
+        moveToCalendarMonthJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourNoon(Date date) {
+    public static void moveToDateMonthTerminal(Date date) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarHourNoon(cal);
+        moveToCalendarMonthTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayBegin(Date date) {
+    public static void moveToDateDayJust(Date date) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarDayBegin(cal);
+        moveToCalendarDayJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateDayEnd(Date date) {
+    public static void moveToDateDayTerminal(Date date) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarDayEnd(cal);
+        moveToCalendarDayTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthBegin(Date date) {
+    public static void moveToDateHourJust(Date date, int hourOfDay) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarMonthBegin(cal);
+        moveToCalendarHourJustFor(cal, hourOfDay);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateMonthEnd(Date date) {
+    public static void moveToDateHourJust(Date date) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarMonthEnd(cal);
+        moveToCalendarHourJust(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearBegin(Date date) {
+    public static void moveToDateHourTerminal(Date date) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarYearBegin(cal);
+        moveToCalendarHourTerminal(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateYearEnd(Date date) {
+    public static void moveToDateHourJustNoon(Date date) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarYearEnd(cal);
+        moveToCalendarHourJustNoon(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateWeekBegin(Date date, int weekStartDay) {
+    public static void moveToDateWeekJust(Date date, int weekStartDay) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarWeekBegin(cal, weekStartDay);
+        moveToCalendarWeekJust(cal, weekStartDay);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateWeekEnd(Date date, int weekStartDay) {
+    public static void moveToDateWeekTerminal(Date date, int weekStartDay) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarWeekEnd(cal, weekStartDay);
+        moveToCalendarWeekTerminal(cal, weekStartDay);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1636,113 +1636,307 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                          Add Calendar
     //                                          ------------
-    public static void addCalendarYear(Calendar cal, int year) {
-        cal.add(Calendar.YEAR, year);
+    public static void addCalendarYear(Calendar cal, int addedYear) {
+        cal.add(Calendar.YEAR, addedYear);
     }
 
-    public static void addCalendarMonth(Calendar cal, int month) {
-        cal.add(Calendar.MONTH, month);
+    public static void addCalendarMonth(Calendar cal, int addedMonth) {
+        cal.add(Calendar.MONTH, addedMonth);
     }
 
+    public static void addCalendarDay(Calendar cal, int addedDay) {
+        cal.add(Calendar.DAY_OF_MONTH, addedDay);
+    }
+
+    public static void addCalendarHour(Calendar cal, int addedHour) {
+        cal.add(Calendar.HOUR_OF_DAY, addedHour);
+    }
+
+    public static void addCalendarMinute(Calendar cal, int addedMinute) {
+        cal.add(Calendar.MINUTE, addedMinute);
+    }
+
+    public static void addCalendarSecond(Calendar cal, int addedSecond) {
+        cal.add(Calendar.SECOND, addedSecond);
+    }
+
+    public static void addCalendarMillisecond(Calendar cal, int addedMillisecond) {
+        cal.add(Calendar.MILLISECOND, addedMillisecond);
+    }
+
+    public static void addCalendarWeek(Calendar cal, int addedWeek) {
+        cal.add(Calendar.WEEK_OF_MONTH, addedWeek);
+    }
+
+    /**
+     * @param cal
+     * @param dayOfMonth
+     * @deprecated
+     */
+    public static void addCalendarDayOfMonth(Calendar cal, int dayOfMonth) {
+        cal.add(Calendar.DAY_OF_MONTH, dayOfMonth);
+    }
+
+    /**
+     * @param cal
+     * @param date
+     * @deprecated
+     */
     public static void addCalendarDate(Calendar cal, int date) {
         cal.add(Calendar.DATE, date);
     }
 
-    public static void addCalendarDayOfMonth(Calendar cal, int date) {
-        cal.add(Calendar.DAY_OF_MONTH, date);
-    }
-
+    /**
+     * @param cal
+     * @param hourOfDay
+     * @deprecated
+     */
     public static void addCalendarHourOfDay(Calendar cal, int hourOfDay) {
         cal.add(Calendar.HOUR_OF_DAY, hourOfDay);
-    }
-
-    public static void addCalendarMinute(Calendar cal, int minute) {
-        cal.add(Calendar.MINUTE, minute);
-    }
-
-    public static void addCalendarSecond(Calendar cal, int second) {
-        cal.add(Calendar.SECOND, second);
-    }
-
-    public static void addCalendarMillisecond(Calendar cal, int millisecond) {
-        cal.add(Calendar.MILLISECOND, millisecond);
-    }
-
-    public static void addCalendarWeekOfMonth(Calendar cal, int weekOfMonth) {
-        cal.add(Calendar.WEEK_OF_MONTH, weekOfMonth);
     }
 
     // -----------------------------------------------------
     //                                      Move-to Calendar
     //                                      ----------------
-    public static void moveToCalendarHour(Calendar cal, int hourOfDay) {
-        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+    // - - - - - - - - - - - - - - - - - - - - - - - -[Year]
+    public static void moveToCalendarYear(Calendar cal, int yaer) {
+        cal.set(Calendar.YEAR, yaer);
+    }
+
+    public static void moveToCalendarYearJust(Calendar cal) { // 2011/01/01 00:00:00:000
+        moveToCalendarYearJust(cal, cal.getActualMinimum(Calendar.MONTH) + 1); // zero origin headache
+    }
+
+    public static void moveToCalendarYearJust(Calendar cal, int yearBeginMonth) {
+        final int realBeginValue;
+        if (yearBeginMonth >= 0) {
+            realBeginValue = yearBeginMonth;
+        } else {
+            realBeginValue = (yearBeginMonth * -1); // remove minus
+            addCalendarYear(cal, -1);
+        }
+        moveToCalendarMonth(cal, realBeginValue);
+        moveToCalendarMonthJust(cal);
+    }
+
+    public static void moveToCalendarYearJustFor(Calendar cal, int yaer) {
+        moveToCalendarYear(cal, yaer);
+        moveToCalendarYearJust(cal);
+    }
+
+    public static void moveToCalendarYearTerminal(Calendar cal) { // 2011/12/31 23:59:59.999
+        moveToCalendarYearTerminal(cal, cal.getActualMinimum(Calendar.MONTH) + 1); // zero origin headache
+    }
+
+    public static void moveToCalendarYearTerminal(Calendar cal, int yearBeginMonth) {
+        moveToCalendarYearJust(cal, yearBeginMonth);
+        addCalendarYear(cal, 1);
+        addCalendarMillisecond(cal, -1);
+    }
+
+    public static void moveToCalendarYearTerminalFor(Calendar cal, int yaer) {
+        moveToCalendarYearJustFor(cal, yaer);
+        moveToCalendarYearTerminal(cal);
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - [Month]
+    public static void moveToCalendarMonth(Calendar cal, int month) {
+        cal.set(Calendar.MONTH, month - 1); // zero origin headache
+    }
+
+    public static void moveToCalendarMonthJust(Calendar cal) { // 2011/11/01 00:00:00.000
+        moveToCalendarMonthJust(cal, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+    }
+
+    public static void moveToCalendarMonthJust(Calendar cal, int monthBeginDay) {
+        final int realBeginValue;
+        if (monthBeginDay >= 0) {
+            realBeginValue = monthBeginDay;
+        } else {
+            realBeginValue = (monthBeginDay * -1); // remove minus
+            addCalendarMonth(cal, -1);
+        }
+        moveToCalendarDay(cal, realBeginValue);
+        moveToCalendarDayJust(cal);
+    }
+
+    public static void moveToCalendarMonthJustFor(Calendar cal, int month) {
+        moveToCalendarMonth(cal, month);
+        moveToCalendarMonthJust(cal);
+    }
+
+    public static void moveToCalendarMonthTerminal(Calendar cal) { // 2011/11/30 23:59:59.999
+        moveToCalendarMonthTerminal(cal, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+    }
+
+    public static void moveToCalendarMonthTerminal(Calendar cal, int monthBeginDay) {
+        moveToCalendarMonthJust(cal, monthBeginDay);
+        addCalendarMonth(cal, 1);
+        addCalendarMillisecond(cal, -1);
+    }
+
+    public static void moveToCalendarMonthTerminalFor(Calendar cal, int month) { // 2011/11/30 23:59:59.999
+        moveToCalendarMonthJustFor(cal, month);
+        moveToCalendarMonthTerminal(cal);
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - [Day]
+    public static void moveToCalendarDay(Calendar cal, int day) {
+        cal.set(Calendar.DAY_OF_MONTH, day);
+    }
+
+    public static void moveToCalendarDayJust(Calendar cal) { // 2011/11/17 00:00:00.000
+        moveToCalendarDayJust(cal, cal.getActualMinimum(Calendar.HOUR_OF_DAY));
+    }
+
+    public static void moveToCalendarDayJust(Calendar cal, int dayBeginHour) {
+        final int realBeginValue;
+        if (dayBeginHour >= 0) {
+            realBeginValue = dayBeginHour;
+        } else {
+            realBeginValue = (dayBeginHour * -1); // remove minus
+            addCalendarDay(cal, -1);
+        }
+        moveToCalendarHour(cal, realBeginValue);
         clearCalendarMinuteWithRear(cal);
     }
 
-    public static void moveToCalendarHourBegin(Calendar cal) {
+    public static void moveToCalendarDayJustFor(Calendar cal, int day) {
+        moveToCalendarDay(cal, day);
+        moveToCalendarDayJust(cal);
+    }
+
+    public static void moveToCalendarDayTerminal(Calendar cal) { // 2011/11/17 23:59:59.999
+        moveToCalendarDayTerminal(cal, cal.getActualMinimum(Calendar.HOUR_OF_DAY));
+    }
+
+    public static void moveToCalendarDayTerminal(Calendar cal, int dayBeginHour) {
+        moveToCalendarDayJust(cal, dayBeginHour);
+        addCalendarDay(cal, 1);
+        addCalendarMillisecond(cal, -1);
+    }
+
+    public static void moveToCalendarDayTerminalFor(Calendar cal, int day) {
+        moveToCalendarDayJustFor(cal, day);
+        moveToCalendarDayTerminal(cal);
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - -[Hour]
+    public static void moveToCalendarHour(Calendar cal, int hour) {
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+    }
+
+    public static void moveToCalendarHourJust(Calendar cal) { // 2011/11/17 11:00:00.000
         clearCalendarMinuteWithRear(cal);
     }
 
-    public static void moveToCalendarHourEnd(Calendar cal) {
-        cal.set(Calendar.MINUTE, cal.getActualMaximum(Calendar.MINUTE));
-        cal.set(Calendar.SECOND, cal.getActualMaximum(Calendar.SECOND));
-        cal.set(Calendar.MILLISECOND, cal.getActualMaximum(Calendar.MILLISECOND));
+    public static void moveToCalendarHourJustFor(Calendar cal, int hour) {
+        moveToCalendarHour(cal, hour);
+        moveToCalendarHourJust(cal);
     }
 
-    public static void moveToCalendarHourNoon(Calendar cal) {
-        moveToCalendarHour(cal, 12);
+    public static void moveToCalendarHourJustNoon(Calendar cal) {
+        moveToCalendarHourJustFor(cal, 12);
     }
 
-    public static void moveToCalendarDayBegin(Calendar cal) {
-        clearCalendarTimeParts(cal);
+    public static void moveToCalendarHourTerminal(Calendar cal) { // 2011/11/17 11:59:59.999
+        moveToCalendarMinute(cal, cal.getActualMaximum(Calendar.MINUTE));
+        moveToCalendarMinuteTerminal(cal);
     }
 
-    public static void moveToCalendarDayEnd(Calendar cal) {
-        cal.set(Calendar.HOUR_OF_DAY, cal.getActualMaximum(Calendar.HOUR_OF_DAY));
-        moveToCalendarHourEnd(cal);
+    public static void moveToCalendarHourTerminalFor(Calendar cal, int hour) {
+        moveToCalendarHourJustFor(cal, hour);
+        moveToCalendarHourTerminal(cal);
     }
 
-    public static void moveToCalendarMonthBegin(Calendar cal) {
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-        clearCalendarTimeParts(cal);
+    // - - - - - - - - - - - - - - - - - - - - - - -[Minute]
+    public static void moveToCalendarMinute(Calendar cal, int minute) {
+        cal.set(Calendar.MINUTE, minute);
     }
 
-    public static void moveToCalendarMonthEnd(Calendar cal) {
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-        moveToCalendarDayEnd(cal);
+    public static void moveToCalendarMinuteJust(Calendar cal) {
+        clearCalendarSecondWithRear(cal);
     }
 
-    public static void moveToCalendarYearBegin(Calendar cal) {
-        cal.set(Calendar.MONTH, cal.getActualMinimum(Calendar.MONTH));
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-        clearCalendarTimeParts(cal);
+    public static void moveToCalendarMinuteJustFor(Calendar cal, int minute) {
+        moveToCalendarMinute(cal, minute);
+        moveToCalendarSecondJust(cal);
     }
 
-    public static void moveToCalendarYearEnd(Calendar cal) {
-        cal.set(Calendar.MONTH, cal.getActualMaximum(Calendar.MONTH));
-        moveToCalendarMonthEnd(cal);
+    public static void moveToCalendarMinuteTerminal(Calendar cal) {
+        moveToCalendarSecond(cal, cal.getActualMaximum(Calendar.SECOND));
+        moveToCalendarSecondTerminal(cal);
     }
 
-    public static void moveToCalendarWeekBegin(Calendar cal, int weekStartDay) {
+    public static void moveToCalendarMinuteTerminalFor(Calendar cal, int minute) {
+        moveToCalendarMinuteJustFor(cal, minute);
+        moveToCalendarMinuteTerminal(cal);
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - -[Second]
+    public static void moveToCalendarSecond(Calendar cal, int second) {
+        cal.set(Calendar.SECOND, second);
+    }
+
+    public static void moveToCalendarSecondJust(Calendar cal) {
+        clearCalendarMillisecond(cal);
+    }
+
+    public static void moveToCalendarSecondJustFor(Calendar cal, int second) {
+        moveToCalendarSecond(cal, second);
+        moveToCalendarSecondJust(cal);
+    }
+
+    public static void moveToCalendarSecondTerminal(Calendar cal) {
+        moveToCalendarMillisecond(cal, cal.getActualMaximum(Calendar.MILLISECOND));
+    }
+
+    public static void moveToCalendarSecondTerminalFor(Calendar cal, int second) {
+        moveToCalendarSecondJustFor(cal, second);
+        moveToCalendarSecondTerminal(cal);
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - [Millisecond]
+    public static void moveToCalendarMillisecond(Calendar cal, int millisecond) {
+        cal.set(Calendar.MILLISECOND, millisecond);
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - -[Week]
+    public static void moveToCalendarWeekOfMonth(Calendar cal, int weekOfMonth) {
+        cal.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
+    }
+
+    public static void moveToCalendarWeekOfYear(Calendar cal, int weekOfYear) {
+        cal.set(Calendar.WEEK_OF_YEAR, weekOfYear);
+    }
+
+    public static void moveToCalendarWeekJust(Calendar cal) {
+        moveToCalendarWeekJust(cal, Calendar.SUNDAY); // as default
+    }
+
+    public static void moveToCalendarWeekJust(Calendar cal, int weekBeginDayOfWeek) {
         final int dayOfWeekDef = Calendar.DAY_OF_WEEK;
         final int currentDayOfWeek = cal.get(dayOfWeekDef);
-        cal.set(dayOfWeekDef, weekStartDay);
-        if (currentDayOfWeek < weekStartDay) {
-            addCalendarWeekOfMonth(cal, -1);
+        cal.set(dayOfWeekDef, weekBeginDayOfWeek);
+        if (currentDayOfWeek < weekBeginDayOfWeek) {
+            addCalendarWeek(cal, -1);
         }
         clearCalendarTimeParts(cal);
     }
 
-    public static void moveToCalendarWeekEnd(Calendar cal, int weekStartDay) {
+    public static void moveToCalendarWeekTerminal(Calendar cal) {
+        moveToCalendarWeekTerminal(cal, Calendar.SUNDAY);
+    }
+
+    public static void moveToCalendarWeekTerminal(Calendar cal, int weekBeginDayOfWeek) {
         final int dayOfWeekDef = Calendar.DAY_OF_WEEK;
         final int currentDayOfWeek = cal.get(dayOfWeekDef);
-        cal.set(dayOfWeekDef, weekStartDay);
-        if (currentDayOfWeek >= weekStartDay) {
-            addCalendarWeekOfMonth(cal, 1);
+        cal.set(dayOfWeekDef, weekBeginDayOfWeek);
+        if (currentDayOfWeek >= weekBeginDayOfWeek) {
+            addCalendarWeek(cal, 1);
         }
-        addCalendarDayOfMonth(cal, -1);
-        moveToCalendarDayEnd(cal);
+        addCalendarDay(cal, -1);
+        moveToCalendarDayTerminal(cal);
     }
 
     // -----------------------------------------------------

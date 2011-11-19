@@ -15,24 +15,153 @@ public class FromToOptionTest extends PlainTestCase {
     //                                                                  Comparison Pattern
     //                                                                  ==================
     // -----------------------------------------------------
-    //                                                  Hour
+    //                                                  Year
     //                                                  ----
-    public void test_compareAsHour_basic() {
+    public void test_compareAsYear_basic() {
         // ## Arrange ##
-        String fromRes = "2008-12-14 12:34:56.789";
-        String toRes = "2008-12-18 18:34:56.789";
+        String fromRes = "2008-09-14 12:34:56";
+        String toRes = "2008-11-18 18:34:56";
         FromToOption option = createOption();
 
         // ## Act ##
-        option.compareAsHour();
+        option.compareAsYear();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
 
         // ## Assert ##
         assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
         assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
-        assertEquals("2008-12-14 12:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
-        assertEquals("2008-12-18 19:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2008-01-01 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2009-01-01 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void test_compareAsYear_YearBegin_fromFour() {
+        // ## Arrange ##
+        String fromRes = "2008-09-14 12:34:56";
+        String toRes = "2008-11-18 18:34:56";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsYear().beginYear_Month(4);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-04-01 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2009-04-01 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void test_compareAsYear_YearBegin_fromOver() {
+        // ## Arrange ##
+        String fromRes = "2008-02-14 12:34:56";
+        String toRes = "2009-02-02 18:34:56";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsYear().beginYear_Month(4);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-04-01 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2010-04-01 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void test_compareAsYear_YearBegin_fromPrevious() {
+        // ## Arrange ##
+        String fromRes = "2008-02-14 12:34:56";
+        String toRes = "2009-02-02 18:34:56";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsYear().beginYear_PreviousMonth(11);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2007-11-01 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2009-11-01 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+    }
+
+    // -----------------------------------------------------
+    //                                                 Month
+    //                                                 -----
+    public void test_compareAsMonth_basic() {
+        // ## Arrange ##
+        String fromRes = "2008-09-14 12:34:56.789";
+        String toRes = "2008-11-18 18:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsMonth();
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-09-01 00:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2008-12-01 00:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_compareAsMonth_MonthBegin_fromThree() {
+        // ## Arrange ##
+        String fromRes = "2008-09-14 12:34:56";
+        String toRes = "2008-11-18 18:34:56";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsMonth().beginMonth_Day(3);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-09-03 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2008-12-03 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void test_compareAsMonth_MonthBegin_fromOver() {
+        // ## Arrange ##
+        String fromRes = "2008-09-14 12:34:56";
+        String toRes = "2008-11-18 18:34:56";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsMonth().beginMonth_Day(15);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-09-15 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2008-12-15 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void test_compareAsMonth_MonthBegin_fromPrevious() {
+        // ## Arrange ##
+        String fromRes = "2008-09-14 12:34:56";
+        String toRes = "2008-11-18 18:34:56";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsMonth().beginMonth_PreviousDay(25);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-08-25 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2008-11-25 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
     }
 
     // -----------------------------------------------------
@@ -54,6 +183,60 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
         assertEquals("2008-12-14 00:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
         assertEquals("2008-12-19 00:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_compareAsDate_beginDay_fromMorning() {
+        // ## Arrange ##
+        String fromRes = "2008-12-14 12:34:56.789";
+        String toRes = "2008-12-18 18:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsDate().beginDay_Hour(6);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-12-14 06:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2008-12-19 06:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_compareAsDate_beginDay_fromOver() {
+        // ## Arrange ##
+        String fromRes = "2008-12-14 2:34:56.789";
+        String toRes = "2008-12-18 18:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsDate().beginDay_Hour(6);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-12-14 06:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2008-12-19 06:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_compareAsDate_beginDay_fromPrevious() {
+        // ## Arrange ##
+        String fromRes = "2008-12-14 12:34:56.789";
+        String toRes = "2008-12-18 18:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsDate().beginDay_PreviousHour(22);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-12-13 22:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2008-12-18 22:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
     }
 
     public void test_compareAsDate_with_greaterThan() {
@@ -94,45 +277,24 @@ public class FromToOptionTest extends PlainTestCase {
     }
 
     // -----------------------------------------------------
-    //                                                 Month
-    //                                                 -----
-    public void test_compareAsMonth_basic() {
-        // ## Arrange ##
-        String fromRes = "2008-09-14 12:34:56";
-        String toRes = "2008-11-18 18:34:56";
-        FromToOption option = createOption();
-
-        // ## Act ##
-        option.compareAsMonth();
-        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
-        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
-
-        // ## Assert ##
-        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
-        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
-        assertEquals("2008-09-01 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
-        assertEquals("2008-12-01 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
-    }
-
-    // -----------------------------------------------------
-    //                                                  Year
+    //                                                  Hour
     //                                                  ----
-    public void test_compareAsYear_basic() {
+    public void test_compareAsHour_basic() {
         // ## Arrange ##
-        String fromRes = "2008-09-14 12:34:56";
-        String toRes = "2008-11-18 18:34:56";
+        String fromRes = "2008-12-14 12:34:56.789";
+        String toRes = "2008-12-18 18:34:56.789";
         FromToOption option = createOption();
 
         // ## Act ##
-        option.compareAsYear();
+        option.compareAsHour();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
 
         // ## Assert ##
         assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
         assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
-        assertEquals("2008-01-01 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
-        assertEquals("2009-01-01 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2008-12-14 12:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2008-12-18 19:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
     }
 
     // -----------------------------------------------------
@@ -156,14 +318,14 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals("2011-11-27 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
     }
 
-    public void test_compareAsWeek_asWeekBeginMonday() {
+    public void test_compareAsWeek_beginWeekMonday() {
         // ## Arrange ##
         String fromRes = "2011-11-14 12:34:56"; // Monday
         String toRes = "2011-11-23 18:34:56"; // Wednesday
         FromToOption option = createOption();
 
         // ## Act ##
-        option.compareAsWeek().asWeekBeginMonday();
+        option.compareAsWeek().beginWeek_DayOfWeek2nd_Monday();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
 
@@ -174,14 +336,14 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals("2011-11-28 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
     }
 
-    public void test_compareAsWeek_asWeekBeginFriday() {
+    public void test_compareAsWeek_beginWeekFriday() {
         // ## Arrange ##
         String fromRes = "2011-11-14 12:34:56"; // Monday
         String toRes = "2011-11-23 18:34:56"; // Wednesday
         FromToOption option = createOption();
 
         // ## Act ##
-        option.compareAsWeek().asWeekBeginFriday();
+        option.compareAsWeek().beginWeek_DayOfWeek6th_Friday();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
 
@@ -190,6 +352,24 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
         assertEquals("2011-11-11 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
         assertEquals("2011-11-25 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void test_compareAsWeek_beginWeekSpecified() {
+        // ## Arrange ##
+        String fromRes = "2011-11-14 12:34:56"; // Monday
+        Date targetDate = DfTypeUtil.toDate(fromRes);
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsWeek().beginWeek_DayOfWeek(targetDate);
+        Date fromDate = option.filterFromDate(targetDate);
+        Date toDate = option.filterToDate(targetDate);
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2011-11-14 00:00:00", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2011-11-21 00:00:00", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss"));
     }
 
     // ===================================================================================
@@ -333,7 +513,7 @@ public class FromToOptionTest extends PlainTestCase {
         FromToOption option = createOption();
 
         // ## Act ##
-        option.toDateWithNoon().fromPatternDayBegin().clearAll();
+        option.toDateWithNoon().fromPatternDayJust().clearAll();
         Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
         Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
 

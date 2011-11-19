@@ -28,23 +28,23 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
  * 
  * [Comparison Pattern]
- *   new FromToOption().compareAsHour(); 
- *     --&gt; column &gt;= '2007/04/10 08:00:00'
- *     and column &lt; '2007/04/16 15:00:00'
- * 
- *   new FromToOption().compareAsDate(); 
- *     --&gt; column &gt;= '2007/04/10 00:00:00'
- *     and column &lt; '2007/04/17 00:00:00'
- * 
- *   new FromToOption().compareAsMonth(); 
- *     --&gt; column &gt;= '2007/04/01 00:00:00'
- *     and column &lt; '2007/05/01 00:00:00'
- * 
- *   new FromToOption().compareAsYear(); 
+ *   new FromToOption().compareAsYear();
  *     --&gt; column &gt;= '2007/01/01 00:00:00'
  *     and column &lt; '2008/01/01 00:00:00'
  * 
- *   new FromToOption().compareAsWeek().asWeekBeginSunday(); 
+ *   new FromToOption().compareAsMonth();
+ *     --&gt; column &gt;= '2007/04/01 00:00:00'
+ *     and column &lt; '2007/05/01 00:00:00'
+ * 
+ *   new FromToOption().compareAsDate();
+ *     --&gt; column &gt;= '2007/04/10 00:00:00'
+ *     and column &lt; '2007/04/17 00:00:00'
+ * 
+ *   new FromToOption().compareAsHour();
+ *     --&gt; column &gt;= '2007/04/10 08:00:00'
+ *     and column &lt; '2007/04/16 15:00:00'
+ * 
+ *   new FromToOption().compareAsWeek().beginWeek_DayOfWeek1st_Sunday(); 
  *     --&gt; column &gt;= '2007/04/08 00:00:00'
  *     and column &lt; '2008/04/22 00:00:00'
  * 
@@ -84,22 +84,25 @@ public class FromToOption implements ConditionOption, Serializable {
     protected boolean _greaterThan;
     protected boolean _lessThan;
 
-    protected boolean _fromPatternHourBegin;
-    protected boolean _fromPatternDayBegin;
-    protected boolean _fromPatternMonthBegin;
-    protected boolean _fromPatternYearBegin;
-    protected boolean _fromPatternWeekBegin;
+    protected boolean _fromPatternHourJust;
+    protected boolean _fromPatternDayJust;
+    protected boolean _fromPatternMonthJust;
+    protected boolean _fromPatternYearJust;
+    protected boolean _fromPatternWeekJust;
     protected boolean _fromDateWithNoon;
     protected Integer _fromDateWithHour;
 
-    protected boolean _toPatternNextHourBegin;
-    protected boolean _toPatternNextDayBegin;
-    protected boolean _toPatternNextMonthBegin;
-    protected boolean _toPatternNextYearBegin;
-    protected boolean _toPatternNextWeekBegin;
+    protected boolean _toPatternNextHourJust;
+    protected boolean _toPatternNextDayJust;
+    protected boolean _toPatternNextMonthJust;
+    protected boolean _toPatternNextYearJust;
+    protected boolean _toPatternNextWeekJust;
     protected boolean _toDateWithNoon;
     protected Integer _toDateWithHour;
 
+    protected Integer _yearBeginMonth = 1; // as default
+    protected Integer _monthBeginDay = 1; // as default
+    protected Integer _dayBeginHour = 0; // as default
     protected Integer _weekBeginDay = Calendar.SUNDAY; // as default
     protected boolean _usePattern;
 
@@ -115,41 +118,20 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                                                  Comparison Pattern
     //                                                                  ==================
     /**
-     * Compare as hour. <br />
+     * Compare as year. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     * e.g. from:{2007/04/10 08:24:53} to:{2008/08/16 14:36:29}
      * 
-     *   new FromToOption().compareAsHour();
-     *     --&gt; column &gt;= '2007/04/10 08:00:00'
-     *     and column &lt; '2007/04/16 15:00:00'
+     *   new FromToOption().compareAsYear();
+     *     --&gt; column &gt;= '2007/01/01 00:00:00'
+     *     and column &lt; '2009/01/01 00:00:00'
      * </pre>
      * @return this. (NotNull)
      */
-    public FromToOption compareAsHour() {
-        fromPatternHourBegin();
-        toPatternNextHourBegin();
-        clearOperand();
-        lessThan();
-        _usePattern = true;
-        return this;
-    }
-
-    /**
-     * Compare as date. <br />
-     * This method ignores operand adjustments and other patterns.
-     * <pre>
-     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
-     * 
-     *   new FromToOption().compareAsDate();
-     *     --&gt; column &gt;= '2007/04/10 00:00:00'
-     *     and column &lt; '2007/04/17 00:00:00'
-     * </pre>
-     * @return this. (NotNull)
-     */
-    public FromToOption compareAsDate() {
-        fromPatternDayBegin();
-        toPatternNextDayBegin();
+    public FromToOption compareAsYear() {
+        fromPatternYearJust();
+        toPatternNextYearJust();
         clearOperand();
         lessThan();
         _usePattern = true;
@@ -169,8 +151,8 @@ public class FromToOption implements ConditionOption, Serializable {
      * @return this. (NotNull)
      */
     public FromToOption compareAsMonth() {
-        fromPatternMonthBegin();
-        toPatternNextMonthBegin();
+        fromPatternMonthJust();
+        toPatternNextMonthJust();
         clearOperand();
         lessThan();
         _usePattern = true;
@@ -178,20 +160,41 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     /**
-     * Compare as year. <br />
+     * Compare as date. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{2007/04/10 08:24:53} to:{2008/08/16 14:36:29}
+     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
      * 
-     *   new FromToOption().compareAsYear();
-     *     --&gt; column &gt;= '2007/01/01 00:00:00'
-     *     and column &lt; '2009/01/01 00:00:00'
+     *   new FromToOption().compareAsDate();
+     *     --&gt; column &gt;= '2007/04/10 00:00:00'
+     *     and column &lt; '2007/04/17 00:00:00'
      * </pre>
      * @return this. (NotNull)
      */
-    public FromToOption compareAsYear() {
-        fromPatternYearBegin();
-        toPatternNextYearBegin();
+    public FromToOption compareAsDate() {
+        fromPatternDayJust();
+        toPatternNextDayJust();
+        clearOperand();
+        lessThan();
+        _usePattern = true;
+        return this;
+    }
+
+    /**
+     * Compare as hour. <br />
+     * This method ignores operand adjustments and other patterns.
+     * <pre>
+     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     * 
+     *   new FromToOption().compareAsHour();
+     *     --&gt; column &gt;= '2007/04/10 08:00:00'
+     *     and column &lt; '2007/04/16 15:00:00'
+     * </pre>
+     * @return this. (NotNull)
+     */
+    public FromToOption compareAsHour() {
+        fromPatternHourJust();
+        toPatternNextHourJust();
         clearOperand();
         lessThan();
         _usePattern = true;
@@ -204,15 +207,15 @@ public class FromToOption implements ConditionOption, Serializable {
      * <pre>
      * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
      * 
-     *   new FromToOption().compareAsWeek().asWeekBeginSunday();
+     *   new FromToOption().compareAsWeek().beginWeek_DayOfWeek1st_Sunday();
      *     --&gt; column &gt;= '2007/04/08 00:00:00'
      *     and column &lt; '2007/04/22 00:00:00'
      * </pre>
      * @return this. (NotNull)
      */
     public FromToOption compareAsWeek() {
-        fromPatternWeekBegin();
-        toPatternNextWeekBegin();
+        fromPatternWeekJust();
+        toPatternNextWeekJust();
         clearOperand();
         lessThan();
         _usePattern = true;
@@ -220,49 +223,94 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     // -----------------------------------------------------
-    //                                            Week Begin
+    //                                            Begin Year
     //                                            ----------
-    public FromToOption asWeekBegin(Date date) {
-        if (date == null) {
+    public FromToOption beginYear_Month(int yearBeginMonth) {
+        assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
+        _yearBeginMonth = yearBeginMonth;
+        return this;
+    }
+
+    public FromToOption beginYear_PreviousMonth(int yearBeginMonth) {
+        assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
+        _yearBeginMonth = -yearBeginMonth; // to be minus
+        return this;
+    }
+
+    // -----------------------------------------------------
+    //                                           Begin Month
+    //                                           -----------
+    public FromToOption beginMonth_Day(int monthBeginDay) {
+        assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
+        _monthBeginDay = monthBeginDay;
+        return this;
+    }
+
+    public FromToOption beginMonth_PreviousDay(int monthBeginDay) {
+        assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
+        _monthBeginDay = -monthBeginDay; // to be minus
+        return this;
+    }
+
+    // -----------------------------------------------------
+    //                                             Begin Day
+    //                                             ---------
+    public FromToOption beginDay_Hour(int dayBeginHour) {
+        assertNotMinusNotOver("dayBeginHour", dayBeginHour, 23);
+        _dayBeginHour = dayBeginHour;
+        return this;
+    }
+
+    public FromToOption beginDay_PreviousHour(int dayBeginHour) {
+        assertNotMinusNotOver("dayBeginHour", dayBeginHour, 23);
+        _dayBeginHour = -dayBeginHour; // to be minus
+        return this;
+    }
+
+    // -----------------------------------------------------
+    //                                            Begin Week
+    //                                            ----------
+    public FromToOption beginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
+        if (weekBeginDayOfWeek == null) {
             String msg = "The argument 'date' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         final Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
+        cal.setTime(weekBeginDayOfWeek);
         final int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        return doAsWeekBeginMonday(dayOfWeek);
+        return doBeginWeek(dayOfWeek);
     }
 
-    public FromToOption asWeekBeginSunday() {
-        return doAsWeekBeginMonday(Calendar.SUNDAY);
+    public FromToOption beginWeek_DayOfWeek1st_Sunday() {
+        return doBeginWeek(Calendar.SUNDAY);
     }
 
-    public FromToOption asWeekBeginMonday() {
-        return doAsWeekBeginMonday(Calendar.MONDAY);
+    public FromToOption beginWeek_DayOfWeek2nd_Monday() {
+        return doBeginWeek(Calendar.MONDAY);
     }
 
-    public FromToOption asWeekBeginTuesday() {
-        return doAsWeekBeginMonday(Calendar.TUESDAY);
+    public FromToOption beginWeek_DayOfWeek3rd_Tuesday() {
+        return doBeginWeek(Calendar.TUESDAY);
     }
 
-    public FromToOption asWeekBeginWednesday() {
-        return doAsWeekBeginMonday(Calendar.WEDNESDAY);
+    public FromToOption beginWeek_DayOfWeek4th_Wednesday() {
+        return doBeginWeek(Calendar.WEDNESDAY);
     }
 
-    public FromToOption asWeekBeginThursday() {
-        return doAsWeekBeginMonday(Calendar.THURSDAY);
+    public FromToOption beginWeek_DayOfWeek5th_Thursday() {
+        return doBeginWeek(Calendar.THURSDAY);
     }
 
-    public FromToOption asWeekBeginFriday() {
-        return doAsWeekBeginMonday(Calendar.FRIDAY);
+    public FromToOption beginWeek_DayOfWeek6th_Friday() {
+        return doBeginWeek(Calendar.FRIDAY);
     }
 
-    public FromToOption asWeekBeginSaturday() {
-        return doAsWeekBeginMonday(Calendar.SATURDAY);
+    public FromToOption beginWeek_DayOfWeek7th_Saturday() {
+        return doBeginWeek(Calendar.SATURDAY);
     }
 
-    protected FromToOption doAsWeekBeginMonday(int dayOfWeek) {
-        _weekBeginDay = dayOfWeek;
+    protected FromToOption doBeginWeek(int weekBeginDayOfWeek) {
+        _weekBeginDay = weekBeginDayOfWeek;
         return this;
     }
 
@@ -304,10 +352,10 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                             From Date
     //                                             ---------
-    public FromToOption fromPatternHourBegin() {
-        assertNotAdjustmentAfterPattern("fromPatternHourBegin");
+    public FromToOption fromPatternHourJust() {
+        assertNotAdjustmentAfterPattern("fromPatternHourJust");
         clearFromPattern();
-        _fromPatternHourBegin = true;
+        _fromPatternHourJust = true;
         return this;
     }
 
@@ -316,13 +364,13 @@ public class FromToOption implements ConditionOption, Serializable {
      * @deprecated
      */
     public FromToOption fromPatternHourStart() {
-        return fromPatternHourBegin();
+        return fromPatternHourJust();
     }
 
-    public FromToOption fromPatternDayBegin() {
-        assertNotAdjustmentAfterPattern("fromPatternDayBegin");
+    public FromToOption fromPatternDayJust() {
+        assertNotAdjustmentAfterPattern("fromPatternDayJust");
         clearFromPattern();
-        _fromPatternDayBegin = true;
+        _fromPatternDayJust = true;
         return this;
     }
 
@@ -331,13 +379,13 @@ public class FromToOption implements ConditionOption, Serializable {
      * @deprecated
      */
     public FromToOption fromPatternDayStart() {
-        return fromPatternDayBegin();
+        return fromPatternDayJust();
     }
 
-    public FromToOption fromPatternMonthBegin() {
-        assertNotAdjustmentAfterPattern("fromPatternMonthBegin");
+    public FromToOption fromPatternMonthJust() {
+        assertNotAdjustmentAfterPattern("fromPatternMonthJust");
         clearFromPattern();
-        _fromPatternMonthBegin = true;
+        _fromPatternMonthJust = true;
         return this;
     }
 
@@ -346,13 +394,13 @@ public class FromToOption implements ConditionOption, Serializable {
      * @deprecated
      */
     public FromToOption fromPatternMonthStart() {
-        return fromPatternMonthBegin();
+        return fromPatternMonthJust();
     }
 
-    public FromToOption fromPatternYearBegin() {
-        assertNotAdjustmentAfterPattern("fromPatternYearBegin");
+    public FromToOption fromPatternYearJust() {
+        assertNotAdjustmentAfterPattern("fromPatternYearJust");
         clearFromPattern();
-        _fromPatternYearBegin = true;
+        _fromPatternYearJust = true;
         return this;
     }
 
@@ -361,22 +409,22 @@ public class FromToOption implements ConditionOption, Serializable {
      * @deprecated
      */
     public FromToOption fromPatternYearStart() {
-        return fromPatternYearBegin();
+        return fromPatternYearJust();
     }
 
-    public FromToOption fromPatternWeekBegin() {
-        assertNotAdjustmentAfterPattern("fromPatternWeekBegin");
+    public FromToOption fromPatternWeekJust() {
+        assertNotAdjustmentAfterPattern("fromPatternWeekJust");
         clearFromPattern();
-        _fromPatternWeekBegin = true;
+        _fromPatternWeekJust = true;
         return this;
     }
 
     protected void clearFromPattern() {
-        _fromPatternHourBegin = false;
-        _fromPatternDayBegin = false;
-        _fromPatternMonthBegin = false;
-        _fromPatternYearBegin = false;
-        _fromPatternWeekBegin = false;
+        _fromPatternHourJust = false;
+        _fromPatternDayJust = false;
+        _fromPatternMonthJust = false;
+        _fromPatternYearJust = false;
+        _fromPatternWeekJust = false;
     }
 
     public FromToOption fromDateWithNoon() {
@@ -399,10 +447,10 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                               To Date
     //                                               -------
-    public FromToOption toPatternNextHourBegin() {
-        assertNotAdjustmentAfterPattern("toPatternNextHourBegin");
+    public FromToOption toPatternNextHourJust() {
+        assertNotAdjustmentAfterPattern("toPatternNextHourJust");
         clearToPattern();
-        _toPatternNextHourBegin = true;
+        _toPatternNextHourJust = true;
         return this;
     }
 
@@ -411,13 +459,13 @@ public class FromToOption implements ConditionOption, Serializable {
      * @deprecated
      */
     public FromToOption toPatternNextHourStart() {
-        return toPatternNextHourBegin();
+        return toPatternNextHourJust();
     }
 
-    public FromToOption toPatternNextDayBegin() {
-        assertNotAdjustmentAfterPattern("toPatternNextDayBegin");
+    public FromToOption toPatternNextDayJust() {
+        assertNotAdjustmentAfterPattern("toPatternNextDayJust");
         clearToPattern();
-        _toPatternNextDayBegin = true;
+        _toPatternNextDayJust = true;
         return this;
     }
 
@@ -426,13 +474,13 @@ public class FromToOption implements ConditionOption, Serializable {
      * @deprecated
      */
     public FromToOption toPatternNextDayStart() {
-        return toPatternNextDayBegin();
+        return toPatternNextDayJust();
     }
 
-    public FromToOption toPatternNextMonthBegin() {
+    public FromToOption toPatternNextMonthJust() {
         assertNotAdjustmentAfterPattern("toPatternNextMonthBegin");
         clearToPattern();
-        _toPatternNextMonthBegin = true;
+        _toPatternNextMonthJust = true;
         return this;
     }
 
@@ -441,13 +489,13 @@ public class FromToOption implements ConditionOption, Serializable {
      * @deprecated
      */
     public FromToOption toPatternNextMonthStart() {
-        return toPatternNextMonthBegin();
+        return toPatternNextMonthJust();
     }
 
-    public FromToOption toPatternNextYearBegin() {
-        assertNotAdjustmentAfterPattern("toPatternNextYearBegin");
+    public FromToOption toPatternNextYearJust() {
+        assertNotAdjustmentAfterPattern("toPatternNextYearJust");
         clearToPattern();
-        _toPatternNextYearBegin = true;
+        _toPatternNextYearJust = true;
         return this;
     }
 
@@ -456,22 +504,22 @@ public class FromToOption implements ConditionOption, Serializable {
      * @deprecated
      */
     public FromToOption toPatternNextYearStart() {
-        return toPatternNextYearBegin();
+        return toPatternNextYearJust();
     }
 
-    public FromToOption toPatternNextWeekBegin() {
-        assertNotAdjustmentAfterPattern("toPatternNextWeekBegin");
+    public FromToOption toPatternNextWeekJust() {
+        assertNotAdjustmentAfterPattern("toPatternNextWeekJust");
         clearToPattern();
-        _toPatternNextWeekBegin = true;
+        _toPatternNextWeekJust = true;
         return this;
     }
 
     protected void clearToPattern() {
-        _toPatternNextHourBegin = false;
-        _toPatternNextDayBegin = false;
-        _toPatternNextMonthBegin = false;
-        _toPatternNextYearBegin = false;
-        _toPatternNextWeekBegin = false;
+        _toPatternNextHourJust = false;
+        _toPatternNextDayJust = false;
+        _toPatternNextMonthJust = false;
+        _toPatternNextYearJust = false;
+        _toPatternNextWeekJust = false;
     }
 
     public FromToOption toDateWithNoon() {
@@ -517,22 +565,22 @@ public class FromToOption implements ConditionOption, Serializable {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(fromDate.getTime());
 
-        if (_fromPatternHourBegin) {
-            moveToCalendarHourBegin(cal);
-        } else if (_fromPatternDayBegin) {
-            moveToCalendarDayBegin(cal);
-        } else if (_fromPatternMonthBegin) {
-            moveToCalendarMonthBegin(cal);
-        } else if (_fromPatternYearBegin) {
-            moveToCalendarYearBegin(cal);
-        } else if (_fromPatternWeekBegin) {
-            moveToCalendarWeekBegin(cal);
+        if (_fromPatternHourJust) {
+            moveToCalendarHourJust(cal);
+        } else if (_fromPatternDayJust) {
+            moveToCalendarDayJust(cal);
+        } else if (_fromPatternMonthJust) {
+            moveToCalendarMonthJust(cal);
+        } else if (_fromPatternYearJust) {
+            moveToCalendarYearJust(cal);
+        } else if (_fromPatternWeekJust) {
+            moveToCalendarWeekJust(cal);
         }
         if (_fromDateWithNoon) {
-            moveToCalendarHourNoon(cal);
+            moveToCalendarHourJustNoon(cal);
         }
         if (_fromDateWithHour != null) {
-            moveToCalendarHour(cal, _fromDateWithHour);
+            moveToCalendarHourJustFor(cal, _fromDateWithHour);
         }
 
         final Date cloneDate = (Date) fromDate.clone();
@@ -553,22 +601,22 @@ public class FromToOption implements ConditionOption, Serializable {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(toDate.getTime());
 
-        if (_toPatternNextHourBegin) {
-            moveToCalendarNextHourBegin(cal);
-        } else if (_toPatternNextDayBegin) {
-            moveToCalendarNextDayBegin(cal);
-        } else if (_toPatternNextMonthBegin) {
-            moveToCalendarNextMonthBegin(cal);
-        } else if (_toPatternNextYearBegin) {
-            moveToCalendarNextYearBegin(cal);
-        } else if (_toPatternNextWeekBegin) {
-            moveToCalendarNextWeekBegin(cal);
+        if (_toPatternNextHourJust) {
+            moveToCalendarNextHourJust(cal);
+        } else if (_toPatternNextDayJust) {
+            moveToCalendarNextDayJust(cal);
+        } else if (_toPatternNextMonthJust) {
+            moveToCalendarNextMonthJust(cal);
+        } else if (_toPatternNextYearJust) {
+            moveToCalendarNextYearJust(cal);
+        } else if (_toPatternNextWeekJust) {
+            moveToCalendarNextWeekJust(cal);
         }
         if (_toDateWithNoon) {
-            moveToCalendarHourNoon(cal);
+            moveToCalendarHourJustNoon(cal);
         }
         if (_toDateWithHour != null) {
-            moveToCalendarHour(cal, _toDateWithHour);
+            moveToCalendarHourJustFor(cal, _toDateWithHour);
         }
 
         final Date cloneDate = (Date) toDate.clone();
@@ -580,7 +628,7 @@ public class FromToOption implements ConditionOption, Serializable {
     protected Date filterNoon(Date date) {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(date.getTime());
-        moveToCalendarHourNoon(cal);
+        moveToCalendarHourJustNoon(cal);
         final Date cloneDate = (Date) date.clone();
         cloneDate.setTime(cal.getTimeInMillis());
         return cloneDate;
@@ -613,57 +661,71 @@ public class FromToOption implements ConditionOption, Serializable {
     // ===================================================================================
     //                                                                     Calendar Helper
     //                                                                     ===============
-    protected void moveToCalendarHour(Calendar cal, int hourOfDay) {
-        DfTypeUtil.moveToCalendarHour(cal, hourOfDay);
+    protected void moveToCalendarYearJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarYearJust(cal, _yearBeginMonth);
     }
 
-    protected void moveToCalendarHourBegin(Calendar cal) {
-        DfTypeUtil.moveToCalendarHourBegin(cal);
+    protected void moveToCalendarMonthJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarMonthJust(cal, _monthBeginDay);
     }
 
-    protected void moveToCalendarHourNoon(Calendar cal) {
-        DfTypeUtil.moveToCalendarHourNoon(cal);
+    protected void moveToCalendarDayJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarDayJust(cal, _dayBeginHour);
     }
 
-    protected void moveToCalendarDayBegin(Calendar cal) {
-        DfTypeUtil.moveToCalendarDayBegin(cal);
+    protected void moveToCalendarHourJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarHourJust(cal);
     }
 
-    protected void moveToCalendarMonthBegin(Calendar cal) {
-        DfTypeUtil.moveToCalendarMonthBegin(cal);
+    protected void moveToCalendarHourJustFor(Calendar cal, int hourOfDay) {
+        DfTypeUtil.moveToCalendarHourJustFor(cal, hourOfDay);
     }
 
-    protected void moveToCalendarYearBegin(Calendar cal) {
-        DfTypeUtil.moveToCalendarYearBegin(cal);
+    protected void moveToCalendarHourJustNoon(Calendar cal) {
+        DfTypeUtil.moveToCalendarHourJustNoon(cal);
     }
 
-    protected void moveToCalendarWeekBegin(Calendar cal) {
-        DfTypeUtil.moveToCalendarWeekBegin(cal, _weekBeginDay);
+    protected void moveToCalendarWeekJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarWeekJust(cal, _weekBeginDay);
     }
 
-    protected void moveToCalendarNextHourBegin(Calendar cal) {
-        DfTypeUtil.addCalendarHourOfDay(cal, 1);
-        moveToCalendarHourBegin(cal);
+    protected void moveToCalendarNextYearJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarYearTerminal(cal, _yearBeginMonth);
+        DfTypeUtil.addCalendarMillisecond(cal, 1);
     }
 
-    protected void moveToCalendarNextDayBegin(Calendar cal) {
-        DfTypeUtil.addCalendarDayOfMonth(cal, 1);
-        moveToCalendarDayBegin(cal);
+    protected void moveToCalendarNextMonthJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarMonthTerminal(cal, _monthBeginDay);
+        DfTypeUtil.addCalendarMillisecond(cal, 1);
     }
 
-    protected void moveToCalendarNextMonthBegin(Calendar cal) {
-        DfTypeUtil.addCalendarMonth(cal, 1);
-        moveToCalendarMonthBegin(cal);
+    protected void moveToCalendarNextDayJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarDayTerminal(cal, _dayBeginHour);
+        DfTypeUtil.addCalendarMillisecond(cal, 1);
     }
 
-    protected void moveToCalendarNextYearBegin(Calendar cal) {
-        DfTypeUtil.addCalendarYear(cal, 1);
-        moveToCalendarYearBegin(cal);
+    protected void moveToCalendarNextHourJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarHourTerminal(cal);
+        DfTypeUtil.addCalendarMillisecond(cal, 1);
     }
 
-    protected void moveToCalendarNextWeekBegin(Calendar cal) {
-        DfTypeUtil.addCalendarWeekOfMonth(cal, 1);
-        moveToCalendarWeekBegin(cal);
+    protected void moveToCalendarNextWeekJust(Calendar cal) {
+        DfTypeUtil.moveToCalendarWeekTerminal(cal, _weekBeginDay);
+        DfTypeUtil.addCalendarMillisecond(cal, 1);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertNotMinusNotOver(String name, int value, int max) {
+        if (value < 0) {
+            String msg = "The argument '" + name + "' should not be minus: value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value > max) {
+            String msg = "The argument '" + name + "' should not be over: value=" + value + " max=" + max;
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     // ===================================================================================
