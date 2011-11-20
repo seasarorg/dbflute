@@ -1061,15 +1061,15 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void addDateDate(Date date, int dayOfMonth) {
+    public static void addDateDay(Date date, int day) {
         final Calendar cal = toCalendar(date);
-        addCalendarDate(cal, dayOfMonth);
+        addCalendarDay(cal, day);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void addDateHourOfDay(Date date, int hourOfDay) {
+    public static void addDateHour(Date date, int hour) {
         final Calendar cal = toCalendar(date);
-        addCalendarHourOfDay(cal, hourOfDay);
+        addCalendarHour(cal, hour);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1097,9 +1097,40 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
+    /**
+     * @param date
+     * @param dayOfMonth
+     * @deprecated
+     */
+    public static void addDateDate(Date date, int dayOfMonth) {
+        final Calendar cal = toCalendar(date);
+        addCalendarDay(cal, dayOfMonth);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    /**
+     * @param date
+     * @param hourOfDay
+     * @deprecated
+     */
+    public static void addDateHourOfDay(Date date, int hourOfDay) {
+        final Calendar cal = toCalendar(date);
+        addCalendarHour(cal, hourOfDay);
+        date.setTime(cal.getTimeInMillis());
+    }
+
     // -----------------------------------------------------
     //                                          Move-to Date
     //                                          ------------
+    // not all methods are supported
+    // because you should use calendar's methods basically
+    // - - - - - - - - - - - - - - - - - - - - - - - -[Year]
+    public static void moveToDateYear(Date date, int yaer) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarYear(cal, yaer);
+        date.setTime(cal.getTimeInMillis());
+    }
+
     public static void moveToDateYearJust(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearJust(cal);
@@ -1109,6 +1140,13 @@ public final class DfTypeUtil {
     public static void moveToDateYearTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearTerminal(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - [Month]
+    public static void moveToDateMonth(Date date, int month) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMonth(cal, month);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1124,6 +1162,13 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
+    // - - - - - - - - - - - - - - - - - - - - - - - - [Day]
+    public static void moveToDateDay(Date date, int day) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarDay(cal, day);
+        date.setTime(cal.getTimeInMillis());
+    }
+
     public static void moveToDateDayJust(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayJust(cal);
@@ -1136,9 +1181,10 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourJust(Date date, int hourOfDay) {
+    // - - - - - - - - - - - - - - - - - - - - - - - -[Hour]
+    public static void moveToDateHour(Date date, int hour) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarHourJustFor(cal, hourOfDay);
+        moveToCalendarHour(cal, hour);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1160,6 +1206,7 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
+    // - - - - - - - - - - - - - - - - - - - - - - - -[Week]
     public static void moveToDateWeekJust(Date date, int weekStartDay) {
         final Calendar cal = toCalendar(date);
         moveToCalendarWeekJust(cal, weekStartDay);

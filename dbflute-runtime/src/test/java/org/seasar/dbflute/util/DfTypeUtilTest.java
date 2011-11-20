@@ -331,22 +331,48 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals(GregorianCalendar.AD, DfTypeUtil.toCalendar(after).get(Calendar.ERA));
 
         // extra
-        DfTypeUtil.addDateDate(before, 1);
+        DfTypeUtil.addDateDay(before, 1);
         DfTypeUtil.clearDateTimeParts(before);
         assertEquals(after, before);
     }
 
     public void test_toDate_isDateBC() {
         // ## Arrange & Act & Assert ##
-        assertFalse(DfTypeUtil.isDateBC(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
-        Date before = DfTypeUtil.toDate("BC0001-12-31 23:59:59.999");
-        Date after = DfTypeUtil.toDate("0001-01-01 00:00:00.000");
+        assertFalse(DfTypeUtil.isDateBC(toDate("2008-12-30 12:34:56.789")));
+        Date before = toDate("BC0001-12-31 23:59:59.999");
+        Date after = toDate("0001-01-01 00:00:00.000");
         log("before time = " + before.getTime());
         log("after  time = " + after.getTime());
         assertTrue(DfTypeUtil.isDateBC(before));
         assertFalse(DfTypeUtil.isDateBC(after));
         assertEquals(GregorianCalendar.BC, DfTypeUtil.toCalendar(before).get(Calendar.ERA));
         assertEquals(GregorianCalendar.AD, DfTypeUtil.toCalendar(after).get(Calendar.ERA));
+    }
+
+    // -----------------------------------------------------
+    //                                              Add Date
+    //                                              --------
+    public void test_Date_addDateYear() {
+        // ## Arrange ##
+        Date date = toDate("2008-12-30 12:34:56.789");
+
+        // ## Act & Assert ##
+        DfTypeUtil.addDateYear(date, 1);
+        assertEquals(toDate("2009-12-30 12:34:56.789"), date);
+        DfTypeUtil.addDateMonth(date, 1);
+        assertEquals(toDate("2010-01-30 12:34:56.789"), date);
+        DfTypeUtil.addDateDay(date, 1);
+        assertEquals(toDate("2010-01-31 12:34:56.789"), date);
+        DfTypeUtil.addDateHour(date, 1);
+        assertEquals(toDate("2010-01-31 13:34:56.789"), date);
+        DfTypeUtil.addDateMinute(date, 1);
+        assertEquals(toDate("2010-01-31 13:35:56.789"), date);
+        DfTypeUtil.addDateSecond(date, 1);
+        assertEquals(toDate("2010-01-31 13:35:57.789"), date);
+        DfTypeUtil.addDateMillisecond(date, 1);
+        assertEquals(toDate("2010-01-31 13:35:57.790"), date);
+        DfTypeUtil.addDateWeekOfMonth(date, 1);
+        assertEquals(toDate("2010-02-07 13:35:57.790"), date);
     }
 
     // -----------------------------------------------------
