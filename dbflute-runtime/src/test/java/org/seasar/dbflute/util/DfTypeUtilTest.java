@@ -2,7 +2,9 @@ package org.seasar.dbflute.util;
 
 import static org.seasar.dbflute.util.DfTypeUtil.AD_ORIGIN_MILLISECOND;
 import static org.seasar.dbflute.util.DfTypeUtil.toClassTitle;
+import static org.seasar.dbflute.util.DfTypeUtil.toDate;
 import static org.seasar.dbflute.util.DfTypeUtil.toTime;
+import static org.seasar.dbflute.util.DfTypeUtil.toTimestamp;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -14,7 +16,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.seasar.dbflute.unit.core.PlainTestCase;
+import junit.framework.TestCase;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.seasar.dbflute.util.DfTypeUtil.ParseDateException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseDateNumberFormatException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseDateOutOfCalendarException;
@@ -26,7 +31,13 @@ import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampOutOfCalendarException;
  * @author jflute
  * @since 0.9.0 (2009/01/19 Monday)
  */
-public class DfTypeUtilTest extends PlainTestCase {
+public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses this
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance for sub class. */
+    private final Logger _logger = Logger.getLogger(getClass());
 
     // ===================================================================================
     //                                                                          Convert To
@@ -139,7 +150,15 @@ public class DfTypeUtilTest extends PlainTestCase {
         // ## Act & Assert ##
         assertNull(toDate(null));
         assertNull(toDate(""));
-        assertEquals("2008/12/30 12:34:56", df.format(toDate(" 2008-12-30 12:34:56 ")));
+        assertEquals("2008/12/30 12:34:56", df.format(toDate(" 2008-12-30 12:34:56 "))); // trimmed
+        assertEquals("2008/12/30 12:34:56", df.format(toDate("2008-12-30 12:34:56"))); // normal
+        assertEquals("2008/12/30 00:00:00", df.format(toDate("20081230", "yyyyMMdd")));
+        assertEquals("2009/11/30 00:00:00", df.format(toDate("20091130", "yyyyMMdd")));
+        assertEquals("2009/11/01 00:00:00", df.format(toDate("200911", "yyyyMM")));
+        assertEquals("2009/01/01 00:00:00", df.format(toDate("2009", "yyyy")));
+        assertEquals("2009/01/01 00:00:00", df.format(toDate("2009", "yyyy")));
+        // illegal patterns were implemented at test_toDate_illegal()
+        //assertEquals("2009/11/30 00:00:00", df.format(toDate("2009113012", "yyyyMMdd")));
     }
 
     public void test_toDate_string_instanceType() {
@@ -236,6 +255,7 @@ public class DfTypeUtilTest extends PlainTestCase {
     }
 
     public void test_toDate_illegal() {
+        // short expression
         try {
             DfTypeUtil.toDate("2009-12");
 
@@ -253,6 +273,14 @@ public class DfTypeUtilTest extends PlainTestCase {
             log(e.getMessage());
         }
         try {
+            DfTypeUtil.toDate("2009-12");
+
+            fail();
+        } catch (ParseDateException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
             DfTypeUtil.toDate("date 20091");
 
             fail();
@@ -260,6 +288,8 @@ public class DfTypeUtilTest extends PlainTestCase {
             // OK
             log(e.getMessage());
         }
+
+        // out of calendar
         try {
             DfTypeUtil.toDate("2009-12-09 12:34:60");
 
@@ -284,6 +314,8 @@ public class DfTypeUtilTest extends PlainTestCase {
             // OK
             log(e.getMessage());
         }
+
+        // number format
         try {
             DfTypeUtil.toDate("2009-12-0-9 12:34:56");
 
@@ -313,6 +345,16 @@ public class DfTypeUtilTest extends PlainTestCase {
 
             fail();
         } catch (ParseDateOutOfCalendarException e) {
+            // OK
+            log(e.getMessage());
+        }
+
+        // with pattern
+        try {
+            DfTypeUtil.toDate("2009120101", "yyyyMMdd");
+
+            fail();
+        } catch (ParseDateException e) {
             // OK
             log(e.getMessage());
         }
@@ -902,5 +944,12 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2008/12/30", DfTypeUtil.toString(timestamp, "yyyy/MM/dd"));
         assertEquals("2008-12-30", DfTypeUtil.toString(timestamp, "yyyy-MM-dd"));
         assertEquals("2008-12-30 12:34:56.000", DfTypeUtil.toString(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    // ===================================================================================
+    //                                                                              Format
+    //                                                                              ======
+    protected void log(Object msg) {
+        _logger.log(getClass().getName(), Level.DEBUG, msg, null);
     }
 }
