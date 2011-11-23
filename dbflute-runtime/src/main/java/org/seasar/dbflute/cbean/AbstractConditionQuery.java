@@ -1367,14 +1367,24 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String flexibleName = container.getFlexibleName();
         final ConditionQuery cq = container.getConditionQuery();
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
-        final ColumnInfo columnInfo = dbmeta.findColumnInfo(flexibleName);
+        final ColumnInfo columnInfo;
+        try {
+            columnInfo = dbmeta.findColumnInfo(flexibleName);
+        } catch (RuntimeException e) {
+            throwConditionInvokingColumnFindFailureException(colName, ckey, value, option, null, e);
+            return; // unreachable (to avoid compile error)
+        }
         final String columnCapPropName = initCap(columnInfo.getPropertyName());
         final String methodName = "set" + columnCapPropName + "_" + initCap(ckey);
         final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
         final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
         final List<Class<?>> typeList = newArrayList();
         if (!noArg) {
-            value = columnInfo.toPropretyType(value); // convert type
+            try {
+                value = columnInfo.toPropretyType(value); // convert type
+            } catch (RuntimeException e) {
+                throwConditionInvokingValueConvertFailureException(colName, ckey, value, option, methodName, e);
+            }
         }
         if (fromTo) {
             typeList.add(Date.class);
@@ -1413,47 +1423,48 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected void throwConditionInvokingDateFromToValueInvalidException(String columnFlexibleName,
-            String conditionKeyName, Object conditionValue, ConditionOption conditionOption, String methodName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The conditionValue should be List that has 2 elements, fromDate and toDate.");
-        br.addItem("columnFlexibleName");
-        br.addElement(columnFlexibleName);
-        br.addItem("conditionKeyName");
-        br.addElement(conditionKeyName);
-        br.addItem("conditionValue");
-        br.addElement(conditionValue);
-        br.addItem("conditionOption");
-        br.addElement(conditionOption);
-        br.addItem("methodName");
-        br.addElement(methodName);
-        final String msg = br.buildExceptionMessage();
-        throw new ConditionInvokingFailureException(msg);
+    protected void throwConditionInvokingColumnFindFailureException(String columnFlexibleName, String conditionKeyName,
+            Object conditionValue, ConditionOption conditionOption, String methodName, RuntimeException e) {
+        final String notice = "Failed to find the column in the table.";
+        doThrouConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue,
+                conditionOption, methodName, e);
+    }
+
+    protected void throwConditionInvokingValueConvertFailureException(String columnFlexibleName,
+            String conditionKeyName, Object conditionValue, ConditionOption conditionOption, String methodName,
+            RuntimeException e) {
+        final String notice = "Failed to convert the value to property type.";
+        doThrouConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue,
+                conditionOption, methodName, e);
     }
 
     protected void throwConditionInvokingSetMethodNotFoundException(String columnFlexibleName, String conditionKeyName,
             Object conditionValue, ConditionOption conditionOption, String methodName) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the method for setting the condition.");
-        br.addItem("columnFlexibleName");
-        br.addElement(columnFlexibleName);
-        br.addItem("conditionKeyName");
-        br.addElement(conditionKeyName);
-        br.addItem("conditionValue");
-        br.addElement(conditionValue);
-        br.addItem("conditionOption");
-        br.addElement(conditionOption);
-        br.addItem("methodName");
-        br.addElement(methodName);
-        final String msg = br.buildExceptionMessage();
-        throw new ConditionInvokingFailureException(msg);
+        final String notice = "Not found the method for setting the condition.";
+        doThrouConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue,
+                conditionOption, methodName, null);
+    }
+
+    protected void throwConditionInvokingDateFromToValueInvalidException(String columnFlexibleName,
+            String conditionKeyName, Object conditionValue, ConditionOption conditionOption, String methodName) {
+        final String notice = "The conditionValue should be List that has 2 elements, fromDate and toDate.";
+        doThrouConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue,
+                conditionOption, methodName, null);
     }
 
     protected void throwConditionInvokingSetReflectionFailureException(String columnFlexibleName,
             String conditionKeyName, Object conditionValue, ConditionOption conditionOption, String methodName,
             ReflectionFailureException e) {
+        final String notice = "Failed to invoke the method for setting the condition.";
+        doThrouConditionInvokingFailureException(notice, columnFlexibleName, conditionKeyName, conditionValue,
+                conditionOption, methodName, e);
+    }
+
+    protected void doThrouConditionInvokingFailureException(String notice, String columnFlexibleName,
+            String conditionKeyName, Object conditionValue, ConditionOption conditionOption, String methodName,
+            RuntimeException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to invoke the method for setting the condition.");
+        br.addNotice(notice);
         br.addItem("columnFlexibleName");
         br.addElement(columnFlexibleName);
         br.addItem("conditionKeyName");
@@ -1462,10 +1473,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         br.addElement(conditionValue);
         br.addItem("conditionOption");
         br.addElement(conditionOption);
-        br.addItem("methodName");
-        br.addElement(methodName);
+        if (methodName != null) {
+            br.addItem("methodName");
+            br.addElement(methodName + "()");
+        }
         final String msg = br.buildExceptionMessage();
-        throw new ConditionInvokingFailureException(msg, e);
+        if (e != null) {
+            throw new ConditionInvokingFailureException(msg, e);
+        } else {
+            throw new ConditionInvokingFailureException(msg);
+        }
     }
 
     /**
