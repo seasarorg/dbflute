@@ -5,12 +5,12 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.9.9.1G"/>
+	<property name="version" value="0.9.9.2A"/>
 	<property name="build.version" value="${version}"/>
-	<property name="pre.version" value="0.9.9.1F"/>
-	<property name="runtime.version" value="0.9.9.1G"/>
+	<property name="pre.version" value="0.9.9.1G"/>
+	<property name="runtime.version" value="0.9.9.2A"/>
 	<property name="runtime.build.version" value="${runtime.version}"/>
-	<property name="runtime.pre.version" value="0.9.9.1F"/>
+	<property name="runtime.pre.version" value="0.9.9.1G"/>
 
 	<!-- Resource Directories -->
 	<property name="workspace.base" value=".."/>
