@@ -1373,7 +1373,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
         final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
         final List<Class<?>> typeList = newArrayList();
-        value = columnInfo.toPropretyType(value); // convert type
+        if (!noArg) {
+            value = columnInfo.toPropretyType(value); // convert type
+        }
         if (fromTo) {
             typeList.add(Date.class);
             typeList.add(Date.class);
