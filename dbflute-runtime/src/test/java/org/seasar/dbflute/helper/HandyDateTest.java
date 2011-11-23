@@ -91,6 +91,36 @@ public class HandyDateTest extends PlainTestCase {
         assertEquals(handy("2011/01/06 11:34:56.789"), handy(large11).moveToWeekOfYear(2));
     }
 
+    // -----------------------------------------------------
+    //                                         Related Begin
+    //                                         -------------
+    public void test_moveTo_related_begin() throws Exception {
+        // ## Arrange ##
+        String targetExp = "2011/11/17 12:34:56.789";
+        HandyDate date = handy(targetExp);
+        date.beginYear_Month02_February().beginMonth_Day(3).beginDay_Hour(4);
+
+        // ## Act & Assert ##
+        assertEquals(handy("2011/02/03 04:00:00.000"), date.clone().moveToYearJust());
+        date.beginDay_PreviousHour(22);
+        assertEquals(handy("2011/02/02 22:00:00.000"), date.clone().moveToYearJust());
+        date.beginMonth_PreviousDay(25);
+        assertEquals(handy("2011/01/24 22:00:00.000"), date.clone().moveToYearJust());
+        date.beginYear_PreviousMonth(11);
+        assertEquals(handy("2010/10/24 22:00:00.000"), date.clone().moveToYearJust());
+    }
+
+    public void test_moveTo_related_quarterOfYear() throws Exception {
+        // ## Arrange ##
+        String exp = "2011/11/17 12:34:56.789";
+
+        // ## Act & Assert ##
+        assertEquals(handy("2011/11/03 04:00:00.000"), handyRelated(exp).moveToQuarterOfYearJust());
+        assertEquals(handy("2012/02/03 04:00:00.000"), handyRelated(exp).moveToQuarterOfYearJustAdded(1));
+        assertEquals(handy("2011/05/03 04:00:00.000"), handyRelated(exp).moveToQuarterOfYearJustFor(2));
+        assertEquals(handy("2012/05/03 03:59:59.999"), handyRelated(exp).moveToQuarterOfYearTerminalAdded(1));
+    }
+
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
@@ -112,5 +142,9 @@ public class HandyDateTest extends PlainTestCase {
 
     protected HandyDate monthPre26(String exp) {
         return new HandyDate(exp).beginMonth_PreviousDay(26);
+    }
+
+    protected HandyDate handyRelated(String exp) {
+        return new HandyDate(exp).beginYear_Month02_February().beginMonth_Day(3).beginDay_Hour(4);
     }
 }

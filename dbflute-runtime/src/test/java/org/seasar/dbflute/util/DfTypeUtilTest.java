@@ -589,6 +589,54 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         assertEquals("2011/11/24 23:59:59.999", df.format(date));
     }
 
+    public void test_Date_moveToDateQuarterOfYearJust_basic() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateQuarterOfYearJust(date);
+
+        // ## Assert ##
+        assertEquals("2011/10/01 00:00:00.000", df.format(date));
+    }
+
+    public void test_Date_moveToDateQuarterOfYearJust_over() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2012-01-20 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateQuarterOfYearJust(date, 2);
+
+        // ## Assert ##
+        assertEquals("2011/11/01 00:00:00.000", df.format(date));
+    }
+
+    public void test_Date_moveToDateQuarterOfYearTerminal_basic() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2011-11-20 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateQuarterOfYearTerminal(date);
+
+        // ## Assert ##
+        assertEquals("2011/12/31 23:59:59.999", df.format(date));
+    }
+
+    public void test_Date_moveToDateQuarterOfYearTerminal_over() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2012-01-20 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.moveToDateQuarterOfYearTerminal(date, 2);
+
+        // ## Assert ##
+        assertEquals("2012/01/31 23:59:59.999", df.format(date));
+    }
+
     // -----------------------------------------------------
     //                                            Clear Date
     //                                            ----------

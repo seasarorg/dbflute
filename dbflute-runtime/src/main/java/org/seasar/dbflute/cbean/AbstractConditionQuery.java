@@ -1367,11 +1367,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String flexibleName = container.getFlexibleName();
         final ConditionQuery cq = container.getConditionQuery();
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(flexibleName));
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(flexibleName);
+        final String columnCapPropName = initCap(columnInfo.getPropertyName());
         final String methodName = "set" + columnCapPropName + "_" + initCap(ckey);
         final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
         final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
         final List<Class<?>> typeList = newArrayList();
+        value = columnInfo.toPropretyType(value); // convert type
         if (fromTo) {
             typeList.add(Date.class);
             typeList.add(Date.class);

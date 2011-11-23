@@ -295,8 +295,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * {@inheritDoc}
      */
-    public int[] lumpCreate(List<Entity> entityList, InsertOption<? extends ConditionBean> option) {
-        return doLumpCreate(entityList, option);
+    public int[] lumpCreate(List<? extends Entity> entityList, InsertOption<? extends ConditionBean> option) {
+        @SuppressWarnings("unchecked")
+        final List<Entity> castList = (List<Entity>) entityList;
+        return doLumpCreate(castList, option);
     }
 
     protected abstract int[] doLumpCreate(List<Entity> entityList, InsertOption<? extends ConditionBean> option);
@@ -304,8 +306,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * {@inheritDoc}
      */
-    public int[] lumpModify(List<Entity> entityList, UpdateOption<? extends ConditionBean> option) {
-        return doLumpModify(entityList, option);
+    public int[] lumpModify(List<? extends Entity> entityList, UpdateOption<? extends ConditionBean> option) {
+        @SuppressWarnings("unchecked")
+        final List<Entity> castList = (List<Entity>) entityList;
+        return doLumpModify(castList, option);
     }
 
     protected abstract int[] doLumpModify(List<Entity> entityList, UpdateOption<? extends ConditionBean> option);
@@ -313,8 +317,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * {@inheritDoc}
      */
-    public int[] lumpModifyNonstrict(List<Entity> entityList, UpdateOption<? extends ConditionBean> option) {
-        return doLumpModifyNonstrict(entityList, option);
+    public int[] lumpModifyNonstrict(List<? extends Entity> entityList, UpdateOption<? extends ConditionBean> option) {
+        @SuppressWarnings("unchecked")
+        final List<Entity> castList = (List<Entity>) entityList;
+        return doLumpModifyNonstrict(castList, option);
     }
 
     protected abstract int[] doLumpModifyNonstrict(List<Entity> entityList, UpdateOption<? extends ConditionBean> option);
@@ -322,8 +328,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * {@inheritDoc}
      */
-    public int[] lumpRemove(List<Entity> entityList, DeleteOption<? extends ConditionBean> option) {
-        return doLumpRemove(entityList, option);
+    public int[] lumpRemove(List<? extends Entity> entityList, DeleteOption<? extends ConditionBean> option) {
+        @SuppressWarnings("unchecked")
+        final List<Entity> castList = (List<Entity>) entityList;
+        return doLumpRemove(castList, option);
     }
 
     protected abstract int[] doLumpRemove(List<Entity> entityList, DeleteOption<? extends ConditionBean> option);
@@ -331,8 +339,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     /**
      * {@inheritDoc}
      */
-    public int[] lumpRemoveNonstrict(List<Entity> entityList, DeleteOption<? extends ConditionBean> option) {
-        return doLumpRemoveNonstrict(entityList, option);
+    public int[] lumpRemoveNonstrict(List<? extends Entity> entityList, DeleteOption<? extends ConditionBean> option) {
+        @SuppressWarnings("unchecked")
+        final List<Entity> castList = (List<Entity>) entityList;
+        return doLumpRemoveNonstrict(castList, option);
     }
 
     protected abstract int[] doLumpRemoveNonstrict(List<Entity> entityList, DeleteOption<? extends ConditionBean> option);

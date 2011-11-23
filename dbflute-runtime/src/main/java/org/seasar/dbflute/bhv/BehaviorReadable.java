@@ -97,18 +97,20 @@ public interface BehaviorReadable {
     /**
      * Read list as result-bean. <br />
      * An interface dispatch for selectList().
+     * @param <ENTITY> The type of entity.
      * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return The list of entity as result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
-    ListResultBean<? extends Entity> readList(ConditionBean cb);
+    <ENTITY extends Entity> ListResultBean<ENTITY> readList(ConditionBean cb);
 
     /**
      * Read page as result-bean. <br />
      * An interface dispatch for selectPage().
+     * @param <ENTITY> The type of entity.
      * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return The page of entity as result-bean. (NotNull)
      */
-    PagingResultBean<? extends Entity> readPage(final ConditionBean cb);
+    <ENTITY extends Entity> PagingResultBean<ENTITY> readPage(final ConditionBean cb);
 
     // ===================================================================================
     //                                                                            Sequence

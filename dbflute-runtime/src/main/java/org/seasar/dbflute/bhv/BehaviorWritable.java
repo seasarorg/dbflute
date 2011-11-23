@@ -101,7 +101,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @param option The option of insert. (NullAllowed: if null, same as batchInsert())
      * @return The array of created count.
      */
-    int[] lumpCreate(List<Entity> entityList, InsertOption<? extends ConditionBean> option);
+    int[] lumpCreate(List<? extends Entity> entityList, InsertOption<? extends ConditionBean> option);
 
     /**
      * Lump-modify the list. <br />
@@ -110,7 +110,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @param option The option of update. (NullAllowed: if null, same as batchUpdate())
      * @return Modified count.
      */
-    int[] lumpModify(List<Entity> entityList, UpdateOption<? extends ConditionBean> option);
+    int[] lumpModify(List<? extends Entity> entityList, UpdateOption<? extends ConditionBean> option);
 
     /**
      * Lump-modify the list non-strictly. <br />
@@ -119,7 +119,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @param option The option of update. (NullAllowed: if null, same as batchUpdateNonstrict())
      * @return Modified count.
      */
-    int[] lumpModifyNonstrict(List<Entity> entityList, UpdateOption<? extends ConditionBean> option);
+    int[] lumpModifyNonstrict(List<? extends Entity> entityList, UpdateOption<? extends ConditionBean> option);
 
     /**
      * Lump-remove the list. <br />
@@ -128,7 +128,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @param option The option of delete. (NullAllowed: if null, same as batchDelete())
      * @return Removed count.
      */
-    int[] lumpRemove(List<Entity> entityList, DeleteOption<? extends ConditionBean> option);
+    int[] lumpRemove(List<? extends Entity> entityList, DeleteOption<? extends ConditionBean> option);
 
     /**
      * Lump-remove the list non-strictly. <br />
@@ -137,7 +137,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @param option The option of delete. (NullAllowed: if null, same as batchDeleteNonstrict())
      * @return Removed count.
      */
-    int[] lumpRemoveNonstrict(List<Entity> entityList, DeleteOption<? extends ConditionBean> option);
+    int[] lumpRemoveNonstrict(List<? extends Entity> entityList, DeleteOption<? extends ConditionBean> option);
 
     // =====================================================================================
     //                                                                          Query Update

@@ -176,9 +176,11 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * {@inheritDoc}
      */
-    public ListResultBean<? extends Entity> readList(ConditionBean cb) {
+    public <ENTITY extends Entity> ListResultBean<ENTITY> readList(ConditionBean cb) {
         assertCBNotNull(cb);
-        return doReadList(cb);
+        @SuppressWarnings("unchecked")
+        final ListResultBean<ENTITY> entityList = (ListResultBean<ENTITY>) doReadList(cb);
+        return entityList;
     }
 
     protected abstract ListResultBean<? extends Entity> doReadList(ConditionBean cb);
@@ -236,9 +238,11 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * {@inheritDoc}
      */
-    public PagingResultBean<? extends Entity> readPage(final ConditionBean cb) {
+    public <ENTITY extends Entity> PagingResultBean<ENTITY> readPage(final ConditionBean cb) {
         assertCBNotNull(cb);
-        return doReadPage(cb);
+        @SuppressWarnings("unchecked")
+        final PagingResultBean<ENTITY> entityList = (PagingResultBean<ENTITY>) doReadPage(cb);
+        return entityList;
     }
 
     protected abstract PagingResultBean<? extends Entity> doReadPage(ConditionBean cb);

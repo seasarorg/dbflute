@@ -1137,9 +1137,45 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
+    public static void moveToDateYearJust(Date date, int yearBeginMonth) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarYearJust(cal, yearBeginMonth);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateYearJustAdded(Date date, int year) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarYearJustAdded(cal, year);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateYearJustFor(Date date, int year) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarYearJustFor(cal, year);
+        date.setTime(cal.getTimeInMillis());
+    }
+
     public static void moveToDateYearTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarYearTerminal(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateYearTerminal(Date date, int yearBeginMonth) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarYearTerminal(cal, yearBeginMonth);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateYearTerminalAdded(Date date, int year) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarYearTerminalAdded(cal, year);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateYearTerminalFor(Date date, int year) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarYearTerminalFor(cal, year);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1156,9 +1192,45 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
+    public static void moveToDateMonthJust(Date date, int monthBeginDay) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMonthJust(cal, monthBeginDay);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMonthAdded(Date date, int month) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMonthJustAdded(cal, month);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMonthFor(Date date, int month) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMonthJustFor(cal, month);
+        date.setTime(cal.getTimeInMillis());
+    }
+
     public static void moveToDateMonthTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarMonthTerminal(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMonthTerminal(Date date, int monthBeginDay) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMonthTerminal(cal, monthBeginDay);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMonthTerminalAdded(Date date, int month) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMonthTerminalAdded(cal, month);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMonthTerminalFor(Date date, int month) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMonthTerminalFor(cal, month);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1175,9 +1247,45 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
+    public static void moveToDateDayJust(Date date, int dayBeginHour) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarDayJust(cal, dayBeginHour);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateDayJustAdded(Date date, int day) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarDayJustAdded(cal, day);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateDayJustFor(Date date, int day) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarDayJustFor(cal, day);
+        date.setTime(cal.getTimeInMillis());
+    }
+
     public static void moveToDateDayTerminal(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarDayTerminal(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateDayTerminal(Date date, int dayBeginHour) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarDayTerminal(cal, dayBeginHour);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateDayTerminalAdded(Date date, int day) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarDayTerminalAdded(cal, day);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateDayTerminalFor(Date date, int day) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarDayTerminalFor(cal, day);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1194,15 +1302,125 @@ public final class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void moveToDateHourTerminal(Date date) {
+    public static void moveToDateHourJustAdded(Date date, int hour) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarHourTerminal(cal);
+        moveToCalendarHourJustAdded(cal, hour);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateHourJustFor(Date date, int hour) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarHourJustFor(cal, hour);
         date.setTime(cal.getTimeInMillis());
     }
 
     public static void moveToDateHourJustNoon(Date date) {
         final Calendar cal = toCalendar(date);
         moveToCalendarHourJustNoon(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateHourTerminal(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarHourTerminal(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateHourTerminalAdded(Date date, int hour) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarHourTerminalAdded(cal, hour);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateHourTerminalFor(Date date, int hour) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarHourTerminalFor(cal, hour);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - -[Minute]
+    public static void moveToDateMinute(Date date, int minute) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMinute(cal, minute);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMinuteJust(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMinuteJust(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMinuteJustAdded(Date date, int minute) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMinuteJustAdded(cal, minute);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMinuteJustFor(Date date, int minute) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMinuteJustFor(cal, minute);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMinuteTerminal(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMinuteTerminal(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMinuteTerminalAdded(Date date, int minute) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMinuteTerminalAdded(cal, minute);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateMinuteTerminalFor(Date date, int minute) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarMinuteTerminalFor(cal, minute);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - -[Second]
+    public static void moveToDateSecond(Date date, int second) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarSecond(cal, second);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateSecondJust(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarSecondJust(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateSecondJustAdded(Date date, int second) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarSecondJustAdded(cal, second);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateSecondJustFor(Date date, int second) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarSecondJustFor(cal, second);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateSecondTerminal(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarSecondTerminal(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateSecondTerminalAdded(Date date, int second) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarSecondTerminalAdded(cal, second);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateSecondTerminalFor(Date date, int second) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarSecondTerminalFor(cal, second);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1216,6 +1434,55 @@ public final class DfTypeUtil {
     public static void moveToDateWeekTerminal(Date date, int weekStartDay) {
         final Calendar cal = toCalendar(date);
         moveToCalendarWeekTerminal(cal, weekStartDay);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    // - - - - - - - - - - - - - - - - - - [Quarter of Year]
+    public static void moveToDateQuarterOfYearJust(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarQuarterOfYearJust(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateQuarterOfYearJust(Date date, int yearBeginMonth) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarQuarterOfYearJust(cal, yearBeginMonth);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateQuarterOfYearJustFor(Date date, int quarterOfYear) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarQuarterOfYearJustFor(cal, quarterOfYear);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateQuarterOfYearJustFor(Date date, int quarterOfYear, int yearBeginMonth) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarQuarterOfYearJustFor(cal, quarterOfYear, yearBeginMonth);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateQuarterOfYearTerminal(Date date) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarQuarterOfYearTerminal(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateQuarterOfYearTerminal(Date date, int yearBeginMonth) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarQuarterOfYearTerminal(cal, yearBeginMonth);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateQuarterOfYearTerminalFor(Date date, int quarterOfYear) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarQuarterOfYearTerminalFor(cal, quarterOfYear);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void moveToDateQuarterOfYearTerminalFor(Date date, int quarterOfYear, int yearBeginMonth) {
+        final Calendar cal = toCalendar(date);
+        moveToCalendarQuarterOfYearTerminalFor(cal, quarterOfYear, yearBeginMonth);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1715,6 +1982,10 @@ public final class DfTypeUtil {
         cal.add(Calendar.WEEK_OF_MONTH, week);
     }
 
+    public static void addCalendarQuarterOfYear(Calendar cal, int quarterOfYear) {
+        addCalendarMonth(cal, quarterOfYear * 3);
+    }
+
     /**
      * @param cal
      * @param dayOfMonth
@@ -1766,6 +2037,11 @@ public final class DfTypeUtil {
         moveToCalendarMonthJust(cal);
     }
 
+    public static void moveToCalendarYearJustAdded(Calendar cal, int yaer) {
+        addCalendarYear(cal, yaer);
+        moveToCalendarYearJust(cal);
+    }
+
     public static void moveToCalendarYearJustFor(Calendar cal, int yaer) {
         moveToCalendarYear(cal, yaer);
         moveToCalendarYearJust(cal);
@@ -1779,6 +2055,11 @@ public final class DfTypeUtil {
         moveToCalendarYearJust(cal, yearBeginMonth);
         addCalendarYear(cal, 1);
         addCalendarMillisecond(cal, -1);
+    }
+
+    public static void moveToCalendarYearTerminalAdded(Calendar cal, int yaer) {
+        addCalendarYear(cal, yaer);
+        moveToCalendarYearTerminal(cal);
     }
 
     public static void moveToCalendarYearTerminalFor(Calendar cal, int yaer) {
@@ -1807,6 +2088,11 @@ public final class DfTypeUtil {
         moveToCalendarDayJust(cal);
     }
 
+    public static void moveToCalendarMonthJustAdded(Calendar cal, int month) {
+        addCalendarMonth(cal, month);
+        moveToCalendarMonthJust(cal);
+    }
+
     public static void moveToCalendarMonthJustFor(Calendar cal, int month) {
         moveToCalendarMonth(cal, month);
         moveToCalendarMonthJust(cal);
@@ -1822,7 +2108,12 @@ public final class DfTypeUtil {
         addCalendarMillisecond(cal, -1);
     }
 
-    public static void moveToCalendarMonthTerminalFor(Calendar cal, int month) { // 2011/11/30 23:59:59.999
+    public static void moveToCalendarMonthTerminalAdded(Calendar cal, int month) {
+        addCalendarMonth(cal, month);
+        moveToCalendarMonthTerminal(cal);
+    }
+
+    public static void moveToCalendarMonthTerminalFor(Calendar cal, int month) {
         moveToCalendarMonthJustFor(cal, month);
         moveToCalendarMonthTerminal(cal);
     }
@@ -1848,6 +2139,11 @@ public final class DfTypeUtil {
         clearCalendarMinuteWithRear(cal);
     }
 
+    public static void moveToCalendarDayJustAdded(Calendar cal, int day) {
+        addCalendarDay(cal, day);
+        moveToCalendarDayJust(cal);
+    }
+
     public static void moveToCalendarDayJustFor(Calendar cal, int day) {
         moveToCalendarDay(cal, day);
         moveToCalendarDayJust(cal);
@@ -1861,6 +2157,11 @@ public final class DfTypeUtil {
         moveToCalendarDayJust(cal, dayBeginHour);
         addCalendarDay(cal, 1);
         addCalendarMillisecond(cal, -1);
+    }
+
+    public static void moveToCalendarDayTerminalAdded(Calendar cal, int day) {
+        addCalendarDay(cal, day);
+        moveToCalendarDayTerminal(cal);
     }
 
     public static void moveToCalendarDayTerminalFor(Calendar cal, int day) {
@@ -1877,6 +2178,11 @@ public final class DfTypeUtil {
         clearCalendarMinuteWithRear(cal);
     }
 
+    public static void moveToCalendarHourJustAdded(Calendar cal, int hour) {
+        addCalendarHour(cal, hour);
+        moveToCalendarHourJust(cal);
+    }
+
     public static void moveToCalendarHourJustFor(Calendar cal, int hour) {
         moveToCalendarHour(cal, hour);
         moveToCalendarHourJust(cal);
@@ -1889,6 +2195,11 @@ public final class DfTypeUtil {
     public static void moveToCalendarHourTerminal(Calendar cal) { // 2011/11/17 11:59:59.999
         moveToCalendarMinute(cal, cal.getActualMaximum(Calendar.MINUTE));
         moveToCalendarMinuteTerminal(cal);
+    }
+
+    public static void moveToCalendarHourTerminalAdded(Calendar cal, int hour) {
+        addCalendarHour(cal, hour);
+        moveToCalendarHourTerminal(cal);
     }
 
     public static void moveToCalendarHourTerminalFor(Calendar cal, int hour) {
@@ -1905,6 +2216,11 @@ public final class DfTypeUtil {
         clearCalendarSecondWithRear(cal);
     }
 
+    public static void moveToCalendarMinuteJustAdded(Calendar cal, int minute) {
+        addCalendarMinute(cal, minute);
+        moveToCalendarSecondJust(cal);
+    }
+
     public static void moveToCalendarMinuteJustFor(Calendar cal, int minute) {
         moveToCalendarMinute(cal, minute);
         moveToCalendarSecondJust(cal);
@@ -1913,6 +2229,11 @@ public final class DfTypeUtil {
     public static void moveToCalendarMinuteTerminal(Calendar cal) {
         moveToCalendarSecond(cal, cal.getActualMaximum(Calendar.SECOND));
         moveToCalendarSecondTerminal(cal);
+    }
+
+    public static void moveToCalendarMinuteTerminalAdded(Calendar cal, int minute) {
+        addCalendarMinute(cal, minute);
+        moveToCalendarMinuteTerminal(cal);
     }
 
     public static void moveToCalendarMinuteTerminalFor(Calendar cal, int minute) {
@@ -1929,6 +2250,11 @@ public final class DfTypeUtil {
         clearCalendarMillisecond(cal);
     }
 
+    public static void moveToCalendarSecondJustAdded(Calendar cal, int second) {
+        addCalendarSecond(cal, second);
+        moveToCalendarSecondJust(cal);
+    }
+
     public static void moveToCalendarSecondJustFor(Calendar cal, int second) {
         moveToCalendarSecond(cal, second);
         moveToCalendarSecondJust(cal);
@@ -1936,6 +2262,11 @@ public final class DfTypeUtil {
 
     public static void moveToCalendarSecondTerminal(Calendar cal) {
         moveToCalendarMillisecond(cal, cal.getActualMaximum(Calendar.MILLISECOND));
+    }
+
+    public static void moveToCalendarSecondTerminalAdded(Calendar cal, int second) {
+        addCalendarSecond(cal, second);
+        moveToCalendarSecondTerminal(cal);
     }
 
     public static void moveToCalendarSecondTerminalFor(Calendar cal, int second) {
@@ -1984,6 +2315,82 @@ public final class DfTypeUtil {
         }
         addCalendarDay(cal, -1);
         moveToCalendarDayTerminal(cal);
+    }
+
+    // - - - - - - - - - - - - - - - - - - [Quarter of Year]
+    public static void moveToCalendarQuarterOfYearJust(Calendar cal) {
+        moveToCalendarQuarterOfYearJust(cal, 1);
+    }
+
+    public static void moveToCalendarQuarterOfYearJust(Calendar cal, int yearBeginMonth) {
+        int month = cal.get(Calendar.MONTH) + 1; // zero origin headache
+        if (month < yearBeginMonth) {
+            month = month + 12;
+        }
+        final int firstBeginMonth = yearBeginMonth;
+        final int secondBeginMonth = firstBeginMonth + 3;
+        final int thirdBeginMonth = secondBeginMonth + 3;
+        final int fourthBeginMonth = thirdBeginMonth + 3;
+        final int addedMonth;
+        if (month >= firstBeginMonth && month <= (firstBeginMonth + 2)) {
+            addedMonth = firstBeginMonth - month;
+        } else if (month >= secondBeginMonth && month <= (secondBeginMonth + 2)) {
+            addedMonth = secondBeginMonth - month;
+        } else if (month >= thirdBeginMonth && month <= (thirdBeginMonth + 2)) {
+            addedMonth = thirdBeginMonth - month;
+        } else {
+            addedMonth = fourthBeginMonth - month;
+        }
+        moveToCalendarMonthJustAdded(cal, addedMonth);
+    }
+
+    public static void moveToCalendarQuarterOfYearJustAdded(Calendar cal, int quarterOfYear) {
+        moveToCalendarQuarterOfYearJustAdded(cal, quarterOfYear, 1);
+    }
+
+    public static void moveToCalendarQuarterOfYearJustAdded(Calendar cal, int quarterOfYear, int yearBeginMonth) {
+        addCalendarQuarterOfYear(cal, quarterOfYear);
+        moveToCalendarQuarterOfYearJust(cal, yearBeginMonth);
+    }
+
+    public static void moveToCalendarQuarterOfYearJustFor(Calendar cal, int quarterOfYear) {
+        moveToCalendarQuarterOfYearJustFor(cal, quarterOfYear, 1);
+    }
+
+    public static void moveToCalendarQuarterOfYearJustFor(Calendar cal, int quarterOfYear, int yearBeginMonth) {
+        final int month = cal.get(Calendar.MONTH) + 1; // zero origin headache
+        if (month < yearBeginMonth) {
+            addCalendarYear(cal, -1);
+        }
+        moveToCalendarYearJust(cal, yearBeginMonth);
+        moveToCalendarMonthJustAdded(cal, ((quarterOfYear - 1) * 3));
+    }
+
+    public static void moveToCalendarQuarterOfYearTerminal(Calendar cal) {
+        moveToCalendarQuarterOfYearTerminal(cal, 1);
+    }
+
+    public static void moveToCalendarQuarterOfYearTerminal(Calendar cal, int yearBeginMonth) {
+        moveToCalendarQuarterOfYearJust(cal, yearBeginMonth);
+        moveToCalendarMonthTerminalAdded(cal, 2);
+    }
+
+    public static void moveToCalendarQuarterOfYearTerminalAdded(Calendar cal, int quarterOfYear) {
+        moveToCalendarQuarterOfYearTerminalAdded(cal, quarterOfYear, 1);
+    }
+
+    public static void moveToCalendarQuarterOfYearTerminalAdded(Calendar cal, int quarterOfYear, int yearBeginMonth) {
+        addCalendarQuarterOfYear(cal, quarterOfYear);
+        moveToCalendarQuarterOfYearTerminal(cal, yearBeginMonth);
+    }
+
+    public static void moveToCalendarQuarterOfYearTerminalFor(Calendar cal, int quarterOfYear) {
+        moveToCalendarQuarterOfYearTerminalFor(cal, quarterOfYear, 1);
+    }
+
+    public static void moveToCalendarQuarterOfYearTerminalFor(Calendar cal, int quarterOfYear, int yearBeginMonth) {
+        moveToCalendarQuarterOfYearJustFor(cal, quarterOfYear, yearBeginMonth);
+        moveToCalendarMonthTerminalAdded(cal, 2);
     }
 
     // -----------------------------------------------------

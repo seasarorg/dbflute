@@ -480,6 +480,81 @@ public class FromToOptionTest extends PlainTestCase {
         assertEquals("2011-11-21 00:00:00", toString(option.filterToDate(toDate("2011-11-21 12:34:56")), fmt));
     }
 
+    // -----------------------------------------------------
+    //                                       Quarter of Year
+    //                                       ---------------
+    public void test_compareAsQuarterOfYear_basic() {
+        // ## Arrange ##
+        String fromRes = "2008-05-14 12:34:56.789";
+        String toRes = "2008-11-18 18:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsQuarterOfYear();
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-04-01 00:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2009-01-01 00:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_compareAsQuarterOfYear_begin_basic() {
+        // ## Arrange ##
+        String fromRes = "2008-05-14 12:34:56.789";
+        String toRes = "2008-11-18 18:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsQuarterOfYear().beginYear_Month02_February();
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2008-05-01 00:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2009-02-01 00:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_compareAsQuarterOfYear_begin_over() {
+        // ## Arrange ##
+        String fromRes = "2008-01-14 12:34:56.789";
+        String toRes = "2008-12-18 18:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsQuarterOfYear().beginYear_Month02_February();
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2007-11-01 00:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2009-02-01 00:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_compareAsQuarterOfYear_moveToScope() {
+        // ## Arrange ##
+        String fromRes = "2008-01-14 12:34:56.789";
+        String toRes = "2008-12-18 18:34:56.789";
+        FromToOption option = createOption();
+
+        // ## Act ##
+        option.compareAsQuarterOfYear().beginYear_Month02_February().moveToScope(-1);
+        Date fromDate = option.filterFromDate(DfTypeUtil.toDate(fromRes));
+        Date toDate = option.filterToDate(DfTypeUtil.toDate(toRes));
+
+        // ## Assert ##
+        assertEquals(ConditionKey.CK_GREATER_EQUAL, option.getFromDateConditionKey());
+        assertEquals(ConditionKey.CK_LESS_THAN, option.getToDateConditionKey());
+        assertEquals("2007-08-01 00:00:00.000", DfTypeUtil.toString(fromDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2008-11-01 00:00:00.000", DfTypeUtil.toString(toDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
     // ===================================================================================
     //                                                                   Manual Adjustment
     //                                                                   =================

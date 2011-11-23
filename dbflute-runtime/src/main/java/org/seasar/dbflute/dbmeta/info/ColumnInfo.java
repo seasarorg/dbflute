@@ -29,6 +29,7 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -121,28 +122,7 @@ public class ColumnInfo {
     }
 
     public void write(Entity entity, Object value) {
-        final Object converted;
-        if (Number.class.isAssignableFrom(_propertyType)) {
-            converted = DfTypeUtil.toNumber(value, _propertyType);
-        } else if (Timestamp.class.isAssignableFrom(_propertyType)) {
-            converted = DfTypeUtil.toTimestamp(value);
-        } else if (Time.class.isAssignableFrom(_propertyType)) {
-            converted = DfTypeUtil.toTime(value);
-        } else if (Date.class.isAssignableFrom(_propertyType)) {
-            converted = DfTypeUtil.toDate(value);
-        } else if (Boolean.class.isAssignableFrom(_propertyType)) {
-            converted = DfTypeUtil.toBoolean(value);
-        } else if (byte[].class.isAssignableFrom(_propertyType)) {
-            if (value instanceof Serializable) {
-                converted = DfTypeUtil.toBinary((Serializable) value);
-            } else {
-                converted = value; // no change
-            }
-        } else if (UUID.class.isAssignableFrom(_propertyType)) {
-            converted = DfTypeUtil.toUUID(value);
-        } else {
-            converted = value;
-        }
+        final Object converted = toPropretyType(value);
         invokeMethod(writer(), entity, new Object[] { converted });
     }
 
@@ -169,6 +149,40 @@ public class ColumnInfo {
      */
     public Class<?> getGenericType() {
         return DfReflectionUtil.getGenericType(reader().getGenericReturnType());
+    }
+
+    // ===================================================================================
+    //                                                                        Convert Type
+    //                                                                        ============
+    public <VALUE> VALUE toPropretyType(Object value) {
+        if (value != null && value instanceof Classification) {
+            value = ((Classification) value).code();
+        }
+        final Object converted;
+        if (Number.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toNumber(value, _propertyType);
+        } else if (Timestamp.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toTimestamp(value);
+        } else if (Time.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toTime(value);
+        } else if (Date.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toDate(value);
+        } else if (Boolean.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toBoolean(value);
+        } else if (byte[].class.isAssignableFrom(_propertyType)) {
+            if (value instanceof Serializable) {
+                converted = DfTypeUtil.toBinary((Serializable) value);
+            } else {
+                converted = value; // no change
+            }
+        } else if (UUID.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toUUID(value);
+        } else {
+            converted = value;
+        }
+        @SuppressWarnings("unchecked")
+        final VALUE result = (VALUE) converted;
+        return result;
     }
 
     // ===================================================================================

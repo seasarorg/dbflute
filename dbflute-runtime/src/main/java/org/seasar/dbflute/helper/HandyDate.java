@@ -1,5 +1,6 @@
 package org.seasar.dbflute.helper;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -9,9 +10,11 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * Now making...
  * @author jflute
- * @since 0.9.9.1G (2011/11/17 Thursday)
+ * @since 0.9.9.2A (2011/11/17 Thursday)
  */
-public class HandyDate {
+public class HandyDate implements Serializable, Cloneable {
+
+    private static final long serialVersionUID = -5181512291555841795L;
 
     // ===================================================================================
     //                                                                           Attribute
@@ -26,11 +29,26 @@ public class HandyDate {
     //                                                                         Constructor
     //                                                                         ===========
     public HandyDate(Date date) {
+        assertConstructorArgumentNotNull("date", date);
         _cal.setTime(date);
     }
 
     public HandyDate(String exp) {
+        assertConstructorArgumentNotNull("exp", exp);
         _cal.setTime(DfTypeUtil.toDate(exp));
+    }
+
+    public HandyDate(String exp, String pattern) {
+        assertConstructorArgumentNotNull("exp", exp);
+        assertConstructorArgumentNotNull("pattern", pattern);
+        _cal.setTime(DfTypeUtil.toDate(exp, pattern));
+    }
+
+    protected void assertConstructorArgumentNotNull(String name, Object value) {
+        if (value == null) {
+            String msg = "The argument '" + name + "' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     // ===================================================================================
@@ -89,6 +107,12 @@ public class HandyDate {
 
     public HandyDate moveToYearJust() {
         DfTypeUtil.moveToCalendarYearJust(_cal, _yearBeginMonth);
+        moveToMonthJust(); // just for others
+        return this;
+    }
+
+    public HandyDate moveToYearJustAdded(int year) {
+        DfTypeUtil.moveToCalendarYearJustAdded(_cal, year);
         return this;
     }
 
@@ -99,6 +123,12 @@ public class HandyDate {
 
     public HandyDate moveToYearTerminal() {
         DfTypeUtil.moveToCalendarYearTerminal(_cal, _yearBeginMonth);
+        moveToMonthTerminal(); // just for others
+        return this;
+    }
+
+    public HandyDate moveToYearTerminalAdded(int year) {
+        DfTypeUtil.moveToCalendarYearTerminalAdded(_cal, year);
         return this;
     }
 
@@ -117,6 +147,12 @@ public class HandyDate {
 
     public HandyDate moveToMonthJust() {
         DfTypeUtil.moveToCalendarMonthJust(_cal, _monthBeginDay);
+        moveToDayJust(); // just for others
+        return this;
+    }
+
+    public HandyDate moveToMonthJustAdded(int month) {
+        DfTypeUtil.moveToCalendarMonthJustAdded(_cal, month);
         return this;
     }
 
@@ -127,6 +163,12 @@ public class HandyDate {
 
     public HandyDate moveToMonthTerminal() {
         DfTypeUtil.moveToCalendarMonthTerminal(_cal, _monthBeginDay);
+        moveToDayTerminal(); // just for others
+        return this;
+    }
+
+    public HandyDate moveToMonthTerminalAdded(int month) {
+        DfTypeUtil.moveToCalendarMonthTerminalAdded(_cal, month);
         return this;
     }
 
@@ -148,8 +190,13 @@ public class HandyDate {
         return this;
     }
 
+    public HandyDate moveToDayJustAdded(int day) {
+        DfTypeUtil.moveToCalendarDayJustAdded(_cal, day);
+        return this;
+    }
+
     public HandyDate moveToDayJustFor(int day) {
-        DfTypeUtil.moveToCalendarDayJust(_cal, day);
+        DfTypeUtil.moveToCalendarDayJustFor(_cal, day);
         return this;
     }
 
@@ -158,8 +205,13 @@ public class HandyDate {
         return this;
     }
 
+    public HandyDate moveToDayTerminalAdded(int day) {
+        DfTypeUtil.moveToCalendarDayTerminalAdded(_cal, day);
+        return this;
+    }
+
     public HandyDate moveToDayTerminalFor(int day) {
-        DfTypeUtil.moveToCalendarDayTerminal(_cal, day);
+        DfTypeUtil.moveToCalendarDayTerminalFor(_cal, day);
         return this;
     }
 
@@ -176,6 +228,11 @@ public class HandyDate {
         return this;
     }
 
+    public HandyDate moveToHourJustAdded(int hour) {
+        DfTypeUtil.moveToCalendarHourJustAdded(_cal, hour);
+        return this;
+    }
+
     public HandyDate moveToHourJustFor(int hour) {
         DfTypeUtil.moveToCalendarHourJustFor(_cal, hour);
         return this;
@@ -183,6 +240,11 @@ public class HandyDate {
 
     public HandyDate moveToHourTerminal() {
         DfTypeUtil.moveToCalendarHourTerminal(_cal);
+        return this;
+    }
+
+    public HandyDate moveToHourTerminalAdded(int hour) {
+        DfTypeUtil.moveToCalendarHourTerminalAdded(_cal, hour);
         return this;
     }
 
@@ -209,6 +271,11 @@ public class HandyDate {
         return this;
     }
 
+    public HandyDate moveToMinuteJustAdded(int minute) {
+        DfTypeUtil.moveToCalendarMinuteJustAdded(_cal, minute);
+        return this;
+    }
+
     public HandyDate moveToMinuteJustFor(int minute) {
         DfTypeUtil.moveToCalendarMinuteJustFor(_cal, minute);
         return this;
@@ -216,6 +283,11 @@ public class HandyDate {
 
     public HandyDate moveToMinuteTerminal() {
         DfTypeUtil.moveToCalendarMinuteTerminal(_cal);
+        return this;
+    }
+
+    public HandyDate moveToMinuteTerminalÅdded(int minute) {
+        DfTypeUtil.moveToCalendarMinuteTerminalAdded(_cal, minute);
         return this;
     }
 
@@ -242,8 +314,18 @@ public class HandyDate {
         return this;
     }
 
+    public HandyDate moveToSecondJustAdded(int second) {
+        DfTypeUtil.moveToCalendarSecondJustAdded(_cal, second);
+        return this;
+    }
+
     public HandyDate moveToSecondTerminal() {
         DfTypeUtil.moveToCalendarSecondTerminal(_cal);
+        return this;
+    }
+
+    public HandyDate moveToSecondTerminalAdded(int second) {
+        DfTypeUtil.moveToCalendarSecondTerminalAdded(_cal, second);
         return this;
     }
 
@@ -280,6 +362,45 @@ public class HandyDate {
 
     public HandyDate moveToWeekTerminal() {
         DfTypeUtil.moveToCalendarWeekTerminal(_cal, _weekBeginDay);
+        return this;
+    }
+
+    // -----------------------------------------------------
+    //                               Move-to Quarter of Year
+    //                               -----------------------
+    public HandyDate moveToQuarterOfYearJust() {
+        DfTypeUtil.moveToCalendarQuarterOfYearJust(_cal, _yearBeginMonth);
+        moveToMonthJust(); // just for others
+        return this;
+    }
+
+    public HandyDate moveToQuarterOfYearJustAdded(int quarterOfYear) {
+        DfTypeUtil.moveToCalendarQuarterOfYearJustAdded(_cal, quarterOfYear, _yearBeginMonth);
+        moveToMonthJust(); // just for others
+        return this;
+    }
+
+    public HandyDate moveToQuarterOfYearJustFor(int quarterOfYear) {
+        DfTypeUtil.moveToCalendarQuarterOfYearJustFor(_cal, quarterOfYear, _yearBeginMonth);
+        moveToMonthJust(); // just for others
+        return this;
+    }
+
+    public HandyDate moveToQuarterOfYearTerminal() {
+        DfTypeUtil.moveToCalendarQuarterOfYearTerminal(_cal, _yearBeginMonth);
+        moveToMonthTerminal(); // just for others
+        return this;
+    }
+
+    public HandyDate moveToQuarterOfYearTerminalAdded(int quarterOfYear) {
+        DfTypeUtil.moveToCalendarQuarterOfYearTerminalAdded(_cal, quarterOfYear, _yearBeginMonth);
+        moveToMonthTerminal(); // just for others
+        return this;
+    }
+
+    public HandyDate moveToQuarterOfYearTerminalFor(int quarterOfYear) {
+        DfTypeUtil.moveToCalendarQuarterOfYearTerminalFor(_cal, quarterOfYear, _yearBeginMonth);
+        moveToMonthTerminal(); // just for others
         return this;
     }
 
@@ -393,6 +514,7 @@ public class HandyDate {
     //                                            Begin Year
     //                                            ----------
     public HandyDate beginYear_Month(Date yearBeginMonth) {
+        assertArgumentNotNull("yearBeginMonth", yearBeginMonth);
         final Calendar cal = Calendar.getInstance();
         cal.setTime(yearBeginMonth);
         _yearBeginMonth = cal.get(Calendar.MONTH) + 1; // zero origin headache
@@ -475,6 +597,7 @@ public class HandyDate {
     //                                           Begin Month
     //                                           -----------
     public HandyDate beginMonth_Day(Date monthBeginDay) {
+        assertArgumentNotNull("monthBeginDay", monthBeginDay);
         final Calendar cal = Calendar.getInstance();
         cal.setTime(monthBeginDay);
         _monthBeginDay = cal.get(Calendar.DAY_OF_MONTH);
@@ -497,6 +620,7 @@ public class HandyDate {
     //                                             Begin Day
     //                                             ---------
     public HandyDate beginDay_Hour(Date dayBeginHour) {
+        assertArgumentNotNull("dayBeginHour", dayBeginHour);
         final Calendar cal = Calendar.getInstance();
         cal.setTime(dayBeginHour);
         _dayBeginHour = cal.get(Calendar.HOUR_OF_DAY);
@@ -519,6 +643,7 @@ public class HandyDate {
     //                                            Begin Week
     //                                            ----------
     public HandyDate beginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
+        assertArgumentNotNull("weekBeginDayOfWeek", weekBeginDayOfWeek);
         final Calendar cal = Calendar.getInstance();
         cal.setTime(weekBeginDayOfWeek);
         _weekBeginDay = cal.get(Calendar.DAY_OF_WEEK);
@@ -574,6 +699,13 @@ public class HandyDate {
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    protected void assertArgumentNotNull(String name, Object value) {
+        if (value == null) {
+            String msg = "The argument '" + name + "' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
     protected void assertNotMinusNotOver(String name, int value, int max) {
         if (value < 0) {
             String msg = "The argument '" + name + "' should not be minus: value=" + value;
@@ -595,6 +727,18 @@ public class HandyDate {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    /**
+     * Clone date instance using super.clone(). 
+     * @return The cloned instance of this date. (NotNull)
+     */
+    public HandyDate clone() {
+        try {
+            return (HandyDate) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Failed to clone the handy date: " + toString(), e);
+        }
+    }
+
     @Override
     public int hashCode() {
         final String pattern = "yyyy/MM/dd HH:mm:ss.SSS";
