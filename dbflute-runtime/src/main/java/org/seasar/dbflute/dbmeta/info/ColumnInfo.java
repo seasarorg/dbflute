@@ -154,9 +154,31 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                        Convert Type
     //                                                                        ============
+    @SuppressWarnings("unchecked")
     public <VALUE> VALUE toPropretyType(Object value) {
+        if (value == null) {
+            return null;
+        }
+        final VALUE result;
+        if (value instanceof List<?>) {
+            final List<?> valueList = (List<?>) value;
+            final List<Object> resultList = new ArrayList<Object>();
+            for (Object obj : valueList) {
+                resultList.add(doConvertToPropretyType(obj));
+            }
+            result = (VALUE) resultList;
+        } else {
+            result = (VALUE) doConvertToPropretyType(value);
+        }
+        return result;
+    }
+
+    protected Object doConvertToPropretyType(Object value) {
         if (value != null && value instanceof Classification) {
             value = ((Classification) value).code();
+        }
+        if (value == null) {
+            return null;
         }
         final Object converted;
         if (Number.class.isAssignableFrom(_propertyType)) {
@@ -180,9 +202,7 @@ public class ColumnInfo {
         } else {
             converted = value;
         }
-        @SuppressWarnings("unchecked")
-        final VALUE result = (VALUE) converted;
-        return result;
+        return converted;
     }
 
     // ===================================================================================
