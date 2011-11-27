@@ -16,7 +16,7 @@
 package org.seasar.dbflute.twowaysql.node;
 
 import java.lang.reflect.Array;
-import java.util.List;
+import java.util.Collection;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
@@ -44,8 +44,8 @@ public class BindVariableNode extends VariableNode {
             if (finalValue == null) { // in-scope does not allow null value
                 throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
             }
-            if (List.class.isAssignableFrom(finalType)) {
-                bindArray(ctx, ((List<?>) finalValue).toArray());
+            if (Collection.class.isAssignableFrom(finalType)) {
+                bindArray(ctx, ((Collection<?>) finalValue).toArray());
             } else if (finalType.isArray()) {
                 bindArray(ctx, finalValue);
             } else {

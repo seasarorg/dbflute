@@ -79,7 +79,8 @@ public class NodeUtil {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The parameter for in-scope condition was not list or array.");
         br.addItem("Advice");
-        br.addElement("If a style of a test value is '(...)', parameter should be list or array for in-scope.");
+        br.addElement("If a style of a test value is, e.g. (2, 5, 7)',");
+        br.addElement("the parameter should be list (collection) or array for in-scope.");
         br.addElement("For example:");
         br.addElement("  (x) - MEMBER_ID in /*" + emmark + "pmb.memberId*/('foo', 'bar')");
         br.addElement("  (o) - MEMBER_ID in /*" + emmark + "pmb.memberIdList*/('foo', 'bar')");

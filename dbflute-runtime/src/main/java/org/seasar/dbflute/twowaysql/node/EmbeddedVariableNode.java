@@ -16,7 +16,7 @@
 package org.seasar.dbflute.twowaysql.node;
 
 import java.lang.reflect.Array;
-import java.util.List;
+import java.util.Collection;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
@@ -66,8 +66,8 @@ public class EmbeddedVariableNode extends VariableNode {
             if (finalValue == null) { // in-scope does not allow null value
                 throwBindOrEmbeddedCommentParameterNullValueException(valueAndType);
             }
-            if (List.class.isAssignableFrom(finalType)) {
-                embedArray(ctx, ((List<?>) finalValue).toArray());
+            if (Collection.class.isAssignableFrom(finalType)) {
+                embedArray(ctx, ((Collection<?>) finalValue).toArray());
             } else if (finalType.isArray()) {
                 embedArray(ctx, finalValue);
             } else {

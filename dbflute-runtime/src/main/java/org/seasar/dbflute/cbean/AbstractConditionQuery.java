@@ -1788,6 +1788,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return The list of the property. (NullAllowed: if null, returns null)
      */
     protected <PROPERTY> List<PROPERTY> cTL(Collection<PROPERTY> col) { // convert to list
+        // though BindVariableNode (or Embedded) can accept Collection and filter it,
+        // this process has been existed for a long time as traditional filter
         return convertToList(col);
     }
 
