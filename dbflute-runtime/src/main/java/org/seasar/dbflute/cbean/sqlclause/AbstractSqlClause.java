@@ -863,6 +863,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append(getLeftOuterJoinClause());
     }
 
+    public String getFromBaseTableHint() {
+        return createFromBaseTableHint();
+    }
+
     protected String getLeftOuterJoinClause() {
         final StringBuilder sb = new StringBuilder();
         reflectInnerJoinAutoDetectLazily();
@@ -925,7 +929,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected void buildLeftOuterJoinClause(StringBuilder sb, String foreignAliasName, LeftOuterJoinInfo joinInfo,
             boolean structuralPossibleInnerJoinAllowed) {
-        final String foreignTableDbName = joinInfo.getForeignTableDbName();
         final Map<ColumnRealName, ColumnRealName> joinOnMap = joinInfo.getJoinOnMap();
         assertJoinOnMapNotEmpty(joinOnMap, foreignAliasName);
 
@@ -938,48 +941,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             joinExp = " left outer join "; // is main!
         }
         sb.append(joinExp); // is main!
-        {
-            final int tablePos = 3 + joinExp.length(); // basically for in-line view indent
-            final DBMeta foreignDBMeta = findDBMeta(foreignTableDbName);
-            final TableSqlName foreignTableSqlName = foreignDBMeta.getTableSqlName();
-            final List<QueryClause> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
-            final String tableExp;
-            if (inlineWhereClauseList.isEmpty()) {
-                tableExp = foreignTableSqlName.toString();
-            } else {
-                tableExp = getInlineViewClause(foreignTableSqlName, inlineWhereClauseList, tablePos);
-            }
-            if (joinInfo.hasFixedCondition()) {
-                sb.append(joinInfo.resolveFixedInlineView(tableExp, canBeInnerJoin));
-            } else {
-                sb.append(tableExp);
-            }
-        }
+        buildJoinTableClause(sb, joinInfo, joinExp, canBeInnerJoin);
         sb.append(" ").append(foreignAliasName);
         if (joinInfo.hasInlineOrOnClause() || joinInfo.hasFixedCondition()) {
             sb.append(ln()).append("     "); // only when additional conditions exist
         }
         sb.append(" on ");
-        int count = 0;
-        for (Entry<ColumnRealName, ColumnRealName> joinOnEntry : joinOnMap.entrySet()) {
-            final ColumnRealName localRealName = joinOnEntry.getKey();
-            final ColumnRealName foreignRealName = joinOnEntry.getValue();
-            if (count > 0) {
-                sb.append(" and ");
-            }
-            sb.append(localRealName).append(" = ").append(foreignRealName);
-            ++count;
-        }
-        if (joinInfo.hasFixedCondition()) {
-            final String fixedCondition = joinInfo.getFixedCondition();
-            sb.append(ln()).append("    ");
-            sb.append(" and ").append(fixedCondition);
-        }
-        final List<QueryClause> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
-        for (QueryClause additionalOnClause : additionalOnClauseList) {
-            sb.append(ln()).append("    ");
-            sb.append(" and ").append(additionalOnClause);
-        }
+        buildJoinOnClause(sb, joinInfo, joinOnMap);
         if (isJoinInParentheses()) {
             sb.append(")");
         }
@@ -997,6 +965,26 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected boolean isJoinInParentheses() { // for DBMS that needs to join in parentheses
         return false; // as default
+    }
+
+    protected void buildJoinTableClause(StringBuilder sb, LeftOuterJoinInfo joinInfo, String joinExp,
+            boolean canBeInnerJoin) {
+        final String foreignTableDbName = joinInfo.getForeignTableDbName();
+        final int tablePos = 3 + joinExp.length(); // basically for in-line view indent
+        final DBMeta foreignDBMeta = findDBMeta(foreignTableDbName);
+        final TableSqlName foreignTableSqlName = foreignDBMeta.getTableSqlName();
+        final List<QueryClause> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
+        final String tableExp;
+        if (inlineWhereClauseList.isEmpty()) {
+            tableExp = foreignTableSqlName.toString();
+        } else {
+            tableExp = getInlineViewClause(foreignTableSqlName, inlineWhereClauseList, tablePos);
+        }
+        if (joinInfo.hasFixedCondition()) {
+            sb.append(joinInfo.resolveFixedInlineView(tableExp, canBeInnerJoin));
+        } else {
+            sb.append(tableExp);
+        }
     }
 
     protected String getInlineViewClause(TableSqlName inlineTableSqlName, List<QueryClause> inlineWhereClauseList,
@@ -1020,8 +1008,48 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return sb.toString();
     }
 
-    public String getFromBaseTableHint() {
-        return createFromBaseTableHint();
+    protected void buildJoinOnClause(StringBuilder sb, LeftOuterJoinInfo joinInfo,
+            Map<ColumnRealName, ColumnRealName> joinOnMap) {
+        int currentConditionCount = 0;
+        currentConditionCount = doBuildJoinOnClauseBasic(sb, joinInfo, joinOnMap, currentConditionCount);
+        currentConditionCount = doBuildJoinOnClauseFixed(sb, joinInfo, joinOnMap, currentConditionCount);
+        currentConditionCount = doBuildJoinOnClauseAdditional(sb, joinInfo, joinOnMap, currentConditionCount);
+    }
+
+    protected int doBuildJoinOnClauseBasic(StringBuilder sb, LeftOuterJoinInfo joinInfo,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, int currentConditionCount) {
+        for (Entry<ColumnRealName, ColumnRealName> joinOnEntry : joinOnMap.entrySet()) {
+            final ColumnRealName localRealName = joinOnEntry.getKey();
+            final ColumnRealName foreignRealName = joinOnEntry.getValue();
+            sb.append(currentConditionCount > 0 ? " and " : "");
+            sb.append(localRealName).append(" = ").append(foreignRealName);
+            ++currentConditionCount;
+        }
+        return currentConditionCount;
+    }
+
+    protected int doBuildJoinOnClauseFixed(StringBuilder sb, LeftOuterJoinInfo joinInfo,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, int currentConditionCount) {
+        if (joinInfo.hasFixedCondition()) {
+            final String fixedCondition = joinInfo.getFixedCondition();
+            sb.append(ln()).append("    ");
+            sb.append(currentConditionCount > 0 ? " and " : "");
+            sb.append(fixedCondition);
+            ++currentConditionCount;
+        }
+        return currentConditionCount;
+    }
+
+    protected int doBuildJoinOnClauseAdditional(StringBuilder sb, LeftOuterJoinInfo joinInfo,
+            Map<ColumnRealName, ColumnRealName> joinOnMap, int currentConditionCount) {
+        final List<QueryClause> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
+        for (QueryClause additionalOnClause : additionalOnClauseList) {
+            sb.append(ln()).append("    ");
+            sb.append(currentConditionCount > 0 ? " and " : "");
+            sb.append(additionalOnClause);
+            ++currentConditionCount;
+        }
+        return currentConditionCount;
     }
 
     // -----------------------------------------------------
