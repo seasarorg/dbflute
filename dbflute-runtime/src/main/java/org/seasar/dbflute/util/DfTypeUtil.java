@@ -1125,9 +1125,9 @@ public final class DfTypeUtil {
     // not all methods are supported
     // because you should use calendar's methods basically
     // - - - - - - - - - - - - - - - - - - - - - - - -[Year]
-    public static void moveToDateYear(Date date, int yaer) {
+    public static void moveToDateYear(Date date, int year) {
         final Calendar cal = toCalendar(date);
-        moveToCalendarYear(cal, yaer);
+        moveToCalendarYear(cal, year);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -2017,8 +2017,12 @@ public final class DfTypeUtil {
     //                                      Move-to Calendar
     //                                      ----------------
     // - - - - - - - - - - - - - - - - - - - - - - - -[Year]
-    public static void moveToCalendarYear(Calendar cal, int yaer) {
-        cal.set(Calendar.YEAR, yaer);
+    public static void moveToCalendarYear(Calendar cal, int year) {
+        assertArgumentNotZeroInteger("year", year);
+        if (year < 0) {
+            year++; // BC headache
+        }
+        cal.set(Calendar.YEAR, year);
     }
 
     public static void moveToCalendarYearJust(Calendar cal) { // 2011/01/01 00:00:00:000
@@ -2026,6 +2030,7 @@ public final class DfTypeUtil {
     }
 
     public static void moveToCalendarYearJust(Calendar cal, int yearBeginMonth) {
+        assertArgumentNotZeroInteger("yearBeginMonth", yearBeginMonth);
         final int realBeginValue;
         if (yearBeginMonth >= 0) {
             realBeginValue = yearBeginMonth;
@@ -2037,13 +2042,13 @@ public final class DfTypeUtil {
         moveToCalendarMonthJust(cal);
     }
 
-    public static void moveToCalendarYearJustAdded(Calendar cal, int yaer) {
-        addCalendarYear(cal, yaer);
+    public static void moveToCalendarYearJustAdded(Calendar cal, int year) {
+        addCalendarYear(cal, year);
         moveToCalendarYearJust(cal);
     }
 
-    public static void moveToCalendarYearJustFor(Calendar cal, int yaer) {
-        moveToCalendarYear(cal, yaer);
+    public static void moveToCalendarYearJustFor(Calendar cal, int year) {
+        moveToCalendarYear(cal, year);
         moveToCalendarYearJust(cal);
     }
 
@@ -2057,18 +2062,19 @@ public final class DfTypeUtil {
         addCalendarMillisecond(cal, -1);
     }
 
-    public static void moveToCalendarYearTerminalAdded(Calendar cal, int yaer) {
-        addCalendarYear(cal, yaer);
+    public static void moveToCalendarYearTerminalAdded(Calendar cal, int year) {
+        addCalendarYear(cal, year);
         moveToCalendarYearTerminal(cal);
     }
 
-    public static void moveToCalendarYearTerminalFor(Calendar cal, int yaer) {
-        moveToCalendarYearJustFor(cal, yaer);
+    public static void moveToCalendarYearTerminalFor(Calendar cal, int year) {
+        moveToCalendarYearJustFor(cal, year);
         moveToCalendarYearTerminal(cal);
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - [Month]
     public static void moveToCalendarMonth(Calendar cal, int month) {
+        assertArgumentNotMinusNotZeroInteger("month", month);
         cal.set(Calendar.MONTH, month - 1); // zero origin headache
     }
 
@@ -2077,6 +2083,7 @@ public final class DfTypeUtil {
     }
 
     public static void moveToCalendarMonthJust(Calendar cal, int monthBeginDay) {
+        assertArgumentNotZeroInteger("monthBeginDay", monthBeginDay);
         final int realBeginValue;
         if (monthBeginDay >= 0) {
             realBeginValue = monthBeginDay;
@@ -2120,6 +2127,7 @@ public final class DfTypeUtil {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - [Day]
     public static void moveToCalendarDay(Calendar cal, int day) {
+        assertArgumentNotMinusNotZeroInteger("day", day);
         cal.set(Calendar.DAY_OF_MONTH, day);
     }
 
@@ -2171,6 +2179,7 @@ public final class DfTypeUtil {
 
     // - - - - - - - - - - - - - - - - - - - - - - - -[Hour]
     public static void moveToCalendarHour(Calendar cal, int hour) {
+        assertArgumentNotMinusInteger("hour", hour);
         cal.set(Calendar.HOUR_OF_DAY, hour);
     }
 
@@ -2209,6 +2218,7 @@ public final class DfTypeUtil {
 
     // - - - - - - - - - - - - - - - - - - - - - - -[Minute]
     public static void moveToCalendarMinute(Calendar cal, int minute) {
+        assertArgumentNotMinusInteger("minute", minute);
         cal.set(Calendar.MINUTE, minute);
     }
 
@@ -2243,6 +2253,7 @@ public final class DfTypeUtil {
 
     // - - - - - - - - - - - - - - - - - - - - - - -[Second]
     public static void moveToCalendarSecond(Calendar cal, int second) {
+        assertArgumentNotMinusInteger("second", second);
         cal.set(Calendar.SECOND, second);
     }
 
@@ -2276,15 +2287,18 @@ public final class DfTypeUtil {
 
     // - - - - - - - - - - - - - - - - - - - - [Millisecond]
     public static void moveToCalendarMillisecond(Calendar cal, int millisecond) {
+        assertArgumentNotMinusInteger("millisecond", millisecond);
         cal.set(Calendar.MILLISECOND, millisecond);
     }
 
     // - - - - - - - - - - - - - - - - - - - - - - - -[Week]
     public static void moveToCalendarWeekOfMonth(Calendar cal, int weekOfMonth) {
+        assertArgumentNotMinusInteger("weekOfMonth", weekOfMonth);
         cal.set(Calendar.WEEK_OF_MONTH, weekOfMonth);
     }
 
     public static void moveToCalendarWeekOfYear(Calendar cal, int weekOfYear) {
+        assertArgumentNotMinusInteger("weekOfYear", weekOfYear);
         cal.set(Calendar.WEEK_OF_YEAR, weekOfYear);
     }
 
@@ -2323,6 +2337,7 @@ public final class DfTypeUtil {
     }
 
     public static void moveToCalendarQuarterOfYearJust(Calendar cal, int yearBeginMonth) {
+        assertArgumentNotMinusNotZeroInteger("yearBeginMonth", yearBeginMonth);
         int month = cal.get(Calendar.MONTH) + 1; // zero origin headache
         if (month < yearBeginMonth) {
             month = month + 12;
@@ -2354,10 +2369,12 @@ public final class DfTypeUtil {
     }
 
     public static void moveToCalendarQuarterOfYearJustFor(Calendar cal, int quarterOfYear) {
+        assertArgumentNotMinusNotZeroInteger("quarterOfYear", quarterOfYear);
         moveToCalendarQuarterOfYearJustFor(cal, quarterOfYear, 1);
     }
 
     public static void moveToCalendarQuarterOfYearJustFor(Calendar cal, int quarterOfYear, int yearBeginMonth) {
+        assertArgumentNotMinusNotZeroInteger("quarterOfYear", quarterOfYear);
         final int month = cal.get(Calendar.MONTH) + 1; // zero origin headache
         if (month < yearBeginMonth) {
             addCalendarYear(cal, -1);
@@ -2663,5 +2680,29 @@ public final class DfTypeUtil {
             list.add(st.nextToken());
         }
         return (String[]) list.toArray(new String[list.size()]);
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected static void assertArgumentNotZeroInteger(String name, int value) {
+        if (value == 0) {
+            String msg = "The argument '" + name + "' should be plus or minus value: " + value;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected static void assertArgumentNotMinusInteger(String name, int value) {
+        if (value < 0) {
+            String msg = "The argument '" + name + "' should be plus or zero value: " + value;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected static void assertArgumentNotMinusNotZeroInteger(String name, int value) {
+        if (value <= 0) {
+            String msg = "The argument '" + name + "' should be plus value: " + value;
+            throw new IllegalArgumentException(msg);
+        }
     }
 }

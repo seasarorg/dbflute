@@ -253,6 +253,12 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                            Begin Year
     //                                            ----------
+    /**
+     * Begin year from the specified month. <br />
+     * e.g. beginYear_Month(toDate("2001/04/01")): year is from 4th month to 3rd month of next year
+     * @param yearBeginMonth The date that has the month of year-begin. (NotNull)
+     * @return this.
+     */
     public FromToOption beginYear_Month(Date yearBeginMonth) {
         assertPatternOptionValid("beginYear_Month");
         assertArgumentNotNull("yearBeginMonth", yearBeginMonth);
@@ -262,6 +268,12 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    /**
+     * Begin year from the specified month. <br />
+     * e.g. beginYear_Month(4): year is from 4th month to 3rd month of next year
+     * @param yearBeginMonth The month of year-begin.
+     * @return this.
+     */
     public FromToOption beginYear_Month(int yearBeginMonth) {
         assertPatternOptionValid("beginYear_Month");
         assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
@@ -351,6 +363,12 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                           Begin Month
     //                                           -----------
+    /**
+     * Begin month from the specified day. <br />
+     * e.g. beginMonth_Day(toDate("2001/01/03")): month is from 3 day to 2 day of next month
+     * @param monthBeginDay The date that has the day of month-begin. (NotNull)
+     * @return this.
+     */
     public FromToOption beginMonth_Day(Date monthBeginDay) {
         assertPatternOptionValid("beginMonth_Day");
         assertArgumentNotNull("monthBeginDay", monthBeginDay);
@@ -360,6 +378,12 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    /**
+     * Begin month from the specified day. <br />
+     * e.g. beginMonth_Day(3): month is from 3 day to 2 day of next month
+     * @param monthBeginDay The day of month-begin.
+     * @return this.
+     */
     public FromToOption beginMonth_Day(int monthBeginDay) {
         assertPatternOptionValid("beginMonth_Day");
         assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
@@ -377,6 +401,12 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                             Begin Day
     //                                             ---------
+    /**
+     * Begin day from the specified hour. <br />
+     * e.g. beginDay_Hour(toDate("2001/01/01 06:00:00")): day is from 06h to 05h of next day
+     * @param dayBeginHour The date that has the hour of day-begin. (NotNull)
+     * @return this.
+     */
     public FromToOption beginDay_Hour(Date dayBeginHour) {
         assertPatternOptionValid("beginDay_Hour");
         assertArgumentNotNull("dayBeginHour", dayBeginHour);
@@ -386,6 +416,12 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    /**
+     * Begin day from the specified hour. <br />
+     * e.g. beginDay_Hour(6): day is from 06h to 05h of next day
+     * @param dayBeginHour The day of day-begin.
+     * @return this.
+     */
     public FromToOption beginDay_Hour(int dayBeginHour) {
         assertPatternOptionValid("beginDay_Hour");
         assertNotMinusNotOver("dayBeginHour", dayBeginHour, 23);
@@ -455,6 +491,18 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                         Move-to Scope
     //                                         -------------
+    /**
+     * Move to the specified count of scope.
+     * <pre>
+     * e.g.
+     * compareAsYear().moveToScope(-1): 2011 to 2010
+     * compareAsMonth().moveToScope(-1): 2011/11 to 2011/10
+     * compareAsDate().moveToScope(2): 2011/11/27 to 2011/11/29
+     * compareAsHour().moveToScope(7): 2011/11/27 12h to 2011/11/27 19h
+     * </pre>
+     * @param moveToCount The count to move-to.
+     * @return this.
+     */
     public FromToOption moveToScope(int moveToCount) {
         assertPatternOptionValid("moveToScope");
         _moveToScope = moveToCount;
