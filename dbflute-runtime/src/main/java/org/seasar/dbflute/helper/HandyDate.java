@@ -15,6 +15,9 @@ import org.seasar.dbflute.util.DfTypeUtil;
  */
 public class HandyDate implements Serializable, Cloneable {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     private static final long serialVersionUID = -5181512291555841795L;
 
     // ===================================================================================
@@ -437,33 +440,67 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Move to the hour just after the hour added. <br />
+     * e.g. moveToHourJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/27 13:00:00.000
+     * @param hour The count added of hour. (MinusAllowed: if minus, move back)
+     * @return this.
+     */
     public HandyDate moveToHourJustAdded(int hour) {
         DfTypeUtil.moveToCalendarHourJustAdded(_cal, hour);
         return this;
     }
 
+    /**
+     * Move to the hour just after the hour moved-to. <br />
+     * e.g. moveToHourJustFor(4): 2011/11/27 12:34:56.789 to 2011/11/27 04:00:00.000
+     * @param hour The move-to hour. (NotMinus)
+     * @return this.
+     */
     public HandyDate moveToHourJustFor(int hour) {
         assertValidHour(hour);
         DfTypeUtil.moveToCalendarHourJustFor(_cal, hour);
         return this;
     }
 
+    /**
+     * Move to the terminal of the hour. <br />
+     * e.g. moveToHourTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #FD4747">59:59.999</span>
+     * @return this.
+     */
     public HandyDate moveToHourTerminal() {
         DfTypeUtil.moveToCalendarHourTerminal(_cal);
         return this;
     }
 
+    /**
+     * Move to the terminal of the hour after the hour added. <br />
+     * e.g. moveToHourTerminalAdded(1): 2011/11/27 12:34:56.789 to 2011/11/27 13:59:59.999
+     * @param hour The count added of hour. (MinusAllowed: if minus, move back)
+     * @return this.
+     */
     public HandyDate moveToHourTerminalAdded(int hour) {
         DfTypeUtil.moveToCalendarHourTerminalAdded(_cal, hour);
         return this;
     }
 
+    /**
+     * Move to the terminal of the hour after the hour moved-to. <br />
+     * e.g. moveToHourTerminalFor(4): 2011/11/27 12:34:56.789 to 2011/11/27 04:59:59.999
+     * @param hour The move-to hour. (NotMinus)
+     * @return this.
+     */
     public HandyDate moveToHourTerminalFor(int hour) {
         assertValidHour(hour);
         DfTypeUtil.moveToCalendarHourTerminalFor(_cal, hour);
         return this;
     }
 
+    /**
+     * Move to the hour just noon. <br />
+     * e.g. moveToHourJustNoon(): 2011/11/27 22:34:56.789 to 2011/11/27 12:00:00.000
+     * @return this.
+     */
     public HandyDate moveToHourJustNoon() {
         DfTypeUtil.moveToCalendarHourJustNoon(_cal);
         return this;
@@ -1054,6 +1091,11 @@ public class HandyDate implements Serializable, Cloneable {
     // ===================================================================================
     //                                                                          To Display
     //                                                                          ==========
+    /**
+     * Convert to the display string of the date.
+     * @param pattern The pattern of date, which can be used at java.text.SimpleDateFormat. (NotNull)
+     * @return The display string of the date. (NotNull)
+     */
     public String toDisp(String pattern) {
         return DfTypeUtil.toString(_cal.getTime(), pattern);
     }
