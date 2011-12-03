@@ -23,7 +23,7 @@ import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * The option of from-to for Date type.
+ * The option of from-to scope for Date type.
  * <pre>
  * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
  * 
@@ -286,7 +286,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/04/01 and less-than 2013/04/04
      * </pre>
      * @param yearBeginMonth The date that has the month of year-begin. (NotNull)
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginYear_Month(Date yearBeginMonth) {
         assertPatternOptionValid("beginYear_Month");
@@ -309,7 +309,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/04/01 and less-than 2013/04/04
      * </pre>
      * @param yearBeginMonth The month for year-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginYear_Month(int yearBeginMonth) {
         assertPatternOptionValid("beginYear_Month");
@@ -318,72 +318,120 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    /**
+     * Begin year from January (1st month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month01_January() {
         assertPatternOptionValid("beginYear_Month01_January");
         _yearBeginMonth = 1;
         return this;
     }
 
+    /**
+     * Begin year from February (2nd month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month02_February() {
         assertPatternOptionValid("beginYear_Month02_February");
         _yearBeginMonth = 2;
         return this;
     }
 
+    /**
+     * Begin year from March (3rd month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month03_March() {
         assertPatternOptionValid("beginYear_Month03_March");
         _yearBeginMonth = 3;
         return this;
     }
 
+    /**
+     * Begin year from April (4th month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month04_April() {
         assertPatternOptionValid("beginYear_Month04_April");
         _yearBeginMonth = 4;
         return this;
     }
 
+    /**
+     * Begin year from May (5th month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month05_May() {
         assertPatternOptionValid("beginYear_Month05_May");
         _yearBeginMonth = 5;
         return this;
     }
 
+    /**
+     * Begin year from June (6th month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month06_June() {
         assertPatternOptionValid("beginYear_Month06_June");
         _yearBeginMonth = 6;
         return this;
     }
 
+    /**
+     * Begin year from July (7th month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month07_July() {
         assertPatternOptionValid("beginYear_Month07_July");
         _yearBeginMonth = 7;
         return this;
     }
 
+    /**
+     * Begin year from August (8th month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month08_August() {
         assertPatternOptionValid("beginYear_Month08_August");
         _yearBeginMonth = 8;
         return this;
     }
 
+    /**
+     * Begin year from September (9th month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month09_September() {
         assertPatternOptionValid("beginYear_Month09_September");
         _yearBeginMonth = 9;
         return this;
     }
 
+    /**
+     * Begin year from October (10th month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month10_October() {
         assertPatternOptionValid("beginYear_Month10_October");
         _yearBeginMonth = 10;
         return this;
     }
 
+    /**
+     * Begin year from November (11th month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month11_November() {
         assertPatternOptionValid("beginYear_Month11_November");
         _yearBeginMonth = 11;
         return this;
     }
 
+    /**
+     * Begin year from December (12th month).
+     * @return this. (NotNull)
+     */
     public FromToOption beginYear_Month12_December() {
         assertPatternOptionValid("beginYear_Month12_December");
         _yearBeginMonth = 12;
@@ -402,7 +450,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2010/11/01 and less-than 2012/11/01
      * </pre>
      * @param yearBeginMonth The month of previous year for year-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginYear_PreviousMonth(int yearBeginMonth) {
         assertPatternOptionValid("beginYear_PreviousMonth");
@@ -427,7 +475,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/11/03 and less-than 2012/01/03
      * </pre>
      * @param monthBeginDay The date that has the day of month-begin. (NotNull)
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginMonth_Day(Date monthBeginDay) {
         assertPatternOptionValid("beginMonth_Day");
@@ -450,7 +498,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/11/03 and less-than 2012/01/03
      * </pre>
      * @param monthBeginDay The day for month-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginMonth_Day(int monthBeginDay) {
         assertPatternOptionValid("beginMonth_Day");
@@ -471,7 +519,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/10/25 and less-than 2011/12/25
      * </pre>
      * @param monthBeginDay The day of previous month for month-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginMonth_PreviousDay(int monthBeginDay) {
         assertPatternOptionValid("beginMonth_PreviousDay");
@@ -495,7 +543,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/11/27 06:00:00 and less-than 2011/11/28 06:00:00
      * </pre>
      * @param dayBeginHour The date that has the hour of day-begin. (NotNull)
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginDay_Hour(Date dayBeginHour) {
         assertPatternOptionValid("beginDay_Hour");
@@ -518,7 +566,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/11/27 06:00:00 and less-than 2011/11/28 06:00:00
      * </pre>
      * @param dayBeginHour The day of day-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginDay_Hour(int dayBeginHour) {
         assertPatternOptionValid("beginDay_Hour");
@@ -539,7 +587,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/11/26 22:00:00 and less-than 2011/11/27 22:00:00
      * </pre>
      * @param dayBeginHour The day of day-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginDay_PreviousHour(int dayBeginHour) {
         assertPatternOptionValid("beginDay_PreviousHour");
@@ -562,7 +610,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/11/21 and less-than 2011/12/05
      * </pre>
      * @param weekBeginDayOfWeek The date that has the day of day-of-week-begin. (NotNull)
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
         assertPatternOptionValid("beginWeek_DayOfWeek");
@@ -580,7 +628,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
      *  the condition is: greater-equal 2011/11/20 and less-than 2011/12/04
      * </pre>
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginWeek_DayOfWeek1st_Sunday() {
         assertPatternOptionValid("beginWeek_DayOfWeek1st_Sunday");
@@ -594,33 +642,78 @@ public class FromToOption implements ConditionOption, Serializable {
      *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
      *  the condition is: greater-equal 2011/11/21 and less-than 2011/12/05
      * </pre>
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption beginWeek_DayOfWeek2nd_Monday() {
         assertPatternOptionValid("beginWeek_DayOfWeek2nd_Monday");
         return doBeginWeek(Calendar.MONDAY);
     }
 
+    /**
+     * Begin week from Tuesday.
+     * <pre>
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek3rd_Tuesday()
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/22 and less-than 2011/12/06
+     * </pre>
+     * @return this. (NotNull)
+     */
     public FromToOption beginWeek_DayOfWeek3rd_Tuesday() {
         assertPatternOptionValid("beginWeek_DayOfWeek3rd_Tuesday");
         return doBeginWeek(Calendar.TUESDAY);
     }
 
+    /**
+     * Begin week from Wednesday.
+     * <pre>
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek4th_Wednesday()
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/23 and less-than 2011/12/07
+     * </pre>
+     * @return this. (NotNull)
+     */
     public FromToOption beginWeek_DayOfWeek4th_Wednesday() {
         assertPatternOptionValid("beginWeek_DayOfWeek4th_Wednesday");
         return doBeginWeek(Calendar.WEDNESDAY);
     }
 
+    /**
+     * Begin week from Thursday.
+     * <pre>
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek5th_Thursday()
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/24 and less-than 2011/12/08
+     * </pre>
+     * @return this. (NotNull)
+     */
     public FromToOption beginWeek_DayOfWeek5th_Thursday() {
         assertPatternOptionValid("beginWeek_DayOfWeek5th_Thursday");
         return doBeginWeek(Calendar.THURSDAY);
     }
 
+    /**
+     * Begin week from Friday.
+     * <pre>
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek6th_Friday()
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/18 and less-than 2011/12/02
+     * </pre>
+     * @return this. (NotNull)
+     */
     public FromToOption beginWeek_DayOfWeek6th_Friday() {
         assertPatternOptionValid("beginWeek_DayOfWeek6th_Friday");
         return doBeginWeek(Calendar.FRIDAY);
     }
 
+    /**
+     * Begin week from Saturday.
+     * <pre>
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek7th_Saturday()
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/19 and less-than 2011/12/03
+     * </pre>
+     * @return this. (NotNull)
+     */
     public FromToOption beginWeek_DayOfWeek7th_Saturday() {
         assertPatternOptionValid("beginWeek_DayOfWeek7th_Saturday");
         return doBeginWeek(Calendar.SATURDAY);
@@ -658,7 +751,7 @@ public class FromToOption implements ConditionOption, Serializable {
      *  the condition is: greater-equal 2011/11/26 and less-than 2011/11/29 
      * </pre>
      * @param moveToCount The count to move-to.
-     * @return this.
+     * @return this. (NotNull)
      */
     public FromToOption moveToScope(int moveToCount) {
         assertPatternOptionValid("moveToScope");
@@ -684,12 +777,22 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                               Operand
     //                                               -------
+    /**
+     * Set up operand for to-date as greater-than. <br />
+     * This is for manual adjustment.
+     * @return this. (NotNull)
+     */
     public FromToOption greaterThan() {
         assertNotAdjustmentAfterPattern("greaterThan");
         _greaterThan = true;
         return this;
     }
 
+    /**
+     * Set up operand for to-date as less-than. <br />
+     * This is for manual adjustment.
+     * @return this. (NotNull)
+     */
     public FromToOption lessThan() {
         assertNotAdjustmentAfterPattern("lessThan");
         _lessThan = true;
@@ -1173,7 +1276,11 @@ public class FromToOption implements ConditionOption, Serializable {
     @Override
     public String toString() {
         final String title = DfTypeUtil.toClassTitle(this);
-        return title + ":{greaterThan=" + _greaterThan + ", lessThan=" + _lessThan + ", usePattern=" + _usePattern
-                + "}";
+        final StringBuilder sb = new StringBuilder();
+        sb.append(title);
+        sb.append(":{usePattern=").append(_usePattern);
+        sb.append(", greaterThan=").append(_greaterThan).append(", lessThan=").append(_lessThan);
+        sb.append("}");
+        return sb.toString();
     }
 }

@@ -84,7 +84,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Add years. e.g. addYear(1): 2001/01/01 to <span style="color: #FD4747">2002</span>/01/01
      * @param year The added count of year. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate addYear(int year) {
         DfTypeUtil.addCalendarYear(_cal, year);
@@ -94,7 +94,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Add months. e.g. addMonth(1): 2001/01/01 to 2001/<span style="color: #FD4747">02</span>/01
      * @param month The added count of month. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate addMonth(int month) {
         DfTypeUtil.addCalendarMonth(_cal, month);
@@ -104,7 +104,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Add days. e.g. addDay(1): 2001/01/01 to 2001/01/<span style="color: #FD4747">02<span>
      * @param day The added count of day. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate addDay(int day) {
         DfTypeUtil.addCalendarDay(_cal, day);
@@ -114,7 +114,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Add hours. e.g. addHour(1): 2001/01/01 00:00:00 to 2001/01/02 <span style="color: #FD4747">01</span>:00:00
      * @param hour The added count of hour. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate addHour(int hour) {
         DfTypeUtil.addCalendarHour(_cal, hour);
@@ -124,7 +124,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Add minutes. e.g. addMinute(1): 2001/01/01 00:00:00 to 2001/01/02 00:<span style="color: #FD4747">01</span>:00
      * @param minute The added count of minute. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate addMinute(int minute) {
         DfTypeUtil.addCalendarMinute(_cal, minute);
@@ -134,7 +134,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Add seconds. e.g. addSecond(1): 2001/01/01 00:00:00 to 2001/01/02 00:00:<span style="color: #FD4747">01</span>
      * @param second The added count of second. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate addSecond(int second) {
         DfTypeUtil.addCalendarSecond(_cal, second);
@@ -144,7 +144,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Add milliseconds. e.g. addMillisecond(1): 2001/01/01 00:00:00.000 to 2001/01/02 00:00:00.<span style="color: #FD4747">001</span>
      * @param millisecond The added count of millisecond. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate addMillisecond(int millisecond) {
         DfTypeUtil.addCalendarMillisecond(_cal, millisecond);
@@ -154,7 +154,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Add weeks. e.g. addWeek(1): 2001/01/01 to 2001/01/<span style="color: #FD4747">08</span>
      * @param week The added count of week. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate addWeek(int week) {
         DfTypeUtil.addCalendarWeek(_cal, week);
@@ -175,7 +175,7 @@ public class HandyDate implements Serializable, Cloneable {
      * o moveToYear(-2007): 2001/01/01 to <span style="color: #FD4747">BC2007</span>/01/01
      * </pre>
      * @param year The move-to year. (NotZero, MinusAllowed: if minus, means before Christ)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToYear(int year) {
         DfTypeUtil.moveToCalendarYear(_cal, year);
@@ -185,7 +185,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the year just (beginning). <br />
      * e.g. moveToYearJust(): 2011/11/27 12:34:56.789 to 2011/<span style="color: #FD4747">01/01 00:00:00.000</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToYearJust() {
         DfTypeUtil.moveToCalendarYearJust(_cal, _yearBeginMonth);
@@ -197,7 +197,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the year just (beginning) after the year added. <br />
      * e.g. moveToYearJustAdded(1): 2011/11/27 12:34:56.789 to 2012/01/01 00:00:00.000
      * @param year The count added of year. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToYearJustAdded(int year) {
         DfTypeUtil.moveToCalendarYearJustAdded(_cal, year);
@@ -208,7 +208,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the year just (beginning) after the year moved-to. <br />
      * e.g. moveToYearJustFor(2007): 2011/11/27 12:34:56.789 to 2007/01/01 00:00:00.000
      * @param year The move-to year. (NotZero, MinusAllowed: if minus, means before Christ)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToYearJustFor(int year) {
         DfTypeUtil.moveToCalendarYearJustFor(_cal, year);
@@ -218,7 +218,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the terminal of the year. <br />
      * e.g. moveToYearTerminal(): 2011/11/27 12:34:56.789 to 2011/<span style="color: #FD4747">12/31 23:59:59.999</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToYearTerminal() {
         DfTypeUtil.moveToCalendarYearTerminal(_cal, _yearBeginMonth);
@@ -230,7 +230,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the terminal of the year after the year added. <br />
      * e.g. moveToYearTerminalAdded(1): 2011/11/27 12:34:56.789 to 2012/12/31 23:59:59.999
      * @param year The count added of year. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToYearTerminalAdded(int year) {
         DfTypeUtil.moveToCalendarYearTerminalAdded(_cal, year);
@@ -241,7 +241,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the terminal of the year after the year moved-to. <br />
      * e.g. moveToYearTerminalFor(2007): 2011/11/27 12:34:56.789 to 2007/12/31 23:59:59.999
      * @param year The move-to year. (NotZero, MinusAllowed: if minus, means before Christ)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToYearTerminalFor(int year) {
         DfTypeUtil.moveToCalendarYearTerminalFor(_cal, year);
@@ -255,7 +255,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the specified month. <br />
      * e.g. moveToMonth(9): 2011/11/27 to 2011/<span style="color: #FD4747">09</span>/27
      * @param month The move-to month. (NotZero, NotMinus)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToMonth(int month) {
         assertValidMonth(month);
@@ -266,7 +266,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the month just (beginning). <br />
      * e.g. moveToMonthJust(): 2011/11/27 12:34:56.789 to 2011/11/<span style="color: #FD4747">01 00:00:00.000</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToMonthJust() {
         DfTypeUtil.moveToCalendarMonthJust(_cal, _monthBeginDay);
@@ -278,7 +278,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the month just (beginning) after the month added. <br />
      * e.g. moveToMonthJustAdded(1): 2011/11/27 12:34:56.789 to 2011/12/01 00:00:00.000
      * @param month The count added of month. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToMonthJustAdded(int month) {
         DfTypeUtil.moveToCalendarMonthJustAdded(_cal, month);
@@ -289,7 +289,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the month just (beginning) after the month moved-to. <br />
      * e.g. moveToMonthJustFor(9): 2011/11/27 12:34:56.789 to 2011/09/01 00:00:00.000
      * @param month The move-to month. (NotZero, NotMinus)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToMonthJustFor(int month) {
         assertValidMonth(month);
@@ -300,7 +300,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the terminal of the month. <br />
      * e.g. moveToMonthTerminal(): 2011/11/27 12:34:56.789 to 2011/11/<span style="color: #FD4747">30 23:59:59.999</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToMonthTerminal() {
         DfTypeUtil.moveToCalendarMonthTerminal(_cal, _monthBeginDay);
@@ -312,7 +312,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the terminal of the month after the month added. <br />
      * e.g. moveToMonthTerminalAdded(1): 2011/11/27 12:34:56.789 to 2011/12/31 23:59:59.999
      * @param month The count added of month. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToMonthTerminalAdded(int month) {
         DfTypeUtil.moveToCalendarMonthTerminalAdded(_cal, month);
@@ -323,7 +323,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the terminal of the month after the month moved-to. <br />
      * e.g. moveToMonthTerminalFor(9): 2011/11/27 12:34:56.789 to 2011/09/30 23:59:59.999
      * @param month The move-to month. (NotZero, NotMinus)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToMonthTerminalFor(int month) {
         assertValidMonth(month);
@@ -338,7 +338,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the specified day. <br />
      * e.g. moveToDay(23): 2001/01/16 to 2007/01/<span style="color: #FD4747">23</span>
      * @param day The move-to day. (NotZero, NotMinus)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToDay(int day) {
         assertValidDay(day);
@@ -349,7 +349,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the day just (beginning). <br />
      * e.g. moveToDayJust(): 2011/11/27 12:34:56.789 to 2011/11/27 <span style="color: #FD4747">00:00:00.000</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToDayJust() {
         DfTypeUtil.moveToCalendarDayJust(_cal, _dayBeginHour);
@@ -360,7 +360,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the day just (beginning) after the day added. <br />
      * e.g. moveToDayJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/28 00:00:00.000
      * @param day The count added of day. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToDayJustAdded(int day) {
         DfTypeUtil.moveToCalendarDayJustAdded(_cal, day);
@@ -371,7 +371,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the day just after the day moved-to. <br />
      * e.g. moveToDayJustFor(14): 2011/11/27 12:34:56.789 to 2011/11/14 00:00:00.000
      * @param day The move-to day. (NotZero, NotMinus)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToDayJustFor(int day) {
         assertValidDay(day);
@@ -382,7 +382,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the terminal of the day. <br />
      * e.g. moveToDayTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 <span style="color: #FD4747">23:59:59.999</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToDayTerminal() {
         DfTypeUtil.moveToCalendarDayTerminal(_cal, _dayBeginHour);
@@ -393,7 +393,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the terminal of the day after the day added. <br />
      * e.g. moveToDayJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/28 23:59:59.999
      * @param day The count added of day. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToDayTerminalAdded(int day) {
         DfTypeUtil.moveToCalendarDayTerminalAdded(_cal, day);
@@ -404,7 +404,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the day just after the day moved-to. <br />
      * e.g. moveToDayTerminalFor(14): 2011/11/27 12:34:56.789 to 2011/11/14 23:59:59.999
      * @param day The move-to day. (NotZero, NotMinus)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToDayTerminalFor(int day) {
         assertValidDay(day);
@@ -422,7 +422,7 @@ public class HandyDate implements Serializable, Cloneable {
      * e.g. moveToHour(26): 2011/11/27 00:00:00 to 2007/11/<span style="color: #FD4747">28 02</span>:00:00
      * </pre>
      * @param hour The move-to hour. (NotZero, MinusAllowed)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToHour(int hour) {
         assertValidHour(hour);
@@ -433,7 +433,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the hour just (beginning). <br />
      * e.g. moveToHourJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #FD4747">00:00.000</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToHourJust() {
         DfTypeUtil.moveToCalendarHourJust(_cal);
@@ -444,7 +444,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the hour just (beginning) after the hour added. <br />
      * e.g. moveToHourJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/27 13:00:00.000
      * @param hour The count added of hour. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToHourJustAdded(int hour) {
         DfTypeUtil.moveToCalendarHourJustAdded(_cal, hour);
@@ -455,7 +455,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the hour just (beginning) after the hour moved-to. <br />
      * e.g. moveToHourJustFor(4): 2011/11/27 12:34:56.789 to 2011/11/27 04:00:00.000
      * @param hour The move-to hour. (NotMinus)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToHourJustFor(int hour) {
         assertValidHour(hour);
@@ -466,7 +466,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the terminal of the hour. <br />
      * e.g. moveToHourTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #FD4747">59:59.999</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToHourTerminal() {
         DfTypeUtil.moveToCalendarHourTerminal(_cal);
@@ -477,7 +477,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the terminal of the hour after the hour added. <br />
      * e.g. moveToHourTerminalAdded(1): 2011/11/27 12:34:56.789 to 2011/11/27 13:59:59.999
      * @param hour The count added of hour. (MinusAllowed: if minus, move back)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToHourTerminalAdded(int hour) {
         DfTypeUtil.moveToCalendarHourTerminalAdded(_cal, hour);
@@ -488,7 +488,7 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the terminal of the hour after the hour moved-to. <br />
      * e.g. moveToHourTerminalFor(4): 2011/11/27 12:34:56.789 to 2011/11/27 04:59:59.999
      * @param hour The move-to hour. (NotMinus)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToHourTerminalFor(int hour) {
         assertValidHour(hour);
@@ -499,7 +499,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the hour just noon. <br />
      * e.g. moveToHourJustNoon(): 2011/11/27 22:34:56.789 to 2011/11/27 12:00:00.000
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToHourJustNoon() {
         DfTypeUtil.moveToCalendarHourJustNoon(_cal);
@@ -518,7 +518,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the minute just (beginning). <br />
      * e.g. moveToMinuteJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:<span style="color: #FD4747">00.000</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToMinuteJust() {
         DfTypeUtil.moveToCalendarMinuteJust(_cal);
@@ -536,6 +536,11 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Move to the terminal of the minute. <br />
+     * e.g. moveToMinuteTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:<span style="color: #FD4747">59.999</span>
+     * @return this. (NotNull)
+     */
     public HandyDate moveToMinuteTerminal() {
         DfTypeUtil.moveToCalendarMinuteTerminal(_cal);
         return this;
@@ -564,7 +569,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the second just (beginning). <br />
      * e.g. moveToSecondJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.<span style="color: #FD4747">000</span>
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate moveToSecondJust() {
         DfTypeUtil.moveToCalendarSecondJust(_cal);
@@ -582,6 +587,11 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Move to the terminal of the second. <br />
+     * e.g. moveToSecondTerminal(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.<span style="color: #FD4747">999</span>
+     * @return this. (NotNull)
+     */
     public HandyDate moveToSecondTerminal() {
         DfTypeUtil.moveToCalendarSecondTerminal(_cal);
         return this;
@@ -675,7 +685,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Clear the time parts, hours, minutes, seconds, milliseconds. <br />
      * e.g. clearTimeParts(): 2011/11/27 12:34:56.789 to 2011/11/27 00:00:00.000
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate clearTimeParts() {
         DfTypeUtil.clearCalendarTimeParts(_cal);
@@ -685,7 +695,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Clear the minute with rear parts, minutes, seconds, milliseconds. <br />
      * e.g. clearMinuteWithRear(): 2011/11/27 12:34:56.789 to 2011/11/27 12:00:00.000
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate clearMinuteWithRear() {
         DfTypeUtil.clearCalendarMinuteWithRear(_cal);
@@ -695,7 +705,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Clear the second with rear parts, seconds, milliseconds. <br />
      * e.g. clearSecondWithRear(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:00.000
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate clearSecondWithRear() {
         DfTypeUtil.clearCalendarSecondWithRear(_cal);
@@ -705,7 +715,7 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Clear the millisecond. <br />
      * e.g. clearMillisecond(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.000
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate clearMillisecond() {
         DfTypeUtil.clearCalendarMillisecond(_cal);
@@ -718,6 +728,12 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                          Confirm Year
     //                                          ------------
+    /**
+     * Is the year of this date same as specified year? <br />
+     * e.g. if 2011/11/27, isYear(2011) is true
+     * @param year The integer of year.
+     * @return The determination, true or false.
+     */
     public boolean isYear(int year) {
         return getYear() == year;
     }
@@ -733,6 +749,12 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                         Confirm Month
     //                                         -------------
+    /**
+     * Is the month of this date same as specified month? <br />
+     * e.g. if 2011/11/27, isMonth(11) is true
+     * @param month The integer of month. (1 origin)
+     * @return The determination, true or false.
+     */
     public boolean isMonth(int month) {
         return getMonth() == month; // zero origin headache
     }
@@ -788,14 +810,42 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                           Confirm Day
     //                                           -----------
+    /**
+     * Is the day of this date same as specified day? <br />
+     * e.g. if 2011/11/27, isDay(27) is true
+     * @param day The integer of day.
+     * @return The determination, true or false.
+     */
     public boolean isDay(int day) {
         return getDay() == day;
     }
 
+    /**
+     * Is the day of this date same as first day of the month? <br />
+     * <pre>
+     * e.g.
+     *  2011/11/01: true
+     *  2011/11/02: false
+     *  2011/11/30: false
+     * </pre>
+     * @return The determination, true or false.
+     */
     public boolean isDay_MonthFirstDay() {
         return isDay(_cal.getActualMinimum(Calendar.DAY_OF_MONTH));
     }
 
+    /**
+     * Is the day of this date same as last day of the month? <br />
+     * <pre>
+     * e.g.
+     *  2011/11/01: false
+     *  2011/11/02: false
+     *  2011/11/30: true
+     *  2011/12/30: false
+     *  2011/12/31: true
+     * </pre>
+     * @return The determination, true or false.
+     */
     public boolean isDay_MonthLastDay() {
         return isDay(_cal.getActualMaximum(Calendar.DAY_OF_MONTH));
     }
@@ -818,7 +868,7 @@ public class HandyDate implements Serializable, Cloneable {
      *  (means the date moves to just beginning of the 2011 year)
      * </pre>
      * @param yearBeginMonth The date that has the month of year-begin. (NotNull)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate beginYear_Month(Date yearBeginMonth) {
         assertArgumentNotNull("yearBeginMonth", yearBeginMonth);
@@ -839,7 +889,7 @@ public class HandyDate implements Serializable, Cloneable {
      *  (means the date moves to just beginning of the 2011 year)
      * </pre>
      * @param yearBeginMonth The month for year-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate beginYear_Month(int yearBeginMonth) {
         assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
@@ -847,61 +897,109 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Begin year from January (1st month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month01_January() {
         _yearBeginMonth = 1;
         return this;
     }
 
+    /**
+     * Begin year from February (2nd month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month02_February() {
         _yearBeginMonth = 2;
         return this;
     }
 
+    /**
+     * Begin year from March (3rd month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month03_March() {
         _yearBeginMonth = 3;
         return this;
     }
 
+    /**
+     * Begin year from April (4th month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month04_April() {
         _yearBeginMonth = 4;
         return this;
     }
 
+    /**
+     * Begin year from May (5th month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month05_May() {
         _yearBeginMonth = 5;
         return this;
     }
 
+    /**
+     * Begin year from June (6th month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month06_June() {
         _yearBeginMonth = 6;
         return this;
     }
 
+    /**
+     * Begin year from July (7th month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month07_July() {
         _yearBeginMonth = 7;
         return this;
     }
 
+    /**
+     * Begin year from August (8th month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month08_August() {
         _yearBeginMonth = 8;
         return this;
     }
 
+    /**
+     * Begin year from September (9th month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month09_September() {
         _yearBeginMonth = 9;
         return this;
     }
 
+    /**
+     * Begin year from October (10th month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month10_October() {
         _yearBeginMonth = 10;
         return this;
     }
 
+    /**
+     * Begin year from November (11th month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month11_November() {
         _yearBeginMonth = 11;
         return this;
     }
 
+    /**
+     * Begin year from December (12th month).
+     * @return this. (NotNull)
+     */
     public HandyDate beginYear_Month12_December() {
         _yearBeginMonth = 12;
         return this;
@@ -918,7 +1016,7 @@ public class HandyDate implements Serializable, Cloneable {
      *  (means the date moves to just beginning of the 2011 year)
      * </pre>
      * @param yearBeginMonth The month of previous year for year-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate beginYear_PreviousMonth(int yearBeginMonth) {
         assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
@@ -941,7 +1039,7 @@ public class HandyDate implements Serializable, Cloneable {
      *  (means the date moves to just beginning of 2011/11)
      * </pre>
      * @param monthBeginDay The date that has the day of month-begin. (NotNull)
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate beginMonth_Day(Date monthBeginDay) {
         assertArgumentNotNull("monthBeginDay", monthBeginDay);
@@ -962,7 +1060,7 @@ public class HandyDate implements Serializable, Cloneable {
      *  (means the date moves to just beginning of 2011/11)
      * </pre>
      * @param monthBeginDay The day for month-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate beginMonth_Day(int monthBeginDay) {
         assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
@@ -981,7 +1079,7 @@ public class HandyDate implements Serializable, Cloneable {
      *  (means the date moves to just beginning of 2011/11)
      * </pre>
      * @param monthBeginDay The day of previous month for month-begin.
-     * @return this.
+     * @return this. (NotNull)
      */
     public HandyDate beginMonth_PreviousDay(int monthBeginDay) {
         assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
@@ -992,6 +1090,19 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                             Begin Day
     //                                             ---------
+    /**
+     * Begin day from the specified hour.
+     * <pre>
+     * e.g. beginDay_Hour(toDate("2001/01/01 06:00:00"))
+     *  day is from 06h to 05h of next day
+     *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
+     * 
+     *  if the date is 2011/11/27 00:00:00, moveToDayJust() moves it to 2011/11/27 06:00:00
+     *  (means the date moves to just beginning of 2011/11/27)
+     * </pre>
+     * @param dayBeginHour The date that has the hour of day-begin. (NotNull)
+     * @return this. (NotNull)
+     */
     public HandyDate beginDay_Hour(Date dayBeginHour) {
         assertArgumentNotNull("dayBeginHour", dayBeginHour);
         final Calendar cal = Calendar.getInstance();
@@ -1000,12 +1111,38 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Begin day from the specified hour.
+     * <pre>
+     * e.g. beginDay_Hour(6)
+     *  day is from 06h to 05h of next day
+     *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
+     * 
+     *  if the date is 2011/11/27 00:00:00, moveToDayJust() moves it to 2011/11/27 06:00:00
+     *  (means the date moves to just beginning of 2011/11/27)
+     * </pre>
+     * @param dayBeginHour The day of day-begin.
+     * @return this. (NotNull)
+     */
     public HandyDate beginDay_Hour(int dayBeginHour) {
         assertNotMinusNotOver("dayBeginHour", dayBeginHour, 23);
         _dayBeginHour = dayBeginHour;
         return this;
     }
 
+    /**
+     * Begin day from the specified hour of previous day.
+     * <pre>
+     * e.g. beginDay_PreviousHour(22)
+     *  day is from 22h of previous day to 21h of this day
+     *  (the 2011/11/27 means 2011/11/26 22h to 2011/11/27 21h)
+     * 
+     *  if the date is 2011/11/27 00:00:00, moveToDayJust() moves it to 2011/11/26 22:00:00
+     *  (means the date moves to just beginning of 2011/11/27)
+     * </pre>
+     * @param dayBeginHour The day of day-begin.
+     * @return this. (NotNull)
+     */
     public HandyDate beginDay_PreviousHour(int dayBeginHour) {
         assertNotMinusNotOver("dayBeginHour", dayBeginHour, 23);
         _dayBeginHour = -dayBeginHour; // to be minus
@@ -1015,6 +1152,18 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                            Begin Week
     //                                            ----------
+    /**
+     * Begin week from the specified day of week.
+     * <pre>
+     * e.g. beginWeek_DayOfWeek(toDate("2011/11/28")) *means Monday
+     *  week starts Monday (the 2011/11/27 belongs the week, 2011/11/21 to 2011/11/27)
+     * 
+     *  if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/21
+     *  (means the date moves to just beginning of week containing 2011/11/27)
+     * </pre>
+     * @param weekBeginDayOfWeek The date that has the day of day-of-week-begin. (NotNull)
+     * @return this. (NotNull)
+     */
     public HandyDate beginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
         assertArgumentNotNull("weekBeginDayOfWeek", weekBeginDayOfWeek);
         final Calendar cal = Calendar.getInstance();

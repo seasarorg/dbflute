@@ -23,6 +23,12 @@ import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The option of like search.
+ * <pre>
+ * e.g.
+ *  new LikeSearchOption().likePrefix()  : PrefixSearch
+ *  new LikeSearchOption().likeContain() : ContainSearch
+ *  new LikeSearchOption().likeSuffix()  : SuffixSearch
+ * </pre>
  * @author jflute
  */
 public class LikeSearchOption extends SimpleStringOption {
@@ -97,7 +103,7 @@ public class LikeSearchOption extends SimpleStringOption {
     //                                                                              Escape
     //                                                                              ======
     /**
-     * Escape like search by pipeLine '|'.
+     * Escape like search by pipe-line '|'.
      * @return The option of like search. (NotNull)
      */
     public LikeSearchOption escape() {
