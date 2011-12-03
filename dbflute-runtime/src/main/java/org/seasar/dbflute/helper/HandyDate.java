@@ -183,7 +183,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the year just. <br />
+     * Move to the year just (beginning). <br />
      * e.g. moveToYearJust(): 2011/11/27 12:34:56.789 to 2011/<span style="color: #FD4747">01/01 00:00:00.000</span>
      * @return this.
      */
@@ -194,7 +194,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the year just after the year added. <br />
+     * Move to the year just (beginning) after the year added. <br />
      * e.g. moveToYearJustAdded(1): 2011/11/27 12:34:56.789 to 2012/01/01 00:00:00.000
      * @param year The count added of year. (MinusAllowed: if minus, move back)
      * @return this.
@@ -205,7 +205,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the year just after the year moved-to. <br />
+     * Move to the year just (beginning) after the year moved-to. <br />
      * e.g. moveToYearJustFor(2007): 2011/11/27 12:34:56.789 to 2007/01/01 00:00:00.000
      * @param year The move-to year. (NotZero, MinusAllowed: if minus, means before Christ)
      * @return this.
@@ -264,7 +264,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the month just. <br />
+     * Move to the month just (beginning). <br />
      * e.g. moveToMonthJust(): 2011/11/27 12:34:56.789 to 2011/11/<span style="color: #FD4747">01 00:00:00.000</span>
      * @return this.
      */
@@ -275,7 +275,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the month just after the month added. <br />
+     * Move to the month just (beginning) after the month added. <br />
      * e.g. moveToMonthJustAdded(1): 2011/11/27 12:34:56.789 to 2011/12/01 00:00:00.000
      * @param month The count added of month. (MinusAllowed: if minus, move back)
      * @return this.
@@ -286,7 +286,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the month just after the month moved-to. <br />
+     * Move to the month just (beginning) after the month moved-to. <br />
      * e.g. moveToMonthJustFor(9): 2011/11/27 12:34:56.789 to 2011/09/01 00:00:00.000
      * @param month The move-to month. (NotZero, NotMinus)
      * @return this.
@@ -347,7 +347,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the day just. <br />
+     * Move to the day just (beginning). <br />
      * e.g. moveToDayJust(): 2011/11/27 12:34:56.789 to 2011/11/27 <span style="color: #FD4747">00:00:00.000</span>
      * @return this.
      */
@@ -357,7 +357,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the day just after the day added. <br />
+     * Move to the day just (beginning) after the day added. <br />
      * e.g. moveToDayJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/28 00:00:00.000
      * @param day The count added of day. (MinusAllowed: if minus, move back)
      * @return this.
@@ -431,7 +431,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the hour just. <br />
+     * Move to the hour just (beginning). <br />
      * e.g. moveToHourJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:<span style="color: #FD4747">00:00.000</span>
      * @return this.
      */
@@ -441,7 +441,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the hour just after the hour added. <br />
+     * Move to the hour just (beginning) after the hour added. <br />
      * e.g. moveToHourJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/27 13:00:00.000
      * @param hour The count added of hour. (MinusAllowed: if minus, move back)
      * @return this.
@@ -452,7 +452,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the hour just after the hour moved-to. <br />
+     * Move to the hour just (beginning) after the hour moved-to. <br />
      * e.g. moveToHourJustFor(4): 2011/11/27 12:34:56.789 to 2011/11/27 04:00:00.000
      * @param hour The move-to hour. (NotMinus)
      * @return this.
@@ -516,7 +516,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the minute just. <br />
+     * Move to the minute just (beginning). <br />
      * e.g. moveToMinuteJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:<span style="color: #FD4747">00.000</span>
      * @return this.
      */
@@ -562,7 +562,7 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     /**
-     * Move to the second just. <br />
+     * Move to the second just (beginning). <br />
      * e.g. moveToSecondJust(): 2011/11/27 12:34:56.789 to 2011/11/27 12:34:56.<span style="color: #FD4747">000</span>
      * @return this.
      */
@@ -806,6 +806,20 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                            Begin Year
     //                                            ----------
+    /**
+     * Begin year from the specified month. <br />
+     * The date of argument is used as only the month part.
+     * <pre>
+     * e.g. beginYear_Month(toDate("2001/04/01"))
+     *  year is from 4th month to 3rd month of next year
+     *  (the 2011 year means 2011/04/01 to 2012/03/31)
+     * 
+     *  if the date is 2011/01/01, moveToYearJust() moves it to 2011/04/01
+     *  (means the date moves to just beginning of the 2011 year)
+     * </pre>
+     * @param yearBeginMonth The date that has the month of year-begin. (NotNull)
+     * @return this.
+     */
     public HandyDate beginYear_Month(Date yearBeginMonth) {
         assertArgumentNotNull("yearBeginMonth", yearBeginMonth);
         final Calendar cal = Calendar.getInstance();
@@ -814,6 +828,19 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Begin year from the specified month.
+     * <pre>
+     * e.g. beginYear_Month(4)
+     *  year is from 4th month to 3rd month of next year
+     *  (the 2011 year means 2011/04/01 to 2012/03/31)
+     * 
+     *  if the date is 2011/01/01, moveToYearJust() moves it to 2011/04/01
+     *  (means the date moves to just beginning of the 2011 year)
+     * </pre>
+     * @param yearBeginMonth The month for year-begin.
+     * @return this.
+     */
     public HandyDate beginYear_Month(int yearBeginMonth) {
         assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
         _yearBeginMonth = yearBeginMonth;
@@ -880,6 +907,19 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Begin year from the specified month of previous year.
+     * <pre>
+     * e.g. beginYear_PreviousMonth(11)
+     *  year is from 11th month of previous year to 10th month of this year
+     *  (the 2011 year means 2010/11/01 to 2011/10/31)
+     * 
+     *  if the date is 2011/01/01, moveToYearJust() moves it to 2010/11/01
+     *  (means the date moves to just beginning of the 2011 year)
+     * </pre>
+     * @param yearBeginMonth The month of previous year for year-begin.
+     * @return this.
+     */
     public HandyDate beginYear_PreviousMonth(int yearBeginMonth) {
         assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
         _yearBeginMonth = -yearBeginMonth; // to be minus
@@ -889,6 +929,20 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                           Begin Month
     //                                           -----------
+    /**
+     * Begin month from the specified day. <br />
+     * The date of argument is used as only the day part.
+     * <pre>
+     * e.g. beginMonth_Day(toDate("2001/01/03"))
+     *  month is from 3 day to 2 day of next month
+     *  (the 2011/11 means 2011/11/03 to 2011/12/02)
+     * 
+     *  if the date is 2011/11/01, moveToMonthJust() moves it to 2011/11/03
+     *  (means the date moves to just beginning of 2011/11)
+     * </pre>
+     * @param monthBeginDay The date that has the day of month-begin. (NotNull)
+     * @return this.
+     */
     public HandyDate beginMonth_Day(Date monthBeginDay) {
         assertArgumentNotNull("monthBeginDay", monthBeginDay);
         final Calendar cal = Calendar.getInstance();
@@ -897,12 +951,38 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Begin month from the specified day.
+     * <pre>
+     * e.g. beginMonth_Day(3)
+     *  month is from 3 day to 2 day of next month
+     *  (the 2011/11 means 2011/11/03 to 2011/12/02)
+     * 
+     *  if the date is 2011/11/01, moveToMonthJust() moves it to 2011/11/03
+     *  (means the date moves to just beginning of 2011/11)
+     * </pre>
+     * @param monthBeginDay The day for month-begin.
+     * @return this.
+     */
     public HandyDate beginMonth_Day(int monthBeginDay) {
         assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
         _monthBeginDay = monthBeginDay;
         return this;
     }
 
+    /**
+     * Begin year from the specified day of previous month.
+     * <pre>
+     * e.g. beginMonth_PreviousDay(25)
+     *  month is from 25 day of previous year to 24 day of this month
+     *  (the 2011/11 means 2011/10/25 to 2011/11/24)
+     * 
+     *  if the date is 2011/11/01, moveToMonthJust() moves it to 2011/10/25
+     *  (means the date moves to just beginning of 2011/11)
+     * </pre>
+     * @param monthBeginDay The day of previous month for month-begin.
+     * @return this.
+     */
     public HandyDate beginMonth_PreviousDay(int monthBeginDay) {
         assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
         _monthBeginDay = -monthBeginDay; // to be minus

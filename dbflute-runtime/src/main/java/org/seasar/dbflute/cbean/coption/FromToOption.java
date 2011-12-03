@@ -126,13 +126,18 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                                                  ==================
     /**
      * Compare as year. <br />
+     * The year part of the date is only used.
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{2007/04/10 08:24:53} to:{2008/08/16 14:36:29}
+     * e.g. from:{<span style="color: #FD4747">2007</span>/04/10 08:24:53} to:{<span style="color: #FD4747">2008</span>/08/16 14:36:29}
      * 
      *   new FromToOption().compareAsYear();
      *     --&gt; column &gt;= '2007/01/01 00:00:00'
      *     and column &lt; '2009/01/01 00:00:00'
+     * 
+     *   new FromToOption().compareAsYear().beginYear_Month(4);
+     *     --&gt; column &gt;= '2007/04/01 00:00:00'
+     *     and column &lt; '2009/04/01 00:00:00'
      * </pre>
      * @return this. (NotNull)
      */
@@ -147,13 +152,18 @@ public class FromToOption implements ConditionOption, Serializable {
 
     /**
      * Compare as month. <br />
+     * The year and month parts of the date are only used. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{2007/04/10 08:24:53} to:{2008/08/16 14:36:29}
+     * e.g. from:{<span style="color: #FD4747">2007/04</span>/10 08:24:53} to:{<span style="color: #FD4747">2008/08</span>/16 14:36:29}
      * 
      *   new FromToOption().compareAsMonth();
      *     --&gt; column &gt;= '2007/04/01 00:00:00'
      *     and column &lt; '2008/09/01 00:00:00'
+     * 
+     *   new FromToOption().compareAsMonth().beginMonth_Day(3);
+     *     --&gt; column &gt;= '2007/04/03 00:00:00'
+     *     and column &lt; '2008/09/03 00:00:00'
      * </pre>
      * @return this. (NotNull)
      */
@@ -168,13 +178,18 @@ public class FromToOption implements ConditionOption, Serializable {
 
     /**
      * Compare as date. <br />
+     * The year, month, day parts of the date are only used. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     * e.g. from:{<span style="color: #FD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #FD4747">2007/04/16</span> 14:36:29}
      * 
      *   new FromToOption().compareAsDate();
      *     --&gt; column &gt;= '2007/04/10 00:00:00'
      *     and column &lt; '2007/04/17 00:00:00'
+     * 
+     *   new FromToOption().compareAsDate().beginDay_Hour(6);
+     *     --&gt; column &gt;= '2007/04/10 06:00:00'
+     *     and column &lt; '2007/04/17 06:00:00'
      * </pre>
      * @return this. (NotNull)
      */
@@ -189,9 +204,10 @@ public class FromToOption implements ConditionOption, Serializable {
 
     /**
      * Compare as hour. <br />
+     * The year, month, day, hour parts of the date are only used. <br />
      * This method ignores operand adjustments and other patterns.
      * <pre>
-     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     * e.g. from:{<span style="color: #FD4747">2007/04/10 08</span>:24:53} to:{<span style="color: #FD4747">2007/04/16 14</span>:36:29}
      * 
      *   new FromToOption().compareAsHour();
      *     --&gt; column &gt;= '2007/04/10 08:00:00'
@@ -210,9 +226,11 @@ public class FromToOption implements ConditionOption, Serializable {
 
     /**
      * Compare as week. <br />
-     * This method ignores operand adjustments and other patterns.
+     * The year, month, day parts of the date are only used. <br />
+     * This method ignores operand adjustments and other patterns. <br />
+     * The default beginning day of week is Sunday, but you can change it by beginWeek_DayOfWeek...() methods.
      * <pre>
-     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     * e.g. from:{<span style="color: #FD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #FD4747">2007/04/16</span> 14:36:29}
      * 
      *   new FromToOption().compareAsWeek().beginWeek_DayOfWeek1st_Sunday();
      *     --&gt; column &gt;= '2007/04/08 00:00:00'
@@ -231,9 +249,11 @@ public class FromToOption implements ConditionOption, Serializable {
 
     /**
      * Compare as quarter of year. <br />
-     * This method ignores operand adjustments and other patterns.
+     * The year and month parts of the date are only used. <br />
+     * This method ignores operand adjustments and other patterns. <br />
+     * The default beginning of quarter of year is 1st month, but you can change it by beginYear_Month...() methods.
      * <pre>
-     * e.g. from:{2007/04/10 08:24:53} to:{2008/08/16 14:36:29}
+     * e.g. from:{<span style="color: #FD4747">2007/04</span>/10 08:24:53} to:{<span style="color: #FD4747">2008/08</span>/16 14:36:29}
      * 
      *   new FromToOption().compareAsQuarterOfYear();
      *     --&gt; column &gt;= '2007/04/01 00:00:00'
@@ -255,7 +275,16 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                            ----------
     /**
      * Begin year from the specified month. <br />
-     * e.g. beginYear_Month(toDate("2001/04/01")): year is from 4th month to 3rd month of next year
+     * The date of argument is used as only the month part.
+     * <pre>
+     * e.g. beginYear_Month(toDate("2001/04/01"))
+     *  year is from 4th month to 3rd month of next year
+     *  (the 2011 year means 2011/04/01 to 2012/03/31)
+     * 
+     * e.g. option.compareAsYear().beginYear_Month(toDate("2001/04/01"))
+     *  if from-date is 2011/01/01 and to-date is 2012/01/01 (means 2011, 2012 year are target),
+     *  the condition is: greater-equal 2011/04/01 and less-than 2013/04/04
+     * </pre>
      * @param yearBeginMonth The date that has the month of year-begin. (NotNull)
      * @return this.
      */
@@ -269,9 +298,17 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     /**
-     * Begin year from the specified month. <br />
-     * e.g. beginYear_Month(4): year is from 4th month to 3rd month of next year
-     * @param yearBeginMonth The month of year-begin.
+     * Begin year from the specified month.
+     * <pre>
+     * e.g. beginYear_Month(4)
+     *  year is from 4th month to 3rd month of next year
+     *  (the 2011 year means 2011/04/01 to 2012/03/31)
+     * 
+     * e.g. option.compareAsYear().beginYear_Month(4)
+     *  if from-date is 2011/01/01 and to-date is 2012/01/01 (means 2011, 2012 year are target),
+     *  the condition is: greater-equal 2011/04/01 and less-than 2013/04/04
+     * </pre>
+     * @param yearBeginMonth The month for year-begin.
      * @return this.
      */
     public FromToOption beginYear_Month(int yearBeginMonth) {
@@ -353,6 +390,20 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    /**
+     * Begin year from the specified month of previous year.
+     * <pre>
+     * e.g. beginYear_PreviousMonth(11)
+     *  year is from 11th month of previous year to 10th month of this year
+     *  (the 2011 year means 2010/11/01 to 2011/10/31)
+     * 
+     * e.g. option.compareAsYear().beginYear_PreviousMonth(11)
+     *  if from-date is 2011/01/01 and to-date is 2012/01/01 (means 2011, 2012 year are target),
+     *  the condition is: greater-equal 2010/11/01 and less-than 2012/11/01
+     * </pre>
+     * @param yearBeginMonth The month of previous year for year-begin.
+     * @return this.
+     */
     public FromToOption beginYear_PreviousMonth(int yearBeginMonth) {
         assertPatternOptionValid("beginYear_PreviousMonth");
         assertNotMinusNotOver("yearBeginMonth", yearBeginMonth, 12);
@@ -365,7 +416,16 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                           -----------
     /**
      * Begin month from the specified day. <br />
-     * e.g. beginMonth_Day(toDate("2001/01/03")): month is from 3 day to 2 day of next month
+     * The date of argument is used as only the day part.
+     * <pre>
+     * e.g. beginMonth_Day(toDate("2001/01/03"))
+     *  month is from 3 day to 2 day of next month
+     *  (the 2011/11 means 2011/11/03 to 2011/12/02)
+     * 
+     * e.g. option.compareAsMonth().beginMonth_Day(toDate("2001/01/03"))
+     *  if from-date is 2011/11/01 and to-date is 2011/12/01 (means 11th, 12th months are target),
+     *  the condition is: greater-equal 2011/11/03 and less-than 2012/01/03
+     * </pre>
      * @param monthBeginDay The date that has the day of month-begin. (NotNull)
      * @return this.
      */
@@ -379,9 +439,17 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     /**
-     * Begin month from the specified day. <br />
-     * e.g. beginMonth_Day(3): month is from 3 day to 2 day of next month
-     * @param monthBeginDay The day of month-begin.
+     * Begin month from the specified day.
+     * <pre>
+     * e.g. beginMonth_Day(3)
+     *  month is from 3 day to 2 day of next month
+     *  (the 2011/11 means 2011/11/03 to 2011/12/02)
+     * 
+     * e.g. option.compareAsMonth().beginMonth_Day(3)
+     *  if from-date is 2011/11/01 and to-date is 2011/12/01 (means 11th, 12th months are target),
+     *  the condition is: greater-equal 2011/11/03 and less-than 2012/01/03
+     * </pre>
+     * @param monthBeginDay The day for month-begin.
      * @return this.
      */
     public FromToOption beginMonth_Day(int monthBeginDay) {
@@ -391,6 +459,20 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    /**
+     * Begin year from the specified day of previous month.
+     * <pre>
+     * e.g. beginMonth_PreviousDay(25)
+     *  month is from 25 day of previous year to 24 day of this month
+     *  (the 2011/11 means 2011/10/25 to 2011/11/24)
+     * 
+     * e.g. option.compareAsMonth().beginMonth_PreviousDay(25)
+     *  if from-date is 2011/11/01 and to-date is 2011/12/01 (means 11th, 12th months are target),
+     *  the condition is: greater-equal 2011/10/25 and less-than 2011/12/25
+     * </pre>
+     * @param monthBeginDay The day of previous month for month-begin.
+     * @return this.
+     */
     public FromToOption beginMonth_PreviousDay(int monthBeginDay) {
         assertPatternOptionValid("beginMonth_PreviousDay");
         assertNotMinusNotOver("monthBeginDay", monthBeginDay, 31);
@@ -402,8 +484,16 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                             Begin Day
     //                                             ---------
     /**
-     * Begin day from the specified hour. <br />
-     * e.g. beginDay_Hour(toDate("2001/01/01 06:00:00")): day is from 06h to 05h of next day
+     * Begin day from the specified hour.
+     * <pre>
+     * e.g. beginDay_Hour(toDate("2001/01/01 06:00:00"))
+     *  day is from 06h to 05h of next day
+     *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
+     * 
+     * e.g. option.compareAsDate().beginDay_Hour(toDate("2001/01/01 06:00:00"))
+     *  if from-date is 2011/11/27 and to-date is 2011/11/28 (means 27, 28 days are target),
+     *  the condition is: greater-equal 2011/11/27 06:00:00 and less-than 2011/11/28 06:00:00
+     * </pre>
      * @param dayBeginHour The date that has the hour of day-begin. (NotNull)
      * @return this.
      */
@@ -417,8 +507,16 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     /**
-     * Begin day from the specified hour. <br />
-     * e.g. beginDay_Hour(6): day is from 06h to 05h of next day
+     * Begin day from the specified hour.
+     * <pre>
+     * e.g. beginDay_Hour(6)
+     *  day is from 06h to 05h of next day
+     *  (the 2011/11/27 means 2011/11/27 06h to 2011/11/28 05h)
+     * 
+     * e.g. option.compareAsDate().beginDay_Hour(6)
+     *  if from-date is 2011/11/27 and to-date is 2011/11/28 (means 27, 28 days are target),
+     *  the condition is: greater-equal 2011/11/27 06:00:00 and less-than 2011/11/28 06:00:00
+     * </pre>
      * @param dayBeginHour The day of day-begin.
      * @return this.
      */
@@ -429,6 +527,20 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
+    /**
+     * Begin day from the specified hour of previous day.
+     * <pre>
+     * e.g. beginDay_PreviousHour(22)
+     *  day is from 22h of previous day to 21h of this day
+     *  (the 2011/11/27 means 2011/11/26 22h to 2011/11/27 21h)
+     * 
+     * e.g. option.compareAsDate().beginDay_PreviousHour(22)
+     *  if from-date is 2011/11/27 and to-date is 2011/11/28 (means 27, 28 days are target),
+     *  the condition is: greater-equal 2011/11/26 22:00:00 and less-than 2011/11/27 22:00:00
+     * </pre>
+     * @param dayBeginHour The day of day-begin.
+     * @return this.
+     */
     public FromToOption beginDay_PreviousHour(int dayBeginHour) {
         assertPatternOptionValid("beginDay_PreviousHour");
         assertNotMinusNotOver("dayBeginHour", dayBeginHour, 23);
@@ -439,6 +551,19 @@ public class FromToOption implements ConditionOption, Serializable {
     // -----------------------------------------------------
     //                                            Begin Week
     //                                            ----------
+    /**
+     * Begin week from the specified day of week.
+     * <pre>
+     * e.g. beginWeek_DayOfWeek(toDate("2011/11/28")) *means Monday
+     *  week starts Monday (the 2011/11/27 belongs the week, 2011/11/21 to 2011/11/27)
+     * 
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek(toDate("2011/11/28")) *means Monday
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/21 and less-than 2011/12/05
+     * </pre>
+     * @param weekBeginDayOfWeek The date that has the day of day-of-week-begin. (NotNull)
+     * @return this.
+     */
     public FromToOption beginWeek_DayOfWeek(Date weekBeginDayOfWeek) {
         assertPatternOptionValid("beginWeek_DayOfWeek");
         assertArgumentNotNull("weekBeginDayOfWeek", weekBeginDayOfWeek);
@@ -448,11 +573,29 @@ public class FromToOption implements ConditionOption, Serializable {
         return doBeginWeek(dayOfWeek);
     }
 
+    /**
+     * Begin week from Sunday.
+     * <pre>
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek1st_Sunday()
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/20 and less-than 2011/12/04
+     * </pre>
+     * @return this.
+     */
     public FromToOption beginWeek_DayOfWeek1st_Sunday() {
         assertPatternOptionValid("beginWeek_DayOfWeek1st_Sunday");
         return doBeginWeek(Calendar.SUNDAY);
     }
 
+    /**
+     * Begin week from Monday.
+     * <pre>
+     * e.g. option.compareAsWeek().beginWeek_DayOfWeek2nd_Monday()
+     *  if from-date is 2011/11/24 and to-date is 2011/12/01 (means two weeks are target),
+     *  the condition is: greater-equal 2011/11/21 and less-than 2011/12/05
+     * </pre>
+     * @return this.
+     */
     public FromToOption beginWeek_DayOfWeek2nd_Monday() {
         assertPatternOptionValid("beginWeek_DayOfWeek2nd_Monday");
         return doBeginWeek(Calendar.MONDAY);
@@ -495,10 +638,24 @@ public class FromToOption implements ConditionOption, Serializable {
      * Move to the specified count of scope.
      * <pre>
      * e.g.
-     * compareAsYear().moveToScope(-1): 2011 to 2010
-     * compareAsMonth().moveToScope(-1): 2011/11 to 2011/10
-     * compareAsDate().moveToScope(2): 2011/11/27 to 2011/11/29
-     * compareAsHour().moveToScope(7): 2011/11/27 12h to 2011/11/27 19h
+     *  compareAsYear().moveToScope(-1): 2011 to 2010 year
+     *  compareAsMonth().moveToScope(-1): 11th to 10th month
+     *  compareAsDate().moveToScope(2): 27 to 29 day
+     *  compareAsHour().moveToScope(7): 12 to 19 hour
+     * 
+     * e.g. compareAsDate().moveToScope(-1)
+     *  if both from-date and to-date are 2011/11/27,
+     *  the condition is: greater-equal 2011/11/26 and less-than 2011/11/27
+     * 
+     *  if both from-date is 2011/11/26 and to-date is 2011/11/28,
+     *  the condition is: greater-equal 2011/11/25 and less-than 2011/11/28 
+     * 
+     * e.g. compareAsDate() *normal (no move-to scope)
+     *  if both from-date and to-date are 2011/11/27,
+     *  the condition is: greater-equal 2011/11/27 and less-than 2011/11/28
+     * 
+     *  if both from-date is 2011/11/26 and to-date is 2011/11/28,
+     *  the condition is: greater-equal 2011/11/26 and less-than 2011/11/29 
      * </pre>
      * @param moveToCount The count to move-to.
      * @return this.
