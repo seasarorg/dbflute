@@ -348,8 +348,16 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).isPropertyOptionFromDate(propertyName);
     }
 
+    public boolean isPropertyOptionFromScope(String className, String propertyName) {
+        return findPmbMetaData(className).isPropertyOptionFromScope(propertyName);
+    }
+
     public boolean isPropertyOptionToDate(String className, String propertyName) {
         return findPmbMetaData(className).isPropertyOptionToDate(propertyName);
+    }
+
+    public boolean isPropertyOptionToScope(String className, String propertyName) {
+        return findPmbMetaData(className).isPropertyOptionToScope(propertyName);
     }
 
     // -----------------------------------------------------

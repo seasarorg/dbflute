@@ -598,8 +598,16 @@ public class Database {
         return getPmbBasicHandler().isPropertyOptionFromDate(className, propertyName);
     }
 
+    public boolean isPmbMetaDataPropertyOptionFromScope(String className, String propertyName) {
+        return getPmbBasicHandler().isPropertyOptionFromScope(className, propertyName);
+    }
+
     public boolean isPmbMetaDataPropertyOptionToDate(String className, String propertyName) {
         return getPmbBasicHandler().isPropertyOptionToDate(className, propertyName);
+    }
+
+    public boolean isPmbMetaDataPropertyOptionToScope(String className, String propertyName) {
+        return getPmbBasicHandler().isPropertyOptionToScope(className, propertyName);
     }
 
     // -----------------------------------------------------

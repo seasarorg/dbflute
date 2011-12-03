@@ -327,6 +327,15 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     }
 
 #end
+#if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
+    protected void assertFromToOptionValid(String name, FromToOption option) {
+        if (option == null) {
+            String msg = "The from-to option is required!";
+            throw new RequiredOptionNotFoundException(msg);
+        }
+    }
+
+#end
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -484,6 +493,21 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
         ${variableName} = new FromToOption().compareAsDate().filterFromDate(${argumentName});
     }
 #end
+#if ($database.isPmbMetaDataPropertyOptionFromScope($pmbClassName, $propertyName))
+
+    /**
+     * [set as fromScope] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     * @param ${argumentName}Option The option of from-to scope for ${propertyName}. (NotNull)
+     */
+    public void set${database.initCap($propertyName)}_FromScope(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
+        assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
+        ${variableName} = option.filterFromDate(${argumentName});
+    }
+#end
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
 
     /**
@@ -495,6 +519,21 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
         ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
+
+    /**
+     * [set as toScope] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+#if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
+     * ${database.getPropertyOptionComment($pmbClassName, $propertyName)}
+#end
+     * @param ${argumentName} The value of ${propertyName}. (NullAllowed)
+     * @param ${argumentName}Option The option of from-to scope for ${propertyName}. (NotNull)
+     */
+    public void set${database.initCap($propertyName)}_ToScope(${propertyType} ${argumentName}, FromToOption ${argumentName}Option) {
+        assertFromToOptionValid("${argumentName}Option", ${argumentName}Option);
+        ${variableName} = option.filterToDate(${argumentName});
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))
