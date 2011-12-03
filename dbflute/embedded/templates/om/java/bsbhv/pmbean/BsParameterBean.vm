@@ -521,7 +521,7 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
         ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});
     }
 #end
-#if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionToScope($pmbClassName, $propertyName))
 
     /**
      * [set as toScope] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
