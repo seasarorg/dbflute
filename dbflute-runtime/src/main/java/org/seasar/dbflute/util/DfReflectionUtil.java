@@ -189,20 +189,23 @@ public class DfReflectionUtil {
     protected static Field findField(Class<?> clazz, String fieldName, VisibilityType visibilityType) {
         assertObjectNotNull("clazz", clazz);
         for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
-            final Field[] fields = target.getDeclaredFields();
-            for (int i = 0; i < fields.length; ++i) {
-                final Field current = fields[i];
-                final int modifier = current.getModifiers();
-                if (visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier)) {
-                    continue;
-                }
-                if (visibilityType == VisibilityType.ACCESSIBLE && target != clazz && isDefaultOrPrivate(modifier)) {
-                    continue;
-                }
-                if (fieldName.equals(current.getName())) {
-                    return current; // target class's fields have priority
-                }
+            final Field declaredField;
+            try {
+                declaredField = target.getDeclaredField(fieldName);
+            } catch (SecurityException e) {
+                String msg = "The security violation was found: " + fieldName;
+                throw new IllegalStateException(msg, e);
+            } catch (NoSuchFieldException continued) {
+                continue;
             }
+            final int modifier = declaredField.getModifiers();
+            if (visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier)) {
+                continue;
+            }
+            if (visibilityType == VisibilityType.ACCESSIBLE && target != clazz && isDefaultOrPrivate(modifier)) {
+                continue;
+            }
+            return declaredField;
         }
         return null;
     }
@@ -320,35 +323,23 @@ public class DfReflectionUtil {
     protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes,
             VisibilityType visibilityType) {
         for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
-            final Method[] methods = target.getDeclaredMethods();
-            for (int i = 0; i < methods.length; ++i) {
-                final Method current = methods[i];
-                final int modifier = current.getModifiers();
-                if (visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier)) {
-                    continue;
-                }
-                if (visibilityType == VisibilityType.ACCESSIBLE && target != clazz && isDefaultOrPrivate(modifier)) {
-                    continue;
-                }
-                if (methodName.equals(current.getName())) {
-                    final Class<?>[] types = current.getParameterTypes();
-                    if (argTypes == null) {
-                        if (types.length == 0) {
-                            return current;
-                        }
-                        continue;
-                    }
-                    if (types.length != argTypes.length) {
-                        continue;
-                    }
-                    for (int j = 0; j < types.length; j++) {
-                        if (types[j] != argTypes[j]) {
-                            continue;
-                        }
-                    }
-                    return current;
-                }
+            final Method declaredMethod;
+            try {
+                declaredMethod = target.getDeclaredMethod(methodName, argTypes);
+            } catch (SecurityException e) {
+                String msg = "The security violation was found: " + methodName;
+                throw new IllegalStateException(msg, e);
+            } catch (NoSuchMethodException continued) {
+                continue;
             }
+            final int modifier = declaredMethod.getModifiers();
+            if (visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier)) {
+                continue;
+            }
+            if (visibilityType == VisibilityType.ACCESSIBLE && target != clazz && isDefaultOrPrivate(modifier)) {
+                continue;
+            }
+            return declaredMethod;
         }
         return null;
     }

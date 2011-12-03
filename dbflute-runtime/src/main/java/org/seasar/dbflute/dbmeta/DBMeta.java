@@ -102,7 +102,7 @@ public interface DBMeta {
     //                                                                         Column Info
     //                                                                         ===========
     /**
-     * Has column?
+     * Does this table have the corresponding column?
      * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return The determination, true or false.
      */
@@ -137,13 +137,13 @@ public interface DBMeta {
     UniqueInfo getPrimaryUniqueInfo();
 
     /**
-     * Has primary-key?
+     * Does this table have primary-key?
      * @return The determination, true or false.
      */
     boolean hasPrimaryKey();
 
     /**
-     * Has compound primary-key? <br />
+     * Does this table have compound primary-key? <br />
      * If this table does not have primary-key in the first place,
      * this method returns false. 
      * @return The determination, true or false.
@@ -157,9 +157,10 @@ public interface DBMeta {
     //                                      Relation Element
     //                                      ----------------
     /**
-     * Find relation info.
+     * Find the information of relation.
      * @param relationPropertyName The flexible name of the relation property. (NotNull)
-     * @return Relation info. (NotNull)
+     * @return The information object of relation. (NotNull)
+     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding relation info was not found.
      */
     RelationInfo findRelationInfo(String relationPropertyName);
 
@@ -167,29 +168,31 @@ public interface DBMeta {
     //                                       Foreign Element
     //                                       ---------------
     /**
-     * Has foreign?
-     * @param foreignPropName The flexible name of the foreign property. (NotNull)
+     * Does this table have the corresponding foreign relation?
+     * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return The determination, true or false. (NotNull)
      */
-    boolean hasForeign(String foreignPropName);
+    boolean hasForeign(String foreignPropertyName);
 
     /**
-     * Find foreign DB meta.
-     * @param foreignPropName The flexible name of the foreign property. (NotNull)
-     * @return Foreign DBMeta. (NotNull)
+     * Find the DB meta of foreign relation.
+     * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
+     * @return The DB meta of foreign relation. (NotNull)
+     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
      */
-    DBMeta findForeignDBMeta(String foreignPropName);
+    DBMeta findForeignDBMeta(String foreignPropertyName);
 
     /**
-     * Find foreign info.
-     * @param foreignPropName The flexible name of the foreign property. (NotNull)
-     * @return Foreign info. (NotNull)
+     * Find the information of foreign relation.
+     * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
+     * @return The information object of foreign relation. (NotNull)
+     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
      */
-    ForeignInfo findForeignInfo(String foreignPropName);
+    ForeignInfo findForeignInfo(String foreignPropertyName);
 
     /**
-     * Get the list of foreign information.
-     * @return The list of foreign information. (NotNull)
+     * Get the list of foreign info.
+     * @return The list of foreign info. (NotNull)
      */
     List<ForeignInfo> getForeignInfoList();
 
@@ -197,29 +200,30 @@ public interface DBMeta {
     //                                      Referrer Element
     //                                      ----------------
     /**
-     * Has referrer?
+     * Does this table have the corresponding referrer relation?
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return The determination, true or false. (NotNull)
      */
     boolean hasReferrer(String referrerPropertyName);
 
     /**
-     * Find referrer DB meta.
+     * Find the DB meta of referrer relation.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
-     * @return Referrer DBMeta. (NotNull)
+     * @return The DB meta of referrer relation. (NotNull)
      */
     DBMeta findReferrerDBMeta(String referrerPropertyName);
 
     /**
-     * Find referrer information.
+     * Find the information of referrer relation.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
-     * @return Referrer information. (NotNull)
+     * @return The information object of referrer relation. (NotNull)
+     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding referrer info was not found.
      */
     ReferrerInfo findReferrerInfo(String referrerPropertyName);
 
     /**
-     * Get the list of referrer information.
-     * @return The list of referrer information. (NotNull)
+     * Get the list of referrer info.
+     * @return The list of referrer info. (NotNull)
      */
     List<ReferrerInfo> getReferrerInfoList();
 
@@ -252,7 +256,7 @@ public interface DBMeta {
     //                                                                       Identity Info
     //                                                                       =============
     /**
-     * Has identity?
+     * Does this table have identity?
      * @return The determination, true or false.
      */
     boolean hasIdentity();
@@ -261,7 +265,7 @@ public interface DBMeta {
     //                                                                       Sequence Info
     //                                                                       =============
     /**
-     * Has sequence?
+     * Does this table have sequence?
      * @return The determination, true or false.
      */
     boolean hasSequence();
@@ -358,6 +362,7 @@ public interface DBMeta {
      * Find DB name by flexible name. {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return The DB name of anything. (NotNull and NotEmpty)
+     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
      */
     String findDbName(String flexibleName);
 
@@ -365,6 +370,7 @@ public interface DBMeta {
      * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return The DB name of anything. (NotNull and NotEmpty)
+     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
      */
     String findPropertyName(String flexibleName);
 
@@ -457,7 +463,7 @@ public interface DBMeta {
     //                                                               =====================
     // It's very INTERNAL!
     /**
-     * Has the set-upper of entity property by the name of property? <br />
+     * Does this table have the set-upper of entity property by the name of property? <br />
      * Comparing is so flexible. {Ignore cases and underscore}
      * @param propertyName The name of the property. (NotNull)
      * @return The determination, true or false.

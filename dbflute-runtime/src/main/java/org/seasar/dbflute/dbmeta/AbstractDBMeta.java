@@ -38,6 +38,7 @@ import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
+import org.seasar.dbflute.exception.DBMetaNotFoundException;
 import org.seasar.dbflute.exception.IllegalClassificationCodeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -81,9 +82,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     private volatile List<ReferrerInfo> _referrerInfoList;
     private volatile StringKeyMap<ReferrerInfo> _referrerInfoFlexibleMap;
 
-    // lazy-initialized at hasMethod()
-    private final Map<String, Object> _methodNameMap = newHashMap();
-
     // ===================================================================================
     //                                                             Resource Initialization
     //                                                             =======================
@@ -107,9 +105,6 @@ public abstract class AbstractDBMeta implements DBMeta {
         //getForeignInfoFlexibleMap();
         //getReferrerInfoList();
         //getReferrerInfoFlexibleMap();
-
-        // Initialize the map of (public)method name. 
-        hasMethod("dummy");
     }
 
     // ===================================================================================
@@ -181,9 +176,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final ColumnInfo columnInfo = getColumnInfoFlexibleMap().get(columnFlexibleName);
         if (columnInfo == null) {
-            String msg = "Not found column by columnFlexibleName: " + columnFlexibleName;
-            msg = msg + " tableName=" + getTableDbName();
-            throw new IllegalArgumentException(msg);
+            throwDBMetaNotFoundException("The column info was not found.", "Column", columnFlexibleName);
         }
         return columnInfo;
     }
@@ -266,8 +259,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                       Relation Info
     //                                                                       =============
     /**
-     * @param relationPropertyName The flexible name of the relation property. (NotNull)
-     * @return The information of relation. (NotNull)
+     * {@inheritDoc}
      */
     public RelationInfo findRelationInfo(String relationPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
@@ -283,8 +275,7 @@ public abstract class AbstractDBMeta implements DBMeta {
      */
     public boolean hasForeign(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
-        return hasMethod(methodName);
+        return getForeignInfoFlexibleMap().containsKey(foreignPropertyName);
     }
 
     /**
@@ -299,9 +290,11 @@ public abstract class AbstractDBMeta implements DBMeta {
      */
     public ForeignInfo findForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
-        final Method method = DfReflectionUtil.getPublicMethod(getClass(), methodName, null);
-        return (ForeignInfo) DfReflectionUtil.invoke(method, this, null);
+        final ForeignInfo foreignInfo = getForeignInfoFlexibleMap().get(foreignPropertyName);
+        if (foreignInfo == null) {
+            throwDBMetaNotFoundException("The foreign info was not found.", "Foreign Property", foreignPropertyName);
+        }
+        return foreignInfo;
     }
 
     // createForeignInfo()
@@ -339,7 +332,7 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * Get the flexible map of foreign information.
-     * @return The flexible map of foreign information. (NotNull, NotEmpty)
+     * @return The flexible map of foreign information. (NotNull)
      */
     protected Map<String, ForeignInfo> getForeignInfoFlexibleMap() {
         if (_foreignInfoFlexibleMap != null) {
@@ -362,18 +355,15 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                      Referrer Element
     //                                      ----------------
     /**
-     * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
-     * @return The determination, true or false. (NotNull)
+     * {@inheritDoc}
      */
     public boolean hasReferrer(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
-        final String methodName = buildRelationInfoGetterMethodNameInitCap("referrer", referrerPropertyName);
-        return hasMethod(methodName);
+        return getReferrerInfoFlexibleMap().containsKey(referrerPropertyName);
     }
 
     /**
-     * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
-     * @return Referrer DBMeta. (NotNull)
+     * {@inheritDoc}
      */
     public DBMeta findReferrerDBMeta(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
@@ -381,14 +371,15 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-     * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
-     * @return Referrer information. (NotNull)
+     * {@inheritDoc}
      */
     public ReferrerInfo findReferrerInfo(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
-        final String methodName = buildRelationInfoGetterMethodNameInitCap("referrer", referrerPropertyName);
-        final Method method = DfReflectionUtil.getPublicMethod(getClass(), methodName, null);
-        return (ReferrerInfo) DfReflectionUtil.invoke(method, this, null);
+        final ReferrerInfo referrerInfo = getReferrerInfoFlexibleMap().get(referrerPropertyName);
+        if (referrerInfo == null) {
+            throwDBMetaNotFoundException("The referrer info was not found.", "Referrer Property", referrerPropertyName);
+        }
+        return referrerInfo;
     }
 
     protected ReferrerInfo cri(String propName, DBMeta localDbm, DBMeta referrerDbm,
@@ -422,7 +413,7 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * Get the flexible map of referrer information.
-     * @return The flexible map of referrer information. (NotNull, NotEmpty)
+     * @return The flexible map of referrer information. (NotNull)
      */
     protected Map<String, ReferrerInfo> getReferrerInfoFlexibleMap() {
         if (_referrerInfoFlexibleMap != null) {
@@ -632,8 +623,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (tableDbName != null) {
             return tableDbName;
         }
-        String msg = "Not found DB name by the flexible name: flexibleName=" + flexibleName;
-        throw new IllegalArgumentException(msg);
+        throwDBMetaNotFoundException("The DB name was not found.", "Flexible Name", flexibleName);
+        return null; // unreachable
     }
 
     /**
@@ -649,8 +640,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (tablePropertyName != null) {
             return tablePropertyName;
         }
-        String msg = "Not found property name by the flexible name: flexibleName=" + flexibleName;
-        throw new IllegalArgumentException(msg);
+        throwDBMetaNotFoundException("The property name was not found.", "Flexible Name", flexibleName);
+        return null; // unreachable
     }
 
     // ===================================================================================
@@ -976,6 +967,17 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
+    protected void throwDBMetaNotFoundException(String notice, String keyName, String value) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Table");
+        br.addElement(getTableDbName());
+        br.addItem(keyName);
+        br.addElement(value);
+        final String msg = br.buildExceptionMessage();
+        throw new DBMetaNotFoundException(msg);
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
@@ -1043,34 +1045,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {
         return new ArrayList<ELEMENT>(collection);
-    }
-
-    // -----------------------------------------------------
-    //                                   Reflection Handling
-    //                                   -------------------
-    /**
-     * Does it have the method?
-     * @param methodName The name of method. (NotNull, NotEmpty, PublicMethodOnly)
-     * @return The determination, true or false.
-     */
-    protected boolean hasMethod(String methodName) {
-        assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
-        if (_methodNameMap.containsKey(methodName)) {
-            return true;
-        }
-        synchronized (_methodNameMap) {
-            if (!_methodNameMap.isEmpty()) {
-                // previous thread might have initialized
-                // or reading might failed by same-time writing
-                return _methodNameMap.containsKey(methodName);
-            }
-            // initialize all methods
-            final Method[] methods = this.getClass().getMethods();
-            for (Method method : methods) {
-                _methodNameMap.put(method.getName(), DUMMY_VALUE);
-            }
-            return _methodNameMap.containsKey(methodName);
-        }
     }
 
     // -----------------------------------------------------
