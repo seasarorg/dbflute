@@ -96,7 +96,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     // -----------------------------------------------------
     //                                              Internal
     //                                              --------
-    /** The modified properties for this entity. */
+    /** The modified properties for this entity. (NotNull) */
     protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
 #if ($table.hasAllCommonColumn())
 
@@ -369,7 +369,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
     public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
-        if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
+        if (${referrerVariableName} == null) { ${referrerVariableName} = newReferrerList(); }
         return ${referrerVariableName};
     }
 
@@ -389,7 +389,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     public List<${referrerEntityClassName}> getBuriAllRoundStateHistory_${processName}List() {
-        if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
+        if (${referrerVariableName} == null) { ${referrerVariableName} = newReferrerList(); }
         return ${referrerVariableName};
     }
 
@@ -446,6 +446,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
 #end
 #end
+##
+## it uses List and ArrayList to be able to specify detail import clause
+##
+    protected <ELEMENT> List<ELEMENT> newReferrerList() {
+        return new ArrayList<ELEMENT>();
+    }
+
     // ===================================================================================
     //                                                                 Modified Properties
     //                                                                 ===================
@@ -571,19 +578,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         if (${foreignVariableName} != null)
         { sb.append(l).append(xbRDS(${foreignVariableName}, "${fk.foreignPropertyName}")); }
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
         if (${referrerVariableName} != null)
         { sb.append(l).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
 #end
-#end
-#foreach ($referrer in $table.referrers)
-#if (!${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         if (${referrerVariableName} != null) { for (Entity e : ${referrerVariableName})
         { if (e != null) { sb.append(l).append(xbRDS(e, "${referrer.referrerPropertyName}")); } } }
-#end
 #end
 #end
         return sb.toString();
@@ -610,24 +613,17 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return sb.toString();
     }
     protected String buildColumnString() {
-##
-## it uses List to be able to specify detail import clause
-##
-        List<Object> valueList = new ArrayList<Object>();
-#foreach ($col in $table.columns)
-#if ($col.isJavaNativeUtilDate())
-        valueList.add(xfUD(get${col.javaName}()));
-#elseif ($col.isJavaNativeByteArray())
-        valueList.add(xfBA(get${col.javaName}()));
-#else
-        valueList.add(get${col.javaName}());
-#end
-#end
         StringBuilder sb = new StringBuilder();
         String delimiter = ", ";
-        for (Object value : valueList) {
-            sb.append(delimiter).append(value);
-        }
+#foreach ($col in $table.columns)
+#if ($col.isJavaNativeUtilDate())
+        sb.append(delimiter).append(xfUD(get${col.javaName}()));
+#elseif ($col.isJavaNativeByteArray())
+        sb.append(delimiter).append(xfBA(get${col.javaName}()));
+#else
+        sb.append(delimiter).append(get${col.javaName}());
+#end
+#end
         if (sb.length() > delimiter.length()) {
             sb.delete(0, delimiter.length());
         }
@@ -659,18 +655,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
         if (${foreignVariableName} != null) { sb.append(c).append("${fk.foreignPropertyName}"); }
 #end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
         if (${referrerVariableName} != null) { sb.append(c).append("${referrer.referrerPropertyNameAsOne}"); }
 #end
-#end
-#foreach ($referrer in $table.referrers)
-#if (!${referrer.isOneToOne()})
+#foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         if (${referrerVariableName} != null && !${referrerVariableName}.isEmpty())
         { sb.append(c).append("${referrer.referrerPropertyName}"); }
-#end
 #end
         if (sb.length() > c.length()) {
             sb.delete(0, c.length()).insert(0, "(").append(")");
@@ -682,7 +674,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
-     * Clone entity instance using super.clone(). 
+     * Clone entity instance using super.clone(). (shallow copy) 
      * @return The cloned instance of this entity. (NotNull)
      */
     public ${myExtendedObjectClassName} clone() {
