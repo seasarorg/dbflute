@@ -519,24 +519,24 @@ public class DfPmbMetaData {
     }
 
     public boolean hasPropertyOptionAnyFromTo(String propertyName) {
-        return isPropertyOptionFromDate(propertyName) || isPropertyOptionFromScope(propertyName)
-                || isPropertyOptionToDate(propertyName) || isPropertyOptionToScope(propertyName);
+        return isPropertyOptionFromDate(propertyName) || isPropertyOptionFromDateOption(propertyName)
+                || isPropertyOptionToDate(propertyName) || isPropertyOptionToDateOption(propertyName);
     }
 
     public boolean isPropertyOptionFromDate(String propertyName) {
         return containsPropertyOption(propertyName, "fromDate");
     }
 
-    public boolean isPropertyOptionFromScope(String propertyName) {
-        return containsPropertyOption(propertyName, "fromScope");
+    public boolean isPropertyOptionFromDateOption(String propertyName) {
+        return containsPropertyOption(propertyName, "fromDate(option)");
     }
 
     public boolean isPropertyOptionToDate(String propertyName) {
         return containsPropertyOption(propertyName, "toDate");
     }
 
-    public boolean isPropertyOptionToScope(String propertyName) {
-        return containsPropertyOption(propertyName, "toScope");
+    public boolean isPropertyOptionToDateOption(String propertyName) {
+        return containsPropertyOption(propertyName, "toDate(option)");
     }
 
     // -----------------------------------------------------
