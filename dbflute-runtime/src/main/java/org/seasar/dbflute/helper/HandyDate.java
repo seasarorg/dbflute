@@ -27,7 +27,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.9.9.2A (2011/11/17 Thursday)
  */
-public class HandyDate implements Serializable, Cloneable {
+public class HandyDate implements Serializable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -42,6 +42,8 @@ public class HandyDate implements Serializable, Cloneable {
     protected int _monthBeginDay = _cal.getActualMinimum(Calendar.DAY_OF_MONTH); // as default
     protected int _dayBeginHour = _cal.getActualMinimum(Calendar.HOUR_OF_DAY); // as default
     protected int _weekBeginDay = Calendar.SUNDAY; // as default
+
+    // *you should also fix clone() when you add attributes 
 
     // ===================================================================================
     //                                                                         Constructor
@@ -1769,24 +1771,6 @@ public class HandyDate implements Serializable, Cloneable {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
-    /**
-     * Clone date instance using super.clone(). 
-     * @return The cloned instance of this date. (NotNull)
-     */
-    public HandyDate clone() {
-        try {
-            return (HandyDate) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new IllegalStateException("Failed to clone the handy date: " + toString(), e);
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        final String pattern = getBasicPattern();
-        return pattern.hashCode();
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof HandyDate) {
@@ -1796,6 +1780,12 @@ public class HandyDate implements Serializable, Cloneable {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        final String pattern = getBasicPattern();
+        return pattern.hashCode();
     }
 
     @Override
@@ -1809,5 +1799,28 @@ public class HandyDate implements Serializable, Cloneable {
         } else {
             return "yyyy/MM/dd HH:mm:ss.SSS";
         }
+    }
+
+    // *clone() is very hard to use (final field problem)
+
+    /**
+     * Copy this date deeply. (original method)
+     * @return The copy instance of this date. (NotNull)
+     */
+    public HandyDate deepCopy() {
+        final HandyDate cloned = newCopyInstance();
+        cloned._yearBeginMonth = _yearBeginMonth;
+        cloned._monthBeginDay = _monthBeginDay;
+        cloned._dayBeginHour = _dayBeginHour;
+        cloned._weekBeginDay = _weekBeginDay;
+        return cloned;
+    }
+
+    /**
+     * Create new instance for copy.
+     * @return The new instance of this date. (NotNull)
+     */
+    protected HandyDate newCopyInstance() {
+        return new HandyDate(getDate());
     }
 }

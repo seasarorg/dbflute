@@ -95,15 +95,15 @@ public interface Entity {
         /** Serial version UID. (Default) */
         private static final long serialVersionUID = 1L;
 
-        /** Set of properties. */
-        protected final Set<String> _propertiesSet = new LinkedHashSet<String>();
+        /** The set of property names. */
+        protected final Set<String> _propertyNameSet = new LinkedHashSet<String>();
 
         /**
          * Add property name. (according to Java Beans rule)
          * @param propertyName The string for name. (NotNull)
          */
         public void addPropertyName(String propertyName) {
-            _propertiesSet.add(propertyName);
+            _propertyNameSet.add(propertyName);
         }
 
         /**
@@ -111,7 +111,7 @@ public interface Entity {
          * @return The set of properties. (NotNull)
          */
         public Set<String> getPropertyNames() {
-            return _propertiesSet;
+            return _propertyNameSet;
         }
 
         /**
@@ -119,14 +119,14 @@ public interface Entity {
          * @return The determination, true or false.
          */
         public boolean isEmpty() {
-            return _propertiesSet.isEmpty();
+            return _propertyNameSet.isEmpty();
         }
 
         /**
          * Clear the set of properties.
          */
         public void clear() {
-            _propertiesSet.clear();
+            _propertyNameSet.clear();
         }
 
         /**
@@ -134,7 +134,18 @@ public interface Entity {
          * @param propertyName The string for name. (NotNull)
          */
         public void remove(String propertyName) {
-            _propertiesSet.remove(propertyName);
+            _propertyNameSet.remove(propertyName);
+        }
+
+        /**
+         * Accept specified properties. (after clearing this properties)
+         * @param properties The properties as copy-resource. (NotNull)
+         */
+        public void accept(EntityModifiedProperties properties) {
+            clear();
+            for (String propertyName : properties.getPropertyNames()) {
+                addPropertyName(propertyName);
+            }
         }
     }
 

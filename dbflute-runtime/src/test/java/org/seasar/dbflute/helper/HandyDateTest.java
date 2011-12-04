@@ -186,13 +186,13 @@ public class HandyDateTest extends PlainTestCase {
         date.beginYear_Month02_February().beginMonth_Day(3).beginDay_Hour(4);
 
         // ## Act & Assert ##
-        assertEquals(handy("2011/02/03 04:00:00.000"), date.clone().moveToYearJust());
+        assertEquals(handy("2011/02/03 04:00:00.000"), date.moveToYearJust());
         date.beginDay_PreviousHour(22);
-        assertEquals(handy("2011/02/02 22:00:00.000"), date.clone().moveToYearJust());
+        assertEquals(handy("2011/02/02 22:00:00.000"), date.moveToYearJust());
         date.beginMonth_PreviousDay(25);
-        assertEquals(handy("2011/01/24 22:00:00.000"), date.clone().moveToYearJust());
+        assertEquals(handy("2011/01/24 22:00:00.000"), date.moveToYearJust());
         date.beginYear_PreviousMonth(11);
-        assertEquals(handy("2010/10/24 22:00:00.000"), date.clone().moveToYearJust());
+        assertEquals(handy("2010/10/24 22:00:00.000"), date.moveToYearJust());
     }
 
     public void test_moveTo_related_quarterOfYear() throws Exception {
@@ -362,6 +362,30 @@ public class HandyDateTest extends PlainTestCase {
         assertFalse(handy("2011/03/14 00:00:00").isDay_MonthLastDay());
         assertFalse(handy("2011/03/30 00:00:00").isDay_MonthLastDay());
         assertTrue(handy("2011/03/31 00:00:00").isDay_MonthLastDay());
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    public void test_deepCopy_basic() throws Exception {
+        // ## Arrange ##
+        String pattern = "yyyy/MM/dd";
+        HandyDate date = handy("2011/01/01");
+        date.beginMonth_Day(10);
+
+        // ## Act ##
+        HandyDate copy = date.deepCopy();
+
+        // ## Assert ##
+        copy.addDay(1);
+        assertEquals("2011/01/02", copy.toDisp(pattern));
+        assertEquals("2011/01/01", date.toDisp(pattern));
+
+        copy.moveToMonthJust();
+        assertEquals("2011/01/10", copy.toDisp(pattern));
+        assertEquals("2011/01/01", date.toDisp(pattern));
+        date.moveToMonthJust();
+        assertEquals("2011/01/10", date.toDisp(pattern));
     }
 
     // ===================================================================================
