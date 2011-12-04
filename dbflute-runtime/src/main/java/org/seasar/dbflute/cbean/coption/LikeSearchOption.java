@@ -52,6 +52,24 @@ public class LikeSearchOption extends SimpleStringOption {
     protected List<String> _originalWildCardList;
 
     // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Construct the option of like search normally.
+     * <pre>
+     * e.g.
+     *  new LikeSearchOption().likePrefix()  : PrefixSearch
+     *  new LikeSearchOption().likeContain() : ContainSearch
+     *  new LikeSearchOption().likeSuffix()  : SuffixSearch
+     * 
+     *  new LikeSearchOption().likeContain().splitByBlank()
+     *  new LikeSearchOption().likeContain().splitByBlank().asOrSplit()
+     * </pre>
+     */
+    public LikeSearchOption() {
+    }
+
+    // ===================================================================================
     //                                                                         Rear Option
     //                                                                         ===========
     @Override
@@ -140,6 +158,21 @@ public class LikeSearchOption extends SimpleStringOption {
     //                                                                               =====
     /**
      * Split a value as several condition by blank (space, full-width space, tab, CR, LF).
+     * <pre>
+     * e.g. 'and' condition
+     * LikeSearchOption option = new LikeSearchOption();
+     * option.likeContain().splitByBlank();
+     * cb.query().setFoo_ContainSearch("ab g kl", option);
+     * // FOO like '%ab%' and FOO like '%g%' and FOO like '%kl%'
+     * // (all conditions have escape statements)
+     * 
+     * e.g. 'or' condition
+     * LikeSearchOption option = new LikeSearchOption();
+     * option.likeContain().splitByBlank().asOrSplit();
+     * cb.query().setFoo_ContainSearch("ab g kl", option);
+     * // FOO like '%ab%' or FOO like '%g%' or FOO like '%kl%'
+     * // (conditions have escape statements)
+     * </pre>
      * @return this.
      */
     public LikeSearchOption splitByBlank() {

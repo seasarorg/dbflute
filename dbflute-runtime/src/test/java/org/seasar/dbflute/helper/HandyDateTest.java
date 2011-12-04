@@ -207,8 +207,127 @@ public class HandyDateTest extends PlainTestCase {
     }
 
     // ===================================================================================
-    //                                                                        Confirm Date
+    //                                                                        Compare Date
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                            Match Date
+    //                                            ----------
+    public void test_isMatch() throws Exception {
+        assertTrue(handy("2011/11/27").isMatch(toDate("2011/11/27")));
+        assertFalse(handy("2011/11/27").isMatch(toDate("2011/11/28")));
+        assertTrue(handy("2011/11/27").isMatch(toDate("2011/11/27 00:00:00.000")));
+        assertFalse(handy("2011/11/27").isMatch(toDate("2011/11/27 00:00:00.001")));
+    }
+
+    // -----------------------------------------------------
+    //                                          Greater Date
+    //                                          ------------
+    public void test_isGreaterThan() throws Exception {
+        assertTrue(handy("2011/11/27").isGreaterThan(toDate("2011/11/24")));
+        assertFalse(handy("2011/11/27").isGreaterThan(toDate("2011/11/27")));
+        assertFalse(handy("2011/11/27").isGreaterThan(toDate("2011/11/28")));
+        assertTrue(handy("2011/11/27 12:34:56.789").isGreaterThan(toDate("2011/11/27 12:34:56.788")));
+        assertFalse(handy("2011/11/27 12:34:56.789").isGreaterThan(toDate("2011/11/27 12:34:56.789")));
+        assertFalse(handy("2011/11/27 12:34:56.789").isGreaterThan(toDate("2011/11/27 12:34:56.790")));
+    }
+
+    public void test_isGreaterThanAll() throws Exception {
+        assertTrue(handy("2011/11/27").isGreaterThanAll(toDate("2011/11/24"), toDate("2011/11/26")));
+        assertFalse(handy("2011/11/27").isGreaterThanAll(toDate("2011/11/24"), toDate("2011/11/27")));
+        assertFalse(handy("2011/11/27").isGreaterThanAll(toDate("2011/11/24"), toDate("2011/11/28")));
+        assertFalse(handy("2011/11/27").isGreaterThanAll(toDate("2011/11/27"), toDate("2011/11/29")));
+        assertFalse(handy("2011/11/27").isGreaterThanAll(toDate("2011/11/28"), toDate("2011/11/29")));
+    }
+
+    public void test_isGreaterThanAny() throws Exception {
+        assertTrue(handy("2011/11/27").isGreaterThanAny(toDate("2011/11/24"), toDate("2011/11/26")));
+        assertTrue(handy("2011/11/27").isGreaterThanAny(toDate("2011/11/24"), toDate("2011/11/27")));
+        assertTrue(handy("2011/11/27").isGreaterThanAny(toDate("2011/11/24"), toDate("2011/11/28")));
+        assertFalse(handy("2011/11/27").isGreaterThanAny(toDate("2011/11/27"), toDate("2011/11/29")));
+        assertFalse(handy("2011/11/27").isGreaterThanAny(toDate("2011/11/28"), toDate("2011/11/29")));
+    }
+
+    public void test_isGreaterEqual() throws Exception {
+        assertTrue(handy("2011/11/27").isGreaterEqual(toDate("2011/11/24")));
+        assertTrue(handy("2011/11/27").isGreaterEqual(toDate("2011/11/27")));
+        assertFalse(handy("2011/11/27").isGreaterEqual(toDate("2011/11/28")));
+        assertTrue(handy("2011/11/27 12:34:56.789").isGreaterEqual(toDate("2011/11/27 12:34:56.788")));
+        assertTrue(handy("2011/11/27 12:34:56.789").isGreaterEqual(toDate("2011/11/27 12:34:56.789")));
+        assertFalse(handy("2011/11/27 12:34:56.789").isGreaterEqual(toDate("2011/11/27 12:34:56.790")));
+    }
+
+    public void test_isGreaterEqualAll() throws Exception {
+        assertTrue(handy("2011/11/27").isGreaterEqualAll(toDate("2011/11/24"), toDate("2011/11/26")));
+        assertTrue(handy("2011/11/27").isGreaterEqualAll(toDate("2011/11/24"), toDate("2011/11/27")));
+        assertFalse(handy("2011/11/27").isGreaterEqualAll(toDate("2011/11/24"), toDate("2011/11/28")));
+        assertFalse(handy("2011/11/27").isGreaterEqualAll(toDate("2011/11/27"), toDate("2011/11/29")));
+        assertFalse(handy("2011/11/27").isGreaterEqualAll(toDate("2011/11/28"), toDate("2011/11/29")));
+    }
+
+    public void test_isGreaterEqualAny() throws Exception {
+        assertTrue(handy("2011/11/27").isGreaterEqualAny(toDate("2011/11/24"), toDate("2011/11/26")));
+        assertTrue(handy("2011/11/27").isGreaterEqualAny(toDate("2011/11/24"), toDate("2011/11/27")));
+        assertTrue(handy("2011/11/27").isGreaterEqualAny(toDate("2011/11/24"), toDate("2011/11/28")));
+        assertTrue(handy("2011/11/27").isGreaterEqualAny(toDate("2011/11/27"), toDate("2011/11/29")));
+        assertFalse(handy("2011/11/27").isGreaterEqualAny(toDate("2011/11/28"), toDate("2011/11/29")));
+    }
+
+    // -----------------------------------------------------
+    //                                             Less Date
+    //                                             ---------
+    public void test_isLessThan() throws Exception {
+        assertFalse(handy("2011/11/27").isLessThan(toDate("2011/11/24")));
+        assertFalse(handy("2011/11/27").isLessThan(toDate("2011/11/27")));
+        assertTrue(handy("2011/11/27").isLessThan(toDate("2011/11/28")));
+        assertFalse(handy("2011/11/27 12:34:56.789").isLessThan(toDate("2011/11/27 12:34:56.788")));
+        assertFalse(handy("2011/11/27 12:34:56.789").isLessThan(toDate("2011/11/27 12:34:56.789")));
+        assertTrue(handy("2011/11/27 12:34:56.789").isLessThan(toDate("2011/11/27 12:34:56.790")));
+    }
+
+    public void test_isLessThanAll() throws Exception {
+        assertFalse(handy("2011/11/27").isLessThanAll(toDate("2011/11/24"), toDate("2011/11/26")));
+        assertFalse(handy("2011/11/27").isLessThanAll(toDate("2011/11/24"), toDate("2011/11/27")));
+        assertFalse(handy("2011/11/27").isLessThanAll(toDate("2011/11/24"), toDate("2011/11/28")));
+        assertFalse(handy("2011/11/27").isLessThanAll(toDate("2011/11/27"), toDate("2011/11/29")));
+        assertTrue(handy("2011/11/27").isLessThanAll(toDate("2011/11/28"), toDate("2011/11/29")));
+    }
+
+    public void test_isLessThanAny() throws Exception {
+        assertFalse(handy("2011/11/27").isLessThanAny(toDate("2011/11/24"), toDate("2011/11/26")));
+        assertFalse(handy("2011/11/27").isLessThanAny(toDate("2011/11/24"), toDate("2011/11/27")));
+        assertTrue(handy("2011/11/27").isLessThanAny(toDate("2011/11/24"), toDate("2011/11/28")));
+        assertTrue(handy("2011/11/27").isLessThanAny(toDate("2011/11/27"), toDate("2011/11/29")));
+        assertTrue(handy("2011/11/27").isLessThanAny(toDate("2011/11/28"), toDate("2011/11/29")));
+    }
+
+    public void test_isLessEqual() throws Exception {
+        assertFalse(handy("2011/11/27").isLessEqual(toDate("2011/11/24")));
+        assertTrue(handy("2011/11/27").isLessEqual(toDate("2011/11/27")));
+        assertTrue(handy("2011/11/27").isLessEqual(toDate("2011/11/28")));
+        assertFalse(handy("2011/11/27 12:34:56.789").isLessEqual(toDate("2011/11/27 12:34:56.788")));
+        assertTrue(handy("2011/11/27 12:34:56.789").isLessEqual(toDate("2011/11/27 12:34:56.789")));
+        assertTrue(handy("2011/11/27 12:34:56.789").isLessEqual(toDate("2011/11/27 12:34:56.790")));
+    }
+
+    public void test_isLessEqualAll() throws Exception {
+        assertFalse(handy("2011/11/27").isLessEqualAll(toDate("2011/11/24"), toDate("2011/11/26")));
+        assertFalse(handy("2011/11/27").isLessEqualAll(toDate("2011/11/24"), toDate("2011/11/27")));
+        assertFalse(handy("2011/11/27").isLessEqualAll(toDate("2011/11/24"), toDate("2011/11/28")));
+        assertTrue(handy("2011/11/27").isLessEqualAll(toDate("2011/11/27"), toDate("2011/11/29")));
+        assertTrue(handy("2011/11/27").isLessEqualAll(toDate("2011/11/28"), toDate("2011/11/29")));
+    }
+
+    public void test_isLessEqualAny() throws Exception {
+        assertFalse(handy("2011/11/27").isLessEqualAny(toDate("2011/11/24"), toDate("2011/11/26")));
+        assertTrue(handy("2011/11/27").isLessEqualAny(toDate("2011/11/24"), toDate("2011/11/27")));
+        assertTrue(handy("2011/11/27").isLessEqualAny(toDate("2011/11/24"), toDate("2011/11/28")));
+        assertTrue(handy("2011/11/27").isLessEqualAny(toDate("2011/11/27"), toDate("2011/11/29")));
+        assertTrue(handy("2011/11/27").isLessEqualAny(toDate("2011/11/28"), toDate("2011/11/29")));
+    }
+
+    // ===================================================================================
+    //                                                                       Confirm Parts
+    //                                                                       =============
     // -----------------------------------------------------
     //                                          Confirm Year
     //                                          ------------

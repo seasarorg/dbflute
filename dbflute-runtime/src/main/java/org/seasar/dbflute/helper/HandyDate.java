@@ -9,7 +9,21 @@ import java.util.GregorianCalendar;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
+ * The date which provides you handy manipulations for Date. <br />
  * Now making...
+ * <pre>
+ * e.g.
+ * HandyDate date = new HandyDate("2011/11/27 12:34:56.789");
+ * date.addDay(1); // 2011/11/<span style="color: #FD4747">28</span> 12:34:56.789
+ * date.addMonth(1); // 2011/<span style="color: #FD4747">12</span>/28 12:34:56.789
+ * date.moveToDayJust(); // 2011/12/28 <span style="color: #FD4747">00:00:00.000</span>
+ * date.moveToMonthTerminal(); // 2011/12/<span style="color: #FD4747">31 23:59:59.999</span>
+ * if (date.isGreaterThan(toDate("2011/12/30"))) { // true
+ *     // 2011/12/31 23:59:59.999
+ *     java.util.Date movedDate = date.getDate();
+ *     java.sql.Timestamp movedTimestamp = date.getTimestampDate();
+ * }
+ * </pre>
  * @author jflute
  * @since 0.9.9.2A (2011/11/17 Thursday)
  */
@@ -171,8 +185,8 @@ public class HandyDate implements Serializable, Cloneable {
      * Move to the specified year.
      * <pre>
      * e.g.
-     * o moveToYear(2007): 2001/01/01 to <span style="color: #FD4747">2007</span>/01/01
-     * o moveToYear(-2007): 2001/01/01 to <span style="color: #FD4747">BC2007</span>/01/01
+     *  moveToYear(2007): 2001/01/01 to <span style="color: #FD4747">2007</span>/01/01
+     *  moveToYear(-2007): 2001/01/01 to <span style="color: #FD4747">BC2007</span>/01/01
      * </pre>
      * @param year The move-to year. (NotZero, MinusAllowed: if minus, means before Christ)
      * @return this. (NotNull)
@@ -418,10 +432,11 @@ public class HandyDate implements Serializable, Cloneable {
     /**
      * Move to the specified hour.
      * <pre>
-     * e.g. moveToHour(23): 2011/11/27 00:00:00 to 2007/11/27 <span style="color: #FD4747">23</span>:00:00
-     * e.g. moveToHour(26): 2011/11/27 00:00:00 to 2007/11/<span style="color: #FD4747">28 02</span>:00:00
+     * e.g. 2011/11/27 17:00:00
+     *  moveToHour(23): 2007/11/27 <span style="color: #FD4747">23</span>:00:00
+     *  moveToHour(26): 2007/11/<span style="color: #FD4747">28 02</span>:00:00
      * </pre>
-     * @param hour The move-to hour. (NotZero, MinusAllowed)
+     * @param hour The move-to hour. (MinusAllowed)
      * @return this. (NotNull)
      */
     public HandyDate moveToHour(int hour) {
@@ -509,6 +524,16 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                        Move-to Minute
     //                                        --------------
+    /**
+     * Move to the specified minute.
+     * <pre>
+     * e.g. 2011/11/27 00:32:00
+     *  moveToMinute(12): to 2007/11/27 00:<span style="color: #FD4747">12</span>:00
+     *  moveToMinute(48): to 2007/11/27 00:<span style="color: #FD4747">48</span>:00
+     * </pre>
+     * @param minute The move-to minute. (MinusAllowed)
+     * @return this. (NotNull)
+     */
     public HandyDate moveToMinute(int minute) {
         assertValidMinute(minute);
         DfTypeUtil.moveToCalendarMinute(_cal, minute);
@@ -560,6 +585,16 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                        Move-to Second
     //                                        --------------
+    /**
+     * Move to the specified second.
+     * <pre>
+     * e.g. 2011/11/27 00:32:00
+     *  moveToSecond(12): to 2007/11/27 00:00:<span style="color: #FD4747">12</span>
+     *  moveToSecond(48): to 2007/11/27 00:00:<span style="color: #FD4747">48</span>
+     * </pre>
+     * @param second The move-to second. (MinusAllowed)
+     * @return this. (NotNull)
+     */
     public HandyDate moveToSecond(int second) {
         assertValidSecond(second);
         DfTypeUtil.moveToCalendarSecond(_cal, second);
@@ -611,6 +646,16 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                                   Move-to Millisecond
     //                                   -------------------
+    /**
+     * Move to the specified millisecond.
+     * <pre>
+     * e.g. 2011/11/27 00:00:00.456
+     *  moveToMillisecond(123): to 2007/11/27 00:00:00.<span style="color: #FD4747">123</span>
+     *  moveToMillisecond(877): to 2007/11/27 00:00:00.<span style="color: #FD4747">877</span>
+     * </pre>
+     * @param millisecond The move-to millisecond. (MinusAllowed)
+     * @return this. (NotNull)
+     */
     public HandyDate moveToMillisecond(int millisecond) {
         assertValidMillisecond(millisecond);
         DfTypeUtil.moveToCalendarMillisecond(_cal, millisecond);
@@ -630,11 +675,41 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Move to the week just (beginning). <br />
+     * You can change the beginning of day of week by beginWeek_...(). <br />
+     * Default day of week is Sunday.
+     * <pre>
+     * e.g. 2011/11/30 12:34:56.789 (Wednesday)
+     *  moveToWeekJust(): to 2011/11/27 00:00:00.000
+     *  beginWeek_DayOfWeek1st_Sunday().moveToWeekJust(): to 2011/11/27 00:00:00.000
+     *  beginWeek_DayOfWeek2nd_Monday().moveToWeekJust(): to 2011/11/28 00:00:00.000
+     *  beginWeek_DayOfWeek3rd_Tuesday().moveToWeekJust(): to 2011/11/29 00:00:00.000
+     *  beginWeek_DayOfWeek4th_Wednesday().moveToWeekJust(): to 2011/11/30 00:00:00.000
+     *  beginWeek_DayOfWeek5th_Thursday().moveToWeekJust(): to 2011/11/24 00:00:00.000
+     * </pre>
+     * @return this. (NotNull)
+     */
     public HandyDate moveToWeekJust() {
         DfTypeUtil.moveToCalendarWeekJust(_cal, _weekBeginDay);
         return this;
     }
 
+    /**
+     * Move to the terminal of the week. <br />
+     * You can change the beginning of day of week by beginWeek_...(). <br />
+     * Default day of week is Sunday.
+     * <pre>
+     * e.g. 2011/11/30 12:34:56.789 (Wednesday)
+     *  moveToWeekJust(): to 2011/12/03 23:59:59.999
+     *  beginWeek_DayOfWeek1st_Sunday().moveToWeekJust(): to 2011/12/03 23:59:59.999
+     *  beginWeek_DayOfWeek2nd_Monday().moveToWeekJust(): to 2011/12/04 23:59:59.999
+     *  beginWeek_DayOfWeek3rd_Tuesday().moveToWeekJust(): to 2011/12/05 23:59:59.999
+     *  beginWeek_DayOfWeek4th_Wednesday().moveToWeekJust(): to 2011/12/06 23:59:59.999
+     *  beginWeek_DayOfWeek5th_Thursday().moveToWeekJust(): to 2011/11/30 23:59:59.999
+     * </pre>
+     * @return this. (NotNull)
+     */
     public HandyDate moveToWeekTerminal() {
         DfTypeUtil.moveToCalendarWeekTerminal(_cal, _weekBeginDay);
         return this;
@@ -643,6 +718,20 @@ public class HandyDate implements Serializable, Cloneable {
     // -----------------------------------------------------
     //                               Move-to Quarter of Year
     //                               -----------------------
+    /**
+     * Move to the quarter of year just (beginning). <br />
+     * You can change the beginning of year by beginYear_Month...(). <br />
+     * Default quarter of year is 1-3, 4-6, 7-9, 10-12.
+     * <pre>
+     * e.g.
+     *  moveToQuarterOfYearJust(): 2011/02/27 12:34:56.789 to 2011/01/01 00:00:00.000
+     *  moveToQuarterOfYearJust(): 2011/03/27 12:34:56.789 to 2011/01/01 00:00:00.000
+     *  moveToQuarterOfYearJust(): 2011/04/27 12:34:56.789 to 2011/04/01 00:00:00.000
+     *  moveToQuarterOfYearJust(): 2011/08/27 12:34:56.789 to 2011/07/01 00:00:00.000
+     *  moveToQuarterOfYearJust(): 2011/11/27 12:34:56.789 to 2011/10/01 00:00:00.000
+     * </pre>
+     * @return this. (NotNull)
+     */
     public HandyDate moveToQuarterOfYearJust() {
         DfTypeUtil.moveToCalendarQuarterOfYearJust(_cal, _yearBeginMonth);
         moveToMonthJust(); // just for others
@@ -723,8 +812,304 @@ public class HandyDate implements Serializable, Cloneable {
     }
 
     // ===================================================================================
-    //                                                                        Confirm Date
+    //                                                                        Compare Date
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                            Match Date
+    //                                            ----------
+    /**
+     * Is this date match the specified date?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isMatch(2011/11/24): true
+     *  date.isMatch(2011/11/27): false
+     *  date.isMatch(2011/11/28): false
+     * </pre>
+     * @param date The comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMatch(Date date) {
+        assertArgumentNotNull("date", date);
+        return _cal.getTimeInMillis() == date.getTime();
+    }
+
+    // -----------------------------------------------------
+    //                                          Greater Date
+    //                                          ------------
+    /**
+     * Is this date greater than the specified date?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterThan(2011/11/24): true
+     *  date.isGreaterThan(2011/11/27): false
+     *  date.isGreaterThan(2011/11/28): false
+     * </pre>
+     * @param date The comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterThan(Date date) {
+        assertArgumentNotNull("date", date);
+        return isGreaterThanAll(date);
+    }
+
+    /**
+     * Is this date greater than all the specified dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterThanAll(2011/11/24, 2011/11/26): true
+     *  date.isGreaterThanAll(2011/11/24, 2011/11/27): false
+     *  date.isGreaterThanAll(2011/11/24, 2011/11/28): false
+     *  date.isGreaterThanAll(2011/11/27, 2011/11/29): false
+     *  date.isGreaterThanAll(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterThanAll(Date... dates) {
+        return doCompareAll(createGreaterThanCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date greater than any specified dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterThanAny(2011/11/24, 2011/11/26): true
+     *  date.isGreaterThanAny(2011/11/24, 2011/11/27): true
+     *  date.isGreaterThanAny(2011/11/24, 2011/11/28): true
+     *  date.isGreaterThanAny(2011/11/27, 2011/11/29): false
+     *  date.isGreaterThanAny(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterThanAny(Date... dates) {
+        return doCompareAny(createGreaterThanCompareCallback(), dates);
+    }
+
+    protected CompareCallback createGreaterThanCompareCallback() {
+        return new CompareCallback() {
+            public boolean isTarget(Date current, Date date) {
+                return current.after(date);
+            }
+        };
+    }
+
+    /**
+     * Is this date greater than or equal the specified date?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterEqual(2011/11/24): true
+     *  date.isGreaterEqual(2011/11/27): true
+     *  date.isGreaterEqual(2011/11/28): false
+     * </pre>
+     * @param date The comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterEqual(Date date) {
+        assertArgumentNotNull("date", date);
+        return isGreaterEqualAll(date);
+    }
+
+    /**
+     * Is this date greater than or equal all the specified dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterEqualAll(2011/11/24, 2011/11/26): true
+     *  date.isGreaterEqualAll(2011/11/24, 2011/11/27): true
+     *  date.isGreaterEqualAll(2011/11/24, 2011/11/28): false
+     *  date.isGreaterEqualAll(2011/11/27, 2011/11/29): false
+     *  date.isGreaterEqualAll(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterEqualAll(Date... dates) {
+        return doCompareAll(createGreaterEqualCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date greater than or equal any specified dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isGreaterEqualAny(2011/11/24, 2011/11/26): true
+     *  date.isGreaterEqualAny(2011/11/24, 2011/11/27): true
+     *  date.isGreaterEqualAny(2011/11/24, 2011/11/28): true
+     *  date.isGreaterEqualAny(2011/11/27, 2011/11/29): true
+     *  date.isGreaterEqualAny(2011/11/28, 2011/11/29): false
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isGreaterEqualAny(Date... dates) {
+        return doCompareAny(createGreaterEqualCompareCallback(), dates);
+    }
+
+    protected CompareCallback createGreaterEqualCompareCallback() {
+        return new CompareCallback() {
+            public boolean isTarget(Date current, Date date) {
+                return current.after(date) || current.equals(date);
+            }
+        };
+    }
+
+    // -----------------------------------------------------
+    //                                             Less Date
+    //                                             ---------
+    /**
+     * Is this date less than the specified date?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessThan(2011/11/24): false
+     *  date.isLessThan(2011/11/27): false
+     *  date.isLessThan(2011/11/28): true
+     * </pre>
+     * @param date The comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessThan(Date date) {
+        assertArgumentNotNull("date", date);
+        return isLessThanAll(date);
+    }
+
+    /**
+     * Is this date less than all the specified dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessThanAll(2011/11/24, 2011/11/26): false
+     *  date.isLessThanAll(2011/11/24, 2011/11/27): false
+     *  date.isLessThanAll(2011/11/24, 2011/11/28): false
+     *  date.isLessThanAll(2011/11/27, 2011/11/29): false
+     *  date.isLessThanAll(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessThanAll(Date... dates) {
+        return doCompareAll(createLessThanCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date less than any specified dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessThanAny(2011/11/24, 2011/11/26): false
+     *  date.isLessThanAny(2011/11/24, 2011/11/27): false
+     *  date.isLessThanAny(2011/11/24, 2011/11/28): true
+     *  date.isLessThanAny(2011/11/27, 2011/11/29): true
+     *  date.isLessThanAny(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessThanAny(Date... dates) {
+        return doCompareAny(createLessThanCompareCallback(), dates);
+    }
+
+    protected CompareCallback createLessThanCompareCallback() {
+        return new CompareCallback() {
+            public boolean isTarget(Date current, Date date) {
+                return current.before(date);
+            }
+        };
+    }
+
+    /**
+     * Is this date less than or equal the specified date?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessEqual(2011/11/24): false
+     *  date.isLessEqual(2011/11/27): true
+     *  date.isLessEqual(2011/11/28): true
+     * </pre>
+     * @param date The comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessEqual(Date date) {
+        assertArgumentNotNull("date", date);
+        return isLessEqualAll(date);
+    }
+
+    /**
+     * Is this date less than or equal all the specified dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessEqualAll(2011/11/24, 2011/11/26): false
+     *  date.isLessEqualAll(2011/11/24, 2011/11/27): false
+     *  date.isLessEqualAll(2011/11/24, 2011/11/28): false
+     *  date.isLessEqualAll(2011/11/27, 2011/11/29): true
+     *  date.isLessEqualAll(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessEqualAll(Date... dates) {
+        return doCompareAll(createLessEqualCompareCallback(), dates);
+    }
+
+    /**
+     * Is this date less than or equal any specified dates?
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.isLessEqualAny(2011/11/24, 2011/11/26): false
+     *  date.isLessEqualAny(2011/11/24, 2011/11/27): true
+     *  date.isLessEqualAny(2011/11/24, 2011/11/28): true
+     *  date.isLessEqualAny(2011/11/27, 2011/11/29): true
+     *  date.isLessEqualAny(2011/11/28, 2011/11/29): true
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isLessEqualAny(Date... dates) {
+        return doCompareAny(createLessEqualCompareCallback(), dates);
+    }
+
+    protected CompareCallback createLessEqualCompareCallback() {
+        return new CompareCallback() {
+            public boolean isTarget(Date current, Date date) {
+                return current.before(date) || current.equals(date);
+            }
+        };
+    }
+
+    // -----------------------------------------------------
+    //                                        Compare Helper
+    //                                        --------------
+    protected boolean doCompareAll(CompareCallback callback, Date... dates) {
+        assertCompareDateArrayValid(dates);
+        final Date current = getDate();
+        for (Date date : dates) {
+            if (!callback.isTarget(current, date)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean doCompareAny(CompareCallback callback, Date... dates) {
+        assertCompareDateArrayValid(dates);
+        final Date current = getDate();
+        for (Date date : dates) {
+            if (callback.isTarget(current, date)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void assertCompareDateArrayValid(Date[] dates) {
+        if (dates == null || dates.length == 0) {
+            String msg = "The argument 'dates' should not be null or empty.";
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected static interface CompareCallback {
+        boolean isTarget(Date current, Date date);
+    }
+
+    // ===================================================================================
+    //                                                                       Confirm Parts
+    //                                                                       =============
     // -----------------------------------------------------
     //                                          Confirm Year
     //                                          ------------
@@ -738,10 +1123,20 @@ public class HandyDate implements Serializable, Cloneable {
         return getYear() == year;
     }
 
+    /**
+     * Is the year of this date Anno Domini? <br />
+     * e.g. 2011/11/27: true, BC982/11/27: false
+     * @return The determination, true or false.
+     */
     public boolean isYear_AnnoDomini() {
         return getYear() > 0;
     }
 
+    /**
+     * Is the year of this date Before Christ? <br />
+     * e.g. 2011/11/27: false, BC982/11/27: true
+     * @return The determination, true or false.
+     */
     public boolean isYear_BeforeChrist() {
         return getYear() < 0;
     }
@@ -1172,36 +1567,78 @@ public class HandyDate implements Serializable, Cloneable {
         return this;
     }
 
+    /**
+     * Begin week from Sunday. <br />
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/27 <br />
+     * (means the date moves to just beginning of week containing 2011/11/27)
+     * @return this. (NotNull)
+     */
     public HandyDate beginWeek_DayOfWeek1st_Sunday() {
         _weekBeginDay = Calendar.SUNDAY;
         return this;
     }
 
+    /**
+     * Begin week from Monday. <br />
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/21 <br />
+     * (means the date moves to just beginning of week containing 2011/11/27)
+     * @return this. (NotNull)
+     */
     public HandyDate beginWeek_DayOfWeek2nd_Monday() {
         _weekBeginDay = Calendar.MONDAY;
         return this;
     }
 
+    /**
+     * Begin week from Tuesday. <br />
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/22 <br />
+     * (means the date moves to just beginning of week containing 2011/11/27)
+     * @return this. (NotNull)
+     */
     public HandyDate beginWeek_DayOfWeek3rd_Tuesday() {
         _weekBeginDay = Calendar.TUESDAY;
         return this;
     }
 
+    /**
+     * Begin week from Wednesday. <br />
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/23 <br />
+     * (means the date moves to just beginning of week containing 2011/11/27)
+     * @return this. (NotNull)
+     */
     public HandyDate beginWeek_DayOfWeek4th_Wednesday() {
         _weekBeginDay = Calendar.WEDNESDAY;
         return this;
     }
 
+    /**
+     * Begin week from Thursday. <br />
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/24 <br />
+     * (means the date moves to just beginning of week containing 2011/11/27)
+     * @return this. (NotNull)
+     */
     public HandyDate beginWeek_DayOfWeek5th_Thursday() {
         _weekBeginDay = Calendar.THURSDAY;
         return this;
     }
 
+    /**
+     * Begin week from Friday. <br />
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/25 <br />
+     * (means the date moves to just beginning of week containing 2011/11/27)
+     * @return this. (NotNull)
+     */
     public HandyDate beginWeek_DayOfWeek6th_Friday() {
         _weekBeginDay = Calendar.FRIDAY;
         return this;
     }
 
+    /**
+     * Begin week from Saturday. <br />
+     * if the date is 2011/11/27 00:00:00, moveToWeekJust() moves it to 2011/11/26 <br />
+     * (means the date moves to just beginning of week containing 2011/11/27)
+     * @return this. (NotNull)
+     */
     public HandyDate beginWeek_DayOfWeek7th_Saturday() {
         _weekBeginDay = Calendar.SATURDAY;
         return this;

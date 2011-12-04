@@ -814,27 +814,11 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
-    /**
-     * @return this
-     * @deprecated
-     */
-    public FromToOption fromPatternHourStart() {
-        return fromPatternHourJust();
-    }
-
     public FromToOption fromPatternDayJust() {
         assertNotAdjustmentAfterPattern("fromPatternDayJust");
         clearFromPattern();
         _fromPatternDayJust = true;
         return this;
-    }
-
-    /**
-     * @return this
-     * @deprecated
-     */
-    public FromToOption fromPatternDayStart() {
-        return fromPatternDayJust();
     }
 
     public FromToOption fromPatternMonthJust() {
@@ -844,27 +828,11 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
-    /**
-     * @return this
-     * @deprecated
-     */
-    public FromToOption fromPatternMonthStart() {
-        return fromPatternMonthJust();
-    }
-
     public FromToOption fromPatternYearJust() {
         assertNotAdjustmentAfterPattern("fromPatternYearJust");
         clearFromPattern();
         _fromPatternYearJust = true;
         return this;
-    }
-
-    /**
-     * @return this
-     * @deprecated
-     */
-    public FromToOption fromPatternYearStart() {
-        return fromPatternYearJust();
     }
 
     public FromToOption fromPatternWeekJust() {
@@ -917,27 +885,11 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
-    /**
-     * @return this
-     * @deprecated
-     */
-    public FromToOption toPatternNextHourStart() {
-        return toPatternNextHourJust();
-    }
-
     public FromToOption toPatternNextDayJust() {
         assertNotAdjustmentAfterPattern("toPatternNextDayJust");
         clearToPattern();
         _toPatternNextDayJust = true;
         return this;
-    }
-
-    /**
-     * @return this
-     * @deprecated
-     */
-    public FromToOption toPatternNextDayStart() {
-        return toPatternNextDayJust();
     }
 
     public FromToOption toPatternNextMonthJust() {
@@ -947,27 +899,11 @@ public class FromToOption implements ConditionOption, Serializable {
         return this;
     }
 
-    /**
-     * @return this
-     * @deprecated
-     */
-    public FromToOption toPatternNextMonthStart() {
-        return toPatternNextMonthJust();
-    }
-
     public FromToOption toPatternNextYearJust() {
         assertNotAdjustmentAfterPattern("toPatternNextYearJust");
         clearToPattern();
         _toPatternNextYearJust = true;
         return this;
-    }
-
-    /**
-     * @return this
-     * @deprecated
-     */
-    public FromToOption toPatternNextYearStart() {
-        return toPatternNextYearJust();
     }
 
     public FromToOption toPatternNextWeekJust() {
