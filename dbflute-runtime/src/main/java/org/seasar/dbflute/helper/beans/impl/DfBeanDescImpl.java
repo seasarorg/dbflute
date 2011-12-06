@@ -229,36 +229,40 @@ public class DfBeanDescImpl implements DfBeanDesc {
     //                                                                       Assist Helper
     //                                                                       =============
     private Constructor<?> findSuitableConstructor(Object[] args) {
-        outerLoop: for (int i = 0; i < _constructors.length; ++i) {
-            Class<?>[] paramTypes = _constructors[i].getParameterTypes();
+        outerLoop: for (int consIndex = 0; consIndex < _constructors.length; ++consIndex) {
+            final Class<?>[] paramTypes = _constructors[consIndex].getParameterTypes();
             if (paramTypes.length != args.length) {
                 continue;
             }
-            for (int j = 0; j < args.length; ++j) {
-                if (args[j] == null || DfReflectionUtil.isAssignableFrom(paramTypes[j], args[j].getClass())) {
+            for (int argIndex = 0; argIndex < args.length; ++argIndex) {
+                final Object argValue = args[argIndex];
+                final Class<?> paramType = paramTypes[argIndex];
+                if (argValue == null || DfReflectionUtil.isAssignableFrom(paramType, argValue.getClass())) {
                     continue;
                 }
                 continue outerLoop;
             }
-            return _constructors[i];
+            return _constructors[consIndex];
         }
         return null;
     }
 
     private Constructor<?> findSuitableConstructorAdjustNumber(Object[] args) {
-        outerLoop: for (int i = 0; i < _constructors.length; ++i) {
-            Class<?>[] paramTypes = _constructors[i].getParameterTypes();
+        outerLoop: for (int consIndex = 0; consIndex < _constructors.length; ++consIndex) {
+            Class<?>[] paramTypes = _constructors[consIndex].getParameterTypes();
             if (paramTypes.length != args.length) {
                 continue;
             }
-            for (int j = 0; j < args.length; ++j) {
-                if (args[j] == null || DfReflectionUtil.isAssignableFrom(paramTypes[j], args[j].getClass())
-                        || adjustNumber(paramTypes, args, j)) {
+            for (int argIndex = 0; argIndex < args.length; ++argIndex) {
+                final Object argValue = args[argIndex];
+                final Class<?> paramType = paramTypes[argIndex];
+                if (argValue == null || DfReflectionUtil.isAssignableFrom(paramType, argValue.getClass())
+                        || adjustNumber(paramTypes, args, argIndex)) {
                     continue;
                 }
                 continue outerLoop;
             }
-            return _constructors[i];
+            return _constructors[consIndex];
         }
         return null;
     }
@@ -398,36 +402,40 @@ public class DfBeanDescImpl implements DfBeanDesc {
     }
 
     private Method findSuitableMethod(Method[] methods, Object[] args) {
-        outerLoop: for (int i = 0; i < methods.length; ++i) {
-            Class<?>[] paramTypes = methods[i].getParameterTypes();
+        outerLoop: for (int methodIndex = 0; methodIndex < methods.length; ++methodIndex) {
+            Class<?>[] paramTypes = methods[methodIndex].getParameterTypes();
             if (paramTypes.length != args.length) {
                 continue;
             }
-            for (int j = 0; j < args.length; ++j) {
-                if (args[j] == null || DfReflectionUtil.isAssignableFrom(paramTypes[j], args[j].getClass())) {
+            for (int argIndex = 0; argIndex < args.length; ++argIndex) {
+                final Object argValue = args[argIndex];
+                final Class<?> paramType = paramTypes[argIndex];
+                if (argValue == null || DfReflectionUtil.isAssignableFrom(paramType, argValue.getClass())) {
                     continue;
                 }
                 continue outerLoop;
             }
-            return methods[i];
+            return methods[methodIndex];
         }
         return null;
     }
 
     private Method findSuitableMethodAdjustNumber(Method[] methods, Object[] args) {
-        outerLoop: for (int i = 0; i < methods.length; ++i) {
-            Class<?>[] paramTypes = methods[i].getParameterTypes();
+        outerLoop: for (int methodIndex = 0; methodIndex < methods.length; ++methodIndex) {
+            Class<?>[] paramTypes = methods[methodIndex].getParameterTypes();
             if (paramTypes.length != args.length) {
                 continue;
             }
-            for (int j = 0; j < args.length; ++j) {
-                if (args[j] == null || DfReflectionUtil.isAssignableFrom(paramTypes[j], args[j].getClass())
-                        || adjustNumber(paramTypes, args, j)) {
+            for (int argIndex = 0; argIndex < args.length; ++argIndex) {
+                final Object argValue = args[argIndex];
+                final Class<?> paramType = paramTypes[argIndex];
+                if (argValue == null || DfReflectionUtil.isAssignableFrom(paramType, argValue.getClass())
+                        || adjustNumber(paramTypes, args, argIndex)) {
                     continue;
                 }
                 continue outerLoop;
             }
-            return methods[i];
+            return methods[methodIndex];
         }
         return null;
     }

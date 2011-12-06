@@ -199,10 +199,10 @@ public class DfReflectionUtil {
                 continue;
             }
             final int modifier = declaredField.getModifiers();
-            if (visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier)) {
+            if (isOutOfTargetForPublic(visibilityType, modifier)) {
                 continue;
             }
-            if (visibilityType == VisibilityType.ACCESSIBLE && target != clazz && isDefaultOrPrivate(modifier)) {
+            if (isOutOfTargetForAccessible(visibilityType, modifier, clazz, target)) {
                 continue;
             }
             return declaredField;
@@ -287,7 +287,26 @@ public class DfReflectionUtil {
     public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
-        return findMethod(clazz, methodName, argTypes, VisibilityType.ACCESSIBLE);
+        return findMethod(clazz, methodName, argTypes, VisibilityType.ACCESSIBLE, false);
+    }
+
+    /**
+     * Get the accessible method that means as follows:
+     * <pre>
+     * o target class's methods = all
+     * o superclass's methods   = public or protected
+     * </pre>
+     * And it has the flexibly searching so you can specify types of sub-class to argTypes.
+     * But if overload methods exist, it returns the first-found method.
+     * @param clazz The type of class that defines the method. (NotNull)
+     * @param methodName The name of method. (NotNull)
+     * @param argTypes The type of argument. (NotNull)
+     * @return The instance of method. (NullAllowed: if null, not found)
+     */
+    public static Method getAccessibleMethodFlexibly(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        assertObjectNotNull("clazz", clazz);
+        assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
+        return findMethod(clazz, methodName, argTypes, VisibilityType.ACCESSIBLE, true);
     }
 
     /**
@@ -300,7 +319,22 @@ public class DfReflectionUtil {
     public static Method getPublicMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
-        return findMethod(clazz, methodName, argTypes, VisibilityType.PUBLIC);
+        return findMethod(clazz, methodName, argTypes, VisibilityType.PUBLIC, false);
+    }
+
+    /**
+     * Get the public method. <br />
+     * And it has the flexibly searching so you can specify types of sub-class to argTypes.
+     * But if overload methods exist, it returns the first-found method.
+     * @param clazz The type of class that defines the method. (NotNull)
+     * @param methodName The name of method. (NotNull)
+     * @param argTypes The type of argument. (NotNull)
+     * @return The instance of method. (NullAllowed: if null, not found)
+     */
+    public static Method getPublicMethodFlexibly(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        assertObjectNotNull("clazz", clazz);
+        assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
+        return findMethod(clazz, methodName, argTypes, VisibilityType.PUBLIC, true);
     }
 
     /**
@@ -317,10 +351,43 @@ public class DfReflectionUtil {
     public static Method getWholeMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
         assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
-        return findMethod(clazz, methodName, argTypes, VisibilityType.WHOLE);
+        return findMethod(clazz, methodName, argTypes, VisibilityType.WHOLE, false);
+    }
+
+    /**
+     * Get the method in whole methods that means as follows:
+     * <pre>
+     * o target class's methods = all
+     * o superclass's methods   = all (also contains private)
+     * </pre>
+     * And it has the flexibly searching so you can specify types of sub-class to argTypes.
+     * But if overload methods exist, it returns the first-found method.
+     * @param clazz The type of class that defines the method. (NotNull)
+     * @param methodName The name of method. (NotNull)
+     * @param argTypes The type of argument. (NotNull)
+     * @return The instance of method. (NullAllowed: if null, not found)
+     */
+    public static Method getWholeMethodFlexibly(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        assertObjectNotNull("clazz", clazz);
+        assertStringNotNullAndNotTrimmedEmpty("methodName", methodName);
+        return findMethod(clazz, methodName, argTypes, VisibilityType.WHOLE, true);
     }
 
     protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes,
+            VisibilityType visibilityType, boolean flexibly) {
+        final Method method = doFindMethodBasic(clazz, methodName, argTypes, visibilityType);
+        if (method != null) {
+            return method;
+        } else {
+            if (flexibly && argTypes.length >= 1) { // only when argument exists
+                return doFindMethodFlexibly(clazz, methodName, argTypes, visibilityType);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    protected static Method doFindMethodBasic(Class<?> clazz, String methodName, Class<?>[] argTypes,
             VisibilityType visibilityType) {
         for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
             final Method declaredMethod;
@@ -333,15 +400,61 @@ public class DfReflectionUtil {
                 continue;
             }
             final int modifier = declaredMethod.getModifiers();
-            if (visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier)) {
+            if (isOutOfTargetForPublic(visibilityType, modifier)) {
                 continue;
             }
-            if (visibilityType == VisibilityType.ACCESSIBLE && target != clazz && isDefaultOrPrivate(modifier)) {
+            if (isOutOfTargetForAccessible(visibilityType, modifier, clazz, target)) {
                 continue;
             }
             return declaredMethod;
         }
         return null;
+    }
+
+    protected static Method doFindMethodFlexibly(Class<?> clazz, String methodName, Class<?>[] argTypes,
+            VisibilityType visibilityType) {
+        for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
+            final Method[] methods = target.getDeclaredMethods();
+            for (int methodIndex = 0; methodIndex < methods.length; ++methodIndex) {
+                final Method current = methods[methodIndex];
+                final int modifier = current.getModifiers();
+                if (isOutOfTargetForPublic(visibilityType, modifier)) {
+                    continue;
+                }
+                if (isOutOfTargetForAccessible(visibilityType, modifier, clazz, target)) {
+                    continue;
+                }
+                if (methodName.equals(current.getName())) {
+                    final Class<?>[] types = current.getParameterTypes();
+                    if ((types == null || types.length == 0) && (argTypes == null || argTypes.length == 0)) {
+                        return current;
+                    }
+                    if (types.length != argTypes.length) {
+                        continue;
+                    }
+                    boolean diff = false;
+                    for (int argIndex = 0; argIndex < types.length; argIndex++) {
+                        if (!types[argIndex].isAssignableFrom(argTypes[argIndex])) {
+                            diff = true;
+                            break;
+                        }
+                    }
+                    if (!diff) {
+                        return current;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    protected static boolean isOutOfTargetForPublic(VisibilityType visibilityType, int modifier) {
+        return visibilityType == VisibilityType.PUBLIC && !Modifier.isPublic(modifier);
+    }
+
+    protected static boolean isOutOfTargetForAccessible(VisibilityType visibilityType, int modifier, Class<?> clazz,
+            Class<?> target) {
+        return visibilityType == VisibilityType.ACCESSIBLE && clazz != target && isDefaultOrPrivate(modifier);
     }
 
     /**

@@ -2,8 +2,10 @@ package org.seasar.dbflute.util;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +29,42 @@ public class DfReflectionUtilTest extends PlainTestCase {
         Method method = DfReflectionUtil.getPublicMethod(FooTarget.class, methodName, null);
 
         // ## Assert ##
+        assertNotNull(method);
         assertEquals(methodName, method.getName());
+    }
+
+    public void test_getPublicMethod_args() throws Exception {
+        // ## Arrange ##
+        String methodName = "fooDateArg";
+
+        // ## Act ##
+        Method method = DfReflectionUtil.getPublicMethod(FooTarget.class, methodName, new Class<?>[] { Date.class });
+
+        // ## Assert ##
+        assertNotNull(method);
+        assertEquals(methodName, method.getName());
+    }
+
+    public void test_getPublicMethod_args_SubClass() throws Exception {
+        // ## Arrange ##
+        Class<?> clazz = FooTarget.class;
+        String methodName = "fooDateArg";
+        Class<?>[] argType = new Class<?>[] { Timestamp.class };
+
+        // ## Act & Assert ##
+        assertNull(DfReflectionUtil.getPublicMethod(clazz, methodName, argType));
+        assertNotNull(DfReflectionUtil.getPublicMethodFlexibly(clazz, methodName, argType));
+    }
+
+    public void test_getPublicMethod_args_SuperClass() throws Exception {
+        // ## Arrange ##
+        Class<?> clazz = FooTarget.class;
+        String methodName = "fooTimestampArg";
+        Class<?>[] argType = new Class<?>[] { Date.class };
+
+        // ## Act & Assert ##
+        assertNull(DfReflectionUtil.getPublicMethod(clazz, methodName, argType));
+        assertNull(DfReflectionUtil.getPublicMethodFlexibly(clazz, methodName, argType));
     }
 
     public void test_invoke_basic() throws Exception {
@@ -44,6 +81,14 @@ public class DfReflectionUtilTest extends PlainTestCase {
 
     public static class FooTarget {
         public String fooNoArg() {
+            return "foo";
+        }
+
+        public String fooDateArg(Date date) {
+            return "foo";
+        }
+
+        public String fooTimestampArg(Timestamp timestamp) {
             return "foo";
         }
     }

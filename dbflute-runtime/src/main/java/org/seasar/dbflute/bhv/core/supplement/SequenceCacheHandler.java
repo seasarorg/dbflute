@@ -143,16 +143,18 @@ public class SequenceCacheHandler {
         final Integer maxDualCountInOneJoin = 10;
         int allRecordCount = 0;
         boolean reached = false;
-        for (int i = 0; !reached; i++) {
-            if (i >= 1) {
+        for (int joinIndex = 0; !reached; joinIndex++) {
+            if (joinIndex >= 1) {
                 sb.append(ln()).append("    cross join (");
             }
             int dualCountInOneJoin = 0;
             sb.append("select * from dual");
             ++dualCountInOneJoin;
-            final String indent = (i >= 1 ? "                " : "        ");
+            final String indent = (joinIndex >= 1 ? "                " : "        ");
             int calculatedRecordCount = 0;
-            for (int j = 0; j < (maxDualCountInOneJoin - 1); j++) { // always more one loop 
+
+            // always more one loop
+            for (int unionIndex = 0; unionIndex < (maxDualCountInOneJoin - 1); unionIndex++) {
                 sb.append(ln()).append(indent).append(" union all");
                 sb.append(ln()).append(indent).append("select * from dual");
                 ++dualCountInOneJoin;
@@ -168,7 +170,7 @@ public class SequenceCacheHandler {
                 }
             }
             allRecordCount = calculatedRecordCount;
-            sb.append(") join_" + (i + 1));
+            sb.append(") join_" + (joinIndex + 1));
         }
         sb.append(ln()).append(" where rownum <= " + divided);
         return sb.toString();

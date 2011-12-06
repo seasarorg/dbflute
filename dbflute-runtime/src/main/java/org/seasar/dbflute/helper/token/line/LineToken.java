@@ -32,15 +32,15 @@ public class LineToken {
     public List<String> tokenize(String lineString, LineTokenizingOption lineTokenizingOption) {
         final String delimiter = lineTokenizingOption.getDelimiter();
         final List<String> list = new ArrayList<String>();
-        int i = 0;
-        int j = lineString.indexOf(delimiter);
-        for (int h = 0; j >= 0; h++) {
-            final String value = lineString.substring(i, j);
+        int elementIndex = 0;
+        int delimiterIndex = lineString.indexOf(delimiter);
+        while (delimiterIndex >= 0) {
+            final String value = lineString.substring(elementIndex, delimiterIndex);
             list.add(filterHandlingEmptyAsNull(value, lineTokenizingOption));
-            i = j + delimiter.length();
-            j = lineString.indexOf(delimiter, i);
+            elementIndex = delimiterIndex + delimiter.length();
+            delimiterIndex = lineString.indexOf(delimiter, elementIndex);
         }
-        final String lastElement = lineString.substring(i);
+        final String lastElement = lineString.substring(elementIndex);
         list.add(filterHandlingEmptyAsNull(lastElement, lineTokenizingOption));
         return list;
     }

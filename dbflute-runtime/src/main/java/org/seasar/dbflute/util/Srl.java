@@ -255,15 +255,15 @@ public class Srl {
         assertStringNotNull(str);
         assertDelimiterNotNull(delimiter);
         final List<String> list = new ArrayList<String>();
-        int i = 0;
-        int j = str.indexOf(delimiter);
-        for (int h = 0; j >= 0; h++) {
-            final String element = str.substring(i, j);
+        int elementIndex = 0;
+        int delimiterIndex = str.indexOf(delimiter);
+        while (delimiterIndex >= 0) {
+            final String element = str.substring(elementIndex, delimiterIndex);
             list.add(trim ? element.trim() : element);
-            i = j + delimiter.length();
-            j = str.indexOf(delimiter, i);
+            elementIndex = delimiterIndex + delimiter.length();
+            delimiterIndex = str.indexOf(delimiter, elementIndex);
         }
-        final String element = str.substring(i);
+        final String element = str.substring(elementIndex);
         list.add(trim ? element.trim() : element);
         return list;
     }
