@@ -112,6 +112,7 @@ public class FromToOption implements ConditionOption, Serializable {
     protected Integer _weekBeginDay = Calendar.SUNDAY; // as default
     protected Integer _moveToScope;
     protected boolean _usePattern;
+    protected boolean _orIsNull;
 
     // ===================================================================================
     //                                                            Interface Implementation
@@ -947,6 +948,18 @@ public class FromToOption implements ConditionOption, Serializable {
     }
 
     // ===================================================================================
+    //                                                                      Plug-in Option
+    //                                                                      ==============
+    /**
+     * Add 'or is null' to from-to conditions.
+     * @return this. (NotNull)
+     */
+    public FromToOption orIsNull() {
+        _orIsNull = true;
+        return this;
+    }
+
+    // ===================================================================================
     //                                                                       Internal Main
     //                                                                       =============
     /**
@@ -1052,9 +1065,9 @@ public class FromToOption implements ConditionOption, Serializable {
      */
     public ConditionKey getFromDateConditionKey() {
         if (_greaterThan) {
-            return ConditionKey.CK_GREATER_THAN;
-        } else {
-            return ConditionKey.CK_GREATER_EQUAL; // as default
+            return _orIsNull ? ConditionKey.CK_GREATER_THAN_OR_IS_NULL : ConditionKey.CK_GREATER_THAN;
+        } else { // as default
+            return _orIsNull ? ConditionKey.CK_GREATER_EQUAL_OR_IS_NULL : ConditionKey.CK_GREATER_EQUAL;
         }
     }
 
@@ -1064,9 +1077,9 @@ public class FromToOption implements ConditionOption, Serializable {
      */
     public ConditionKey getToDateConditionKey() {
         if (_lessThan) {
-            return ConditionKey.CK_LESS_THAN;
-        } else {
-            return ConditionKey.CK_LESS_EQUAL; // as default
+            return _orIsNull ? ConditionKey.CK_LESS_THAN_OR_IS_NULL : ConditionKey.CK_LESS_THAN;
+        } else { // as default
+            return _orIsNull ? ConditionKey.CK_LESS_EQUAL_OR_IS_NULL : ConditionKey.CK_LESS_EQUAL;
         }
     }
 

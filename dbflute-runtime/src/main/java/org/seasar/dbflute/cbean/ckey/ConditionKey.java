@@ -59,14 +59,26 @@ public abstract class ConditionKey implements Serializable {
     /** The condition key of greaterThan. */
     public static final ConditionKey CK_GREATER_THAN = new ConditionKeyGreaterThan();
 
-    /** The condition key of lessrThan. */
+    /** The condition key of greaterThan with orIsNull. */
+    public static final ConditionKey CK_GREATER_THAN_OR_IS_NULL = new ConditionKeyGreaterThanOrIsNull();
+
+    /** The condition key of lessThan. */
     public static final ConditionKey CK_LESS_THAN = new ConditionKeyLessThan();
+
+    /** The condition key of lessThan with orIsNull. */
+    public static final ConditionKey CK_LESS_THAN_OR_IS_NULL = new ConditionKeyLessThanOrIsNull();
 
     /** The condition key of greaterEqual. */
     public static final ConditionKey CK_GREATER_EQUAL = new ConditionKeyGreaterEqual();
 
+    /** The condition key of greaterEqual with orIsNull. */
+    public static final ConditionKey CK_GREATER_EQUAL_OR_IS_NULL = new ConditionKeyGreaterEqualOrIsNull();
+
     /** The condition key of lessEqual. */
     public static final ConditionKey CK_LESS_EQUAL = new ConditionKeyLessEqual();
+
+    /** The condition key of lessEqual with orIsNull. */
+    public static final ConditionKey CK_LESS_EQUAL_OR_IS_NULL = new ConditionKeyLessEqualOrIsNull();
 
     /** The condition key of inScope. */
     public static final ConditionKey CK_IN_SCOPE = new ConditionKeyInScope();
@@ -249,9 +261,19 @@ public abstract class ConditionKey implements Serializable {
      * @param cipher The cipher of column by function. (NullAllowed)
      */
     protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher) {
-        final String bindExpression = buildBindExpression(location, null, cipher);
-        final String clause = columnRealName + " " + getOperand() + " " + bindExpression;
+        return new StringQueryClause(doBuildBindMainQuery(columnRealName, location, cipher));
+    }
+
+    protected QueryClause doBuildBindClauseOrIsNull(ColumnRealName columnRealName, String location,
+            ColumnFunctionCipher cipher) {
+        final String mainQuery = doBuildBindMainQuery(columnRealName, location, cipher);
+        final String clause = "(" + mainQuery + " or " + columnRealName + " is null)";
         return new StringQueryClause(clause);
+    }
+
+    protected String doBuildBindMainQuery(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher) {
+        final String bindExpression = buildBindExpression(location, null, cipher);
+        return columnRealName + " " + getOperand() + " " + bindExpression;
     }
 
     /**
