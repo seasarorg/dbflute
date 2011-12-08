@@ -1,4 +1,4 @@
-<h2 id="${table.name}"${table.titleForSchemaHtml}>
+<h2 id="${table.lowerName}"${table.titleForSchemaHtml}>
 ${table.aliasExpression}${table.tableDispName}
 #if ($database.hasAdditionalSchema() && $table.hasSchema())
 &nbsp;<span class="tableschema">on ${table.documentSchema}</span>

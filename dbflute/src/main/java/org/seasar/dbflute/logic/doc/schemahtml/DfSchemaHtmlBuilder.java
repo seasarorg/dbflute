@@ -17,6 +17,7 @@ public class DfSchemaHtmlBuilder {
     }
 
     public String buildRelatedTableLink(ForeignKey fk, String name, String delimiter) {
+        final String lowerName = name.toLowerCase();
         final StringBuilder sb = new StringBuilder();
         sb.append(delimiter);
         final String baseTitle = fk.getName();
@@ -39,7 +40,7 @@ public class DfSchemaHtmlBuilder {
                 comma = true;
             }
             final String title = resolveTitle(titleSb.toString());
-            sb.append("<a href=\"#" + name + "\" class=\"additionalfk\" title=\"" + title + "\">");
+            sb.append("<a href=\"#" + lowerName + "\" class=\"additionalfk\" title=\"" + title + "\">");
             contentName = name + (fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
         } else {
             final StringBuilder titleSb = new StringBuilder();
@@ -48,7 +49,7 @@ public class DfSchemaHtmlBuilder {
                 titleSb.append(": comment=").append(comment);
             }
             final String title = resolveTitle(titleSb.toString());
-            sb.append("<a href=\"#" + name + "\" title=\"" + title + "\">");
+            sb.append("<a href=\"#" + lowerName + "\" title=\"" + title + "\">");
             contentName = name;
         }
         sb.append(contentName).append("</a>");

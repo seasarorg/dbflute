@@ -246,6 +246,17 @@ public class Table {
     }
 
     // -----------------------------------------------------
+    //                                            Lower Name
+    //                                            ----------
+    /**
+     * Get the lower DB name of the Table, which is basically for SchemaHTML.
+     * @return The table lower name as String. (NotNull)
+     */
+    public String getLowerName() {
+        return _name != null ? _name.toLowerCase() : null;
+    }
+
+    // -----------------------------------------------------
     //                                              SQL Name
     //                                              --------
     /**

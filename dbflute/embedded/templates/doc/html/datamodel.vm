@@ -260,7 +260,7 @@
 #if ($isAliasDelimiterInDbCommentValid)
 		<td class="aliascell">${table.alias}</td>
 #end
-		<td><a href="#${table.name}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
+		<td><a href="#${table.lowerName}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
 		<td class="typecell">${table.type}</td>
 		<td class="relcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
 		<td class="relcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
