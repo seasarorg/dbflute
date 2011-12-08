@@ -134,6 +134,12 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return componentMap.get(KEY_COMMENT);
     }
 
+    public boolean isSuppressImplicitReverseFK(String foreignKeyName) { // closet (for emergency)
+        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
+        String value = componentMap.get("isSuppressImplicitReverseFK");
+        return value != null && value.equalsIgnoreCase("true");
+    }
+
     public List<String> findLocalColumnNameList(String foreignKeyName) {
         final String property = findLocalColumnName(foreignKeyName);
         if (property == null || property.trim().length() == 0) {

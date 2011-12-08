@@ -1191,6 +1191,22 @@ public class Table {
         return false;
     }
 
+    public boolean hasForeignTableContainsOne(Table foreignTable) {
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
+        for (ForeignKey foreignKey : foreignKeyList) {
+            if (foreignKey.getForeignTable().getName().equals(foreignTable.getName())) {
+                return true;
+            }
+        }
+        final List<ForeignKey> referrerAsOneList = getReferrerAsOneList();
+        for (ForeignKey referrer : referrerAsOneList) {
+            if (referrer.getTable().getName().equals(foreignTable.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                      Relation Index
     //                                                                      ==============
