@@ -10,7 +10,7 @@
 # property-type: String, Number, Date, (or defaultExcludeColumnList)
 # condition-key: NotEqual, GreaterThan, LessThan, GreaterEqual, LessEqual
 #              , InScope, NotInScope, PrefixSearch, LikeSearch, NotLikeSearch
-#              , EmptyString, FromTo, DateFromTo
+#              , EmptyString, FromTo, DateFromTo, RangeOf
 #              , (and prefix '!' means excluding)
 # table: table name or $$ALL$$
 # column: column name (hint) or $$CommonColumn$$ or $$VersionNo$$
@@ -70,6 +70,7 @@ map:{
         #; !LessThan = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
         #; !GreaterEqual = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
         #; !LessEqual = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
+        #; !RangeOf = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
         #; !InScope = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
         #; !NotInScope = map:{ $$ALL$$ = list:{ $$VersionNo$$ } }
     }

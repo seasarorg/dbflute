@@ -159,6 +159,10 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return isAvailable("Number", "LessEqual", column);
     }
 
+    public boolean isAvailableNumberRangeOf(Column column) {
+        return isAvailable("Number", "RangeOf", column);
+    }
+
     public boolean isAvailableNumberInScope(Column column) {
         return isAvailable("Number", "InScope", column);
     }

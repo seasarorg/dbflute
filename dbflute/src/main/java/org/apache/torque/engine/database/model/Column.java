@@ -1752,6 +1752,13 @@ public class Column {
         }
         return getIncludeQueryProperties().isAvailableNumberLessEqual(this);
     }
+    
+    public boolean isAvailableNumberRangeOf() {
+        if (hasQueryRestrictionByClassification()) {
+            return false;
+        }
+        return getIncludeQueryProperties().isAvailableNumberRangeOf(this);
+    }
 
     public boolean isAvailableNumberInScope() {
         if (isForeignKey() || isPrimaryKey()) {

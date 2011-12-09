@@ -646,6 +646,20 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         reg${tmpJavaName}(CK_LE, ${tmpUncapitalisedJavaName});
     }
 #end
+#if (${col.isAvailableNumberRangeOf()})
+
+    /**
+     * RangeOf with various options. (versatile) <br />
+     * {(default) minNumber &lt;= column &lt;= maxNumber} <br />
+     * And NullIgnored, OnlyOnceRegistered.
+     * @param minNumber The min number of ${col.uncapitalisedJavaName}. (NullAllowed)
+     * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed)
+     * @param rangeOfOption The option of range-of. (NotNull)
+     */
+    public void set${tmpJavaName}_RangeOf(${col.javaNative} minNumber, ${col.javaNative} maxNumber, RangeOfOption rangeOfOption) {
+        regROO(minNumber, maxNumber, getCValue${tmpJavaName}(), "${col.name}", rangeOfOption);
+    }
+#end
 #if (${col.isAvailableNumberInScope()})
 
     /**
