@@ -41,6 +41,7 @@ import org.seasar.dbflute.cbean.coption.DerivedReferrerOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.coption.ParameterOption;
+import org.seasar.dbflute.cbean.coption.RangeOfOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -566,85 +567,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // -----------------------------------------------------
-    //                                         InScope Query
-    //                                         -------------
-    protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String columnDbName) {
-        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
-            return;
-        }
-        final int inScopeLimit = xgetSqlClause().getInScopeLimit();
-        if (inScopeLimit > 0 && value.size() > inScopeLimit) {
-            // if the key is for inScope, it should be split as 'or'
-            // (if the key is for notInScope, it should be split as 'and')
-            final boolean orScopeQuery = xgetSqlClause().isOrScopeQueryEffective();
-            final boolean orScopeQueryAndPart = xgetSqlClause().isOrScopeQueryAndPartEffective();
-            final boolean needsAndPart = orScopeQuery && !orScopeQueryAndPart;
-            if (isConditionKeyInScope(key)) {
-                // if or-scope query has already been effective, create new or-scope
-                xgetSqlClause().makeOrScopeQueryEffective();
-            } else {
-                if (needsAndPart) {
-                    xgetSqlClause().beginOrScopeQueryAndPart();
-                }
-            }
-
-            try {
-                // split the condition
-                @SuppressWarnings("unchecked")
-                final List<Object> objectList = (List<Object>) value;
-                final List<List<Object>> valueList = DfCollectionUtil.splitByLimit(objectList, inScopeLimit);
-                for (int i = 0; i < valueList.size(); i++) {
-                    final List<Object> currentValue = valueList.get(i);
-                    if (i == 0) {
-                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, columnDbName);
-                    } else {
-                        invokeQuery(columnDbName, key.getConditionKey(), currentValue);
-                    }
-                }
-            } finally {
-                if (isConditionKeyInScope(key)) {
-                    xgetSqlClause().closeOrScopeQuery();
-                } else {
-                    if (needsAndPart) {
-                        xgetSqlClause().endOrScopeQueryAndPart();
-                    }
-                }
-            }
-        } else {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName);
-        }
-    }
-
-    static boolean isConditionKeyInScope(ConditionKey key) { // default scope for test 
-        return ConditionKeyInScope.class.isAssignableFrom(key.getClass());
-    }
-
-    // -----------------------------------------------------
-    //                                          FromTo Query
-    //                                          ------------
-    protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
-        final ConditionKey fromKey = option.getFromDateConditionKey();
-        boolean fromInvalid = false;
-        final Date filteredFromDate = option.filterFromDate(fromDate);
-        if (isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName)) {
-            setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
-        } else {
-            fromInvalid = true;
-        }
-        final ConditionKey toKey = option.getToDateConditionKey();
-        final Date filteredToDate = option.filterToDate(toDate);
-        if (isValidQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName)) {
-            setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
-        } else {
-            if (fromInvalid) { // means both queries are invalid
-                final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
-                final List<Date> valueList = newArrayList(fromDate, toDate);
-                handleInvalidQueryList(keyList, valueList, columnDbName);
-            }
-        }
-    }
-
-    // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------
     protected void regLSQ(ConditionKey key, String value, ConditionValue cvalue, String columnDbName,
@@ -740,6 +662,109 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void invokeQueryLikeSearch(String columnFlexibleName, Object value, LikeSearchOption option) {
         invokeQuery(columnFlexibleName, "likeSearch", value, option);
+    }
+
+    // -----------------------------------------------------
+    //                                          FromTo Query
+    //                                          ------------
+    protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
+        final ConditionKey fromKey = option.getFromDateConditionKey();
+        boolean fromInvalid = false;
+        final Date filteredFromDate = option.filterFromDate(fromDate);
+        if (isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName)) {
+            setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
+        } else {
+            fromInvalid = true;
+        }
+        final ConditionKey toKey = option.getToDateConditionKey();
+        final Date filteredToDate = option.filterToDate(toDate);
+        if (isValidQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName)) {
+            setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
+        } else {
+            if (fromInvalid) { // means both queries are invalid
+                final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
+                final List<Date> valueList = newArrayList(fromDate, toDate);
+                handleInvalidQueryList(keyList, valueList, columnDbName);
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         RangeOf Query
+    //                                         -------------
+    protected void regROO(Number minNumber, Number maxNumber, ConditionValue cvalue, String columnDbName,
+            RangeOfOption option) {
+        final ConditionKey minKey = option.getMinNumberConditionKey();
+        boolean fromInvalid = false;
+        if (isValidQueryNoCheck(minKey, minNumber, cvalue, columnDbName)) {
+            setupConditionValueAndRegisterWhereClause(minKey, minNumber, cvalue, columnDbName);
+        } else {
+            fromInvalid = true;
+        }
+        final ConditionKey maxKey = option.getMaxNumberConditionKey();
+        if (isValidQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName)) {
+            setupConditionValueAndRegisterWhereClause(maxKey, maxNumber, cvalue, columnDbName);
+        } else {
+            if (fromInvalid) { // means both queries are invalid
+                final List<ConditionKey> keyList = newArrayList(minKey, maxKey);
+                final List<Number> valueList = newArrayList(minNumber, maxNumber);
+                handleInvalidQueryList(keyList, valueList, columnDbName);
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         InScope Query
+    //                                         -------------
+    protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String columnDbName) {
+        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
+            return;
+        }
+        final int inScopeLimit = xgetSqlClause().getInScopeLimit();
+        if (inScopeLimit > 0 && value.size() > inScopeLimit) {
+            // if the key is for inScope, it should be split as 'or'
+            // (if the key is for notInScope, it should be split as 'and')
+            final boolean orScopeQuery = xgetSqlClause().isOrScopeQueryEffective();
+            final boolean orScopeQueryAndPart = xgetSqlClause().isOrScopeQueryAndPartEffective();
+            final boolean needsAndPart = orScopeQuery && !orScopeQueryAndPart;
+            if (isConditionKeyInScope(key)) {
+                // if or-scope query has already been effective, create new or-scope
+                xgetSqlClause().makeOrScopeQueryEffective();
+            } else {
+                if (needsAndPart) {
+                    xgetSqlClause().beginOrScopeQueryAndPart();
+                }
+            }
+
+            try {
+                // split the condition
+                @SuppressWarnings("unchecked")
+                final List<Object> objectList = (List<Object>) value;
+                final List<List<Object>> valueList = DfCollectionUtil.splitByLimit(objectList, inScopeLimit);
+                for (int i = 0; i < valueList.size(); i++) {
+                    final List<Object> currentValue = valueList.get(i);
+                    if (i == 0) {
+                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, columnDbName);
+                    } else {
+                        invokeQuery(columnDbName, key.getConditionKey(), currentValue);
+                    }
+                }
+            } finally {
+                if (isConditionKeyInScope(key)) {
+                    xgetSqlClause().closeOrScopeQuery();
+                } else {
+                    if (needsAndPart) {
+                        xgetSqlClause().endOrScopeQueryAndPart();
+                    }
+                }
+            }
+        } else {
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName);
+        }
+    }
+
+    static boolean isConditionKeyInScope(ConditionKey key) { // default scope for test 
+        return ConditionKeyInScope.class.isAssignableFrom(key.getClass());
     }
 
     // -----------------------------------------------------

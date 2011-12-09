@@ -104,6 +104,17 @@ public abstract class ConditionKey implements Serializable {
     /** Dummy-object for IsNull and IsNotNull and so on... */
     protected static final Object DUMMY_OBJECT = new Object();
 
+    /**
+     * Is the condition key null-able?
+     * @param key The condition key. (NotNull)
+     * @return The determination, true or false.
+     */
+    public static boolean isNullaleConditionKey(ConditionKey key) {
+        return CK_GREATER_EQUAL_OR_IS_NULL.equals(key) || CK_GREATER_THAN_OR_IS_NULL.equals(key)
+                || CK_LESS_EQUAL_OR_IS_NULL.equals(key) || CK_LESS_THAN_OR_IS_NULL.equals(key)
+                || CK_IS_NULL.equals(key) || CK_IS_NULL_OR_EMPTY.equals(key);
+    }
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -344,33 +355,6 @@ public abstract class ConditionKey implements Serializable {
     //                                                                      Basic Override
     //                                                                      ==============
     /**
-     * The override.
-     * Returns hash-code of this condition-key string.
-     * @return HashCode.
-     */
-    @Override
-    public int hashCode() {
-        return getConditionKey().hashCode();
-    }
-
-    /**
-     * The override.
-     * If the condition-key of the other is same as this one, returns true.
-     * @param other Other entity. (NullAllowed)
-     * @return Comparing result. If other is null, returns false.
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof ConditionKey) {
-            if (this.getConditionKey().equals(((ConditionKey) other).getConditionKey())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * The override.
      * @return View-string of condition key information.
      */
     @Override

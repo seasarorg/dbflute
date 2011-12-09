@@ -779,7 +779,7 @@ public class FromToOption implements ConditionOption, Serializable {
     //                                               Operand
     //                                               -------
     /**
-     * Set up operand for to-date as greater-than. <br />
+     * Set up operand for from-date as greater-than. <br />
      * This is for manual adjustment.
      * @return this. (NotNull)
      */
@@ -1229,7 +1229,7 @@ public class FromToOption implements ConditionOption, Serializable {
         sb.append(title);
         sb.append(":{usePattern=").append(_usePattern);
         sb.append(", greaterThan=").append(_greaterThan).append(", lessThan=").append(_lessThan);
-        sb.append("}");
+        sb.append(", orIsNull=").append(_orIsNull).append("}");
         return sb.toString();
     }
 }
