@@ -42,7 +42,15 @@ public class ConditionKeyLessThan extends ConditionKey {
      * Constructor.
      */
     protected ConditionKeyLessThan() {
+        initializeConditionKey();
+        initializeOperand();
+    }
+
+    protected void initializeConditionKey() {
         _conditionKey = "lessThan";
+    }
+
+    protected void initializeOperand() {
         _operand = "<";
     }
 

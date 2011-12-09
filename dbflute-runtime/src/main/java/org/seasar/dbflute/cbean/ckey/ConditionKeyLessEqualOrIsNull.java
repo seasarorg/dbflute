@@ -35,11 +35,9 @@ public class ConditionKeyLessEqualOrIsNull extends ConditionKeyLessEqual {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
-    protected ConditionKeyLessEqualOrIsNull() {
-        // same key as super's
+    @Override
+    protected void initializeConditionKey() {
+        _conditionKey = "lessEqualOrIsNull";
     }
 
     // ===================================================================================

@@ -35,11 +35,9 @@ public class ConditionKeyGreaterEqualOrIsNull extends ConditionKeyGreaterEqual {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
-    protected ConditionKeyGreaterEqualOrIsNull() {
-        // same key as super's
+    @Override
+    protected void initializeConditionKey() {
+        _conditionKey = "greaterEqualOrIsNull";
     }
 
     // ===================================================================================

@@ -42,7 +42,15 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
      * Constructor.
      */
     protected ConditionKeyGreaterEqual() {
+        initializeConditionKey();
+        initializeOperand();
+    }
+
+    protected void initializeConditionKey() {
         _conditionKey = "greaterEqual";
+    }
+
+    protected void initializeOperand() {
         _operand = ">=";
     }
 
