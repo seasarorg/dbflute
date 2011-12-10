@@ -1401,6 +1401,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         final String columnCapPropName = initCap(columnInfo.getPropertyName());
         final boolean noArg = Srl.equalsIgnoreCase(ckey, "IsNull", "IsNotNull", "IsNullOrEmpty", "EmptyString");
+        final boolean rangeOf = Srl.equalsIgnoreCase(ckey, "RangeOf");
         final boolean fromTo = Srl.equalsIgnoreCase(ckey, "FromTo", "DateFromTo");
         if (!noArg) {
             try {
@@ -1409,11 +1410,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 throwConditionInvokingValueConvertFailureException(colName, ckey, value, option, e);
             }
         }
-        final List<Class<?>> typeList = newArrayList();
         final String methodName = "set" + columnCapPropName + "_" + initCap(ckey);
+        final List<Class<?>> typeList = newArrayList();
         if (fromTo) {
             typeList.add(Date.class);
             typeList.add(Date.class);
+        } else if (rangeOf) {
+            final Class<?> propertyType = columnInfo.getPropertyType();
+            typeList.add(propertyType);
+            typeList.add(propertyType);
         } else {
             if (!noArg) {
                 typeList.add(value.getClass());
@@ -1429,7 +1434,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         try {
             final List<Object> argList = newArrayList();
-            if (fromTo) {
+            if (fromTo || rangeOf) {
                 if (!(value instanceof List<?>)) { // check type
                     throwConditionInvokingDateFromToValueInvalidException(colName, ckey, value, option, methodName,
                             parameterTypes);
