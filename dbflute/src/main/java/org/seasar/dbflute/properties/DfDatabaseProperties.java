@@ -236,7 +236,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
         _tableExceptList = new ArrayList<String>();
         _tableExceptGenOnlyList = new ArrayList<String>();
-        setupTableExceptList(plainList, _tableExceptList, _tableExceptGenOnlyList);
+        setupTableOrColumnExceptList(plainList, _tableExceptList, _tableExceptGenOnlyList);
         return _tableExceptList;
     }
 
@@ -248,14 +248,14 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return _tableExceptGenOnlyList;
     }
 
-    protected void setupTableExceptList(List<String> plainList, List<String> tableExceptList,
-            List<String> tableExceptGenOnlyList) {
+    protected void setupTableOrColumnExceptList(List<String> plainList, List<String> exceptList,
+            List<String> exceptGenOnlyList) {
         final String genOnlySuffix = "@gen";
         for (String element : plainList) {
             if (Srl.endsWithIgnoreCase(element, genOnlySuffix)) {
-                tableExceptGenOnlyList.add(Srl.substringLastFrontIgnoreCase(element, genOnlySuffix));
+                exceptGenOnlyList.add(Srl.substringLastFrontIgnoreCase(element, genOnlySuffix));
             } else {
-                tableExceptList.add(element);
+                exceptList.add(element);
             }
         }
     }
@@ -288,6 +288,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     //                                     Column Except Map
     //                                     -----------------
     protected Map<String, List<String>> _columnExceptMap;
+    protected Map<String, List<String>> _columnExceptGenOnlyMap; // getting meta data but no generating classes
 
     public Map<String, List<String>> getColumnExceptMap() { // for main schema
         if (_columnExceptMap != null) {
@@ -299,13 +300,10 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             msg = msg + " in databaseInfoMap.dfprop: columnExceptList=" + oldStyleList;
             throw new IllegalStateException(msg);
         }
-        final Map<String, List<String>> columnExceptMap = StringKeyMap.createAsFlexible();
+        _columnExceptMap = StringKeyMap.createAsFlexible();
+        _columnExceptGenOnlyMap = StringKeyMap.createAsFlexible();
         final Map<String, Object> keyMap = getVairousStringKeyMap("columnExceptMap");
-        if (keyMap.isEmpty()) {
-            return columnExceptMap;
-        }
-        final Set<Entry<String, Object>> entrySet = keyMap.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
+        for (Entry<String, Object> entry : keyMap.entrySet()) {
             final String tableName = entry.getKey();
             final Object obj = entry.getValue();
             if (!(obj instanceof List<?>)) {
@@ -314,11 +312,22 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
                 throw new DfIllegalPropertyTypeException(msg);
             }
             @SuppressWarnings("unchecked")
-            final List<String> columnList = (List<String>) obj;
-            columnExceptMap.put(tableName, columnList);
+            final List<String> plainList = (List<String>) obj;
+            final List<String> exceptList = new ArrayList<String>();
+            final List<String> exceptGenOnlyList = new ArrayList<String>();
+            setupTableOrColumnExceptList(plainList, exceptList, exceptGenOnlyList);
+            _columnExceptMap.put(tableName, exceptList);
+            _columnExceptGenOnlyMap.put(tableName, exceptGenOnlyList);
         }
-        _columnExceptMap = columnExceptMap;
         return _columnExceptMap;
+    }
+
+    public Map<String, List<String>> getColumnExceptGenOnlyMap() { // for main schema
+        if (_columnExceptGenOnlyMap != null) {
+            return _columnExceptGenOnlyMap;
+        }
+        getColumnExceptMap(); // initialize
+        return _columnExceptGenOnlyMap;
     }
 
     // ===================================================================================
@@ -432,7 +441,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             final List<String> plainList = (List<String>) obj;
             final List<String> tableExceptList = new ArrayList<String>();
             final List<String> tableExceptGenOnlyList = new ArrayList<String>();
-            setupTableExceptList(plainList, tableExceptList, tableExceptGenOnlyList);
+            setupTableOrColumnExceptList(plainList, tableExceptList, tableExceptGenOnlyList);
             info.setTableExceptList(tableExceptList);
             info.setTableExceptGenOnlyList(tableExceptGenOnlyList);
         }
@@ -459,6 +468,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         if (obj == null) {
             final Map<String, List<String>> columnExceptMap = DfCollectionUtil.emptyMap();
             info.setColumnExceptMap(columnExceptMap);
+            final Map<String, List<String>> columnExceptGenOnlyMap = DfCollectionUtil.emptyMap();
+            info.setColumnExceptGenOnlyMap(columnExceptGenOnlyMap);
         } else if (!(obj instanceof Map<?, ?>)) {
             String msg = "The type of columnExceptMap in the property 'additionalSchemaMap' should be Map:";
             msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
@@ -469,6 +480,13 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             final Map<String, List<String>> flexibleMap = StringKeyMap.createAsFlexible();
             flexibleMap.putAll(columnExceptMap);
             info.setColumnExceptMap(flexibleMap);
+            for (Entry<String, List<String>> entry : columnExceptMap.entrySet()) {
+                final List<String> plainList = entry.getValue();
+                final List<String> colummExceptList = new ArrayList<String>();
+                final List<String> columnExceptGenOnlyList = new ArrayList<String>();
+                setupTableOrColumnExceptList(plainList, colummExceptList, columnExceptGenOnlyList);
+            }
+            info.setColumnExceptGenOnlyMap(columnExceptMap);
         }
     }
 

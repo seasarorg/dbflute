@@ -99,7 +99,7 @@ public class XmlToAppData extends DefaultHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected final AppData _appData;
-    protected final XmlReadingTableFilter _tableFilter;
+    protected final XmlReadingFilter _readingFilter;
     protected Database _currentDB;
     protected Table _currentTable;
     protected Column _currentColumn;
@@ -122,16 +122,18 @@ public class XmlToAppData extends DefaultHandler {
     /**
      * Creates a new instance for the specified database type.
      * @param databaseType The type of database for the application.
-     * @param tableFilter The filter of table by name when reading XML. (NullAllowed)
+     * @param readingFilter The filter of table by name when reading XML. (NullAllowed)
      */
-    public XmlToAppData(String databaseType, XmlReadingTableFilter tableFilter) {
+    public XmlToAppData(String databaseType, XmlReadingFilter readingFilter) {
         _appData = new AppData(databaseType);
-        _tableFilter = tableFilter;
+        _readingFilter = readingFilter;
         _firstPass = true;
     }
 
-    public static interface XmlReadingTableFilter {
-        boolean isExcept(UnifiedSchema unifiedSchema, String tableName);
+    public static interface XmlReadingFilter {
+        boolean isTableExcept(UnifiedSchema unifiedSchema, String tableName);
+
+        boolean isColumnExcept(UnifiedSchema unifiedSchema, String tableName, String columnName);
     }
 
     // ===================================================================================
@@ -232,11 +234,11 @@ public class XmlToAppData extends DefaultHandler {
                 _currentDB = _appData.addDatabase(attributes); // two or more calls throws Exception
             } else if (rawName.equals("table")) { // contains additional schema's tables
                 clearCurrentTableElements();
-                _currentTable = _currentDB.addTable(attributes, _tableFilter); // null allowed
+                _currentTable = _currentDB.addTable(attributes, _readingFilter); // null allowed
             } else if (_currentTable != null) { // check because the table may be filtered
                 // handle table elements
                 if (rawName.equals("column")) {
-                    _currentColumn = _currentTable.addColumn(attributes);
+                    _currentColumn = _currentTable.addColumn(attributes, _readingFilter);
                 } else if (rawName.equals("foreign-key")) {
                     // except foreign tables are adjusted later (at final initialization)
                     _currentFK = _currentTable.addForeignKey(attributes);

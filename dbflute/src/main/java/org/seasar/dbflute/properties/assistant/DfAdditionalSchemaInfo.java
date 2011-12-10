@@ -15,6 +15,7 @@ public class DfAdditionalSchemaInfo {
     protected List<String> _objectTypeTargetList;
     protected List<String> _tableExceptList;
     protected List<String> _tableExceptGenOnlyList;
+    protected Map<String, List<String>> _columnExceptGenOnlyMap;
     protected List<String> _tableTargetList;
     protected Map<String, List<String>> _columnExceptMap;
     protected boolean _suppressCommonColumn;
@@ -85,6 +86,14 @@ public class DfAdditionalSchemaInfo {
 
     public void setColumnExceptMap(Map<String, List<String>> columnExceptMap) {
         this._columnExceptMap = columnExceptMap;
+    }
+
+    public Map<String, List<String>> getColumnExceptGenOnlyMap() {
+        return _columnExceptGenOnlyMap;
+    }
+
+    public void setColumnExceptGenOnlyMap(Map<String, List<String>> _columnExceptGenOnlyMap) {
+        this._columnExceptGenOnlyMap = _columnExceptGenOnlyMap;
     }
 
     public boolean isSuppressCommonColumn() {

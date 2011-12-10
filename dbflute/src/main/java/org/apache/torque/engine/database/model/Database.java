@@ -72,7 +72,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
-import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseNameMapping;
@@ -221,7 +221,7 @@ public class Database {
      * @param tableFilter The filter of table. (NullAllowed)
      * @return The instance of added table. (NullAllowed: if null, means the table is excepted) 
      */
-    public Table addTable(Attributes attrib, XmlReadingTableFilter tableFilter) {
+    public Table addTable(Attributes attrib, XmlReadingFilter tableFilter) {
         final Table tbl = new Table();
         tbl.setDatabase(this);
         if (!tbl.loadFromXML(attrib, tableFilter)) {

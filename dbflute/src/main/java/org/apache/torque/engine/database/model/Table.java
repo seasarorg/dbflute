@@ -68,7 +68,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
-import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -192,11 +192,11 @@ public class Table {
      * @param tableFilter The filter of table by name when reading XML. (NullAllowed)
      * @return Should be the table excepted?
      */
-    public boolean loadFromXML(Attributes attrib, XmlReadingTableFilter tableFilter) {
+    public boolean loadFromXML(Attributes attrib, XmlReadingFilter tableFilter) {
         _name = attrib.getValue("name"); // table name
         _type = attrib.getValue("type"); // TABLE, VIEW, SYNONYM...
         _unifiedSchema = UnifiedSchema.createAsDynamicSchema(attrib.getValue("schema"));
-        if (tableFilter != null && tableFilter.isExcept(_unifiedSchema, _name)) {
+        if (tableFilter != null && tableFilter.isTableExcept(_unifiedSchema, _name)) {
             return false;
         }
         _plainComment = attrib.getValue("comment");
@@ -496,12 +496,13 @@ public class Table {
     /**
      * A utility function to create a new column from attrib and add it to this table.
      * @param attrib xml attributes for the column to add
+     * @param columnFilter The filter of column. (NullAllowed)
      * @return the added column
      */
-    public Column addColumn(Attributes attrib) {
+    public Column addColumn(Attributes attrib, XmlReadingFilter columnFilter) {
         Column col = new Column();
         col.setTable(this);
-        col.loadFromXML(attrib);
+        col.loadFromXML(attrib, columnFilter);
         addColumn(col);
         return col;
     }

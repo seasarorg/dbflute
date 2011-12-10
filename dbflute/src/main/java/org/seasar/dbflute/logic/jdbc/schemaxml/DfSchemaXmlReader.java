@@ -3,11 +3,12 @@ package org.seasar.dbflute.logic.jdbc.schemaxml;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.torque.engine.database.transform.XmlToAppData;
-import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingTableFilter;
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -27,7 +28,7 @@ public class DfSchemaXmlReader {
     //                                                                           =========
     protected final String _schemaXml;
     protected final String _databaseType;
-    protected final XmlReadingTableFilter _tableFilter;
+    protected final XmlReadingFilter _tableFilter;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -37,7 +38,7 @@ public class DfSchemaXmlReader {
      * @param databaseType The type of database for the application.
      * @param tableFilter The filter of table by name when reading XML. (NullAllowed)
      */
-    protected DfSchemaXmlReader(String schemaXml, String databaseType, XmlReadingTableFilter tableFilter) {
+    protected DfSchemaXmlReader(String schemaXml, String databaseType, XmlReadingFilter tableFilter) {
         _schemaXml = schemaXml;
         _databaseType = databaseType;
         _tableFilter = tableFilter;
@@ -70,14 +71,14 @@ public class DfSchemaXmlReader {
         return new DfSchemaXmlReader(schemaXml, databaseType, tableFilter);
     }
 
-    protected static class DfGenetateXmlReadingTableFilter implements XmlReadingTableFilter {
+    protected static class DfGenetateXmlReadingTableFilter implements XmlReadingFilter {
         protected DfDatabaseProperties _databaseProp;
 
         public DfGenetateXmlReadingTableFilter(DfDatabaseProperties databaseProp) {
             _databaseProp = databaseProp;
         }
 
-        public boolean isExcept(UnifiedSchema unifiedSchema, String tableName) {
+        public boolean isTableExcept(UnifiedSchema unifiedSchema, String tableName) {
             final DfAdditionalSchemaInfo additional = _databaseProp.getAdditionalSchemaInfo(unifiedSchema);
             final List<String> tableExceptGenOnlyList;
             if (additional != null) {
@@ -87,6 +88,23 @@ public class DfSchemaXmlReader {
             }
             final List<String> targetEmptyList = DfCollectionUtil.emptyList();
             return !isTargetByHint(tableName, targetEmptyList, tableExceptGenOnlyList);
+        }
+
+        public boolean isColumnExcept(UnifiedSchema unifiedSchema, String tableName, String columnName) {
+            final DfAdditionalSchemaInfo additional = _databaseProp.getAdditionalSchemaInfo(unifiedSchema);
+            final Map<String, List<String>> tableExceptGenOnlyMap;
+            if (additional != null) {
+                tableExceptGenOnlyMap = additional.getColumnExceptGenOnlyMap();
+            } else {
+                tableExceptGenOnlyMap = _databaseProp.getColumnExceptGenOnlyMap();
+            }
+            final List<String> targetEmptyList = DfCollectionUtil.emptyList();
+            final List<String> columnExceptGenOnlyList = tableExceptGenOnlyMap.get(tableName);
+            if (columnExceptGenOnlyList != null) {
+                return !isTargetByHint(tableName, targetEmptyList, columnExceptGenOnlyList);
+            } else {
+                return false;
+            }
         }
 
         protected boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
@@ -101,7 +119,7 @@ public class DfSchemaXmlReader {
      * @return The instance of this. (NotNull)
      */
     public static DfSchemaXmlReader createAsPlain(String schemaXml, String databaseType,
-            XmlReadingTableFilter tableFilter) {
+            XmlReadingFilter tableFilter) {
         return new DfSchemaXmlReader(schemaXml, databaseType, tableFilter);
     }
 

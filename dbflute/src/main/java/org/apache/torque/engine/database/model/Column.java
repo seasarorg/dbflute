@@ -61,6 +61,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -157,10 +158,16 @@ public class Column {
     // -----------------------------------------------------
     //                                         Load from XML
     //                                         -------------
-    public void loadFromXML(Attributes attrib) {
+    public void loadFromXML(Attributes attrib, XmlReadingFilter columnFilter) {
         // name
         _name = attrib.getValue("name"); // column name
         _javaName = attrib.getValue("javaName");
+
+        final UnifiedSchema unifiedSchema = getTable().getUnifiedSchema();
+        final String tableName = getTable().getName();
+        if (columnFilter != null && columnFilter.isColumnExcept(unifiedSchema, tableName, _name)) {
+            return;
+        }
 
         // primary key
         _isPrimaryKey = ("true".equals(attrib.getValue("primaryKey")));
@@ -1752,7 +1759,7 @@ public class Column {
         }
         return getIncludeQueryProperties().isAvailableNumberLessEqual(this);
     }
-    
+
     public boolean isAvailableNumberRangeOf() {
         if (hasQueryRestrictionByClassification()) {
             return false;
