@@ -158,7 +158,7 @@ public class Column {
     // -----------------------------------------------------
     //                                         Load from XML
     //                                         -------------
-    public void loadFromXML(Attributes attrib, XmlReadingFilter columnFilter) {
+    public boolean loadFromXML(Attributes attrib, XmlReadingFilter columnFilter) {
         // name
         _name = attrib.getValue("name"); // column name
         _javaName = attrib.getValue("javaName");
@@ -166,7 +166,7 @@ public class Column {
         final UnifiedSchema unifiedSchema = getTable().getUnifiedSchema();
         final String tableName = getTable().getName();
         if (columnFilter != null && columnFilter.isColumnExcept(unifiedSchema, tableName, _name)) {
-            return;
+            return false;
         }
 
         // primary key
@@ -199,6 +199,7 @@ public class Column {
         _plainComment = attrib.getValue("comment");
 
         handleProgramReservationWord();
+        return true;
     }
 
     protected void handleProgramReservationWord() {

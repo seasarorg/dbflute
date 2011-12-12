@@ -46,14 +46,14 @@ public class DfSchemaXmlReader {
 
     public static DfSchemaXmlReader createAsCoreToGenerate() {
         final DfDatabaseProperties databaseProp = DfBuildProperties.getInstance().getDatabaseProperties();
-        return doCreateAsCoreTo(new DfGenetateXmlReadingTableFilter(databaseProp));
+        return doCreateAsCoreTo(new DfGenetateXmlReadingFilter(databaseProp));
     }
 
     public static DfSchemaXmlReader createAsCoreToManage() {
         return doCreateAsCoreTo(null);
     }
 
-    public static DfSchemaXmlReader doCreateAsCoreTo(DfGenetateXmlReadingTableFilter tableFilter) {
+    public static DfSchemaXmlReader doCreateAsCoreTo(DfGenetateXmlReadingFilter tableFilter) {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
         final String schemaXml = facadeProp.getProejctSchemaXMLFile();
@@ -64,17 +64,17 @@ public class DfSchemaXmlReader {
         return doCreateAs(schemaXml, null);
     }
 
-    public static DfSchemaXmlReader doCreateAs(String schemaXml, DfGenetateXmlReadingTableFilter tableFilter) {
+    public static DfSchemaXmlReader doCreateAs(String schemaXml, DfGenetateXmlReadingFilter tableFilter) {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfDatabaseTypeFacadeProp facadeProp = basicProp.getDatabaseTypeFacadeProp();
         final String databaseType = facadeProp.getTargetDatabase();
         return new DfSchemaXmlReader(schemaXml, databaseType, tableFilter);
     }
 
-    protected static class DfGenetateXmlReadingTableFilter implements XmlReadingFilter {
+    protected static class DfGenetateXmlReadingFilter implements XmlReadingFilter {
         protected DfDatabaseProperties _databaseProp;
 
-        public DfGenetateXmlReadingTableFilter(DfDatabaseProperties databaseProp) {
+        public DfGenetateXmlReadingFilter(DfDatabaseProperties databaseProp) {
             _databaseProp = databaseProp;
         }
 
@@ -101,7 +101,7 @@ public class DfSchemaXmlReader {
             final List<String> targetEmptyList = DfCollectionUtil.emptyList();
             final List<String> columnExceptGenOnlyList = tableExceptGenOnlyMap.get(tableName);
             if (columnExceptGenOnlyList != null) {
-                return !isTargetByHint(tableName, targetEmptyList, columnExceptGenOnlyList);
+                return !isTargetByHint(columnName, targetEmptyList, columnExceptGenOnlyList);
             } else {
                 return false;
             }
@@ -118,8 +118,7 @@ public class DfSchemaXmlReader {
      * @param tableFilter The filter of table by name when reading XML. (NullAllowed)
      * @return The instance of this. (NotNull)
      */
-    public static DfSchemaXmlReader createAsPlain(String schemaXml, String databaseType,
-            XmlReadingFilter tableFilter) {
+    public static DfSchemaXmlReader createAsPlain(String schemaXml, String databaseType, XmlReadingFilter tableFilter) {
         return new DfSchemaXmlReader(schemaXml, databaseType, tableFilter);
     }
 

@@ -497,12 +497,14 @@ public class Table {
      * A utility function to create a new column from attrib and add it to this table.
      * @param attrib xml attributes for the column to add
      * @param columnFilter The filter of column. (NullAllowed)
-     * @return the added column
+     * @return the added column (NullAllowed: if null, means the column was filtered)
      */
     public Column addColumn(Attributes attrib, XmlReadingFilter columnFilter) {
         Column col = new Column();
         col.setTable(this);
-        col.loadFromXML(attrib, columnFilter);
+        if (!col.loadFromXML(attrib, columnFilter)) {
+            return null;
+        }
         addColumn(col);
         return col;
     }

@@ -219,7 +219,7 @@ public class Database {
      * Add table from attributes of SchemaXML.
      * @param attrib The attributes of SchemaXML. (NotNull)
      * @param tableFilter The filter of table. (NullAllowed)
-     * @return The instance of added table. (NullAllowed: if null, means the table is excepted) 
+     * @return The instance of added table. (NullAllowed: if null, means the table was filtered) 
      */
     public Table addTable(Attributes attrib, XmlReadingFilter tableFilter) {
         final Table tbl = new Table();
