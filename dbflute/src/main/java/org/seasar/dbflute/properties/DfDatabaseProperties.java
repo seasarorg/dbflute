@@ -429,8 +429,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         final Object obj = elementMap.get("tableExceptList");
         if (obj == null) {
             final List<String> tableExceptList = DfCollectionUtil.emptyList();
-            info.setTableExceptList(tableExceptList);
             final List<String> tableExceptGenOnlyList = DfCollectionUtil.emptyList();
+            info.setTableExceptList(tableExceptList);
             info.setTableExceptGenOnlyList(tableExceptGenOnlyList);
         } else if (!(obj instanceof List<?>)) {
             String msg = "The type of tableExceptList in the property 'additionalSchemaMap' should be List:";
@@ -467,8 +467,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         final Object obj = elementMap.get("columnExceptMap");
         if (obj == null) {
             final Map<String, List<String>> columnExceptMap = DfCollectionUtil.emptyMap();
-            info.setColumnExceptMap(columnExceptMap);
             final Map<String, List<String>> columnExceptGenOnlyMap = DfCollectionUtil.emptyMap();
+            info.setColumnExceptMap(columnExceptMap);
             info.setColumnExceptGenOnlyMap(columnExceptGenOnlyMap);
         } else if (!(obj instanceof Map<?, ?>)) {
             String msg = "The type of columnExceptMap in the property 'additionalSchemaMap' should be Map:";
@@ -476,17 +476,20 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             throw new DfIllegalPropertyTypeException(msg);
         } else {
             @SuppressWarnings("unchecked")
-            final Map<String, List<String>> columnExceptMap = (Map<String, List<String>>) obj;
-            final Map<String, List<String>> flexibleMap = StringKeyMap.createAsFlexible();
-            flexibleMap.putAll(columnExceptMap);
-            info.setColumnExceptMap(flexibleMap);
-            for (Entry<String, List<String>> entry : columnExceptMap.entrySet()) {
+            final Map<String, List<String>> plainMap = (Map<String, List<String>>) obj;
+            final Map<String, List<String>> columnExceptMap = StringKeyMap.createAsFlexible();
+            final Map<String, List<String>> columnExceptGenOnlyMap = StringKeyMap.createAsFlexible();
+            for (Entry<String, List<String>> entry : plainMap.entrySet()) {
+                final String key = entry.getKey();
                 final List<String> plainList = entry.getValue();
                 final List<String> colummExceptList = new ArrayList<String>();
                 final List<String> columnExceptGenOnlyList = new ArrayList<String>();
                 setupTableOrColumnExceptList(plainList, colummExceptList, columnExceptGenOnlyList);
+                columnExceptMap.put(key, colummExceptList);
+                columnExceptGenOnlyMap.put(key, columnExceptGenOnlyList);
             }
-            info.setColumnExceptGenOnlyMap(columnExceptMap);
+            info.setColumnExceptMap(columnExceptMap);
+            info.setColumnExceptGenOnlyMap(columnExceptGenOnlyMap);
         }
     }
 
