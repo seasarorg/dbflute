@@ -109,7 +109,7 @@
 	<ul class="table-content">
 #foreach ($tableDiff in $schemaDiff.addedTableDiffList)
 #if ($schemaDiff.isLatest())
-		<li><a href="./${database.schemaHtmlFileName}#${tableDiff.tableName}">${tableDiff.tableDispName}</a></li>
+		<li><a href="./${database.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></li>
 #else
 		<li>${tableDiff.tableDispName}</li>
 #end 
@@ -121,7 +121,7 @@
 	<div class="table-content">
 #foreach ($tableDiff in $schemaDiff.changedTableDiffList)
 #if ($schemaDiff.isLatest())
-		<h4><a href="./${database.schemaHtmlFileName}#${tableDiff.tableName}">${tableDiff.tableDispName}</a></h4>
+		<h4><a href="./${database.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></h4>
 #else
 		<h4>${tableDiff.tableDispName}</h4>
 #end

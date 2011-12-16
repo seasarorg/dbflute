@@ -345,6 +345,10 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
         return _tableName;
     }
 
+    public String getLowerTableName() {
+        return _tableName != null ? _tableName.toLowerCase() : "";
+    }
+
     public String getTableDispName() {
         // An implementation for the display name option is so easy here.
         // The best way is to save display names on a DiffMap file,
