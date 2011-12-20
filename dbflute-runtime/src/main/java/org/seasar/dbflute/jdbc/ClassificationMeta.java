@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.jdbc;
 
+import java.util.List;
+
 /**
  * The meta of classification. <br />
  * It's an internal interface for DBFlute runtime.
@@ -23,10 +25,24 @@ package org.seasar.dbflute.jdbc;
 public interface ClassificationMeta {
 
     /**
-     * @param code The code of the classification. (NullAllowed)
+     * Get classification by the code.
+     * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
      * @return The instance of the classification. (NullAllowed: when not found and code is null)
      */
     Classification codeOf(Object code);
+
+    /**
+     * Get classification by the name.
+     * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
+     * @return The instance of the classification. (NullAllowed: when not found and name is null)
+     */
+    Classification nameOf(String name);
+
+    /**
+     * Get the list of all classification elements. (returns new copied list)
+     * @return The list of classification elements. (NotNull)
+     */
+    List<Classification> listAll();
 
     /**
      * @return The instance of the code type for the classification. (NotNull)
