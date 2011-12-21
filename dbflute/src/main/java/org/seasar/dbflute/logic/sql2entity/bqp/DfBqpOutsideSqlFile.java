@@ -70,7 +70,12 @@ public class DfBqpOutsideSqlFile {
             if (getBasicProperties().isTargetLanguageJava()) {
                 final String sqlPackage;
                 if (getOutsideSqlProperties().isSqlPackageValid()) {
-                    sqlPackage = getOutsideSqlProperties().getSqlPackage();
+                    final String pureSqlPackage = getOutsideSqlProperties().getSqlPackage();
+                    if (pureSqlPackage.endsWith(exbhvName)) { // contains 'exbhv'
+                        sqlPackage = Srl.substringLastFront(pureSqlPackage, ".");
+                    } else {
+                        sqlPackage = pureSqlPackage;
+                    }
                 } else {
                     sqlPackage = Srl.substringLastFront(exbhvPackage, ".");
                 }
