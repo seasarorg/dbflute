@@ -201,7 +201,7 @@ public class DfXlsReader {
 
     protected void setupRows(DfDataTable table, HSSFSheet sheet) {
         for (int i = 1;; ++i) {
-            HSSFRow row = sheet.getRow((short) i);
+            HSSFRow row = sheet.getRow(i);
             if (row == null) {
                 break;
             }
