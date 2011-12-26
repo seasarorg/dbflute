@@ -20,13 +20,14 @@ import org.seasar.dbflute.jdbc.*;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
-import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
-import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
 import org.seasar.dbflute.cbean.coption.FromToOption;
 #end
 import org.seasar.dbflute.util.DfCollectionUtil;
+#if ($database.hasPmbMetaDataPropertyUseOriginalException($pmbClassName))
+import org.seasar.dbflute.exception.*;
+#end
 import org.seasar.dbflute.util.DfTypeUtil;
 import ${glPackageBaseCommon}.*;
 #if ($database.isPmbMetaDataTypedParameterBean($pmbClassName))

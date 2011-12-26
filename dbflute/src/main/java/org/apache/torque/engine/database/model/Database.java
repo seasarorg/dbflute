@@ -556,6 +556,10 @@ public class Database {
                 _sql2entitySchemaData);
     }
 
+    public boolean hasPmbMetaDataPropertyUseOriginalException(String className) {
+        return hasPmbMetaDataPropertyOptionAnyLikeSearch(className) || hasPmbMetaDataPropertyOptionAnyFromTo(className);
+    }
+
     // -----------------------------------------------------
     //                                    Option LikeSeasrch
     //                                    ------------------
