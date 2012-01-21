@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.cbean.sqlclause.query;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,10 +49,7 @@ public interface QueryClauseFilter {
      * So when there are same-name column between tables, both are target!
      * @author jflute
      */
-    public static class QueryClauseToEmbeddedSimpleFilter implements QueryClauseFilter, Serializable {
-
-        /** Serial version UID. (Default) */
-        private static final long serialVersionUID = 1L;
+    public static class QueryClauseToEmbeddedSimpleFilter implements QueryClauseFilter {
 
         protected final Set<ColumnInfo> _filterTargetColumnInfoSet;
 
@@ -107,9 +103,6 @@ public interface QueryClauseFilter {
      * @author jflute
      */
     public static class QueryClauseToEmbeddedQuotedSimpleFilter extends QueryClauseToEmbeddedSimpleFilter {
-
-        /** Serial version UID. (Default) */
-        private static final long serialVersionUID = 1L;
 
         public QueryClauseToEmbeddedQuotedSimpleFilter(ColumnInfo filterTargetColumnInfo) {
             super(filterTargetColumnInfo);

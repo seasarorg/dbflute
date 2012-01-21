@@ -1947,7 +1947,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throw new IllegalArgumentException(msg);
         }
         conditionValue = xescapeFullTextSearchValue(conditionValue);
-        int index = 0;
         xgetSqlClause().makeOrScopeQueryEffective();
         try {
             for (ColumnInfo columnInfo : textColumnList) {
@@ -1966,7 +1965,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     throw new IllegalArgumentException(msg);
                 }
                 invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, xcreateMatchLikeSearch());
-                ++index;
             }
         } finally {
             xgetSqlClause().closeOrScopeQuery();

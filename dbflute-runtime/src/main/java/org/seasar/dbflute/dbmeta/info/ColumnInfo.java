@@ -41,6 +41,9 @@ import org.seasar.dbflute.util.Srl;
  */
 public class ColumnInfo {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** The empty read-only list for empty property. */
     protected static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<String>());
 

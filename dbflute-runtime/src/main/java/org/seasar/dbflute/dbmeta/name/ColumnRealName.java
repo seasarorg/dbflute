@@ -15,12 +15,19 @@
  */
 package org.seasar.dbflute.dbmeta.name;
 
+import java.io.Serializable;
+
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class ColumnRealName {
+public class ColumnRealName implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

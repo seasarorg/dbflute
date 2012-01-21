@@ -60,9 +60,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
-
     /** The dummy value for internal map value. */
     protected static final Object DUMMY_VALUE = new Object();
 

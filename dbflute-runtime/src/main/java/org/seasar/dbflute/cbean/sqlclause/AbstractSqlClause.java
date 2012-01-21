@@ -223,7 +223,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                               WhereClauseSimpleFilter
     //                               -----------------------
     /** The filter for where clause. */
-    protected List<QueryClauseFilter> _whereClauseSimpleFilterList;
+    protected transient List<QueryClauseFilter> _whereClauseSimpleFilterList; // transient because of non-serializable
 
     // -----------------------------------------------------
     //                                    ColumnQuery Object
@@ -1764,7 +1764,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 }
             }
 
-            int count = 0;
             for (String orderBy : orderByList) {
                 _orderByEffective = true;
                 String aliasName = null;
@@ -1786,8 +1785,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                     element.setupDesc();
                 }
                 getOrderBy().addOrderByElement(element);
-
-                ++count;
             }
         } catch (RuntimeException e) {
             String msg = "Failed to register order-by:";

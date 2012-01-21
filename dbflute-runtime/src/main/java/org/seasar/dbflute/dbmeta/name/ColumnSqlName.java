@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.dbmeta.name;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,7 +23,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * The value class for the SQL name of column.
  * @author jflute
  */
-public class ColumnSqlName {
+public class ColumnSqlName implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute

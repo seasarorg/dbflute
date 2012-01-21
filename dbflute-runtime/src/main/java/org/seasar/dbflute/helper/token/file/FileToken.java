@@ -15,8 +15,20 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.seasar.dbflute.helper.token.line.LineMakingOption;
@@ -48,23 +60,23 @@ public class FileToken {
      * @throws java.io.IOException
      */
     public void tokenize(String filename, FileTokenizingCallback fileTokenizingCallback,
-            FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
+            FileTokenizingOption fileTokenizingOption) throws FileNotFoundException, IOException {
         assertStringNotNullAndNotTrimmedEmpty("filename", filename);
 
-        java.io.FileInputStream fis = null;
+        FileInputStream fis = null;
         try {
-            fis = new java.io.FileInputStream(filename);
+            fis = new FileInputStream(filename);
             tokenize(fis, fileTokenizingCallback, fileTokenizingOption);
-        } catch (java.io.FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw e;
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             throw e;
         } finally {
             try {
                 if (fis != null) {
                     fis.close();
                 }
-            } catch (java.io.IOException ignored) {
+            } catch (IOException ignored) {
             }
         }
     }
@@ -81,8 +93,8 @@ public class FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void tokenize(java.io.InputStream inputStream, FileTokenizingCallback fileTokenizingCallback,
-            FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void tokenize(InputStream inputStream, FileTokenizingCallback fileTokenizingCallback,
+            FileTokenizingOption fileTokenizingOption) throws FileNotFoundException, IOException {
         assertObjectNotNull("inputStream", inputStream);
         assertObjectNotNull("fileTokenizingCallback", fileTokenizingCallback);
         assertObjectNotNull("fileTokenizingOption", fileTokenizingOption);
@@ -91,8 +103,8 @@ public class FileToken {
         assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
         assertObjectNotNull("delimiter", delimiter);
 
-        java.io.InputStreamReader ir = null;
-        java.io.BufferedReader br = null;
+        InputStreamReader ir = null;
+        BufferedReader br = null;
 
         String lineString = null;
         String preContinueString = "";
@@ -100,8 +112,8 @@ public class FileToken {
         final List<String> filteredValueList = new ArrayList<String>();
 
         try {
-            ir = new java.io.InputStreamReader(inputStream, encoding);
-            br = new java.io.BufferedReader(ir);
+            ir = new InputStreamReader(inputStream, encoding);
+            br = new BufferedReader(ir);
 
             FileTokenizingHeaderInfo fileTokenizingHeaderInfo = null;
             int count = -1;
@@ -170,9 +182,9 @@ public class FileToken {
                     preContinueString = "";
                 }
             }
-        } catch (java.io.FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw e;
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             throw e;
         } finally {
             try {
@@ -325,7 +337,7 @@ public class FileToken {
     }
 
     protected FileTokenizingHeaderInfo analyzeHeaderInfo(String delimiter, final String lineString) {
-        final java.util.List<String> columnNameList = new ArrayList<String>();
+        final List<String> columnNameList = new ArrayList<String>();
         final String[] values = lineString.split(delimiter);
         for (int i = 0; i < values.length; i++) {
             final String value = values[i].trim();// Trimming is Header Only!;
@@ -375,16 +387,16 @@ public class FileToken {
      * @throws java.io.IOException
      */
     public void make(String filename, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption)
-            throws java.io.FileNotFoundException, java.io.IOException {
+            throws FileNotFoundException, IOException {
         assertStringNotNullAndNotTrimmedEmpty("filename", filename);
 
-        java.io.FileOutputStream fos = null;
+        FileOutputStream fos = null;
         try {
-            fos = new java.io.FileOutputStream(filename);
+            fos = new FileOutputStream(filename);
             make(fos, fileMakingCallback, fileMakingOption);
-        } catch (java.io.FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw e;
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             throw e;
         } finally {
             if (fos != null) {
@@ -405,8 +417,8 @@ public class FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void make(java.io.OutputStream outputStream, FileMakingCallback fileMakingCallback,
-            FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void make(OutputStream outputStream, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption)
+            throws FileNotFoundException, IOException {
         assertObjectNotNull("outputStream", outputStream);
         assertObjectNotNull("fileMakingCallback", fileMakingCallback);
         assertObjectNotNull("fileMakingOption", fileMakingOption);
@@ -421,11 +433,11 @@ public class FileToken {
             lineSeparator = "\n"; // Default!
         }
 
-        java.io.BufferedOutputStream bos = null;
-        java.io.Writer writer = null;
+        BufferedOutputStream bos = null;
+        Writer writer = null;
         try {
-            bos = new java.io.BufferedOutputStream(outputStream);
-            writer = new java.io.OutputStreamWriter(bos, encoding);
+            bos = new BufferedOutputStream(outputStream);
+            writer = new OutputStreamWriter(bos, encoding);
 
             boolean headerDone = false;
 
@@ -436,7 +448,8 @@ public class FileToken {
                 if (columnNameList != null && !columnNameList.isEmpty()) {
                     final LineMakingOption lineMakingOption = new LineMakingOption();
                     lineMakingOption.setDelimiter(delimiter);
-                    lineMakingOption.trimSpace();// Trimming is Header Only!
+                    lineMakingOption.trimSpace(); // trimming is header only
+                    reflectQuoteMinimally(fileMakingOption, lineMakingOption);
                     final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
                     writer.write(columnHeaderString + lineSeparator);
                     headerDone = true;
@@ -450,17 +463,17 @@ public class FileToken {
                 if (rowResource == null) {
                     break;// The End!
                 }
-                final java.util.List<String> valueList;
+                final List<String> valueList;
                 if (rowResource.getValueList() != null) {
                     valueList = rowResource.getValueList();
                 } else {
-                    final java.util.LinkedHashMap<String, String> nameValueMap = rowResource.getNameValueMap();
+                    final LinkedHashMap<String, String> nameValueMap = rowResource.getNameValueMap();
                     if (!headerDone) {
-                        final java.util.List<String> columnNameList = new java.util.ArrayList<String>(
-                                nameValueMap.keySet());
+                        final List<String> columnNameList = new ArrayList<String>(nameValueMap.keySet());
                         final LineMakingOption lineMakingOption = new LineMakingOption();
                         lineMakingOption.setDelimiter(delimiter);
-                        lineMakingOption.trimSpace();// Trimming is Header Only!
+                        lineMakingOption.trimSpace(); // trimming is header only
+                        reflectQuoteMinimally(fileMakingOption, lineMakingOption);
                         final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
                         writer.write(columnHeaderString + lineSeparator);
                         headerDone = true;
@@ -469,18 +482,14 @@ public class FileToken {
                 }
                 final LineMakingOption lineMakingOption = new LineMakingOption();
                 lineMakingOption.setDelimiter(delimiter);
-                if (fileMakingOption.isQuoteMinimally()) {
-                    lineMakingOption.quoteMinimally();
-                } else {
-                    lineMakingOption.quoteAll();
-                }
+                reflectQuoteMinimally(fileMakingOption, lineMakingOption);
                 final String lineString = _lineToken.make(valueList, lineMakingOption);
                 writer.write(lineString + lineSeparator);
             }
             writer.flush();
-        } catch (java.io.FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw e;
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             throw e;
         } finally {
             if (bos != null) {
@@ -489,6 +498,14 @@ public class FileToken {
             if (writer != null) {
                 writer.close();
             }
+        }
+    }
+
+    protected void reflectQuoteMinimally(FileMakingOption fileMakingOption, LineMakingOption lineMakingOption) {
+        if (fileMakingOption.isQuoteMinimally()) {
+            lineMakingOption.quoteMinimally();
+        } else {
+            lineMakingOption.quoteAll();
         }
     }
 
