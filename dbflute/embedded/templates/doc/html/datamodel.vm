@@ -333,7 +333,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 <h2 id="outsidesql">OutsideSql List</h2>
 #foreach ($table in $database.tableDisplaySortedList)
 #if ($table.hasBehaviorQueryPath())
-<h3 id="${table.javaName}Sql"><a href="#${table.name}">${table.tableDispName}</a></h3>
+<h3 id="${table.javaName}Sql"><a href="#${table.lowerName}">${table.tableDispName}</a></h3>
 <dl class="bqplist">
 #foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
 	<dt>$table.getBehaviorQueryPathTitleForSchemaHtml($behaviorQueryPath)$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>

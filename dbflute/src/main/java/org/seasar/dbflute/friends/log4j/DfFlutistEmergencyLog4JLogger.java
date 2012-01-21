@@ -20,8 +20,6 @@ import org.seasar.dbflute.util.DfTypeUtil;
  */
 public class DfFlutistEmergencyLog4JLogger implements Log {
 
-    private static final long serialVersionUID = 1L;
-
     // /- - - - - - - - - - - - - - - - - - -
     // DBFlute uses debug, info, warn, error
     // - - - - - - - - - -/

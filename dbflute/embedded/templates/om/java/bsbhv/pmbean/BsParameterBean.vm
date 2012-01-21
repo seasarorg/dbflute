@@ -284,8 +284,10 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
         return ShortCharHandlingMode.${database.shortCharHandlingMode};
     }
 
+    @SuppressWarnings("unchecked")
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
-        return DfCollectionUtil.newArrayList(elements);
+        Object obj = DfCollectionUtil.newArrayList(elements);
+        return (ArrayList<ELEMENT>)obj; // to avoid the warning between JDK6 and JDK7
     }
 
     @SuppressWarnings("unchecked")

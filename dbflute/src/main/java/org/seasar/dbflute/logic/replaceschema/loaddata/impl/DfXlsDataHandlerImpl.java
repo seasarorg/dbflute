@@ -506,11 +506,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     }
                     table.addColumn(defaultTargetColumnName, columnType);
 
-                    int rowSize = table.getRowSize();
                     for (int j = 0; j < table.getRowSize(); j++) {
                         final DfDataRow row = table.getRow(j);
                         row.addValue(defaultTargetColumnName, null); // value is set later
-                        ++rowSize;
                     }
                 }
             }

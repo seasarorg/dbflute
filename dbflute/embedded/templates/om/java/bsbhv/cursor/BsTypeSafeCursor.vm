@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${myBaseCursorPackageName};
 #set ($myClassName = "${myBaseTypeSafeCursorClassName}")
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -14,7 +15,13 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 #end
  * @author ${database.classAuthor}
  */
-public class ${myClassName} {
+public class ${myClassName} implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     // -----------------------------------------------------
     //                                        Column DB Name

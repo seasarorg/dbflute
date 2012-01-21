@@ -39,7 +39,6 @@ public class DfSerialVersionUIDResolver {
         final StringBuilder sb = new StringBuilder();
         final String sourceCodeLn = _sourceLn;
         String line = null;
-        int index = 0;
         try {
             while (true) {
                 line = br.readLine();
@@ -55,7 +54,6 @@ public class DfSerialVersionUIDResolver {
                     sb.append("    " + serialComment).append(sourceCodeLn);
                     sb.append("    " + serialDefinition).append(sourceCodeLn);
                 }
-                ++index;
             }
         } catch (IOException e) {
             String msg = "bufferedReader.readLine() threw the exception: current line=" + line;

@@ -142,13 +142,11 @@ public class DfLReverseOutputHandler {
         }
         final DfDataTable dataTable = new DfDataTable(resolveSheetName(table, index));
         final List<Column> columnList = table.getColumnList();
-        int columnIndex = 0;
         for (Column column : columnList) {
             if (isExceptCommonColumn(column)) {
                 continue;
             }
             dataTable.addColumn(column.getName(), DfDtsColumnTypes.STRING);
-            ++columnIndex;
         }
         for (Map<String, String> recordMap : recordList) {
             final Set<String> columnNameSet = recordMap.keySet();
