@@ -12,4 +12,7 @@ import ${myBaseCursorPackageName}.${myBaseTypeSafeCursorClassName};
  * @author ${database.classAuthor}
  */
 public class ${myClassName} extends ${myBaseTypeSafeCursorClassName} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 }
