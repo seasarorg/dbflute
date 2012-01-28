@@ -60,33 +60,15 @@ public class PagingInvoker<ENTITY> {
         if (!pagingBean.isFetchScopeEffective()) {
             throwPagingStatusInvalidException(pagingBean);
         }
-        final int safetyMaxResultSize = pagingBean.getSafetyMaxResultSize();
         final ResultBeanBuilder<ENTITY> builder = createResultBeanBuilder();
         final boolean useManualThreadDataSource = isUseManualThreadDataSource();
         if (useManualThreadDataSource) {
             ManualThreadDataSourceHandler.prepareDataSourceHandler();
         }
         try {
-            final int allRecordCount;
-            final List<ENTITY> selectedList;
-            if (pagingBean.canPagingCountLater()) { // faster when last page selected (contains zero record)
-                selectedList = executePaging(handler);
-                if (isCurrentLastPage(selectedList, pagingBean)) {
-                    allRecordCount = deriveAllRecordCountByLastPage(selectedList, pagingBean);
-                } else {
-                    allRecordCount = executeCount(handler); // count later
-                }
-                checkSafetyResultIfNeed(safetyMaxResultSize, allRecordCount);
-            } else { // faster when zero record selected
-                // basically main here because it has been used for a long time
-                allRecordCount = executeCount(handler);
-                checkSafetyResultIfNeed(safetyMaxResultSize, allRecordCount);
-                if (allRecordCount == 0) {
-                    selectedList = builder.buildEmptyListResultBean(pagingBean);
-                } else {
-                    selectedList = executePaging(handler);
-                }
-            }
+            final InvocationResultResource<ENTITY> resource = doPaging(handler, pagingBean, builder);
+            final int allRecordCount = resource.getAllRecordCount();
+            final List<ENTITY> selectedList = resource.getSelectedList();
             final PagingResultBean<ENTITY> rb = builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
             if (pagingBean.canPagingReSelect() && isNecessaryToReadPageAgain(rb)) {
                 return reselect(handler, pagingBean, builder, rb);
@@ -98,6 +80,56 @@ public class PagingInvoker<ENTITY> {
             if (useManualThreadDataSource) {
                 ManualThreadDataSourceHandler.closeDataSourceHandler();
             }
+        }
+    }
+
+    protected InvocationResultResource<ENTITY> doPaging(PagingHandler<ENTITY> handler, PagingBean pagingBean,
+            ResultBeanBuilder<ENTITY> builder) {
+        final int safetyMaxResultSize = pagingBean.getSafetyMaxResultSize();
+        final int allRecordCount;
+        final List<ENTITY> selectedList;
+        if (pagingBean.canPagingCountLater()) { // faster when last page selected (contains zero record)
+            selectedList = executePaging(handler);
+            if (isCurrentLastPage(selectedList, pagingBean)) {
+                allRecordCount = deriveAllRecordCountByLastPage(selectedList, pagingBean);
+            } else {
+                allRecordCount = executeCount(handler); // count later
+            }
+            checkSafetyResultIfNeeds(safetyMaxResultSize, allRecordCount);
+        } else { // faster when zero record selected
+            // basically main here because it has been used for a long time
+            allRecordCount = executeCount(handler);
+            checkSafetyResultIfNeeds(safetyMaxResultSize, allRecordCount);
+            if (allRecordCount == 0) {
+                selectedList = builder.buildEmptyListResultBean(pagingBean);
+            } else {
+                selectedList = executePaging(handler);
+            }
+        }
+        final InvocationResultResource<ENTITY> resource = new InvocationResultResource<ENTITY>();
+        resource.setAllRecordCount(allRecordCount);
+        resource.setSelectedList(selectedList);
+        return resource;
+    }
+
+    protected static class InvocationResultResource<ENTITY> {
+        protected int _allRecordCount;
+        protected List<ENTITY> _selectedList;
+
+        public int getAllRecordCount() {
+            return _allRecordCount;
+        }
+
+        public void setAllRecordCount(int allRecordCount) {
+            _allRecordCount = allRecordCount;
+        }
+
+        public List<ENTITY> getSelectedList() {
+            return _selectedList;
+        }
+
+        public void setSelectedList(List<ENTITY> selectedList) {
+            _selectedList = selectedList;
         }
     }
 
@@ -120,9 +152,10 @@ public class PagingInvoker<ENTITY> {
     protected PagingResultBean<ENTITY> reselect(PagingHandler<ENTITY> handler, PagingBean pagingBean,
             ResultBeanBuilder<ENTITY> builder, PagingResultBean<ENTITY> rb) {
         pagingBean.fetchPage(rb.getAllPageCount());
-        final int reAllRecordCount = executeCount(handler); // always count first in ReSelect 
-        final List<ENTITY> reSelectedList = executePaging(handler);
-        return builder.buildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
+        final InvocationResultResource<ENTITY> resource = doPaging(handler, pagingBean, builder);
+        final int allRecordCount = resource.getAllRecordCount();
+        final List<ENTITY> selectedList = resource.getSelectedList();
+        return builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
     }
 
     /**
@@ -176,7 +209,7 @@ public class PagingInvoker<ENTITY> {
      * @param allRecordCount The count of all records.
      * @throws DangerousResultSizeException When the count of all records is dangerous.
      */
-    protected void checkSafetyResultIfNeed(int safetyMaxResultSize, int allRecordCount) {
+    protected void checkSafetyResultIfNeeds(int safetyMaxResultSize, int allRecordCount) {
         if (safetyMaxResultSize > 0 && allRecordCount > safetyMaxResultSize) {
             throwPagingOverSafetySizeException(safetyMaxResultSize, allRecordCount);
         }
