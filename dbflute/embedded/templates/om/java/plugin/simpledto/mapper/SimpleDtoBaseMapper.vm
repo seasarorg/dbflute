@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${myBaseDtoMapperPackageName};
 #set ($myClassName = "${myBaseDtoMapperClassName}")
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -52,7 +53,7 @@ import ${myExtendedDtoMapperPackageName}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class ${myClassName} {
+public abstract class ${myClassName} implements Serializable {
 
     // ===================================================================================
     //                                                                          Definition
