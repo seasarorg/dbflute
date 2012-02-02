@@ -503,6 +503,9 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         return ownerTabSetMap;
     }
 
+    // -----------------------------------------------------
+    //                             Supplementary Column Info
+    //                             -------------------------
     protected List<DfColumnMeta> getSynonymColumns(Connection conn, UnifiedSchema synonymOwner, String synonymName)
             throws SQLException {
         final List<DfColumnMeta> columnList = new ArrayList<DfColumnMeta>();
