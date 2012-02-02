@@ -42,7 +42,7 @@ public class DfSynonymMeta {
     protected Map<String, DfForeignKeyMeta> _foreignKeyMap;
     protected Map<String, Map<Integer, String>> _indexMap;
     protected String _dbLinkName;
-    protected List<DfColumnMeta> _columnMetaInfoList4DBLink;
+    protected List<DfColumnMeta> _columnMetaInfoList;
     protected boolean _selectable;
     protected String _tableComment;
     protected Map<String, UserColComments> _columnCommentMap;
@@ -93,8 +93,8 @@ public class DfSynonymMeta {
             }
         }
         String columns = "";
-        if (_columnMetaInfoList4DBLink != null) {
-            columns = "(" + _columnMetaInfoList4DBLink.size() + " columns for DB link)";
+        if (_columnMetaInfoList != null) {
+            columns = "(" + _columnMetaInfoList.size() + " columns for DB link)";
         }
         final String synonymSchema = _synonymOwner != null ? _synonymOwner.getPureSchema() : "";
         final String tableSchema = _tableOwner != null ? _tableOwner.getPureSchema() : "";
@@ -189,12 +189,12 @@ public class DfSynonymMeta {
         this._dbLinkName = dbLinkName;
     }
 
-    public List<DfColumnMeta> getColumnMetaInfoList4DBLink() {
-        return _columnMetaInfoList4DBLink != null ? _columnMetaInfoList4DBLink : new ArrayList<DfColumnMeta>();
+    public List<DfColumnMeta> getColumnMetaInfoList() {
+        return _columnMetaInfoList != null ? _columnMetaInfoList : new ArrayList<DfColumnMeta>();
     }
 
-    public void setColumnMetaInfoList4DBLink(List<DfColumnMeta> columnMetaInfoList4DBLink) {
-        this._columnMetaInfoList4DBLink = columnMetaInfoList4DBLink;
+    public void setColumnMetaInfoList(List<DfColumnMeta> columnMetaInfoList4DBLink) {
+        this._columnMetaInfoList = columnMetaInfoList4DBLink;
     }
 
     public boolean isSelectable() {

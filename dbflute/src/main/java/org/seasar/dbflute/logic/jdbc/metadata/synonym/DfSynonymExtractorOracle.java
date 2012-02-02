@@ -75,16 +75,16 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     // -----------------------------------------------------
     //                                     Meta Data Handler
     //                                     -----------------
-    protected DfTableExtractor _tableExtractor = new DfTableExtractor();
-    protected DfUniqueKeyExtractor _uniqueKeyExtractor = new DfUniqueKeyExtractor();
-    protected DfAutoIncrementExtractor _autoIncrementExtractor = new DfAutoIncrementExtractor();
-    protected DfForeignKeyExtractor _foreignKeyExtractor = new DfForeignKeyExtractor();
+    protected final DfTableExtractor _tableExtractor = new DfTableExtractor();
+    protected final DfUniqueKeyExtractor _uniqueKeyExtractor = new DfUniqueKeyExtractor();
+    protected final DfAutoIncrementExtractor _autoIncrementExtractor = new DfAutoIncrementExtractor();
+    protected final DfForeignKeyExtractor _foreignKeyExtractor = new DfForeignKeyExtractor();
     {
         // All foreign tables are target if the foreign table is except.
         // Because the filtering is executed when translating foreign keys.
         _foreignKeyExtractor.suppressExceptTarget();
     }
-    protected DfIndexExtractor _indexExtractor = new DfIndexExtractor();
+    protected final DfIndexExtractor _indexExtractor = new DfIndexExtractor();
 
     // ===================================================================================
     //                                                                             Extract
@@ -124,6 +124,12 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
 
                 // Select-able?
                 judgeSynonymSelectable(info);
+
+                if (info.isSelectable()) { // e.g. procedure synonym
+                    // set up column definition for supplement info
+                    final List<DfColumnMeta> columnMetaInfoList = getSynonymColumns(conn, synonymOwner, synonymName);
+                    info.setColumnMetaInfoList(columnMetaInfoList);
+                }
 
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {
                     if (dbLinkSynonymNativeMap == null) { // lazy load
@@ -251,12 +257,8 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         if (!info.isSelectable()) { // e.g. procedure synonym
             return info;
         }
-        final UnifiedSchema synonymOwner = info.getSynonymOwner();
-        final String synonymName = info.getSynonymName();
         final String tableName = info.getTableName();
         final String dbLinkName = info.getDBLinkName();
-        final List<DfColumnMeta> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymOwner, synonymName);
-        info.setColumnMetaInfoList4DBLink(columnMetaInfoList);
 
         final String realTableName = translateTableName(tableName, dbLinkName, dbLinkSynonymNativeMap);
         final DfPrimaryKeyMeta pkInfo = getDBLinkSynonymPKInfo(conn, realTableName, dbLinkName);
@@ -343,17 +345,17 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
 
     protected void translateFKTable(Map<String, DfSynonymMeta> synonymMap) {
         final Collection<DfSynonymMeta> synonymList = synonymMap.values();
-        final Map<String, List<String>> tableForeignSynonymListMap = new LinkedHashMap<String, List<String>>();
+        final Map<String, List<String>> referredTableSynonymListMap = new LinkedHashMap<String, List<String>>();
         for (DfSynonymMeta synonym : synonymList) {
             final String synonymName = synonym.getSynonymName();
             final String tableName = synonym.getTableName();
-            final List<String> foreignSynonymList = tableForeignSynonymListMap.get(tableName);
+            final List<String> foreignSynonymList = referredTableSynonymListMap.get(tableName);
             if (foreignSynonymList != null) {
                 foreignSynonymList.add(synonymName);
             } else {
                 final List<String> foreignNewSynonymList = new ArrayList<String>();
                 foreignNewSynonymList.add(synonymName);
-                tableForeignSynonymListMap.put(tableName, foreignNewSynonymList);
+                referredTableSynonymListMap.put(tableName, foreignNewSynonymList);
             }
         }
         for (DfSynonymMeta synonym : synonymList) {
@@ -371,11 +373,12 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 fk.setLocalTableName(synonym.getSynonymName());
 
                 final String orignalForeignTableName = fk.getForeignTableName();
-                final List<String> foreignSynonymList = tableForeignSynonymListMap.get(orignalForeignTableName);
+                final List<String> foreignSynonymList = referredTableSynonymListMap.get(orignalForeignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
-                    if (_tableExtractor.isTableExcept(synonym.getTableOwner(), orignalForeignTableName)) {
+                    final UnifiedSchema tableOwner = synonym.getTableOwner();
+                    if (_tableExtractor.isTableExcept(tableOwner, orignalForeignTableName)) {
                         removedFKMap.put(fkName, orignalForeignTableName);
-                    } else if (!isForeignTableGenerated(orignalForeignTableName)) {
+                    } else if (!isForeignTableGenerated(tableOwner, orignalForeignTableName)) {
                         removedFKMap.put(fkName, orignalForeignTableName);
                     }
                     continue;
@@ -418,13 +421,19 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
-    protected boolean isForeignTableGenerated(String foreignTableName) {
+    protected boolean isForeignTableGenerated(UnifiedSchema tableOwner, String foreignTableName) {
         if (_generatedTableMap == null || _generatedTableMap.isEmpty()) {
             // means no check of generation
             return true;
         }
         final DfTableMeta info = _generatedTableMap.get(foreignTableName);
         if (info == null) {
+            return false;
+        }
+        final UnifiedSchema unifiedSchema = info.getUnifiedSchema();
+        if (!unifiedSchema.getPureSchema().equals(tableOwner.getPureSchema())) {
+            // treated as NOT FOUND
+            // (tables in same schema are target here)
             return false;
         }
         if (info.isOutOfGenerateTarget()) {
@@ -494,10 +503,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         return ownerTabSetMap;
     }
 
-    // -----------------------------------------------------
-    //                                   For DB Link Synonym
-    //                                   -------------------
-    protected List<DfColumnMeta> getDBLinkSynonymColumns(Connection conn, UnifiedSchema synonymOwner, String synonymName)
+    protected List<DfColumnMeta> getSynonymColumns(Connection conn, UnifiedSchema synonymOwner, String synonymName)
             throws SQLException {
         final List<DfColumnMeta> columnList = new ArrayList<DfColumnMeta>();
         Statement st = null;
@@ -543,6 +549,9 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         }
     }
 
+    // -----------------------------------------------------
+    //                                   For DB Link Synonym
+    //                                   -------------------
     protected DfPrimaryKeyMeta getDBLinkSynonymPKInfo(Connection conn, String tableName, String dbLinkName)
             throws SQLException {
         final DfPrimaryKeyMeta pkInfo = new DfPrimaryKeyMeta();

@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -652,14 +653,48 @@ public class DfSchemaXmlSerializer {
      */
     public List<DfColumnMeta> getColumns(DatabaseMetaData dbMeta, DfTableMeta tableInfo) throws SQLException {
         List<DfColumnMeta> columnList = _columnExtractor.getColumnList(dbMeta, tableInfo);
-        if (canHandleSynonym(tableInfo) && columnList.isEmpty()) {
-            DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
-            if (synonym != null && synonym.isDBLink()) {
-                columnList = synonym.getColumnMetaInfoList4DBLink();
-            }
-        }
-
+        columnList = helpColumnAdjustment(dbMeta, tableInfo, columnList);
         helpColumnComments(tableInfo, columnList);
+        return columnList;
+    }
+
+    protected List<DfColumnMeta> helpColumnAdjustment(DatabaseMetaData dbMeta, DfTableMeta tableInfo,
+            List<DfColumnMeta> columnList) {
+        if (!canHandleSynonym(tableInfo)) {
+            return columnList;
+        }
+        final DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
+        if (synonym == null) { // means not synonym or no supplementary info
+            return columnList;
+        }
+        final List<DfColumnMeta> metaInfoList = synonym.getColumnMetaInfoList();
+        if (metaInfoList.isEmpty()) {
+            return metaInfoList;
+        }
+        if (synonym.isDBLink() && columnList.isEmpty()) {
+            columnList = metaInfoList;
+        } else if (metaInfoList.size() != columnList.size()) {
+            // for Oracle's bug(?), which is following:
+            // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // For example, Schema A, B are like this:
+            //  A: FOO table
+            //  B: FOO table, BAR synonym to A's FOO table
+            // BAR synonym's columns are from both A and B's FOO table.
+            // (means that BAR synonym has other table's columns)
+            // Why? my friend, the Oracle JDBC Driver! 
+            // - - - - - - - - - -/
+            final StringSet columnSet = StringSet.createAsCaseInsensitive();
+            for (DfColumnMeta columnMeta : metaInfoList) {
+                columnSet.add(columnMeta.getColumnName());
+            }
+            final List<DfColumnMeta> filteredList = new ArrayList<DfColumnMeta>();
+            for (DfColumnMeta columnMeta : columnList) {
+                if (columnSet.contains(columnMeta.getColumnName())) {
+                    filteredList.add(columnMeta);
+                }
+            }
+            columnList = filteredList;
+        }
         return columnList;
     }
 
