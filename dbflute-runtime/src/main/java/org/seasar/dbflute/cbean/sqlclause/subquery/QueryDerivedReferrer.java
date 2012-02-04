@@ -1,5 +1,7 @@
 package org.seasar.dbflute.cbean.sqlclause.subquery;
 
+import java.util.List;
+
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -18,7 +20,7 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     //                                                                           Attribute
     //                                                                           =========
     protected final String _operand;
-    protected final Object _value;
+    protected final Object _value; // NullAllowed: when IsNull or IsNotNull
     protected final String _parameterPath;
 
     // ===================================================================================
@@ -47,11 +49,32 @@ public class QueryDerivedReferrer extends DerivedReferrer {
         sb.append(ln()).append(endIndent).append(") ");
         sb.append(_operand);
         if (_value != null) {
-            final String parameter = "/*pmb." + _parameterPath + "*/null";
+            final String prefix = "/*pmb.";
+            final String suffix = "*/null";
+            final String parameter;
+            if (isOperandBetween() && isValueListType()) {
+                final String fromParameter = buildListParameter(prefix, 0, suffix);
+                final String toParameter = buildListParameter(prefix, 1, suffix);
+                parameter = fromParameter + " and " + toParameter;
+            } else {
+                parameter = prefix + _parameterPath + suffix;
+            }
             sb.append(" ").append(parameter);
         }
         sb.append(" ").append(endMark);
         return sb.toString();
+    }
+
+    protected boolean isOperandBetween() {
+        return "between".equalsIgnoreCase(_operand);
+    }
+
+    protected boolean isValueListType() {
+        return _value instanceof List<?>;
+    }
+
+    protected String buildListParameter(String prefix, int index, String suffix) {
+        return prefix + _parameterPath + ".get(" + index + ")" + suffix;
     }
 
     @Override
