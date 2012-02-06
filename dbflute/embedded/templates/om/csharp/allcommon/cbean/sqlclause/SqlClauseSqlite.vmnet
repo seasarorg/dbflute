@@ -34,7 +34,7 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     }
 
     protected override void doFetchPage() {
-        _fetchScopeSqlSuffix = " offset " + this.getPageStartIndex() + " limit " + this.getFetchSize();
+        _fetchScopeSqlSuffix = " limit " + this.getFetchSize() + " offset " + this.getPageStartIndex();
     }
 
     protected override void doClearFetchPageClause() {
