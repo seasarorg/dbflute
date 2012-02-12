@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.bhv.DtoMapper;
 #if ($table.hasClassification())
 import ${glPackageBaseCommon}.${glCDef};
 #end
@@ -53,7 +54,7 @@ import ${myExtendedDtoMapperPackageName}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class ${myClassName} implements Serializable {
+public abstract class ${myClassName} implements DtoMapper<${table.extendedEntityClassName}, ${myExtendedObjectClassName}>, Serializable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -186,7 +187,7 @@ public abstract class ${myClassName} implements Serializable {
      * Do mapping from an entity list to a DTO list with relation data. <br />
      * This calls this.mappingToDto() in a loop of the list.
      * @param entityList The list of entity as mapping resource. (NotNull: null elements are inherited)
-     * @return The mapped DTO. (NotNull)
+     * @return The list of mapped DTO. (NotNull)
      */
     public List<${myExtendedObjectClassName}> mappingToDtoList(List<${table.extendedEntityClassName}> entityList) {
         if (entityList == null) {
@@ -298,9 +299,8 @@ public abstract class ${myClassName} implements Serializable {
         Set<String> modifiedProperties = dto.modifiedProperties();
         if (modifiedProperties.isEmpty()) {
             return isMappingToEntityContainsNull() || value != null;
-        } else {
-            return modifiedProperties.contains(propName);
         }
+        return modifiedProperties.contains(propName);
     }
 
     /**
@@ -326,7 +326,7 @@ public abstract class ${myClassName} implements Serializable {
      * Do mapping from a DTO list to an entity list with relation data. <br />
      * This calls this.mappingToEntity() in loop of the list.
      * @param dtoList The list of DTO as mapping resource. (NotNull: null elements are inherited)
-     * @return The mapped entity. (NotNull)
+     * @return The list of mapped entity. (NotNull)
      */
     public List<${table.extendedEntityClassName}> mappingToEntityList(List<${myExtendedObjectClassName}> dtoList) {
         if (dtoList == null) {
