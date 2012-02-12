@@ -1,5 +1,10 @@
 package org.seasar.dbflute.properties;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Properties;
@@ -22,6 +27,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     // here fixed line separator (simplified)
     protected static final String NORMAL_LINE_SEPARATOR = "\n";
     protected static final String SPECIAL_LINE_SEPARATOR = "&#xa;";
+
+    protected static final String STYLE_SHEET_EMBEDDED_MARK = "$";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -241,6 +248,59 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isSuppressSchemaHtmlOutsideSql", false, getDocumentDefinitionMap());
     }
 
+    public boolean isSchemaHtmlStyleSheetEmbedded() {
+        final String styleSheet = getSchemaHtmlStyleSheet();
+        return styleSheet != null && hasSchemaHtmlStyleSheetEmbeddedMark(styleSheet);
+    }
+
+    public boolean isSchemaHtmlStyleSheetLink() {
+        final String styleSheet = getSchemaHtmlStyleSheet();
+        return styleSheet != null && !hasSchemaHtmlStyleSheetEmbeddedMark(styleSheet);
+    }
+
+    protected boolean hasSchemaHtmlStyleSheetEmbeddedMark(String styleSheet) {
+        return styleSheet.startsWith(STYLE_SHEET_EMBEDDED_MARK);
+    }
+
+    public String getSchemaHtmlStyleSheetEmbedded() {
+        return readSchemaHtmlStyleSheetEmbedded(getSchemaHtmlStyleSheet());
+    }
+
+    protected String readSchemaHtmlStyleSheetEmbedded(String styleSheet) {
+        final String purePath = Srl.substringFirstRear(styleSheet, STYLE_SHEET_EMBEDDED_MARK);
+        final File cssFile = new File(purePath);
+        BufferedReader br = null;
+        try {
+            final String encoding = getBasicProperties().getTemplateFileEncoding();
+            final String separator = getBasicProperties().getSourceCodeLineSeparator();
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(cssFile), encoding));
+            final StringBuilder sb = new StringBuilder();
+            while (true) {
+                final String line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                sb.append(line).append(separator);
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            String msg = "Failed to read the CSS file: " + cssFile;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    public String getSchemaHtmlStyleSheetLink() {
+        return buildSchemaHtmlStyleSheetLink(getSchemaHtmlStyleSheet());
+    }
+
+    protected String buildSchemaHtmlStyleSheetLink(String styleSheet) {
+        return "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + styleSheet + "\" />";
+    }
+
+    protected String getSchemaHtmlStyleSheet() {
+        return getProperty("schemaHtmlStyleSheet", null, getDocumentDefinitionMap());
+    }
+
     // ===================================================================================
     //                                                                         HistoryHTML
     //                                                                         ===========
@@ -257,6 +317,28 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public boolean isCheckDbCommentDiff() {
         return isProperty("isCheckDbCommentDiff", false, getDocumentDefinitionMap());
+    }
+
+    public boolean isHistoryHtmlStyleSheetEmbedded() {
+        final String styleSheet = getHistoryHtmlStyleSheet();
+        return styleSheet != null && hasSchemaHtmlStyleSheetEmbeddedMark(styleSheet);
+    }
+
+    public boolean isHistoryHtmlStyleSheetLink() {
+        final String styleSheet = getHistoryHtmlStyleSheet();
+        return styleSheet != null && !hasSchemaHtmlStyleSheetEmbeddedMark(styleSheet);
+    }
+
+    public String getHistoryHtmlStyleSheetEmbedded() {
+        return readSchemaHtmlStyleSheetEmbedded(getHistoryHtmlStyleSheet());
+    }
+
+    public String getHistoryHtmlStyleSheetLink() {
+        return buildSchemaHtmlStyleSheetLink(getHistoryHtmlStyleSheet());
+    }
+
+    protected String getHistoryHtmlStyleSheet() {
+        return getProperty("historyHtmlStyleSheet", null, getDocumentDefinitionMap());
     }
 
     // ===================================================================================

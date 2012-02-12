@@ -1484,9 +1484,9 @@ public class Database {
         return getProperties().getCommonColumnProperties().isCommonColumnConversion(commonColumnName);
     }
 
-    // --------------------------------------
-    //                                 insert
-    //                                 ------
+    // -----------------------------------------------------
+    //                                                insert
+    //                                                ------
     public boolean hasCommonColumnBeforeInsertLogic(String columnName) {
         return getProperties().getCommonColumnProperties().hasCommonColumnBeforeInsertLogic(columnName);
     }
@@ -1495,9 +1495,9 @@ public class Database {
         return getProperties().getCommonColumnProperties().getCommonColumnBeforeInsertLogicByColumnName(columnName);
     }
 
-    // --------------------------------------
-    //                                 update
-    //                                 ------
+    // -----------------------------------------------------
+    //                                                update
+    //                                                ------
     public boolean hasCommonColumnBeforeUpdateLogic(String columnName) {
         return getProperties().getCommonColumnProperties().hasCommonColumnBeforeUpdateLogic(columnName);
     }
@@ -1506,9 +1506,9 @@ public class Database {
         return getProperties().getCommonColumnProperties().getCommonColumnBeforeUpdateLogicByColumnName(columnName);
     }
 
-    // --------------------------------------
-    //                               resource
-    //                               --------
+    // -----------------------------------------------------
+    //                                              resource
+    //                                              --------
     public boolean hasCommonColumnSetupResource() {
         return getProperties().getCommonColumnProperties().hasCommonColumnSetupResource();
     }
@@ -1517,9 +1517,9 @@ public class Database {
         return getProperties().getCommonColumnProperties().getCommonColumnSetupResourceList();
     }
 
-    // --------------------------------------
-    //                         logic handling
-    //                         --------------
+    // -----------------------------------------------------
+    //                                        logic handling
+    //                                        --------------
     public boolean isCommonColumnSetupInvokingLogic(String logic) {
         return getProperties().getCommonColumnProperties().isCommonColumnSetupInvokingLogic(logic);
     }
@@ -1535,9 +1535,9 @@ public class Database {
         return getProperties().getClassificationProperties();
     }
 
-    // --------------------------------------
-    //                             Definition
-    //                             ----------
+    // -----------------------------------------------------
+    //                                            Definition
+    //                                            ----------
     public boolean hasClassificationDefinitionMap() {
         return getClassificationProperties().hasClassificationDefinitionMap();
     }
@@ -1591,9 +1591,9 @@ public class Database {
         return getClassificationProperties().isTableClassification(classificationName);
     }
 
-    // --------------------------------------
-    //                             Deployment
-    //                             ----------
+    // -----------------------------------------------------
+    //                                            Deployment
+    //                                            ----------
     public Map<String, Map<String, String>> getClassificationDeploymentMap() {
         return getClassificationProperties().getClassificationDeploymentMap();
     }
@@ -1878,6 +1878,9 @@ public class Database {
     // ===================================================================================
     //                                                                 Document Properties
     //                                                                 ===================
+    // -----------------------------------------------------
+    //                                            DB Comment
+    //                                            ----------
     public boolean isAliasDelimiterInDbCommentValid() {
         return getProperties().getDocumentProperties().isAliasDelimiterInDbCommentValid();
     }
@@ -1886,6 +1889,9 @@ public class Database {
         return getProperties().getDocumentProperties().isEntityJavaDocDbCommentValid();
     }
 
+    // -----------------------------------------------------
+    //                                            SchemaHTML
+    //                                            ----------
     public String getSchemaHtmlFileName() {
         final String projectName = getProjectName();
         return getProperties().getDocumentProperties().getSchemaHtmlFileName(projectName);
@@ -1898,11 +1904,49 @@ public class Database {
         return hasTableBqpMap() || isGenerateProcedureParameterBean();
     }
 
+    public boolean isSchemaHtmlStyleSheetEmbedded() {
+        return getProperties().getDocumentProperties().isSchemaHtmlStyleSheetEmbedded();
+    }
+
+    public boolean isSchemaHtmlStyleSheetLink() {
+        return getProperties().getDocumentProperties().isSchemaHtmlStyleSheetLink();
+    }
+
+    public String getSchemaHtmlStyleSheetEmbedded() {
+        return getProperties().getDocumentProperties().getSchemaHtmlStyleSheetEmbedded();
+    }
+
+    public String getSchemaHtmlStyleSheetLink() {
+        return getProperties().getDocumentProperties().getSchemaHtmlStyleSheetLink();
+    }
+
+    // -----------------------------------------------------
+    //                                           HistoryHTML
+    //                                           -----------
     public String getHistoryHtmlFileName() {
         final String projectName = getProjectName();
         return getProperties().getDocumentProperties().getHistoryHtmlFileName(projectName);
     }
 
+    public boolean isHistoryHtmlStyleSheetEmbedded() {
+        return getProperties().getDocumentProperties().isHistoryHtmlStyleSheetEmbedded();
+    }
+
+    public boolean isHistoryHtmlStyleSheetLink() {
+        return getProperties().getDocumentProperties().isHistoryHtmlStyleSheetLink();
+    }
+
+    public String getHistoryHtmlStyleSheetEmbedded() {
+        return getProperties().getDocumentProperties().getHistoryHtmlStyleSheetEmbedded();
+    }
+
+    public String getHistoryHtmlStyleSheetLink() {
+        return getProperties().getDocumentProperties().getHistoryHtmlStyleSheetLink();
+    }
+
+    // -----------------------------------------------------
+    //                                            Compatible
+    //                                            ----------
     public void deleteOldSchemaHtmlFile() {
         final String currentFileName = getSchemaHtmlFileName();
         final String outputDirectory = getProperties().getDocumentProperties().getDocumentOutputDirectory();
