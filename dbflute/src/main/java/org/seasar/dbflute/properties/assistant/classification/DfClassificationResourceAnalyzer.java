@@ -16,6 +16,8 @@ import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -112,7 +114,7 @@ public class DfClassificationResourceAnalyzer {
 
     protected List<DfClassificationTop> analyze(final List<String> lineList) {
         final List<DfClassificationTop> classificationList = new ArrayList<DfClassificationTop>();
-        String relatedColumnName = null;
+        AnalyzedTitleLine titleLine = null;
         boolean inGroup = false;
         final int size = lineList.size();
         int index = -1;
@@ -120,10 +122,11 @@ public class DfClassificationResourceAnalyzer {
             ++index;
             if (inGroup) {
                 if (isTopLine(line)) {
-                    final DfClassificationTop classificationTop = extractClassificationTop(line);
+                    final DfClassificationTop classificationTop = extractClassificationTop(titleLine, line);
                     classificationList.add(classificationTop);
-                    if (relatedColumnName != null) {
-                        classificationTop.setRelatedColumnName(relatedColumnName);
+                    if (titleLine != null) {
+                        classificationTop.setRelatedColumnName(titleLine.getRelatedColumnName());
+                        classificationTop.setCheckImplicitSet(titleLine.isCheckImplicitSet());
                     }
                     continue;
                 } else if (isElementLine(line)) {
@@ -155,7 +158,7 @@ public class DfClassificationResourceAnalyzer {
             if (!isElementLine(nextNextLine)) {
                 continue;
             }
-            relatedColumnName = extractRelatedColumnNameFronTitleLine(line);
+            titleLine = extractRelatedColumnNameFronTitleLine(line);
             inGroup = true;
         }
         return classificationList;
@@ -253,34 +256,83 @@ public class DfClassificationResourceAnalyzer {
         return line.contains("- ") && line.contains(",") && line.indexOf("- ") + 1 < line.indexOf(",");
     }
 
-    protected String extractRelatedColumnNameFronTitleLine(String line) {
+    protected AnalyzedTitleLine extractRelatedColumnNameFronTitleLine(String line) {
         if (!isTitleLine(line)) {
             String msg = "The line should be title line: line=" + line;
             throw new IllegalArgumentException(msg);
         }
-        final String connectMark = "]:";
+        final String connectBeginMark = "[";
+        final String connectEndMark = "]:";
         final String wildCard = "*";
         final String prefixMark = DfNameHintUtil.PREFIX_MARK;
         final String suffixMark = DfNameHintUtil.SUFFIX_MARK;
-        if (!line.contains(connectMark)) {
+        if (!Srl.containsAll(line, connectBeginMark, connectEndMark)) {
             return null;
         }
         line = line.trim();
         line = removeRearXmlEndIfNeeds(line);
-        String relatedColumnName = line.substring(line.indexOf(connectMark) + connectMark.length()).trim();
-        if (relatedColumnName == null) {
-            return relatedColumnName;
+        final AnalyzedTitleLine titleLine = new AnalyzedTitleLine();
+        final ScopeInfo scopeFirst = Srl.extractScopeFirst(line, connectBeginMark, connectEndMark);
+        if (scopeFirst == null) { // basically no way
+            return null;
         }
-        if (relatedColumnName.startsWith(wildCard)) { // *_FLG
-            relatedColumnName = suffixMark + relatedColumnName.substring(wildCard.length());
-        } else if (relatedColumnName.endsWith(wildCard)) { // LD_*
-            relatedColumnName = relatedColumnName.substring(0, relatedColumnName.lastIndexOf(wildCard));
-            relatedColumnName = prefixMark + relatedColumnName;
+        titleLine.setTitle(scopeFirst.getContent().trim());
+        final String relatedColumnName;
+        final String option;
+        {
+            String pureValue = Srl.substringFirstRear(line, connectEndMark).trim();
+            if (pureValue.startsWith(wildCard)) { // *_FLG
+                pureValue = suffixMark + pureValue.substring(wildCard.length());
+            } else if (pureValue.endsWith(wildCard)) { // LD_*
+                pureValue = pureValue.substring(0, pureValue.lastIndexOf(wildCard));
+                pureValue = prefixMark + pureValue;
+            }
+            if (pureValue.contains("|")) {
+                relatedColumnName = Srl.substringFirstFront(pureValue, "|").trim();
+                option = Srl.substringFirstRear(pureValue, "|").trim();
+            } else {
+                relatedColumnName = pureValue;
+                option = null;
+            }
         }
-        return relatedColumnName;
+        titleLine.setRelatedColumnName(relatedColumnName);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(option)) {
+            titleLine.setCheckImplicitSet(Srl.containsIgnoreCase(option, "check"));
+        }
+        return titleLine;
     }
 
-    protected DfClassificationTop extractClassificationTop(String line) {
+    protected static class AnalyzedTitleLine {
+        protected String _title;
+        protected String _relatedColumnName;
+        protected boolean _checkImplicitSet;
+
+        public String getTitle() {
+            return _title;
+        }
+
+        public void setTitle(String title) {
+            this._title = title;
+        }
+
+        public String getRelatedColumnName() {
+            return _relatedColumnName;
+        }
+
+        public void setRelatedColumnName(String relatedColumnName) {
+            this._relatedColumnName = relatedColumnName;
+        }
+
+        public boolean isCheckImplicitSet() {
+            return _checkImplicitSet;
+        }
+
+        public void setCheckImplicitSet(boolean checkImplicitSet) {
+            this._checkImplicitSet = checkImplicitSet;
+        }
+    }
+
+    protected DfClassificationTop extractClassificationTop(AnalyzedTitleLine titleLine, String line) {
         if (!isTopLine(line)) {
             String msg = "The line should be top line: line=" + line;
             throw new IllegalArgumentException(msg);
@@ -290,17 +342,28 @@ public class DfClassificationResourceAnalyzer {
         line = line.substring(line.indexOf("$ ") + "$ ".length());
 
         final String classificationName;
-        final String topComment;
+        final String topDesc;
         if (line.contains(",")) {
             classificationName = line.substring(0, line.indexOf(",")).trim();
-            topComment = line.substring(line.indexOf(",") + ",".length()).trim();
+            topDesc = line.substring(line.indexOf(",") + ",".length()).trim();
         } else {
             classificationName = line.trim();
-            topComment = null;
+            topDesc = null;
         }
         final DfClassificationTop classificationTop = new DfClassificationTop();
         classificationTop.setClassificationName(classificationName);
-        if (topComment != null) {
+        final String title = titleLine != null ? titleLine.getTitle() : null;
+        final String topComment;
+        if (topDesc != null) {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(title) && !topDesc.startsWith(title)) {
+                topComment = title + ": " + topDesc;
+            } else { // title is not found or topComment starts with same word as title
+                topComment = topDesc;
+            }
+        } else {
+            topComment = title;
+        }
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(topComment)) {
             classificationTop.setTopComment(topComment);
         }
         return classificationTop;
