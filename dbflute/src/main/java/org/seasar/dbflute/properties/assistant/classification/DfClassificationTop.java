@@ -35,6 +35,7 @@ public class DfClassificationTop {
     protected String _codeType;
     protected String _relatedColumnName;
     protected List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
+    protected boolean _tableClassification;
     protected boolean _checkImplicitSet;
     protected boolean _useDocumentOnly;
     protected boolean _suppressAutoDeploy;
@@ -150,6 +151,14 @@ public class DfClassificationTop {
 
     public void addClassificationElement(DfClassificationElement classificationElement) {
         this._elementList.add(classificationElement);
+    }
+
+    public boolean isTableClassification() {
+        return _tableClassification;
+    }
+
+    public void setTableClassification(boolean tableClassification) {
+        this._tableClassification = tableClassification;
     }
 
     public boolean isCheckImplicitSet() {

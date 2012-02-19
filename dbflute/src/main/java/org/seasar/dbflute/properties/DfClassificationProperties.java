@@ -141,6 +141,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             }
             final List<?> plainList = (List<?>) value;
             final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();
+            boolean tableClassification = false;
             for (Object element : plainList) {
                 if (!(element instanceof Map<?, ?>)) {
                     throwClassificationListElementIllegalMapTypeException(element);
@@ -153,6 +154,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 // - - - - - -
                 final String table = (String) elementMap.get(DfClassificationElement.KEY_TABLE);
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(table)) {
+                    tableClassification = true;
                     processTableClassification(classificationName, elementMap, table, elementList);
                     continue;
                 }
@@ -171,6 +173,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 } else {
                     literalArranger.arrange(classificationName, elementMap, elementList);
                 }
+            }
+            final DfClassificationTop classificationTop = _classificationTopMap.get(classificationName);
+            if (classificationTop != null) {
+                classificationTop.setTableClassification(tableClassification);
             }
             _classificationDefinitionMap.put(classificationName, elementList);
         }

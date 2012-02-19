@@ -116,7 +116,7 @@ td {
 	font-size: 0.6em;
 }
 .commentcell {
-	font-size: 0.6em;
+	font-size: 0.7em;
 }
 .subcell {
 	font-size: 0.6em;
@@ -128,12 +128,14 @@ td {
 	font-style: italic;
 }
 .additionalpk {
-	font-size: 0.7em;
 	font-style: italic;
 }
 .additionalfk {
-	font-size: 0.7em;
 	font-style: italic;
+}
+.clstypecell {
+	text-align: center;
+	font-size: 0.8em;
 }
 
 /* inner table */
@@ -162,12 +164,14 @@ dl.bqplist {
 }
 dl.bqplist dt {
 	display: list-item;
-	font-size: 1.2em;
+	font-size: 1.3em;
 	margin-top: 0.3em;
 }
 dl.bqplist dd {
-	font-size: 0.9em;
 	padding-left: 1em;
+}
+dl.bqplist dd pre {
+	font-size: 1.1em;
 }
 dl.bqplist dd.subinfo {
 	padding-left: 2em;
@@ -178,6 +182,7 @@ dl.bqplist dd.subinfo span.sqlap {
 }
 dl.bqplist dd.subinfo span.file {
 	font-style: italic;
+	color: #002266;
 }
 dl.bqplist dd.subinfo span.ctet {
 	color: green;
@@ -190,7 +195,7 @@ dl.procedurelist {
 }
 dl.procedurelist dt {
 	display: list-item;
-	font-size: 1.2em;
+	font-size: 1.3em;
 	margin-top: 0.3em;
 }
 dl.procedurelist dt span.type {
@@ -198,8 +203,10 @@ dl.procedurelist dt span.type {
 	color: green;
 }
 dl.procedurelist dd {
-	font-size: 0.9em;
 	padding-left: 1em;
+}
+dl.procedurelist dd pre {
+	font-size: 1.1em;
 }
 dl.procedurelist dd.column {
 	font-style: italic;
@@ -292,6 +299,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 	<thead>
 	<tr>
 		<th>Classification</th>
+		<th>Type</th>
 		<th>Top Comment</th>
 		<th>Definition</th>
 	</tr>
@@ -308,6 +316,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 	<tr>
 		<td>${classificationName}</td>
+		<td class="clstypecell">#if ($classificationTop.isTableClassification())table#else implicit#if ($classificationTop.isCheckImplicitSet())<br />(check)#end#end</td>
 		<td>#if ($existTop && $classificationTop.hasTopComment())${classificationTop.topComment}#else &nbsp;#end</td>
 		<td>
 			<table class="child">
