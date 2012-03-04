@@ -379,6 +379,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
+    //                                                                            Continue
+    //                                                                            ========
+    public boolean isErrorSqlContinue() {
+        return isProperty("isErrorSqlContinue", false, getReplaceSchemaDefinitionMap());
+    }
+
+    // ===================================================================================
     //                                                                   SQL File Encoding
     //                                                                   =================
     public String getSqlFileEncoding() {

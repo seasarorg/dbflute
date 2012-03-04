@@ -31,7 +31,7 @@ public class DfAbstractReplaceSchemaProcess {
         runInfo.setUser(prop.getDatabaseUser());
         runInfo.setPassword(prop.getDatabasePassword());
         runInfo.setEncoding(getReplaceSchemaProperties().getSqlFileEncoding());
-        runInfo.setErrorContinue(true); // fixed
+        runInfo.setErrorContinue(isErrorContinue());
         if (isRollbackTransaction()) { // basically take-assert
             runInfo.setAutoCommit(false);
             runInfo.setRollbackOnly(true);
@@ -40,6 +40,10 @@ public class DfAbstractReplaceSchemaProcess {
             runInfo.setRollbackOnly(false);
         }
         return runInfo;
+    }
+
+    protected boolean isErrorContinue() {
+        return getReplaceSchemaProperties().isErrorSqlContinue();
     }
 
     protected boolean isRollbackTransaction() {
