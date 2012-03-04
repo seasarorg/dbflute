@@ -97,6 +97,13 @@ p.tablecount {
 }
 	</style>
 #end
+#if ($database.isHistoryHtmlJavaScriptEmbedded())
+	<script type="text/javascript">
+${database.historyHtmlJavaScriptEmbedded}
+	</script>
+#elseif ($database.isHistoryHtmlJavaScriptLink())
+	${database.historyHtmlJavaScriptLink}
+#end
 </head>
 
 <body>

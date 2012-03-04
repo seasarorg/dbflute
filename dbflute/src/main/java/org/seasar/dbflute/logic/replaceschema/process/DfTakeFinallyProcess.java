@@ -126,9 +126,9 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return _takeAssert;
     }
 
-    // --------------------------------------------
-    //                                 Take Finally
-    //                                 ------------
+    // -----------------------------------------------------
+    //                                          Take Finally
+    //                                          ------------
     protected DfSqlFileFireResult takeFinally(DfRunnerInformation runInfo) {
         _log.info("");
         _log.info("* * * * * * * **");
@@ -224,9 +224,9 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return fileList;
     }
 
-    // --------------------------------------------
-    //                           Increment Sequence
-    //                           ------------------
+    // -----------------------------------------------------
+    //                                    Increment Sequence
+    //                                    ------------------
     protected void incrementSequenceToDataMax() {
         if (!getReplaceSchemaProperties().isIncrementSequenceToDataMax()) {
             return;

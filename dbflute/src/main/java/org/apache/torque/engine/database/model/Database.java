@@ -1920,6 +1920,22 @@ public class Database {
         return getProperties().getDocumentProperties().getSchemaHtmlStyleSheetLink();
     }
 
+    public boolean isSchemaHtmlJavaScriptEmbedded() {
+        return getProperties().getDocumentProperties().isSchemaHtmlJavaScriptEmbedded();
+    }
+
+    public boolean isSchemaHtmlJavaScriptLink() {
+        return getProperties().getDocumentProperties().isSchemaHtmlJavaScriptLink();
+    }
+
+    public String getSchemaHtmlJavaScriptEmbedded() {
+        return getProperties().getDocumentProperties().getSchemaHtmlJavaScriptEmbedded();
+    }
+
+    public String getSchemaHtmlJavaScriptLink() {
+        return getProperties().getDocumentProperties().getSchemaHtmlJavaScriptLink();
+    }
+
     // -----------------------------------------------------
     //                                           HistoryHTML
     //                                           -----------
@@ -1942,6 +1958,22 @@ public class Database {
 
     public String getHistoryHtmlStyleSheetLink() {
         return getProperties().getDocumentProperties().getHistoryHtmlStyleSheetLink();
+    }
+
+    public boolean isHistoryHtmlJavaScriptEmbedded() {
+        return getProperties().getDocumentProperties().isHistoryHtmlJavaScriptEmbedded();
+    }
+
+    public boolean isHistoryHtmlJavaScriptLink() {
+        return getProperties().getDocumentProperties().isHistoryHtmlJavaScriptLink();
+    }
+
+    public String getHistoryHtmlJavaScriptEmbedded() {
+        return getProperties().getDocumentProperties().getHistoryHtmlJavaScriptEmbedded();
+    }
+
+    public String getHistoryHtmlJavaScriptLink() {
+        return getProperties().getDocumentProperties().getHistoryHtmlJavaScriptLink();
     }
 
     // -----------------------------------------------------

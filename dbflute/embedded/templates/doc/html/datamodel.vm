@@ -225,6 +225,13 @@ dl.procedurelist dd.column pre {
 }
 	</style>
 #end
+#if ($database.isSchemaHtmlJavaScriptEmbedded())
+	<script type="text/javascript">
+${database.schemaHtmlJavaScriptEmbedded}
+	</script>
+#elseif ($database.isSchemaHtmlJavaScriptLink())
+	${database.schemaHtmlJavaScriptLink}
+#end
 </head>
 
 <body>

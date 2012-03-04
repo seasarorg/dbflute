@@ -29,6 +29,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     protected static final String SPECIAL_LINE_SEPARATOR = "&#xa;";
 
     protected static final String STYLE_SHEET_EMBEDDED_MARK = "$";
+    protected static final String JAVA_SCRIPT_EMBEDDED_MARK = "$";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -248,6 +249,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isSuppressSchemaHtmlOutsideSql", false, getDocumentDefinitionMap());
     }
 
+    // -----------------------------------------------------
+    //                                           Style Sheet
+    //                                           -----------
     public boolean isSchemaHtmlStyleSheetEmbedded() {
         final String styleSheet = getSchemaHtmlStyleSheet();
         return styleSheet != null && hasSchemaHtmlStyleSheetEmbeddedMark(styleSheet);
@@ -301,6 +305,62 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return getProperty("schemaHtmlStyleSheet", null, getDocumentDefinitionMap());
     }
 
+    // -----------------------------------------------------
+    //                                            JavaScript
+    //                                            ----------
+    public boolean isSchemaHtmlJavaScriptEmbedded() {
+        final String javaScript = getSchemaHtmlJavaScript();
+        return javaScript != null && hasSchemaHtmlJavaScriptEmbeddedMark(javaScript);
+    }
+
+    public boolean isSchemaHtmlJavaScriptLink() {
+        final String javaScript = getSchemaHtmlJavaScript();
+        return javaScript != null && !hasSchemaHtmlJavaScriptEmbeddedMark(javaScript);
+    }
+
+    protected boolean hasSchemaHtmlJavaScriptEmbeddedMark(String javaScript) {
+        return javaScript.startsWith(JAVA_SCRIPT_EMBEDDED_MARK);
+    }
+
+    public String getSchemaHtmlJavaScriptEmbedded() {
+        return readSchemaHtmlJavaScriptEmbedded(getSchemaHtmlJavaScript());
+    }
+
+    protected String readSchemaHtmlJavaScriptEmbedded(String javaScript) {
+        final String purePath = Srl.substringFirstRear(javaScript, JAVA_SCRIPT_EMBEDDED_MARK);
+        final File cssFile = new File(purePath);
+        BufferedReader br = null;
+        try {
+            final String encoding = getBasicProperties().getTemplateFileEncoding();
+            final String separator = getBasicProperties().getSourceCodeLineSeparator();
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(cssFile), encoding));
+            final StringBuilder sb = new StringBuilder();
+            while (true) {
+                final String line = br.readLine();
+                if (line == null) {
+                    break;
+                }
+                sb.append(line).append(separator);
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            String msg = "Failed to read the CSS file: " + cssFile;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    public String getSchemaHtmlJavaScriptLink() {
+        return buildSchemaHtmlJavaScriptLink(getSchemaHtmlJavaScript());
+    }
+
+    protected String buildSchemaHtmlJavaScriptLink(String javaScript) {
+        return "<script type=\"text/javascript\" src=\"" + javaScript + "\"></script>";
+    }
+
+    protected String getSchemaHtmlJavaScript() {
+        return getProperty("schemaHtmlJavaScript", null, getDocumentDefinitionMap());
+    }
+
     // ===================================================================================
     //                                                                         HistoryHTML
     //                                                                         ===========
@@ -319,6 +379,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isCheckDbCommentDiff", false, getDocumentDefinitionMap());
     }
 
+    // -----------------------------------------------------
+    //                                           Style Sheet
+    //                                           -----------
     public boolean isHistoryHtmlStyleSheetEmbedded() {
         final String styleSheet = getHistoryHtmlStyleSheet();
         return styleSheet != null && hasSchemaHtmlStyleSheetEmbeddedMark(styleSheet);
@@ -339,6 +402,31 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     protected String getHistoryHtmlStyleSheet() {
         return getProperty("historyHtmlStyleSheet", null, getDocumentDefinitionMap());
+    }
+
+    // -----------------------------------------------------
+    //                                            JavaScript
+    //                                            ----------
+    public boolean isHistoryHtmlJavaScriptEmbedded() {
+        final String javaScript = getHistoryHtmlJavaScript();
+        return javaScript != null && hasSchemaHtmlJavaScriptEmbeddedMark(javaScript);
+    }
+
+    public boolean isHistoryHtmlJavaScriptLink() {
+        final String javaScript = getHistoryHtmlJavaScript();
+        return javaScript != null && !hasSchemaHtmlJavaScriptEmbeddedMark(javaScript);
+    }
+
+    public String getHistoryHtmlJavaScriptEmbedded() {
+        return readSchemaHtmlJavaScriptEmbedded(getHistoryHtmlJavaScript());
+    }
+
+    public String getHistoryHtmlJavaScriptLink() {
+        return buildSchemaHtmlJavaScriptLink(getHistoryHtmlJavaScript());
+    }
+
+    protected String getHistoryHtmlJavaScript() {
+        return getProperty("historyHtmlJavaScript", null, getDocumentDefinitionMap());
     }
 
     // ===================================================================================
