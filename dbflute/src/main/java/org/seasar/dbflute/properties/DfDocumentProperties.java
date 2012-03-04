@@ -301,7 +301,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + styleSheet + "\" />";
     }
 
-    protected String getSchemaHtmlStyleSheet() {
+    protected String getSchemaHtmlStyleSheet() { // closet
         return getProperty("schemaHtmlStyleSheet", null, getDocumentDefinitionMap());
     }
 
@@ -357,7 +357,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return "<script type=\"text/javascript\" src=\"" + javaScript + "\"></script>";
     }
 
-    protected String getSchemaHtmlJavaScript() {
+    protected String getSchemaHtmlJavaScript() { // closet
         return getProperty("schemaHtmlJavaScript", null, getDocumentDefinitionMap());
     }
 
@@ -400,7 +400,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return buildSchemaHtmlStyleSheetLink(getHistoryHtmlStyleSheet());
     }
 
-    protected String getHistoryHtmlStyleSheet() {
+    protected String getHistoryHtmlStyleSheet() { // closet
         return getProperty("historyHtmlStyleSheet", null, getDocumentDefinitionMap());
     }
 
@@ -425,7 +425,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return buildSchemaHtmlJavaScriptLink(getHistoryHtmlJavaScript());
     }
 
-    protected String getHistoryHtmlJavaScript() {
+    protected String getHistoryHtmlJavaScript() { // closet
         return getProperty("historyHtmlJavaScript", null, getDocumentDefinitionMap());
     }
 

@@ -113,12 +113,6 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     @Override
-    protected boolean isErrorContinue() {
-        // take-assert task should not stop by first error
-        return _takeAssert ? true : super.isErrorContinue();
-    }
-
-    @Override
     protected boolean isRollbackTransaction() {
         // take-assert task should not update data
         // the task cannot execute update statement basically

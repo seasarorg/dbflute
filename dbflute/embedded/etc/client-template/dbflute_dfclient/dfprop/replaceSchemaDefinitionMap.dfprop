@@ -5,6 +5,7 @@
 #
 # o repsEnvType: (NotRequired - Default inherits or 'ut')
 # o isLoggingInsertSql: (NotRequired - Default true)
+# o isErrorSqlContinue: (NotRequired - Default false)
 # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
 # o skipSheet: (NotRequired - Default '')
 # o isIncrementSequenceToDataMax: (NotRequired - Default false)
@@ -40,6 +41,13 @@ map:{
     #  Does it show insert values on log?
     #
     #; isLoggingInsertSql = true
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isErrorSqlContinue: (NotRequired - Default false)
+    #  Does it continue the task when error SQL exists?
+    #
+    #; isErrorSqlContinue = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
