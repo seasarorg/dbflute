@@ -30,10 +30,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * <pre>
      * cb.query().derivedPurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchaseId(); // *Point
+     *         subCB.specify().columnPurchaseId(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).greaterEqual(123); // *Don't forget the parameter
+     * }).greaterEqual(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull) 
      * @return The parameter for comparing with scalar. (NotNull)
@@ -70,10 +70,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * <pre>
      * cb.query().derivedPurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchasePrice(); // *Point
+     *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).greaterEqual(123); // *Don't forget the parameter
+     * }).greaterEqual(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull) 
      * @return The parameter for comparing with scalar. (NotNull)
@@ -110,10 +110,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchasePrice(); // *Point
+     *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).greaterEqual(123); // *Don't forget the parameter
+     * }).greaterEqual(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull) 
      * @return The parameter for comparing with scalar. (NotNull)
@@ -150,10 +150,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * <pre>
      * cb.query().derivedPurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchasePrice(); // *Point
+     *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).greaterEqual(123); // *Don't forget the parameter
+     * }).greaterEqual(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull) 
      * @return The parameter for comparing with scalar. (NotNull)
@@ -189,10 +189,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * <pre>
      * cb.query().derivedPurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchasePrice(); // *Point
+     *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).greaterEqual(123); // *Don't forget the parameter
+     * }).greaterEqual(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull) 
      * @return The parameter for comparing with scalar. (NotNull)
@@ -229,10 +229,10 @@ public class HpQDRFunction<CB extends ConditionBean> {
      * <pre>
      * cb.query().derivedPurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
      *     public void query(PurchaseCB subCB) {
-     *         subCB.specify().columnPurchasePrice(); // *Point
+     *         subCB.specify().columnPurchasePrice(); <span style="color: #3F7E5E">// *Point</span>
      *         subCB.query().setPaymentCompleteFlg_Equal_True();
      *     }
-     * }).greaterEqual(123); // *Don't forget the parameter
+     * }).greaterEqual(123); <span style="color: #3F7E5E">// *Don't forget the parameter</span>
      * </pre> 
      * @param subQuery The sub query of referrer. (NotNull) 
      * @return The parameter for comparing with scalar. (NotNull)

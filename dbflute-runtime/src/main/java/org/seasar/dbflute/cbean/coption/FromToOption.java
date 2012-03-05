@@ -1050,6 +1050,46 @@ public class FromToOption implements ConditionOption, Serializable {
         return toDate;
     }
 
+    public Date xfilterToDateBetweenWay(Date toDate) {
+        if (toDate == null) {
+            return null;
+        }
+        final Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(toDate.getTime());
+
+        // moveToScope first because of using terminal
+        if (_toPatternNextYearJust) {
+            moveToScopeYear(cal);
+            moveToCalendarYearTerminal(cal);
+        } else if (_toPatternNextMonthJust) {
+            moveToScopeMonth(cal);
+            moveToCalendarMonthTerminal(cal);
+        } else if (_toPatternNextDayJust) {
+            moveToScopeDay(cal);
+            moveToCalendarDayTerminal(cal);
+        } else if (_toPatternNextHourJust) {
+            moveToScopeHour(cal);
+            moveToCalendarHourTerminal(cal);
+        } else if (_toPatternNextWeekJust) {
+            moveToScopeWeek(cal);
+            moveToCalendarWeekTerminal(cal);
+        } else if (_toPatternNextQuarterOfYearJust) {
+            moveToScopeQuarterOfYear(cal);
+            moveToCalendarQuarterOfYearTerminal(cal);
+        }
+        if (_toDateWithNoon) {
+            moveToCalendarHourJustNoon(cal);
+        }
+        if (_toDateWithHour != null) {
+            moveToCalendarHourJustFor(cal, _toDateWithHour);
+        }
+
+        final Date cloneDate = (Date) toDate.clone();
+        cloneDate.setTime(cal.getTimeInMillis());
+        toDate = cloneDate;
+        return toDate;
+    }
+
     protected Date filterNoon(Date date) {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(date.getTime());
@@ -1086,6 +1126,9 @@ public class FromToOption implements ConditionOption, Serializable {
     // ===================================================================================
     //                                                                     Calendar Helper
     //                                                                     ===============
+    // -----------------------------------------------------
+    //                                          Move-to Just
+    //                                          ------------
     protected void moveToCalendarYearJust(Calendar cal) {
         DfTypeUtil.moveToCalendarYearJust(cal, _yearBeginMonth);
     }
@@ -1118,36 +1161,73 @@ public class FromToOption implements ConditionOption, Serializable {
         DfTypeUtil.moveToCalendarQuarterOfYearJust(cal, _yearBeginMonth);
     }
 
+    // -----------------------------------------------------
+    //                                          Move-to Next
+    //                                          ------------
     protected void moveToCalendarNextYearJust(Calendar cal) {
-        DfTypeUtil.moveToCalendarYearTerminal(cal, _yearBeginMonth);
-        DfTypeUtil.addCalendarMillisecond(cal, 1);
+        moveToCalendarYearTerminal(cal);
+        addCalendarMillisecondOne(cal);
     }
 
     protected void moveToCalendarNextMonthJust(Calendar cal) {
-        DfTypeUtil.moveToCalendarMonthTerminal(cal, _monthBeginDay);
-        DfTypeUtil.addCalendarMillisecond(cal, 1);
+        moveToCalendarMonthTerminal(cal);
+        addCalendarMillisecondOne(cal);
     }
 
     protected void moveToCalendarNextDayJust(Calendar cal) {
-        DfTypeUtil.moveToCalendarDayTerminal(cal, _dayBeginHour);
-        DfTypeUtil.addCalendarMillisecond(cal, 1);
+        moveToCalendarDayTerminal(cal);
+        addCalendarMillisecondOne(cal);
     }
 
     protected void moveToCalendarNextHourJust(Calendar cal) {
-        DfTypeUtil.moveToCalendarHourTerminal(cal);
-        DfTypeUtil.addCalendarMillisecond(cal, 1);
+        moveToCalendarHourTerminal(cal);
+        addCalendarMillisecondOne(cal);
     }
 
     protected void moveToCalendarNextWeekJust(Calendar cal) {
-        DfTypeUtil.moveToCalendarWeekTerminal(cal, _weekBeginDay);
-        DfTypeUtil.addCalendarMillisecond(cal, 1);
+        moveToCalendarWeekTerminal(cal);
+        addCalendarMillisecondOne(cal);
     }
 
     protected void moveToCalendarNextQuarterOfYearJust(Calendar cal) {
-        DfTypeUtil.moveToCalendarQuarterOfYearTerminal(cal, _yearBeginMonth);
+        moveToCalendarQuarterOfYearTerminal(cal);
+        addCalendarMillisecondOne(cal);
+    }
+
+    protected void addCalendarMillisecondOne(Calendar cal) {
         DfTypeUtil.addCalendarMillisecond(cal, 1);
     }
 
+    // -----------------------------------------------------
+    //                                      Move-to Terminal
+    //                                      ----------------
+    protected void moveToCalendarYearTerminal(Calendar cal) {
+        DfTypeUtil.moveToCalendarYearTerminal(cal, _yearBeginMonth);
+    }
+
+    protected void moveToCalendarMonthTerminal(Calendar cal) {
+        DfTypeUtil.moveToCalendarMonthTerminal(cal, _monthBeginDay);
+    }
+
+    protected void moveToCalendarDayTerminal(Calendar cal) {
+        DfTypeUtil.moveToCalendarDayTerminal(cal, _dayBeginHour);
+    }
+
+    protected void moveToCalendarHourTerminal(Calendar cal) {
+        DfTypeUtil.moveToCalendarHourTerminal(cal);
+    }
+
+    protected void moveToCalendarWeekTerminal(Calendar cal) {
+        DfTypeUtil.moveToCalendarWeekTerminal(cal, _weekBeginDay);
+    }
+
+    protected void moveToCalendarQuarterOfYearTerminal(Calendar cal) {
+        DfTypeUtil.moveToCalendarQuarterOfYearTerminal(cal, _yearBeginMonth);
+    }
+
+    // -----------------------------------------------------
+    //                                         Move-to Scope
+    //                                         -------------
     protected void moveToScopeYear(Calendar cal) {
         if (_moveToScope != null) {
             DfTypeUtil.addCalendarYear(cal, _moveToScope);
