@@ -33,7 +33,21 @@ public interface RelationInfo {
 
     Map<ColumnInfo, ColumnInfo> getLocalTargetColumnInfoMap();
 
+    /**
+     * Does the relation is one-to-one?
+     * @return The determination, true or false.
+     */
     boolean isOneToOne();
 
+    /**
+     * Does the relation is referrer?
+     * @return The determination, true or false.
+     */
     boolean isReferrer();
+
+    /**
+     * Get the relation info of reverse relation.
+     * @return The instance of relation info. (NullAllowed: if null, means one-way reference)
+     */
+    RelationInfo getReverseRelation();
 }

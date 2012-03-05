@@ -298,9 +298,9 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected ForeignInfo cfi(String propName // property name
             , DBMeta localDbm, DBMeta foreignDbm // DB meta
             , Map<ColumnInfo, ColumnInfo> locFrColMap, int relNo // relation info
-            , boolean oneToOne, boolean bizOneToOne // one-to-one info
-            , boolean additionalFK) { // additional info
-        return new ForeignInfo(propName, localDbm, foreignDbm, locFrColMap, relNo, oneToOne, bizOneToOne, additionalFK);
+            , boolean oneToOne, boolean bizOne // one-to-one info
+            , boolean addFK, String revsName) { // additional info
+        return new ForeignInfo(propName, localDbm, foreignDbm, locFrColMap, relNo, oneToOne, bizOne, addFK, revsName);
     }
 
     /**
@@ -380,8 +380,8 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected ReferrerInfo cri(String propName, DBMeta localDbm, DBMeta referrerDbm,
-            Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap, boolean oneToOne) { // createReferrerInfo()
-        return new ReferrerInfo(propName, localDbm, referrerDbm, localReferrerColumnInfoMap, oneToOne);
+            Map<ColumnInfo, ColumnInfo> locRfColMap, boolean oneToOne, String revsName) { // createReferrerInfo()
+        return new ReferrerInfo(propName, localDbm, referrerDbm, locRfColMap, oneToOne, revsName);
     }
 
     /**

@@ -42,20 +42,21 @@ public class ReferrerInfo implements RelationInfo {
     protected final Map<ColumnInfo, ColumnInfo> _localReferrerColumnInfoMap;
     protected final Map<ColumnInfo, ColumnInfo> _referrerLocalColumnInfoMap;
     protected final boolean _oneToOne;
+    protected final String _reversePropertyName;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ReferrerInfo(String referrerPropertyName, DBMeta localDBMeta, DBMeta referrerDBMeta,
-            Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap, boolean oneToOne) {
+            Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap, boolean oneToOne, String reversePropertyName) {
         assertObjectNotNull("referrerPropertyName", referrerPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("referrerDBMeta", referrerDBMeta);
         assertObjectNotNull("localReferrerColumnInfoMap", localReferrerColumnInfoMap);
-        this._referrerPropertyName = referrerPropertyName;
-        this._localDBMeta = localDBMeta;
-        this._referrerDBMeta = referrerDBMeta;
-        this._localReferrerColumnInfoMap = localReferrerColumnInfoMap;
+        _referrerPropertyName = referrerPropertyName;
+        _localDBMeta = localDBMeta;
+        _referrerDBMeta = referrerDBMeta;
+        _localReferrerColumnInfoMap = localReferrerColumnInfoMap;
         final Set<ColumnInfo> keySet = localReferrerColumnInfoMap.keySet();
         _referrerLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
         for (final Iterator<ColumnInfo> ite = keySet.iterator(); ite.hasNext();) {
@@ -63,7 +64,8 @@ public class ReferrerInfo implements RelationInfo {
             final ColumnInfo value = localReferrerColumnInfoMap.get(key);
             _referrerLocalColumnInfoMap.put(value, key);
         }
-        this._oneToOne = oneToOne;
+        _oneToOne = oneToOne;
+        _reversePropertyName = reversePropertyName;
     }
 
     // ===================================================================================
@@ -134,8 +136,8 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     // ===================================================================================
-    //                                                                           Implement
-    //                                                                           =========
+    //                                                                 Relation Implements
+    //                                                                 ===================
     public String getRelationPropertyName() {
         return getReferrerPropertyName();
     }
@@ -253,11 +255,17 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     /**
-     * Does the relation is one-to-one? <br />
+     * {@inheritDoc} <br />
      * But basically this returns false because DBFlute treats one-to-one relations as a foreign relation.  
-     * @return The determination, true or false.
      */
     public boolean isOneToOne() {
         return _oneToOne;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public RelationInfo getReverseRelation() {
+        return _reversePropertyName != null ? _referrerDBMeta.findRelationInfo(_reversePropertyName) : null;
     }
 }

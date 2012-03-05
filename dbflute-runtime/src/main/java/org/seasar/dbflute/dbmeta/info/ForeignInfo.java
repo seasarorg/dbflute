@@ -46,21 +46,22 @@ public class ForeignInfo implements RelationInfo {
     protected final boolean _oneToOne;
     protected final boolean _bizOneToOne;
     protected final boolean _additionalFK;
+    protected final String _reversePropertyName;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ForeignInfo(String foreignPropertyName, DBMeta localDBMeta, DBMeta foreignDBMeta,
             Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, boolean oneToOne,
-            boolean bizOneToOne, boolean additionalFK) {
+            boolean bizOneToOne, boolean additionalFK, String reversePropertyName) {
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("foreignDBMeta", foreignDBMeta);
         assertObjectNotNull("localForeignColumnInfoMap", localForeignColumnInfoMap);
-        this._foreignPropertyName = foreignPropertyName;
-        this._localDBMeta = localDBMeta;
-        this._foreignDBMeta = foreignDBMeta;
-        this._localForeignColumnInfoMap = localForeignColumnInfoMap;
+        _foreignPropertyName = foreignPropertyName;
+        _localDBMeta = localDBMeta;
+        _foreignDBMeta = foreignDBMeta;
+        _localForeignColumnInfoMap = localForeignColumnInfoMap;
         final Set<ColumnInfo> keySet = localForeignColumnInfoMap.keySet();
         _foreignLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
         for (final Iterator<ColumnInfo> ite = keySet.iterator(); ite.hasNext();) {
@@ -68,10 +69,11 @@ public class ForeignInfo implements RelationInfo {
             final ColumnInfo value = localForeignColumnInfoMap.get(key);
             _foreignLocalColumnInfoMap.put(value, key);
         }
-        this._relationNo = relationNo;
-        this._oneToOne = oneToOne;
-        this._bizOneToOne = bizOneToOne;
-        this._additionalFK = additionalFK;
+        _relationNo = relationNo;
+        _oneToOne = oneToOne;
+        _bizOneToOne = bizOneToOne;
+        _additionalFK = additionalFK;
+        _reversePropertyName = reversePropertyName;
     }
 
     // ===================================================================================
@@ -132,8 +134,8 @@ public class ForeignInfo implements RelationInfo {
     }
 
     // ===================================================================================
-    //                                                                           Implement
-    //                                                                           =========
+    //                                                                 Relation Implements
+    //                                                                 ===================
     public String getRelationPropertyName() {
         return getForeignPropertyName();
     }
@@ -259,8 +261,7 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
-     * Does the relation is one-to-one?
-     * @return The determination, true or false.
+     * {@inheritDoc}
      */
     public boolean isOneToOne() {
         return _oneToOne;
@@ -280,6 +281,13 @@ public class ForeignInfo implements RelationInfo {
      */
     public boolean isAdditionalFK() {
         return _additionalFK;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public RelationInfo getReverseRelation() {
+        return _reversePropertyName != null ? _foreignDBMeta.findRelationInfo(_reversePropertyName) : null;
     }
 
     // -----------------------------------------------------
