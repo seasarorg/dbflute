@@ -196,11 +196,11 @@ public class ForeignKey {
     }
 
     // ===================================================================================
-    //                                                                       Property Name
-    //                                                                       =============
+    //                                                                    Foreign Property
+    //                                                                    ================
     // -----------------------------------------------------
-    //                                               Foreign
-    //                                               -------
+    //                                                 Basic
+    //                                                 -----
     /**
      * Get the value of foreign property name.
      * @return Generated string.
@@ -286,8 +286,48 @@ public class ForeignKey {
     }
 
     // -----------------------------------------------------
-    //                                              Referrer
-    //                                              --------
+    //                                       Foreign Reverse
+    //                                       ---------------
+    public String getForeignReverseRelationPropertyName() {
+        if (canBeReferrer()) {
+            if (isOneToOne()) {
+                return getReferrerJavaBeansRulePropertyNameAsOne();
+            } else {
+                return getReferrerJavaBeansRulePropertyName();
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public String getForeignReverseRelationPropertyNameArg() {
+        final String propertyName = getForeignReverseRelationPropertyName();
+        return propertyName != null ? "\"" + propertyName + "\"" : "null";
+    }
+
+    public String getForeignReverseRelationPropertyNameInitCap() {
+        if (canBeReferrer()) {
+            if (isOneToOne()) {
+                return getReferrerJavaBeansRulePropertyNameAsOneInitCap();
+            } else {
+                return getReferrerJavaBeansRulePropertyNameInitCap();
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public String getForeignReverseRelationPropertyNameInitCapArg() {
+        final String propertyName = getForeignReverseRelationPropertyNameInitCap();
+        return propertyName != null ? "\"" + propertyName + "\"" : "null";
+    }
+
+    // ===================================================================================
+    //                                                                   Referrer Property
+    //                                                                   =================
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     public String getReferrerPropertyName() {
         return getReferrerPropertyName(false);
     }
@@ -390,6 +430,18 @@ public class ForeignKey {
     public String getReferrerPropertyNameInitCap() {
         final String referrerPropertyName = getReferrerPropertyName();
         return referrerPropertyName.substring(0, 1).toUpperCase() + referrerPropertyName.substring(1);
+    }
+
+    // -----------------------------------------------------
+    //                                      Referrer Reverse
+    //                                      ----------------
+    public String getReferrerReverseRelationPropertyName() {
+        return getForeignJavaBeansRulePropertyName();
+    }
+
+    public String getReferrerReverseRelationPropertyNameArg() {
+        final String propertyName = getForeignJavaBeansRulePropertyName();
+        return "\"" + propertyName + "\"";
     }
 
     // ===================================================================================
