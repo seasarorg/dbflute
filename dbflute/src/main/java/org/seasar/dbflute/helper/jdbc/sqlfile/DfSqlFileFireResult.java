@@ -18,6 +18,8 @@ package org.seasar.dbflute.helper.jdbc.sqlfile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.exception.SQLFailureException;
+
 /**
  * @author jflute
  */
@@ -25,7 +27,8 @@ public class DfSqlFileFireResult {
 
     protected String _resultMessage;
     protected String _detailMessage;
-    protected boolean _existsError; // basically continued errors
+    protected SQLFailureException _breakCause;
+    protected boolean _existsError; // break or continue-error
     protected final List<DfSqlFileRunnerResult> _runnerResultList = new ArrayList<DfSqlFileRunnerResult>();
 
     public String getResultMessage() {
@@ -44,7 +47,15 @@ public class DfSqlFileFireResult {
         this._detailMessage = detailMessage;
     }
 
-    public boolean existsError() {
+    public SQLFailureException getBreakCause() {
+        return _breakCause;
+    }
+
+    public void setBreakCause(SQLFailureException breakCause) {
+        this._breakCause = breakCause;
+    }
+
+    public boolean isExistsError() {
         return _existsError;
     }
 

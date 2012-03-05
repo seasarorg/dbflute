@@ -114,17 +114,25 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 traceSql(realSql);
                 execSQL(realSql);
             }
-            if (_currentConnection != null) {
-                final Boolean autoCommit = getAutoCommit();
-                if (autoCommit != null && !autoCommit) {
-                    rollbackOrCommit();
-                }
+            rollbackOrCommit();
+        } catch (SQLFailureException breakCause) {
+            if (_runInfo.isBreakCauseThrow()) {
+                throw breakCause;
+            } else {
+                _result.setGoodSqlCount(_goodSqlCount);
+                _result.setTotalSqlCount(-1);
+                _result.setBreakCause(breakCause);
+                return _result;
             }
         } catch (SQLException e) {
             // here is for the exception except executing SQL
             // so it always does not continue
             throwSQLFailureException(currentSql, e);
         } finally {
+            try {
+                rollback();
+            } catch (SQLException ignored) {
+            }
             closeStatement();
             closeConnection();
             closeReader(reader);
@@ -226,12 +234,39 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     protected void rollbackOrCommit() throws SQLException {
+        if (_currentConnection == null) {
+            return;
+        }
+        final Boolean autoCommit = getAutoCommit();
+        if (autoCommit == null || autoCommit) {
+            return;
+        }
         try {
             if (_runInfo.isRollbackOnly()) {
                 _currentConnection.rollback();
             } else {
                 _currentConnection.commit();
             }
+        } catch (SQLException mayContinued) {
+            if (_runInfo.isIgnoreTxError()) {
+                // e.g. SQLite may throw an exception (actually said: Database is locked!)
+                _log.warn("Connection#rollback()/commit() said: " + mayContinued.getMessage());
+            } else {
+                throw mayContinued;
+            }
+        }
+    }
+
+    protected void rollback() throws SQLException {
+        if (_currentConnection == null) {
+            return;
+        }
+        final Boolean autoCommit = getAutoCommit();
+        if (autoCommit == null || autoCommit) {
+            return;
+        }
+        try {
+            _currentConnection.rollback();
         } catch (SQLException mayContinued) {
             if (_runInfo.isIgnoreTxError()) {
                 // e.g. SQLite may throw an exception (actually said: Database is locked!)

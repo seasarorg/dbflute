@@ -126,12 +126,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
+
+        // Sql2Entity task immediately breaks the process by error
+        runInfo.setBreakCauseThrow(true);
         runInfo.setErrorContinue(false);
+
         runInfo.setAutoCommit(false);
         runInfo.setRollbackOnly(true); // this task does not commit
         runInfo.setIgnoreTxError(false); // requires to be roll-backed correctly
         runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
 
+        // FireMan's fire result is ignored here because runner's option breakCauseThrow=true
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         final DfOutsideSqlPack outsideSqlPack = getTargetSqlFileList();
         final DfSqlFileRunner runner = createSqlFileRunner(runInfo, outsideSqlPack);

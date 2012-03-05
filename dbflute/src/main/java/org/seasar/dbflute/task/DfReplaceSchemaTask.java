@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfCreateSchemaFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyFailureException;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAbstractSchemaTaskFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
@@ -166,6 +167,10 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected void createSchema(String sqlRootDir) {
         final DfCreateSchemaProcess process = createCreateSchemaProcess(sqlRootDir);
         _createSchemaFinalInfo = process.execute();
+        final SQLFailureException breakCause = _createSchemaFinalInfo.getBreakCause();
+        if (breakCause != null) { // high priority exception
+            throw breakCause;
+        }
     }
 
     protected DfCreateSchemaProcess createCreateSchemaProcess(String sqlRootDir) {
@@ -201,6 +206,10 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected void takeFinally(String sqlRootDir) {
         final DfTakeFinallyProcess process = createTakeFinallyProcess(sqlRootDir);
         _takeFinallyFinalInfo = process.execute();
+        final SQLFailureException breakCause = _takeFinallyFinalInfo.getBreakCause();
+        if (breakCause != null) { // high priority exception
+            throw breakCause;
+        }
         final DfTakeFinallyAssertionFailureException assertionEx = _takeFinallyFinalInfo.getAssertionEx();
         if (assertionEx != null) { // high priority exception
             throw assertionEx;
@@ -299,7 +308,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         if (finalInfo != null) {
             final DfTakeFinallyFinalInfo takeFinallyFinalInfo = finalInfo.getTakeFinallyFinalInfo();
             if (takeFinallyFinalInfo != null) {
-                assertionFailure = takeFinallyFinalInfo.hasAssertionFailure();
+                assertionFailure = (takeFinallyFinalInfo.getAssertionEx() != null);
                 if (takeFinallyFinalInfo.isValidInfo()) {
                     if (!alterFailure || takeFinallyFinalInfo.isFailure()) {
                         if (firstDone) {

@@ -137,9 +137,9 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
             if (_runInfo.isErrorContinue()) {
                 _log.warn("Failed to execute: " + sql, e);
                 _sql2entityMeta.addExceptionInfo(_sqlFile.getName(), e.getMessage() + ln() + sql);
-                return;
+            } else {
+                throwSQLFailureException(sql, e);
             }
-            throwSQLFailureException(sql, e);
         } finally {
             if (rs != null) {
                 try {

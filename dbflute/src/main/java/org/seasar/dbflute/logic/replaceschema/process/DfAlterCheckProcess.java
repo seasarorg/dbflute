@@ -26,6 +26,7 @@ import org.seasar.dbflute.exception.DfAlterCheckDifferenceFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckRollbackSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckSavePreviousFailureException;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
@@ -328,7 +329,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final DfAlterCheckFinalInfo finalInfo = executeAlterSql();
         if (finalInfo.isFailure()) {
             markAlterNG(getAlterCheckAlterSqlFailureNotice());
-            setupAlterCheckAlterSqlFailureException(finalInfo);
+            setupAlterCheckAlterSqlFailureException(finalInfo); // with handling break cause
         } else {
             serializeAlteredSchema();
         }
@@ -409,7 +410,14 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         br.addItem("Message");
         br.addElement(finalInfo.getResultMessage());
         String msg = br.buildExceptionMessage();
-        finalInfo.setAlterSqlFailureEx(new DfAlterCheckAlterSqlFailureException(msg));
+        final DfAlterCheckAlterSqlFailureException failureEx;
+        final SQLFailureException breakCause = finalInfo.getBreakCause();
+        if (breakCause != null) {
+            failureEx = new DfAlterCheckAlterSqlFailureException(msg, breakCause);
+        } else {
+            failureEx = new DfAlterCheckAlterSqlFailureException(msg);
+        }
+        finalInfo.setAlterSqlFailureEx(failureEx);
         finalInfo.setFailure(true);
     }
 
@@ -645,7 +653,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         for (String detailMessage : detailMessageList) {
             finalInfo.addDetailMessage(detailMessage);
         }
-        finalInfo.setFailure(fireResult.existsError());
+        finalInfo.setBreakCause(fireResult.getBreakCause());
+        finalInfo.setFailure(fireResult.isExistsError());
         return finalInfo;
     }
 

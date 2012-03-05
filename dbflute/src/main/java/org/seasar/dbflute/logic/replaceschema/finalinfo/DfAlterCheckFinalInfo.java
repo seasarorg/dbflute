@@ -4,6 +4,7 @@ import org.seasar.dbflute.exception.DfAlterCheckAlterSqlFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckDifferenceFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckSavePreviousFailureException;
+import org.seasar.dbflute.exception.SQLFailureException;
 
 /**
  * @author jflute
@@ -11,12 +12,16 @@ import org.seasar.dbflute.exception.DfAlterCheckSavePreviousFailureException;
 public class DfAlterCheckFinalInfo extends DfAbstractSchemaTaskFinalInfo {
 
     // one exists, the others always does not exist
+    protected SQLFailureException _breakCause;
     protected DfAlterCheckSavePreviousFailureException _savePreviousFailureEx;
     protected DfAlterCheckAlterSqlFailureException _alterSqlFailureEx;
     protected DfAlterCheckReplaceSchemaFailureException _replaceSchemaFailureEx;
     protected DfAlterCheckDifferenceFoundException _diffFoundEx;
 
     public void throwAlterCheckExceptionIfExists() {
+        if (_breakCause != null) {
+            throw _breakCause;
+        }
         if (_savePreviousFailureEx != null) {
             throw _savePreviousFailureEx;
         }
@@ -29,6 +34,14 @@ public class DfAlterCheckFinalInfo extends DfAbstractSchemaTaskFinalInfo {
         if (_diffFoundEx != null) {
             throw _diffFoundEx;
         }
+    }
+
+    public SQLFailureException getBreakCause() {
+        return _breakCause;
+    }
+
+    public void setBreakCause(SQLFailureException breakCause) {
+        this._breakCause = breakCause;
     }
 
     public DfAlterCheckSavePreviousFailureException getSavePreviousFailureEx() {

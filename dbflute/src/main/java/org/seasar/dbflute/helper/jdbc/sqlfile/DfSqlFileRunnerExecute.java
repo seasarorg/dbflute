@@ -71,12 +71,12 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 _goodSqlCount++;
             }
         } catch (SQLException e) {
-            if (!lazyConnectFailed && _runInfo.isErrorContinue()) {
+            if (!lazyConnectFailed && _runInfo.isErrorContinue()) { // when continue option
                 showContinueWarnLog(sql, e);
                 _result.addErrorContinuedSql(sql, e);
-                return;
+            } else { // main root @since 0.9.9.2F
+                throwSQLFailureException(sql, e);
             }
-            throwSQLFailureException(sql, e);
         }
     }
 

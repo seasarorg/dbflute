@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfAlterCheckAlterScriptSQLException;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
@@ -51,6 +52,7 @@ public class DfSqlFileFireMan {
      */
     public DfSqlFileFireResult fire(DfSqlFileRunner runner, List<File> sqlFileList) {
         final DfSqlFileFireResult fireResult = new DfSqlFileFireResult();
+        SQLFailureException breakCause = null;
         int goodSqlCount = 0;
         int totalSqlCount = 0;
         for (final File sqlFile : sqlFileList) {
@@ -67,25 +69,43 @@ public class DfSqlFileFireMan {
             if (runnerResult != null) {
                 fireResult.addRunnerResult(runnerResult);
                 goodSqlCount = goodSqlCount + runnerResult.getGoodSqlCount();
-                totalSqlCount = totalSqlCount + runnerResult.getTotalSqlCount();
+                breakCause = runnerResult.getBreakCause();
+                if (breakCause != null) {
+                    totalSqlCount = -1;
+                    break;
+                } else {
+                    totalSqlCount = totalSqlCount + runnerResult.getTotalSqlCount();
+                }
             }
         }
         final String title = _executorName != null ? _executorName : "Fired SQL";
 
-        // Result Message
-        final StringBuilder resultSb = new StringBuilder();
-        resultSb.append("{").append(title).append("}: success=").append(goodSqlCount);
-        resultSb.append(" failure=").append((totalSqlCount - goodSqlCount));
-        resultSb.append(" (in ").append(sqlFileList.size()).append(" files)");
-        _log.info(resultSb.toString());
-        fireResult.setResultMessage(resultSb.toString());
+        // Break Cause
+        fireResult.setBreakCause(breakCause);
 
         // Exists Error
-        fireResult.setExistsError(totalSqlCount > goodSqlCount);
+        fireResult.setExistsError((breakCause != null) || (totalSqlCount > goodSqlCount));
+
+        // Result Message
+        buildResultMessage(sqlFileList, fireResult, goodSqlCount, totalSqlCount, title);
 
         // Detail Message
         fireResult.setDetailMessage(buildDetailMessage(fireResult));
         return fireResult;
+    }
+
+    protected void buildResultMessage(List<File> sqlFileList, final DfSqlFileFireResult fireResult, int goodSqlCount,
+            int totalSqlCount, final String title) {
+        final StringBuilder resultSb = new StringBuilder();
+        resultSb.append("{").append(title).append("}: success=").append(goodSqlCount);
+        if (fireResult.getBreakCause() != null) {
+            resultSb.append(" failure=1 *break");
+        } else { // normal or continue-error
+            resultSb.append(" failure=").append(totalSqlCount - goodSqlCount);
+        }
+        resultSb.append(" (in ").append(sqlFileList.size()).append(" files)");
+        _log.info(resultSb.toString());
+        fireResult.setResultMessage(resultSb.toString());
     }
 
     protected String buildDetailMessage(DfSqlFileFireResult fireResult) {
@@ -94,34 +114,40 @@ public class DfSqlFileFireMan {
         for (DfSqlFileRunnerResult currentResult : runnerResultList) {
             final List<ErrorContinuedSql> errorContinuedSqlList = currentResult.getErrorContinuedSqlList();
             final String fileName = currentResult.getSqlFile().getName();
+            final SQLFailureException breakCause = currentResult.getBreakCause();
             if (sb.length() > 0) {
                 sb.append(ln());
             }
-            sb.append(errorContinuedSqlList.isEmpty() ? "o " : "x ").append(fileName);
-            for (ErrorContinuedSql errorContinuedSql : errorContinuedSqlList) {
-                final String sql = errorContinuedSql.getSql();
-                sb.append(ln()).append(sql);
-                final SQLException sqlEx = errorContinuedSql.getSqlEx();
-                String message = sqlEx.getMessage();
-                if (sqlEx != null && message != null) {
-                    message = message.trim();
-                    final LineToken lineToken = new LineToken();
-                    final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
-                    lineTokenizingOption.setDelimiter(ln());
-                    final List<String> tokenizedList = lineToken.tokenize(message, lineTokenizingOption);
-                    int elementIndex = 0;
-                    for (String element : tokenizedList) {
-                        if (elementIndex == 0) {
-                            sb.append(ln()).append(" >> ").append(element);
-                        } else {
-                            sb.append(ln()).append("    ").append(element);
+            if (breakCause != null) { // break by error
+                sb.append("x ").append(fileName);
+                sb.append(ln()).append(" >> (failed: Look at the exception message)");
+            } else { // normal or error-continued
+                sb.append(errorContinuedSqlList.isEmpty() ? "o " : "x ").append(fileName);
+                for (ErrorContinuedSql errorContinuedSql : errorContinuedSqlList) {
+                    final String sql = errorContinuedSql.getSql();
+                    sb.append(ln()).append(sql);
+                    final SQLException sqlEx = errorContinuedSql.getSqlEx();
+                    String message = sqlEx.getMessage();
+                    if (sqlEx != null && message != null) {
+                        message = message.trim();
+                        final LineToken lineToken = new LineToken();
+                        final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
+                        lineTokenizingOption.setDelimiter(ln());
+                        final List<String> tokenizedList = lineToken.tokenize(message, lineTokenizingOption);
+                        int elementIndex = 0;
+                        for (String element : tokenizedList) {
+                            if (elementIndex == 0) {
+                                sb.append(ln()).append(" >> ").append(element);
+                            } else {
+                                sb.append(ln()).append("    ").append(element);
+                            }
+                            ++elementIndex;
                         }
-                        ++elementIndex;
-                    }
-                    if (isShowSQLState(sqlEx)) {
-                        sb.append(ln());
-                        sb.append("    (SQLState=").append(sqlEx.getSQLState());
-                        sb.append(" ErrorCode=").append(sqlEx.getErrorCode()).append(")");
+                        if (isShowSQLState(sqlEx)) {
+                            sb.append(ln());
+                            sb.append("    (SQLState=").append(sqlEx.getSQLState());
+                            sb.append(" ErrorCode=").append(sqlEx.getErrorCode()).append(")");
+                        }
                     }
                 }
             }

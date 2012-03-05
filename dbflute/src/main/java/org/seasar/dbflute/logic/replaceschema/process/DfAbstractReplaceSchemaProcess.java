@@ -31,6 +31,7 @@ public class DfAbstractReplaceSchemaProcess {
         runInfo.setUser(prop.getDatabaseUser());
         runInfo.setPassword(prop.getDatabasePassword());
         runInfo.setEncoding(getReplaceSchemaProperties().getSqlFileEncoding());
+        runInfo.setBreakCauseThrow(false); // save break cause to prepare messages
         runInfo.setErrorContinue(isErrorContinue());
         if (isRollbackTransaction()) { // basically take-assert
             runInfo.setAutoCommit(false);

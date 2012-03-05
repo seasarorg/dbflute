@@ -28,6 +28,7 @@ public class DfRunnerInformation {
     protected String _user;
     protected String _password;
     protected String _delimiter = ";";
+    protected boolean _breakCauseThrow;
     protected boolean _errorContinue;
     protected boolean _autoCommit;
     protected boolean _rollbackOnly;
@@ -79,6 +80,14 @@ public class DfRunnerInformation {
 
     public void setDelimiter(String delimiter) {
         this._delimiter = delimiter;
+    }
+
+    public boolean isBreakCauseThrow() {
+        return _breakCauseThrow;
+    }
+
+    public void setBreakCauseThrow(boolean breakCauseThrow) {
+        this._breakCauseThrow = breakCauseThrow;
     }
 
     public boolean isErrorContinue() {

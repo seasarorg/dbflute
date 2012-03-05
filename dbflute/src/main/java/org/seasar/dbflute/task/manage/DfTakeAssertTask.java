@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfTakeAssertAssertionFailureException;
 import org.seasar.dbflute.exception.DfTakeAssertFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
@@ -82,6 +83,10 @@ public class DfTakeAssertTask extends DfAbstractTask {
         final String sqlRootDir = Srl.is_NotNull_and_NotTrimmedEmpty(_sqlRootDir) ? _sqlRootDir : "./playsql";
         final DfTakeFinallyProcess process = DfTakeFinallyProcess.createAsTakeAssert(sqlRootDir, getDataSource());
         _finalInfo = process.execute();
+        final SQLFailureException breakCause = _finalInfo.getBreakCause();
+        if (breakCause != null) { // high priority exception
+            throw breakCause;
+        }
 
         // get exceptions from this method when take-assert
         // (then the finalInfo does not have an exception)

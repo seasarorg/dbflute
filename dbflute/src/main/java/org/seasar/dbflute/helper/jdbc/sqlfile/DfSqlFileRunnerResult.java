@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.exception.SQLFailureException;
+
 /**
  * @author jflute
  * @since 0.9.4 (2009/03/31 Tuesday)
@@ -30,9 +32,10 @@ public class DfSqlFileRunnerResult {
     //                                                                           Attribute
     //                                                                           =========
     protected final File _sqlFile;
-    protected final List<ErrorContinuedSql> _errorContinuedSqlList = new ArrayList<ErrorContinuedSql>();
+    protected final List<ErrorContinuedSql> _errorContinuedSqlList = new ArrayList<ErrorContinuedSql>(); // only when continued
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
+    protected SQLFailureException _breakCause; // only when break immediately by error
 
     // ===================================================================================
     //                                                                         Constructor
@@ -94,5 +97,13 @@ public class DfSqlFileRunnerResult {
 
     public void setTotalSqlCount(int totalSqlCount) {
         this._totalSqlCount = totalSqlCount;
+    }
+
+    public SQLFailureException getBreakCause() {
+        return _breakCause;
+    }
+
+    public void setBreakCause(SQLFailureException breakCause) {
+        this._breakCause = breakCause;
     }
 }

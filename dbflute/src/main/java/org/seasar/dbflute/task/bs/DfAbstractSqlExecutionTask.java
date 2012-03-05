@@ -48,6 +48,7 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
+        // FireMan's fire result is ignored here because runner's option breakCauseThrow=true
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
         final List<File> sqlFileList = getTargetSqlFileList();
@@ -68,6 +69,7 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
         runInfo.setUrl(_url);
         runInfo.setUser(_user);
         runInfo.setPassword(_password);
+        runInfo.setBreakCauseThrow(isBreakCauseThrow());
         runInfo.setErrorContinue(isErrorContinue());
         runInfo.setAutoCommit(isAutoCommit());
         runInfo.setRollbackOnly(isRollbackOnly());
@@ -79,6 +81,8 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
     protected abstract List<File> getTargetSqlFileList();
 
     protected abstract DfSqlFileRunnerExecute getSqlFileRunner(DfRunnerInformation runInfo);
+
+    protected abstract boolean isBreakCauseThrow();
 
     protected abstract boolean isErrorContinue();
 

@@ -259,7 +259,8 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
             for (String detailMessage : detailMessageList) {
                 finalInfo.addDetailMessage(detailMessage);
             }
-            finalInfo.setFailure(fireResult.existsError());
+            finalInfo.setBreakCause(fireResult.getBreakCause());
+            finalInfo.setFailure(fireResult.isExistsError());
         }
         finalInfo.setAssertionEx(assertionEx);
         return finalInfo;

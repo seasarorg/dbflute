@@ -5,10 +5,10 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.9.9.2F"/>
+	<property name="version" value="0.9.9.3A"/>
 	<property name="build.version" value="${version}"/>
 	<property name="pre.version" value="0.9.9.2D"/>
-	<property name="runtime.version" value="0.9.9.2F"/>
+	<property name="runtime.version" value="0.9.9.3A"/>
 	<property name="runtime.build.version" value="${runtime.version}"/>
 	<property name="runtime.pre.version" value="0.9.9.2D"/>
 

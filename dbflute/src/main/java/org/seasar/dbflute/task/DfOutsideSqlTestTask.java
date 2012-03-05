@@ -210,6 +210,11 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     }
 
     @Override
+    protected boolean isBreakCauseThrow() {
+        return true; // OutsideSqlTest task immediately breaks the process by error
+    }
+
+    @Override
     protected boolean isErrorContinue() {
         return false;
     }
