@@ -212,6 +212,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
 
     /**
      * Set up the comparison 'DateFromTo' and the values of parameter. <br />
+     * The type of the parameter should be same as the type of target column. <br />
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
@@ -231,6 +232,7 @@ public class HpQDRParameter<CB extends ConditionBean, PARAMETER> {
 
     /**
      * Set up the comparison 'FromTo' and the values of parameter. <br />
+     * The type of the parameter should be same as the type of target column. <br />
      * If the specified column is date type and has time-parts, you should use java.sql.Timestamp type.
      * <pre>
      * cb.query().derivedPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
