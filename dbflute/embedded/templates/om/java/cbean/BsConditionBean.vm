@@ -544,6 +544,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         /**
          * Prepare for '(Specify)DerivedReferrer'. <br />
+         * {select max(FOO) from ${referrer.table.name} where ...) as FOO_MAX} <br />
          * ${referrer.referrerDispForJavaDocNest}
          * <pre>
          * cb.specify().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {

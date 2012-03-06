@@ -62,7 +62,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringEmptyString()})
 
     /**
-     * Equal(=). As the empty-string. And OnlyOnceRegistered.
+     * Equal(=). As the empty-string. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_Equal_EmptyString() {
         doSet${tmpJavaName}_Equal("");
@@ -107,7 +108,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringNotEqual()})
 
     /**
-     * NotEqual(&lt;&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * NotEqual(&lt;&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -116,7 +118,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringEmptyString()})
 
     /**
-     * NotEqual(&lt;&gt;). As the empty-string. And OnlyOnceRegistered.
+     * NotEqual(&lt;&gt;). As the empty-string. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual_EmptyString() {
         doSet${tmpJavaName}_NotEqual("");
@@ -162,7 +165,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringGreaterThan()})
 
     /**
-     * GreaterThan(&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * GreaterThan(&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan.
      */
     public void set${tmpJavaName}_GreaterThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -172,7 +176,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringLessThan()})
 
     /**
-     * LessThan(&lt;). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * LessThan(&lt;). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan.
      */
     public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -182,7 +187,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringGreaterEqual()})
 
     /**
-     * GreaterEqual(&gt;=). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * GreaterEqual(&gt;=). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual.
      */
     public void set${tmpJavaName}_GreaterEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -192,7 +198,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringLessEqual()})
 
     /**
-     * LessEqual(&lt;=). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * LessEqual(&lt;=). And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual.
      */
     public void set${tmpJavaName}_LessEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -202,7 +209,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringInScope()})
 
     /**
-     * InScope(in ('a', 'b')). And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered.
+     * InScope {in ('a', 'b')}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope.
      */
     public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
@@ -216,7 +224,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * InScope(in ('a', 'b')). As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * InScope {in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
 #if ($existTop && $classificationTop.hasTopComment())
      * $classificationTop.topComment
 #end
@@ -234,7 +242,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringNotInScope()})
 
     /**
-     * NotInScope(not in ('a', 'b')). And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered.
+     * NotInScope {not in ('a', 'b')}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope.
      */
     public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
@@ -248,7 +257,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * NotInScope(not in ('a', 'b')). As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * NotInScope {not in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
 #if ($existTop && $classificationTop.hasTopComment())
      * $classificationTop.topComment
 #end
@@ -266,7 +275,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringPrefixSearch()})
 
     /**
-     * PrefixSearch(like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
+     * PrefixSearch {like 'xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch.
      */
     public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -277,7 +287,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * LikeSearch with various options. (versatile) {like '%xxx%' escape ...} <br />
-     * And NullOrEmptyIgnored, SeveralRegistered.
+     * And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
@@ -289,7 +300,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * NotLikeSearch with various options. (versatile) {not like 'xxx%' escape ...} <br />
-     * And NullOrEmptyIgnored, SeveralRegistered.
+     * And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
@@ -497,6 +509,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare for (Query)DerivedReferrer. <br />
      * {FOO &lt;= (select max(BAR) from ${referrer.table.name} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
+     * <pre>
+     * cb.query().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
+     *     public void query(${tmpCBClassName} subCB) {
+     *         subCB.specify().<span style="color: #FD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
+     *     }
+     * }).<span style="color: #FD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
+     * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
      */
     public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
@@ -567,7 +587,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableNumberNotEqual()})
 
     /**
-     * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered.
+     * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
      */
     ${col.propertySettingModifier} void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -609,7 +630,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableNumberGreaterThan()})
 
     /**
-     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan.
      */
     public void set${tmpJavaName}_GreaterThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -619,7 +641,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableNumberLessThan()})
 
     /**
-     * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered.
+     * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan.
      */
     public void set${tmpJavaName}_LessThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -629,7 +652,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableNumberGreaterEqual()})
 
     /**
-     * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered.
+     * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual.
      */
     public void set${tmpJavaName}_GreaterEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -639,7 +663,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableNumberLessEqual()})
 
     /**
-     * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered.
+     * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual.
      */
     public void set${tmpJavaName}_LessEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
@@ -651,7 +676,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * RangeOf with various options. (versatile) <br />
      * {(default) minNumber &lt;= column &lt;= maxNumber} <br />
-     * And NullIgnored, OnlyOnceRegistered.
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param minNumber The min number of ${col.uncapitalisedJavaName}. (NullAllowed)
      * @param maxNumber The max number of ${col.uncapitalisedJavaName}. (NullAllowed)
      * @param rangeOfOption The option of range-of. (NotNull)
@@ -663,7 +689,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableNumberInScope()})
 
     /**
-     * InScope(in (1, 2)). And NullIgnored, NullElementIgnored, SeveralRegistered.
+     * InScope {in (1, 2)}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope.
      */
     public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
@@ -677,7 +704,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * InScope(in (1, 2)). As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * InScope {in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
 #if ($existTop && $classificationTop.hasTopComment())
      * $classificationTop.topComment
 #end
@@ -695,7 +722,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableNumberNotInScope()})
 
     /**
-     * NotInScope(not in (1, 2)). And NullIgnored, NullElementIgnored, SeveralRegistered.
+     * NotInScope {not in (1, 2)}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope.
      */
     public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
@@ -709,7 +737,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * NotInScope(not in (1, 2)). As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * NotInScope {not in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
 #if ($existTop && $classificationTop.hasTopComment())
      * $classificationTop.topComment
 #end
@@ -924,6 +952,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Prepare for (Query)DerivedReferrer. <br />
      * {FOO &lt;= (select max(BAR) from ${referrer.table.name} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
+     * <pre>
+     * cb.query().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
+     *     public void query(${tmpCBClassName} subCB) {
+     *         subCB.specify().<span style="color: #FD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
+     *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
+     *     }
+     * }).<span style="color: #FD4747">greaterEqual</span>(123); <span style="color: #3F7E5E">// condition to derived column</span>
+     * </pre>
      * @return The object to set up a function for referrer table. (NotNull)
      */
     public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
@@ -950,7 +986,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 #if (${col.isJavaNativeDateObject()})
-    
+
     /**
      * Equal(=). And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
@@ -962,7 +998,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateNotEqual()})
 
     /**
-     * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered.
+     * NotEqual(&lt;&gt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
      */
     public void set${tmpJavaName}_NotEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -972,7 +1009,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateGreaterThan()})
 
     /**
-     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan.
      */
     public void set${tmpJavaName}_GreaterThan($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -982,7 +1020,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateLessThan()})
 
     /**
-     * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered.
+     * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan.
      */
     public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -992,7 +1031,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateGreaterEqual()})
 
     /**
-     * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered.
+     * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual.
      */
     public void set${tmpJavaName}_GreaterEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -1002,7 +1042,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateLessEqual()})
 
     /**
-     * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered.
+     * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual.
      */
     public void set${tmpJavaName}_LessEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
@@ -1014,7 +1055,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * FromTo with various options. (versatile) <br />
      * {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
-     * And NullIgnored, OnlyOnceRegistered.
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed)
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed)
      * @param fromToOption The option of from-to. (NotNull)
@@ -1032,11 +1074,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * DateFromTo. (Date means yyyy/MM/dd) <br />
      * {fromDate &lt;= column &lt; toDate + 1 day} <br />
-     * And NullIgnored, OnlyOnceRegistered.
+     * And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * <pre>
-     * ex) from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
-     *     --&gt; column &gt;= '2007/04/10 00:00:00'
-     *     and column <span style="color: #FD4747">&lt; '2007/04/17 00:00:00'</span>
+     * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
+     *  --&gt; column &gt;= '2007/04/10 00:00:00'
+     *  and column <span style="color: #FD4747">&lt; '2007/04/17 00:00:00'</span>
      * </pre>
      * @param fromDate The from-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed)
      * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed)
@@ -1048,7 +1091,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateInScope()})
 
     /**
-     * InScope(in ('1965-03-03', '1966-09-15')). And NullIgnored, NullElementIgnored, SeveralRegistered.
+     * InScope {in ('1965-03-03', '1966-09-15')}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope.
      */
     public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
@@ -1062,7 +1106,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateNotInScope()})
 
     /**
-     * NotInScope(not in ('1965-03-03', '1966-09-15')). And NullIgnored, NullElementIgnored, SeveralRegistered.
+     * NotInScope {not in ('1965-03-03', '1966-09-15')}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope.
      */
     public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
@@ -1110,7 +1155,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringInScope()})
 
     /**
-     * InScope(in ('a', 'b')). And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered.
+     * InScope {in ('a', 'b')}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope.
      */
     public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
@@ -1121,19 +1167,22 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (!${col.isNotNull()} || ${col.isPrimaryKey()})
 
     /**
-     * IsNull(is null). And OnlyOnceRegistered.
+     * IsNull {is null}. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
     public void set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DOBJ); }
 #if ($col.isMakeIsNullOrEmpty())
 
     /**
-     * IsNullOrEmpty(is null or empty). And OnlyOnceRegistered.
+     * IsNullOrEmpty {is null or empty}. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
     public void set${tmpJavaName}_IsNullOrEmpty() { reg${tmpJavaName}(CK_ISNOE, DOBJ); }
 #end
 
     /**
-     * IsNotNull(is not null). And OnlyOnceRegistered.
+     * IsNotNull {is not null}. And OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      */
     public void set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DOBJ); }
 #end
