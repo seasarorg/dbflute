@@ -150,9 +150,9 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         return Srl.substringFirstRear(baseMapperClassName, getBaseDtoPrefix());
     }
 
-    public boolean isMappingOneWayReference() {
-        // default is true because cyclic references may have problems
-        return isProperty("isMappingOneWayReference", true, getSimpleDtoDefinitionMap());
+    public boolean isMappingReverseReference() {
+        // default is false because cyclic references may have problems
+        return isProperty("isMappingReverseReference", false, getSimpleDtoDefinitionMap());
     }
 
     // ===================================================================================

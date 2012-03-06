@@ -2039,8 +2039,8 @@ public class Database {
         return getProperties().getSimpleDtoProperties().isUseDtoMapper();
     }
 
-    public boolean isSimpleDtoMappingOneWayReference() {
-        return getProperties().getSimpleDtoProperties().isMappingOneWayReference();
+    public boolean isSimpleDtoMappingReverseReference() {
+        return getProperties().getSimpleDtoProperties().isMappingReverseReference();
     }
 
     public boolean isSimpleDtoClassificationDeployment() {

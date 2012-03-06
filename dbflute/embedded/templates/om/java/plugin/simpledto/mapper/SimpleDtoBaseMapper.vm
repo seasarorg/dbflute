@@ -67,6 +67,11 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
     //                                                                           =========
     protected final Map<Entity, Object> _relationDtoMap;
     protected final Map<Object, Entity> _relationEntityMap;
+#if ($database.isSimpleDtoMappingReverseReference())
+    protected boolean _reverseReference = true; // default: reverse reference
+#else
+    protected boolean _reverseReference; // default: one-way reference
+#end
 #foreach ($fk in $table.foreignKeys)
     protected boolean _suppress${fk.foreignJavaBeansRulePropertyNameInitCap};
 #end
@@ -119,7 +124,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         if (entity.hasPrimaryKeyValue()) { // caches only a DTO that has a primary key value
             _relationDtoMap.put(localKey, dto);
         }
-        boolean oneWayReference = isMappingOneWayReference();
+        boolean reverseReference = _reverseReference;
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
         if (!_suppress${fk.foreignJavaBeansRulePropertyNameInitCap} && entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
@@ -129,7 +134,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             if (cachedDto != null) {
                 ${foreignDtoClassName} relationDto = (${foreignDtoClassName})cachedDto;
                 dto.set${fk.foreignJavaBeansRulePropertyNameInitCap}(relationDto);
-                if (!oneWayReference) {
+                if (reverseReference) {
 ## the 'if' statement of one-way reference is not deleted to suppress no-use warning
 #if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
@@ -141,6 +146,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
                 }
             } else {
                 ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                mapper.setReverseReference(reverseReference);
 #if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
                 mapper.suppress${fk.referrerJavaBeansRulePropertyNameAsOneInitCap}();
@@ -150,7 +156,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #end
                 ${foreignDtoClassName} relationDto = mapper.mappingToDto(relationEntity);
                 dto.set${fk.foreignJavaBeansRulePropertyNameInitCap}(relationDto);
-                if (!oneWayReference) {
+                if (reverseReference) {
 #if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
                     relationDto.set${fk.referrerJavaBeansRulePropertyNameAsOneInitCap}(dto);
@@ -175,15 +181,16 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             if (cachedDto != null) {
                 ${referrerDtoClassName} relationDto = (${referrerDtoClassName})cachedDto;
                 dto.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(relationDto);
-                if (!oneWayReference) {
+                if (reverseReference) {
                     relationDto.set${referrer.foreignJavaBeansRulePropertyNameInitCap}(dto);
                 }
             } else {
                 ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                mapper.setReverseReference(reverseReference);
                 mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
                 ${referrerDtoClassName} relationDto = mapper.mappingToDto(relationEntity);
                 dto.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(relationDto);
-                if (!oneWayReference) {
+                if (reverseReference) {
                     relationDto.set${referrer.foreignJavaBeansRulePropertyNameInitCap}(dto);
                 }
                 if (relationEntity.hasPrimaryKeyValue()) {
@@ -194,10 +201,11 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #else
         if (!_suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} && !entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
             ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+            mapper.setReverseReference(reverseReference);
             mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
             List<${referrerDtoClassName}> relationDtoList = mapper.mappingToDtoList(entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}());
             dto.set${referrer.referrerJavaBeansRulePropertyNameInitCap}(relationDtoList);
-            if (!oneWayReference) {
+            if (reverseReference) {
                 for (${referrerDtoClassName} relationDto : relationDtoList) {
                     relationDto.set${referrer.foreignJavaBeansRulePropertyNameInitCap}(dto);
                 }
@@ -261,7 +269,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         if (entity.hasPrimaryKeyValue()) { // caches only an entity that has a primary key value
             _relationEntityMap.put(localKey, entity);
         }
-        boolean oneWayReference = isMappingOneWayReference();
+        boolean reverseReference = _reverseReference;
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
         if (!_suppress${fk.foreignJavaBeansRulePropertyNameInitCap} && dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
@@ -271,7 +279,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             if (cachedEntity != null) {
                 ${fk.foreignTableExtendedEntityClassName} relationEntity = (${fk.foreignTableExtendedEntityClassName})cachedEntity;
                 entity.set${fk.foreignJavaBeansRulePropertyNameInitCap}(relationEntity);
-                if (!oneWayReference) {
+                if (reverseReference) {
 ## the 'if' statement of one-way reference is not deleted to suppress no-use warning
 #if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
@@ -283,6 +291,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
                 }
             } else {
                 ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                mapper.setReverseReference(reverseReference);
 #if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
                 mapper.suppress${fk.referrerJavaBeansRulePropertyNameAsOneInitCap}();
@@ -292,7 +301,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #end
                 ${fk.foreignTableExtendedEntityClassName} relationEntity = mapper.mappingToEntity(relationDto);
                 entity.set${fk.foreignJavaBeansRulePropertyNameInitCap}(relationEntity);
-                if (!oneWayReference) {
+                if (reverseReference) {
 ## the 'if' statement of one-way reference is not deleted to suppress no-use warning
 #if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
@@ -318,15 +327,16 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             if (cachedEntity != null) {
                 ${referrer.referrerTableExtendedEntityClassName} relationEntity = (${referrer.referrerTableExtendedEntityClassName})cachedEntity;
                 entity.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(relationEntity);
-                if (!oneWayReference) {
+                if (reverseReference) {
                     relationEntity.set${referrer.foreignJavaBeansRulePropertyNameInitCap}(entity);
                 }
             } else {
                 ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+                mapper.setReverseReference(reverseReference);
                 mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
                 ${referrer.referrerTableExtendedEntityClassName} relationEntity = mapper.mappingToEntity(relationDto);
                 entity.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(relationEntity);
-                if (!oneWayReference) {
+                if (reverseReference) {
                     relationEntity.set${referrer.foreignJavaBeansRulePropertyNameInitCap}(entity);
                 }
                 if (entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}().hasPrimaryKeyValue()) {
@@ -337,10 +347,11 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #else
         if (!_suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} && !dto.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
             ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
+            mapper.setReverseReference(reverseReference);
             mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
             List<${referrer.referrerTableExtendedEntityClassName}> relationEntityList = mapper.mappingToEntityList(dto.get${referrer.referrerJavaBeansRulePropertyNameInitCap}());
             entity.set${referrer.referrerJavaBeansRulePropertyNameInitCap}(relationEntityList);
-            if (!oneWayReference) {
+            if (reverseReference) {
                 for (${referrer.referrerTableExtendedEntityClassName} relationEntity : relationEntityList) {
                     relationEntity.set${referrer.foreignJavaBeansRulePropertyNameInitCap}(entity);
                 }
@@ -377,19 +388,6 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
      */
     protected boolean isMappingToEntityContainsNull() { // for extension
         return true; // as default
-    }
-
-    /**
-     * Does the mapping to a DTO or an entity comply the one-way reference policy? <br />
-#if ($database.isSimpleDtoMappingOneWayReference())
-     * Default is true that means no reverse reference between base point and relation.
-#else
-     * Default is false that means reverse references between base point and relation are mapped.
-#end
-     * @return The determination, true or false.
-     */
-    protected boolean isMappingOneWayReference() { // for extension
-        return ${database.isSimpleDtoMappingOneWayReference()}; // as default
     }
 
     /**
@@ -437,4 +435,15 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
     }
 #end
 #end
+
+    // ===================================================================================
+    //                                                                      Mapping Option
+    //                                                                      ==============
+    /**
+     * Set the option whether reverse reference or not.
+     * @param reverseReference Does the mapping contain reverse reference? (true: reverse reference, false: one-way reference)
+     */
+    public void setReverseReference(boolean reverseReference) {
+        _reverseReference = reverseReference;
+    }
 }
