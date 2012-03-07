@@ -677,7 +677,7 @@ public class DfPmbMetaData {
         }
     }
 
-    public List<Map<String, String>> getPropertyOptionClassificationMapList(String propertyName, AppData schemaData) {
+    public List<Map<String, Object>> getPropertyOptionClassificationMapList(String propertyName, AppData schemaData) {
         // should be called when it has classification
         if (isPropertyOptionSpecifiedClassification(propertyName)) {
             final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);

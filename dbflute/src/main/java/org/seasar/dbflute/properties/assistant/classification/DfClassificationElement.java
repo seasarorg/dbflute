@@ -20,6 +20,7 @@ public class DfClassificationElement {
     public static final String KEY_NAME = "name";
     public static final String KEY_ALIAS = "alias";
     public static final String KEY_COMMENT = "comment";
+    public static final String KEY_SUB_ITEM_MAP = "subItemMap";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -30,16 +31,17 @@ public class DfClassificationElement {
     protected String _name;
     protected String _alias;
     protected String _comment;
+    protected Map<String, Object> _subItemMap;
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
     public void acceptClassificationBasicElementMap(Map<?, ?> elementMap) {
-        acceptBasicMap(elementMap, KEY_CODE, KEY_NAME, KEY_ALIAS, KEY_COMMENT);
+        acceptBasicMap(elementMap, KEY_CODE, KEY_NAME, KEY_ALIAS, KEY_COMMENT, KEY_SUB_ITEM_MAP);
     }
 
     protected void acceptBasicMap(Map<?, ?> elementMap, String codeKey, String nameKey, String aliasKey,
-            String commentKey) {
+            String commentKey, String subItemMapKey) {
         final String code = (String) elementMap.get(codeKey);
         if (code == null) {
             throwClassificationRequiredAttributeNotFoundException(elementMap);
@@ -59,6 +61,11 @@ public class DfClassificationElement {
         // comment
         final String comment = (String) elementMap.get(commentKey);
         this._comment = comment;
+
+        // subItemMap
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> subItemMap = (Map<String, Object>) elementMap.get(subItemMapKey);
+        this._subItemMap = subItemMap;
     }
 
     protected void throwClassificationRequiredAttributeNotFoundException(Map<?, ?> elementMap) {
@@ -137,5 +144,13 @@ public class DfClassificationElement {
 
     public void setComment(String comment) {
         this._comment = comment;
+    }
+
+    public Map<String, Object> getSubItemMap() {
+        return _subItemMap;
+    }
+
+    public void setSubItemMap(Map<String, Object> subItemMap) {
+        this._subItemMap = subItemMap;
     }
 }

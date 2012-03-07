@@ -387,7 +387,7 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).getPropertyOptionClassificationFixedElementValueExp(propertyName);
     }
 
-    public List<Map<String, String>> getPropertyOptionClassificationMapList(String className, String propertyName,
+    public List<Map<String, Object>> getPropertyOptionClassificationMapList(String className, String propertyName,
             AppData schemaData) {
         return findPmbMetaData(className).getPropertyOptionClassificationMapList(propertyName, schemaData);
     }

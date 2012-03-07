@@ -1847,7 +1847,7 @@ public class Column {
         return getClassificationProperties().getClassificationDeploymentMap();
     }
 
-    public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
+    public Map<String, List<Map<String, Object>>> getClassificationDefinitionMap() {
         return getClassificationProperties().getClassificationDefinitionMap();
     }
 
@@ -1915,10 +1915,10 @@ public class Column {
         return isForceClassificationSetting() ? "protected" : "public";
     }
 
-    public List<Map<String, String>> getClassificationMapList() {
-        final Map<String, List<Map<String, String>>> definitionMap = getClassificationDefinitionMap();
+    public List<Map<String, Object>> getClassificationMapList() {
+        final Map<String, List<Map<String, Object>>> definitionMap = getClassificationDefinitionMap();
         final String classificationName = getClassificationName();
-        final List<Map<String, String>> classificationMapList = definitionMap.get(classificationName);
+        final List<Map<String, Object>> classificationMapList = definitionMap.get(classificationName);
         if (classificationMapList == null) {
             throwClassificationDeploymentClassificationNotFoundException(classificationName);
         }

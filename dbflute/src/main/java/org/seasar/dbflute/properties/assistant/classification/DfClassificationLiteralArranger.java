@@ -2,9 +2,12 @@ package org.seasar.dbflute.properties.assistant.classification;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.mapstring.MapListString;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -12,28 +15,52 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
  */
 public class DfClassificationLiteralArranger {
 
-    public void arrange(String classificationName, Map<String, String> elementMap, List<Map<String, String>> elementList) {
+    public void arrange(String classificationName, Map<String, Object> elementMap, List<Map<String, Object>> elementList) {
         final String codeKey = DfClassificationElement.KEY_CODE;
-        final String nameKey = DfClassificationElement.KEY_NAME;
-        final String aliasKey = DfClassificationElement.KEY_ALIAS;
-
         final String code = (String) elementMap.get(codeKey);
-        if (code == null) {
+        if (code == null) { // required check
             throwClassificationLiteralCodeNotFoundException(classificationName, elementMap);
         }
+
+        final String nameKey = DfClassificationElement.KEY_NAME;
         final String name = (String) elementMap.get(nameKey);
-        if (name == null) {
+        if (name == null) { // use code
             elementMap.put(nameKey, code);
         }
+
+        final String aliasKey = DfClassificationElement.KEY_ALIAS;
         final String alias = (String) elementMap.get(aliasKey);
-        if (alias == null) {
+        if (alias == null) { // use name or code
             elementMap.put(aliasKey, name != null ? name : code);
         }
+
+        final String subItemMapKey = DfClassificationElement.KEY_SUB_ITEM_MAP;
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> subItemMap = (Map<String, Object>) elementMap.get(subItemMapKey);
+        final MapListString mapListString = new MapListString();
+        for (Entry<String, Object> entry : subItemMap.entrySet()) {
+            String key = entry.getKey();
+            final Object value = entry.getValue();
+            if (value != null && value instanceof List<?>) { // nested List is treated as string
+                final List<?> listValue = (List<?>) value;
+                final String listString = mapListString.buildListString(listValue);
+                subItemMap.put(key, filterLineStringOnMapListString(listString));
+            } else if (value != null && value instanceof Map<?, ?>) { // nested Map is treated as string
+                @SuppressWarnings("unchecked")
+                final Map<String, ?> mapValue = (Map<String, ?>) value;
+                final String mapString = mapListString.buildMapString(mapValue);
+                subItemMap.put(key, filterLineStringOnMapListString(mapString));
+            }
+        }
+
         elementList.add(elementMap);
     }
 
-    protected void throwClassificationLiteralCodeNotFoundException(String classificationName,
-            Map<String, String> elementMap) {
+    protected String filterLineStringOnMapListString(String mapListString) {
+        return Srl.replace(mapListString, "\n", "\\n");
+    }
+
+    protected void throwClassificationLiteralCodeNotFoundException(String classificationName, Map<?, ?> elementMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The code attribute of the classification was not found.");
         br.addItem("Advice");

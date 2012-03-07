@@ -875,9 +875,9 @@ public class ForeignKey {
         }
         final String classificationName = parameterType.substring(0, parameterType.indexOf("."));
         final String elementName = parameterType.substring(parameterType.indexOf(".") + ".".length());
-        final Map<String, List<Map<String, String>>> definitionMap = getClassificationProperties()
+        final Map<String, List<Map<String, Object>>> definitionMap = getClassificationProperties()
                 .getClassificationDefinitionMap();
-        final List<Map<String, String>> elementMapList = definitionMap.get(classificationName);
+        final List<Map<String, Object>> elementMapList = definitionMap.get(classificationName);
         if (elementMapList == null) {
             String msg = "The classification name was NOT FOUND:";
             msg = msg + " classificationName=" + classificationName + " embeddedComment=" + peace;
@@ -885,10 +885,10 @@ public class ForeignKey {
             throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
         }
         String code = null;
-        for (Map<String, String> elementMap : elementMapList) {
-            String name = elementMap.get(DfClassificationElement.KEY_NAME);
+        for (Map<String, Object> elementMap : elementMapList) {
+            String name = (String) elementMap.get(DfClassificationElement.KEY_NAME);
             if (elementName.equals(name)) {
-                code = elementMap.get(DfClassificationElement.KEY_CODE);
+                code = (String) elementMap.get(DfClassificationElement.KEY_CODE);
                 break;
             }
         }

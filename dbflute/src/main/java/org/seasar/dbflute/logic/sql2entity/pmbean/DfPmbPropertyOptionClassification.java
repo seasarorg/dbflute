@@ -89,9 +89,9 @@ public class DfPmbPropertyOptionClassification {
         return Srl.splitListTrimmed(fixedElement, ",");
     }
 
-    public List<Map<String, String>> getPropertyOptionClassificationMapList() {
+    public List<Map<String, Object>> getPropertyOptionClassificationMapList() {
         final String classificationName = extractClassificationNameFromOption(true);
-        final List<Map<String, String>> classificationMapList = _classificationProperties
+        final List<Map<String, Object>> classificationMapList = _classificationProperties
                 .getClassificationMapList(classificationName);
         if (classificationMapList == null) {
             throwClassificationNotFoundException(classificationName);

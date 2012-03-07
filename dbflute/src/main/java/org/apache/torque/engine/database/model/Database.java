@@ -642,7 +642,7 @@ public class Database {
         return getPmbBasicHandler().getPropertyOptionClassificationFixedElementValueExp(className, propertyName);
     }
 
-    public List<Map<String, String>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
+    public List<Map<String, Object>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
             String propertyName) {
         return getPmbBasicHandler().getPropertyOptionClassificationMapList(className, propertyName,
                 _sql2entitySchemaData);
@@ -1558,7 +1558,7 @@ public class Database {
         return getClassificationProperties().isCheckImplicitSet(classificationName);
     }
 
-    public Map<String, List<Map<String, String>>> getClassificationDefinitionMap() {
+    public Map<String, List<Map<String, Object>>> getClassificationDefinitionMap() {
         return getClassificationProperties().getClassificationDefinitionMap();
     }
 
@@ -1571,7 +1571,7 @@ public class Database {
                 .getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
     }
 
-    public List<java.util.Map<String, String>> getClassificationMapList(String classificationName) {
+    public List<Map<String, Object>> getClassificationMapList(String classificationName) {
         return getClassificationProperties().getClassificationMapList(classificationName);
     }
 
@@ -1589,6 +1589,14 @@ public class Database {
 
     public boolean isTableClassification(String classificationName) {
         return getClassificationProperties().isTableClassification(classificationName);
+    }
+
+    public boolean hasClassificationSubItemMap(String classificationName) {
+        return getClassificationProperties().hasClassificationSubItemMap(classificationName);
+    }
+
+    public List<String> getClassificationSubItemList(Map<String, Object> classificationMap) {
+        return getClassificationProperties().getClassificationSubItemList(classificationMap);
     }
 
     // -----------------------------------------------------
