@@ -37,19 +37,23 @@ public class DfClassificationLiteralArranger {
         final String subItemMapKey = DfClassificationElement.KEY_SUB_ITEM_MAP;
         @SuppressWarnings("unchecked")
         final Map<String, Object> subItemMap = (Map<String, Object>) elementMap.get(subItemMapKey);
-        final MapListString mapListString = new MapListString();
-        for (Entry<String, Object> entry : subItemMap.entrySet()) {
-            String key = entry.getKey();
-            final Object value = entry.getValue();
-            if (value != null && value instanceof List<?>) { // nested List is treated as string
-                final List<?> listValue = (List<?>) value;
-                final String listString = mapListString.buildListString(listValue);
-                subItemMap.put(key, filterLineStringOnMapListString(listString));
-            } else if (value != null && value instanceof Map<?, ?>) { // nested Map is treated as string
-                @SuppressWarnings("unchecked")
-                final Map<String, ?> mapValue = (Map<String, ?>) value;
-                final String mapString = mapListString.buildMapString(mapValue);
-                subItemMap.put(key, filterLineStringOnMapListString(mapString));
+        if (subItemMap != null) {
+            final MapListString mapListString = new MapListString();
+            for (Entry<String, Object> entry : subItemMap.entrySet()) {
+                String key = entry.getKey();
+                final Object value = entry.getValue();
+                if (value != null && value instanceof List<?>) { // nested List is treated as string
+                    final List<?> listValue = (List<?>) value;
+                    final String listString = mapListString.buildListString(listValue);
+                    subItemMap.put(key, filterLineStringOnMapListString(listString));
+                } else if (value != null && value instanceof Map<?, ?>) { // nested Map is treated as string
+                    @SuppressWarnings("unchecked")
+                    final Map<String, ?> mapValue = (Map<String, ?>) value;
+                    final String mapString = mapListString.buildMapString(mapValue);
+                    subItemMap.put(key, filterLineStringOnMapListString(mapString));
+                } else if (value != null && value instanceof String) {
+                    subItemMap.put(key, filterLineStringOnMapListString((String) value));
+                }
             }
         }
 

@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -352,6 +353,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final String name = quoteColumnNameIfNeedsDirectUse(element.getName());
         final String alias = quoteColumnNameIfNeedsDirectUse(element.getAlias());
         final String comment = quoteColumnNameIfNeedsDirectUse(element.getComment());
+        final Map<String, Object> subItemPropMap = element.getSubItemMap();
         final StringBuilder sb = new StringBuilder();
         sb.append("select ").append(code).append(" as cls_code");
         sb.append(", ").append(name).append(" as cls_name");
@@ -359,6 +361,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         sb.append("     , ").append(alias).append(" as cls_alias");
         final String commentColumn = Srl.is_NotNull_and_NotTrimmedEmpty(comment) ? comment : "null";
         sb.append(", ").append(commentColumn).append(" as cls_comment");
+        if (subItemPropMap != null && !subItemPropMap.isEmpty()) {
+            for (Entry<String, Object> entry : subItemPropMap.entrySet()) {
+                sb.append(", ").append(entry.getValue()).append(" as cls_").append(entry.getKey());
+            }
+        }
         sb.append(ln());
         sb.append("  from ").append(quoteTableNameIfNeedsDirectUse(table));
         // where and order-by is unsupported to be quoted
@@ -419,6 +426,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     protected void setupTableClassification(String classificationName, List<Map<String, Object>> elementList,
             String sql, DfClassificationElement element, Set<String> exceptCodeSet) {
+        final Map<String, Object> subItemPropMap = element.getSubItemMap();
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
@@ -452,6 +460,14 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 selectedMap.put(DfClassificationElement.KEY_ALIAS, currentAlias); // already adjusted at SQL
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(currentComment)) { // because of not required
                     selectedMap.put(DfClassificationElement.KEY_COMMENT, currentComment);
+                }
+                if (subItemPropMap != null && !subItemPropMap.isEmpty()) {
+                    final Map<String, Object> subItemMap = new HashMap<String, Object>();
+                    for (String subItemKey : subItemPropMap.keySet()) {
+                        final String subItemValue = rs.getString(subItemKey);
+                        subItemMap.put("cls_" + subItemKey, Srl.replace(subItemValue, "\n", "\\n"));
+                    }
+                    selectedMap.put(DfClassificationElement.KEY_SUB_ITEM_MAP, subItemMap);
                 }
                 elementList.add(selectedMap);
             }
