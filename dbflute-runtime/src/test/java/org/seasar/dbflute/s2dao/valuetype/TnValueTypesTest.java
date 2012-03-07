@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -30,6 +31,7 @@ import org.seasar.dbflute.s2dao.valuetype.basic.ObjectType;
 import org.seasar.dbflute.s2dao.valuetype.basic.SqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
 import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -214,6 +216,10 @@ public class TnValueTypesTest extends PlainTestCase {
 
         public String alias() {
             return null;
+        }
+
+        public Map<String, Object> subItemMap() {
+            return DfCollectionUtil.emptyMap();
         }
 
         public ClassificationMeta meta() {

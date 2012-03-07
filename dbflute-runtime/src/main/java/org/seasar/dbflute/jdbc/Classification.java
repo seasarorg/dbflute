@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.jdbc;
 
+import java.util.Map;
+
 /**
  * The basic interface of classification. <br />
  * It's an internal interface for DBFlute runtime.
@@ -36,6 +38,11 @@ public interface Classification {
      * @return The code of the classification. (NullAllowed: when an alias is not specified in its setting)
      */
     String alias();
+
+    /**
+     * @return The map of sub-items. (NotNull, EmptyAllowed, ReadOnly)
+     */
+    Map<String, Object> subItemMap();
 
     /**
      * @return The meta of the classification. (NotNull)

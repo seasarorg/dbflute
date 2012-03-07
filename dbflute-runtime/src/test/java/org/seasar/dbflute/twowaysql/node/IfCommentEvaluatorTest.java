@@ -23,6 +23,7 @@ import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedExpressionExce
 import org.seasar.dbflute.twowaysql.exception.IfCommentUnsupportedTypeComparisonException;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -919,6 +920,10 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
 
         public String alias() {
             return null;
+        }
+
+        public Map<String, Object> subItemMap() {
+            return DfCollectionUtil.emptyMap();
         }
 
         public ClassificationMeta meta() {

@@ -7,6 +7,7 @@ import org.seasar.dbflute.dbmeta.AbstractDBMeta.MapStringValueAnalyzer;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -55,6 +56,10 @@ public class AbstractDBMetaTest extends PlainTestCase {
 
         public static MockClassification codeOf(Object obj) {
             return obj instanceof String && obj.equals("bar") ? BAR : null;
+        }
+
+        public Map<String, Object> subItemMap() {
+            return DfCollectionUtil.emptyMap();
         }
 
         public ClassificationMeta meta() {
