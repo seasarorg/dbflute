@@ -2858,10 +2858,26 @@ public class Table {
         return getSimpleDtoExtendedDtoClassName() + prop.getMapperSuffix();
     }
 
+    // -----------------------------------------------------
+    //                                     JSONIC Decoration
+    //                                     -----------------
     public boolean hasSimpleDtoJsonicDecoration() {
         final List<Column> columnList = getColumnList();
         for (Column column : columnList) {
             if (column.hasSimpleDtoJsonicDecoration()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // -----------------------------------------------------
+    //                             JsonPullParser Decoration
+    //                             -------------------------
+    public boolean hasSimpleDtoJsonPullParserDecoration() {
+        final List<Column> columnList = getColumnList();
+        for (Column column : columnList) {
+            if (column.hasSimpleDtoJsonPullParserDecoration()) {
                 return true;
             }
         }

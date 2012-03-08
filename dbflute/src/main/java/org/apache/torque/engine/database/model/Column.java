@@ -2138,6 +2138,13 @@ public class Column {
         return getProperties().getSimpleDtoProperties().getJsonicDecorationTimePattern();
     }
 
+    // -----------------------------------------------------
+    //                             JsonPullParser Decoration
+    //                             -------------------------
+    public boolean hasSimpleDtoJsonPullParserDecoration() {
+        return getProperties().getSimpleDtoProperties().isJsonPullParserBasicDecorate();
+    }
+
     // ===================================================================================
     //                                                                     Behavior Filter
     //                                                                     ===============

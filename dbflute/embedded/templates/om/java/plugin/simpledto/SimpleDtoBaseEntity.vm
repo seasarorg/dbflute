@@ -7,6 +7,9 @@ import java.util.*;
 #if ($table.hasSimpleDtoJsonicDecoration())
 import net.arnx.jsonic.JSONHint;
 #end
+#if ($table.hasSimpleDtoJsonPullParserDecoration())
+import net.vvakame.util.jsonpullparser.annotation.*;
+#end
 #if ($database.isSimpleDtoClassificationDeployment() && $table.hasClassification())
 import ${database.simpleCDefPackage}.${database.simpleCDefClass};
 #end
@@ -49,6 +52,9 @@ import ${myExtendedEntityPackageName}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
+#if ($table.hasSimpleDtoJsonPullParserDecoration())
+@JsonModel(decamelize = false)
+#end
 public abstract class $myClassName implements Serializable {
 
     // ===================================================================================
@@ -65,6 +71,9 @@ public abstract class $myClassName implements Serializable {
     //                                                ------
 #foreach ($col in $table.columns)
     /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
+#if ($col.hasSimpleDtoJsonPullParserDecoration())
+    @JsonKey
+#end
     protected ${col.javaNative} ${col.simpleDtoVariableName};
 
 #end
@@ -171,6 +180,9 @@ public abstract class $myClassName implements Serializable {
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignEntityClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
 #set ($foreignVariableName = "${fk.simpleDtoForeignVariableName}")
+#if ($col.hasSimpleDtoJsonPullParserDecoration())
+    @JsonKey
+#end
     protected ${foreignEntityClassName} ${foreignVariableName};
 
     public ${foreignEntityClassName} get${fk.foreignJavaBeansRulePropertyNameInitCap}() {
@@ -185,6 +197,9 @@ public abstract class $myClassName implements Serializable {
 #foreach ($referrer in $table.referrerAsOneList)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedSimpleDtoClassName}")
 #set ($referrerVariableName = "${referrer.simpleDtoReferrerAsOneVariableName}")
+#if ($col.hasSimpleDtoJsonPullParserDecoration())
+    @JsonKey
+#end
     protected ${referrerEntityClassName} ${referrerVariableName};
 
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
@@ -202,6 +217,9 @@ public abstract class $myClassName implements Serializable {
 #foreach ($referrer in $table.referrerAsManyList)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedSimpleDtoClassName}")
 #set ($referrerVariableName = "${referrer.simpleDtoReferrerVariableName}")
+#if ($col.hasSimpleDtoJsonPullParserDecoration())
+    @JsonKey
+#end
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {

@@ -240,6 +240,30 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                      JsonPullParser
+    //                                                                      ==============
+    protected Map<String, String> _jsonPullParserDecorationMap;
+
+    protected Map<String, String> getJsonPullParserDecorationMap() {
+        if (_jsonPullParserDecorationMap != null) {
+            return _jsonPullParserDecorationMap;
+        }
+        final String key = "jsonPullParserDecorationMap";
+        @SuppressWarnings("unchecked")
+        final Map<String, String> map = (Map<String, String>) getSimpleDtoDefinitionMap().get(key);
+        if (map != null) {
+            _jsonPullParserDecorationMap = map;
+        } else {
+            _jsonPullParserDecorationMap = DfCollectionUtil.emptyMap();
+        }
+        return _jsonPullParserDecorationMap;
+    }
+
+    public boolean isJsonPullParserBasicDecorate() {
+        return isProperty("isBasicDecorate", false, getJsonPullParserDecorationMap());
+    }
+
+    // ===================================================================================
     //                                                                                 GWT
     //                                                                                 ===
     protected Map<String, String> _gwtDecorationMap;
