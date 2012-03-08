@@ -58,7 +58,7 @@ public interface ${glCDef} extends Classification {
         private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
         public String code() { return _code; } public String alias() { return _alias; }
 #if ($database.hasClassificationSubItemMap($classificationName))
-        public Map<String, Object> subItemMap() { return _subItemMapMap.get(this); }
+        public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
 #else
         @SuppressWarnings("unchecked")
         public Map<String, Object> subItemMap() { return (Map<String, Object>)Collections.EMPTY_LIST; }
