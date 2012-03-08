@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * The definition of classification.
@@ -26,6 +27,11 @@ public interface ${database.simpleCDefClass} {
      * @return The code of the classification. (NullAllowed: when an alias is not specified in its setting)
      */
     String alias();
+
+    /**
+     * @return The map of sub-items. (NotNull, EmptyAllowed, ReadOnly)
+     */
+    Map<String, Object> subItemMap();
 
     /**
      * @return The meta of the classification. (NotNull)
@@ -58,9 +64,32 @@ public interface ${database.simpleCDefClass} {
         ;
         private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
         static { for (${classificationName} value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
+#if ($database.hasClassificationSubItemMap($classificationName))
+        private static final Map<String, Map<String, Object>> _subItemMapMap = new HashMap<String, Map<String, Object>>();
+        static {
+#foreach ($classificationMap in $classificationMapList)
+#set ($subItemList = $database.getClassificationSubItemList($classificationMap))
+#set ($subItemMap = $classificationMap.get('subItemMap'))
+            {
+                Map<String, Object> subItemMap = new HashMap<String, Object>();
+#foreach ($subItemKey in $subItemList)
+#set ($subItemValue = $subItemMap.get($subItemKey))
+                subItemMap.put("${subItemKey}", "${subItemValue}");
+#end
+                _subItemMapMap.put(${classificationMap.get('name')}.code(), Collections.unmodifiableMap(subItemMap));
+            }
+#end
+        }
+#end
         private String _code; private String _alias;
         private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
         public String code() { return _code; } public String alias() { return _alias; }
+#if ($database.hasClassificationSubItemMap($classificationName))
+        public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
+#else
+        @SuppressWarnings("unchecked")
+        public Map<String, Object> subItemMap() { return (Map<String, Object>)Collections.EMPTY_MAP; }
+#end
         public DefMeta meta() { return DefMeta.${classificationName}; }
 
         /**

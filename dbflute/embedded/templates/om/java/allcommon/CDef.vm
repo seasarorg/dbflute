@@ -61,7 +61,7 @@ public interface ${glCDef} extends Classification {
         public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
 #else
         @SuppressWarnings("unchecked")
-        public Map<String, Object> subItemMap() { return (Map<String, Object>)Collections.EMPTY_LIST; }
+        public Map<String, Object> subItemMap() { return (Map<String, Object>)Collections.EMPTY_MAP; }
 #end
         public ClassificationMeta meta() { return ${glCDef}.DefMeta.${classificationName}; }
 

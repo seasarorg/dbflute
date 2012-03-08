@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -462,7 +461,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     selectedMap.put(DfClassificationElement.KEY_COMMENT, currentComment);
                 }
                 if (subItemPropMap != null && !subItemPropMap.isEmpty()) {
-                    final Map<String, Object> subItemMap = new HashMap<String, Object>();
+                    final Map<String, Object> subItemMap = new LinkedHashMap<String, Object>();
                     for (String subItemKey : subItemPropMap.keySet()) {
                         final String clsKey = "cls_" + subItemKey;
                         final String subItemValue = rs.getString(clsKey);

@@ -191,7 +191,7 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
         return targetSet.contains(classificationName);
     }
 
-    public boolean isClassificationDeployment() { //  if true, SimpleCDef should be true
+    public boolean isClassificationDeployment() { //  if true, SimpleCDef should be true too
         return isProperty("isClassificationDeployment", false, getSimpleDtoDefinitionMap());
     }
 
