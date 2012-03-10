@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
+import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -28,6 +29,15 @@ import org.seasar.dbflute.util.Srl.IndexOfInfo;
  * @since 0.9.7.5 (2010/10/11 Monday)
  */
 public class HpFixedConditionQueryResolver implements FixedConditionResolver {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String LOCAL_ALIAS_MARK = "$$localAlias$$";
+    public static final String FOREIGN_ALIAS_MARK = "$$foreignAlias$$";
+    public static final String SQ_BEGIN_MARK = "$$sqbegin$$";
+    public static final String SQ_END_MARK = "$$sqend$$";
+    public static final String LOCATION_BASE_MARK = "$$locationBase$$";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -53,14 +63,31 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
      * {@inheritDoc}
      */
     public String resolveVariable(String fixedCondition) {
+        fixedCondition = filterBasicMark(fixedCondition);
+        fixedCondition = filterSubQueryIndentMark(fixedCondition);
+        final String locationBase = _localCQ.xgetLocationBase();
+        fixedCondition = replaceString(fixedCondition, getLocationBaseMark() + ".", "pmb." + locationBase);
+        fixedCondition = resolveFixedConditionOverRelation(fixedCondition);
+        return fixedCondition;
+    }
+
+    protected String filterBasicMark(String fixedCondition) {
         final String localAliasName = _localCQ.xgetAliasName();
         final String foreignAliasName = _foreignCQ.xgetAliasName();
         fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatibility
         fixedCondition = replaceString(fixedCondition, getLocalAliasMark(), localAliasName);
         fixedCondition = replaceString(fixedCondition, getForeignAliasMark(), foreignAliasName);
-        final String locationBase = _localCQ.xgetLocationBase();
-        fixedCondition = replaceString(fixedCondition, getLocationBaseMark() + ".", "pmb." + locationBase);
-        fixedCondition = resolveFixedConditionOverRelation(fixedCondition);
+        return fixedCondition;
+    }
+
+    protected String filterSubQueryIndentMark(String fixedCondition) {
+        final SubQueryIndentProcessor processor = new SubQueryIndentProcessor();
+        final String foreignAliasName = _foreignCQ.xgetAliasName();
+        final String subQueryIdentity = "fixed_" + foreignAliasName;
+        final String beginMark = processor.resolveSubQueryBeginMark(subQueryIdentity);
+        fixedCondition = Srl.replace(fixedCondition, getSqBeginMark(), beginMark);
+        final String endMark = processor.resolveSubQueryEndMark(subQueryIdentity);
+        fixedCondition = Srl.replace(fixedCondition, getSqEndMark(), endMark);
         return fixedCondition;
     }
 
@@ -354,15 +381,23 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     //                                                                       Variable Mark
     //                                                                       =============
     protected String getLocalAliasMark() {
-        return "$$localAlias$$";
+        return LOCAL_ALIAS_MARK;
     }
 
     protected String getForeignAliasMark() {
-        return "$$foreignAlias$$";
+        return FOREIGN_ALIAS_MARK;
+    }
+
+    protected String getSqBeginMark() {
+        return SQ_BEGIN_MARK;
+    }
+
+    protected String getSqEndMark() {
+        return SQ_END_MARK;
     }
 
     protected String getLocationBaseMark() {
-        return "$$locationBase$$";
+        return LOCATION_BASE_MARK;
     }
 
     protected String getRelationBeginMark() {
