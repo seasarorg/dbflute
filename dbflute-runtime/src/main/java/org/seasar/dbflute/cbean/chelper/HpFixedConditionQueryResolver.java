@@ -65,8 +65,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     public String resolveVariable(String fixedCondition) {
         fixedCondition = filterBasicMark(fixedCondition);
         fixedCondition = filterSubQueryIndentMark(fixedCondition);
-        final String locationBase = _localCQ.xgetLocationBase();
-        fixedCondition = replaceString(fixedCondition, getLocationBaseMark() + ".", "pmb." + locationBase);
+        fixedCondition = filterLocationMark(fixedCondition);
         fixedCondition = resolveFixedConditionOverRelation(fixedCondition);
         return fixedCondition;
     }
@@ -83,7 +82,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     protected String filterSubQueryIndentMark(String fixedCondition) {
         final String sqBeginMark = getSqBeginMark();
         final String sqEndMark = getSqEndMark();
-        if (!fixedCondition.contains(sqBeginMark) || !!fixedCondition.contains(sqEndMark)) {
+        if (!fixedCondition.contains(sqBeginMark) || !fixedCondition.contains(sqEndMark)) {
             return fixedCondition;
         }
         fixedCondition = Srl.replace(fixedCondition, "\n)" + sqEndMark, "\n         )" + sqEndMark);
@@ -95,6 +94,11 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         final String endMark = processor.resolveSubQueryEndMark(subQueryIdentity);
         fixedCondition = Srl.replace(fixedCondition, sqEndMark, endMark);
         return fixedCondition;
+    }
+
+    protected String filterLocationMark(String fixedCondition) {
+        final String locationBase = _localCQ.xgetLocationBase();
+        return replaceString(fixedCondition, getLocationBaseMark() + ".", "pmb." + locationBase);
     }
 
     protected String resolveFixedConditionOverRelation(String fixedCondition) {
