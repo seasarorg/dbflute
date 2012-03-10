@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.util.Srl;
 
@@ -116,9 +117,11 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         String fixedCondition = componentMap.get(KEY_FIXED_CONDITION);
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
             // adjust a little about camel case
+            final String foreignAliasMark = HpFixedConditionQueryResolver.FOREIGN_ALIAS_MARK;
+            final String localAliasMark = HpFixedConditionQueryResolver.LOCAL_ALIAS_MARK;
             fixedCondition = Srl.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
-            fixedCondition = Srl.replace(fixedCondition, "$$ForeignAlias$$", "$$foreignAlias$$");
-            fixedCondition = Srl.replace(fixedCondition, "$$LocalAlias$$", "$$localAlias$$");
+            fixedCondition = Srl.replace(fixedCondition, "$$ForeignAlias$$", foreignAliasMark);
+            fixedCondition = Srl.replace(fixedCondition, "$$LocalAlias$$", localAliasMark);
             fixedCondition = Srl.replace(fixedCondition, "\n", "\\n");
         }
         return fixedCondition;
