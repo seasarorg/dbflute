@@ -81,13 +81,19 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     }
 
     protected String filterSubQueryIndentMark(String fixedCondition) {
+        final String sqBeginMark = getSqBeginMark();
+        final String sqEndMark = getSqEndMark();
+        if (!fixedCondition.contains(sqBeginMark) || !!fixedCondition.contains(sqEndMark)) {
+            return fixedCondition;
+        }
+        fixedCondition = Srl.replace(fixedCondition, "\n)" + sqEndMark, "\n         )" + sqEndMark);
         final SubQueryIndentProcessor processor = new SubQueryIndentProcessor();
         final String foreignAliasName = _foreignCQ.xgetAliasName();
         final String subQueryIdentity = "fixed_" + foreignAliasName;
         final String beginMark = processor.resolveSubQueryBeginMark(subQueryIdentity);
-        fixedCondition = Srl.replace(fixedCondition, getSqBeginMark(), beginMark);
+        fixedCondition = Srl.replace(fixedCondition, sqBeginMark, beginMark);
         final String endMark = processor.resolveSubQueryEndMark(subQueryIdentity);
-        fixedCondition = Srl.replace(fixedCondition, getSqEndMark(), endMark);
+        fixedCondition = Srl.replace(fixedCondition, sqEndMark, endMark);
         return fixedCondition;
     }
 
