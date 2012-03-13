@@ -38,7 +38,7 @@ public interface ${database.simpleCDefClass} {
      */
     DefMeta meta();
 
-#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList))
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
 #set ($existTop = false)
 #if ($database.hasClassificationTop($classificationName))
@@ -152,7 +152,7 @@ public interface ${database.simpleCDefClass} {
          * @return The instance of the classification. (NullAllowed: when not found and code is null)
          */
         public ${database.simpleCDefClass} codeOf(Object code) {
-#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList))
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if ("${classificationName}".equals(name())) { return ${database.simpleCDefClass}.${classificationName}.codeOf(code); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
@@ -164,7 +164,7 @@ public interface ${database.simpleCDefClass} {
          * @return The instance of the classification. (NullAllowed: when not found and name is null)
          */
         public ${database.simpleCDefClass} nameOf(String name) {
-#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList))
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if ("${classificationName}".equals(name())) { return ${database.simpleCDefClass}.${classificationName}.valueOf(name); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
@@ -175,7 +175,7 @@ public interface ${database.simpleCDefClass} {
          * @return The list of classification elements. (NotNull)
          */
         public List<${database.simpleCDefClass}> listAll() {
-#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList))
+#foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
             if ("${classificationName}".equals(name())) { return toClassificationList(${database.simpleCDefClass}.${classificationName}.listAll()); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
