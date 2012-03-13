@@ -479,6 +479,10 @@ public abstract class DfAbstractHelperProperties {
         return handler().getAdditionalForeignKeyProperties(getProperties());
     }
 
+    protected DfClassificationProperties getClassificationProperties() {
+        return handler().getClassificationProperties(getProperties());
+    }
+
     protected DfCommonColumnProperties getCommonColumnProperties() {
         return handler().getCommonColumnProperties(getProperties());
     }

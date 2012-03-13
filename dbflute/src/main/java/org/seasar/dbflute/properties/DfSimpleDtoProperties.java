@@ -1,5 +1,6 @@
 package org.seasar.dbflute.properties;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -189,6 +190,18 @@ public final class DfSimpleDtoProperties extends DfAbstractHelperProperties {
             return true;
         }
         return targetSet.contains(classificationName);
+    }
+
+    public List<String> getSimpleCDefTargetClassificationNameList() {
+        final DfClassificationProperties prop = getClassificationProperties();
+        final List<String> classificationNameList = prop.getClassificationNameList();
+        final List<String> filteredList = new ArrayList<String>();
+        for (String classificationName : classificationNameList) {
+            if (isSimpleCDefTarget(classificationName)) {
+                filteredList.add(classificationName);
+            }
+        }
+        return filteredList;
     }
 
     public boolean isClassificationDeployment() { //  if true, SimpleCDef should be true too

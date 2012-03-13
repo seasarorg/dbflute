@@ -2071,6 +2071,10 @@ public class Database {
         return getProperties().getSimpleDtoProperties().isSimpleCDefTarget(classificationName);
     }
 
+    public List<String> getSimpleCDefTargetClassificationNameList() {
+        return getProperties().getSimpleDtoProperties().getSimpleCDefTargetClassificationNameList();
+    }
+
     public boolean isSimpleDtoGwtDecorationSuppressJavaDependency() {
         return getProperties().getSimpleDtoProperties().isGwtDecorationSuppressJavaDependency();
     }
