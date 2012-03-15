@@ -605,11 +605,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             handleInvalidQuery(key, value, columnDbName);
             return;
         }
-        final boolean orScopeQuery = xgetSqlClause().isOrScopeQueryEffective();
-        final boolean orScopeQueryAndPart = xgetSqlClause().isOrScopeQueryAndPartEffective();
         if (!option.isAsOrSplit()) {
             // as 'and' condition
-            final boolean needsAndPart = orScopeQuery && !orScopeQueryAndPart;
+            final boolean needsAndPart = isOrScopeQueryDirectlyUnder();
             if (needsAndPart) {
                 xgetSqlClause().beginOrScopeQueryAndPart();
             }
@@ -625,12 +623,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         } else {
             // as 'or' condition
-            if (orScopeQueryAndPart) {
+            if (isOrScopeQueryAndPartEffective()) {
                 // limit because of so complex
                 String msg = "The AsOrSplit in and-part is unsupported: " + getTableDbName();
                 throw new OrScopeQueryAndPartUnsupportedOperationException(msg);
             }
-            final boolean needsNewOrScope = !orScopeQuery;
+            final boolean needsNewOrScope = !isOrScopeQueryEffective();
             if (needsNewOrScope) {
                 xgetSqlClause().makeOrScopeQueryEffective();
             }
@@ -651,40 +649,64 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected boolean xsuppressEscape() { // for override
-        return false; // as default
-    }
-
     protected void throwLikeSearchOptionNotFoundException(String columnDbName, String value) {
         final DBMeta dbmeta = xgetDBMetaProvider().provideDBMeta(getTableDbName());
         createCBExThrower().throwLikeSearchOptionNotFoundException(columnDbName, value, dbmeta);
+    }
+
+    protected boolean xsuppressEscape() { // for override
+        return false; // as default
     }
 
     protected void invokeQueryLikeSearch(String columnFlexibleName, Object value, LikeSearchOption option) {
         invokeQuery(columnFlexibleName, "likeSearch", value, option);
     }
 
+    protected boolean isOrScopeQueryDirectlyUnder() {
+        final boolean orScopeQuery = isOrScopeQueryEffective();
+        final boolean orScopeQueryAndPart = isOrScopeQueryAndPartEffective();
+        return orScopeQuery && !orScopeQueryAndPart;
+    }
+
+    protected boolean isOrScopeQueryEffective() {
+        return xgetSqlClause().isOrScopeQueryEffective();
+    }
+
+    protected boolean isOrScopeQueryAndPartEffective() {
+        return xgetSqlClause().isOrScopeQueryAndPartEffective();
+    }
+
     // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
     protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
-        final ConditionKey fromKey = option.getFromDateConditionKey();
-        boolean fromInvalid = false;
-        final Date filteredFromDate = option.filterFromDate(fromDate);
-        if (isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName)) {
-            setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
-        } else {
-            fromInvalid = true;
+        final boolean needsAndPart = isOrScopeQueryDirectlyUnder();
+        if (needsAndPart) {
+            xgetSqlClause().beginOrScopeQueryAndPart();
         }
-        final ConditionKey toKey = option.getToDateConditionKey();
-        final Date filteredToDate = option.filterToDate(toDate);
-        if (isValidQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName)) {
-            setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
-        } else {
-            if (fromInvalid) { // means both queries are invalid
-                final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
-                final List<Date> valueList = newArrayList(fromDate, toDate);
-                handleInvalidQueryList(keyList, valueList, columnDbName);
+        try {
+            final ConditionKey fromKey = option.getFromDateConditionKey();
+            boolean fromInvalid = false;
+            final Date filteredFromDate = option.filterFromDate(fromDate);
+            if (isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName)) {
+                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
+            } else {
+                fromInvalid = true;
+            }
+            final ConditionKey toKey = option.getToDateConditionKey();
+            final Date filteredToDate = option.filterToDate(toDate);
+            if (isValidQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName)) {
+                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
+            } else {
+                if (fromInvalid) { // means both queries are invalid
+                    final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
+                    final List<Date> valueList = newArrayList(fromDate, toDate);
+                    handleInvalidQueryList(keyList, valueList, columnDbName);
+                }
+            }
+        } finally {
+            if (needsAndPart) {
+                xgetSqlClause().endOrScopeQueryAndPart();
             }
         }
     }
@@ -694,21 +716,31 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         -------------
     protected void regROO(Number minNumber, Number maxNumber, ConditionValue cvalue, String columnDbName,
             RangeOfOption option) {
-        final ConditionKey minKey = option.getMinNumberConditionKey();
-        boolean fromInvalid = false;
-        if (isValidQueryNoCheck(minKey, minNumber, cvalue, columnDbName)) {
-            setupConditionValueAndRegisterWhereClause(minKey, minNumber, cvalue, columnDbName);
-        } else {
-            fromInvalid = true;
+        final boolean needsAndPart = isOrScopeQueryDirectlyUnder();
+        if (needsAndPart) {
+            xgetSqlClause().beginOrScopeQueryAndPart();
         }
-        final ConditionKey maxKey = option.getMaxNumberConditionKey();
-        if (isValidQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName)) {
-            setupConditionValueAndRegisterWhereClause(maxKey, maxNumber, cvalue, columnDbName);
-        } else {
-            if (fromInvalid) { // means both queries are invalid
-                final List<ConditionKey> keyList = newArrayList(minKey, maxKey);
-                final List<Number> valueList = newArrayList(minNumber, maxNumber);
-                handleInvalidQueryList(keyList, valueList, columnDbName);
+        try {
+            final ConditionKey minKey = option.getMinNumberConditionKey();
+            boolean fromInvalid = false;
+            if (isValidQueryNoCheck(minKey, minNumber, cvalue, columnDbName)) {
+                setupConditionValueAndRegisterWhereClause(minKey, minNumber, cvalue, columnDbName);
+            } else {
+                fromInvalid = true;
+            }
+            final ConditionKey maxKey = option.getMaxNumberConditionKey();
+            if (isValidQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName)) {
+                setupConditionValueAndRegisterWhereClause(maxKey, maxNumber, cvalue, columnDbName);
+            } else {
+                if (fromInvalid) { // means both queries are invalid
+                    final List<ConditionKey> keyList = newArrayList(minKey, maxKey);
+                    final List<Number> valueList = newArrayList(minNumber, maxNumber);
+                    handleInvalidQueryList(keyList, valueList, columnDbName);
+                }
+            }
+        } finally {
+            if (needsAndPart) {
+                xgetSqlClause().endOrScopeQueryAndPart();
             }
         }
     }
