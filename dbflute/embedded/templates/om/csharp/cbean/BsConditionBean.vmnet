@@ -128,6 +128,7 @@ namespace ${glPackageBaseCB} {
             return (${glPackageBaseCommonSqlClause}.${glSqlClause}Oracle)this.SqlClause;
         }
 #end
+#end
 
         // ===============================================================================
         //                                                                    Setup Select
