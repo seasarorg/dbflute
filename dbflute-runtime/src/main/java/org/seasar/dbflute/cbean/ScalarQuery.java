@@ -20,7 +20,7 @@ package org.seasar.dbflute.cbean;
  * <pre>
  * fooBhv.scalarSelect(Date.class).max(new ScalarQuery&lt;FooCB&gt;() {
  *     public void query(FooCB cb) {
- *         cb.specify().columnFooDatetime(); // required for a function
+ *         cb.specify().columnFooDatetime(); <span style="color: #3F7E5E">// required for a function</span>
  *         cb.query().setFoo...
  *     }
  * }

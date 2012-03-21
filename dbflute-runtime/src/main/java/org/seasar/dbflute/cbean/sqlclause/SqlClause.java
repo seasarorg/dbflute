@@ -786,6 +786,7 @@ public interface SqlClause {
         , UNIQUE_COUNT(true, true, true, false) // basically for selectCount(cb)
         , PLAIN_COUNT(true, true, false, false) // basically for count of selectPage(cb)
         // scalar mainly for Behavior.scalarSelect(cb)
+        , COUNT_DISTINCT(false, true, true, true) // count(distinct)
         , MAX(false, true, true, true), MIN(false, true, true, true) // max(), min()
         , SUM(false, true, true, true), AVG(false, true, true, true); // sum(), avg()
 
@@ -801,7 +802,7 @@ public interface SqlClause {
             _specifiedScalar = specifiedScalar;
         }
 
-        public boolean isCount() {
+        public boolean isCount() { // except count-distinct
             return _count;
         }
 

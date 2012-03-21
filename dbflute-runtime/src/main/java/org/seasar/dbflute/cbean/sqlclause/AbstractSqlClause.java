@@ -690,6 +690,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected String buildSelectClauseScalar(String aliasName) {
         if (isSelectClauseTypeCount()) {
             return buildSelectClauseCount();
+        } else if (_selectClauseType.equals(SelectClauseType.COUNT_DISTINCT)) {
+            return buildSelectClauseCountDistinct(aliasName);
         } else if (_selectClauseType.equals(SelectClauseType.MAX)) {
             return buildSelectClauseMax(aliasName);
         } else if (_selectClauseType.equals(SelectClauseType.MIN)) {
@@ -706,6 +708,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected String buildSelectClauseCount() {
         return "select count(*)";
+    }
+
+    protected String buildSelectClauseCountDistinct(String aliasName) {
+        return buildSelectClauseSpecifiedScalar(aliasName, "count(distinct");
     }
 
     protected String buildSelectClauseMax(String aliasName) {
@@ -754,7 +760,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String doBuildFunctionExp(String function, String columnExp) {
-        final String functionExp = function + "(" + columnExp + ")";
+        final String frontConnector = function.contains("(") ? " " : "("; // e.g. "count(distinct"
+        final String functionExp = function + frontConnector + columnExp + ")";
         return _scalarSelectOption != null ? _scalarSelectOption.filterFunction(functionExp) : functionExp;
     }
 

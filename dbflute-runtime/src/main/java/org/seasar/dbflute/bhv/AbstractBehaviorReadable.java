@@ -381,11 +381,87 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
 
         /**
+         * Select the count value. <br />
+         * You can also get same result by selectCount(cb) method.
+         * <pre>
+         * memberBhv.scalarSelect(Integer.class).<span style="color: #FD4747">count</span>(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+         * });
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @return The count value. (NotNull)
+         */
+        public RESULT count(ScalarQuery<CB> scalarQuery) {
+            return doCount(scalarQuery, null);
+        }
+
+        /**
+         * Select the count value with function conversion option.
+         * <pre>
+         * memberBhv.scalarSelect(Integer.class).<span style="color: #FD4747">count</span>(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+         * }, new ScalarSelectOption().<span style="color: #FD4747">coalesce</span>(0));
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @param option The option for scalar. (NotNull)
+         * @return The count value. (NotNull)
+         */
+        public RESULT count(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertScalarSelectOption(option);
+            return doCount(scalarQuery, option);
+        }
+
+        protected RESULT doCount(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertScalarQuery(scalarQuery);
+            return exec(scalarQuery, SqlClause.SelectClauseType.UNIQUE_COUNT, option);
+        }
+
+        /**
+         * Select the count-distinct value. <br />
+         * You can also get same result by selectCount(cb) method.
+         * <pre>
+         * memberBhv.scalarSelect(Integer.class).<span style="color: #FD4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnMemberId</span>(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+         * });
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @return The count-distinct value. (NotNull)
+         */
+        public RESULT countDistinct(ScalarQuery<CB> scalarQuery) {
+            return doCountDistinct(scalarQuery, null);
+        }
+
+        /**
+         * Select the count-distinct value with function conversion option.
+         * <pre>
+         * memberBhv.scalarSelect(Integer.class).<span style="color: #FD4747">countDistinct</span>(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().columnMemberId(); <span style="color: #3F7E5E">// the required specification of (basically) primary key column</span>
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+         * }, new ScalarSelectOption().<span style="color: #FD4747">coalesce</span>(0));
+         * </pre>
+         * @param scalarQuery The query for scalar. (NotNull)
+         * @param option The option for scalar. (NotNull)
+         * @return The count-distinct value. (NotNull)
+         */
+        public RESULT countDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertScalarSelectOption(option);
+            return doCountDistinct(scalarQuery, option);
+        }
+
+        protected RESULT doCountDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
+            assertScalarQuery(scalarQuery);
+            return exec(scalarQuery, SqlClause.SelectClauseType.COUNT_DISTINCT, option);
+        }
+
+        /**
          * Select the maximum value.
          * <pre>
-         * memberBhv.scalarSelect(Date.class).max(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().columnMemberBirthday(); // the required specification of target column
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); // query as you like it
+         * memberBhv.scalarSelect(Date.class).<span style="color: #FD4747">max</span>(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
@@ -398,10 +474,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         /**
          * Select the maximum value with function conversion option.
          * <pre>
-         * memberBhv.scalarSelect(Date.class).max(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().columnMemberBirthday(); // the required specification of target column
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); // query as you like it
-         * }, new ScalarSelectOption().coalesce(0));
+         * memberBhv.scalarSelect(Date.class).<span style="color: #FD4747">max</span>(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+         * }, new ScalarSelectOption().<span style="color: #FD4747">coalesce</span>(0));
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
@@ -420,9 +496,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         /**
          * Select the minimum value.
          * <pre>
-         * memberBhv.scalarSelect(Date.class).min(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().columnMemberBirthday(); // the required specification of target column
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); // query as you like it
+         * memberBhv.scalarSelect(Date.class).<span style="color: #FD4747">min</span>(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
@@ -435,10 +511,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         /**
          * Select the minimum value with function conversion option.
          * <pre>
-         * memberBhv.scalarSelect(Date.class).min(new ScalarQuery(MemberCB cb) {
-         *     cb.specify().columnMemberBirthday(); // the required specification of target column
-         *     cb.query().setMemberStatusCode_Equal_Formalized(); // query as you like it
-         * }, new ScalarSelectOption().coalesce(0));
+         * memberBhv.scalarSelect(Date.class).<span style="color: #FD4747">min</span>(new ScalarQuery(MemberCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnBirthdate</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+         *     cb.query().setMemberStatusCode_Equal_Formalized(); <span style="color: #3F7E5E">// query as you like it</span>
+         * }, new ScalarSelectOption().<span style="color: #FD4747">coalesce</span>(0));
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
@@ -457,9 +533,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         /**
          * Select the summary value.
          * <pre>
-         * purchaseBhv.scalarSelect(Integer.class).sum(new ScalarQuery(PurchaseCB cb) {
-         *     cb.specify().columnPurchaseCount(); // the required specification of target column
-         *     cb.query().setPurchaseDatetime_GreaterEqual(date); // query as you like it
+         * purchaseBhv.scalarSelect(Integer.class).<span style="color: #FD4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+         *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
@@ -472,10 +548,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         /**
          * Select the summary value with function conversion option.
          * <pre>
-         * purchaseBhv.scalarSelect(Integer.class).sum(new ScalarQuery(PurchaseCB cb) {
-         *     cb.specify().columnPurchaseCount(); // the required specification of target column
-         *     cb.query().setPurchaseDatetime_GreaterEqual(date); // query as you like it
-         * }, new ScalarSelectOption().coalesce(0));
+         * purchaseBhv.scalarSelect(Integer.class).<span style="color: #FD4747">sum</span>(new ScalarQuery(PurchaseCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+         *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
+         * }, new ScalarSelectOption().<span style="color: #FD4747">coalesce</span>(0));
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
@@ -494,9 +570,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         /**
          * Select the average value.
          * <pre>
-         * purchaseBhv.scalarSelect(Integer.class).avg(new ScalarQuery(PurchaseCB cb) {
-         *     cb.specify().columnPurchaseCount(); // the required specification of target column
-         *     cb.query().setPurchaseDatetime_GreaterEqual(date); // query as you like it
+         * purchaseBhv.scalarSelect(Integer.class).<span style="color: #FD4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+         *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
@@ -509,10 +585,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         /**
          * Select the average value.
          * <pre>
-         * purchaseBhv.scalarSelect(Integer.class).avg(new ScalarQuery(PurchaseCB cb) {
-         *     cb.specify().columnPurchaseCount(); // the required specification of target column
-         *     cb.query().setPurchaseDatetime_GreaterEqual(date); // query as you like it
-         * }, new ScalarSelectOption().coalesce(0));
+         * purchaseBhv.scalarSelect(Integer.class).<span style="color: #FD4747">avg</span>(new ScalarQuery(PurchaseCB cb) {
+         *     cb.specify().<span style="color: #FD4747">columnPurchaseCount</span>(); <span style="color: #3F7E5E">// the required specification of target column</span>
+         *     cb.query().setPurchaseDatetime_GreaterEqual(date); <span style="color: #3F7E5E">// query as you like it</span>
+         * }, new ScalarSelectOption().<span style="color: #FD4747">coalesce</span>(0));
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
