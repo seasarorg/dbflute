@@ -92,8 +92,8 @@ namespace ${glPackageBaseCB} {
         }
 
         // ===============================================================================
-        //                                                                     Union Query
-        //                                                                     ===========
+        //                                                                           Union
+        //                                                                           =====
 	    public virtual void Union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
             ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
             cb.xsetupForUnion(this); xsyncUQ(cb); unionQuery.Invoke(cb);
@@ -109,7 +109,26 @@ namespace ${glPackageBaseCB} {
         public override bool HasUnionQueryOrUnionAllQuery() {
             return Query().hasUnionQueryOrUnionAllQuery();
         }
-    
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabaseOracle())
+
+        // ===============================================================================
+        //                                                                       Lock Wait
+        //                                                                       =========
+        public virtual ${glConditionBean} LockForUpdateNoWait()
+        { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateNoWait(); } return this; }
+        public virtual ${glConditionBean} LockForUpdateWait(int waitSec)
+        { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateWait(waitSec); } return this; }
+
+        protected virtual bool xhelpIsSqlClauseOracle() {
+            return this.SqlClause is ${glPackageBaseCommonSqlClause}.${glSqlClause}Oracle;
+        }
+
+        protected virtual ${glPackageBaseCommonSqlClause}.${glSqlClause}Oracle xhelpGettingSqlClauseOracle() {
+            return (${glPackageBaseCommonSqlClause}.${glSqlClause}Oracle)this.SqlClause;
+        }
+#end
+
         // ===============================================================================
         //                                                                    Setup Select
         //                                                                    ============

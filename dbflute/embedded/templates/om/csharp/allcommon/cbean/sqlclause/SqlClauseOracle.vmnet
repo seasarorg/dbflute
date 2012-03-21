@@ -95,6 +95,21 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
 
+    // ===================================================================================
+    //                                                                 Database Dependency
+    //                                                                 ===================
+    public virtual ${glSqlClause} lockForUpdateNoWait() {
+        lockForUpdate();
+        _lockSqlSuffix = _lockSqlSuffix + " nowait";
+        return this;
+    }
+
+    public virtual ${glSqlClause} lockForUpdateWait(int waitSec) {
+        lockForUpdate();
+        _lockSqlSuffix = _lockSqlSuffix + " wait " + waitSec;
+        return this;
+    }
+
     // [DBFlute-0.8.9.9]
     // ===================================================================================
     //                                                                       InScope Limit
