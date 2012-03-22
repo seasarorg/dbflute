@@ -362,7 +362,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getProperty("baseClassPackage", "");
     }
 
-    public String getExtendedClassPackage() { // [packageBase].[baseClassPackage].[exbhv/exentity...]
+    public String getExtendedClassPackage() { // [packageBase].[extendedClassPackage].[exbhv/exentity...]
         return getProperty("extendedClassPackage", "");
     }
 
