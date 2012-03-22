@@ -354,8 +354,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                    Generate Package
     //                                                                    ================
-    public String getPackageBase() {
+    public String getPackageBase() { // [packageBase].[bsbhv/exbhv/exentity...]
         return getProperty("packageBase", "");
+    }
+
+    public String getBaseClassPackage() { // [packageBase].[baseClassPackage].[bsbhv/bsentity...]
+        return getProperty("baseClassPackage", "");
+    }
+
+    public String getExtendedClassPackage() { // [packageBase].[baseClassPackage].[exbhv/exentity...]
+        return getProperty("extendedClassPackage", "");
     }
 
     public String getBaseCommonPackage() {
@@ -364,20 +372,20 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         if (isApplicationBehaviorProject()) {
             return getLibraryAllCommonPackage(); // basically for Sql2Entity task at BhvAp mode
         } else {
-            return filterBase(baseCommonPackage);
+            return filterPackageBaseForBase(baseCommonPackage);
         }
     }
 
     public String getBaseBehaviorPackage() {
-        return filterBase(getProperty("baseBehaviorPackage", getPackageInfo().getBaseBehaviorPackage()));
+        return filterPackageBaseForBase(getProperty("baseBehaviorPackage", getPackageInfo().getBaseBehaviorPackage()));
     }
 
     public String getBaseDaoPackage() {
-        return filterBase(getProperty("baseDaoPackage", getPackageInfo().getBaseDaoPackage()));
+        return filterPackageBaseForBase(getProperty("baseDaoPackage", getPackageInfo().getBaseDaoPackage()));
     }
 
     public String getBaseEntityPackage() {
-        return filterBase(getProperty("baseEntityPackage", getPackageInfo().getBaseEntityPackage()));
+        return filterPackageBaseForBase(getProperty("baseEntityPackage", getPackageInfo().getBaseEntityPackage()));
     }
 
     public String getDBMetaPackage() {
@@ -385,42 +393,67 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getConditionBeanPackage() {
-        return filterBase(getProperty("conditionBeanPackage", getPackageInfo().getConditionBeanPackage()));
+        return filterPackageBaseForBase(getPureConditionBeanPackage());
     }
 
     public String getExtendedConditionBeanPackage() {
-        String pkg = getProperty("extendedConditionBeanPackage", null);
+        final String pkg = getProperty("extendedConditionBeanPackage", null);
         if (pkg != null) {
-            return filterBase(pkg);
+            return filterPackageBaseForExtended(pkg);
         }
-        return getConditionBeanPackage();
+        final String extendedClassPackage = getExtendedClassPackage();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(extendedClassPackage)) {
+            return filterPackageBaseForExtended(getPureConditionBeanPackage());
+        }
+        return getConditionBeanPackage(); // as default
     }
 
-    protected boolean hasConditionBeanPackage() {
-        return getProperty("conditionBeanPackage", null) != null;
+    public String getPureConditionBeanPackage() {
+        return getProperty("conditionBeanPackage", getPackageInfo().getConditionBeanPackage());
     }
 
     public String getExtendedBehaviorPackage() {
-        return filterBase(getProperty("extendedBehaviorPackage", getPackageInfo().getExtendedBehaviorPackage()));
+        final String packageString = getProperty("extendedBehaviorPackage", getPackageInfo()
+                .getExtendedBehaviorPackage());
+        return filterPackageBaseForExtended(packageString);
     }
 
     public String getExtendedDaoPackage() {
-        return filterBase(getProperty("extendedDaoPackage", getPackageInfo().getExtendedDaoPackage()));
+        final String packageString = getProperty("extendedDaoPackage", getPackageInfo().getExtendedDaoPackage());
+        return filterPackageBaseForExtended(packageString);
     }
 
     public String getExtendedEntityPackage() {
-        return filterBase(getProperty("extendedEntityPackage", getPackageInfo().getExtendedEntityPackage()));
+        final String packageString = getProperty("extendedEntityPackage", getPackageInfo().getExtendedEntityPackage());
+        return filterPackageBaseForExtended(packageString);
     }
 
-    protected String filterBase(String packageString) {
-        return filterBase(packageString, getPackageBase());
+    protected String filterPackageBaseForBase(String packageString) {
+        final String packageBase = getPackageBase();
+        final String baseClassPackage = getBaseClassPackage();
+        return filterBase(packageString, packageBase, baseClassPackage);
     }
 
-    protected String filterBase(String packageString, String packageBase) {
+    protected String filterPackageBaseForExtended(String packageString) {
+        final String packageBase = getPackageBase();
+        final String extendedClassPackage = getExtendedClassPackage();
+        return filterBase(packageString, packageBase, extendedClassPackage);
+    }
+
+    protected String filterBase(String packageString, String packageBase, String middleBase) {
+        boolean hasMiddle = middleBase.trim().length() > 0;
         if (packageBase.trim().length() > 0) {
-            return packageBase + "." + packageString;
+            if (hasMiddle) {
+                return packageBase + "." + middleBase + "." + packageString;
+            } else {
+                return packageBase + "." + packageString;
+            }
         } else {
-            return packageString;
+            if (hasMiddle) {
+                return middleBase + "." + packageString;
+            } else {
+                return packageString;
+            }
         }
     }
 
@@ -525,23 +558,23 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String getLibraryAllCommonPackage() {
         final String packageBase = getLibraryProjectPackageBase();
         final String allcommonSimplePackage = getPackageInfo().getBaseCommonPackage();
-        return filterBase(allcommonSimplePackage, packageBase);
+        return filterBase(allcommonSimplePackage, packageBase, "");
     }
 
     public String getLibraryBehaviorPackage() {
         final String packageBase = getLibraryProjectPackageBase();
         final String exbhvSimplePackage = getPackageInfo().getExtendedBehaviorPackage();
-        return filterBase(exbhvSimplePackage, packageBase);
+        return filterBase(exbhvSimplePackage, packageBase, "");
     }
 
     public String getLibraryEntityPackage() {
         final String packageBase = getLibraryProjectPackageBase();
         final String entitySimplePackage = getPackageInfo().getExtendedEntityPackage();
-        return filterBase(entitySimplePackage, packageBase);
+        return filterBase(entitySimplePackage, packageBase, "");
     }
 
     public String getApplicationAllCommonPackage() {
-        return filterBase(getPackageInfo().getBaseCommonPackage());
+        return filterPackageBaseForBase(getPackageInfo().getBaseCommonPackage());
     }
 
     public String getLibraryProjectPrefix() {
