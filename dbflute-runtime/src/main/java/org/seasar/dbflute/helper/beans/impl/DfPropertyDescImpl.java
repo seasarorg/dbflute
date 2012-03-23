@@ -41,16 +41,16 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String propertyName;
-    private Class<?> propertyType;
-    private Method readMethod;
-    private Method writeMethod;
-    private Field field;
-    private DfBeanDesc beanDesc;
-    private Constructor<?> stringConstructor;
-    private Method valueOfMethod;
-    private boolean readable = false;
-    private boolean writable = false;
+    private String _propertyName;
+    private Class<?> _propertyType;
+    private Method _readMethod;
+    private Method _writeMethod;
+    private Field _field;
+    private DfBeanDesc _beanDesc;
+    private Constructor<?> _stringConstructor;
+    private Method _valueOfMethod;
+    private boolean _readable = false;
+    private boolean _writable = false;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -70,29 +70,29 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
             String msg = "The argument 'propertyType' should not be null!";
             throw new IllegalArgumentException(msg);
         }
-        this.propertyName = propertyName;
-        this.propertyType = propertyType;
+        this._propertyName = propertyName;
+        this._propertyType = propertyType;
         setReadMethod(readMethod);
         setWriteMethod(writeMethod);
         setField(field);
-        this.beanDesc = beanDesc;
+        this._beanDesc = beanDesc;
         setupStringConstructor();
         setupValueOfMethod();
     }
 
     private void setupStringConstructor() {
-        Constructor<?>[] cons = propertyType.getConstructors();
+        Constructor<?>[] cons = _propertyType.getConstructors();
         for (int i = 0; i < cons.length; ++i) {
             Constructor<?> con = cons[i];
             if (con.getParameterTypes().length == 1 && con.getParameterTypes()[0].equals(String.class)) {
-                stringConstructor = con;
+                _stringConstructor = con;
                 break;
             }
         }
     }
 
     private void setupValueOfMethod() {
-        Method[] methods = propertyType.getMethods();
+        Method[] methods = _propertyType.getMethods();
         for (int i = 0; i < methods.length; ++i) {
             Method method = methods[i];
             if (DfReflectionUtil.isBridgeMethod(method) || DfReflectionUtil.isSyntheticMethod(method)) {
@@ -100,7 +100,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
             }
             if (DfReflectionUtil.isStatic(method.getModifiers()) && method.getName().equals("valueOf")
                     && method.getParameterTypes().length == 1 && method.getParameterTypes()[0].equals(String.class)) {
-                valueOfMethod = method;
+                _valueOfMethod = method;
                 break;
             }
         }
@@ -110,65 +110,65 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     //                                                                                Bean
     //                                                                                ====
     public DfBeanDesc getBeanDesc() {
-        return beanDesc;
+        return _beanDesc;
     }
 
     // ===================================================================================
     //                                                                            Property
     //                                                                            ========
     public final String getPropertyName() {
-        return propertyName;
+        return _propertyName;
     }
 
     public final Class<?> getPropertyType() {
-        return propertyType;
+        return _propertyType;
     }
 
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
     public final Method getReadMethod() {
-        return readMethod;
+        return _readMethod;
     }
 
     public final void setReadMethod(Method readMethod) {
-        this.readMethod = readMethod;
+        this._readMethod = readMethod;
         if (readMethod != null) {
-            readable = true;
+            _readable = true;
         }
     }
 
     public final boolean hasReadMethod() {
-        return readMethod != null;
+        return _readMethod != null;
     }
 
     public final Method getWriteMethod() {
-        return writeMethod;
+        return _writeMethod;
     }
 
     public final void setWriteMethod(Method writeMethod) {
-        this.writeMethod = writeMethod;
+        this._writeMethod = writeMethod;
         if (writeMethod != null) {
-            writable = true;
+            _writable = true;
         }
     }
 
     public final boolean hasWriteMethod() {
-        return writeMethod != null;
+        return _writeMethod != null;
     }
 
     // ===================================================================================
     //                                                                               Field
     //                                                                               =====
     public Field getField() {
-        return field;
+        return _field;
     }
 
     public void setField(Field field) {
-        this.field = field;
+        this._field = field;
         if (field != null && DfReflectionUtil.isPublic(field.getModifiers())) {
-            readable = true;
-            writable = true;
+            _readable = true;
+            _writable = true;
         }
     }
 
@@ -180,18 +180,18 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
      */
     public final Object getValue(Object target) {
         try {
-            if (!readable) {
-                final Class<?> beanClass = beanDesc.getBeanClass();
-                String msg = DfTypeUtil.toClassTitle(beanClass) + "." + propertyName;
+            if (!_readable) {
+                final Class<?> beanClass = _beanDesc.getBeanClass();
+                String msg = DfTypeUtil.toClassTitle(beanClass) + "." + _propertyName;
                 msg = msg + " is not readable.";
                 throw new IllegalStateException(msg);
             } else if (hasReadMethod()) {
-                return DfReflectionUtil.invoke(readMethod, target, EMPTY_ARGS);
+                return DfReflectionUtil.invoke(_readMethod, target, EMPTY_ARGS);
             } else {
-                return DfReflectionUtil.getValue(field, target);
+                return DfReflectionUtil.getValue(_field, target);
             }
         } catch (Throwable t) {
-            throw new DfBeanIllegalPropertyException(beanDesc.getBeanClass(), propertyName, t);
+            throw new DfBeanIllegalPropertyException(_beanDesc.getBeanClass(), _propertyName, t);
         }
     }
 
@@ -201,18 +201,18 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     public final void setValue(Object target, Object value) {
         try {
             value = convertIfNeed(value);
-            if (!writable) {
-                final Class<?> beanClass = beanDesc.getBeanClass();
-                String msg = DfTypeUtil.toClassTitle(beanClass) + "." + propertyName;
+            if (!_writable) {
+                final Class<?> beanClass = _beanDesc.getBeanClass();
+                String msg = DfTypeUtil.toClassTitle(beanClass) + "." + _propertyName;
                 msg = msg + " is not writable.";
                 throw new IllegalStateException(msg);
             } else if (hasWriteMethod()) {
-                DfReflectionUtil.invoke(writeMethod, target, new Object[] { value });
+                DfReflectionUtil.invoke(_writeMethod, target, new Object[] { value });
             } else {
-                DfReflectionUtil.setValue(field, target, value);
+                DfReflectionUtil.setValue(_field, target, value);
             }
         } catch (Throwable t) {
-            throw new DfBeanIllegalPropertyException(beanDesc.getBeanClass(), propertyName, t);
+            throw new DfBeanIllegalPropertyException(_beanDesc.getBeanClass(), _propertyName, t);
         }
     }
 
@@ -220,62 +220,62 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     //                                                                       Determination
     //                                                                       =============
     public boolean isReadable() {
-        return readable;
+        return _readable;
     }
 
     public boolean isWritable() {
-        return writable;
+        return _writable;
     }
 
     // ===================================================================================
     //                                                                             Convert
     //                                                                             =======
     public Object convertIfNeed(Object arg) {
-        if (propertyType.isPrimitive()) {
+        if (_propertyType.isPrimitive()) {
             return convertPrimitiveWrapper(arg);
-        } else if (Number.class.isAssignableFrom(propertyType)) {
+        } else if (Number.class.isAssignableFrom(_propertyType)) {
             return convertNumber(arg);
-        } else if (java.util.Date.class.isAssignableFrom(propertyType)) {
+        } else if (java.util.Date.class.isAssignableFrom(_propertyType)) {
             return convertDate(arg);
-        } else if (Boolean.class.isAssignableFrom(propertyType)) {
+        } else if (Boolean.class.isAssignableFrom(_propertyType)) {
             return DfTypeUtil.toBoolean(arg);
-        } else if (arg != null && arg.getClass() != String.class && String.class == propertyType) {
+        } else if (arg != null && arg.getClass() != String.class && String.class == _propertyType) {
             return arg.toString();
-        } else if (arg instanceof String && !String.class.equals(propertyType)) {
+        } else if (arg instanceof String && !String.class.equals(_propertyType)) {
             return convertWithString(arg);
-        } else if (java.util.Calendar.class.isAssignableFrom(propertyType)) {
+        } else if (java.util.Calendar.class.isAssignableFrom(_propertyType)) {
             return DfTypeUtil.toCalendar(arg);
         }
         return arg;
     }
 
     private Object convertPrimitiveWrapper(Object arg) {
-        return DfTypeUtil.toWrapper(arg, propertyType);
+        return DfTypeUtil.toWrapper(arg, _propertyType);
     }
 
     private Object convertNumber(Object arg) {
-        return DfTypeUtil.toNumber(arg, propertyType);
+        return DfTypeUtil.toNumber(arg, _propertyType);
     }
 
     private Object convertDate(Object arg) {
-        if (propertyType == java.util.Date.class) {
+        if (_propertyType == java.util.Date.class) {
             return DfTypeUtil.toDate(arg);
-        } else if (propertyType == Timestamp.class) {
+        } else if (_propertyType == Timestamp.class) {
             return DfTypeUtil.toTimestamp(arg);
-        } else if (propertyType == java.sql.Date.class) {
+        } else if (_propertyType == java.sql.Date.class) {
             return DfTypeUtil.toDate(arg);
-        } else if (propertyType == Time.class) {
+        } else if (_propertyType == Time.class) {
             return DfTypeUtil.toTime(arg);
         }
         return arg;
     }
 
     private Object convertWithString(Object arg) {
-        if (stringConstructor != null) {
-            return DfReflectionUtil.newInstance(stringConstructor, new Object[] { arg });
+        if (_stringConstructor != null) {
+            return DfReflectionUtil.newInstance(_stringConstructor, new Object[] { arg });
         }
-        if (valueOfMethod != null) {
-            return DfReflectionUtil.invoke(valueOfMethod, null, new Object[] { arg });
+        if (_valueOfMethod != null) {
+            return DfReflectionUtil.invoke(_valueOfMethod, null, new Object[] { arg });
         }
         return arg;
     }
@@ -287,13 +287,13 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     public final String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("propertyName=");
-        buf.append(propertyName);
+        buf.append(_propertyName);
         buf.append(",propertyType=");
-        buf.append(propertyType.getName());
+        buf.append(_propertyType.getName());
         buf.append(",readMethod=");
-        buf.append(readMethod != null ? readMethod.getName() : "null");
+        buf.append(_readMethod != null ? _readMethod.getName() : "null");
         buf.append(",writeMethod=");
-        buf.append(writeMethod != null ? writeMethod.getName() : "null");
+        buf.append(_writeMethod != null ? _writeMethod.getName() : "null");
         return buf.toString();
     }
 }

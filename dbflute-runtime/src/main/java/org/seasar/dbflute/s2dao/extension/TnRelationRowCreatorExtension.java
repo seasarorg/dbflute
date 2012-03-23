@@ -164,8 +164,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     protected void setValue(TnRelationRowCreationResource res, TnPropertyMapping mapping, DBMeta dbmeta, Object value) {
         final String propertyName = mapping.getPropertyName();
-        if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
-            dbmeta.setupEntityProperty(propertyName, res.getRow(), value);
+        if (dbmeta != null && dbmeta.hasEntityPropertyWriter(propertyName)) {
+            dbmeta.writeEntityProperty(propertyName, res.getRow(), value);
         } else {
             final DfPropertyAccessor accessor = mapping.getPropertyAccessor();
             accessor.setValue(res.getRow(), value);

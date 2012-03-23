@@ -158,7 +158,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
             final Class<?> propertyType = columnInfo.getPropertyType();
             if (attr == null) {
                 if (List.class.isAssignableFrom(propertyType)) {
-                    dbmeta.setupEntityProperty(propertyName, entity, DfCollectionUtil.newArrayList());
+                    dbmeta.writeEntityProperty(propertyName, entity, DfCollectionUtil.newArrayList());
                 }
                 continue;
             }
@@ -171,7 +171,7 @@ public abstract class GreatWallOfOracleType implements ValueType {
             } else {
                 mappedValue = adjustScalarToPropertyValue(attr, propertyType);
             }
-            dbmeta.setupEntityProperty(propertyName, entity, mappedValue);
+            dbmeta.writeEntityProperty(propertyName, entity, mappedValue);
         }
         return entity;
     }

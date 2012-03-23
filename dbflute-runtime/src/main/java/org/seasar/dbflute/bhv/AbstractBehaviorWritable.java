@@ -436,12 +436,12 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (dbmeta.hasVersionNo()) {
             final ColumnInfo columnInfo = dbmeta.getVersionNoColumnInfo();
             final String propertyName = columnInfo.getPropertyName();
-            dbmeta.setupEntityProperty(propertyName, entity, InsertOption.VERSION_NO_FIRST_VALUE);
+            dbmeta.writeEntityProperty(propertyName, entity, InsertOption.VERSION_NO_FIRST_VALUE);
         }
         if (dbmeta.hasUpdateDate()) {
             final ColumnInfo columnInfo = dbmeta.getUpdateDateColumnInfo();
             final String propertyName = columnInfo.getPropertyName();
-            dbmeta.setupEntityProperty(propertyName, entity, ResourceContext.getAccessTimestamp());
+            dbmeta.writeEntityProperty(propertyName, entity, ResourceContext.getAccessTimestamp());
         }
     }
 

@@ -203,16 +203,26 @@ public interface ConditionBean extends PagingBean {
     String toDisplaySql();
 
     // ===================================================================================
-    //                                                                        Basic Status
-    //                                                                        ============
+    //                                                                       Meta Handling
+    //                                                                       =============
     /**
-     * Does it have where clauses? <br />
-     * If this condition-bean has union queries,
-     * all unions must have each where clauses for true. <br />
-     * However, where clauses in in-line views is NOT contained.
+     * Does it have where clauses? (contains in-line view of base table) <br />
+     * If this condition-bean has union queries, all unions must have each where clauses for true. <br />
+     * Because union without where clause selects all records. <br />
+     * However, where clauses in in-line views of outer-join tables have no influence. <br />
+     * (Here "where clause" means selecting elements that can change result count)
      * @return The determination, true or false.
      */
     boolean hasWhereClause();
+
+    /**
+     * Clear where clauses. (contains in-line view of base table) <br />
+     * If this condition-bean has union queries, all unions (themselves) also are cleared. <br />
+     * Because union without where clause is a total nothing. <br />
+     * However, where clauses in in-line views of outer-join tables have no influence. <br />
+     * (Here "where clause" means selecting elements that can change result count)
+     */
+    void clearWhereClause();
 
     /**
      * Does it have order-by clauses? <br />
@@ -220,6 +230,8 @@ public interface ConditionBean extends PagingBean {
      * @return The determination, true or false.
      */
     boolean hasOrderByClause();
+
+    // clearOrderBy() is defined at OrderByBean
 
     /**
      * Has union query or union all query?

@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.dbmeta.hierarchy.basic;
 
+import java.util.List;
+
 /**
  * @author jflute
  * @param <SOURCE_ROW> The type of source.
@@ -23,10 +25,9 @@ public class HierarchySourceEntityListIterator<SOURCE_ROW> extends HierarchySour
 
     /**
      * Constructor.
-     * 
      * @param sourceRowList The list of source row. (NotNull)
      */
-    public HierarchySourceEntityListIterator(java.util.List<SOURCE_ROW> sourceRowList) {
+    public HierarchySourceEntityListIterator(List<SOURCE_ROW> sourceRowList) {
         super(sourceRowList, new HierarchySourceRowSetupper<SOURCE_ROW>() {
             public org.seasar.dbflute.dbmeta.hierarchy.HierarchySourceRow setup(SOURCE_ROW source) {
                 return new HierarchySourceEntityRow(source);

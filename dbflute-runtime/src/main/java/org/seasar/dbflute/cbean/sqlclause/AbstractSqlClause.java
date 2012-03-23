@@ -1518,10 +1518,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public boolean hasWhereClause() {
+    public boolean hasWhereClauseOnBase() {
         return _whereList != null && !_whereList.isEmpty();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void clearWhereClauseOnBase() {
+        if (_whereList != null) {
+            _whereList.clear();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       In-line Where
+    //                                                                       =============
     // -----------------------------------------------------
     //                                In-line for Base Table
     //                                ----------------------
@@ -1559,8 +1571,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _baseTableInlineWhereList;
     }
 
-    protected boolean hasBaseTableInlineWhereClause() {
+    public boolean hasBaseTableInlineWhereClause() {
         return _baseTableInlineWhereList != null && !_baseTableInlineWhereList.isEmpty();
+    }
+
+    public void clearBaseTableInlineWhereClause() {
+        if (_baseTableInlineWhereList != null) {
+            _baseTableInlineWhereList.clear();
+        }
     }
 
     // -----------------------------------------------------
@@ -1611,6 +1629,32 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (!getOuterJoinMap().containsKey(aliasName)) {
             String msg = "The alias name have not registered in outer join yet: " + aliasName;
             throw new IllegalStateException(msg);
+        }
+    }
+
+    public boolean hasOuterJoinInlineWhereClause() {
+        if (_outerJoinMap == null) {
+            return false;
+        }
+        for (Entry<String, LeftOuterJoinInfo> entry : _outerJoinMap.entrySet()) {
+            final LeftOuterJoinInfo joinInfo = entry.getValue();
+            if (joinInfo.hasInlineOrOnClause()) { // contains on-clause condition
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void clearOuterJoinInlineWhereClause() {
+        if (_outerJoinMap == null) {
+            return;
+        }
+        for (Entry<String, LeftOuterJoinInfo> entry : _outerJoinMap.entrySet()) {
+            final LeftOuterJoinInfo joinInfo = entry.getValue();
+            if (joinInfo.hasInlineOrOnClause()) {
+                joinInfo.getInlineWhereClauseList().clear();
+                joinInfo.getAdditionalOnClauseList().clear(); // contains on-clause condition
+            }
         }
     }
 
@@ -1880,6 +1924,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public boolean hasUnionQuery() {
         return _unionQueryInfoList != null && !_unionQueryInfoList.isEmpty();
+    }
+
+    public void clearUnionQuery() {
+        if (_unionQueryInfoList != null) {
+            _unionQueryInfoList.clear();
+        }
     }
 
     protected static class UnionQueryInfo {

@@ -567,7 +567,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
             msg = msg + " table=" + entity.getTableDbName() + " column=" + columnDbName;
             throw new IllegalStateException(msg);
         }
-        invoke(entity.getDBMeta().findColumnInfo(columnDbName).writer(), entity, new Object[] { columnValue });
+        entity.getDBMeta().findColumnInfo(columnDbName).write(entity, columnValue);
     }
 
     protected void injectColumnValueMapToDestination(Entity entity, final Map<String, Object> columnValueMap) {
@@ -586,8 +586,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         invoke(method, entity, new Object[] { foreignEntity });
     }
 
-    protected void injectReferrerList(Entity entity, ReferrerInfo referrerInfo, java.util.List<Entity> referrerList) {
-        invoke(referrerInfo.writer(), entity, new Object[] { referrerList });
+    protected void injectReferrerList(Entity entity, ReferrerInfo referrerInfo, List<Entity> referrerList) {
+        referrerInfo.write(entity, referrerList);
     }
 
     protected void injectForeignPrimaryKey(Entity foreignEntity, Map<String, Object> foreigPrimaryKeyMap) {

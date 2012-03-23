@@ -88,10 +88,6 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
-    public boolean hasEntityPropertySetupper(String propertyName) {
-        return false;
-    }
-
     public boolean hasPrimaryKey() {
         return false;
     }
@@ -104,7 +100,19 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
-    public void setupEntityProperty(String propertyName, Object entity, Object value) {
+    public boolean hasEntityPropertyReader(String propertyName) {
+        return false;
+    }
+
+    public Object readEntityProperty(String propertyName, Object entity) {
+        return null;
+    }
+
+    public boolean hasEntityPropertyWriter(String propertyName) {
+        return false;
+    }
+
+    public void writeEntityProperty(String propertyName, Object entity, Object value) {
     }
 
     @Override
@@ -125,5 +133,4 @@ public class MockDBMeta extends AbstractDBMeta {
     public Map<String, Object> extractAllColumnMap(Entity entity) {
         return null;
     }
-
 }

@@ -909,7 +909,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public boolean hasWhereClause() {
-        if (!getSqlClause().hasWhereClause()) {
+        if (!getSqlClause().hasWhereClauseOnBase() && !getSqlClause().hasBaseTableInlineWhereClause()) {
             return false;
         }
         // mainCB has clauses here
@@ -923,6 +923,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
             }
         }
         return true; // means all unions have clauses
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void clearWhereClause() {
+        getSqlClause().clearWhereClauseOnBase();
+        getSqlClause().clearBaseTableInlineWhereClause();
+        getSqlClause().clearUnionQuery();
     }
 
     /**

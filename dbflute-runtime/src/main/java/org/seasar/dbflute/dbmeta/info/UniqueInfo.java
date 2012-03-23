@@ -16,7 +16,6 @@
 package org.seasar.dbflute.dbmeta.info;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -46,15 +45,14 @@ public class UniqueInfo {
     }
 
     // ===================================================================================
-    //                                                                         Easy-to-Use
-    //                                                                         ===========
+    //                                                                    Column Existence
+    //                                                                    ================
     public boolean containsColumn(ColumnInfo columnInfo) {
-        return containsColumn(columnInfo.getColumnDbName());
+        return doContainsColumn(columnInfo.getColumnDbName());
     }
 
-    protected boolean containsColumn(String columnName) {
-        for (final Iterator<ColumnInfo> ite = _uniqueColumnList.iterator(); ite.hasNext();) {
-            final ColumnInfo columnInfo = ite.next();
+    protected boolean doContainsColumn(String columnName) {
+        for (ColumnInfo columnInfo : _uniqueColumnList) {
             if (columnInfo.getColumnDbName().equals(columnName)) {
                 return true;
             }
@@ -109,8 +107,8 @@ public class UniqueInfo {
     }
 
     /**
-     * Get the list of unique column.
-     * @return The list of unique column. (NotNull)
+     * Get the snapshot list of unique column.
+     * @return The snapshot list of unique column. (NotNull)
      */
     public List<ColumnInfo> getUniqueColumnList() {
         return new ArrayList<ColumnInfo>(_uniqueColumnList); // as snapshot

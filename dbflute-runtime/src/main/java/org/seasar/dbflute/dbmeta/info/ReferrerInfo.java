@@ -43,6 +43,8 @@ public class ReferrerInfo implements RelationInfo {
     protected final Map<ColumnInfo, ColumnInfo> _referrerLocalColumnInfoMap;
     protected final boolean _oneToOne;
     protected final String _reversePropertyName;
+    protected final Method _reader;
+    protected final Method _writer;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -66,18 +68,49 @@ public class ReferrerInfo implements RelationInfo {
         }
         _oneToOne = oneToOne;
         _reversePropertyName = reversePropertyName;
+        _reader = findReader();
+        _writer = findWriter();
     }
 
     // ===================================================================================
-    //                                                                              Finder
-    //                                                                              ======
+    //                                                                    Column Existence
+    //                                                                    ================
+    public boolean containsLocalColumn(ColumnInfo localColumn) {
+        return doContainsLocalColumn(localColumn.getColumnDbName());
+    }
+
+    protected boolean doContainsLocalColumn(String columnName) {
+        for (ColumnInfo columnInfo : _localReferrerColumnInfoMap.keySet()) {
+            if (columnInfo.getColumnDbName().equals(columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean containsReferrerColumn(ColumnInfo referrerColumn) {
+        return doContainsReferrerColumn(referrerColumn.getColumnDbName());
+    }
+
+    protected boolean doContainsReferrerColumn(String columnName) {
+        for (ColumnInfo columnInfo : _referrerLocalColumnInfoMap.keySet()) {
+            if (columnInfo.getColumnDbName().equals(columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                      Column Mapping
+    //                                                                      ==============
     public ColumnInfo findLocalByReferrer(String referrerColumnDbName) {
         final ColumnInfo keyColumnInfo = _referrerDBMeta.findColumnInfo(referrerColumnDbName);
         final ColumnInfo resultColumnInfo = (ColumnInfo) _referrerLocalColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by referrerColumnDbName in referrerLocalColumnInfoMap:";
-            msg = msg + " referrerColumnDbName=" + referrerColumnDbName + " referrerLocalColumnInfoMap="
-                    + _referrerLocalColumnInfoMap;
+            msg = msg + " referrerColumnDbName=" + referrerColumnDbName;
+            msg = msg + " referrerLocalColumnInfoMap=" + _referrerLocalColumnInfoMap;
             throw new IllegalArgumentException(msg);
         }
         return resultColumnInfo;
@@ -88,8 +121,8 @@ public class ReferrerInfo implements RelationInfo {
         final ColumnInfo resultColumnInfo = (ColumnInfo) _localReferrerColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by localColumnDbName in localReferrerColumnInfoMap:";
-            msg = msg + " localColumnDbName=" + localColumnDbName + " localReferrerColumnInfoMap="
-                    + _localReferrerColumnInfoMap;
+            msg = msg + " localColumnDbName=" + localColumnDbName;
+            msg = msg + " localReferrerColumnInfoMap=" + _localReferrerColumnInfoMap;
             throw new IllegalArgumentException(msg);
         }
         return resultColumnInfo;
@@ -98,12 +131,51 @@ public class ReferrerInfo implements RelationInfo {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                                  Read
+    //                                                  ----
+    /**
+     * Read the value to the entity.
+     * @param localEntity The local entity of this column to read. (NotNull)
+     * @return The read instance of referrer entity. (NullAllowed)
+     */
     @SuppressWarnings("unchecked")
     public <PROPERTY extends List<? extends Entity>> PROPERTY read(Entity localEntity) {
         return (PROPERTY) invokeMethod(reader(), localEntity, new Object[] {});
     }
 
+    /**
+     * Get the read method for reflection.
+     * @return The read method, cached in this instance. (NotNull)
+     */
     public Method reader() {
+        return _reader;
+    }
+
+    // -----------------------------------------------------
+    //                                                 Write
+    //                                                 -----
+    /**
+     * Write the value to the entity.
+     * @param localEntity The local entity of this column to write. (NotNull)
+     * @param referrerEntityList The written list of referrer entity. (NullAllowed: if null, null value is written)
+     */
+    public void write(Entity localEntity, List<? extends Entity> referrerEntityList) {
+        invokeMethod(writer(), localEntity, new Object[] { referrerEntityList });
+    }
+
+    /**
+     * Get the write method for reflection.
+     * @return The writer method, cached in this instance. (NotNull)
+     */
+    public Method writer() {
+        return _writer;
+    }
+
+    // -----------------------------------------------------
+    //                                                Finder
+    //                                                ------
+    protected Method findReader() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
         final String methodName = buildAccessorName("get");
         final Method method = findMethod(localType, methodName, new Class[] {});
@@ -115,11 +187,7 @@ public class ReferrerInfo implements RelationInfo {
         return method;
     }
 
-    public void write(Entity localEntity, List<? extends Entity> referrerEntityList) {
-        invokeMethod(writer(), localEntity, new Object[] { referrerEntityList });
-    }
-
-    public Method writer() {
+    protected Method findWriter() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
         final String methodName = buildAccessorName("set");
         final Method method = findMethod(localType, methodName, new Class[] { List.class });
@@ -135,9 +203,20 @@ public class ReferrerInfo implements RelationInfo {
         return prefix + initCap(_referrerPropertyName);
     }
 
+    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
+    }
+
+    // -----------------------------------------------------
+    //                                               Invoker
+    //                                               -------
+    protected Object invokeMethod(Method method, Object target, Object[] args) {
+        return DfReflectionUtil.invoke(method, target, args);
+    }
+
     // ===================================================================================
-    //                                                                 Relation Implements
-    //                                                                 ===================
+    //                                                             Relation Implementation
+    //                                                             =======================
     public String getRelationPropertyName() {
         return getReferrerPropertyName();
     }
@@ -159,14 +238,6 @@ public class ReferrerInfo implements RelationInfo {
     //                                                                      ==============
     protected String initCap(final String name) {
         return Srl.initCap(name);
-    }
-
-    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
-        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
-    }
-
-    protected Object invokeMethod(Method method, Object target, Object[] args) {
-        return DfReflectionUtil.invoke(method, target, args);
     }
 
     protected void assertObjectNotNull(String variableName, Object value) {
@@ -239,16 +310,16 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     /**
-     * Get the read-only map, key is a local column info, value is a referrer column info.
-     * @return The read-only map. (NotNull)
+     * Get the snapshot map, key is a local column info, value is a referrer column info.
+     * @return The snapshot map. (NotNull)
      */
     public Map<ColumnInfo, ColumnInfo> getLocalReferrerColumnInfoMap() {
         return new LinkedHashMap<ColumnInfo, ColumnInfo>(_localReferrerColumnInfoMap); // as snapshot
     }
 
     /**
-     * Get the read-only map, key is a referrer column info, value is a column column info.
-     * @return The read-only map. (NotNull)
+     * Get the snapshot map, key is a referrer column info, value is a column column info.
+     * @return The snapshot map. (NotNull)
      */
     public Map<ColumnInfo, ColumnInfo> getReferrerLocalColumnInfoMap() {
         return new LinkedHashMap<ColumnInfo, ColumnInfo>(_referrerLocalColumnInfoMap); // as snapshot

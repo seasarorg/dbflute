@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.dbmeta.hierarchy.basic;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchySourceColumn;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 
@@ -33,7 +34,7 @@ public class HierarchySourceEntityColumn implements HierarchySourceColumn {
         return columnInfo.getColumnDbName();
     }
 
-    public java.lang.reflect.Method findGetter() {
-        return columnInfo.reader();
+    public Object read(Entity entity) {
+        return columnInfo.read(entity);
     }
 }

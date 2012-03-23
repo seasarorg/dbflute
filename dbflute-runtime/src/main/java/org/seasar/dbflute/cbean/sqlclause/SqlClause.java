@@ -333,15 +333,24 @@ public interface SqlClause {
     void exchangeFirstWhereClauseForLastOne();
 
     /**
-     * Does it have where clauses? <br />
-     * In-line where clause is NOT contained.
+     * Does it have where clauses on base query? <br />
+     * However, where clauses in in-line views and union queries have no influence.
      * @return The determination, true or false.
      */
-    boolean hasWhereClause();
+    boolean hasWhereClauseOnBase();
+
+    /**
+     * Clear where clauses on base query. <br />
+     * However, where clauses in in-line views and union queries have no influence.
+     */
+    void clearWhereClauseOnBase();
 
     // ===================================================================================
-    //                                                                         InlineWhere
-    //                                                                         ===========
+    //                                                                       In-line Where
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                In-line for Base Table
+    //                                ----------------------
     void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
             ColumnFunctionCipher cipher);
 
@@ -350,6 +359,13 @@ public interface SqlClause {
 
     void registerBaseTableInlineWhereClause(String value);
 
+    boolean hasBaseTableInlineWhereClause();
+
+    void clearBaseTableInlineWhereClause();
+
+    // -----------------------------------------------------
+    //                                In-line for Outer Join
+    //                                ----------------------
     void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName, ConditionKey key,
             ConditionValue value, ColumnFunctionCipher cipher, boolean onClause);
 
@@ -357,6 +373,10 @@ public interface SqlClause {
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option, boolean onClause);
 
     void registerOuterJoinInlineWhereClause(String foreignAliasName, String clause, boolean onClause);
+
+    boolean hasOuterJoinInlineWhereClause();
+
+    void clearOuterJoinInlineWhereClause();
 
     // ===================================================================================
     //                                                                        OrScopeQuery
@@ -435,6 +455,8 @@ public interface SqlClause {
     void registerUnionQuery(String unionClause, boolean unionAll);
 
     boolean hasUnionQuery();
+
+    void clearUnionQuery();
 
     // ===================================================================================
     //                                                                          FetchScope

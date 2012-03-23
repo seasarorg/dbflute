@@ -69,6 +69,8 @@ public class ColumnInfo {
     protected final List<String> _foreignPropList;
     protected final List<String> _referrerPropList;
     protected final ClassificationMeta _classificationMeta;
+    protected final Method _reader;
+    protected final Method _writer;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -83,36 +85,89 @@ public class ColumnInfo {
         assertObjectNotNull("columnSqlName", columnSqlName);
         assertObjectNotNull("propertyName", propertyName);
         assertObjectNotNull("propertyType", propertyType);
-        this._dbmeta = dbmeta;
-        this._columnDbName = columnDbName;
-        this._columnSqlName = new ColumnSqlName(columnSqlName);
-        this._columnSynonym = columnSynonym;
-        this._columnAlias = columnAlias;
-        this._notNull = notNull;
-        this._propertyName = propertyName;
-        this._propertyType = propertyType;
-        this._primary = primary;
-        this._autoIncrement = autoIncrement;
-        this._columnSize = columnSize;
-        this._columnDbType = columnDbType;
-        this._decimalDigits = decimalDigits;
-        this._commonColumn = commonColumn;
-        this._optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
-        this._columnComment = columnComment;
-        this._foreignPropList = foreignPropList != null ? foreignPropList : EMPTY_LIST;
-        this._referrerPropList = referrerPropList != null ? referrerPropList : EMPTY_LIST;
-        this._classificationMeta = classificationMeta;
+        _dbmeta = dbmeta;
+        _columnDbName = columnDbName;
+        _columnSqlName = new ColumnSqlName(columnSqlName);
+        _columnSynonym = columnSynonym;
+        _columnAlias = columnAlias;
+        _notNull = notNull;
+        _propertyName = propertyName;
+        _propertyType = propertyType;
+        _primary = primary;
+        _autoIncrement = autoIncrement;
+        _columnSize = columnSize;
+        _columnDbType = columnDbType;
+        _decimalDigits = decimalDigits;
+        _commonColumn = commonColumn;
+        _optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
+        _columnComment = columnComment;
+        _foreignPropList = foreignPropList != null ? foreignPropList : EMPTY_LIST;
+        _referrerPropList = referrerPropList != null ? referrerPropList : EMPTY_LIST;
+        _classificationMeta = classificationMeta;
+        _reader = findReader();
+        _writer = findWriter();
     }
 
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                                  Read
+    //                                                  ----
+    /**
+     * Read the value from the entity.
+     * @param entity The target entity of this column to read. (NotNull)
+     * @param <PROPERTY> The type of the property.
+     * @return The read value. (NullAllowed)
+     */
     @SuppressWarnings("unchecked")
     public <PROPERTY> PROPERTY read(Entity entity) {
-        return (PROPERTY) invokeMethod(reader(), entity, new Object[] {});
+        return (PROPERTY) _dbmeta.readEntityProperty(_propertyName, entity);
     }
 
+    /**
+     * Get the read method for reflection.
+     * @return The read method, cached in this instance. (NotNull)
+     */
     public Method reader() {
+        return _reader;
+    }
+
+    // -----------------------------------------------------
+    //                                                 Write
+    //                                                 -----
+    /**
+     * Write the value to the entity.
+     * @param entity The target entity of this column to write. (NotNull)
+     * @param value The written value. (NullAllowed: if null, null value is written)
+     */
+    public void write(Entity entity, Object value) {
+        _dbmeta.writeEntityProperty(_propertyName, entity, value);
+    }
+
+    /**
+     * Get the write method for reflection.
+     * @return The writer method, cached in this instance. (NotNull)
+     */
+    public Method writer() {
+        return _writer;
+    }
+
+    // -----------------------------------------------------
+    //                                               Generic
+    //                                               -------
+    /**
+     * Get the generic type of property type for list property.
+     * @return The type instance. (NullAllowed: when not list type)
+     */
+    public Class<?> getGenericType() {
+        return DfReflectionUtil.getGenericType(reader().getGenericReturnType());
+    }
+
+    // -----------------------------------------------------
+    //                                                Finder
+    //                                                ------
+    protected Method findReader() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
         final String methodName = buildAccessorName("get");
         final Method method = findMethod(entityType, methodName, new Class<?>[] {});
@@ -124,34 +179,25 @@ public class ColumnInfo {
         return method;
     }
 
-    public void write(Entity entity, Object value) {
-        final Object converted = toPropretyType(value);
-        invokeMethod(writer(), entity, new Object[] { converted });
-    }
-
-    public Method writer() {
+    protected Method findWriter() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
         final String methodName = buildAccessorName("set");
-        final Method method = findMethod(entityType, buildAccessorName("set"), new Class<?>[] { _propertyType });
+        final Method method = findMethod(entityType, methodName, new Class<?>[] { _propertyType });
         if (method == null) {
             String msg = "Failed to find the method by the name:";
             msg = msg + " methodName=" + methodName;
             msg = msg + " propertyType=" + _propertyType;
             throw new IllegalStateException(msg);
         }
-        return findMethod(_dbmeta.getEntityType(), buildAccessorName("set"), new Class<?>[] { _propertyType });
+        return method;
     }
 
     protected String buildAccessorName(String prefix) {
         return prefix + initCap(_propertyName);
     }
 
-    /**
-     * Get the generic type of property type for list property.
-     * @return The type instance. (NullAllowed: when not list type)
-     */
-    public Class<?> getGenericType() {
-        return DfReflectionUtil.getGenericType(reader().getGenericReturnType());
+    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
     }
 
     // ===================================================================================
@@ -213,14 +259,6 @@ public class ColumnInfo {
     //                                                                      ==============
     protected String initCap(final String name) {
         return Srl.initCap(name);
-    }
-
-    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
-        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
-    }
-
-    protected Object invokeMethod(Method method, Object target, Object[] args) {
-        return DfReflectionUtil.invokeForcedly(method, target, args);
     }
 
     protected void assertObjectNotNull(String variableName, Object value) {

@@ -295,8 +295,8 @@ public interface DBMeta {
     Integer getSequenceCacheSize();
 
     // ===================================================================================
-    //                                                                Optimistic Lock Info
-    //                                                                ====================
+    //                                                                 OptimisticLock Info
+    //                                                                 ===================
     /**
      * Does the table have a column for version no?
      * @return The determination, true or false.
@@ -322,8 +322,8 @@ public interface DBMeta {
     ColumnInfo getUpdateDateColumnInfo();
 
     // ===================================================================================
-    //                                                                  Common Column Info
-    //                                                                  ==================
+    //                                                                   CommonColumn Info
+    //                                                                   =================
     /**
      * Does the table have common columns?
      * @return The determination, true or false.
@@ -420,8 +420,8 @@ public interface DBMeta {
     Entity newEntity();
 
     // ===================================================================================
-    //                                                                     Entity Handling
-    //                                                                     ===============
+    //                                                                   Map Communication
+    //                                                                   =================
     // -----------------------------------------------------
     //                                                Accept
     //                                                ------
@@ -459,37 +459,75 @@ public interface DBMeta {
     Map<String, Object> extractAllColumnMap(Entity entity);
 
     // ===================================================================================
-    //                                                               Entity Property Setup
-    //                                                               =====================
+    //                                                                    Property Gateway
+    //                                                                    ================
     // It's very INTERNAL!
+    // -----------------------------------------------------
+    //                                                Reader
+    //                                                ------
     /**
-     * Does this table have the set-upper of entity property by the name of property? <br />
+     * Does this table have the reader of entity property by the name of property? <br />
      * Comparing is so flexible. {Ignore cases and underscore}
      * @param propertyName The name of the property. (NotNull)
      * @return The determination, true or false.
      */
-    boolean hasEntityPropertySetupper(String propertyName);
+    boolean hasEntityPropertyReader(String propertyName);
 
     /**
-     * Set up entity property. (for INTERNAL)
+     * Read the value of the entity property. (for INTERNAL)
      * @param propertyName The name of the property. (NotNull)
      * @param entity The entity for the property. (NotNull)
-     * @param value The value of the property. (NullAllowed)
+     * @return The read value of the property. (NullAllowed)
      */
-    void setupEntityProperty(String propertyName, Object entity, Object value);
+    Object readEntityProperty(String propertyName, Object entity);
 
     /**
-     * The set-upper of entity property. <br />
+     * The reader of entity property. <br />
      * This class is for Internal. Don't use this!
      * @param <ENTITY_TYPE> The type of entity.
      */
-    public interface Eps<ENTITY_TYPE extends Entity> {
+    public interface Epr<ENTITY_TYPE extends Entity> {
 
         /**
-         * @param entity Entity. (NotNull)
-         * @param value Value. (NullAllowed)
+         * Read the property value from the entity.
+         * @param entity The target entity to read. (NotNull)
+         * @return The read value. (NullAllowed)
          */
-        void setup(ENTITY_TYPE entity, Object value);
+        Object read(ENTITY_TYPE entity);
+    }
+
+    // -----------------------------------------------------
+    //                                                Writer
+    //                                                ------
+    /**
+     * Does this table have the writer of entity property by the name of property? <br />
+     * Comparing is so flexible. {Ignore cases and underscore}
+     * @param propertyName The name of the property. (NotNull)
+     * @return The determination, true or false.
+     */
+    boolean hasEntityPropertyWriter(String propertyName);
+
+    /**
+     * Write the value of the entity property. (for INTERNAL)
+     * @param propertyName The name of the property. (NotNull)
+     * @param entity The entity for the property. (NotNull)
+     * @param value The written value of the property. (NullAllowed)
+     */
+    void writeEntityProperty(String propertyName, Object entity, Object value);
+
+    /**
+     * The writer of entity property. <br />
+     * This class is for Internal. Don't use this!
+     * @param <ENTITY_TYPE> The type of entity.
+     */
+    public interface Epw<ENTITY_TYPE extends Entity> {
+
+        /**
+         * Write the property value to the entity.
+         * @param entity The target entity to write. (NotNull)
+         * @param value The written value. (NullAllowed)
+         */
+        void write(ENTITY_TYPE entity, Object value);
     }
 
     // ===================================================================================

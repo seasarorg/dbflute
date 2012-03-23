@@ -273,32 +273,54 @@ public class ${myClassName} extends AbstractDBMeta {
     public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
 
     // ===================================================================================
-    //                                                                     Entity Handling
-    //                                                                     ===============  
+    //                                                                   Map Communication
+    //                                                                   =================
     public void acceptPrimaryKeyMap(Entity e, Map<String, ? extends Object> m)
-    { doAcceptPrimaryKeyMap((${myExtendedObjectClassName})e, m, _epsMap); }
+    { doAcceptPrimaryKeyMap((${myExtendedObjectClassName})e, m, _epwMap); }
     public void acceptAllColumnMap(Entity e, Map<String, ? extends Object> m)
-    { doAcceptAllColumnMap((${myExtendedObjectClassName})e, m, _epsMap); }
+    { doAcceptAllColumnMap((${myExtendedObjectClassName})e, m, _epwMap); }
     public Map<String, Object> extractPrimaryKeyMap(Entity e) { return doExtractPrimaryKeyMap(e); }
     public Map<String, Object> extractAllColumnMap(Entity e) { return doExtractAllColumnMap(e); }
 
     // ===================================================================================
-    //                                                               Entity Property Setup
-    //                                                               =====================
+    //                                                                    Property Gateway
+    //                                                                    ================
     // It's very INTERNAL!
-    protected final Map<String, Eps<${myExtendedObjectClassName}>> _epsMap = StringKeyMap.createAsFlexibleConcurrent();
+    // -----------------------------------------------------
+    //                                                Reader
+    //                                                ------
+    protected final Map<String, Epr<${myExtendedObjectClassName}>> _eprMap = StringKeyMap.createAsFlexibleConcurrent();
     {
 #foreach ($col in $table.columns)
-        setupEps(_epsMap, new Eps${col.javaName}(), column${col.javaBeansRulePropertyNameInitCap}());
+        setupEpr(_eprMap, new Epr${col.javaName}(), column${col.javaBeansRulePropertyNameInitCap}());
 #end
     }
 
-    public boolean hasEntityPropertySetupper(String propertyName) { return _epsMap.containsKey(propertyName); }
-    public void setupEntityProperty(String propertyName, Object entity, Object value)
-    { findEps(_epsMap, propertyName).setup((${myExtendedObjectClassName})entity, value); }
+    public boolean hasEntityPropertyReader(String propertyName) { return _eprMap.containsKey(propertyName); }
+    public Object readEntityProperty(String propertyName, Object entity)
+    { return findEpr(_eprMap, propertyName).read((${myExtendedObjectClassName})entity); }
 
 #foreach ($col in $table.columns)
-#set ($setupperClassName = "Eps${col.javaName}")
+#set ($setupperClassName = "Epr${col.javaName}")
+    public class ${setupperClassName} implements Epr<${myExtendedObjectClassName}>
+    { public Object read(${myExtendedObjectClassName} e) { return e.get${col.javaName}(); } }
+#end
+    // -----------------------------------------------------
+    //                                                Writer
+    //                                                ------
+    protected final Map<String, Epw<${myExtendedObjectClassName}>> _epwMap = StringKeyMap.createAsFlexibleConcurrent();
+    {
+#foreach ($col in $table.columns)
+        setupEpw(_epwMap, new Epw${col.javaName}(), column${col.javaBeansRulePropertyNameInitCap}());
+#end
+    }
+
+    public boolean hasEntityPropertyWriter(String propertyName) { return _epwMap.containsKey(propertyName); }
+    public void writeEntityProperty(String propertyName, Object entity, Object value)
+    { findEpw(_epwMap, propertyName).write((${myExtendedObjectClassName})entity, value); }
+
+#foreach ($col in $table.columns)
+#set ($setupperClassName = "Epw${col.javaName}")
 #if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
     public class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
     { public void setup(${myExtendedObjectClassName} e, Object v) {
@@ -314,23 +336,23 @@ public class ${myClassName} extends AbstractDBMeta {
 ## (Integer, Long and BigDecimal are prior)
 ## - - - - - - - - - -/
 #if ($col.isJavaNativeNumberObject())
-    public class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
+    public class ${setupperClassName} implements Epw<${myExtendedObjectClassName}>
 #if ($col.isJavaNativeInteger())
-    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(cti(v)); } }
+    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(cti(v)); } }
 #elseif ($col.isJavaNativeLong())
-    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctl(v)); } }
+    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctl(v)); } }
 #elseif ($col.isJavaNativeBigDecimal())
-    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctb(v)); } }
+    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctb(v)); } }
 #else
-    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctn(v, ${col.javaNative}.class)); } }
+    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctn(v, ${col.javaNative}.class)); } }
 #end
 #else
-    public static class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
+    public static class ${setupperClassName} implements Epw<${myExtendedObjectClassName}>
 #if ($col.isJavaNativeUtilList())
     { @SuppressWarnings("unchecked")
-    public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
+    public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
 #else
-    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
+    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
 #end
 #end
 #end

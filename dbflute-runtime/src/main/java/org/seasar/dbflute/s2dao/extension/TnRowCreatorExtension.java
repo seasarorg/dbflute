@@ -139,8 +139,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                     mapping = entry.getValue();
                     propertyName = mapping.getPropertyName();
                     selectedValue = getValue(rs, columnName, mapping.getValueType(), selectIndexMap);
-                    if (dbmeta.hasEntityPropertySetupper(propertyName)) {
-                        dbmeta.setupEntityProperty(propertyName, row, selectedValue);
+                    if (dbmeta.hasEntityPropertyWriter(propertyName)) {
+                        dbmeta.writeEntityProperty(propertyName, row, selectedValue);
                     } else {
                         mapping.getPropertyAccessor().setValue(row, selectedValue);
                     }

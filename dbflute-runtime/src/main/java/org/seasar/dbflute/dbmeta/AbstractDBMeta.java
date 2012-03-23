@@ -642,13 +642,13 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     // ===================================================================================
-    //                                                                     Entity Handling
-    //                                                                     ===============  
+    //                                                                   Map Communication
+    //                                                                   =================
     // -----------------------------------------------------
     //                                                Accept
     //                                                ------
     protected <ENTITY extends Entity> void doAcceptPrimaryKeyMap(ENTITY entity,
-            Map<String, ? extends Object> primaryKeyMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+            Map<String, ? extends Object> primaryKeyMap, Map<String, Epw<ENTITY>> entityPropertySetupperMap) {
         if (primaryKeyMap == null || primaryKeyMap.isEmpty()) {
             String msg = "The argument 'primaryKeyMap' should not be null or empty:";
             msg = msg + " primaryKeyMap=" + primaryKeyMap;
@@ -659,7 +659,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected <ENTITY extends Entity> void doAcceptAllColumnMap(ENTITY entity,
-            Map<String, ? extends Object> allColumnMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+            Map<String, ? extends Object> allColumnMap, Map<String, Epw<ENTITY>> entityPropertySetupperMap) {
         if (allColumnMap == null || allColumnMap.isEmpty()) {
             String msg = "The argument 'allColumnMap' should not be null or empty:";
             msg = msg + " allColumnMap=" + allColumnMap;
@@ -670,7 +670,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected <ENTITY extends Entity> void doConvertToEntity(ENTITY entity, Map<String, ? extends Object> columnMap,
-            List<ColumnInfo> columnInfoList, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+            List<ColumnInfo> columnInfoList, Map<String, Epw<ENTITY>> entityPropertySetupperMap) {
         entity.clearModifiedInfo();
         final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnMap);
         for (ColumnInfo columnInfo : columnInfoList) {
@@ -695,7 +695,7 @@ public abstract class AbstractDBMeta implements DBMeta {
                 } else {
                     value = analyzer.analyzeOther(propertyType);
                 }
-                findEps(entityPropertySetupperMap, propertyName).setup(entity, value);
+                findEpw(entityPropertySetupperMap, propertyName).write(entity, value);
             }
         }
     }
@@ -828,29 +828,60 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     // ===================================================================================
-    //                                                               Entity Property Setup
-    //                                                               =====================
+    //                                                                    Property Gateway
+    //                                                                    ================
     // It's very INTERNAL!
-    protected <ENTITY extends Entity> void setupEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap,
-            Eps<ENTITY> setupper, ColumnInfo columnInfo) {
-        String columnName = columnInfo.getColumnDbName();
-        String propertyName = columnInfo.getPropertyName();
-        registerEntityPropertySetupper(columnName, propertyName, setupper, entityPropertySetupperMap);
+    // -----------------------------------------------------
+    //                                                Reader
+    //                                                ------
+    protected <ENTITY extends Entity> void setupEpr(Map<String, Epr<ENTITY>> entityPropertyReaderMap,
+            Epr<ENTITY> setupper, ColumnInfo columnInfo) {
+        final String columnName = columnInfo.getColumnDbName();
+        final String propertyName = columnInfo.getPropertyName();
+        registerEntityPropertyReader(columnName, propertyName, setupper, entityPropertyReaderMap);
     }
 
-    protected <ENTITY extends Entity> void registerEntityPropertySetupper(String columnName, String propertyName,
-            Eps<ENTITY> setupper, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+    protected <ENTITY extends Entity> void registerEntityPropertyReader(String columnName, String propertyName,
+            Epr<ENTITY> setupper, Map<String, Epr<ENTITY>> entityPropertyReaderMap) {
         // Only column name is registered because the map must be flexible map.
-        entityPropertySetupperMap.put(columnName, setupper);
+        entityPropertyReaderMap.put(columnName, setupper);
     }
 
-    protected <ENTITY extends Entity> Eps<ENTITY> findEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap,
+    protected <ENTITY extends Entity> Epr<ENTITY> findEpr(Map<String, Epr<ENTITY>> entityPropertyReaderMap,
             String propertyName) {
-        Eps<ENTITY> setupper = entityPropertySetupperMap.get(propertyName);
+        final Epr<ENTITY> setupper = entityPropertyReaderMap.get(propertyName);
         if (setupper == null) {
             String msg = "The propertyName was not found in the map of set-upper of entity property:";
-            msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.keySet()="
-                    + entityPropertySetupperMap.keySet();
+            msg = msg + " propertyName=" + propertyName;
+            msg = msg + " _entityPropertyReaderMap.keySet()=" + entityPropertyReaderMap.keySet();
+            throw new IllegalStateException(msg);
+        }
+        return setupper;
+    }
+
+    // -----------------------------------------------------
+    //                                                Writer
+    //                                                ------
+    protected <ENTITY extends Entity> void setupEpw(Map<String, Epw<ENTITY>> entityPropertyWriterMap,
+            Epw<ENTITY> setupper, ColumnInfo columnInfo) {
+        final String columnName = columnInfo.getColumnDbName();
+        final String propertyName = columnInfo.getPropertyName();
+        registerEntityPropertyWriter(columnName, propertyName, setupper, entityPropertyWriterMap);
+    }
+
+    protected <ENTITY extends Entity> void registerEntityPropertyWriter(String columnName, String propertyName,
+            Epw<ENTITY> setupper, Map<String, Epw<ENTITY>> entityPropertyWriterMap) {
+        // Only column name is registered because the map must be flexible map.
+        entityPropertyWriterMap.put(columnName, setupper);
+    }
+
+    protected <ENTITY extends Entity> Epw<ENTITY> findEpw(Map<String, Epw<ENTITY>> entityPropertyWriterMap,
+            String propertyName) {
+        final Epw<ENTITY> setupper = entityPropertyWriterMap.get(propertyName);
+        if (setupper == null) {
+            String msg = "The propertyName was not found in the map of set-upper of entity property:";
+            msg = msg + " propertyName=" + propertyName;
+            msg = msg + " _entityPropertyWriterMap.keySet()=" + entityPropertyWriterMap.keySet();
             throw new IllegalStateException(msg);
         }
         return setupper;

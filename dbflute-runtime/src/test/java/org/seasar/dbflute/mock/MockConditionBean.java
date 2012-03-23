@@ -208,11 +208,14 @@ public class MockConditionBean implements ConditionBean {
     public void checkSafetyResult(int safetyMaxResultSize) {
     }
 
-    public boolean hasOrderByClause() {
+    public boolean hasWhereClause() {
         return false;
     }
 
-    public boolean hasWhereClause() {
+    public void clearWhereClause() {
+    }
+
+    public boolean hasOrderByClause() {
         return false;
     }
 

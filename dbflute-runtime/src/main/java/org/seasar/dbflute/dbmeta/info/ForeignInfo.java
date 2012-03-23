@@ -16,7 +16,6 @@
 package org.seasar.dbflute.dbmeta.info;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,6 +46,8 @@ public class ForeignInfo implements RelationInfo {
     protected final boolean _bizOneToOne;
     protected final boolean _additionalFK;
     protected final String _reversePropertyName;
+    protected final Method _reader;
+    protected final Method _writer;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -74,18 +75,61 @@ public class ForeignInfo implements RelationInfo {
         _bizOneToOne = bizOneToOne;
         _additionalFK = additionalFK;
         _reversePropertyName = reversePropertyName;
+        _reader = findReader();
+        _writer = findWriter();
     }
 
     // ===================================================================================
-    //                                                                              Finder
-    //                                                                              ======
+    //                                                                    Column Existence
+    //                                                                    ================
+    public boolean containsLocalColumn(ColumnInfo localColumn) {
+        return doContainsLocalColumn(localColumn.getColumnDbName());
+    }
+
+    protected boolean doContainsLocalColumn(String columnName) {
+        for (ColumnInfo columnInfo : _localForeignColumnInfoMap.keySet()) {
+            if (columnInfo.getColumnDbName().equals(columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean containsForeignColumn(ColumnInfo foreignColumn) {
+        return doContainsForeignColumn(foreignColumn.getColumnDbName());
+    }
+
+    protected boolean doContainsForeignColumn(String columnName) {
+        for (ColumnInfo columnInfo : _foreignLocalColumnInfoMap.keySet()) {
+            if (columnInfo.getColumnDbName().equals(columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                      Column Mapping
+    //                                                                      ==============
     public ColumnInfo findLocalByForeign(String foreignColumnDbName) {
         final ColumnInfo keyColumnInfo = _foreignDBMeta.findColumnInfo(foreignColumnDbName);
         final ColumnInfo resultColumnInfo = (ColumnInfo) _foreignLocalColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
-            msg = msg + " foreignColumnDbName=" + foreignColumnDbName + " foreignLocalColumnInfoMap="
-                    + _foreignLocalColumnInfoMap;
+            msg = msg + " foreignColumnDbName=" + foreignColumnDbName;
+            msg = msg + " foreignLocalColumnInfoMap=" + _foreignLocalColumnInfoMap;
+            throw new IllegalArgumentException(msg);
+        }
+        return resultColumnInfo;
+    }
+
+    public ColumnInfo findForeignByLocal(String localColumnDbName) {
+        final ColumnInfo keyColumnInfo = _localDBMeta.findColumnInfo(localColumnDbName);
+        final ColumnInfo resultColumnInfo = (ColumnInfo) _localForeignColumnInfoMap.get(keyColumnInfo);
+        if (resultColumnInfo == null) {
+            String msg = "Not found by localColumnDbName in localForeignColumnInfoMap:";
+            msg = msg + " localColumnDbName=" + localColumnDbName;
+            msg = msg + " localForeignColumnInfoMap=" + _localForeignColumnInfoMap;
             throw new IllegalArgumentException(msg);
         }
         return resultColumnInfo;
@@ -94,15 +138,54 @@ public class ForeignInfo implements RelationInfo {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
+    // -----------------------------------------------------
+    //                                                  Read
+    //                                                  ----
+    /**
+     * Read the value to the entity.
+     * @param localEntity The local entity of this column to read. (NotNull)
+     * @return The read instance of foreign entity. (NullAllowed)
+     */
     @SuppressWarnings("unchecked")
     public <PROPERTY extends Entity> PROPERTY read(Entity localEntity) {
         return (PROPERTY) invokeMethod(reader(), localEntity, new Object[] {});
     }
 
+    /**
+     * Get the read method for reflection.
+     * @return The read method, cached in this instance. (NotNull)
+     */
     public Method reader() {
+        return _reader;
+    }
+
+    // -----------------------------------------------------
+    //                                                 Write
+    //                                                 -----
+    /**
+     * Write the value to the entity.
+     * @param localEntity The local entity of this column to write. (NotNull)
+     * @param foreignEntity The written instance of foreign entity. (NullAllowed: if null, null value is written)
+     */
+    public void write(Entity localEntity, Entity foreignEntity) {
+        invokeMethod(writer(), localEntity, new Object[] { foreignEntity });
+    }
+
+    /**
+     * Get the write method for reflection.
+     * @return The writer method, cached in this instance. (NotNull)
+     */
+    public Method writer() {
+        return _writer;
+    }
+
+    // -----------------------------------------------------
+    //                                                Finder
+    //                                                ------
+    protected Method findReader() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
         final String methodName = buildAccessorName("get");
-        final Method method = findMethod(localType, buildAccessorName("get"), new Class[] {});
+        final Method method = findMethod(localType, methodName, new Class[] {});
         if (method == null) {
             String msg = "Failed to find the method by the name:";
             msg = msg + " methodName=" + methodName;
@@ -111,11 +194,7 @@ public class ForeignInfo implements RelationInfo {
         return method;
     }
 
-    public void write(Entity localEntity, Entity foreignEntity) {
-        invokeMethod(writer(), localEntity, new Object[] { foreignEntity });
-    }
-
-    public Method writer() {
+    protected Method findWriter() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
         final Class<? extends Entity> foreignType = _foreignDBMeta.getEntityType();
         final String methodName = buildAccessorName("set");
@@ -133,9 +212,20 @@ public class ForeignInfo implements RelationInfo {
         return prefix + initCap(_foreignPropertyName);
     }
 
+    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
+    }
+
+    // -----------------------------------------------------
+    //                                               Invoker
+    //                                               -------
+    protected Object invokeMethod(Method method, Object target, Object[] args) {
+        return DfReflectionUtil.invoke(method, target, args);
+    }
+
     // ===================================================================================
-    //                                                                 Relation Implements
-    //                                                                 ===================
+    //                                                             Relation Implementation
+    //                                                             =======================
     public String getRelationPropertyName() {
         return getForeignPropertyName();
     }
@@ -157,14 +247,6 @@ public class ForeignInfo implements RelationInfo {
     //                                                                      ==============
     protected String initCap(final String name) {
         return Srl.initCap(name);
-    }
-
-    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
-        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
-    }
-
-    protected Object invokeMethod(Method method, Object target, Object[] args) {
-        return DfReflectionUtil.invoke(method, target, args);
     }
 
     protected void assertObjectNotNull(String variableName, Object value) {
@@ -237,19 +319,19 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
-     * Get the read-only map, key is a local column info, value is a foreign column info.
-     * @return The read-only map. (NotNull)
+     * Get the snapshot map, key is a local column info, value is a foreign column info.
+     * @return The snapshot map. (NotNull)
      */
     public Map<ColumnInfo, ColumnInfo> getLocalForeignColumnInfoMap() {
-        return Collections.unmodifiableMap(_localForeignColumnInfoMap); // as read-only
+        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_localForeignColumnInfoMap); // as snapshot
     }
 
     /**
-     * Get the read-only map, key is a foreign column info, value is a local column info.
-     * @return The read-only map. (NotNull)
+     * Get the snapshot map, key is a foreign column info, value is a local column info.
+     * @return The snapshot map. (NotNull)
      */
     public Map<ColumnInfo, ColumnInfo> getForeignLocalColumnInfoMap() {
-        return Collections.unmodifiableMap(_foreignLocalColumnInfoMap); // as read-only
+        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_foreignLocalColumnInfoMap); // as snapshot
     }
 
     /**

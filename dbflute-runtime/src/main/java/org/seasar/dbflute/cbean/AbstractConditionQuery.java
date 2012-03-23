@@ -680,25 +680,26 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          FromTo Query
     //                                          ------------
     protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
-        final boolean needsAndPart = isOrScopeQueryDirectlyUnder();
+        final Date filteredFromDate = option.filterFromDate(fromDate);
+        final ConditionKey fromKey = option.getFromDateConditionKey();
+        final boolean fromValidQuery = isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
+
+        final Date filteredToDate = option.filterToDate(toDate);
+        final ConditionKey toKey = option.getToDateConditionKey();
+        final boolean toValidQuery = isValidQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName);
+
+        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && fromValidQuery && toValidQuery;
         if (needsAndPart) {
             xgetSqlClause().beginOrScopeQueryAndPart();
         }
         try {
-            final ConditionKey fromKey = option.getFromDateConditionKey();
-            boolean fromInvalid = false;
-            final Date filteredFromDate = option.filterFromDate(fromDate);
-            if (isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName)) {
+            if (fromValidQuery) {
                 setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, columnDbName);
-            } else {
-                fromInvalid = true;
             }
-            final ConditionKey toKey = option.getToDateConditionKey();
-            final Date filteredToDate = option.filterToDate(toDate);
-            if (isValidQueryNoCheck(toKey, filteredToDate, cvalue, columnDbName)) {
+            if (toValidQuery) {
                 setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, columnDbName);
             } else {
-                if (fromInvalid) { // means both queries are invalid
+                if (!fromValidQuery) { // means both queries are invalid
                     final List<ConditionKey> keyList = newArrayList(fromKey, toKey);
                     final List<Date> valueList = newArrayList(fromDate, toDate);
                     handleInvalidQueryList(keyList, valueList, columnDbName);
@@ -716,23 +717,24 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         -------------
     protected void regROO(Number minNumber, Number maxNumber, ConditionValue cvalue, String columnDbName,
             RangeOfOption option) {
-        final boolean needsAndPart = isOrScopeQueryDirectlyUnder();
+        final ConditionKey minKey = option.getMinNumberConditionKey();
+        final boolean minValidQuery = isValidQueryNoCheck(minKey, minNumber, cvalue, columnDbName);
+
+        final ConditionKey maxKey = option.getMaxNumberConditionKey();
+        final boolean maxValidQuery = isValidQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName);
+
+        final boolean needsAndPart = isOrScopeQueryDirectlyUnder() && minValidQuery && maxValidQuery;
         if (needsAndPart) {
             xgetSqlClause().beginOrScopeQueryAndPart();
         }
         try {
-            final ConditionKey minKey = option.getMinNumberConditionKey();
-            boolean fromInvalid = false;
-            if (isValidQueryNoCheck(minKey, minNumber, cvalue, columnDbName)) {
+            if (minValidQuery) {
                 setupConditionValueAndRegisterWhereClause(minKey, minNumber, cvalue, columnDbName);
-            } else {
-                fromInvalid = true;
             }
-            final ConditionKey maxKey = option.getMaxNumberConditionKey();
-            if (isValidQueryNoCheck(maxKey, maxNumber, cvalue, columnDbName)) {
+            if (maxValidQuery) {
                 setupConditionValueAndRegisterWhereClause(maxKey, maxNumber, cvalue, columnDbName);
             } else {
-                if (fromInvalid) { // means both queries are invalid
+                if (!minValidQuery) { // means both queries are invalid
                     final List<ConditionKey> keyList = newArrayList(minKey, maxKey);
                     final List<Number> valueList = newArrayList(minNumber, maxNumber);
                     handleInvalidQueryList(keyList, valueList, columnDbName);
