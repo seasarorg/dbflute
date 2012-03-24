@@ -322,8 +322,8 @@ public class ${myClassName} extends AbstractDBMeta {
 #foreach ($col in $table.columns)
 #set ($setupperClassName = "Epw${col.javaName}")
 #if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
-    public class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
-    { public void setup(${myExtendedObjectClassName} e, Object v) {
+    public class ${setupperClassName} implements Epw<${myExtendedObjectClassName}>
+    { public void write(${myExtendedObjectClassName} e, Object v) {
         ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
 #if ($col.isCheckSelectedClassification())
         ccls(col, v);

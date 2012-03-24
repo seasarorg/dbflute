@@ -658,8 +658,8 @@ public class ${myClassName} extends AbstractConditionBean {
     protected String getLogTimestampFormat() { return ${glDBFluteConfig}.getInstance().getLogTimestampFormat(); }
 
     // ===================================================================================
-    //                                                                        Basic Status
-    //                                                                        ============
+    //                                                                       Meta Handling
+    //                                                                       =============
     public boolean hasUnionQueryOrUnionAllQuery() {
         return query().hasUnionQueryOrUnionAllQuery();
     }
