@@ -1518,14 +1518,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public boolean hasWhereClauseOnBase() {
+    public boolean hasWhereClauseOnBaseQuery() {
         return _whereList != null && !_whereList.isEmpty();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void clearWhereClauseOnBase() {
+    public void clearWhereClauseOnBaseQuery() {
         if (_whereList != null) {
             _whereList.clear();
         }

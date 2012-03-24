@@ -208,13 +208,6 @@ public class MockConditionBean implements ConditionBean {
     public void checkSafetyResult(int safetyMaxResultSize) {
     }
 
-    public boolean hasWhereClause() {
-        return false;
-    }
-
-    public void clearWhereClause() {
-    }
-
     public boolean hasOrderByClause() {
         return false;
     }
@@ -260,5 +253,23 @@ public class MockConditionBean implements ConditionBean {
     }
 
     public void disablePagingCountLeastJoin() {
+    }
+
+    public boolean hasWhereClauseOnBaseQuery() {
+        return false;
+    }
+
+    public boolean hasWhereClauseOnBaseTableInline() {
+        return false;
+    }
+
+    public void clearWhereClauseOnBaseQuery() {
+    }
+
+    public void clearWhereClauseOnBaseTableInline() {
+    }
+
+    public boolean hasSelectAllPossible() {
+        return false;
     }
 }

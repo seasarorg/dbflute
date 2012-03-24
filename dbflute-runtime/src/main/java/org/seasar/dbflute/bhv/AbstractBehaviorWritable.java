@@ -642,7 +642,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (option != null && option.isNonQueryUpdateAllowed()) {
             return;
         }
-        if (!cb.hasWhereClause()) {
+        if (cb.hasSelectAllPossible()) {
             createBhvExThrower().throwNonQueryUpdateNotAllowedException(entity, cb, option);
         }
     }
@@ -726,7 +726,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (option != null && option.isNonQueryDeleteAllowed()) {
             return;
         }
-        if (!cb.hasWhereClause()) {
+        if (cb.hasSelectAllPossible()) {
             createBhvExThrower().throwNonQueryDeleteNotAllowedException(cb, option);
         }
     }

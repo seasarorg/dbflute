@@ -120,7 +120,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
             InternalSelectEntityCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
-        if (!cb.hasWhereClause() && cb.getFetchSize() != 1) { // if no condition for one
+        if (cb.hasSelectAllPossible() && cb.getFetchSize() != 1) { // if no condition for one
             throwSelectEntityConditionNotFoundException(cb);
         }
         final int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);

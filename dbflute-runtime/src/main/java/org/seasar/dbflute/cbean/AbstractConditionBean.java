@@ -903,35 +903,40 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     // [DBFlute-0.9.5.2]
     // ===================================================================================
-    //                                                          Basic Status Determination
-    //                                                          ==========================
+    //                                                                       Meta Handling
+    //                                                                       =============
     /**
      * {@inheritDoc}
      */
-    public boolean hasWhereClause() {
-        if (!getSqlClause().hasWhereClauseOnBase() && !getSqlClause().hasBaseTableInlineWhereClause()) {
-            return false;
-        }
-        // mainCB has clauses here
-        if (_unionCBeanList == null || _unionCBeanList.isEmpty()) {
-            return true; // no union
-        }
-        // mainCB has unions
-        for (ConditionBean unionCB : _unionCBeanList) {
-            if (!unionCB.hasWhereClause()) {
-                return false;
-            }
-        }
-        return true; // means all unions have clauses
+    public boolean hasWhereClauseOnBaseQuery() {
+        return getSqlClause().hasWhereClauseOnBaseQuery();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void clearWhereClause() {
-        getSqlClause().clearWhereClauseOnBase();
-        getSqlClause().clearBaseTableInlineWhereClause();
-        getSqlClause().clearUnionQuery();
+    public void clearWhereClauseOnBaseQuery() {
+        getSqlClause().clearWhereClauseOnBaseQuery();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasSelectAllPossible() {
+        if (!getSqlClause().hasWhereClauseOnBaseQuery() && !getSqlClause().hasBaseTableInlineWhereClause()) {
+            return true;
+        }
+        // mainCB has clauses here
+        if (_unionCBeanList == null || _unionCBeanList.isEmpty()) {
+            return false; // no union
+        }
+        // mainCB has unions
+        for (ConditionBean unionCB : _unionCBeanList) {
+            if (unionCB.hasSelectAllPossible()) {
+                return true;
+            }
+        }
+        return false; // means all unions have clauses
     }
 
     /**

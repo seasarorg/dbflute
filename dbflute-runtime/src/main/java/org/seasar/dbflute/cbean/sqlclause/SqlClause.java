@@ -333,17 +333,17 @@ public interface SqlClause {
     void exchangeFirstWhereClauseForLastOne();
 
     /**
-     * Does it have where clauses on base query? <br />
-     * However, where clauses in in-line views and union queries have no influence.
+     * Does it have where clauses on the base query? <br />
+     * Clauses on union queries and in-line views are not concerned.
      * @return The determination, true or false.
      */
-    boolean hasWhereClauseOnBase();
+    boolean hasWhereClauseOnBaseQuery();
 
     /**
-     * Clear where clauses on base query. <br />
-     * However, where clauses in in-line views and union queries have no influence.
+     * Clear where clauses on the base query. <br />
+     * Clauses on union queries and in-line views are not concerned.
      */
-    void clearWhereClauseOnBase();
+    void clearWhereClauseOnBaseQuery();
 
     // ===================================================================================
     //                                                                       In-line Where

@@ -206,23 +206,29 @@ public interface ConditionBean extends PagingBean {
     //                                                                       Meta Handling
     //                                                                       =============
     /**
-     * Does it have where clauses? (contains in-line view of base table) <br />
-     * If this condition-bean has union queries, all unions must have each where clauses for true. <br />
-     * Because union without where clause selects all records. <br />
-     * However, where clauses in in-line views of outer-join tables have no influence. <br />
-     * (Here "where clause" means selecting elements that can change result count)
-     * @return The determination, true or false.
+     * Does it have where clause on the base query? <br />
+     * Clauses on union queries and in-line views are not concerned.
+     * @return The determination, true or false. 
      */
-    boolean hasWhereClause();
+    boolean hasWhereClauseOnBaseQuery();
 
     /**
-     * Clear where clauses. (contains in-line view of base table) <br />
-     * If this condition-bean has union queries, all unions (themselves) also are cleared. <br />
-     * Because union without where clause is a total nothing. <br />
-     * However, where clauses in in-line views of outer-join tables have no influence. <br />
-     * (Here "where clause" means selecting elements that can change result count)
+     * Clear where clauses where clause on the base query. <br />
+     * Clauses on union queries and in-line views are not concerned.
      */
-    void clearWhereClause();
+    void clearWhereClauseOnBaseQuery();
+
+    /**
+     * Does it have select-all possible? <br />
+     * The elements for possible are:
+     * <pre>
+     * o no where clause on base query
+     * o no where clause in base table in-line view
+     * o union queries with select-all possible
+     * </pre>
+     * @return The determination, true or false.
+     */
+    boolean hasSelectAllPossible();
 
     /**
      * Does it have order-by clauses? <br />
