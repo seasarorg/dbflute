@@ -9,7 +9,6 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.AbstractDBMeta;
 import org.seasar.dbflute.dbmeta.info.*;
 import org.seasar.dbflute.dbmeta.name.*;
-import org.seasar.dbflute.helper.StringKeyMap;
 import ${glPackageBaseCommon}.*;
 import ${myExtendedEntityPackageName}.*;
 
@@ -289,16 +288,16 @@ public class ${myClassName} extends AbstractDBMeta {
     // -----------------------------------------------------
     //                                                Reader
     //                                                ------
-    protected final Map<String, Epr<${myExtendedObjectClassName}>> _eprMap = StringKeyMap.createAsFlexibleConcurrent();
+    protected final Map<String, Epr<${myExtendedObjectClassName}>> _eprMap = newHashMap(); // plan map for speed
     {
 #foreach ($col in $table.columns)
         setupEpr(_eprMap, new Epr${col.javaName}(), column${col.javaBeansRulePropertyNameInitCap}());
 #end
     }
 
-    public boolean hasEntityPropertyReader(String flexibleName) { return _eprMap.containsKey(flexibleName); }
-    public Object readEntityProperty(String flexibleName, Object entity)
-    { return findEpr(_eprMap, flexibleName).read((${myExtendedObjectClassName})entity); }
+    public boolean hasEntityPropertyReader(String propertyName) { return _eprMap.containsKey(propertyName); }
+    public Object readEntityProperty(String propertyName, Object entity)
+    { return findEpr(_eprMap, propertyName).read((${myExtendedObjectClassName})entity); }
 
 #foreach ($col in $table.columns)
 #set ($setupperClassName = "Epr${col.javaName}")
@@ -309,16 +308,16 @@ public class ${myClassName} extends AbstractDBMeta {
     // -----------------------------------------------------
     //                                                Writer
     //                                                ------
-    protected final Map<String, Epw<${myExtendedObjectClassName}>> _epwMap = StringKeyMap.createAsFlexibleConcurrent();
+    protected final Map<String, Epw<${myExtendedObjectClassName}>> _epwMap = newHashMap(); // plan map for speed
     {
 #foreach ($col in $table.columns)
         setupEpw(_epwMap, new Epw${col.javaName}(), column${col.javaBeansRulePropertyNameInitCap}());
 #end
     }
 
-    public boolean hasEntityPropertyWriter(String flexibleName) { return _epwMap.containsKey(flexibleName); }
-    public void writeEntityProperty(String flexibleName, Object entity, Object value)
-    { findEpw(_epwMap, flexibleName).write((${myExtendedObjectClassName})entity, value); }
+    public boolean hasEntityPropertyWriter(String propertyName) { return _epwMap.containsKey(propertyName); }
+    public void writeEntityProperty(String propertyName, Object entity, Object value)
+    { findEpw(_epwMap, propertyName).write((${myExtendedObjectClassName})entity, value); }
 
 #foreach ($col in $table.columns)
 #set ($setupperClassName = "Epw${col.javaName}")
