@@ -101,8 +101,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
             ret = executeUpdate(ps);
             handleUpdateResultWithOptimisticLock(bean, ret);
         } catch (RuntimeException e) {
-            // not SQLFailureException because
-            // a wrapper of JDBC may throw an other exception
+            // not SQLFailureException because the JDBC wrapper may throw an other exception
             sqlEx = e;
             throw e;
         } finally {

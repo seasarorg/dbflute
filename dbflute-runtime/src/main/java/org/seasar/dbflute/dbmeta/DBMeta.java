@@ -122,7 +122,7 @@ public interface DBMeta {
 
     /**
      * Get the list of column information.
-     * @return The list of column information. (NotNull and NotEmpty)
+     * @return The list of column information. (NotNull, NotEmpty)
      */
     List<ColumnInfo> getColumnInfoList();
 
@@ -353,23 +353,23 @@ public interface DBMeta {
     //                                                                       =============
     /**
      * Does the table have an object for the flexible name? {Target objects are TABLE and COLUMN}
-     * @param flexibleName The flexible name. (NotNull and NotEmpty)
+     * @param flexibleName The flexible name of the object. (NotNull)
      * @return The determination, true or false.
      */
     boolean hasFlexibleName(String flexibleName);
 
     /**
      * Find DB name by flexible name. {Target objects are TABLE and COLUMN}
-     * @param flexibleName The flexible name. (NotNull and NotEmpty)
-     * @return The DB name of anything. (NotNull and NotEmpty)
+     * @param flexibleName The flexible name of the object. (NotNull)
+     * @return The DB name of anything. (NotNull)
      * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
      */
     String findDbName(String flexibleName);
 
     /**
      * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
-     * @param flexibleName The flexible name. (NotNull and NotEmpty)
-     * @return The DB name of anything. (NotNull and NotEmpty)
+     * @param flexibleName The flexible name of the property. (NotNull)
+     * @return The DB name of anything. (NotNull)
      * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding name was not found.
      */
     String findPropertyName(String flexibleName);
@@ -428,7 +428,7 @@ public interface DBMeta {
     /**
      * Accept the map of primary-keys. map:{[column-name] = [value]}
      * @param entity The instance of entity to accept the map data. (NotNull)
-     * @param primaryKeyMap The value map of primary-keys. (NotNull and NotEmpty)
+     * @param primaryKeyMap The value map of primary-keys. (NotNull, NotEmpty)
      */
     void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap);
 
@@ -436,7 +436,7 @@ public interface DBMeta {
      * Accept the map of all columns. map:{[column-name] = [value]}<br />
      * Derived columns are not accepted, physical columns only.
      * @param entity The instance of entity to accept the map data. (NotNull)
-     * @param allColumnMap The value map of all columns. (NotNull and NotEmpty)
+     * @param allColumnMap The value map of all columns. (NotNull, NotEmpty)
      */
     void acceptAllColumnMap(Entity entity, Map<String, ? extends Object> allColumnMap);
 
@@ -468,14 +468,14 @@ public interface DBMeta {
     /**
      * Does this table have the reader of entity property by the name of property? <br />
      * Comparing is so flexible. {Ignore cases and underscore}
-     * @param propertyName The name of the property. (NotNull)
+     * @param propertyName The name of the property (you can also set column DB name). (NotNull)
      * @return The determination, true or false.
      */
     boolean hasEntityPropertyReader(String propertyName);
 
     /**
      * Read the value of the entity property. (for INTERNAL)
-     * @param propertyName The name of the property. (NotNull)
+     * @param propertyName The name of the property (you can also set column DB name). (NotNull)
      * @param entity The entity for the property. (NotNull)
      * @return The read value of the property. (NullAllowed)
      */
@@ -502,14 +502,14 @@ public interface DBMeta {
     /**
      * Does this table have the writer of entity property by the name of property? <br />
      * Comparing is so flexible. {Ignore cases and underscore}
-     * @param propertyName The name of the property. (NotNull)
+     * @param propertyName The name of the property (you can also set column DB name). (NotNull)
      * @return The determination, true or false.
      */
     boolean hasEntityPropertyWriter(String propertyName);
 
     /**
      * Write the value of the entity property. (for INTERNAL)
-     * @param propertyName The name of the property. (NotNull)
+     * @param propertyName The name of the property (you can also set column DB name). (NotNull)
      * @param entity The entity for the property. (NotNull)
      * @param value The written value of the property. (NullAllowed)
      */

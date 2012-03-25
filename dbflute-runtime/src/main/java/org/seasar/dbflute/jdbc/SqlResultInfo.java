@@ -24,16 +24,33 @@ public class SqlResultInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     protected Object _result;
     protected String _tableDbName;
     protected String _commandName;
     protected String _displaySql;
-    protected long _beforeTimeMillis;
-    protected long _afterTimeMillis;
+
+    // -----------------------------------------------------
+    //                                            TimeMillis
+    //                                            ----------
+    // basically NotNull but no guarantee
+    protected Long _commandBeforeTimeMillis;
+    protected Long _commandAfterTimeMillis;
+    protected Long _sqlBeforeTimeMillis;
+    protected Long _sqlAfterTimeMillis;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    /**
+     * Get the result of SQL execution (mapped to entity if select). <br />
+     * @return The instance of result. (NullAllowed)
+     */
     public Object getResult() {
         return _result;
     }
@@ -42,6 +59,10 @@ public class SqlResultInfo {
         this._result = result;
     }
 
+    /**
+     * Get the table DB name for the behavior command.
+     * @return The DB name of table. (NotNull)
+     */
     public String getTableDbName() {
         return _tableDbName;
     }
@@ -50,6 +71,10 @@ public class SqlResultInfo {
         this._tableDbName = tableDbName;
     }
 
+    /**
+     * Get the name of the behavior command.
+     * @return The name of the behavior command. (NotNull)
+     */
     public String getCommandName() {
         return _commandName;
     }
@@ -60,8 +85,7 @@ public class SqlResultInfo {
 
     /**
      * Get the SQL for display. <br />
-     * If the statement is batch-update, this value
-     * contains only a part of batch statements.
+     * If the statement is batch-update, this value contains only a part of batch statements.
      * @return The string of SQL. (NullAllowed: for example, when batch logging is limited by option)
      */
     public String getDisplaySql() {
@@ -72,19 +96,58 @@ public class SqlResultInfo {
         this._displaySql = displaySql;
     }
 
-    public long getBeforeTimeMillis() {
-        return _beforeTimeMillis;
+    // -----------------------------------------------------
+    //                                            TimeMillis
+    //                                            ----------
+    /**
+     * Get the time as millisecond before command invoking (before building SQL clause). <br />
+     * Basically NotNull but no guarantee, because this is additional info.
+     * @return The long value of millisecond. (NullAllowed: basically NotNull but no guarantee)
+     */
+    public Long getCommandBeforeTimeMillis() {
+        return _commandBeforeTimeMillis;
     }
 
-    public void setBeforeTimeMillis(long beforeTimeMillis) {
-        this._beforeTimeMillis = beforeTimeMillis;
+    public void setCommandBeforeTimeMillis(Long commandInvokeTimeMillis) {
+        this._commandBeforeTimeMillis = commandInvokeTimeMillis;
     }
 
-    public long getAfterTimeMillis() {
-        return _afterTimeMillis;
+    /**
+     * Get the time as millisecond after command invoking (after mapping to entity). <br />
+     * Basically NotNull but no guarantee, because this is additional info.
+     * @return The long value of millisecond. (NullAllowed: basically NotNull but no guarantee)
+     */
+    public Long getCommandAfterTimeMillis() {
+        return _commandAfterTimeMillis;
     }
 
-    public void setAfterTimeMillis(long beforeTimeMillis) {
-        this._afterTimeMillis = beforeTimeMillis;
+    public void setCommandAfterTimeMillis(Long commandAfterTimeMillis) {
+        this._commandAfterTimeMillis = commandAfterTimeMillis;
+    }
+
+    /**
+     * Get the time as millisecond before SQL invoking (after building SQL clause). <br />
+     * Basically NotNull but no guarantee, because this is additional info.
+     * @return The long value of millisecond. (NullAllowed: basically NotNull but no guarantee)
+     */
+    public Long getSqlBeforeTimeMillis() {
+        return _sqlBeforeTimeMillis;
+    }
+
+    public void setSqlBeforeTimeMillis(Long sqlBeforeTimeMillis) {
+        this._sqlBeforeTimeMillis = sqlBeforeTimeMillis;
+    }
+
+    /**
+     * Get the time as millisecond after SQL invoking (before mapping to entity). <br />
+     * Basically NotNull but no guarantee, because this is additional info.
+     * @return The long value of millisecond. (NullAllowed: basically NotNull but no guarantee)
+     */
+    public Long getSqlAfterTimeMillis() {
+        return _sqlAfterTimeMillis;
+    }
+
+    public void setSqlAfterTimeMillis(Long sqlAfterTimeMillis) {
+        this._sqlAfterTimeMillis = sqlAfterTimeMillis;
     }
 }

@@ -343,7 +343,7 @@ public class ColumnInfo {
     /**
      * Get the synonym of the column. <br />
      * This is for the synonym of DBFlute. (for example, PgReservColumn handling)
-     * @return The synonym of the column. (NotNull)
+     * @return The synonym of the column. (NullAllowed: when the column does not have its synonym)
      */
     public String getColumnSynonym() {
         return this._columnSynonym;

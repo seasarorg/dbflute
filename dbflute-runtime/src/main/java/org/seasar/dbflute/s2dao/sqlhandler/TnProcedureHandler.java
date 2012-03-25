@@ -70,12 +70,12 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
         CallableStatement cs = null;
         try {
             conn = getConnection();
-            cs = prepareCallableStatement(conn);
+            cs = prepareCall(conn);
             bindArgs(conn, cs, pmb);
 
             // Execute the procedure!
             // The return means whether the first result is a (not-parameter) result set.
-            final boolean executed = cs.execute();
+            final boolean executed = executeProcedure(cs);
 
             handleNotParamResult(conn, cs, pmb, executed); // should be before out-parameter handling
             handleOutParameter(conn, cs, pmb, executed);
@@ -100,13 +100,6 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
             return args[0];
         }
         throw new IllegalStateException("The size of args should be 1: " + args.length);
-    }
-
-    protected CallableStatement prepareCallableStatement(final Connection connection) {
-        if (_sql == null) {
-            throw new IllegalStateException("The SQL should not be null!");
-        }
-        return _statementFactory.createCallableStatement(connection, _sql);
     }
 
     protected void bindArgs(Connection conn, CallableStatement cs, Object dto) throws SQLException {

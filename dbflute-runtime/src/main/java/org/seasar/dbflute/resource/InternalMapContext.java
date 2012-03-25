@@ -84,6 +84,8 @@ public class InternalMapContext {
     public static final String KEY_CLIENT_INVOKE_NAME = "df:ClientInvokeName";
     public static final String KEY_BYPASS_INVOKE_NAME = "df:ByPassInvokeName";
     public static final String KEY_RESULT_INFO_DISPLAY_SQL = "df:ResultInfoDisplaySql";
+    public static final String KEY_SQL_BEFORE_TIME_MILLIS = "df:SqlBeforeTimeMillis";
+    public static final String KEY_SQL_AFTER_TIME_MILLIS = "df:SqlAfterTimeMillis";
 
     public static String getBehaviorInvokeName() {
         return (String) getObject(KEY_BEHAVIOR_INVOKE_NAME);
@@ -115,5 +117,21 @@ public class InternalMapContext {
 
     public static void setResultInfoDisplaySql(String displaySql) {
         setObject(KEY_RESULT_INFO_DISPLAY_SQL, displaySql);
+    }
+
+    public static Long getSqlBeforeTimeMillis() {
+        return (Long) getObject(KEY_SQL_BEFORE_TIME_MILLIS);
+    }
+
+    public static void setSqlBeforeTimeMillis(Long sqlBeforeTimeMillis) {
+        setObject(KEY_SQL_BEFORE_TIME_MILLIS, sqlBeforeTimeMillis);
+    }
+
+    public static Long getSqlAfterTimeMillis() {
+        return (Long) getObject(KEY_SQL_AFTER_TIME_MILLIS);
+    }
+
+    public static void setSqlAfterTimeMillis(Long sqlAfterTimeMillis) {
+        setObject(KEY_SQL_AFTER_TIME_MILLIS, sqlAfterTimeMillis);
     }
 }

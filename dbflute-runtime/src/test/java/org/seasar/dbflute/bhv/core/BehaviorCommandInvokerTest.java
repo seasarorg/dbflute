@@ -244,8 +244,8 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
             callbackContext.setSqlResultHandler(new SqlResultHandler() {
                 public void handle(SqlResultInfo info) {
                     markList.add("handle");
-                    long before = info.getBeforeTimeMillis();
-                    long after = info.getAfterTimeMillis();
+                    long before = info.getCommandBeforeTimeMillis();
+                    long after = info.getCommandAfterTimeMillis();
                     log("before=" + before + ", after=" + after);
                     assertTrue(before > 0);
                     assertTrue(after > 0);
@@ -553,8 +553,8 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
                 }
             }, true, new SqlResultHandler() {
                 public void handle(SqlResultInfo info) {
-                    long actualBefore = info.getBeforeTimeMillis();
-                    long actualAfter = info.getAfterTimeMillis();
+                    long actualBefore = info.getCommandBeforeTimeMillis();
+                    long actualAfter = info.getCommandAfterTimeMillis();
                     assertEquals(ret, info.getResult());
                     assertEquals("FOO", info.getTableDbName());
                     assertEquals("BAR", info.getCommandName());
@@ -593,8 +593,8 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
                 }
             }, true, new SqlResultHandler() {
                 public void handle(SqlResultInfo info) {
-                    long actualBefore = info.getBeforeTimeMillis();
-                    long actualAfter = info.getAfterTimeMillis();
+                    long actualBefore = info.getCommandBeforeTimeMillis();
+                    long actualAfter = info.getCommandAfterTimeMillis();
                     assertEquals(ret, info.getResult());
                     assertEquals("FOO", info.getTableDbName());
                     assertEquals("BAR", info.getCommandName());

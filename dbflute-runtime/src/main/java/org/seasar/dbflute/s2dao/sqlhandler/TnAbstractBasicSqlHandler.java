@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.sqlhandler;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -268,6 +269,9 @@ public abstract class TnAbstractBasicSqlHandler {
     // ===================================================================================
     //                                                                       JDBC Handling
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                            Connection
+    //                                            ----------
     /**
      * Get the database connection from data source. <br />
      * getting connection for SQL executions is only here. <br />
@@ -296,18 +300,74 @@ public abstract class TnAbstractBasicSqlHandler {
     }
 
     protected PreparedStatement prepareStatement(Connection conn) {
+        if (_sql == null) {
+            throw new IllegalStateException("The SQL should not be null.");
+        }
         return _statementFactory.createPreparedStatement(conn, _sql);
     }
 
-    protected int executeUpdate(PreparedStatement ps) {
+    protected CallableStatement prepareCall(final Connection conn) {
+        if (_sql == null) {
+            throw new IllegalStateException("The SQL should not be null.");
+        }
+        return _statementFactory.createCallableStatement(conn, _sql);
+    }
+
+    // -----------------------------------------------------
+    //                                             Execution
+    //                                             ---------
+    protected ResultSet executeQuery(PreparedStatement ps) throws SQLException {
+        final boolean saveMillis = hasSqlResultHandler();
+        if (saveMillis) {
+            saveBeforeSqlTimeMillis();
+        }
+        final ResultSet rs = ps.executeQuery();
+        if (saveMillis) {
+            saveAfterSqlTimeMillis();
+        }
+        return rs;
+    }
+
+    protected int executeUpdate(PreparedStatement ps) { // with SQLException handling
         try {
-            return ps.executeUpdate();
+            final boolean saveMillis = hasSqlResultHandler();
+            if (saveMillis) {
+                saveBeforeSqlTimeMillis();
+            }
+            final int updated = ps.executeUpdate();
+            if (saveMillis) {
+                saveAfterSqlTimeMillis();
+            }
+            return updated;
         } catch (SQLException e) {
             handleSQLException(e, ps, true);
-            return 0;// unreachable
+            return -1; // unreachable
         }
     }
 
+    protected boolean executeProcedure(CallableStatement cs) throws SQLException {
+        final boolean saveMillis = hasSqlResultHandler();
+        if (saveMillis) {
+            saveBeforeSqlTimeMillis();
+        }
+        final boolean executed = cs.execute();
+        if (saveMillis) {
+            saveAfterSqlTimeMillis();
+        }
+        return executed;
+    }
+
+    protected void saveBeforeSqlTimeMillis() {
+        InternalMapContext.setSqlBeforeTimeMillis(systemTime());
+    }
+
+    protected void saveAfterSqlTimeMillis() {
+        InternalMapContext.setSqlAfterTimeMillis(systemTime());
+    }
+
+    // -----------------------------------------------------
+    //                                           JDBC Option
+    //                                           -----------
     protected void setFetchSize(Statement statement, int fetchSize) {
         if (statement == null) {
             return;
@@ -330,6 +390,9 @@ public abstract class TnAbstractBasicSqlHandler {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                 Close
+    //                                                 -----
     protected void close(Statement statement) {
         if (statement == null) {
             return;
@@ -400,6 +463,10 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                                                      ==============
     protected String ln() {
         return DBFluteSystem.getBasicLn();
+    }
+
+    protected long systemTime() {
+        return DBFluteSystem.currentTimeMillis(); // for calculating performance
     }
 
     // ===================================================================================

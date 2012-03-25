@@ -542,8 +542,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
     }
 
     @SuppressWarnings("unchecked")
-    protected java.util.List<Entity> extractReferrerList(Entity entity, ReferrerInfo referrerInfo) {
-        return (java.util.List<Entity>) invoke(referrerInfo.reader(), entity, new Object[] {});
+    protected List<Entity> extractReferrerList(Entity entity, ReferrerInfo referrerInfo) {
+        return (List<Entity>) referrerInfo.read(entity);
     }
 
     // ===================================================================================

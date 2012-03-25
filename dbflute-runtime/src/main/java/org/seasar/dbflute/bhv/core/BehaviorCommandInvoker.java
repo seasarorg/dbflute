@@ -219,8 +219,8 @@ public class BehaviorCommandInvoker {
         // Execute SQL Execution
         // - - - - - - - - - - -
         final SqlResultHandler sqlResultHander = getSqlResultHander();
-        final boolean existsSqlResultHandler = sqlResultHander != null;
-        final long before = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, existsSqlResultHandler);
+        final boolean hasSqlResultHandler = sqlResultHander != null;
+        final long before = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, hasSqlResultHandler);
         Object ret = null;
         try {
             final Object[] args = behaviorCommand.getSqlExecutionArgument();
@@ -232,7 +232,7 @@ public class BehaviorCommandInvoker {
         }
         final Class<?> retType = behaviorCommand.getCommandReturnType();
         assertRetType(retType, ret);
-        final long after = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, existsSqlResultHandler);
+        final long after = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, hasSqlResultHandler);
         if (logEnabled) {
             logReturn(behaviorCommand, retType, ret, before, after);
         }
@@ -249,7 +249,7 @@ public class BehaviorCommandInvoker {
         // - - - - - - - - - - - -
         // Call the handler back!
         // - - - - - - - - - - - -
-        callbackSqlResultHanler(behaviorCommand, existsSqlResultHandler, sqlResultHander, ret, before, after);
+        callbackSqlResultHanler(behaviorCommand, hasSqlResultHandler, sqlResultHander, ret, before, after);
 
         // - - - - - - - - -
         // Cast and Return!
@@ -259,9 +259,9 @@ public class BehaviorCommandInvoker {
         return result;
     }
 
-    protected long deriveCommandBeforeAfterTimeIfNeeds(boolean logEnabled, boolean existsSqlResultHandler) {
+    protected long deriveCommandBeforeAfterTimeIfNeeds(boolean logEnabled, boolean hasSqlResultHandler) {
         long time = 0;
-        if (logEnabled || existsSqlResultHandler) {
+        if (logEnabled || hasSqlResultHandler) {
             time = systemTime();
         }
         return time;
@@ -289,16 +289,18 @@ public class BehaviorCommandInvoker {
     }
 
     protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,
-            boolean existsSqlResultHandler, SqlResultHandler sqlResultHander, Object ret, long before, long after) {
-        if (existsSqlResultHandler) {
+            boolean hasSqlResultHandler, SqlResultHandler sqlResultHander, Object ret, long before, long after) {
+        if (hasSqlResultHandler) {
             final String displaySql = InternalMapContext.getResultInfoDisplaySql();
             final SqlResultInfo info = new SqlResultInfo();
             info.setResult(ret);
             info.setTableDbName(behaviorCommand.getTableDbName());
             info.setCommandName(behaviorCommand.getCommandName());
             info.setDisplaySql(displaySql);
-            info.setBeforeTimeMillis(before);
-            info.setAfterTimeMillis(after);
+            info.setCommandBeforeTimeMillis(before);
+            info.setCommandAfterTimeMillis(after);
+            info.setSqlBeforeTimeMillis(InternalMapContext.getSqlBeforeTimeMillis());
+            info.setSqlAfterTimeMillis(InternalMapContext.getSqlAfterTimeMillis());
             sqlResultHander.handle(info);
         }
     }

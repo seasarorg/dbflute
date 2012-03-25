@@ -81,18 +81,18 @@ public class TnBasicSelectHandler extends TnBasicParameterHandler {
     protected Object queryResult(PreparedStatement ps) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = executeQuery(ps);
+            rs = doQueryResult(ps);
             return _resultSetHandler.handle(rs);
         } finally {
             close(rs);
         }
     }
 
-    protected ResultSet executeQuery(PreparedStatement ps) throws SQLException {
+    protected ResultSet doQueryResult(PreparedStatement ps) throws SQLException {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
         // All select statements on DBFlute use this result set. 
         // - - - - - - - - - -/
-        final ResultSet rs = ps.executeQuery();
+        final ResultSet rs = executeQuery(ps);
         if (!isUseFunctionalResultSet()) {
             return rs;
         }
