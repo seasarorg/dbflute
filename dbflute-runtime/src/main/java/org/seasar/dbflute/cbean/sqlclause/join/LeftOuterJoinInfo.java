@@ -70,7 +70,7 @@ public class LeftOuterJoinInfo implements Serializable {
         if (hasFixedCondition() && _fixedConditionResolver != null) {
             // over-relation should be determined before resolving
             _fixedConditionOverRelation = _fixedConditionResolver.hasOverRelation(_fixedCondition);
-            _fixedCondition = _fixedConditionResolver.resolveVariable(_fixedCondition);
+            _fixedCondition = _fixedConditionResolver.resolveVariable(_fixedCondition, false);
         }
     }
 

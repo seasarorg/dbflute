@@ -532,7 +532,11 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         joinOnMap.put("${localColumn.name}", "${foreignColumnName}");
 #end
 #if ($fk.hasFixedCondition())
+#if ($fk.isFixedInline())
+        registerOuterJoinFixedInline(cq, joinOnMap, "${fk.foreignPropertyName}", "${fk.fixedCondition}");
+#else
         registerOuterJoin(cq, joinOnMap, "${fk.foreignPropertyName}", "${fk.fixedCondition}");
+#end
 #else
         registerOuterJoin(cq, joinOnMap, "${fk.foreignPropertyName}");
 #end
@@ -576,7 +580,11 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         joinOnMap.put("${foreignColumn.name}", "${referrerColumnName}");
 #end
 #if ($referrer.hasFixedCondition())
+#if ($fk.isFixedInline())
+        registerOuterJoinFixedInline(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}", "${referrer.fixedCondition}");
+#else
         registerOuterJoin(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}", "${referrer.fixedCondition}");
+#end
 #else
         registerOuterJoin(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}");
 #end

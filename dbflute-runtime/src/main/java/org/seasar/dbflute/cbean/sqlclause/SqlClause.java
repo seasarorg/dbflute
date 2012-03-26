@@ -202,7 +202,8 @@ public interface SqlClause {
     //                                          Registration
     //                                          ------------
     /**
-     * Register outer-join.
+     * Register outer-join. <br />
+     * The fixed-conditions are located on on-clause.
      * @param foreignAliasName The alias name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull, Unique)
      * @param foreignTableDbName The DB name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull)
      * @param localAliasName The alias name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
@@ -213,6 +214,22 @@ public interface SqlClause {
      * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
      */
     void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
+            String fixedCondition, FixedConditionResolver fixedConditionResolver);
+
+    /**
+     * Register outer-join using in-line view for fixed-conditions. <br />
+     * The fixed-conditions are located on in-line view.
+     * @param foreignAliasName The alias name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull, Unique)
+     * @param foreignTableDbName The DB name of foreign table. {left outer join [foreignTableDbName] [foreignAliasName]} (NotNull)
+     * @param localAliasName The alias name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
+     * @param localTableDbName The DB name of local table. {[localTableDbName] [localAliasName] left outer join} (NotNull)
+     * @param joinOnMap The map of join condition on on-clause. (NotNull)
+     * @param foreignInfo The information of foreign relation corresponding to this join. (NotNull)
+     * @param fixedCondition The fixed condition on in-line view. (NullAllowed: if null, means no fixed condition)
+     * @param fixedConditionResolver The resolver for variables on fixed-condition. (NullAllowed) 
+     */
+    void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName,
             String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
             String fixedCondition, FixedConditionResolver fixedConditionResolver);
 
@@ -602,22 +619,28 @@ public interface SqlClause {
     int resolveRelationNo(String localTableName, String foreignPropertyName);
 
     /**
+     * Get the alias name for base point table on in-line view.
+     * @return The string name for alias. (NotNull)
+     */
+    String getInlineViewBasePointAlias();
+
+    /**
      * Get the alias name for in-line view of union-query.
      * @return The string name for alias. (NotNull)
      */
     String getUnionQueryInlineViewAlias();
 
     /**
-     * Get the alias name for specified column of scalar-select.
-     * @return The string name for alias. (NotNull)
-     */
-    String getScalarSelectColumnAlias();
-
-    /**
      * Get the alias name for derived column of nested DerivedReferrer.
      * @return The string name for alias. (NotNull)
      */
     String getDerivedReferrerNestedAlias();
+
+    /**
+     * Get the alias name for specified column of scalar-select.
+     * @return The string name for alias. (NotNull)
+     */
+    String getScalarSelectColumnAlias();
 
     // ===================================================================================
     //                                                                       Template Mark

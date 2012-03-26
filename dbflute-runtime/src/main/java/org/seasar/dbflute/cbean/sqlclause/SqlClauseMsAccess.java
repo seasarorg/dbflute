@@ -24,7 +24,6 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbway.DBWay;
 import org.seasar.dbflute.dbway.WayOfMSAccess;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * SqlClause for MS Access.
@@ -69,16 +68,8 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
             String fixedCondition, FixedConditionResolver fixedConditionResolver) {
         // MS-Access does not support additional conditions on OnClause
         // so switch it to in-line where clause
-        super.registerOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName // normal 
-                , joinOnMap, foreignInfo // normal until here
-                , null, null); // null set to OnClause
-        if (fixedCondition != null) { // uses it instead of null set
-            if (fixedConditionResolver != null) {
-                fixedCondition = fixedConditionResolver.resolveVariable(fixedCondition);
-            }
-            final String clause = Srl.replace(fixedCondition, foreignAliasName + ".", "");
-            registerOuterJoinInlineWhereClause(foreignAliasName, clause, false);
-        }
+        registerOuterJoinFixedInline(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName, joinOnMap,
+                foreignInfo, fixedCondition, fixedConditionResolver);
     }
 
     // ===================================================================================

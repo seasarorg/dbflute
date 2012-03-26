@@ -9,9 +9,10 @@ public interface FixedConditionResolver {
     /**
      * Resolve variables on fixed-condition.
      * @param fixedCondition The string of fixed-condition. (NotNull)
+     * @param fixedInline Are the fixed-conditions located on in-line view?
      * @return Resolved fixed-condition. (NotNull)
      */
-    String resolveVariable(String fixedCondition);
+    String resolveVariable(String fixedCondition, boolean fixedInline);
 
     /**
      * Resolve fixed InlineView for fixed-condition.

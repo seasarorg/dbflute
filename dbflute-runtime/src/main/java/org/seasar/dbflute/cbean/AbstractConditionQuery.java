@@ -349,7 +349,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * Register outer-join with fixed-condition.
+     * Register outer-join with fixed-condition on on-clause.
      * @param foreignCQ The condition-query for foreign table. (NotNull)
      * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
      * @param foreignPropertyName The property name of foreign relation corresponding to this join. (NotNull)
@@ -357,6 +357,23 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
             String foreignPropertyName, String fixedCondition) {
+        doRegisterOuterJoin(foreignCQ, joinOnResourceMap, foreignPropertyName, fixedCondition, false);
+    }
+
+    /**
+     * Register outer-join with fixed-condition on in-line view.
+     * @param foreignCQ The condition-query for foreign table. (NotNull)
+     * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
+     * @param foreignPropertyName The property name of foreign relation corresponding to this join. (NotNull)
+     * @param fixedCondition The plain fixed condition. (NullAllowed: if null, no fixed condition)
+     */
+    protected void registerOuterJoinFixedInline(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
+            String foreignPropertyName, String fixedCondition) {
+        doRegisterOuterJoin(foreignCQ, joinOnResourceMap, foreignPropertyName, fixedCondition, true);
+    }
+
+    protected void doRegisterOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
+            String foreignPropertyName, String fixedCondition, boolean fixedInline) {
         // translate join-on map using column real name
         final Map<ColumnRealName, ColumnRealName> joinOnMap = newLinkedHashMap();
         final Set<Entry<String, String>> entrySet = joinOnResourceMap.entrySet();
@@ -371,9 +388,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String localTable = getTableDbName();
         final ForeignInfo foreignInfo = findDBMeta(getTableDbName()).findForeignInfo(foreignPropertyName);
         final FixedConditionResolver resolver = createFixedConditionResolver(foreignCQ, joinOnMap);
-        xgetSqlClause().registerOuterJoin(foreignAlias, foreignTable, localAlias, localTable // basic
-                , joinOnMap, foreignInfo // join objects
-                , fixedCondition, resolver); // fixed condition
+        if (fixedInline) {
+            xgetSqlClause().registerOuterJoinFixedInline(foreignAlias, foreignTable, localAlias, localTable // basic
+                    , joinOnMap, foreignInfo // join objects
+                    , fixedCondition, resolver); // fixed condition (to in-line view)
+        } else { // normally here
+            xgetSqlClause().registerOuterJoin(foreignAlias, foreignTable, localAlias, localTable // basic
+                    , joinOnMap, foreignInfo // join objects
+                    , fixedCondition, resolver); // fixed condition (to on-clause)
+        }
     }
 
     protected FixedConditionResolver createFixedConditionResolver(ConditionQuery foreignCQ,

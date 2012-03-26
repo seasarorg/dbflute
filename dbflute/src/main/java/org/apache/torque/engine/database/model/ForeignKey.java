@@ -97,6 +97,7 @@ public class ForeignKey {
 
     protected String _fixedCondition;
     protected String _fixedSuffix;
+    protected boolean _fixedInline;
     protected String _comment;
 
     // -----------------------------------------------------
@@ -1452,6 +1453,14 @@ public class ForeignKey {
 
     public void setFixedSuffix(String fixedSuffix) {
         this._fixedSuffix = fixedSuffix;
+    }
+
+    public boolean isFixedInline() {
+        return _fixedInline;
+    }
+
+    public void setFixedInline(boolean fixedInline) {
+        this._fixedInline = fixedInline;
     }
 
     public String getComment() {

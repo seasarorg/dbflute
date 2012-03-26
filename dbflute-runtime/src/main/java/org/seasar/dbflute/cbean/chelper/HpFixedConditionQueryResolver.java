@@ -62,15 +62,15 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     /**
      * {@inheritDoc}
      */
-    public String resolveVariable(String fixedCondition) {
-        fixedCondition = filterBasicMark(fixedCondition);
-        fixedCondition = filterSubQueryIndentMark(fixedCondition);
-        fixedCondition = filterLocationMark(fixedCondition);
-        fixedCondition = resolveFixedConditionOverRelation(fixedCondition);
+    public String resolveVariable(String fixedCondition, boolean fixedInline) {
+        fixedCondition = filterBasicMark(fixedCondition, fixedInline);
+        fixedCondition = filterSubQueryIndentMark(fixedCondition, fixedInline);
+        fixedCondition = filterLocationMark(fixedCondition, fixedInline);
+        fixedCondition = resolveFixedConditionOverRelation(fixedCondition, fixedInline);
         return fixedCondition;
     }
 
-    protected String filterBasicMark(String fixedCondition) {
+    protected String filterBasicMark(String fixedCondition, boolean fixedInline) {
         final String localAliasName = _localCQ.xgetAliasName();
         final String foreignAliasName = _foreignCQ.xgetAliasName();
         fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatibility
@@ -79,13 +79,16 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         return fixedCondition;
     }
 
-    protected String filterSubQueryIndentMark(String fixedCondition) {
+    protected String filterSubQueryIndentMark(String fixedCondition, boolean fixedInline) {
         final String sqBeginMark = getSqBeginMark();
         final String sqEndMark = getSqEndMark();
         if (!fixedCondition.contains(sqBeginMark) || !fixedCondition.contains(sqEndMark)) {
             return fixedCondition;
         }
-        fixedCondition = Srl.replace(fixedCondition, "\n)" + sqEndMark, "\n         )" + sqEndMark);
+        final String sqEndIndent = getSqEndIndent(fixedInline);
+        final String indentFrom = "\n)" + sqEndMark;
+        final String indentTo = "\n" + sqEndIndent + ")" + sqEndMark;
+        fixedCondition = Srl.replace(fixedCondition, indentFrom, indentTo);
         final SubQueryIndentProcessor processor = new SubQueryIndentProcessor();
         final String foreignAliasName = _foreignCQ.xgetAliasName();
         final String subQueryIdentity = "fixed_" + foreignAliasName;
@@ -96,12 +99,27 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         return fixedCondition;
     }
 
-    protected String filterLocationMark(String fixedCondition) {
+    protected String getSqEndIndent(boolean fixedInline) {
+        final String indent;
+        if (fixedInline) {
+            // ------"    left outer join (select ..."
+            // ------"                      where ..."
+            indent = "                            ";
+            // *inner-join gives up
+        } else {
+            // ------"    left outer join ..."
+            // ------"      on ..."
+            indent = "         ";
+        }
+        return indent;
+    }
+
+    protected String filterLocationMark(String fixedCondition, boolean fixedInline) {
         final String locationBase = _localCQ.xgetLocationBase();
         return replaceString(fixedCondition, getLocationBaseMark() + ".", "pmb." + locationBase);
     }
 
-    protected String resolveFixedConditionOverRelation(String fixedCondition) {
+    protected String resolveFixedConditionOverRelation(String fixedCondition, boolean fixedInline) {
         final String relationBeginMark = getRelationBeginMark();
         final String relationEndMark = getRelationEndMark();
         String remainder = fixedCondition;

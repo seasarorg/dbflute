@@ -996,8 +996,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     protected String getInlineViewClause(TableSqlName inlineTableSqlName, List<QueryClause> inlineWhereClauseList,
             int tablePos) {
+        final String inlineBaseAlias = getInlineViewBasePointAlias();
         final StringBuilder sb = new StringBuilder();
-        sb.append("(select * from ").append(inlineTableSqlName);
+        sb.append("(select * from ").append(inlineTableSqlName).append(" ").append(inlineBaseAlias);
         final String baseIndent = buildSpaceBar(tablePos + 1);
         sb.append(ln()).append(baseIndent);
         sb.append(" where ");
@@ -1211,6 +1212,32 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * {@inheritDoc}
      */
     public void registerOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
+            String fixedCondition, FixedConditionResolver fixedConditionResolver) {
+        doRegisterOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName, joinOnMap,
+                foreignInfo, fixedCondition, fixedConditionResolver);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName,
+            String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
+            String fixedCondition, FixedConditionResolver fixedConditionResolver) {
+        doRegisterOuterJoin(foreignAliasName, foreignTableDbName, localAliasName, localTableDbName // same as normal
+                , joinOnMap, foreignInfo // normal until here
+                , null, null); // null set to OnClause
+        if (fixedCondition != null) { // uses it instead of null set
+            if (fixedConditionResolver != null) {
+                fixedCondition = fixedConditionResolver.resolveVariable(fixedCondition, true);
+            }
+            final String inlineBaseAlias = getInlineViewBasePointAlias();
+            final String clause = Srl.replace(fixedCondition, foreignAliasName + ".", inlineBaseAlias + ".");
+            registerOuterJoinInlineWhereClause(foreignAliasName, clause, false);
+        }
+    }
+
+    protected void doRegisterOuterJoin(String foreignAliasName, String foreignTableDbName, String localAliasName,
             String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
             String fixedCondition, FixedConditionResolver fixedConditionResolver) {
         assertAlreadyOuterJoin(foreignAliasName);
@@ -1596,7 +1623,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             , boolean onClause) {
         assertNotYetOuterJoin(foreignAliasName);
         final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(foreignAliasName, onClause);
-        final ColumnRealName columnRealName = new ColumnRealName((onClause ? foreignAliasName : ""), columnSqlName);
+        String tableAliasName = onClause ? foreignAliasName : getInlineViewBasePointAlias();
+        final ColumnRealName columnRealName = new ColumnRealName(tableAliasName, columnSqlName);
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, true, onClause);
     }
 
@@ -2222,6 +2250,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
+    public String getInlineViewBasePointAlias() {
+        return "dfinloc";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String getUnionQueryInlineViewAlias() {
         return "dfunionview";
     }
@@ -2229,15 +2264,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /**
      * {@inheritDoc}
      */
-    public String getScalarSelectColumnAlias() {
-        return "dfscalar";
+    public String getDerivedReferrerNestedAlias() {
+        return "dfrefview";
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getDerivedReferrerNestedAlias() {
-        return "dfrefview";
+    public String getScalarSelectColumnAlias() {
+        return "dfscalar";
     }
 
     // ===================================================================================

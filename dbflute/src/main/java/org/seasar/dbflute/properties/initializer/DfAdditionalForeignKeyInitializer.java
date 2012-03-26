@@ -88,6 +88,7 @@ public class DfAdditionalForeignKeyInitializer {
     protected void processAllTableFK(String foreignKeyName, String foreignTableName, List<String> foreignColumnNameList) {
         final String fixedCondition = getFixedCondition(foreignKeyName);
         final String fixedSuffix = getFixedSuffix(foreignKeyName);
+        final String fixedInline = getFixedInline(foreignKeyName);
         final String comment = getComment(foreignKeyName);
 
         // for check about same-column self reference
@@ -120,7 +121,7 @@ public class DfAdditionalForeignKeyInitializer {
 
             final String currentForeignKeyName = foreignKeyName + "_" + localTableName;
             setupForeignKeyToTable(currentForeignKeyName, foreignTableName, foreignColumnNameList, fixedCondition,
-                    localTable, localColumnNameList, fixedSuffix, comment);
+                    localTable, localColumnNameList, fixedSuffix, fixedInline, comment);
             showResult(foreignTableName, foreignColumnNameList, fixedCondition, localTable, localColumnNameList);
         }
     }
@@ -130,6 +131,7 @@ public class DfAdditionalForeignKeyInitializer {
         assertLocalTable(foreignKeyName, localTableName);
         final String fixedCondition = getFixedCondition(foreignKeyName);
         final String fixedSuffix = getFixedSuffix(foreignKeyName);
+        final String fixedInline = getFixedInline(foreignKeyName);
         final String comment = getComment(foreignKeyName);
         final Table table = getTable(localTableName);
         final List<String> localColumnNameList = getLocalColumnNameList(foreignKeyName, foreignTableName,
@@ -141,16 +143,16 @@ public class DfAdditionalForeignKeyInitializer {
             return;
         }
         setupForeignKeyToTable(foreignKeyName, foreignTableName, foreignColumnNameList, fixedCondition, table,
-                localColumnNameList, fixedSuffix, comment);
+                localColumnNameList, fixedSuffix, fixedInline, comment);
         showResult(foreignTableName, foreignColumnNameList, fixedCondition, table, localColumnNameList);
     }
 
     protected void setupForeignKeyToTable(String foreignKeyName, String foreignTableName,
             List<String> foreignColumnNameList, String fixedCondition, Table table, List<String> localColumnNameList,
-            String fixedSuffix, String comment) {
+            String fixedSuffix, String fixedInline, String comment) {
         // set up foreign key instance
         final ForeignKey fk = createAdditionalForeignKey(foreignKeyName, foreignTableName, localColumnNameList,
-                foreignColumnNameList, fixedCondition, fixedSuffix, comment);
+                foreignColumnNameList, fixedCondition, fixedSuffix, fixedInline, comment);
         table.addForeignKey(fk);
 
         // set up referrer instance
@@ -204,7 +206,7 @@ public class DfAdditionalForeignKeyInitializer {
             fixedSuffix = sb.toString();
         }
         final ForeignKey fk = createAdditionalForeignKey(reverseName, table.getName(), foreignColumnNameList,
-                localColumnNameList, null, fixedSuffix, comment);
+                localColumnNameList, null, fixedSuffix, null, comment);
         foreignTable.addForeignKey(fk);
         final boolean canBeReferrer = table.addReferrer(fk);
         if (canBeReferrer) { // basically true because foreign columns are PK and no fixed condition
@@ -218,7 +220,7 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected ForeignKey createAdditionalForeignKey(String foreignKeyName, String foreignTableName,
             List<String> localColumnNameList, List<String> foreignColumnNameList, String fixedCondition,
-            String fixedSuffix, String comment) {
+            String fixedSuffix, String fixedInline, String comment) {
         final ForeignKey fk = new ForeignKey();
         fk.setName(foreignKeyName);
         fk.setForeignTableName(foreignTableName);
@@ -229,6 +231,9 @@ public class DfAdditionalForeignKeyInitializer {
         }
         if (Srl.is_NotNull_and_NotTrimmedEmpty(fixedSuffix)) {
             fk.setFixedSuffix(fixedSuffix);
+        }
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(fixedInline)) {
+            fk.setFixedInline(fixedInline.equalsIgnoreCase("true"));
         }
         if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
             fk.setComment(comment);
@@ -402,6 +407,10 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected String getFixedSuffix(String foreignKeyName) {
         return getProperties().findFixedSuffix(foreignKeyName);
+    }
+
+    protected String getFixedInline(String foreignKeyName) {
+        return getProperties().findFixedInline(foreignKeyName);
     }
 
     protected String getComment(String foreignKeyName) {

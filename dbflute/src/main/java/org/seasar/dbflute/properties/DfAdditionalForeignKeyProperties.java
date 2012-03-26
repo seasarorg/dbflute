@@ -25,6 +25,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     public static final String KEY_FOREIGN_COLUMN_NAME = "foreignColumnName";
     public static final String KEY_FIXED_CONDITION = "fixedCondition";
     public static final String KEY_FIXED_SUFFIX = "fixedSuffix";
+    public static final String KEY_FIXED_INLINE = "fixedInline";
     public static final String KEY_COMMENT = "comment";
 
     // ===================================================================================
@@ -93,28 +94,23 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     //                                                                      Finding Helper
     //                                                                      ==============
     public String findLocalTableName(String foreignKeyName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
-        return componentMap.get(KEY_LOCAL_TABLE_NAME);
+        return doFindAttributeValue(foreignKeyName, KEY_LOCAL_TABLE_NAME);
     }
 
     public String findForeignTableName(String foreignKeyName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
-        return componentMap.get(KEY_FOREIGN_TABLE_NAME);
+        return doFindAttributeValue(foreignKeyName, KEY_FOREIGN_TABLE_NAME);
     }
 
     protected String findLocalColumnName(String foreignKeyName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
-        return componentMap.get(KEY_LOCAL_COLUMN_NAME);
+        return doFindAttributeValue(foreignKeyName, KEY_LOCAL_COLUMN_NAME);
     }
 
     protected String findForeignColumnName(String foreignKeyName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
-        return componentMap.get(KEY_FOREIGN_COLUMN_NAME);
+        return doFindAttributeValue(foreignKeyName, KEY_FOREIGN_COLUMN_NAME);
     }
 
     public String findFixedCondition(String foreignKeyName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
-        String fixedCondition = componentMap.get(KEY_FIXED_CONDITION);
+        String fixedCondition = doFindAttributeValue(foreignKeyName, KEY_FIXED_CONDITION);
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
             // adjust a little about camel case
             final String foreignAliasMark = HpFixedConditionQueryResolver.FOREIGN_ALIAS_MARK;
@@ -128,13 +124,20 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     }
 
     public String findFixedSuffix(String foreignKeyName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
-        return componentMap.get(KEY_FIXED_SUFFIX);
+        return doFindAttributeValue(foreignKeyName, KEY_FIXED_SUFFIX);
+    }
+
+    public String findFixedInline(String foreignKeyName) {
+        return doFindAttributeValue(foreignKeyName, KEY_FIXED_INLINE);
     }
 
     public String findComment(String foreignKeyName) {
-        final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignKeyName);
-        return componentMap.get(KEY_COMMENT);
+        return doFindAttributeValue(foreignKeyName, KEY_COMMENT);
+    }
+
+    protected String doFindAttributeValue(String foreignKeyName, String optionKey) {
+        final Map<String, String> attributeMap = getAdditionalForeignKeyMap().get(foreignKeyName);
+        return attributeMap.get(optionKey);
     }
 
     public boolean isSuppressImplicitReverseFK(String foreignKeyName) { // closet (for emergency)
