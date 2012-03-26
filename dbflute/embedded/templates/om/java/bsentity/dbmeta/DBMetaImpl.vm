@@ -7,6 +7,7 @@ import java.util.Map;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.AbstractDBMeta;
+import org.seasar.dbflute.dbmeta.PropertyGateway;
 import org.seasar.dbflute.dbmeta.info.*;
 import org.seasar.dbflute.dbmeta.name.*;
 import ${glPackageBaseCommon}.*;
@@ -29,6 +30,58 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                       Current DBDef
     //                                                                       =============
     public DBDef getCurrentDBDef() { return ${glDBCurrent}.getInstance().currentDBDef(); }
+
+    // ===================================================================================
+    //                                                                    Property Gateway
+    //                                                                    ================
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## these fields and methods should be defined before definitions of column info
+## - - - - - - - - - -/
+    protected final Map<String, PropertyGateway> _epgMap = newHashMap();
+    {
+#foreach ($col in $table.columns)
+        setupEpg(_epgMap, new Epg${col.javaName}(), "${col.name}", "${col.javaBeansRulePropertyName}");
+#end
+    }
+    public PropertyGateway findPropertyGateway(String propertyName)
+    { return doFindEpg(_epgMap, propertyName); }
+#foreach ($col in $table.columns)
+#set ($setupperClassName = "Epg${col.javaName}")
+    public class ${setupperClassName} implements PropertyGateway {
+        public Object read(Entity e) { return ((${myExtendedObjectClassName})e).get${col.javaName}(); }
+#if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
+        public void write(Entity e, Object v) {
+            ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
+#if ($col.isCheckSelectedClassification())
+            ccls(col, v);
+#end
+            ((${myExtendedObjectClassName})e).set${col.javaName}As${col.classificationName}((${glCDef}.${col.classificationName})gcls(col, v));
+        }
+#else
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## for different type between relation (Integer, Long and BigDecimal are prior)
+## - - - - - - - - - -/
+#if ($col.isJavaNativeNumberObject())
+#if ($col.isJavaNativeInteger())
+        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}(cti(v)); }
+#elseif ($col.isJavaNativeLong())
+        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}(ctl(v)); }
+#elseif ($col.isJavaNativeBigDecimal())
+        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}(ctb(v)); }
+#else
+        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}(ctn(v, ${col.javaNative}.class)); }
+#end
+#else
+#if ($col.isJavaNativeUtilList())
+        @SuppressWarnings("unchecked")
+        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}((${col.javaNative})v); }
+#else
+        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}((${col.javaNative})v); }
+#end
+#end
+#end
+    }
+#end
 
     // ===================================================================================
     //                                                                          Table Info
@@ -275,86 +328,9 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                   Map Communication
     //                                                                   =================
     public void acceptPrimaryKeyMap(Entity e, Map<String, ? extends Object> m)
-    { doAcceptPrimaryKeyMap((${myExtendedObjectClassName})e, m, _epwMap); }
+    { doAcceptPrimaryKeyMap((${myExtendedObjectClassName})e, m); }
     public void acceptAllColumnMap(Entity e, Map<String, ? extends Object> m)
-    { doAcceptAllColumnMap((${myExtendedObjectClassName})e, m, _epwMap); }
+    { doAcceptAllColumnMap((${myExtendedObjectClassName})e, m); }
     public Map<String, Object> extractPrimaryKeyMap(Entity e) { return doExtractPrimaryKeyMap(e); }
     public Map<String, Object> extractAllColumnMap(Entity e) { return doExtractAllColumnMap(e); }
-
-    // ===================================================================================
-    //                                                                    Property Gateway
-    //                                                                    ================
-    // It's very INTERNAL!
-    // -----------------------------------------------------
-    //                                                Reader
-    //                                                ------
-    protected final Map<String, Epr<${myExtendedObjectClassName}>> _eprMap = newHashMap(); // plan map for speed
-    {
-#foreach ($col in $table.columns)
-        setupEpr(_eprMap, new Epr${col.javaName}(), column${col.javaBeansRulePropertyNameInitCap}());
-#end
-    }
-
-    public boolean hasEntityPropertyReader(String propertyName) { return _eprMap.containsKey(propertyName); }
-    public Object readEntityProperty(String propertyName, Object entity)
-    { return findEpr(_eprMap, propertyName).read((${myExtendedObjectClassName})entity); }
-
-#foreach ($col in $table.columns)
-#set ($setupperClassName = "Epr${col.javaName}")
-    public class ${setupperClassName} implements Epr<${myExtendedObjectClassName}>
-    { public Object read(${myExtendedObjectClassName} e) { return e.get${col.javaName}(); } }
-#end
-
-    // -----------------------------------------------------
-    //                                                Writer
-    //                                                ------
-    protected final Map<String, Epw<${myExtendedObjectClassName}>> _epwMap = newHashMap(); // plan map for speed
-    {
-#foreach ($col in $table.columns)
-        setupEpw(_epwMap, new Epw${col.javaName}(), column${col.javaBeansRulePropertyNameInitCap}());
-#end
-    }
-
-    public boolean hasEntityPropertyWriter(String propertyName) { return _epwMap.containsKey(propertyName); }
-    public void writeEntityProperty(String propertyName, Object entity, Object value)
-    { findEpw(_epwMap, propertyName).write((${myExtendedObjectClassName})entity, value); }
-
-#foreach ($col in $table.columns)
-#set ($setupperClassName = "Epw${col.javaName}")
-#if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
-    public class ${setupperClassName} implements Epw<${myExtendedObjectClassName}>
-    { public void write(${myExtendedObjectClassName} e, Object v) {
-        ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
-#if ($col.isCheckSelectedClassification())
-        ccls(col, v);
-#end
-        e.set${col.javaName}As${col.classificationName}((${glCDef}.${col.classificationName})gcls(col, v));
-    } }
-#else
-## /- - - - - - - - - - - - - - - - - - - -
-## for different type between relation
-## (Integer, Long and BigDecimal are prior)
-## - - - - - - - - - -/
-#if ($col.isJavaNativeNumberObject())
-    public class ${setupperClassName} implements Epw<${myExtendedObjectClassName}>
-#if ($col.isJavaNativeInteger())
-    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(cti(v)); } }
-#elseif ($col.isJavaNativeLong())
-    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctl(v)); } }
-#elseif ($col.isJavaNativeBigDecimal())
-    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctb(v)); } }
-#else
-    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctn(v, ${col.javaNative}.class)); } }
-#end
-#else
-    public static class ${setupperClassName} implements Epw<${myExtendedObjectClassName}>
-#if ($col.isJavaNativeUtilList())
-    { @SuppressWarnings("unchecked")
-    public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
-#else
-    { public void write(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
-#end
-#end
-#end
-#end
 }
