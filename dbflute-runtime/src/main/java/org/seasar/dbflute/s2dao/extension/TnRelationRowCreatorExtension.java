@@ -23,9 +23,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -163,9 +165,9 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     }
 
     protected void setValue(TnRelationRowCreationResource res, TnPropertyMapping mapping, DBMeta dbmeta, Object value) {
-        final String propertyName = mapping.getPropertyName();
-        if (dbmeta != null && dbmeta.hasEntityPropertyWriter(propertyName)) {
-            dbmeta.writeEntityProperty(propertyName, res.getRow(), value);
+        final ColumnInfo columnInfo = mapping.getEntityColumnInfo();
+        if (columnInfo != null) {
+            columnInfo.write((Entity) res.getRow(), value);
         } else {
             final DfPropertyAccessor accessor = mapping.getPropertyAccessor();
             accessor.setValue(res.getRow(), value);

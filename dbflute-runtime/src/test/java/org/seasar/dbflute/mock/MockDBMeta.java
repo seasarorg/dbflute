@@ -7,6 +7,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.AbstractDBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.PropertyGateway;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
@@ -100,21 +101,6 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
-    public boolean hasEntityPropertyReader(String propertyName) {
-        return false;
-    }
-
-    public Object readEntityProperty(String propertyName, Object entity) {
-        return null;
-    }
-
-    public boolean hasEntityPropertyWriter(String propertyName) {
-        return false;
-    }
-
-    public void writeEntityProperty(String propertyName, Object entity, Object value) {
-    }
-
     @Override
     protected List<ColumnInfo> ccil() {
         return null;
@@ -131,6 +117,10 @@ public class MockDBMeta extends AbstractDBMeta {
     }
 
     public Map<String, Object> extractAllColumnMap(Entity entity) {
+        return null;
+    }
+
+    public PropertyGateway findPropertyGateway(String propertyName) {
         return null;
     }
 }

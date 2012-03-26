@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.MappingClassCastException;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.DBFluteSystem;
@@ -139,8 +140,9 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                     mapping = entry.getValue();
                     propertyName = mapping.getPropertyName();
                     selectedValue = getValue(rs, columnName, mapping.getValueType(), selectIndexMap);
-                    if (dbmeta.hasEntityPropertyWriter(propertyName)) {
-                        dbmeta.writeEntityProperty(propertyName, row, selectedValue);
+                    final ColumnInfo columnInfo = mapping.getEntityColumnInfo();
+                    if (columnInfo != null) {
+                        columnInfo.write((Entity) row, selectedValue);
                     } else {
                         mapping.getPropertyAccessor().setValue(row, selectedValue);
                     }

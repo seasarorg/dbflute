@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
 import org.seasar.dbflute.jdbc.ValueType;
@@ -29,9 +30,23 @@ public interface TnPropertyMapping {
 
     ValueType getValueType();
 
+    /**
+     * @return The property name of column. (NotNull)
+     */
     String getPropertyName();
 
+    /**
+     * @return The DB name of column. (NotNull)
+     */
     String getColumnDbName();
 
+    /**
+     * @return The SQL name of column. (NotNull)
+     */
     ColumnSqlName getColumnSqlName();
+
+    /**
+     * @return The column info of DBMeta for the entity. (NullAllowed)
+     */
+    ColumnInfo getEntityColumnInfo(); // for DBFlute original mapping
 }

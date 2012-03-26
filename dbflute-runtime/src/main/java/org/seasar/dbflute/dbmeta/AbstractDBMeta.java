@@ -105,6 +105,82 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     // ===================================================================================
+    //                                                                    Property Gateway
+    //                                                                    ================
+    protected void setupEpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway,
+            String columnDbName, String propertyName) {
+        // propertyGatewayMap is plain map for speed so it registers keys like this:
+        propertyGatewayMap.put(columnDbName, gateway); // as supplementary key
+        propertyGatewayMap.put(propertyName, gateway); // as main key (resolving synonym)
+    }
+
+    protected <ENTITY extends Entity> PropertyGateway doFindEpg(Map<String, PropertyGateway> propertyGatewayMap,
+            String propertyName) {
+        return propertyGatewayMap.get(propertyName);
+    }
+
+    // -----------------------------------------------------
+    //                                       Write Converter
+    //                                       ---------------
+    protected Classification gcls(ColumnInfo columnInfo, Object code) { // getClassification
+        assertObjectNotNull("columnInfo", columnInfo);
+        if (code == null) {
+            return null;
+        }
+        final ClassificationMeta classificationMeta = columnInfo.getClassificationMeta();
+        if (classificationMeta == null) {
+            return null;
+        }
+        return classificationMeta.codeOf(code);
+    }
+
+    protected void ccls(ColumnInfo columnInfo, Object code) { // checkClassification
+        assertObjectNotNull("columnInfo", columnInfo);
+        if (code == null) {
+            return; // no check null value which means no existence on DB
+        }
+        final Classification classification = gcls(columnInfo, code);
+        if (classification == null) {
+            throwIllegalClassificationCodeException(columnInfo, code);
+        }
+    }
+
+    protected void throwIllegalClassificationCodeException(ColumnInfo columnInfo, Object code) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to get the classification by the code.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the code value of the classication column on your database.");
+        br.addElement("The code may NOT be one of classification code defined on DBFlute.");
+        br.addItem("Code");
+        br.addElement(code);
+        br.addItem("Classication");
+        br.addElement(columnInfo.getClassificationMeta());
+        br.addItem("Table");
+        br.addElement(getTableDbName());
+        br.addItem("Column");
+        br.addElement(columnInfo.getColumnDbName());
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalClassificationCodeException(msg);
+    }
+
+    protected Integer cti(Object value) { // convertToInteger
+        return DfTypeUtil.toInteger(value);
+    }
+
+    protected Long ctl(Object value) { // convertToLong
+        return DfTypeUtil.toLong(value);
+    }
+
+    protected BigDecimal ctb(Object value) { // convertToBigDecimal
+        return DfTypeUtil.toBigDecimal(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <NUMBER extends Number> NUMBER ctn(Object value, Class<NUMBER> type) { // convertToNumber
+        return (NUMBER) DfTypeUtil.toNumber(value, type);
+    }
+
+    // ===================================================================================
     //                                                                          Table Info
     //                                                                          ==========
     // These methods is expected to override if it needs.
@@ -648,29 +724,29 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                Accept
     //                                                ------
     protected <ENTITY extends Entity> void doAcceptPrimaryKeyMap(ENTITY entity,
-            Map<String, ? extends Object> primaryKeyMap, Map<String, Epw<ENTITY>> entityPropertyWriterMap) {
+            Map<String, ? extends Object> primaryKeyMap) {
         if (primaryKeyMap == null || primaryKeyMap.isEmpty()) {
             String msg = "The argument 'primaryKeyMap' should not be null or empty:";
             msg = msg + " primaryKeyMap=" + primaryKeyMap;
             throw new IllegalArgumentException(msg);
         }
         final List<ColumnInfo> uniqueColumnList = getPrimaryUniqueInfo().getUniqueColumnList();
-        doConvertToEntity(entity, primaryKeyMap, uniqueColumnList, entityPropertyWriterMap);
+        doConvertToEntity(entity, primaryKeyMap, uniqueColumnList);
     }
 
     protected <ENTITY extends Entity> void doAcceptAllColumnMap(ENTITY entity,
-            Map<String, ? extends Object> allColumnMap, Map<String, Epw<ENTITY>> entityPropertyWriterMap) {
+            Map<String, ? extends Object> allColumnMap) {
         if (allColumnMap == null || allColumnMap.isEmpty()) {
             String msg = "The argument 'allColumnMap' should not be null or empty:";
             msg = msg + " allColumnMap=" + allColumnMap;
             throw new IllegalArgumentException(msg);
         }
         final List<ColumnInfo> uniqueColumnList = getColumnInfoList();
-        doConvertToEntity(entity, allColumnMap, uniqueColumnList, entityPropertyWriterMap);
+        doConvertToEntity(entity, allColumnMap, uniqueColumnList);
     }
 
     protected <ENTITY extends Entity> void doConvertToEntity(ENTITY entity, Map<String, ? extends Object> columnMap,
-            List<ColumnInfo> columnInfoList, Map<String, Epw<ENTITY>> entityPropertyWriterMap) {
+            List<ColumnInfo> columnInfoList) {
         entity.clearModifiedInfo();
         final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnMap);
         for (ColumnInfo columnInfo : columnInfoList) {
@@ -695,7 +771,7 @@ public abstract class AbstractDBMeta implements DBMeta {
                 } else {
                     value = analyzer.analyzeOther(propertyType);
                 }
-                findEpw(entityPropertyWriterMap, propertyName).write(entity, value);
+                columnInfo.write(entity, value);
             }
         }
     }
@@ -828,114 +904,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     // ===================================================================================
-    //                                                                    Property Gateway
-    //                                                                    ================
-    // It's very INTERNAL!
-    // -----------------------------------------------------
-    //                                                Reader
-    //                                                ------
-    protected <ENTITY extends Entity> void setupEpr(Map<String, Epr<ENTITY>> entityPropertyReaderMap,
-            Epr<ENTITY> reader, ColumnInfo columnInfo) {
-        entityPropertyReaderMap.put(columnInfo.getPropertyName(), reader); // as main key (resolving synonym)
-        entityPropertyReaderMap.put(columnInfo.getColumnDbName(), reader); // as additional key
-    }
-
-    protected <ENTITY extends Entity> Epr<ENTITY> findEpr(Map<String, Epr<ENTITY>> entityPropertyReaderMap,
-            String propertyName) {
-        final Epr<ENTITY> reader = entityPropertyReaderMap.get(propertyName);
-        if (reader == null) {
-            String msg = "The propertyName was not found in the map of reader of entity property:";
-            msg = msg + " propertyName=" + propertyName;
-            msg = msg + " _entityPropertyReaderMap.keySet()=" + entityPropertyReaderMap.keySet();
-            throw new IllegalStateException(msg);
-        }
-        return reader;
-    }
-
-    // -----------------------------------------------------
-    //                                                Writer
-    //                                                ------
-    protected <ENTITY extends Entity> void setupEpw(Map<String, Epw<ENTITY>> entityPropertyWriterMap,
-            Epw<ENTITY> writer, ColumnInfo columnInfo) {
-        entityPropertyWriterMap.put(columnInfo.getPropertyName(), writer); // as main key (resolving synonym)
-        entityPropertyWriterMap.put(columnInfo.getColumnDbName(), writer); // as additional key
-    }
-
-    protected <ENTITY extends Entity> void registerEntityPropertyWriter(String columnName, String propertyName,
-            Epw<ENTITY> writer, Map<String, Epw<ENTITY>> entityPropertyWriterMap) {
-    }
-
-    protected <ENTITY extends Entity> Epw<ENTITY> findEpw(Map<String, Epw<ENTITY>> entityPropertyWriterMap,
-            String propertyName) {
-        final Epw<ENTITY> writer = entityPropertyWriterMap.get(propertyName);
-        if (writer == null) {
-            String msg = "The propertyName was not found in the map of writer of entity property:";
-            msg = msg + " propertyName=" + propertyName;
-            msg = msg + " _entityPropertyWriterMap.keySet()=" + entityPropertyWriterMap.keySet();
-            throw new IllegalStateException(msg);
-        }
-        return writer;
-    }
-
-    protected Classification gcls(ColumnInfo columnInfo, Object code) { // getClassification
-        assertObjectNotNull("columnInfo", columnInfo);
-        if (code == null) {
-            return null;
-        }
-        final ClassificationMeta classificationMeta = columnInfo.getClassificationMeta();
-        if (classificationMeta == null) {
-            return null;
-        }
-        return classificationMeta.codeOf(code);
-    }
-
-    protected void ccls(ColumnInfo columnInfo, Object code) { // checkClassification
-        assertObjectNotNull("columnInfo", columnInfo);
-        if (code == null) {
-            return; // no check null value which means no existence on DB
-        }
-        final Classification classification = gcls(columnInfo, code);
-        if (classification == null) {
-            throwIllegalClassificationCodeException(columnInfo, code);
-        }
-    }
-
-    protected void throwIllegalClassificationCodeException(ColumnInfo columnInfo, Object code) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to get the classification by the code.");
-        br.addItem("Advice");
-        br.addElement("Please confirm the code value of the classication column on your database.");
-        br.addElement("The code may NOT be one of classification code defined on DBFlute.");
-        br.addItem("Code");
-        br.addElement(code);
-        br.addItem("Classication");
-        br.addElement(columnInfo.getClassificationMeta());
-        br.addItem("Table");
-        br.addElement(getTableDbName());
-        br.addItem("Column");
-        br.addElement(columnInfo.getColumnDbName());
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalClassificationCodeException(msg);
-    }
-
-    protected Integer cti(Object value) { // convertToInteger
-        return DfTypeUtil.toInteger(value);
-    }
-
-    protected Long ctl(Object value) { // convertToLong
-        return DfTypeUtil.toLong(value);
-    }
-
-    protected BigDecimal ctb(Object value) { // convertToBigDecimal
-        return DfTypeUtil.toBigDecimal(value);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <NUMBER extends Number> NUMBER ctn(Object value, Class<NUMBER> type) { // convertToNumber
-        return (NUMBER) DfTypeUtil.toNumber(value, type);
-    }
-
-    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     @SuppressWarnings("unchecked")
@@ -946,8 +914,8 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected void checkDowncast(Entity entity) {
         assertObjectNotNull("entity", entity);
-        Class<? extends Entity> entityType = getEntityType();
-        Class<? extends Entity> targetType = entity.getClass();
+        final Class<?> entityType = getEntityType();
+        final Class<?> targetType = entity.getClass();
         if (!entityType.isAssignableFrom(targetType)) {
             final String titleName = DfTypeUtil.toClassTitle(entityType);
             String msg = "The entity should be " + titleName + " but it was: " + targetType;

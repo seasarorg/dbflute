@@ -28,6 +28,7 @@ import java.util.UUID;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
+import org.seasar.dbflute.dbmeta.PropertyGateway;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
@@ -69,8 +70,9 @@ public class ColumnInfo {
     protected final List<String> _foreignPropList;
     protected final List<String> _referrerPropList;
     protected final ClassificationMeta _classificationMeta;
-    protected final Method _reader;
-    protected final Method _writer;
+    protected final PropertyGateway _gateway;
+    protected final Method _readMethod;
+    protected final Method _writeMethod;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -104,53 +106,65 @@ public class ColumnInfo {
         _foreignPropList = foreignPropList != null ? foreignPropList : EMPTY_LIST;
         _referrerPropList = referrerPropList != null ? referrerPropList : EMPTY_LIST;
         _classificationMeta = classificationMeta;
-        _reader = findReader();
-        _writer = findWriter();
+        _gateway = findPropertyGateway();
+        _readMethod = findReadMethod();
+        _writeMethod = findWriteMethod();
     }
 
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
     // -----------------------------------------------------
+    //                                               Gateway
+    //                                               -------
+    /**
+     * Get the property gateway for the column.
+     * @return The property gateway for the column, cached in this instance. (NotNull)
+     */
+    public PropertyGateway getPropertyGateway() {
+        return _gateway;
+    }
+
+    // -----------------------------------------------------
     //                                                  Read
     //                                                  ----
     /**
-     * Read the value from the entity.
+     * Read the value from the entity by its gateway (means no reflection).
      * @param entity The target entity of this column to read. (NotNull)
      * @param <PROPERTY> The type of the property.
      * @return The read value. (NullAllowed)
      */
     @SuppressWarnings("unchecked")
     public <PROPERTY> PROPERTY read(Entity entity) {
-        return (PROPERTY) _dbmeta.readEntityProperty(_propertyName, entity);
+        return (PROPERTY) _gateway.read(entity);
     }
 
     /**
-     * Get the read method for reflection.
+     * Get the read method for entity reflection.
      * @return The read method, cached in this instance. (NotNull)
      */
-    public Method reader() {
-        return _reader;
+    public Method getReadMethod() {
+        return _readMethod;
     }
 
     // -----------------------------------------------------
     //                                                 Write
     //                                                 -----
     /**
-     * Write the value to the entity.
+     * Write the value to the entity by its gateway (means no reflection).
      * @param entity The target entity of this column to write. (NotNull)
      * @param value The written value. (NullAllowed: if null, null value is written)
      */
     public void write(Entity entity, Object value) {
-        _dbmeta.writeEntityProperty(_propertyName, entity, value);
+        _gateway.write(entity, value);
     }
 
     /**
-     * Get the write method for reflection.
+     * Get the write method for entity reflection.
      * @return The writer method, cached in this instance. (NotNull)
      */
-    public Method writer() {
-        return _writer;
+    public Method getWriteMethod() {
+        return _writeMethod;
     }
 
     // -----------------------------------------------------
@@ -161,32 +175,38 @@ public class ColumnInfo {
      * @return The type instance. (NullAllowed: when not list type)
      */
     public Class<?> getGenericType() {
-        return DfReflectionUtil.getGenericType(reader().getGenericReturnType());
+        return DfReflectionUtil.getGenericType(getReadMethod().getGenericReturnType());
     }
 
     // -----------------------------------------------------
     //                                                Finder
     //                                                ------
-    protected Method findReader() {
+    protected PropertyGateway findPropertyGateway() {
+        final PropertyGateway gateway = _dbmeta.findPropertyGateway(_propertyName);
+        if (gateway == null) { // no way
+            String msg = "Not found the property gateway by the name: " + _propertyName;
+            throw new IllegalStateException(msg);
+        }
+        return gateway;
+    }
+
+    protected Method findReadMethod() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
         final String methodName = buildAccessorName("get");
         final Method method = findMethod(entityType, methodName, new Class<?>[] {});
         if (method == null) {
-            String msg = "Failed to find the method by the name:";
-            msg = msg + " methodName=" + methodName;
+            String msg = "Not found the metho by the name: " + methodName;
             throw new IllegalStateException(msg);
         }
         return method;
     }
 
-    protected Method findWriter() {
+    protected Method findWriteMethod() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
         final String methodName = buildAccessorName("set");
         final Method method = findMethod(entityType, methodName, new Class<?>[] { _propertyType });
         if (method == null) {
-            String msg = "Failed to find the method by the name:";
-            msg = msg + " methodName=" + methodName;
-            msg = msg + " propertyType=" + _propertyType;
+            String msg = "Not found the metho by the name and type: " + methodName + ", " + _propertyType;
             throw new IllegalStateException(msg);
         }
         return method;

@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata.impl;
 
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
@@ -33,10 +34,11 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfPropertyDesc _propertyDesc;
+    protected final ValueType _valueType;
     protected final String _propertyName;
     protected final String _columnDbName;
     protected final ColumnSqlName _columnSqlName;
-    protected final ValueType _valueType;
+    protected final ColumnInfo _entityColumnInfo; // not required
     protected boolean _primaryKey = false;
     protected boolean _persistent = true;
 
@@ -46,16 +48,17 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc) {
         // for non persistent property (for example, relation)
         this(propertyDesc, TnValueTypes.DEFAULT_OBJECT, propertyDesc.getPropertyName(), new ColumnSqlName(
-                propertyDesc.getPropertyName()));
+                propertyDesc.getPropertyName()), null);
     }
 
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType, String columnDbName,
-            ColumnSqlName columnSqlName) {
-        this._propertyDesc = propertyDesc;
-        this._propertyName = propertyDesc.getPropertyName();
-        this._valueType = valueType;
-        this._columnDbName = columnDbName;
-        this._columnSqlName = columnSqlName;
+            ColumnSqlName columnSqlName, ColumnInfo entityColumnInfo) {
+        _propertyDesc = propertyDesc;
+        _propertyName = propertyDesc.getPropertyName();
+        _valueType = valueType;
+        _columnDbName = columnDbName;
+        _columnSqlName = columnSqlName;
+        _entityColumnInfo = entityColumnInfo;
     }
 
     // ===================================================================================
@@ -78,6 +81,10 @@ public class TnPropertyTypeImpl implements TnPropertyType {
         return _propertyDesc;
     }
 
+    public ValueType getValueType() {
+        return _valueType;
+    }
+
     public String getPropertyName() {
         return _propertyName;
     }
@@ -90,8 +97,8 @@ public class TnPropertyTypeImpl implements TnPropertyType {
         return _columnSqlName;
     }
 
-    public ValueType getValueType() {
-        return _valueType;
+    public ColumnInfo getEntityColumnInfo() {
+        return _entityColumnInfo;
     }
 
     public boolean isPrimaryKey() {

@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
@@ -166,8 +167,15 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     protected ColumnSqlName getColumnSqlName(String columnDbName) {
         if (hasDBMeta() && _dbmeta.hasColumn(columnDbName)) {
             return _dbmeta.findColumnInfo(columnDbName).getColumnSqlName();
-        } else {
-            return new ColumnSqlName(columnDbName);
         }
+        return new ColumnSqlName(columnDbName);
+    }
+
+    @Override
+    protected ColumnInfo getEntityColumnInfo(String columnDbName) {
+        if (hasDBMeta() && _dbmeta.hasColumn(columnDbName)) {
+            return _dbmeta.findColumnInfo(columnDbName);
+        }
+        return null;
     }
 }

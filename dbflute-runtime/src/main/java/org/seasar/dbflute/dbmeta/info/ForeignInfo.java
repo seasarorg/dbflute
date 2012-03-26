@@ -46,8 +46,8 @@ public class ForeignInfo implements RelationInfo {
     protected final boolean _bizOneToOne;
     protected final boolean _additionalFK;
     protected final String _reversePropertyName;
-    protected final Method _reader;
-    protected final Method _writer;
+    protected final Method _readMethod;
+    protected final Method _writeMethod;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -75,8 +75,8 @@ public class ForeignInfo implements RelationInfo {
         _bizOneToOne = bizOneToOne;
         _additionalFK = additionalFK;
         _reversePropertyName = reversePropertyName;
-        _reader = findReader();
-        _writer = findWriter();
+        _readMethod = findReadMethod();
+        _writeMethod = findWriteMethod();
     }
 
     // ===================================================================================
@@ -148,15 +148,15 @@ public class ForeignInfo implements RelationInfo {
      */
     @SuppressWarnings("unchecked")
     public <PROPERTY extends Entity> PROPERTY read(Entity localEntity) {
-        return (PROPERTY) invokeMethod(reader(), localEntity, new Object[] {});
+        return (PROPERTY) invokeMethod(getReadMethod(), localEntity, new Object[] {});
     }
 
     /**
-     * Get the read method for reflection.
+     * Get the read method for entity reflection.
      * @return The read method, cached in this instance. (NotNull)
      */
-    public Method reader() {
-        return _reader;
+    public Method getReadMethod() {
+        return _readMethod;
     }
 
     // -----------------------------------------------------
@@ -168,41 +168,38 @@ public class ForeignInfo implements RelationInfo {
      * @param foreignEntity The written instance of foreign entity. (NullAllowed: if null, null value is written)
      */
     public void write(Entity localEntity, Entity foreignEntity) {
-        invokeMethod(writer(), localEntity, new Object[] { foreignEntity });
+        invokeMethod(getWriteMethod(), localEntity, new Object[] { foreignEntity });
     }
 
     /**
-     * Get the write method for reflection.
+     * Get the write method for entity reflection.
      * @return The writer method, cached in this instance. (NotNull)
      */
-    public Method writer() {
-        return _writer;
+    public Method getWriteMethod() {
+        return _writeMethod;
     }
 
     // -----------------------------------------------------
     //                                                Finder
     //                                                ------
-    protected Method findReader() {
+    protected Method findReadMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
         final String methodName = buildAccessorName("get");
         final Method method = findMethod(localType, methodName, new Class[] {});
         if (method == null) {
-            String msg = "Failed to find the method by the name:";
-            msg = msg + " methodName=" + methodName;
+            String msg = "Not found the method by the name: " + methodName;
             throw new IllegalStateException(msg);
         }
         return method;
     }
 
-    protected Method findWriter() {
+    protected Method findWriteMethod() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
         final Class<? extends Entity> foreignType = _foreignDBMeta.getEntityType();
         final String methodName = buildAccessorName("set");
         final Method method = findMethod(localType, methodName, new Class[] { foreignType });
         if (method == null) {
-            String msg = "Failed to find the method by the name:";
-            msg = msg + " methodName=" + methodName;
-            msg = msg + " foreignType=" + foreignType;
+            String msg = "Not found the method by the name and type: " + methodName + ", " + foreignType;
             throw new IllegalStateException(msg);
         }
         return method;

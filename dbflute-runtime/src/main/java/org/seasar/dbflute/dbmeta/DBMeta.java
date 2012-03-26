@@ -64,6 +64,17 @@ public interface DBMeta {
     DBDef getCurrentDBDef();
 
     // ===================================================================================
+    //                                                                    Property Gateway
+    //                                                                    ================
+    // these fields and methods should be defined before definitions of column info at implementation classes
+    /**
+     * Find the property gateway of the entity for the column. <br />
+     * @param propertyName The name of the property for the column (you can also set column DB name). (NotNull)
+     * @return The instance of the property gateway. (NullAllowed: if not found, returns null)
+     */
+    PropertyGateway findPropertyGateway(String propertyName);
+
+    // ===================================================================================
     //                                                                          Table Info
     //                                                                          ==========
     /**
@@ -457,78 +468,6 @@ public interface DBMeta {
      * @return The map of all columns. (NotNull)
      */
     Map<String, Object> extractAllColumnMap(Entity entity);
-
-    // ===================================================================================
-    //                                                                    Property Gateway
-    //                                                                    ================
-    // It's very INTERNAL!
-    // -----------------------------------------------------
-    //                                                Reader
-    //                                                ------
-    /**
-     * Does this table have the reader of entity property by the name of property? <br />
-     * Comparing is so flexible. {Ignore cases and underscore}
-     * @param propertyName The name of the property (you can also set column DB name). (NotNull)
-     * @return The determination, true or false.
-     */
-    boolean hasEntityPropertyReader(String propertyName);
-
-    /**
-     * Read the value of the entity property. (for INTERNAL)
-     * @param propertyName The name of the property (you can also set column DB name). (NotNull)
-     * @param entity The entity for the property. (NotNull)
-     * @return The read value of the property. (NullAllowed)
-     */
-    Object readEntityProperty(String propertyName, Object entity);
-
-    /**
-     * The reader of entity property. <br />
-     * This class is for Internal. Don't use this!
-     * @param <ENTITY_TYPE> The type of entity.
-     */
-    public interface Epr<ENTITY_TYPE extends Entity> {
-
-        /**
-         * Read the property value from the entity.
-         * @param entity The target entity to read. (NotNull)
-         * @return The read value. (NullAllowed)
-         */
-        Object read(ENTITY_TYPE entity);
-    }
-
-    // -----------------------------------------------------
-    //                                                Writer
-    //                                                ------
-    /**
-     * Does this table have the writer of entity property by the name of property? <br />
-     * Comparing is so flexible. {Ignore cases and underscore}
-     * @param propertyName The name of the property (you can also set column DB name). (NotNull)
-     * @return The determination, true or false.
-     */
-    boolean hasEntityPropertyWriter(String propertyName);
-
-    /**
-     * Write the value of the entity property. (for INTERNAL)
-     * @param propertyName The name of the property (you can also set column DB name). (NotNull)
-     * @param entity The entity for the property. (NotNull)
-     * @param value The written value of the property. (NullAllowed)
-     */
-    void writeEntityProperty(String propertyName, Object entity, Object value);
-
-    /**
-     * The writer of entity property. <br />
-     * This class is for Internal. Don't use this!
-     * @param <ENTITY_TYPE> The type of entity.
-     */
-    public interface Epw<ENTITY_TYPE extends Entity> {
-
-        /**
-         * Write the property value to the entity.
-         * @param entity The target entity to write. (NotNull)
-         * @param value The written value. (NullAllowed)
-         */
-        void write(ENTITY_TYPE entity, Object value);
-    }
 
     // ===================================================================================
     //                                                                Optimistic Lock Type
