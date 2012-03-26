@@ -108,10 +108,9 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                    Property Gateway
     //                                                                    ================
     protected void setupEpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway,
-            String columnDbName, String propertyName) {
-        // propertyGatewayMap is plain map for speed so it registers keys like this:
-        propertyGatewayMap.put(columnDbName, gateway); // as supplementary key
-        propertyGatewayMap.put(propertyName, gateway); // as main key (resolving synonym)
+            String propertyName) {
+        // the map should be plain map for performance
+        propertyGatewayMap.put(propertyName, gateway);
     }
 
     protected <ENTITY extends Entity> PropertyGateway doFindEpg(Map<String, PropertyGateway> propertyGatewayMap,
@@ -207,7 +206,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_tableDbNameFlexibleMap != null) {
                 return _tableDbNameFlexibleMap;
             }
-            _tableDbNameFlexibleMap = StringKeyMap.createAsFlexibleConcurrent();
+            _tableDbNameFlexibleMap = createFlexibleConcurrentMap();
             _tableDbNameFlexibleMap.put(getTableDbName(), getTableDbName());
             return _tableDbNameFlexibleMap;
         }
@@ -225,7 +224,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_tablePropertyNameFlexibleMap != null) {
                 return _tablePropertyNameFlexibleMap;
             }
-            _tablePropertyNameFlexibleMap = StringKeyMap.createAsFlexibleConcurrent();
+            _tablePropertyNameFlexibleMap = createFlexibleConcurrentMap();
             _tablePropertyNameFlexibleMap.put(getTableDbName(), getTablePropertyName());
             return _tableDbNameFlexibleMap;
         }
@@ -254,7 +253,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return columnInfo;
     }
 
-    protected ColumnInfo cci(String columnDbName, String columnSqlName, String columnSynonymName, String columnAlias,
+    protected ColumnInfo cci(String columnDbName, String columnSqlName, String columnSynonym, String columnAlias,
             boolean notNull, String propertyName, Class<?> propertyType, boolean primary, boolean autoIncrement,
             String columnDbType, Integer columnSize, Integer decimalDigits, boolean commonColumn,
             OptimisticLockType optimisticLockType, String columnComment, String foreignListExp, String referrerListExp,
@@ -268,7 +267,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (referrerListExp != null && referrerListExp.trim().length() > 0) {
             referrerPropList = splitListTrimmed(referrerListExp, delimiter);
         }
-        return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonymName, columnAlias, notNull, propertyName,
+        return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonym, columnAlias, notNull, propertyName,
                 propertyType, primary, autoIncrement, columnDbType, columnSize, decimalDigits, commonColumn,
                 optimisticLockType, columnComment, foreignPropList, referrerPropList, classificationMeta);
     }
@@ -304,13 +303,9 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_columnInfoFlexibleMap != null) {
                 return _columnInfoFlexibleMap;
             }
-            _columnInfoFlexibleMap = StringKeyMap.createAsFlexibleConcurrent();
+            _columnInfoFlexibleMap = createFlexibleConcurrentMap();
             for (ColumnInfo columnInfo : columnInfoList) {
-                _columnInfoFlexibleMap.put(columnInfo.getColumnDbName(), columnInfo);
-                final String columnSynonym = columnInfo.getColumnSynonym();
-                if (columnSynonym != null) {
-                    _columnInfoFlexibleMap.put(columnSynonym, columnInfo); // to find by synonym name
-                }
+                columnInfo.diveIntoFlexibleMap(_columnInfoFlexibleMap);
             }
             return _columnInfoFlexibleMap;
         }
@@ -416,7 +411,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_foreignInfoFlexibleMap != null) {
                 return _foreignInfoFlexibleMap;
             }
-            _foreignInfoFlexibleMap = StringKeyMap.createAsFlexibleConcurrent();
+            _foreignInfoFlexibleMap = createFlexibleConcurrentMap();
             for (ForeignInfo foreignInfo : foreignInfoList) {
                 _foreignInfoFlexibleMap.put(foreignInfo.getForeignPropertyName(), foreignInfo);
             }
@@ -497,7 +492,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_referrerInfoFlexibleMap != null) {
                 return _referrerInfoFlexibleMap;
             }
-            _referrerInfoFlexibleMap = StringKeyMap.createAsFlexibleConcurrent();
+            _referrerInfoFlexibleMap = createFlexibleConcurrentMap();
             for (ReferrerInfo referrerInfo : referrerInfoList) {
                 _referrerInfoFlexibleMap.put(referrerInfo.getReferrerPropertyName(), referrerInfo);
             }
@@ -1031,6 +1026,10 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {
         return new ArrayList<ELEMENT>(collection);
+    }
+
+    protected <VALUE> StringKeyMap<VALUE> createFlexibleConcurrentMap() {
+        return StringKeyMap.createAsFlexibleConcurrent();
     }
 
     // -----------------------------------------------------

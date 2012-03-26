@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.seasar.dbflute.Entity;
@@ -223,6 +224,11 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                        Convert Type
     //                                                                        ============
+    /**
+     * Convert the value to property type.
+     * @param value The conversion target value. (NullAllowed)
+     * @return The converted value as property type. (NullAllowed)
+     */
     @SuppressWarnings("unchecked")
     public <VALUE> VALUE toPropretyType(Object value) {
         if (value == null) {
@@ -275,6 +281,45 @@ public class ColumnInfo {
     }
 
     // ===================================================================================
+    //                                                                         FlexibleKey
+    //                                                                         ===========
+    /**
+     * Dive into flexible map by flexible keys.
+     * @param flexibleMap The flexible map for column. (NotNull)
+     */
+    public void diveIntoFlexibleMap(Map<String, ColumnInfo> flexibleMap) {
+        final List<String> flexibleKeyList = getFlexibleKeyList();
+        for (String flexibleKey : flexibleKeyList) {
+            flexibleMap.put(flexibleKey, this);
+        }
+    }
+
+    /**
+     * Get the list of flexible keys for this column.
+     * @return The list of flexible keys. (NotNull)
+     */
+    protected List<String> getFlexibleKeyList() {
+        return generateFlexibleKeyList(_columnDbName, _columnSynonym, _propertyName);
+    }
+
+    /**
+     * Generate the list of flexible keys. (static utility)
+     * @param columnDbName The DB name of column. (NotNull)
+     * @param columnSynonym The DB synonym name of column. (NotNull)
+     * @param propertyName The property name of column. (NotNull)
+     * @return The list of flexible keys. (NotNull)
+     */
+    public static List<String> generateFlexibleKeyList(String columnDbName, String columnSynonym, String propertyName) {
+        final List<String> keyList = new ArrayList<String>();
+        keyList.add(columnDbName);
+        if (columnSynonym != null) {
+            keyList.add(columnSynonym);
+        }
+        keyList.add(propertyName);
+        return keyList;
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(final String name) {
@@ -295,10 +340,12 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    @Override
     public int hashCode() {
         return _dbmeta.hashCode() + _columnDbName.hashCode();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof ColumnInfo)) {
             return false;
@@ -313,6 +360,7 @@ public class ColumnInfo {
         return true;
     }
 
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(_dbmeta.getTableDbName());

@@ -69,7 +69,7 @@ public interface DBMeta {
     // these fields and methods should be defined before definitions of column info at implementation classes
     /**
      * Find the property gateway of the entity for the column. <br />
-     * @param propertyName The name of the property for the column (you can also set column DB name). (NotNull)
+     * @param propertyName The property name of the column as case insensitive for performance. (NotNull)
      * @return The instance of the property gateway. (NullAllowed: if not found, returns null)
      */
     PropertyGateway findPropertyGateway(String propertyName);
