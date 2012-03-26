@@ -2251,7 +2251,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      * {@inheritDoc}
      */
     public String getInlineViewBasePointAlias() {
-        return "dfinloc";
+        return "dfinlineloc";
     }
 
     /**
