@@ -34,13 +34,14 @@ public class ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                    Property Gateway
     //                                                                    ================
-## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## these fields and methods should be defined before definitions of column info
+## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## These fields and methods should be defined before definitions of column info.
+## And the map should be plain map for performance.
 ## - - - - - - - - - -/
     protected final Map<String, PropertyGateway> _epgMap = newHashMap();
     {
 #foreach ($col in $table.columns)
-        setupEpg(_epgMap, new Epg${col.javaName}(), "${col.name}", "${col.javaBeansRulePropertyName}");
+        setupEpg(_epgMap, new Epg${col.javaName}(), "${col.javaBeansRulePropertyName}");
 #end
     }
     public PropertyGateway findPropertyGateway(String propertyName)
