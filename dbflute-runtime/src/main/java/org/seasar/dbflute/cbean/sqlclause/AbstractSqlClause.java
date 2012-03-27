@@ -1574,7 +1574,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             , ConditionKey key, ConditionValue value // basic resources
             , ColumnFunctionCipher cipher, ConditionOption option) { // optional resources
         final List<QueryClause> clauseList = getBaseTableInlineWhereClauseList4Register();
-        final ColumnRealName columnRealName = new ColumnRealName(null, columnSqlName);
+        final String inlineBaseAlias = getInlineViewBasePointAlias();
+        final ColumnRealName columnRealName = new ColumnRealName(inlineBaseAlias, columnSqlName);
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, true, false);
     }
 
@@ -1623,7 +1624,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             , boolean onClause) {
         assertNotYetOuterJoin(foreignAliasName);
         final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(foreignAliasName, onClause);
-        String tableAliasName = onClause ? foreignAliasName : getInlineViewBasePointAlias();
+        final String tableAliasName = onClause ? foreignAliasName : getInlineViewBasePointAlias();
         final ColumnRealName columnRealName = new ColumnRealName(tableAliasName, columnSqlName);
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, true, onClause);
     }
