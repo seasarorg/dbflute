@@ -1074,6 +1074,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
         xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION, mainCQ);
     }
 
+    public void xsetupForScalarConditionPartitionBy(ConditionQuery mainCQ) {
+        xprepareSubQueryInfo(mainCQ);
+        xchangePurposeSqlClause(HpCBPurpose.SCALAR_CONDITION_PARTITION_BY, mainCQ);
+    }
+
     public void xsetupForMyselfInScope(ConditionQuery mainCQ) {
         xprepareSubQueryInfo(mainCQ);
         xchangePurposeSqlClause(HpCBPurpose.MYSELF_IN_SCOPE, mainCQ);

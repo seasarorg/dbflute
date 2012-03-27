@@ -9,15 +9,15 @@ import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
 public class QueryUsedAliasInfo {
 
     protected final String _usedAliasName; // NotNull
-    protected final InnerJoinNoWaySpeaker _innerJoinAutoDetectNoWaySpeaker; // NullAllowed
+    protected final InnerJoinNoWaySpeaker _innerJoinNoWaySpeaker; // NullAllowed
 
     /**
      * @param usedAliasName The alias name of joined table (or local) where it is used in query. (NotNull)
-     * @param innerJoinAutoDetectNoWaySpeaker The no-way speaker for auto-detect of inner-join. (NullAllowed)
+     * @param innerJoinNoWaySpeaker The no-way speaker for auto-detect of inner-join. (NullAllowed)
      */
-    public QueryUsedAliasInfo(String usedAliasName, InnerJoinNoWaySpeaker innerJoinAutoDetectNoWaySpeaker) {
+    public QueryUsedAliasInfo(String usedAliasName, InnerJoinNoWaySpeaker innerJoinNoWaySpeaker) {
         _usedAliasName = usedAliasName;
-        _innerJoinAutoDetectNoWaySpeaker = innerJoinAutoDetectNoWaySpeaker;
+        _innerJoinNoWaySpeaker = innerJoinNoWaySpeaker;
     }
 
     public String getUsedAliasName() {
@@ -25,6 +25,6 @@ public class QueryUsedAliasInfo {
     }
 
     public InnerJoinNoWaySpeaker getInnerJoinAutoDetectNoWaySpeaker() {
-        return _innerJoinAutoDetectNoWaySpeaker;
+        return _innerJoinNoWaySpeaker;
     }
 }

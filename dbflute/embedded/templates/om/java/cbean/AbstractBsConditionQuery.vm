@@ -1299,19 +1299,32 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     protected HpSSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String operand) {
         return new HpSSQFunction<${myConditionBeanClassName}>(new HpSSQSetupper<${myConditionBeanClassName}>() {
-            public void setup(String function, SubQuery<${myConditionBeanClassName}> subQuery) {
-                xscalarCondition(function, subQuery, operand);
+            public void setup(String function, SubQuery<${myConditionBeanClassName}> subQuery, HpSSQOption<${myConditionBeanClassName}> option) {
+                xscalarCondition(function, subQuery, operand, option);
             }
         });
     }
 
-    protected void xscalarCondition(String function, SubQuery<${myConditionBeanClassName}> subQuery, String operand) {
+    protected void xscalarCondition(String function, SubQuery<${myConditionBeanClassName}> subQuery, String operand, HpSSQOption<${myConditionBeanClassName}> option) {
         assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForScalarCondition(this); subQuery.query(cb);
+        ${myConditionBeanClassName} cb = xcreateScalarConditionCB(); subQuery.query(cb);
         String subQueryPropertyName = keepScalarCondition(cb.query()); // for saving query-value.
-        registerScalarCondition(function, cb.query(), subQueryPropertyName, operand);
+        option.setPartitionByCBean(xcreateScalarConditionPartitionByCB());
+        registerScalarCondition(function, cb.query(), subQueryPropertyName, operand, option);
     }
     public abstract String keepScalarCondition(${myConditionQueryClassName} subQuery);
+
+    protected ${myConditionBeanClassName} xcreateScalarConditionCB() {
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+        cb.xsetupForScalarCondition(this);
+        return cb;
+    }
+
+    protected ${myConditionBeanClassName} xcreateScalarConditionPartitionByCB() {
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+        cb.xsetupForScalarConditionPartitionBy(this);
+        return cb;
+    }
 
     // ===================================================================================
     //                                                                       MyselfInScope

@@ -8,15 +8,25 @@ import org.seasar.dbflute.util.Srl;
 public enum HpCBPurpose {
 
     NORMAL_USE(new HpSpec()) // basic (all functions can be used)
+
     , UNION_QUERY(new HpSpec().noSetupSelect().noSpecify().noOrderBy()) // Union
-    , EXISTS_REFERRER(new HpSpec().noSetupSelect().noSpecify().noOrderBy().subQuery()) // ExistsReferrer 
+
+    , EXISTS_REFERRER(new HpSpec().noSetupSelect().noSpecify().noOrderBy().subQuery()) // ExistsReferrer
+
     , IN_SCOPE_RELATION(new HpSpec().noSetupSelect().noSpecify().noOrderBy().subQuery()) // InScopeRelation
+
     , DERIVED_REFERRER(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
             .noSpecifyDerivedReferrerTwoOrMore().noOrderBy().subQuery()) // DerivedReferrer
+
     , SCALAR_SELECT(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
             .noSpecifyDerivedReferrerTwoOrMore().noSpecifyRelation().noOrderBy()) // ScalarSelect
+
     , SCALAR_CONDITION(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
             .noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarCondition
+
+    , SCALAR_CONDITION_PARTITION_BY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
+            .noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarConditionPartitionBy
+
     , MYSELF_IN_SCOPE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore()
             .noSpecifyColumnWithDerivedReferrer().noOrderBy().subQuery()) // MyselfInScope
 
@@ -26,8 +36,10 @@ public enum HpCBPurpose {
     // Because specification uses query internally.
     , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
             .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // ColumnQuery
+
     , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
             .noSpecifyDerivedReferrer().noQuery()) // VaryingUpdate
+
     , SPECIFIED_UPDATE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyDerivedReferrer().noQuery()) // SpecifiedUpdate
 
     // for intoCB (not for resourceCB)

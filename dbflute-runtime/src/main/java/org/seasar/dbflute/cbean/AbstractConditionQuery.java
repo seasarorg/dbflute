@@ -32,6 +32,7 @@ import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpQDRParameter;
+import org.seasar.dbflute.cbean.chelper.HpSSQOption;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
@@ -48,11 +49,14 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.cbean.sqlclause.subquery.ExistsReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.InScopeRelation;
 import org.seasar.dbflute.cbean.sqlclause.subquery.QueryDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.ScalarCondition;
+import org.seasar.dbflute.cbean.sqlclause.subquery.ScalarCondition.PartitionByProvider;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -1061,8 +1065,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                       ScalarCondition
     //                                       ---------------
-    protected void registerScalarCondition(String function, final ConditionQuery subQuery, String propertyName,
-            String operand) {
+    protected <CB extends ConditionBean> void registerScalarCondition(final String function,
+            final ConditionQuery subQuery, String propertyName, String operand, final HpSSQOption<CB> option) {
         assertSubQueryNotNull("ScalarCondition", propertyName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -1077,11 +1081,22 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta subQueryDBMeta = findDBMeta(subQuery.getTableDbName());
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final String mainSubQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+        final PartitionByProvider partitionByProvider = new ScalarCondition.PartitionByProvider() {
+            public SqlClause provideSqlClause() {
+                return option.preparePartitionBySqlClause();
+            }
+        };
         final ScalarCondition scalarCondition = new ScalarCondition(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta,
-                cipherManager, mainSubQueryIdentity, operand);
-        final String clause = scalarCondition.buildScalarCondition(function);
-        registerWhereClause(clause);
+                cipherManager, mainSubQueryIdentity, operand, partitionByProvider);
+        final QueryClause clause = new QueryClause() { // lazy registration to use partition-by
+            public String toString() {
+                return scalarCondition.buildScalarCondition(function);
+            }
+        };
+        // no speak about inner-join because of no possible of null revival
+        final QueryUsedAliasInfo usedAliasInfo = new QueryUsedAliasInfo(xgetAliasName(), null);
+        registerWhereClause(clause, usedAliasInfo);
     }
 
     // -----------------------------------------------------
@@ -1159,6 +1174,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerWhereClause(String whereClause, boolean noWayInner) {
         final String usedAliasName = xgetAliasName();
         xgetSqlClause().registerWhereClause(whereClause, usedAliasName, noWayInner);
+    }
+
+    protected void registerWhereClause(QueryClause whereClause, QueryUsedAliasInfo... usedAliasInfos) {
+        xgetSqlClause().registerWhereClause(whereClause, usedAliasInfos);
     }
 
     protected void registerInlineWhereClause(String whereClause) {

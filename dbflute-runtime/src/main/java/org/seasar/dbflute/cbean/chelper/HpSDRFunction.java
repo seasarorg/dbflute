@@ -10,10 +10,10 @@ import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * The function of specify-derived-referrer.
- * @author jflute
+ * The function for (Specify)DerivedReferrer.
  * @param <REFERRER_CB> The type of referrer condition-bean.
  * @param <LOCAL_CQ> The type of local condition-query.
+ * @author jflute
  */
 public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
 
