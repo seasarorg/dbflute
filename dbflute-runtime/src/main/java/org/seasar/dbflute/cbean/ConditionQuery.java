@@ -56,8 +56,14 @@ public interface ConditionQuery {
     ColumnSqlName toColumnSqlName(String columnDbName);
 
     /**
+     * Get the base query.
+     * @return The condition-query of base table. (NotNull: if this is base query, returns this)
+     */
+    ConditionQuery xgetBaseQuery();
+
+    /**
      * Get the referrer query.
-     * @return The condition-query of referrer table. (NullAllowed: If null, this is base query)
+     * @return The condition-query of referrer table. (NullAllowed: if null, this is base query)
      */
     ConditionQuery xgetReferrerQuery();
 

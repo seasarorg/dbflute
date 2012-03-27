@@ -198,6 +198,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * {@inheritDoc}
      */
+    public ConditionQuery xgetBaseQuery() {
+        ConditionQuery currentQuery = this;
+        while (true) {
+            final ConditionQuery referrerQuery = currentQuery.xgetReferrerQuery();
+            if (referrerQuery == null) {
+                break;
+            }
+            currentQuery = referrerQuery;
+        }
+        return currentQuery;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public ConditionQuery xgetReferrerQuery() {
         return _referrerQuery;
     }

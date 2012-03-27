@@ -45,6 +45,10 @@ public class HpSSQDecorator<CB extends ConditionBean> {
     public void partitionBy(SpecifyQuery<CB> specifyQuery) {
         assertSpecifyQuery(specifyQuery);
         _option.setPartitionBySpecify(specifyQuery);
+
+        // It's difficult for using relation in partition-by so unsupported.
+        // The alias-name problem occurs so if you try, check ColumnQuery way.
+        // (You need to synchronize QyCall...)
     }
 
     // ===================================================================================
