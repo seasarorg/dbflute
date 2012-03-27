@@ -1308,8 +1308,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     protected void xscalarCondition(String function, SubQuery<${myConditionBeanClassName}> subQuery, String operand, HpSSQOption<${myConditionBeanClassName}> option) {
         assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
         ${myConditionBeanClassName} cb = xcreateScalarConditionCB(); subQuery.query(cb);
-        String subQueryPropertyName = keepScalarCondition(cb.query()); // for saving query-value.
-        option.setPartitionByCBean(xcreateScalarConditionPartitionByCB());
+        String subQueryPropertyName = keepScalarCondition(cb.query()); // for saving query-value
+        option.setPartitionByCBean(xcreateScalarConditionPartitionByCB()); // for using partition-by
         registerScalarCondition(function, cb.query(), subQueryPropertyName, operand, option);
     }
     public abstract String keepScalarCondition(${myConditionQueryClassName} subQuery);
