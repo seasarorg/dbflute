@@ -31,9 +31,10 @@ public interface SqlLogHandler {
 
     /**
      * Handle the SQL log. <br />
-     * Attention: If the command would be not executed, this is not called back.
-     * For example, update() that the entity has no modification.
-     * And if the command would be for batch, this is called back per batch elements in a command.
+     * This is called back per SQL logging.
+     * But if the SQL would be not executed, this is not called back,
+     * for example, update() that the entity has no modification.
+     * And if the command is for batch, this is called back per batch elements in a command.
      * @param info The information of SQL log. (NotNull)
      */
     void handle(SqlLogInfo info);

@@ -31,24 +31,17 @@ package org.seasar.dbflute.jdbc;
 public interface SqlResultHandler {
 
     /**
-     * Handle the SQL result.
+     * Handle the SQL result. <br />
+     * This is called back per command execution.
+     * But when the command fails by exception, this is not called back.
      * <pre>
      * [SqlResultInfo]
      * o result : The result (mapped object) of executed SQL. (NullAllowed)
      * o tableDbName : The DB name of table of executed behavior. (NotNull)
      * o commandName : The name of executed command. (for display only) (NotNull)
      * o sqlLogInfo : The information of SQL log, which has executedSql, arguments, displaySql... (NotNull)
-     * o commandBeforeTimeMillis : The time in millisecond before executing command (after initializing executions).
-     * o commandAfterTimeMillis : The time in millisecond after executing command (after mapping entities).
-     * o sqlBeforeTimeMillis : The time in millisecond before executing SQL (after initializing executions).
-     * o sqlAfterTimeMillis : The time in millisecond after executing SQL (after mapping entities).
+     * o executionTimeInfo : The information of execution time. (NotNull)
      * </pre>
-     * <p>
-     * Attention: If the SQL would be not executed, the displaySql in the information is null.
-     * For example, update() that the entity has no modification.
-     * And if the command would be for batch, this is called back only once in a command.
-     * So the displaySql is the latest SQL in a command at that time.
-     * </p>
      * @param info The information of executed SQL result. (NotNull)
      */
     void handle(SqlResultInfo info);

@@ -164,30 +164,30 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                           -----------
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         final boolean logEnabled = isLogEnabled();
-        final Object sqlLogRegistry = getSqlLogRegistry();
-        final boolean hasRegistry = sqlLogRegistry != null;
         final boolean hasSqlLog = hasSqlLogHandler();
         final boolean hasSqlResult = hasSqlResultHandler();
+        final Object sqlLogRegistry = getSqlLogRegistry();
+        final boolean hasRegistry = sqlLogRegistry != null;
 
-        if (logEnabled || hasRegistry || hasSqlLog || hasSqlResult) {
+        if (logEnabled || hasSqlLog || hasSqlResult || hasRegistry) {
             if (isInternalDebugEnabled()) {
-                final String determination = logEnabled + ", " + hasRegistry + ", " + hasSqlLog + ", " + hasSqlResult;
+                final String determination = logEnabled + ", " + hasSqlLog + ", " + hasSqlResult + ", " + hasRegistry;
                 _log.debug("...Logging SQL by " + determination);
             }
-            if (processBeforeLogging(args, argTypes, logEnabled, sqlLogRegistry, hasSqlLog, hasSqlResult)) {
+            if (processBeforeLogging(args, argTypes, logEnabled, hasSqlLog, hasSqlResult, sqlLogRegistry)) {
                 return; // processed by anyone
             }
-            doLogSql(args, argTypes, logEnabled, sqlLogRegistry, hasSqlLog, hasSqlResult);
+            doLogSql(args, argTypes, logEnabled, hasSqlLog, hasSqlResult, sqlLogRegistry);
         }
     }
 
-    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled,
-            Object sqlLogRegistry, boolean hasSqlLog, boolean hasSqlResult) {
+    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlLog,
+            boolean hasSqlResult, Object sqlLogRegistry) {
         return false;
     }
 
-    protected void doLogSql(Object[] args, Class<?>[] argTypes, boolean logEnabled, Object sqlLogRegistry,
-            boolean hasSqlLog, boolean hasSqlResult) {
+    protected void doLogSql(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlLog,
+            boolean hasSqlResult, Object sqlLogRegistry) {
         final boolean hasRegistry = sqlLogRegistry != null;
         final String firstDisplaySql;
         if (logEnabled || hasRegistry) { // build at once
