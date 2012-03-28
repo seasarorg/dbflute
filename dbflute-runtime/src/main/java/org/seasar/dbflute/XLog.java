@@ -29,13 +29,14 @@ public class XLog {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(XLog.class);
     protected static boolean _executeStatusLogLevelInfo;
+    protected static boolean _loggingInHolidayMood;
     protected static boolean _locked = true;
 
     // ===================================================================================
     //                                                                             Logging
     //                                                                             =======
     public static void log(String msg) { // very internal
-        if (isExecuteStatusLogLevelInfo()) {
+        if (_executeStatusLogLevelInfo) {
             _log.info(msg);
         } else {
             _log.debug(msg);
@@ -43,7 +44,10 @@ public class XLog {
     }
 
     public static boolean isLogEnabled() { // very internal
-        if (isExecuteStatusLogLevelInfo()) {
+        if (_loggingInHolidayMood) {
+            return false;
+        }
+        if (_executeStatusLogLevelInfo) {
             return _log.isInfoEnabled();
         } else {
             return _log.isDebugEnabled();
@@ -60,6 +64,18 @@ public class XLog {
             _log.info("...Setting executeStatusLogLevelInfo: " + executeStatusLogLevelInfo);
         }
         _executeStatusLogLevelInfo = executeStatusLogLevelInfo;
+    }
+
+    protected static boolean isLoggingInHolidayMood() {
+        return _loggingInHolidayMood;
+    }
+
+    public static void setLoggingInHolidayMood(boolean loggingInHolidayMood) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting loggingInHolidayMood: " + loggingInHolidayMood);
+        }
+        _loggingInHolidayMood = loggingInHolidayMood;
     }
 
     // ===================================================================================

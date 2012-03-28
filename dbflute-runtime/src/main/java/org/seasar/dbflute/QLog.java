@@ -29,13 +29,14 @@ public class QLog {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(QLog.class);
     protected static boolean _queryLogLevelInfo;
+    protected static boolean _loggingInHolidayMood;
     protected static boolean _locked = true;
 
     // ===================================================================================
     //                                                                             Logging
     //                                                                             =======
     public static void log(String sql) { // very Internal
-        if (isQueryLogLevelInfo()) {
+        if (_queryLogLevelInfo) {
             _log.info(sql);
         } else {
             _log.debug(sql);
@@ -43,7 +44,10 @@ public class QLog {
     }
 
     public static boolean isLogEnabled() { // very internal
-        if (isQueryLogLevelInfo()) {
+        if (_loggingInHolidayMood) {
+            return false;
+        }
+        if (_queryLogLevelInfo) {
             return _log.isInfoEnabled();
         } else {
             return _log.isDebugEnabled();
@@ -60,6 +64,18 @@ public class QLog {
             _log.info("...Setting queryLogLevelInfo: " + queryLogLevelInfo);
         }
         _queryLogLevelInfo = queryLogLevelInfo;
+    }
+
+    protected static boolean isLoggingInHolidayMood() {
+        return _loggingInHolidayMood;
+    }
+
+    public static void setLoggingInHolidayMood(boolean loggingInHolidayMood) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting loggingInHolidayMood: " + loggingInHolidayMood);
+        }
+        _loggingInHolidayMood = loggingInHolidayMood;
     }
 
     // ===================================================================================
