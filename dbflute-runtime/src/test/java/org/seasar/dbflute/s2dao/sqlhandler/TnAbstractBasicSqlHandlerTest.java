@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
+import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.resource.InternalMapContext;
@@ -61,9 +62,9 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
             }
 
             @Override
-            protected void saveDisplaySqlForResultInfo(String displaySql) {
-                markList.add("saveDisplaySqlForResultInfo");
-                super.saveDisplaySqlForResultInfo(displaySql);
+            protected void saveResultSqlLogInfo(SqlLogInfo sqlLogInfo) {
+                markList.add("saveResultSqlLogInfo");
+                super.saveResultSqlLogInfo(sqlLogInfo);
             }
 
             @Override
@@ -81,7 +82,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         try {
             handler.logSql(null, null);
 
-            assertNull(InternalMapContext.getResultInfoDisplaySql());
+            assertNull(InternalMapContext.getResultSqlLogInfo());
         } finally {
             CallbackContext.clearCallbackContextOnThread();
             InternalMapContext.clearInternalMapContextOnThread();
@@ -98,11 +99,10 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         final List<String> markList = new ArrayList<String>();
         final Object[] args = new Object[] {};
         final Class<?>[] argsTypes = new Class<?>[] {};
-        TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
+        TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, "select ...") {
             @Override
             protected String buildDisplaySql(Object[] args) {
-                markList.add("getDisplaySql");
-                return "select ...";
+                throw new IllegalStateException("log should not be called!");
             }
 
             @Override
@@ -116,9 +116,8 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
             }
 
             @Override
-            protected void saveDisplaySqlForResultInfo(String displaySql) {
-                markList.add("saveDisplaySqlForResultInfo");
-                super.saveDisplaySqlForResultInfo(displaySql);
+            protected void saveResultSqlLogInfo(SqlLogInfo sqlLogInfo) {
+                throw new IllegalStateException("log should not be called!");
             }
 
             @Override
@@ -136,36 +135,34 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         try {
             CallbackContext callbackContext = new CallbackContext();
             callbackContext.setSqlLogHandler(new SqlLogHandler() {
-                public void handle(String executedSql, String displaySql, Object[] actualArgs, Class<?>[] actualArgTypes) {
+                public void handle(SqlLogInfo info) {
                     markList.add("handle");
-                    assertEquals("select ...", displaySql);
-                    assertEquals(args, actualArgs);
-                    assertEquals(argsTypes, actualArgTypes);
+                    assertEquals("select ...", info.getDisplaySql());
+                    assertEquals(args, info.getBindArgs());
+                    assertEquals(argsTypes, info.getBindArgTypes());
                 }
             });
             CallbackContext.setCallbackContextOnThread(callbackContext);
             handler.logSql(args, argsTypes);
 
-            assertNull(InternalMapContext.getResultInfoDisplaySql());
+            assertNull(InternalMapContext.getResultSqlLogInfo());
         } finally {
             CallbackContext.clearCallbackContextOnThread();
             InternalMapContext.clearInternalMapContextOnThread();
         }
 
         // ## Assert ##
-        assertEquals(2, markList.size());
-        assertEquals("getDisplaySql", markList.get(0));
-        assertEquals("handle", markList.get(1));
+        assertEquals(1, markList.size());
+        assertEquals("handle", markList.get(0));
     }
 
     public void test_logSql_whitebox_sqlResultHandlerOnly() {
         // ## Arrange ##
         final List<String> markList = new ArrayList<String>();
-        TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
+        TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, "select ...") {
             @Override
             protected String buildDisplaySql(Object[] args) {
-                markList.add("getDisplaySql");
-                return "select ...";
+                throw new IllegalStateException("log should not be called!");
             }
 
             @Override
@@ -179,9 +176,9 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
             }
 
             @Override
-            protected void saveDisplaySqlForResultInfo(String displaySql) {
-                markList.add("saveDisplaySqlForResultInfo");
-                super.saveDisplaySqlForResultInfo(displaySql);
+            protected void saveResultSqlLogInfo(SqlLogInfo sqlLogInfo) {
+                markList.add("saveResultSqlLogInfo");
+                super.saveResultSqlLogInfo(sqlLogInfo);
             }
 
             @Override
@@ -206,16 +203,15 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
             CallbackContext.setCallbackContextOnThread(callbackContext);
             handler.logSql(null, null);
 
-            assertEquals("select ...", InternalMapContext.getResultInfoDisplaySql());
+            assertEquals("select ...", InternalMapContext.getResultSqlLogInfo().getDisplaySql());
         } finally {
             CallbackContext.clearCallbackContextOnThread();
             InternalMapContext.clearInternalMapContextOnThread();
         }
 
         // ## Assert ##
-        assertEquals(2, markList.size());
-        assertEquals("getDisplaySql", markList.get(0));
-        assertEquals("saveDisplaySqlForResultInfo", markList.get(1));
+        assertEquals(1, markList.size());
+        assertEquals("saveResultSqlLogInfo", markList.get(0));
     }
 
     public void test_logSql_whitebox_bigThree() {
@@ -244,9 +240,9 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
             }
 
             @Override
-            protected void saveDisplaySqlForResultInfo(String displaySql) {
-                markList.add("saveDisplaySqlForResultInfo");
-                super.saveDisplaySqlForResultInfo(displaySql);
+            protected void saveResultSqlLogInfo(SqlLogInfo sqlLogInfo) {
+                markList.add("saveResultSqlLogInfo");
+                super.saveResultSqlLogInfo(sqlLogInfo);
             }
 
             @Override
@@ -264,11 +260,12 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         try {
             CallbackContext callbackContext = new CallbackContext();
             callbackContext.setSqlLogHandler(new SqlLogHandler() {
-                public void handle(String executedSql, String displaySql, Object[] actualArgs, Class<?>[] actualArgTypes) {
+
+                public void handle(SqlLogInfo info) {
                     markList.add("handle");
-                    assertEquals("select ..." + ln() + "  from ...", displaySql);
-                    assertEquals(args, actualArgs);
-                    assertEquals(argsTypes, actualArgTypes);
+                    assertEquals("select ..." + ln() + "  from ...", info.getDisplaySql());
+                    assertEquals(args, info.getBindArgs());
+                    assertEquals(argsTypes, info.getBindArgTypes());
                 }
             });
             callbackContext.setSqlResultHandler(new SqlResultHandler() {
@@ -279,7 +276,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
             CallbackContext.setCallbackContextOnThread(callbackContext);
             handler.logSql(args, argsTypes);
 
-            assertEquals("select ..." + ln() + "  from ...", InternalMapContext.getResultInfoDisplaySql());
+            assertEquals("select ..." + ln() + "  from ...", InternalMapContext.getResultSqlLogInfo().getDisplaySql());
         } finally {
             CallbackContext.clearCallbackContextOnThread();
             InternalMapContext.clearInternalMapContextOnThread();
@@ -291,6 +288,6 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         assertEquals("logDisplaySql", markList.get(1));
         assertEquals("log", markList.get(2));
         assertEquals("handle", markList.get(3));
-        assertEquals("saveDisplaySqlForResultInfo", markList.get(4));
+        assertEquals("saveResultSqlLogInfo", markList.get(4));
     }
 }

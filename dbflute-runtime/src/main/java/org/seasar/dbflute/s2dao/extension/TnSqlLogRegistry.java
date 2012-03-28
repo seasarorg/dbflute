@@ -35,8 +35,37 @@ public class TnSqlLogRegistry {
     protected static final String NAME_SqlLog = PKG_ORG_SEASAR + "extension.jdbc.SqlLog";
     protected static final String NAME_SqlLogImpl = PKG_ORG_SEASAR + "extension.jdbc.impl.SqlLogImpl";
     protected static final boolean exists;
+    protected static final Class<?> locatorType;
+    protected static final Method locatorInstanceMethod;
+    protected static final Class<?> registryType;
+    protected static final Class<?> registryImplType;
+    protected static final Class<?> sqlLogType;
+    protected static final Class<?> sqlLogImplType;
     static {
-        exists = forNameContainerSqlLogRegistryLocator() != null;
+        locatorType = forNameContainerSqlLogRegistryLocator();
+        if (locatorType != null) {
+            exists = true;
+            final String methodName = NAME_getInstance;
+            final Method foundMethod;
+            try {
+                foundMethod = locatorType.getMethod(methodName, (Class[]) null);
+            } catch (Exception e) {
+                String msg = "Failed to get the method to get the instance: " + methodName;
+                throw new IllegalStateException(msg);
+            }
+            locatorInstanceMethod = foundMethod;
+            registryType = forNameContainerSqlLogRegistry();
+            registryImplType = forNameContainerSqlLogRegistryImpl();
+            sqlLogType = forNameContainerSqlLog();
+            sqlLogImplType = forNameContainerSqlLogImpl();
+        } else {
+            exists = false;
+            locatorInstanceMethod = null;
+            registryType = null;
+            registryImplType = null;
+            sqlLogType = null;
+            sqlLogImplType = null;
+        }
     }
 
     // ===================================================================================
@@ -50,27 +79,16 @@ public class TnSqlLogRegistry {
         if (!exists) {
             return false;
         }
-        final Class<?> sqlLogRegistryLocatorType = forNameContainerSqlLogRegistryLocator();
-        if (sqlLogRegistryLocatorType == null) {
-            return false;
-        }
-        final Class<?> sqlLogRegistryType = forNameContainerSqlLogRegistry();
-        if (sqlLogRegistryType == null) {
-            return false;
-        }
         final Object sqlLogRegistryImpl = createContainerSqlLogRegistryImpl();
-        if (sqlLogRegistryImpl == null) {
-            return false;
-        }
+        final String methodName = NAME_setInstance;
         try {
-            final Method method = sqlLogRegistryLocatorType.getMethod(NAME_setInstance,
-                    new Class[] { sqlLogRegistryType });
+            final Method method = locatorType.getMethod(methodName, new Class[] { registryType });
             method.invoke(null, new Object[] { sqlLogRegistryImpl });
             return true;
         } catch (Exception e) {
-            String msg = "InternalSqlLogRegistry.setupSqlLogRegistry() threw the exception:";
-            msg = msg + " sqlLogRegistryLocatorType=" + sqlLogRegistryLocatorType;
-            msg = msg + " NAME_setInstance=" + NAME_setInstance;
+            String msg = "Failed to set the locator instance:";
+            msg = msg + " locatorType=" + locatorType;
+            msg = msg + " methodName=" + methodName;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -79,21 +97,15 @@ public class TnSqlLogRegistry {
         if (!exists) {
             return;
         }
-        final Class<?> sqlLogRegistryLocatorType = forNameContainerSqlLogRegistryLocator();
-        if (sqlLogRegistryLocatorType == null) {
-            return;
-        }
-        final Object sqlLogRegistry = findContainerSqlLogRegistry();
-        if (sqlLogRegistry == null) {
-            return;
-        }
-        Class<? extends Object> sqlLogRegistryType = sqlLogRegistry.getClass();
+        final String methodName = "clear";
         try {
-            final Method method = sqlLogRegistryType.getMethod("clear", new Class[] {});
+            final Object sqlLogRegistry = findContainerSqlLogRegistry();
+            final Method method = locatorType.getMethod(methodName, new Class[] {});
             method.invoke(sqlLogRegistry, new Object[] {});
         } catch (Exception e) {
-            String msg = "InternalSqlLogRegistry.clearSqlLogRegistry() threw the exception:";
-            msg = msg + " sqlLogRegistryLocatorType=" + sqlLogRegistryLocatorType;
+            String msg = "Failed to clear registry of the locator:";
+            msg = msg + " locatorType=" + locatorType;
+            msg = msg + " methodName=" + methodName;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -102,17 +114,12 @@ public class TnSqlLogRegistry {
         if (!exists) {
             return null;
         }
-        final Class<?> sqlLogRegistryLocatorType = forNameContainerSqlLogRegistryLocator();
-        if (sqlLogRegistryLocatorType == null) {
-            return null;
-        }
         try {
-            final Method method = sqlLogRegistryLocatorType.getMethod(NAME_getInstance, (Class[]) null);
-            return method.invoke(null, (Object[]) null);
+            return locatorInstanceMethod.invoke(null, (Object[]) null);
         } catch (Exception e) {
-            String msg = "InternalSqlLogRegistry.findContainerSqlLogRegistry() threw the exception:";
-            msg = msg + " sqlLogRegistryLocatorType=" + sqlLogRegistryLocatorType;
-            msg = msg + " NAME_getInstance=" + NAME_getInstance;
+            String msg = "Failed to get the locator instance:";
+            msg = msg + " locatorType=" + locatorType;
+            msg = msg + " methodName=" + NAME_getInstance;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -121,22 +128,14 @@ public class TnSqlLogRegistry {
         if (!exists) {
             return;
         }
-        final Class<?> sqlLogRegistryLocatorType = forNameContainerSqlLogRegistryLocator();
-        if (sqlLogRegistryLocatorType == null) {
-            return;
-        }
-        final Class<?> sqlLogRegistryType = forNameContainerSqlLogRegistry();
-        if (sqlLogRegistryType == null) {
-            return;
-        }
+        final String methodName = NAME_setInstance;
         try {
-            final Method method = sqlLogRegistryLocatorType.getMethod(NAME_setInstance,
-                    new Class[] { sqlLogRegistryType });
+            final Method method = locatorType.getMethod(methodName, new Class[] { registryType });
             method.invoke(null, new Object[] { null });
         } catch (Exception e) {
-            String msg = "InternalSqlLogRegistry.closeRegistration() threw the exception:";
-            msg = msg + " sqlLogRegistryLocatorType=" + sqlLogRegistryLocatorType;
-            msg = msg + " NAME_setInstance=" + NAME_setInstance;
+            String msg = "Failed to handle the locator method:";
+            msg = msg + " locatorType=" + locatorType;
+            msg = msg + " methodName=" + methodName;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -147,7 +146,7 @@ public class TnSqlLogRegistry {
             return;
         }
         if (sqlLogRegistry == null) {
-            throw new IllegalArgumentException("sqlLogRegistry should not be null!");
+            throw new IllegalArgumentException("sqlLogRegistry should not be null.");
         }
         final Object sqlLogImpl = createContainerSqlLogImpl(rawSql, completeSql, bindArgs, bindArgTypes);
         reflectSqlLogToContainerSqlLogRegistry(sqlLogImpl, sqlLogRegistry);
@@ -158,13 +157,7 @@ public class TnSqlLogRegistry {
             return null;
         }
         final Object sqlLogRegistry = findContainerSqlLogRegistry();
-        if (sqlLogRegistry == null) {
-            return null;
-        }
         final Object sqlLog = findLastContainerSqlLog(sqlLogRegistry);
-        if (sqlLog == null) {
-            return null;
-        }
         return extractCompleteSqlFromContainerSqlLog(sqlLog);
     }
 
@@ -173,15 +166,11 @@ public class TnSqlLogRegistry {
     //                                                                ====================
     protected static Object createContainerSqlLogRegistryImpl() {
         try {
-            final Class<?> clazz = forNameContainerSqlLogRegistryImpl();
-            if (clazz == null) {
-                return null;
-            }
-            final Constructor<?> constructor = clazz.getConstructor(int.class);
+            final Constructor<?> constructor = registryImplType.getConstructor(int.class);
             return constructor.newInstance(new Object[] { 3 });
         } catch (Exception e) {
-            String msg = NAME_SqlLogRegistry + ".class.newInstance threw the exception:";
-            msg = msg + " NAME_SqlLogRegistry=" + NAME_SqlLogRegistry;
+            String msg = "Failed to create registryImpl:";
+            msg = msg + " registryImplType=" + registryImplType;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -189,14 +178,13 @@ public class TnSqlLogRegistry {
     protected static Object createContainerSqlLogImpl(String rawSql, String completeSql, Object[] bindArgs,
             Class<?>[] bindArgTypes) {
         try {
-            final Class<?> sqlLogImplType = Class.forName(NAME_SqlLogImpl);
             final Class<?>[] argTypes = new Class[] { String.class, String.class, Object[].class, Class[].class };
             final Constructor<?> constructor = sqlLogImplType.getConstructor(argTypes);
             return constructor.newInstance(new Object[] { rawSql, completeSql, bindArgs, bindArgTypes });
         } catch (Exception e) {
-            String msg = "InternalSqlLogRegistry.createContainerSqlLogImpl() threw the exception:";
+            String msg = "Failed to create sqlLogImpl:";
             msg = msg + " completeSql=" + completeSql;
-            msg = msg + " NAME_SqlLogImpl=" + NAME_SqlLogImpl;
+            msg = msg + " sqlLogImplType=" + sqlLogImplType;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -205,15 +193,15 @@ public class TnSqlLogRegistry {
         if (sqlLog == null || sqlLogRegistry == null) {
             return;
         }
+        final String methodName = "add";
         try {
-            final Class<?> sqlLogRegistryType = sqlLogRegistry.getClass();
-            final Class<?> sqlLogType = Class.forName(NAME_SqlLog);
-            final Method method = sqlLogRegistryType.getMethod("add", new Class[] { sqlLogType });
+            final Method method = registryType.getMethod(methodName, new Class[] { sqlLogType });
             method.invoke(sqlLogRegistry, new Object[] { sqlLog });
         } catch (Exception e) {
-            String msg = "InternalSqlLogRegistry.reflectToContainerSqlLogRegistry() threw the exception:";
+            String msg = "Failed to reflect sqlLogRegistry:";
             msg = msg + " sqlLog=" + sqlLog + " sqlLogRegistry=" + sqlLogRegistry;
-            msg = msg + " NAME_SqlLog=" + NAME_SqlLog;
+            msg = msg + " registryType=" + registryType;
+            msg = msg + " methodName=" + methodName;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -222,13 +210,14 @@ public class TnSqlLogRegistry {
         if (sqlLogRegistry == null) {
             return null;
         }
+        final String methodName = "getLast";
         try {
-            final Class<?> sqlLogRegistryType = sqlLogRegistry.getClass();
-            final Method method = sqlLogRegistryType.getMethod("getLast", (Class[]) null);
+            final Method method = registryType.getMethod(methodName, (Class[]) null);
             return method.invoke(sqlLogRegistry, (Object[]) null);
         } catch (Exception e) {
-            String msg = "InternalSqlLogRegistry.findLastContainerSqlLog() threw the exception:";
+            String msg = "Failed to find sqlLog:";
             msg = msg + " sqlLogRegistry=" + sqlLogRegistry;
+            msg = msg + " methodName=" + methodName;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -237,13 +226,14 @@ public class TnSqlLogRegistry {
         if (sqlLog == null) {
             return null;
         }
+        final String methodName = "getCompleteSql";
         try {
-            final Class<?> sqlLogType = sqlLog.getClass();
-            final Method method = sqlLogType.getMethod("getCompleteSql", (Class[]) null);
+            final Method method = sqlLogType.getMethod(methodName, (Class[]) null);
             return (String) method.invoke(sqlLog, (Object[]) null);
         } catch (Exception e) {
-            String msg = "InternalSqlLogRegistry.extractCompleteSqlFromContainerSqlLog() threw the exception:";
+            String msg = "Failed to extract completeSql:";
             msg = msg + " sqlLog=" + sqlLog;
+            msg = msg + " methodName=" + methodName;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -272,6 +262,26 @@ public class TnSqlLogRegistry {
         Class<?> clazz = null;
         try {
             clazz = Class.forName(NAME_SqlLogRegistryImpl);
+        } catch (Exception ignored) {
+            return null;
+        }
+        return clazz;
+    }
+
+    protected static Class<?> forNameContainerSqlLog() {
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(NAME_SqlLog);
+        } catch (Exception ignored) {
+            return null;
+        }
+        return clazz;
+    }
+
+    protected static Class<?> forNameContainerSqlLogImpl() {
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(NAME_SqlLogImpl);
         } catch (Exception ignored) {
             return null;
         }

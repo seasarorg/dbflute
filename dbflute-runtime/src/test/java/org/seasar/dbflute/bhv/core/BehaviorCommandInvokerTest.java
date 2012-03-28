@@ -16,6 +16,8 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.FetchAssistContext;
+import org.seasar.dbflute.jdbc.SqlLogInfo;
+import org.seasar.dbflute.jdbc.SqlLogInfo.SqlLogDisplaySqlBuilder;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.mock.MockConditionBean;
@@ -244,8 +246,8 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
             callbackContext.setSqlResultHandler(new SqlResultHandler() {
                 public void handle(SqlResultInfo info) {
                     markList.add("handle");
-                    long before = info.getCommandBeforeTimeMillis();
-                    long after = info.getCommandAfterTimeMillis();
+                    long before = info.getExecutionTimeInfo().getCommandBeforeTimeMillis();
+                    long after = info.getExecutionTimeInfo().getCommandAfterTimeMillis();
                     log("before=" + before + ", after=" + after);
                     assertTrue(before > 0);
                     assertTrue(after > 0);
@@ -253,7 +255,6 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
                 }
             });
             CallbackContext.setCallbackContextOnThread(callbackContext);
-            InternalMapContext.setResultInfoDisplaySql("select ...");
             actualResult = invoker.dispatchInvoking(new MockBehaviorCommand() {
                 @Override
                 public Object[] getSqlExecutionArgument() {
@@ -538,7 +539,13 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final Object ret = new Object();
         final HashSet<String> markSet = new HashSet<String>();
         try {
-            InternalMapContext.setResultInfoDisplaySql("select ...");
+            SqlLogInfo sqlLogInfo = new SqlLogInfo("select ...", new Object[] {}, new Class<?>[] {},
+                    new SqlLogDisplaySqlBuilder() {
+                        public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
+                            return "select ...";
+                        }
+                    });
+            InternalMapContext.setResultSqlLogInfo(sqlLogInfo);
 
             // ## Act & Assert ##
             invoker.callbackSqlResultHanler(new MockBehaviorCommand() {
@@ -551,18 +558,19 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
                 public String getCommandName() {
                     return "BAR";
                 }
-            }, true, new SqlResultHandler() {
+            }, new SqlResultHandler() {
                 public void handle(SqlResultInfo info) {
-                    long actualBefore = info.getCommandBeforeTimeMillis();
-                    long actualAfter = info.getCommandAfterTimeMillis();
+                    long actualBefore = info.getExecutionTimeInfo().getCommandBeforeTimeMillis();
+                    long actualAfter = info.getExecutionTimeInfo().getCommandAfterTimeMillis();
                     assertEquals(ret, info.getResult());
                     assertEquals("FOO", info.getTableDbName());
                     assertEquals("BAR", info.getCommandName());
-                    assertEquals("select ...", info.getDisplaySql());
+                    String displaySql = info.getSqlLogInfo().getDisplaySql();
+                    assertEquals("select ...", displaySql);
                     assertEquals(before, actualBefore);
                     assertEquals(after, actualAfter);
                     markSet.add("handle()");
-                    log(info.getResult() + ":" + info.getDisplaySql() + ":" + actualBefore + ":" + actualAfter);
+                    log(info.getResult() + ":" + displaySql + ":" + actualBefore + ":" + actualAfter);
                 }
             }, ret, before, after);
             assertTrue(markSet.size() == 1);
@@ -579,6 +587,13 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final long after = 456;
         final Object ret = new Object();
         final HashSet<String> markSet = new HashSet<String>();
+        SqlLogInfo sqlLogInfo = new SqlLogInfo("select ...", new Object[] {}, new Class<?>[] {},
+                new SqlLogDisplaySqlBuilder() {
+                    public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
+                        return "select ...";
+                    }
+                });
+        InternalMapContext.setResultSqlLogInfo(sqlLogInfo);
         try {
             // ## Act & Assert ##
             invoker.callbackSqlResultHanler(new MockBehaviorCommand() {
@@ -591,18 +606,19 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
                 public String getCommandName() {
                     return "BAR";
                 }
-            }, true, new SqlResultHandler() {
+            }, new SqlResultHandler() {
                 public void handle(SqlResultInfo info) {
-                    long actualBefore = info.getCommandBeforeTimeMillis();
-                    long actualAfter = info.getCommandAfterTimeMillis();
+                    long actualBefore = info.getExecutionTimeInfo().getCommandBeforeTimeMillis();
+                    long actualAfter = info.getExecutionTimeInfo().getCommandAfterTimeMillis();
                     assertEquals(ret, info.getResult());
                     assertEquals("FOO", info.getTableDbName());
                     assertEquals("BAR", info.getCommandName());
-                    assertEquals(null, info.getDisplaySql());
+                    String displaySql = info.getSqlLogInfo().getDisplaySql();
+                    assertEquals("select ...", displaySql);
                     assertEquals(before, actualBefore);
                     assertEquals(after, actualAfter);
                     markSet.add("handle()");
-                    log(info.getResult() + ":" + info.getDisplaySql() + ":" + actualBefore + ":" + actualAfter);
+                    log(info.getResult() + ":" + displaySql + ":" + actualBefore + ":" + actualAfter);
                 }
             }, ret, before, after);
             assertTrue(markSet.size() == 1);

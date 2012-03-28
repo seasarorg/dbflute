@@ -29,7 +29,6 @@ import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
-import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.jdbc.TnFetchAssistResultSet;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
@@ -141,12 +140,5 @@ public class TnBasicSelectHandler extends TnBasicParameterHandler {
     protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet rs, FetchBean fcbean, boolean offset,
             boolean limit) {
         return new TnFetchAssistResultSet(rs, fcbean, offset, limit);
-    }
-
-    // ===================================================================================
-    //                                                                      Internal Debug
-    //                                                                      ==============
-    private boolean isInternalDebugEnabled() { // because log instance is private
-        return ResourceContext.isInternalDebug() && _log.isDebugEnabled();
     }
 }

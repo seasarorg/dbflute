@@ -18,6 +18,8 @@ package org.seasar.dbflute.resource;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.seasar.dbflute.jdbc.SqlLogInfo;
+
 /**
  * The context of internal map.
  * @author jflute
@@ -83,7 +85,7 @@ public class InternalMapContext {
     public static final String KEY_BEHAVIOR_INVOKE_NAME = "df:BehaviorInvokeName";
     public static final String KEY_CLIENT_INVOKE_NAME = "df:ClientInvokeName";
     public static final String KEY_BYPASS_INVOKE_NAME = "df:ByPassInvokeName";
-    public static final String KEY_RESULT_INFO_DISPLAY_SQL = "df:ResultInfoDisplaySql";
+    public static final String KEY_RESULT_SQL_LOG_INFO = "df:SqlLogInfo";
     public static final String KEY_SQL_BEFORE_TIME_MILLIS = "df:SqlBeforeTimeMillis";
     public static final String KEY_SQL_AFTER_TIME_MILLIS = "df:SqlAfterTimeMillis";
 
@@ -111,12 +113,12 @@ public class InternalMapContext {
         setObject(KEY_BYPASS_INVOKE_NAME, byPassInvokeName);
     }
 
-    public static String getResultInfoDisplaySql() {
-        return (String) getObject(KEY_RESULT_INFO_DISPLAY_SQL);
+    public static SqlLogInfo getResultSqlLogInfo() {
+        return (SqlLogInfo) getObject(KEY_RESULT_SQL_LOG_INFO);
     }
 
-    public static void setResultInfoDisplaySql(String displaySql) {
-        setObject(KEY_RESULT_INFO_DISPLAY_SQL, displaySql);
+    public static void setResultSqlLogInfo(SqlLogInfo sqlLogInfo) {
+        setObject(KEY_RESULT_SQL_LOG_INFO, sqlLogInfo);
     }
 
     public static Long getSqlBeforeTimeMillis() {

@@ -38,7 +38,9 @@ import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractor;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
+import org.seasar.dbflute.jdbc.ExecutionTimeInfo;
 import org.seasar.dbflute.jdbc.SQLExceptionDigger;
+import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -249,7 +251,9 @@ public class BehaviorCommandInvoker {
         // - - - - - - - - - - - -
         // Call the handler back!
         // - - - - - - - - - - - -
-        callbackSqlResultHanler(behaviorCommand, hasSqlResultHandler, sqlResultHander, ret, before, after);
+        if (hasSqlResultHandler) {
+            callbackSqlResultHanler(behaviorCommand, sqlResultHander, ret, before, after);
+        }
 
         // - - - - - - - - -
         // Cast and Return!
@@ -289,20 +293,15 @@ public class BehaviorCommandInvoker {
     }
 
     protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,
-            boolean hasSqlResultHandler, SqlResultHandler sqlResultHander, Object ret, long before, long after) {
-        if (hasSqlResultHandler) {
-            final String displaySql = InternalMapContext.getResultInfoDisplaySql();
-            final SqlResultInfo info = new SqlResultInfo();
-            info.setResult(ret);
-            info.setTableDbName(behaviorCommand.getTableDbName());
-            info.setCommandName(behaviorCommand.getCommandName());
-            info.setDisplaySql(displaySql);
-            info.setCommandBeforeTimeMillis(before);
-            info.setCommandAfterTimeMillis(after);
-            info.setSqlBeforeTimeMillis(InternalMapContext.getSqlBeforeTimeMillis());
-            info.setSqlAfterTimeMillis(InternalMapContext.getSqlAfterTimeMillis());
-            sqlResultHander.handle(info);
-        }
+            SqlResultHandler sqlResultHander, Object ret, long commandBefore, long commandAfter) {
+        final SqlLogInfo sqlLogInfo = InternalMapContext.getResultSqlLogInfo();
+        final String tableDbName = behaviorCommand.getTableDbName();
+        final String commandName = behaviorCommand.getCommandName();
+        final Long sqlBefore = InternalMapContext.getSqlBeforeTimeMillis();
+        final Long sqlAfter = InternalMapContext.getSqlAfterTimeMillis();
+        final ExecutionTimeInfo timeInfo = new ExecutionTimeInfo(commandBefore, commandAfter, sqlBefore, sqlAfter);
+        final SqlResultInfo info = new SqlResultInfo(ret, tableDbName, commandName, sqlLogInfo, timeInfo);
+        sqlResultHander.handle(info);
     }
 
     // ===================================================================================

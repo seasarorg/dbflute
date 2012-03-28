@@ -29,6 +29,7 @@ import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
+import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -95,7 +96,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
                     processBatchBefore(bean);
                     prepareBatchElement(conn, ps, bean);
                 }
-                handleBatchLogging();
+                handleBatchLogging(); // last scope handling
                 result = executeBatch(ps, beanList);
                 handleBatchUpdateResultWithOptimisticLock(ps, beanList, result);
             } catch (RuntimeException e) {
@@ -129,6 +130,10 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         addBatch(ps);
     }
 
+    // -----------------------------------------------------
+    //                                           SQL Logging
+    //                                           -----------
+    @Override
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         if (isBatchLoggingOver()) {
             _existsSkippedLogging = true;
@@ -136,17 +141,6 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         }
         super.logSql(args, argTypes);
     };
-
-    @Override
-    protected void logDisplaySql(String displaySql) {
-        if (_batchLoggingSb == null) {
-            _batchLoggingSb = new StringBuilder(1000);
-        }
-        saveBatchLoggingSql(displaySql);
-        if (needsBreakLoggingScope()) {
-            handleBatchLogging(); // and also cleared
-        }
-    }
 
     protected boolean isBatchLoggingOver() {
         final Integer batchLoggingLimit = getBatchLoggingLimit();
@@ -156,16 +150,22 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         return _loggingRecordCount >= batchLoggingLimit;
     }
 
-    protected void noticeBatchLoggingOver() {
-        if (_existsSkippedLogging) {
-            if (XLog.isLogEnabled()) {
-                final Integer batchLoggingLimit = getBatchLoggingLimit();
-                XLog.log("...Skipping several loggings by the limit option: " + batchLoggingLimit);
-            }
-        }
-    }
-
     protected abstract Integer getBatchLoggingLimit();
+
+    @Override
+    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled,
+            Object sqlLogRegistry, boolean hasSqlLog, boolean hasSqlResult) {
+        if (_batchLoggingSb == null) {
+            _batchLoggingSb = new StringBuilder(1000);
+        }
+        final String displaySql = buildDisplaySql(args);
+        saveBatchLoggingSql(displaySql);
+        doLogSql(args, argTypes, false, sqlLogRegistry, hasSqlLog, false); // handle others
+        if (needsBreakLoggingScope()) {
+            handleBatchLogging(); // and also cleared
+        }
+        return true;
+    };
 
     protected void saveBatchLoggingSql(String displaySql) {
         ++_loggingRecordCount;
@@ -177,13 +177,9 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         return _loggingScopeSize >= 100; // per 100 statements
     }
 
-    @Override
-    protected void saveDisplaySqlForResultInfo(String displaySql) {
-        // do nothing but it saves batch SQL in batch logging process
-    }
-
     protected String handleBatchLogging() {
-        if (_batchLoggingSb == null) {
+        if (_batchLoggingSb == null) { // may be limited by option
+            handleSqlResultHandler(null); // but SqlResultHandler handling is needed
             return null;
         }
         final String batchSql = _batchLoggingSb.toString();
@@ -191,12 +187,24 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
             log(batchSql); // batch logging (always starts with a line separator)
         }
         clearBatchLogging();
-        if (!_alreadySavedToResultInfo && hasSqlResultHandler()) {
-            final String savedDisplaySql = batchSql.trim(); // remove first line separator
-            super.saveDisplaySqlForResultInfo(savedDisplaySql); // only first scope is saved)
+        handleSqlResultHandler(batchSql);
+        return batchSql;
+    }
+
+    protected void handleSqlResultHandler(String batchSql) {
+        if (!_alreadySavedToResultInfo && hasSqlResultHandler()) { // only first scope is saved
+            final Object[] bindArgs = _bindVariables;
+            final Class<?>[] bindArgTypes = getArgTypes(bindArgs);
+            final String savedDisplaySql = batchSql != null ? batchSql.trim() : null; // remove first line separator
+            final SqlLogInfo sqlLogInfo = prepareSqlLogInfo(bindArgs, bindArgTypes, savedDisplaySql);
+            super.saveResultSqlLogInfo(sqlLogInfo); // super's because one of this class is overridden
             _alreadySavedToResultInfo = true;
         }
-        return batchSql;
+    }
+
+    @Override
+    protected void saveResultSqlLogInfo(SqlLogInfo sqlLogInfo) {
+        // do nothing because it saves later
     }
 
     protected void clearBatchLogging() {
@@ -220,6 +228,15 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         // clear just in case
         _existsSkippedLogging = false;
         _alreadySavedToResultInfo = false;
+    }
+
+    protected void noticeBatchLoggingOver() {
+        if (_existsSkippedLogging) {
+            if (XLog.isLogEnabled()) {
+                final Integer batchLoggingLimit = getBatchLoggingLimit();
+                XLog.log("...Skipping several loggings by the limit option: " + batchLoggingLimit);
+            }
+        }
     }
 
     @Override

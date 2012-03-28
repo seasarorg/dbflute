@@ -20,8 +20,7 @@ package org.seasar.dbflute.jdbc;
  * This handler is called back before executing the SQL.
  * <pre>
  * context.setSqlLogHandler(new SqlLogHandler() {
- *     public void handle(String executedSql, String displaySql
- *                      , Object[] args, Class&lt;?&gt;[] argTypes) {
+ *     public void handle(SqlLogInfo info) {
  *         // You can get your SQL string here.
  *     }
  * });
@@ -32,16 +31,10 @@ public interface SqlLogHandler {
 
     /**
      * Handle the SQL log. <br />
-     * <p>
-     * Attention: <br />
-     * If the command would be not executed, this is not called back. <br />
-     * For example, update() that the entity has no modification. <br />
+     * Attention: If the command would be not executed, this is not called back.
+     * For example, update() that the entity has no modification.
      * And if the command would be for batch, this is called back per batch elements in a command.
-     * </p>
-     * @param executedSql The executed SQL. (NotNull)
-     * @param displaySql The SQL for display. (NotNull)
-     * @param args The arguments of the SQL. (NullAllowed)
-     * @param argTypes The argument types of the SQL. (NullAllowed)
+     * @param info The information of SQL log. (NotNull)
      */
-    void handle(String executedSql, String displaySql, Object[] args, Class<?>[] argTypes);
+    void handle(SqlLogInfo info);
 }

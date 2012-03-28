@@ -30,6 +30,8 @@ import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.QLog;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
+import org.seasar.dbflute.jdbc.SqlLogInfo;
+import org.seasar.dbflute.jdbc.SqlLogInfo.SqlLogDisplaySqlBuilder;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
@@ -161,30 +163,72 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                           SQL Logging
     //                                           -----------
     protected void logSql(Object[] args, Class<?>[] argTypes) {
-        final boolean existsSqlLogHandler = hasSqlLogHandler();
-        final boolean existsSqlResultHandler = hasSqlResultHandler();
-        final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
-        final boolean existsSqlLogRegistry = sqlLogRegistry != null;
+        final boolean logEnabled = isLogEnabled();
+        final Object sqlLogRegistry = getSqlLogRegistry();
+        final boolean hasRegistry = sqlLogRegistry != null;
+        final boolean hasSqlLog = hasSqlLogHandler();
+        final boolean hasSqlResult = hasSqlResultHandler();
 
-        if (isLogEnabled() || existsSqlLogHandler || existsSqlResultHandler || existsSqlLogRegistry) {
+        if (logEnabled || hasRegistry || hasSqlLog || hasSqlResult) {
             if (isInternalDebugEnabled()) {
-                _log.debug("...Building displaySql because of " + isLogEnabled() + ", " + existsSqlLogHandler + ", "
-                        + existsSqlResultHandler + ", " + existsSqlLogRegistry);
+                final String determination = logEnabled + ", " + hasRegistry + ", " + hasSqlLog + ", " + hasSqlResult;
+                _log.debug("...Logging SQL by " + determination);
             }
-            final String displaySql = buildDisplaySql(args);
-            if (isLogEnabled()) {
-                logDisplaySql(displaySql);
+            if (processBeforeLogging(args, argTypes, logEnabled, sqlLogRegistry, hasSqlLog, hasSqlResult)) {
+                return; // processed by anyone
             }
-            if (existsSqlLogHandler) { // DBFlute provides
-                getSqlLogHander().handle(_sql, displaySql, args, argTypes);
+            doLogSql(args, argTypes, logEnabled, sqlLogRegistry, hasSqlLog, hasSqlResult);
+        }
+    }
+
+    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled,
+            Object sqlLogRegistry, boolean hasSqlLog, boolean hasSqlResult) {
+        return false;
+    }
+
+    protected void doLogSql(Object[] args, Class<?>[] argTypes, boolean logEnabled, Object sqlLogRegistry,
+            boolean hasSqlLog, boolean hasSqlResult) {
+        final boolean hasRegistry = sqlLogRegistry != null;
+        final String firstDisplaySql;
+        if (logEnabled || hasRegistry) { // build at once
+            if (isInternalDebugEnabled()) {
+                _log.debug("...Building DisplaySql by " + logEnabled + ", " + hasRegistry);
             }
-            if (existsSqlLogRegistry) { // S2Container provides
-                TnSqlLogRegistry.push(_sql, displaySql, args, argTypes, sqlLogRegistry);
+            firstDisplaySql = buildDisplaySql(args);
+            if (logEnabled) {
+                logDisplaySql(firstDisplaySql);
             }
-            if (existsSqlResultHandler) {
-                saveDisplaySqlForResultInfo(displaySql);
+            if (hasRegistry) { // S2Container provides
+                pushToSqlLogRegistry(args, argTypes, firstDisplaySql, sqlLogRegistry);
+            }
+        } else {
+            firstDisplaySql = null;
+        }
+        if (hasSqlLog || hasSqlResult) { // build lazily
+            if (isInternalDebugEnabled()) {
+                _log.debug("...Handling SqlLog or SqlResult by " + hasSqlLog + ", " + hasSqlResult);
+            }
+            final SqlLogInfo sqlLogInfo = prepareSqlLogInfo(args, argTypes, firstDisplaySql);
+            if (sqlLogInfo != null) { // basically true (except override)
+                if (hasSqlLog) {
+                    getSqlLogHander().handle(sqlLogInfo);
+                }
+                if (hasSqlResult) {
+                    saveResultSqlLogInfo(sqlLogInfo);
+                }
             }
         }
+    }
+
+    // -----------------------------------------------------
+    //                                            DisplaySql
+    //                                            ----------
+    protected void logDisplaySql(String displaySql) {
+        log((isContainsLineSeparatorInSql(displaySql) ? ln() : "") + displaySql);
+    }
+
+    protected boolean isContainsLineSeparatorInSql(String displaySql) {
+        return displaySql != null ? displaySql.contains(ln()) : false;
     }
 
     protected String buildDisplaySql(Object[] args) {
@@ -201,6 +245,9 @@ public abstract class TnAbstractBasicSqlHandler {
         return new DisplaySqlBuilder(logDateFormat, logTimestampFormat);
     }
 
+    // -----------------------------------------------------
+    //                                         SqlLogHandler
+    //                                         -------------
     protected SqlLogHandler getSqlLogHander() {
         if (!CallbackContext.isExistCallbackContextOnThread()) {
             return null;
@@ -212,6 +259,37 @@ public abstract class TnAbstractBasicSqlHandler {
         return getSqlLogHander() != null;
     }
 
+    protected SqlLogInfo prepareSqlLogInfo(Object[] args, Class<?>[] argTypes, String alreadyBuiltDisplaySql) {
+        final SqlLogDisplaySqlBuilder sqlLogDisplaySqlBuilder = createSqlLogDisplaySqlBuilder(alreadyBuiltDisplaySql);
+        return new SqlLogInfo(_sql, args, argTypes, sqlLogDisplaySqlBuilder);
+    }
+
+    protected SqlLogDisplaySqlBuilder createSqlLogDisplaySqlBuilder(final String alreadyBuiltDisplaySql) {
+        if (alreadyBuiltDisplaySql != null) {
+            return new SqlLogDisplaySqlBuilder() {
+                public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
+                    if (isInternalDebugEnabled()) {
+                        _log.debug("...Returning DisplaySql, already built");
+                    }
+                    return alreadyBuiltDisplaySql;
+                }
+            };
+        } else {
+            final DisplaySqlBuilder displaySqlBuilder = createDisplaySqlBuilder();
+            return new SqlLogDisplaySqlBuilder() {
+                public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
+                    if (isInternalDebugEnabled()) {
+                        _log.debug("...Building DisplaySql lazily");
+                    }
+                    return displaySqlBuilder.buildDisplaySql(executedSql, bindArgs);
+                }
+            };
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                      SqlResultHandler
+    //                                      ----------------
     protected SqlResultHandler getSqlResultHander() {
         if (!CallbackContext.isExistCallbackContextOnThread()) {
             return null;
@@ -223,16 +301,21 @@ public abstract class TnAbstractBasicSqlHandler {
         return getSqlResultHander() != null;
     }
 
-    protected void logDisplaySql(String displaySql) {
-        log((isContainsLineSeparatorInSql(displaySql) ? ln() : "") + displaySql);
+    protected void saveResultSqlLogInfo(SqlLogInfo sqlLogInfo) {
+        InternalMapContext.setResultSqlLogInfo(sqlLogInfo);
     }
 
-    protected boolean isContainsLineSeparatorInSql(String displaySql) {
-        return displaySql != null ? displaySql.contains(ln()) : false;
+    // -----------------------------------------------------
+    //                                        SqlLogRegistry
+    //                                        --------------
+    protected Object getSqlLogRegistry() { // S2Container provides
+        // find by reflection so you should determine existence by null
+        return TnSqlLogRegistry.findContainerSqlLogRegistry();
     }
 
-    protected void saveDisplaySqlForResultInfo(String displaySql) {
-        InternalMapContext.setResultInfoDisplaySql(displaySql);
+    protected void pushToSqlLogRegistry(Object[] args, Class<?>[] argTypes, String firstDisplaySql,
+            Object sqlLogRegistry) {
+        TnSqlLogRegistry.push(_sql, firstDisplaySql, args, argTypes, sqlLogRegistry);
     }
 
     // ===================================================================================
@@ -440,7 +523,7 @@ public abstract class TnAbstractBasicSqlHandler {
     // ===================================================================================
     //                                                                      Internal Debug
     //                                                                      ==============
-    private boolean isInternalDebugEnabled() { // because log instance is private
+    protected boolean isInternalDebugEnabled() { // because log instance is private
         return ResourceContext.isInternalDebug() && _log.isDebugEnabled();
     }
 

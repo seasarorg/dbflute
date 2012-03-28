@@ -481,10 +481,13 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected final Map<String, String> _nameFromToMap = newLinkedHashMap();
     {
         // basic unexpected marks
+        _nameFromToMap.put(" ", "_");
         _nameFromToMap.put("%", "_PERCENT_");
         _nameFromToMap.put("&", "_AND_");
         _nameFromToMap.put("(", "_");
         _nameFromToMap.put(")", "_");
+        _nameFromToMap.put(".", "_");
+        _nameFromToMap.put(",", "_");
 
         // basic full-width marks
         _nameFromToMap.put("\uff05", "_PERCENT_");
