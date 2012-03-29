@@ -23,7 +23,7 @@ public class DfTraceViewUtil {
     /**
      * Convert to performance view.
      * @param after_minus_before The difference between before time and after time.
-     * @return The view string to show performance. (ex. 1m23s456ms) (NotNull)
+     * @return The view string to show performance. e.g. 01m40s012ms (NotNull)
      */
     public static String convertToPerformanceView(long after_minus_before) {
         if (after_minus_before < 0) {

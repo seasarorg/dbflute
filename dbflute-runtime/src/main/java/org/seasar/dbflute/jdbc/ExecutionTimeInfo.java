@@ -1,5 +1,7 @@
 package org.seasar.dbflute.jdbc;
 
+import org.seasar.dbflute.util.DfTraceViewUtil;
+
 /**
  * The information of execution time.
  * @author jflute
@@ -26,39 +28,93 @@ public class ExecutionTimeInfo {
     }
 
     // ===================================================================================
+    //                                                                                View
+    //                                                                                ====
+    /**
+     * The performance view of command invoking. e.g. 01m40s012ms <br />
+     * (before building SQL clause after mapping to entity). <br />
+     * Basically it returns true but no guarantee, because this is additional info. <br />
+     * For example, no-modified-column update execution does not have its SQL execution.
+     * @return The view string of command invoking. (NotNull) 
+     */
+    public String toCommandPerformanceView() {
+        return convertToPerformanceView(_commandAfterTimeMillis - _commandBeforeTimeMillis);
+    }
+
+    /**
+     * The performance view of SQL execution. e.g. 01m40s012ms <br />
+     * (from mapping to entity to building SQL clause) <br />
+     * Basically NotNull but no guarantee, because this is additional info. <br />
+     * For example, no-modified-column update execution does not have its SQL execution. <br />
+     * When batch execution, all statements is contained to the time.
+     * @return The view string of SQL execution. (NotNull: if no time, returns "*No time")
+     */
+    public String toSqlPerformanceView() {
+        if (hasSqlTimeMillis()) {
+            return convertToPerformanceView(_sqlAfterTimeMillis - _sqlBeforeTimeMillis);
+        } else {
+            return "*No time";
+        }
+    }
+
+    /**
+     * Convert to performance view.
+     * @param after_minus_before The difference between before time and after time.
+     * @return The view string to show performance. e.g. 01m40s012ms (NotNull)
+     */
+    protected String convertToPerformanceView(long after_minus_before) {
+        return DfTraceViewUtil.convertToPerformanceView(after_minus_before);
+    }
+
+    // ===================================================================================
+    //                                                                              Status
+    //                                                                              ======
+    /**
+     * Does it have the time of SQL execution. <br />
+     * Basically it returns true but no guarantee, because this is additional info. <br />
+     * For example, no-modified-column update execution does not have its SQL execution.
+     * @return The determination, true or false. (basically true but no guarantee)
+     */
+    public boolean hasSqlTimeMillis() {
+        return _sqlAfterTimeMillis != null && _sqlBeforeTimeMillis != null;
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Get the time as millisecond before command invoking (before building SQL clause). <br />
-     * Basically NotNull but no guarantee, because this is additional info.
-     * @return The long value of millisecond. (NullAllowed: basically NotNull but no guarantee)
+     * Get the time as millisecond before command invoking (before building SQL clause).
+     * @return The long value of millisecond. (NotNull)
      */
     public Long getCommandBeforeTimeMillis() {
         return _commandBeforeTimeMillis;
     }
 
     /**
-     * Get the time as millisecond after command invoking (after mapping to entity). <br />
-     * Basically NotNull but no guarantee, because this is additional info.
-     * @return The long value of millisecond. (NullAllowed: basically NotNull but no guarantee)
+     * Get the time as millisecond after command invoking (after mapping to entity).
+     * @return The long value of millisecond. (NotNull)
      */
     public Long getCommandAfterTimeMillis() {
         return _commandAfterTimeMillis;
     }
 
     /**
-     * Get the time as millisecond before SQL invoking (after building SQL clause). <br />
-     * Basically NotNull but no guarantee, because this is additional info.
-     * @return The long value of millisecond. (NullAllowed: basically NotNull but no guarantee)
+     * Get the time as millisecond before SQL execution (after building SQL clause). <br />
+     * Basically NotNull but no guarantee, because this is additional info. <br />
+     * For example, no-modified-column update execution does not have its SQL execution. <br />
+     * When batch execution, all statements is contained to the time.
+     * @return The long value of millisecond. (basically NotNull but no guarantee)
      */
     public Long getSqlBeforeTimeMillis() {
         return _sqlBeforeTimeMillis;
     }
 
     /**
-     * Get the time as millisecond after SQL invoking (before mapping to entity). <br />
-     * Basically NotNull but no guarantee, because this is additional info.
-     * @return The long value of millisecond. (NullAllowed: basically NotNull but no guarantee)
+     * Get the time as millisecond after SQL execution (before mapping to entity). <br />
+     * Basically NotNull but no guarantee, because this is additional info. <br />
+     * For example, no-modified-column update execution does not have its SQL execution. <br />
+     * When batch execution, all statements is contained to the time.
+     * @return The long value of millisecond. (basically NotNull but no guarantee)
      */
     public Long getSqlAfterTimeMillis() {
         return _sqlAfterTimeMillis;

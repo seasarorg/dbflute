@@ -52,7 +52,7 @@ public class SqlLogInfo {
      * Get the SQL string for display, bind variables are embedded. <br />
      * Basically the string is built lazily, but no guarantee. <br />
      * If the command is for batch, it returns SQLs for a part of entities.
-     * @return The string of SQL. (NotNull)
+     * @return The string of SQL. (basically NotNull: if no SQL execution, returns null)
      */
     public String getDisplaySql() {
         if (_cachedDisplaySql != null) {
@@ -67,7 +67,7 @@ public class SqlLogInfo {
     //                                                                            ========
     /**
      * Get the actually-executed SQL, which JDBC can analyze.
-     * @return The string of SQL. (NotNull)
+     * @return The string of SQL. (basically NotNull: if no SQL execution, returns null)
      */
     public String getExecutedSql() {
         return _executedSql;

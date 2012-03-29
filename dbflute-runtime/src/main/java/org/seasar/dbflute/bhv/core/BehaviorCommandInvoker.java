@@ -294,7 +294,7 @@ public class BehaviorCommandInvoker {
 
     protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,
             SqlResultHandler sqlResultHander, Object ret, long commandBefore, long commandAfter) {
-        final SqlLogInfo sqlLogInfo = InternalMapContext.getResultSqlLogInfo();
+        final SqlLogInfo sqlLogInfo = getResultSqlLogInfo();
         final String tableDbName = behaviorCommand.getTableDbName();
         final String commandName = behaviorCommand.getCommandName();
         final Long sqlBefore = InternalMapContext.getSqlBeforeTimeMillis();
@@ -302,6 +302,18 @@ public class BehaviorCommandInvoker {
         final ExecutionTimeInfo timeInfo = new ExecutionTimeInfo(commandBefore, commandAfter, sqlBefore, sqlAfter);
         final SqlResultInfo info = new SqlResultInfo(ret, tableDbName, commandName, sqlLogInfo, timeInfo);
         sqlResultHander.handle(info);
+    }
+
+    protected SqlLogInfo getResultSqlLogInfo() {
+        final SqlLogInfo sqlLogInfo = InternalMapContext.getResultSqlLogInfo();
+        if (sqlLogInfo != null) {
+            return sqlLogInfo;
+        }
+        return new SqlLogInfo(null, new Object[] {}, new Class<?>[] {}, new SqlLogInfo.SqlLogDisplaySqlBuilder() {
+            public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
+                return null;
+            }
+        }); // as dummy
     }
 
     // ===================================================================================

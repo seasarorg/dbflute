@@ -70,13 +70,13 @@ public class SqlResultInfo {
     }
 
     /**
-     * Get the information of SQL info. <br />
+     * Get the information of SQL log info.
      * <pre>
      * [SqlLogInfo]
-     * o executedSql : The actually-executed SQL, which JDBC can analyze. (NotNull)
+     * o executedSql : The actually-executed SQL, which JDBC can analyze. (basically NotNull: if no SQL execution, null)
      * o bindArgs : The argument values of bind variables. (NotNull, EmptyAllowed)
      * o bindArgTypes : The argument types of bind variables. (NotNull, EmptyAllowed)
-     * o displaySql : The SQL string for display, bind variables are embedded. (NotNull)
+     * o displaySql : The SQL string for display, bind variables are embedded. (basically NotNull: if no SQL execution, null)
      * </pre>
      * @return The information of SQL info. (NotNull) 
      */
@@ -85,13 +85,13 @@ public class SqlResultInfo {
     }
 
     /**
-     * Get the information of execution time.
+     * Get the information of execution time info.
      * <pre>
      * [SqlLogInfo]
      * o commandBeforeTimeMillis : The time as millisecond before command invoking (before building SQL clause). (NotNull)
-     * o commandAfterTimeMillis : The time as millisecond after command invoking (after mapping to entity). (NotNull, EmptyAllowed)
-     * o sqlBeforeTimeMillis : The time as millisecond before SQL invoking (after building SQL clause). (NotNull, EmptyAllowed)
-     * o sqlAfterTimeMillis : The time as millisecond after SQL invoking (before mapping to entity). (NotNull)
+     * o commandAfterTimeMillis : The time as millisecond after command invoking (after mapping to entity). (NotNull)
+     * o sqlBeforeTimeMillis : The time as millisecond before SQL execution (after building SQL clause). (basically NotNull but no guarantee)
+     * o sqlAfterTimeMillis : The time as millisecond after SQL execution (before mapping to entity). (basically NotNull but no guarantee)
      * </pre>
      * @return The information of execution time. (NotNull)
      */
