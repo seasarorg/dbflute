@@ -836,18 +836,23 @@ public class ${glDBFluteConfig} {
     public static class ImplementedPhysicalConnectionDigger implements PhysicalConnectionDigger {
 
         public Connection digUp(Connection conn) throws SQLException {
+            Connection digged = unwrap(conn);
+            digged = resolveS2DBCP(digged);
+            digged = resolveCommonsDBCP(digged);
+            return digged;
+        }
+
+        protected Connection unwrap(Connection conn) {
             if (conn instanceof NotClosingConnectionWrapper) {
-                conn = ((NotClosingConnectionWrapper) conn).getActualConnection();
+                return ((NotClosingConnectionWrapper)conn).getActualConnection();
             }
-            conn = resolveS2DBCP(conn);
-            conn = resolveCommonsDBCP(conn);
             return conn;
         }
 
         protected Connection resolveS2DBCP(Connection conn) {
 #if ($database.isTargetContainerSeasar())
             if (conn instanceof ConnectionWrapper) {
-                conn = ((ConnectionWrapper)conn).getPhysicalConnection();
+                return ((ConnectionWrapper)conn).getPhysicalConnection();
             }
 #end
             return conn;
@@ -855,17 +860,17 @@ public class ${glDBFluteConfig} {
 
         protected Connection resolveCommonsDBCP(Connection conn) {
             if ("org.apache.commons.dbcp.PoolingDataSource$PoolGuardConnectionWrapper".equals(conn.getClass().getName())) {
-                conn = getFieldConnection(conn, "delegate");
+                return getFieldConnection(conn, "delegate");
             }
             if ("org.apache.commons.dbcp.PoolableConnection".equals(conn.getClass().getName())) {
-                conn = getFieldConnection(conn, "_conn");
+                return getFieldConnection(conn, "_conn");
             }
             return conn;
         }
 
         protected Connection getFieldConnection(Connection conn, String fieldName) {
             Field field = DfReflectionUtil.getWholeField(conn.getClass(), fieldName);
-            return (Connection) DfReflectionUtil.getValueForcedly(field, conn);
+            return (Connection)DfReflectionUtil.getValueForcedly(field, conn);
         }
     }
 

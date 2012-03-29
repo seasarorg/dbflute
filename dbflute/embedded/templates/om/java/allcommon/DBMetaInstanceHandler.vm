@@ -132,32 +132,37 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
      */
     protected static DBMeta byTableFlexibleName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        tableFlexibleName = removeSchemaIfExists(tableFlexibleName);
-        tableFlexibleName = removeQuoteIfExists(tableFlexibleName);
-        final String tableDbName = _tableDbNameFlexibleMap.get(tableFlexibleName);
+        final String name = normalizeTableFlexibleName(tableFlexibleName);
+        final String tableDbName = _tableDbNameFlexibleMap.get(name);
         if (tableDbName != null) {
             return byTableDbName(tableDbName);
         }
         return null;
     }
 
+    protected static String normalizeTableFlexibleName(final String tableFlexibleName) {
+        return removeQuoteIfExists(removeSchemaIfExists(tableFlexibleName));
+    }
+
     protected static String removeSchemaIfExists(String name) {
         final int dotLastIndex = name.lastIndexOf(".");
         if (dotLastIndex >= 0) {
-            name = name.substring(dotLastIndex + ".".length());
+            return name.substring(dotLastIndex + ".".length());
         }
         return name; 
     }
 
     protected static String removeQuoteIfExists(String name) {
         if (name.startsWith("\"") && name.endsWith("\"")) {
-            name = name.substring(1);
-            name = name.substring(0, name.length() - 1);
+            return strip(name);
         } else if (name.startsWith("[") && name.endsWith("]")) {
-            name = name.substring(1);
-            name = name.substring(0, name.length() - 1);
+            return strip(name);
         }
         return name;
+    }
+
+    protected static String strip(String name) {
+        return name.substring(1, name.length() - 1);
     }
 
     /**
