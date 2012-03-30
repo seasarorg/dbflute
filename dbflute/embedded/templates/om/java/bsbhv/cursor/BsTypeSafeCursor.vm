@@ -66,8 +66,8 @@ public class ${myClassName} implements Serializable {
     //                                                                             Prepare
     //                                                                             =======
     /**
-     * Accept result set.
-     * @param rs Result set. (NotNull)
+     * Accept the result set.
+     * @param rs The cursor (result set) for the query, which has first pointer. (NotNull)
      */
     public void accept(ResultSet rs) {
         this._rs = rs;
@@ -77,10 +77,10 @@ public class ${myClassName} implements Serializable {
     //                                                                              Direct
     //                                                                              ======
     /**
-     * Get wrapped result set.
-     * @return Wrapped result set. (NotNull)
+     * Get the wrapped cursor (result set).
+     * @return The instance of result set. (NotNull)
      */
-    public java.sql.ResultSet cursor() {
+    public ResultSet cursor() {
         return _rs;
     }
 
@@ -90,7 +90,7 @@ public class ${myClassName} implements Serializable {
     /**
      * Move to next result.
      * @return Is exist next result.
-     * @throws java.sql.SQLException
+     * @throws SQLException
      */
     public boolean next() throws SQLException {
         return _rs.next();

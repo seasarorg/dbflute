@@ -859,13 +859,14 @@ public class ${glDBFluteConfig} {
         }
 
         protected Connection resolveCommonsDBCP(Connection conn) {
-            if ("org.apache.commons.dbcp.PoolingDataSource$PoolGuardConnectionWrapper".equals(conn.getClass().getName())) {
-                return getFieldConnection(conn, "delegate");
+            Connection resolved = conn;
+            if ("org.apache.commons.dbcp.PoolingDataSource$PoolGuardConnectionWrapper".equals(resolved.getClass().getName())) {
+                resolved = getFieldConnection(resolved, "delegate");
             }
-            if ("org.apache.commons.dbcp.PoolableConnection".equals(conn.getClass().getName())) {
-                return getFieldConnection(conn, "_conn");
+            if ("org.apache.commons.dbcp.PoolableConnection".equals(resolved.getClass().getName())) {
+                resolved = getFieldConnection(resolved, "_conn");
             }
-            return conn;
+            return resolved;
         }
 
         protected Connection getFieldConnection(Connection conn, String fieldName) {
