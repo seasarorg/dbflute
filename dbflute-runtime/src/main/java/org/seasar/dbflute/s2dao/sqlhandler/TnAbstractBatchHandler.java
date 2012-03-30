@@ -158,7 +158,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
         if (_batchLoggingSb == null) {
             _batchLoggingSb = new StringBuilder(1000);
         }
-        final String displaySql = buildDisplaySql(args);
+        final String displaySql = buildDisplaySql(_sql, args);
         saveBatchLoggingSql(displaySql);
         doLogSql(args, argTypes, false, hasSqlLog, false, sqlLogRegistry); // process non-batch handling
         if (needsBreakLoggingScope()) {

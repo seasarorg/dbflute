@@ -17,7 +17,9 @@ package org.seasar.dbflute.twowaysql;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Arrays;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -115,8 +117,14 @@ public class DisplaySqlBuilder {
 
         protected void assertArgumentSize(Object[] args, String sql) {
             if (args.length <= _loopIndex) {
-                String msg = "The size of bind arguments is illegal:";
-                msg = msg + " size=" + args.length + " sql=" + sql;
+                final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+                br.addNotice("The count of bind arguments is illegal for DisplaySql.");
+                br.addItem("ExecutedSql");
+                br.addElement(sql);
+                br.addItem("Arguments");
+                br.addElement(Arrays.asList(args));
+                br.addElement("count=" + args.length);
+                final String msg = br.buildExceptionMessage();
                 throw new IllegalStateException(msg);
             }
         }

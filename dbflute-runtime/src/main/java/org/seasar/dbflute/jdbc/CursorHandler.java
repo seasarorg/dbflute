@@ -25,9 +25,10 @@ import java.sql.SQLException;
 public interface CursorHandler {
 
     /**
-     * @param resultSet Result set. (NotNull)
-     * @return Result
-     * @throws java.sql.SQLException
+     * Handle the cursor.
+     * @param rs The cursor (result set) for the query, which has first pointer. (NotNull)
+     * @return The result object of handling process. (NullAllowed)
+     * @throws SQLException
      */
-    Object handle(ResultSet resultSet) throws SQLException;
+    Object handle(ResultSet rs) throws SQLException;
 }

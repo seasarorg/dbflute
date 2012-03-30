@@ -21,7 +21,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         // ## Arrange ##
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
-            protected String buildDisplaySql(Object[] args) {
+            protected String buildDisplaySql(String sql, Object[] args) {
                 throw new IllegalStateException("log should not be called!");
             }
 
@@ -50,7 +50,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         final List<String> markList = new ArrayList<String>();
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
-            protected String buildDisplaySql(Object[] args) {
+            protected String buildDisplaySql(String sql, Object[] args) {
                 markList.add("getDisplaySql");
                 return "select ...";
             }
@@ -101,8 +101,9 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         final Class<?>[] argsTypes = new Class<?>[] {};
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, "select ...") {
             @Override
-            protected String buildDisplaySql(Object[] args) {
-                throw new IllegalStateException("log should not be called!");
+            protected String buildDisplaySql(String sql, Object[] args) {
+                markList.add("buildDisplaySql");
+                return "select ...";
             }
 
             @Override
@@ -152,8 +153,9 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         }
 
         // ## Assert ##
-        assertEquals(1, markList.size());
+        assertEquals(2, markList.size());
         assertEquals("handle", markList.get(0));
+        assertEquals("buildDisplaySql", markList.get(1));
     }
 
     public void test_logSql_whitebox_sqlResultHandlerOnly() {
@@ -161,8 +163,9 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         final List<String> markList = new ArrayList<String>();
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, "select ...") {
             @Override
-            protected String buildDisplaySql(Object[] args) {
-                throw new IllegalStateException("log should not be called!");
+            protected String buildDisplaySql(String sql, Object[] args) {
+                markList.add("buildDisplaySql");
+                return "select ...";
             }
 
             @Override
@@ -210,8 +213,9 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         }
 
         // ## Assert ##
-        assertEquals(1, markList.size());
+        assertEquals(2, markList.size());
         assertEquals("saveResultSqlLogInfo", markList.get(0));
+        assertEquals("buildDisplaySql", markList.get(1));
     }
 
     public void test_logSql_whitebox_bigThree() {
@@ -221,7 +225,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         final Class<?>[] argsTypes = new Class<?>[] {};
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
-            protected String buildDisplaySql(Object[] args) {
+            protected String buildDisplaySql(String sql, Object[] args) {
                 markList.add("getDisplaySql");
                 return "select ..." + ln() + "  from ...";
             }

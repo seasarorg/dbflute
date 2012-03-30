@@ -194,7 +194,7 @@ public abstract class TnAbstractBasicSqlHandler {
             if (isInternalDebugEnabled()) {
                 _log.debug("...Building DisplaySql by " + logEnabled + ", " + hasRegistry);
             }
-            firstDisplaySql = buildDisplaySql(args);
+            firstDisplaySql = buildDisplaySql(_sql, args);
             if (logEnabled) {
                 logDisplaySql(firstDisplaySql);
             }
@@ -231,8 +231,8 @@ public abstract class TnAbstractBasicSqlHandler {
         return displaySql != null ? displaySql.contains(ln()) : false;
     }
 
-    protected String buildDisplaySql(Object[] args) {
-        return createDisplaySqlBuilder().buildDisplaySql(_sql, args);
+    protected String buildDisplaySql(String sql, Object[] args) {
+        return createDisplaySqlBuilder().buildDisplaySql(sql, args);
     }
 
     protected String getBindVariableText(Object bindVariable) { // basically for sub-class
@@ -275,13 +275,12 @@ public abstract class TnAbstractBasicSqlHandler {
                 }
             };
         } else {
-            final DisplaySqlBuilder displaySqlBuilder = createDisplaySqlBuilder();
             return new SqlLogDisplaySqlBuilder() {
                 public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
                     if (isInternalDebugEnabled()) {
                         _log.debug("...Building DisplaySql lazily");
                     }
-                    return displaySqlBuilder.buildDisplaySql(executedSql, bindArgs);
+                    return buildDisplaySql(executedSql, bindArgs);
                 }
             };
         }
@@ -339,7 +338,7 @@ public abstract class TnAbstractBasicSqlHandler {
         String displaySql = null;
         if (_sql != null && _exceptionMessageSqlArgs != null) {
             try {
-                displaySql = buildDisplaySql(_exceptionMessageSqlArgs);
+                displaySql = buildDisplaySql(_sql, _exceptionMessageSqlArgs);
             } catch (RuntimeException continued) { // because of when exception occurs
                 if (_log.isDebugEnabled()) {
                     _log.debug("*Failed to build SQL for an exception message: " + continued.getMessage());

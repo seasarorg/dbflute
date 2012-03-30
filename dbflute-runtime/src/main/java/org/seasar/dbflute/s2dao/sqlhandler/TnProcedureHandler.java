@@ -206,8 +206,7 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
     //                                                                          DisplaySql
     //                                                                          ==========
     @Override
-    protected String buildDisplaySql(final Object[] args) { // for procedure call
-        final String sql = _sql;
+    protected String buildDisplaySql(String sql, Object[] args) { // for procedure call
         final Object dto = getParameterBean(args);
         if (args == null || dto == null) {
             return sql;
