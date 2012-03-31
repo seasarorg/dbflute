@@ -137,6 +137,7 @@ public class ReferrerInfo implements RelationInfo {
     /**
      * Read the value to the entity.
      * @param localEntity The local entity of this column to read. (NotNull)
+     * @param <PROPERTY> The type of property
      * @return The read instance of referrer entity. (NullAllowed)
      */
     @SuppressWarnings("unchecked")

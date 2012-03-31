@@ -227,6 +227,7 @@ public class ColumnInfo {
     /**
      * Convert the value to property type.
      * @param value The conversion target value. (NullAllowed)
+     * @param <VALUE> The type of property value.
      * @return The converted value as property type. (NullAllowed)
      */
     @SuppressWarnings("unchecked")
