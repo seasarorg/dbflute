@@ -60,11 +60,15 @@ public class BatchInsertCommand extends AbstractListEntityCommand {
     }
 
     protected TnInsertEntityDynamicCommand createBatchInsertDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final TnBatchInsertDynamicCommand cmd = new TnBatchInsertDynamicCommand(_dataSource, _statementFactory);
+        final TnBatchInsertDynamicCommand cmd = newBatchInsertDynamicCommand();
         cmd.setBeanMetaData(bmd);
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);
         return cmd;
+    }
+
+    protected TnBatchInsertDynamicCommand newBatchInsertDynamicCommand() {
+        return new TnBatchInsertDynamicCommand(_dataSource, _statementFactory);
     }
 
     @Override

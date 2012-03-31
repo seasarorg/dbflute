@@ -46,6 +46,10 @@ public class QueryInsertCBCommand extends AbstractQueryEntityCBCommand {
     //                                                               =====================
     @Override
     protected SqlExecution createQueryEntityCBExecution() {
+        return newQueryInsertDynamicCommand();
+    }
+
+    protected TnQueryInsertDynamicCommand newQueryInsertDynamicCommand() {
         return new TnQueryInsertDynamicCommand(_dataSource, _statementFactory);
     }
 

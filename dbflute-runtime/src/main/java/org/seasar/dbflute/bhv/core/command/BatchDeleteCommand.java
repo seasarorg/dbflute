@@ -68,6 +68,11 @@ public class BatchDeleteCommand extends AbstractListEntityCommand {
     protected TnBatchDeleteStaticCommand createBatchDeleteStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
         final DBMeta dbmeta = findDBMeta();
         final boolean opt = isOptimisticLockHandling();
+        return newBatchDeleteStaticCommand(bmd, propertyNames, dbmeta, opt);
+    }
+
+    protected TnBatchDeleteStaticCommand newBatchDeleteStaticCommand(TnBeanMetaData bmd, String[] propertyNames,
+            DBMeta dbmeta, boolean opt) {
         return new TnBatchDeleteStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt);
     }
 

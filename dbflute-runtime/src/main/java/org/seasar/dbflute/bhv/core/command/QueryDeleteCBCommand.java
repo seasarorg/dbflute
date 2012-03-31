@@ -44,6 +44,10 @@ public class QueryDeleteCBCommand extends AbstractQueryEntityCBCommand {
 
     @Override
     protected SqlExecution createQueryEntityCBExecution() {
+        return newQueryDeleteDynamicCommand();
+    }
+
+    protected TnQueryDeleteDynamicCommand newQueryDeleteDynamicCommand() {
         return new TnQueryDeleteDynamicCommand(_dataSource, _statementFactory);
     }
 

@@ -1003,44 +1003,65 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                  ----
     protected SelectCountCBCommand createSelectCountCBCommand(ConditionBean cb, boolean uniqueCount) {
         assertBehaviorCommandInvoker("createSelectCountCBCommand");
-        final SelectCountCBCommand cmd = xsetupSelectCommand(new SelectCountCBCommand());
+        final SelectCountCBCommand cmd = newSelectCountCBCommand();
+        xsetupSelectCommand(cmd);
         cmd.setConditionBean(cb);
         cmd.setUniqueCount(uniqueCount);
         return cmd;
     }
 
+    protected SelectCountCBCommand newSelectCountCBCommand() {
+        return new SelectCountCBCommand();
+    }
+
     protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> createSelectCursorCBCommand(ConditionBean cb,
             EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectCursorCBCommand");
-        final SelectCursorCBCommand<ENTITY> cmd = xsetupSelectCommand(new SelectCursorCBCommand<ENTITY>());
+        final SelectCursorCBCommand<ENTITY> cmd = newSelectCursorCBCommand();
+        xsetupSelectCommand(cmd);
         cmd.setConditionBean(cb);
         cmd.setEntityType(entityType);
         cmd.setEntityRowHandler(entityRowHandler);
         return cmd;
     }
 
+    protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> newSelectCursorCBCommand() {
+        return new SelectCursorCBCommand<ENTITY>();
+    }
+
     protected <ENTITY extends Entity> SelectListCBCommand<ENTITY> createSelectListCBCommand(ConditionBean cb,
             Class<ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectListCBCommand");
-        final SelectListCBCommand<ENTITY> cmd = xsetupSelectCommand(new SelectListCBCommand<ENTITY>());
+        final SelectListCBCommand<ENTITY> cmd = newSelectListCBCommand();
+        xsetupSelectCommand(cmd);
         cmd.setConditionBean(cb);
         cmd.setEntityType(entityType);
         return cmd;
     }
 
+    protected <ENTITY extends Entity> SelectListCBCommand<ENTITY> newSelectListCBCommand() {
+        return new SelectListCBCommand<ENTITY>();
+    }
+
     protected <RESULT> SelectNextValCommand<RESULT> createSelectNextValCommand(Class<RESULT> resultType) {
         assertBehaviorCommandInvoker("createSelectNextValCommand");
-        final SelectNextValCommand<RESULT> cmd = xsetupSelectCommand(new SelectNextValCommand<RESULT>());
+        final SelectNextValCommand<RESULT> cmd = newSelectNextValCommand();
+        xsetupSelectCommand(cmd);
         cmd.setResultType(resultType);
         cmd.setDBMeta(getDBMeta());
         cmd.setSequenceCacheHandler(_behaviorCommandInvoker.getSequenceCacheHandler());
         return cmd;
     }
 
+    protected <RESULT> SelectNextValCommand<RESULT> newSelectNextValCommand() {
+        return new SelectNextValCommand<RESULT>();
+    }
+
     protected <RESULT> SelectNextValCommand<RESULT> createSelectNextValSubCommand(Class<RESULT> resultType,
             String columnDbName, String sequenceName, Integer incrementSize, Integer cacheSize) {
         assertBehaviorCommandInvoker("createSelectNextValCommand");
-        final SelectNextValSubCommand<RESULT> cmd = xsetupSelectCommand(new SelectNextValSubCommand<RESULT>());
+        final SelectNextValSubCommand<RESULT> cmd = newSelectNextValSubCommand();
+        xsetupSelectCommand(cmd);
         cmd.setResultType(resultType);
         cmd.setDBMeta(getDBMeta());
         cmd.setSequenceCacheHandler(_behaviorCommandInvoker.getSequenceCacheHandler());
@@ -1051,20 +1072,28 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return cmd;
     }
 
+    protected <RESULT> SelectNextValSubCommand<RESULT> newSelectNextValSubCommand() {
+        return new SelectNextValSubCommand<RESULT>();
+    }
+
     protected <RESULT> SelectScalarCBCommand<RESULT> createSelectScalarCBCommand(ConditionBean cb,
             Class<RESULT> resultType, SqlClause.SelectClauseType selectClauseType) {
         assertBehaviorCommandInvoker("createSelectScalarCBCommand");
-        final SelectScalarCBCommand<RESULT> cmd = xsetupSelectCommand(new SelectScalarCBCommand<RESULT>());
+        final SelectScalarCBCommand<RESULT> cmd = newSelectScalarCBCommand();
+        xsetupSelectCommand(cmd);
         cmd.setConditionBean(cb);
         cmd.setResultType(resultType);
         cmd.setSelectClauseType(selectClauseType);
         return cmd;
     }
 
-    protected <COMMAND extends AbstractBehaviorCommand<?>> COMMAND xsetupSelectCommand(COMMAND cmd) {
+    protected <RESULT> SelectScalarCBCommand<RESULT> newSelectScalarCBCommand() {
+        return new SelectScalarCBCommand<RESULT>();
+    }
+
+    protected void xsetupSelectCommand(AbstractBehaviorCommand<?> cmd) {
         cmd.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
-        return cmd;
     }
 
     // -----------------------------------------------------
@@ -1073,16 +1102,20 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // defined here (on the readable interface) for non-primary key value
     protected InsertEntityCommand createInsertEntityCommand(Entity entity, InsertOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createInsertEntityCommand");
-        final InsertEntityCommand cmd = xsetupEntityCommand(new InsertEntityCommand(), entity);
+        final InsertEntityCommand cmd = newInsertEntityCommand();
+        xsetupEntityCommand(cmd, entity);
         cmd.setInsertOption(option);
         return cmd;
     }
 
-    protected <COMMAND extends AbstractEntityCommand> COMMAND xsetupEntityCommand(COMMAND cmd, Entity entity) {
+    protected InsertEntityCommand newInsertEntityCommand() {
+        return new InsertEntityCommand();
+    }
+
+    protected void xsetupEntityCommand(AbstractEntityCommand cmd, Entity entity) {
         cmd.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setEntity(entity);
-        return cmd;
     }
 
     // -----------------------------------------------------

@@ -136,6 +136,11 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
     protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(Object pmbTypeObj, String sql,
             TnResultSetHandler handler) {
         final Map<String, Class<?>> argNameTypeMap = createBeanArgNameTypeMap(pmbTypeObj);
+        return newOutsideSqlSelectExecution(argNameTypeMap, sql, handler);
+    }
+
+    protected OutsideSqlSelectExecution newOutsideSqlSelectExecution(Map<String, Class<?>> argNameTypeMap, String sql,
+            TnResultSetHandler handler) {
         return new OutsideSqlSelectExecution(_dataSource, _statementFactory, argNameTypeMap, sql, handler);
     }
 

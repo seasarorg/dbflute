@@ -44,9 +44,13 @@ public class QueryUpdateCBCommand extends AbstractQueryEntityCBCommand {
 
     @Override
     protected SqlExecution createQueryEntityCBExecution() {
-        final TnQueryUpdateDynamicCommand sqlCommand = new TnQueryUpdateDynamicCommand(_dataSource, _statementFactory);
+        final TnQueryUpdateDynamicCommand sqlCommand = newQueryUpdateDynamicCommand();
         sqlCommand.setBeanMetaData(createBeanMetaData());
         return sqlCommand;
+    }
+
+    protected TnQueryUpdateDynamicCommand newQueryUpdateDynamicCommand() {
+        return new TnQueryUpdateDynamicCommand(_dataSource, _statementFactory);
     }
 
     @Override

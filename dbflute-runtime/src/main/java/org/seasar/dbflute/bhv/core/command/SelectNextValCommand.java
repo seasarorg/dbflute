@@ -19,9 +19,8 @@ import java.util.Map;
 
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
-import org.seasar.dbflute.bhv.core.execution.SelectSimpleExecution;
+import org.seasar.dbflute.bhv.core.execution.SelectNextValExecution;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCache;
-import org.seasar.dbflute.bhv.core.supplement.SequenceCache.SequenceRealExecutor;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -188,29 +187,15 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         }
     }
 
-    protected SelectSimpleExecution createSequenceExecution(TnResultSetHandler handler, String sql,
+    protected SelectNextValExecution createSequenceExecution(TnResultSetHandler handler, String sql,
             final SequenceCache sequenceCache) {
         final Map<String, Class<?>> argNameTypeMap = newArgNameTypeMap();
-        final SelectSimpleExecution cmd;
-        if (sequenceCache != null) {
-            cmd = new SelectSimpleExecution(_dataSource, _statementFactory, argNameTypeMap, sql, handler) {
-                @Override
-                public Object execute(final Object[] args) {
-                    return sequenceCache.nextval(new SequenceRealExecutor() {
-                        public Object execute() {
-                            return executeSuperExecute(args);
-                        }
-                    });
-                }
+        return newSelectNextValExecution(argNameTypeMap, sql, handler, sequenceCache);
+    }
 
-                protected Object executeSuperExecute(Object[] args) {
-                    return super.execute(args);
-                }
-            };
-        } else {
-            cmd = new SelectSimpleExecution(_dataSource, _statementFactory, argNameTypeMap, sql, handler);
-        }
-        return cmd;
+    protected SelectNextValExecution newSelectNextValExecution(Map<String, Class<?>> argNameTypeMap, String sql,
+            TnResultSetHandler handler, final SequenceCache sequenceCache) {
+        return new SelectNextValExecution(_dataSource, _statementFactory, argNameTypeMap, sql, handler, sequenceCache);
     }
 
     public Object[] getSqlExecutionArgument() {

@@ -840,32 +840,52 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     protected UpdateEntityCommand createUpdateEntityCommand(Entity entity, UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createUpdateEntityCommand");
-        final UpdateEntityCommand cmd = xsetupEntityCommand(new UpdateEntityCommand(), entity);
+        final UpdateEntityCommand cmd = newUpdateEntityCommand();
+        xsetupEntityCommand(cmd, entity);
         cmd.setUpdateOption(option);
         return cmd;
+    }
+
+    protected UpdateEntityCommand newUpdateEntityCommand() {
+        return new UpdateEntityCommand();
     }
 
     protected UpdateNonstrictEntityCommand createUpdateNonstrictEntityCommand(Entity entity,
             UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createUpdateNonstrictEntityCommand");
-        final UpdateNonstrictEntityCommand cmd = xsetupEntityCommand(new UpdateNonstrictEntityCommand(), entity);
+        final UpdateNonstrictEntityCommand cmd = newUpdateNonstrictEntityCommand();
+        xsetupEntityCommand(cmd, entity);
         cmd.setUpdateOption(option);
         return cmd;
     }
 
+    protected UpdateNonstrictEntityCommand newUpdateNonstrictEntityCommand() {
+        return new UpdateNonstrictEntityCommand();
+    }
+
     protected DeleteEntityCommand createDeleteEntityCommand(Entity entity, DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createDeleteEntityCommand");
-        final DeleteEntityCommand cmd = xsetupEntityCommand(new DeleteEntityCommand(), entity);
+        final DeleteEntityCommand cmd = newDeleteEntityCommand();
+        xsetupEntityCommand(cmd, entity);
         cmd.setDeleteOption(option);
         return cmd;
+    }
+
+    protected DeleteEntityCommand newDeleteEntityCommand() {
+        return new DeleteEntityCommand();
     }
 
     protected DeleteNonstrictEntityCommand createDeleteNonstrictEntityCommand(Entity entity,
             DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createDeleteNonstrictEntityCommand");
-        final DeleteNonstrictEntityCommand cmd = xsetupEntityCommand(new DeleteNonstrictEntityCommand(), entity);
+        final DeleteNonstrictEntityCommand cmd = newDeleteNonstrictEntityCommand();
+        xsetupEntityCommand(cmd, entity);
         cmd.setDeleteOption(option);
         return cmd;
+    }
+
+    protected DeleteNonstrictEntityCommand newDeleteNonstrictEntityCommand() {
+        return new DeleteNonstrictEntityCommand();
     }
 
     // -----------------------------------------------------
@@ -874,51 +894,73 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     protected BatchInsertCommand createBatchInsertCommand(List<? extends Entity> entityList,
             InsertOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchInsertCommand");
-        final BatchInsertCommand cmd = xsetupListEntityCommand(new BatchInsertCommand(), entityList);
+        final BatchInsertCommand cmd = newBatchInsertCommand();
+        xsetupListEntityCommand(cmd, entityList);
         cmd.setInsertOption(option);
         return cmd;
+    }
+
+    protected BatchInsertCommand newBatchInsertCommand() {
+        return new BatchInsertCommand();
     }
 
     protected BatchUpdateCommand createBatchUpdateCommand(List<? extends Entity> entityList,
             UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchUpdateCommand");
-        final BatchUpdateCommand cmd = xsetupListEntityCommand(new BatchUpdateCommand(), entityList);
+        final BatchUpdateCommand cmd = newBatchUpdateCommand();
+        xsetupListEntityCommand(cmd, entityList);
         cmd.setUpdateOption(option);
         return cmd;
+    }
+
+    protected BatchUpdateCommand newBatchUpdateCommand() {
+        return new BatchUpdateCommand();
     }
 
     protected BatchUpdateNonstrictCommand createBatchUpdateNonstrictCommand(List<? extends Entity> entityList,
             UpdateOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchUpdateNonstrictCommand");
-        final BatchUpdateNonstrictCommand cmd = xsetupListEntityCommand(new BatchUpdateNonstrictCommand(), entityList);
+        final BatchUpdateNonstrictCommand cmd = newBatchUpdateNonstrictCommand();
+        xsetupListEntityCommand(cmd, entityList);
         cmd.setUpdateOption(option);
         return cmd;
+    }
+
+    protected BatchUpdateNonstrictCommand newBatchUpdateNonstrictCommand() {
+        return new BatchUpdateNonstrictCommand();
     }
 
     protected BatchDeleteCommand createBatchDeleteCommand(List<? extends Entity> entityList,
             DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchDeleteCommand");
-        final BatchDeleteCommand cmd = xsetupListEntityCommand(new BatchDeleteCommand(), entityList);
+        final BatchDeleteCommand cmd = newBatchDeleteCommand();
+        xsetupListEntityCommand(cmd, entityList);
         cmd.setDeleteOption(option);
         return cmd;
+    }
+
+    protected BatchDeleteCommand newBatchDeleteCommand() {
+        return new BatchDeleteCommand();
     }
 
     protected BatchDeleteNonstrictCommand createBatchDeleteNonstrictCommand(List<? extends Entity> entityList,
             DeleteOption<? extends ConditionBean> option) {
         assertBehaviorCommandInvoker("createBatchDeleteNonstrictCommand");
-        final BatchDeleteNonstrictCommand cmd = xsetupListEntityCommand(new BatchDeleteNonstrictCommand(), entityList);
+        final BatchDeleteNonstrictCommand cmd = newBatchDeleteNonstrictCommand();
+        xsetupListEntityCommand(cmd, entityList);
         cmd.setDeleteOption(option);
         return cmd;
     }
 
+    protected BatchDeleteNonstrictCommand newBatchDeleteNonstrictCommand() {
+        return new BatchDeleteNonstrictCommand();
+    }
+
     /**
-     * @param <COMMAND> The type of behavior command for list entity.
      * @param command The command of behavior. (NotNull)
      * @param entityList The list of entity. (NotNull, NotEmpty)
-     * @return The command of behavior. (NotNull)
      */
-    protected <COMMAND extends AbstractListEntityCommand> COMMAND xsetupListEntityCommand(COMMAND command,
-            List<? extends Entity> entityList) {
+    protected void xsetupListEntityCommand(AbstractListEntityCommand command, List<? extends Entity> entityList) {
         if (entityList.isEmpty()) {
             String msg = "The argument 'entityList' should not be empty: " + entityList;
             throw new IllegalStateException(msg);
@@ -927,7 +969,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setEntityType(entityList.get(0).getClass()); // *The list should not be empty!
         command.setEntityList(entityList);
-        return command;
     }
 
     // -----------------------------------------------------

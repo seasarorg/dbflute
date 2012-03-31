@@ -59,13 +59,17 @@ public class UpdateEntityCommand extends AbstractEntityCommand {
     }
 
     protected TnUpdateEntityDynamicCommand createUpdateEntityDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final TnUpdateEntityDynamicCommand cmd = new TnUpdateEntityDynamicCommand(_dataSource, _statementFactory);
+        final TnUpdateEntityDynamicCommand cmd = newUpdateEntityDynamicCommand();
         cmd.setBeanMetaData(bmd);
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling());
         cmd.setVersionNoAutoIncrementOnMemory(isVersionNoAutoIncrementOnMemory());
         return cmd;
+    }
+
+    protected TnUpdateEntityDynamicCommand newUpdateEntityDynamicCommand() {
+        return new TnUpdateEntityDynamicCommand(_dataSource, _statementFactory);
     }
 
     protected boolean isOptimisticLockHandling() {

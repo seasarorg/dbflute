@@ -68,6 +68,11 @@ public class DeleteEntityCommand extends AbstractEntityCommand {
     protected TnDeleteEntityStaticCommand createDeleteEntityStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
         final DBMeta dbmata = findDBMeta();
         final boolean opt = isOptimisticLockHandling();
+        return newDeleteEntityStaticCommand(bmd, propertyNames, dbmata, opt);
+    }
+
+    protected TnDeleteEntityStaticCommand newDeleteEntityStaticCommand(TnBeanMetaData bmd, String[] propertyNames,
+            DBMeta dbmata, final boolean opt) {
         return new TnDeleteEntityStaticCommand(_dataSource, _statementFactory, bmd, dbmata, propertyNames, opt);
     }
 

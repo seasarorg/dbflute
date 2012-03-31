@@ -55,17 +55,21 @@ public class BatchUpdateCommand extends AbstractListEntityCommand {
 
     protected SqlExecution createBatchUpdateEntitySqlExecution(TnBeanMetaData bmd) {
         final String[] propertyNames = getPersistentPropertyNames(bmd);
-        return createBatchUpdateAutoDynamicCommand(bmd, propertyNames);
+        return createBatchUpdateDynamicCommand(bmd, propertyNames);
     }
 
-    protected TnBatchUpdateDynamicCommand createBatchUpdateAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final TnBatchUpdateDynamicCommand cmd = new TnBatchUpdateDynamicCommand(_dataSource, _statementFactory);
+    protected TnBatchUpdateDynamicCommand createBatchUpdateDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
+        final TnBatchUpdateDynamicCommand cmd = newBatchUpdateDynamicCommand();
         cmd.setBeanMetaData(bmd);
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling());
         cmd.setVersionNoAutoIncrementOnMemory(isVersionNoAutoIncrementOnMemory());
         return cmd;
+    }
+
+    protected TnBatchUpdateDynamicCommand newBatchUpdateDynamicCommand() {
+        return new TnBatchUpdateDynamicCommand(_dataSource, _statementFactory);
     }
 
     protected boolean isOptimisticLockHandling() {

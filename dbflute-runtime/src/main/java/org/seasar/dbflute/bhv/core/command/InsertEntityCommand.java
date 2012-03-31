@@ -67,11 +67,15 @@ public class InsertEntityCommand extends AbstractEntityCommand {
     }
 
     protected TnInsertEntityDynamicCommand createInsertEntityDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        final TnInsertEntityDynamicCommand cmd = new TnInsertEntityDynamicCommand(_dataSource, _statementFactory);
+        final TnInsertEntityDynamicCommand cmd = newInsertEntityDynamicCommand();
         cmd.setBeanMetaData(bmd);
         cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);
         return cmd;
+    }
+
+    protected TnInsertEntityDynamicCommand newInsertEntityDynamicCommand() {
+        return new TnInsertEntityDynamicCommand(_dataSource, _statementFactory);
     }
 
     /**

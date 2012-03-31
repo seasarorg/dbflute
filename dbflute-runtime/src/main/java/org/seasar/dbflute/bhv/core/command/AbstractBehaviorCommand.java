@@ -71,8 +71,13 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                            OutsideSqlExecuteExecution
     //                            --------------------------
+    // the non-primary insert also uses this so defined here
     protected OutsideSqlExecuteExecution createOutsideSqlExecuteExecution(Object pmbTypeObj, String sql) {
         final Map<String, Class<?>> argNameTypeMap = createBeanArgNameTypeMap(pmbTypeObj);
+        return newOutsideSqlExecuteExecution(argNameTypeMap, sql);
+    }
+
+    protected OutsideSqlExecuteExecution newOutsideSqlExecuteExecution(Map<String, Class<?>> argNameTypeMap, String sql) {
         return new OutsideSqlExecuteExecution(_dataSource, _statementFactory, argNameTypeMap, sql);
     }
 
