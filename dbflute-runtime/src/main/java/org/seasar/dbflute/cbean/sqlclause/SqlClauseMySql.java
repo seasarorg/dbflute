@@ -182,6 +182,12 @@ public class SqlClauseMySql extends AbstractSqlClause {
         }
     }
 
+    public static class CollateUTF8GeneralArranger implements QueryClauseArranger {
+        public String arrange(ColumnRealName columnRealName, String operand, String bindExpression, String rearOption) {
+            return columnRealName + " collate utf8_general_ci " + operand + " " + bindExpression + rearOption;
+        }
+    }
+
     // [DBFlute-0.9.5]
     // ===================================================================================
     //                                                                    Full-Text Search
