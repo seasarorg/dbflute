@@ -126,6 +126,10 @@ public class DfClassificationResourceAnalyzer {
                     classificationList.add(classificationTop);
                     if (titleLine != null) {
                         classificationTop.setRelatedColumnName(titleLine.getRelatedColumnName());
+                        final String codeType = titleLine.getCodeType();
+                        if (codeType != null) {
+                            classificationTop.setCodeType(codeType);
+                        }
                         classificationTop.setCheckImplicitSet(titleLine.isCheckImplicitSet());
                     }
                     continue;
@@ -297,6 +301,10 @@ public class DfClassificationResourceAnalyzer {
         }
         titleLine.setRelatedColumnName(relatedColumnName);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(option)) {
+            final String codeTypeNumber = DfClassificationTop.CODE_TYPE_NUMBER;
+            if (Srl.containsIgnoreCase(option, codeTypeNumber)) {
+                titleLine.setCodeType(codeTypeNumber);
+            }
             titleLine.setCheckImplicitSet(Srl.containsIgnoreCase(option, "check"));
         }
         return titleLine;
@@ -305,6 +313,7 @@ public class DfClassificationResourceAnalyzer {
     protected static class AnalyzedTitleLine {
         protected String _title;
         protected String _relatedColumnName;
+        protected String _codeType;
         protected boolean _checkImplicitSet;
 
         public String getTitle() {
@@ -321,6 +330,14 @@ public class DfClassificationResourceAnalyzer {
 
         public void setRelatedColumnName(String relatedColumnName) {
             this._relatedColumnName = relatedColumnName;
+        }
+
+        public String getCodeType() {
+            return _codeType;
+        }
+
+        public void setCodeType(String codeType) {
+            this._codeType = codeType;
         }
 
         public boolean isCheckImplicitSet() {

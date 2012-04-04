@@ -303,8 +303,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return false;
         }
         final String codeType = classificationTop.getCodeType();
-        if (codeType == null) {
-            return false;
+        if (codeType == null) { // unknown
+            return true; // quoted
         }
         return codeType.equalsIgnoreCase(DfClassificationTop.CODE_TYPE_STRING);
     }

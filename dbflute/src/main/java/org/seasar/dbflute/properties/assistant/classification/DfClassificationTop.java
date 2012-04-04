@@ -32,7 +32,7 @@ public class DfClassificationTop {
     //                                                                           =========
     protected String _classificationName;
     protected String _topComment;
-    protected String _codeType;
+    protected String _codeType = DfClassificationTop.CODE_TYPE_STRING; // as default
     protected String _relatedColumnName;
     protected List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
     protected boolean _tableClassification;
@@ -65,7 +65,9 @@ public class DfClassificationTop {
             }
             codeType = tmpType;
         }
-        this._codeType = codeType;
+        if (codeType != null) {
+            this._codeType = codeType;
+        }
     }
 
     protected void throwClassificationLiteralCommentNotFoundException(String classificationName, Map<?, ?> elementMap) {
