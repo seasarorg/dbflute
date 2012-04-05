@@ -5,12 +5,12 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.9.9.3F"/>
+	<property name="version" value="0.9.9.4A"/>
 	<property name="build.version" value="${version}"/>
-	<property name="pre.version" value="0.9.9.3D"/>
-	<property name="runtime.version" value="0.9.9.3F"/>
+	<property name="pre.version" value="0.9.9.3F"/>
+	<property name="runtime.version" value="0.9.9.4A"/>
 	<property name="runtime.build.version" value="${runtime.version}"/>
-	<property name="runtime.pre.version" value="0.9.9.3D"/>
+	<property name="runtime.pre.version" value="0.9.9.3F"/>
 
 	<!-- Resource Directories -->
 	<property name="workspace.base" value=".."/>
@@ -204,6 +204,8 @@
 		<copy file="${dist}/${runtime.jar}" tofile="lib/${runtime.nonversion.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="lib/sources/${runtime.sources.nonversion.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${embedded}/lib/${runtime.nonversion.jar}" overwrite="true"/>
+		<delete dir="${runtime.dir}/target/apidocs"/>
+		<delete dir="${runtime.dir}/target/java-bundle-options"/>
 	</target>
 
 	<target name="adjust">
