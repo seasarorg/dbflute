@@ -1,5 +1,7 @@
 package org.seasar.dbflute.util;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
@@ -61,6 +63,28 @@ public class DfReflectionUtilTest extends PlainTestCase {
         Class<?> clazz = FooTarget.class;
         String methodName = "fooTimestampArg";
         Class<?>[] argType = new Class<?>[] { Date.class };
+
+        // ## Act & Assert ##
+        assertNull(DfReflectionUtil.getPublicMethod(clazz, methodName, argType));
+        assertNull(DfReflectionUtil.getPublicMethodFlexibly(clazz, methodName, argType));
+    }
+
+    public void test_getPublicMethod_args_Interface_exists() throws Exception {
+        // ## Arrange ##
+        Class<?> clazz = FilenameFilter.class;
+        String methodName = "accept";
+        Class<?>[] argType = new Class<?>[] { File.class, String.class };
+
+        // ## Act & Assert ##
+        assertNotNull(DfReflectionUtil.getPublicMethod(clazz, methodName, argType));
+        assertNotNull(DfReflectionUtil.getPublicMethodFlexibly(clazz, methodName, argType));
+    }
+
+    public void test_getPublicMethod_args_Interface_notExists() throws Exception {
+        // ## Arrange ##
+        Class<?> clazz = FilenameFilter.class;
+        String methodName = "noexist"; // expect no exception
+        Class<?>[] argType = new Class<?>[] { File.class, String.class };
 
         // ## Act & Assert ##
         assertNull(DfReflectionUtil.getPublicMethod(clazz, methodName, argType));

@@ -118,7 +118,7 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Add days. e.g. addDay(1): 2001/01/01 to 2001/01/<span style="color: #FD4747">02<span>
+     * Add days. e.g. addDay(1): 2001/01/01 to 2001/01/<span style="color: #FD4747">02</span>
      * @param day The added count of day. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */

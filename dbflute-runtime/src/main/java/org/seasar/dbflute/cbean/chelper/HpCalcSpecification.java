@@ -188,7 +188,8 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         calculation.setCalculationType(CalculationType.CONV);
         calculation.setColumnConversionOption(option);
         _calculationList.add(calculation);
-        prepareConvOption(option);
+        // called later for VaryingUpdate
+        //prepareConvOption(option);
         _convert = true;
         return this;
     }
@@ -254,15 +255,21 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     protected String doBuildStatement(String columnExp) {
-        final List<CalculationElement> calculationList = getCalculationList();
-        if (calculationList.isEmpty()) {
+        if (_calculationList.isEmpty()) {
             return null;
         }
         String targetExp = decryptIfNeeds(columnExp);
         int index = 0;
-        for (CalculationElement calculation : calculationList) {
+        for (CalculationElement calculation : _calculationList) {
             if (index > 0) {
                 targetExp = "(" + targetExp + ")";
+            }
+            if (!calculation.isPreparedConvOption()) {
+                final ColumnConversionOption option = calculation.getColumnConversionOption();
+                if (option != null) {
+                    prepareConvOption(option);
+                    calculation.setPreparedConvOption(true);
+                }
             }
             targetExp = calculation.buildExp(targetExp);
             ++index;

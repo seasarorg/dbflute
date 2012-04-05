@@ -188,7 +188,7 @@ public class DfReflectionUtil {
 
     protected static Field findField(Class<?> clazz, String fieldName, VisibilityType visibilityType) {
         assertObjectNotNull("clazz", clazz);
-        for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
+        for (Class<?> target = clazz; target != null && target != Object.class; target = target.getSuperclass()) {
             final Field declaredField;
             try {
                 declaredField = target.getDeclaredField(fieldName);
@@ -389,7 +389,7 @@ public class DfReflectionUtil {
 
     protected static Method doFindMethodBasic(Class<?> clazz, String methodName, Class<?>[] argTypes,
             VisibilityType visibilityType) {
-        for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
+        for (Class<?> target = clazz; target != null && target != Object.class; target = target.getSuperclass()) {
             final Method declaredMethod;
             try {
                 declaredMethod = target.getDeclaredMethod(methodName, argTypes);
@@ -413,7 +413,7 @@ public class DfReflectionUtil {
 
     protected static Method doFindMethodFlexibly(Class<?> clazz, String methodName, Class<?>[] argTypes,
             VisibilityType visibilityType) {
-        for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
+        for (Class<?> target = clazz; target != null && target != Object.class; target = target.getSuperclass()) {
             final Method[] methods = target.getDeclaredMethods();
             for (int methodIndex = 0; methodIndex < methods.length; ++methodIndex) {
                 final Method current = methods[methodIndex];

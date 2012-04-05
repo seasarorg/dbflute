@@ -155,9 +155,9 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         if (columnInfo.isOptimisticLock()) {
             throwVaryingUpdateOptimisticLockSpecificationException(columnInfo);
         }
-        if (!columnInfo.isPropertyTypeNumber()) {
+        if (!columnInfo.isPropertyTypeNumber() && !columnInfo.isPropertyTypeDate()) {
             // *simple message because other types may be supported at the future
-            String msg = "Not number column specified: " + columnInfo;
+            String msg = "Not number or date column specified: " + columnInfo;
             throw new VaryingUpdateCalculationUnsupportedColumnTypeException(msg);
         }
     }

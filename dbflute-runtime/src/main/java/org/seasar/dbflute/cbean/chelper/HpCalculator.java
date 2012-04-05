@@ -68,6 +68,7 @@ public interface HpCalculator {
         protected CalculationType _calculationType;
         protected Number _calculationValue;
         protected ColumnConversionOption _columnConversionOption;
+        protected boolean _preparedConvOption;
 
         protected String buildExp(String targetExp) {
             if (_calculationType.equals(CalculationType.CONV)) {
@@ -99,6 +100,14 @@ public interface HpCalculator {
 
         public void setColumnConversionOption(ColumnConversionOption columnConversionOption) {
             this._columnConversionOption = columnConversionOption;
+        }
+
+        public boolean isPreparedConvOption() {
+            return _preparedConvOption;
+        }
+
+        public void setPreparedConvOption(boolean preparedConvOption) {
+            this._preparedConvOption = preparedConvOption;
         }
     }
 
