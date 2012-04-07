@@ -60,6 +60,10 @@ public class SelectScalarCBCommand<RESULT> extends AbstractSelectCBCommand<RESUL
         return false;
     }
 
+    public boolean isSelectCursor() {
+        return false;
+    }
+
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================

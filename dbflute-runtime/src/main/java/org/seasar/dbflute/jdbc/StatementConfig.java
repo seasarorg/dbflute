@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 
 /**
- * The config of statement.
+ * The configuration of JDBC statement.
  * @author jflute
  */
 public class StatementConfig implements Serializable {
@@ -45,6 +45,11 @@ public class StatementConfig implements Serializable {
     protected Integer _fetchSize;
     protected Integer _maxRows;
 
+    // -----------------------------------------------------
+    //                                        Request Option
+    //                                        --------------
+    protected boolean _suppressDefault;
+
     // ===================================================================================
     //                                                                   Setting Interface
     //                                                                   =================
@@ -69,18 +74,26 @@ public class StatementConfig implements Serializable {
     // -----------------------------------------------------
     //                                      Statement Option
     //                                      ----------------
-    public StatementConfig queryTimeout(int queryTimeout) {
-        this._queryTimeout = queryTimeout;
+    public StatementConfig queryTimeout(Integer queryTimeout) {
+        _queryTimeout = queryTimeout;
         return this;
     }
 
-    public StatementConfig fetchSize(int fetchSize) {
-        this._fetchSize = fetchSize;
+    public StatementConfig fetchSize(Integer fetchSize) {
+        _fetchSize = fetchSize;
         return this;
     }
 
-    public StatementConfig maxRows(int maxRows) {
-        this._maxRows = maxRows;
+    public StatementConfig maxRows(Integer maxRows) {
+        _maxRows = maxRows;
+        return this;
+    }
+
+    // -----------------------------------------------------
+    //                                        Request Option
+    //                                        --------------
+    public StatementConfig suppressDefault() { // only for configuration per request
+        _suppressDefault = true;
         return this;
     }
 
@@ -111,6 +124,26 @@ public class StatementConfig implements Serializable {
 
     public boolean hasMaxRows() {
         return _maxRows != null;
+    }
+
+    // -----------------------------------------------------
+    //                                        Request Option
+    //                                        --------------
+    public boolean isSuppressDefault() {
+        return _suppressDefault;
+    }
+
+    // ===================================================================================
+    //                                                                            Snapshot
+    //                                                                            ========
+    public StatementConfig createSnapshot() {
+        final StatementConfig config = new StatementConfig();
+        config._resultSetType = _resultSetType;
+        config._queryTimeout = _queryTimeout;
+        config._fetchSize = _fetchSize;
+        config._maxRows = _maxRows;
+        config._suppressDefault = _suppressDefault;
+        return config;
     }
 
     // ===================================================================================

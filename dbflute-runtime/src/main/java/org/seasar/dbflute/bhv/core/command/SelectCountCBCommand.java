@@ -66,6 +66,10 @@ public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
         return true;
     }
 
+    public boolean isSelectCursor() {
+        return false;
+    }
+
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================

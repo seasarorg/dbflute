@@ -57,6 +57,10 @@ public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCB
         return false;
     }
 
+    public boolean isSelectCursor() {
+        return false;
+    }
+
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================

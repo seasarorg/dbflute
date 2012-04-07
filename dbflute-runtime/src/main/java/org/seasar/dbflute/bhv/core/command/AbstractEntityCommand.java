@@ -68,6 +68,10 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
         return false;
     }
 
+    public boolean isSelectCursor() {
+        return false;
+    }
+
     // ===================================================================================
     //                                                                             Factory
     //                                                                             =======

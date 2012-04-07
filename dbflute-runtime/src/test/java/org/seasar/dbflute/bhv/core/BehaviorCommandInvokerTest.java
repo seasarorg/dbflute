@@ -394,6 +394,10 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         public boolean isSelectCount() {
             return false;
         }
+
+        public boolean isSelectCursor() {
+            return false;
+        }
     }
 
     public void test_getSqlExecution_threadSafe() {

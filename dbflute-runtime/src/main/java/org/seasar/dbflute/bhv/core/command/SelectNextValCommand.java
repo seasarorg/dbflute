@@ -82,6 +82,10 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         return false;
     }
 
+    public boolean isSelectCursor() {
+        return false;
+    }
+
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================

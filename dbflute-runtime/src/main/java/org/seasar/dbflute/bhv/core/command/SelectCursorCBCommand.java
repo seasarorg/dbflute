@@ -61,6 +61,10 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
         return false;
     }
 
+    public boolean isSelectCursor() {
+        return true;
+    }
+
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================

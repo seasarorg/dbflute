@@ -18,6 +18,7 @@ package org.seasar.dbflute.s2dao.jdbc;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -48,6 +49,7 @@ public class TnStatementFactoryImpl implements StatementFactory {
     //                                                                           =========
     protected StatementConfig _defaultStatementConfig;
     protected boolean _internalDebug;
+    protected Integer _cursorSelectFetchSize;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -56,43 +58,33 @@ public class TnStatementFactoryImpl implements StatementFactory {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
+    //                                                                   PreparedStatement
+    //                                                                   =================
     public PreparedStatement createPreparedStatement(Connection conn, String sql) {
+        final StatementConfig config = findStatementConfigOnThread();
+        final int resultSetType = getResultSetType(config);
+        final int resultSetConcurrency = getResultSetConcurrency(config);
+        if (isInternalDebugEnabled()) {
+            _log.debug("...Preparing statement:(sql, " + resultSetType + ", " + resultSetConcurrency + ")");
+        }
+        final PreparedStatement ps = prepareStatement(conn, sql, resultSetType, resultSetConcurrency);
+        reflectStatementOptions(ps, config);
+        return ps;
+    }
+
+    protected PreparedStatement prepareStatement(Connection conn, String sql, int resultSetType,
+            int resultSetConcurrency) {
         try {
-            final StatementConfig config = findStatementConfigOnThread();
-            final int resultSetType;
-            if (config != null && config.hasResultSetType()) {
-                resultSetType = config.getResultSetType();
-            } else if (_defaultStatementConfig != null && _defaultStatementConfig.hasResultSetType()) {
-                resultSetType = _defaultStatementConfig.getResultSetType();
-            } else {
-                resultSetType = java.sql.ResultSet.TYPE_FORWARD_ONLY;
-            }
-            final int resultSetConcurrency = java.sql.ResultSet.CONCUR_READ_ONLY;
-            if (isInternalDebugEnabled()) {
-                _log.debug("...Creating prepareStatement(sql, " + resultSetType + ", " + resultSetConcurrency + ")");
-            }
-            final PreparedStatement ps = conn.prepareStatement(sql, resultSetType, resultSetConcurrency);
-            if (config != null && config.hasStatementOptions()) {
-                if (isInternalDebugEnabled()) {
-                    _log.debug("...Setting statement config as request: " + config);
-                }
-                reflectStatementOptions(config, ps);
-            } else {
-                reflectDefaultOptionsToStatementIfNeeds(ps);
-            }
-            return ps;
+            return conn.prepareStatement(sql, resultSetType, resultSetConcurrency);
         } catch (SQLException e) {
             handleSQLException(e, null);
-            return null; // unreachable
+            return null;// unreachable
         }
     }
 
-    public CallableStatement createCallableStatement(Connection conn, String sql) {
-        return prepareCall(conn, sql);
-    }
-
+    // -----------------------------------------------------
+    //                                       StatementConfig
+    //                                       ---------------
     protected StatementConfig findStatementConfigOnThread() {
         final StatementConfig config;
         if (ConditionBeanContext.isExistConditionBeanOnThread()) {
@@ -107,47 +99,185 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return config;
     }
 
-    protected void reflectDefaultOptionsToStatementIfNeeds(PreparedStatement ps) {
-        if (_defaultStatementConfig != null && _defaultStatementConfig.hasStatementOptions()) {
-            if (isInternalDebugEnabled()) {
-                _log.debug("...Setting statement config as default: " + _defaultStatementConfig);
+    // -----------------------------------------------------
+    //                                      ResultSet Option
+    //                                      ----------------
+    protected int getResultSetType(StatementConfig config) {
+        final int resultSetType;
+        if (config != null && config.hasResultSetType()) {
+            resultSetType = config.getResultSetType();
+        } else {
+            final int defaultType = ResultSet.TYPE_FORWARD_ONLY;
+            if (_defaultStatementConfig != null && _defaultStatementConfig.hasResultSetType()) {
+                if (config != null && config.isSuppressDefault()) {
+                    resultSetType = defaultType;
+                } else {
+                    resultSetType = _defaultStatementConfig.getResultSetType();
+                }
+            } else {
+                resultSetType = defaultType;
             }
-            reflectStatementOptions(_defaultStatementConfig, ps);
-            return;
         }
+        return resultSetType;
     }
 
-    protected void reflectStatementOptions(StatementConfig config, PreparedStatement ps) {
+    protected int getResultSetConcurrency(StatementConfig config) {
+        return ResultSet.CONCUR_READ_ONLY;
+    }
+
+    // -----------------------------------------------------
+    //                                  Statement Reflection
+    //                                  --------------------
+    protected void reflectStatementOptions(PreparedStatement ps, StatementConfig config) {
+        final StatementConfig actualConfig = getActualStatementConfig(config);
+        doReflectStatementOptions(ps, actualConfig);
+    }
+
+    protected StatementConfig getActualStatementConfig(StatementConfig config) {
+        final boolean existsRequest = config != null;
+        final StatementConfig defaultConfig = getActualDefaultConfig(config);
+        final boolean existsDefault = defaultConfig != null;
+        final boolean existsCursor = _cursorSelectFetchSize != null;
+        final Integer queryTimeout = getActualQueryTimeout(config, existsRequest, defaultConfig, existsDefault);
+        final Integer fetchSize = getActualFetchSize(config, existsRequest, defaultConfig, existsDefault, existsCursor);
+        final Integer maxRows = getActualMaxRows(config, existsRequest, defaultConfig, existsDefault);
+        if (queryTimeout == null && fetchSize == null && maxRows == null) {
+            return null;
+        }
+        final StatementConfig actualConfig = new StatementConfig();
+        actualConfig.queryTimeout(queryTimeout).fetchSize(fetchSize).maxRows(maxRows);
+        return actualConfig;
+    }
+
+    protected StatementConfig getActualDefaultConfig(StatementConfig config) {
+        final StatementConfig defaultConfig;
+        if (_defaultStatementConfig != null) {
+            if (config != null && config.isSuppressDefault()) {
+                defaultConfig = null; // suppressed
+            } else {
+                defaultConfig = _defaultStatementConfig.createSnapshot(); // snapshot just in case
+            }
+        } else {
+            defaultConfig = null;
+        }
+        return defaultConfig;
+    }
+
+    protected Integer getActualQueryTimeout(StatementConfig config, final boolean existsRequest,
+            final StatementConfig defaultConfig, final boolean existsDefault) {
+        final Integer queryTimeout;
+        if (existsRequest && config.hasQueryTimeout()) {
+            queryTimeout = config.getQueryTimeout();
+        } else if (existsDefault && defaultConfig.hasQueryTimeout()) {
+            queryTimeout = defaultConfig.getQueryTimeout();
+        } else {
+            queryTimeout = null;
+        }
+        return queryTimeout;
+    }
+
+    protected Integer getActualFetchSize(StatementConfig config, final boolean existsRequest,
+            final StatementConfig defaultConfig, final boolean existsDefault, final boolean existsCursor) {
+        final Integer fetchSize;
+        if (existsRequest && config.hasFetchSize()) {
+            fetchSize = config.getFetchSize();
+        } else if (existsCursor && isSelectCursorCommand()) {
+            fetchSize = _cursorSelectFetchSize;
+        } else if (existsDefault && defaultConfig.hasFetchSize()) {
+            fetchSize = defaultConfig.getFetchSize();
+        } else {
+            fetchSize = null;
+        }
+        return fetchSize;
+    }
+
+    protected Integer getActualMaxRows(StatementConfig config, final boolean existsRequest,
+            final StatementConfig defaultConfig, final boolean existsDefault) {
+        final Integer maxRows;
+        if (existsRequest && config.hasMaxRows()) {
+            maxRows = config.getMaxRows();
+        } else if (existsDefault && defaultConfig.hasMaxRows()) {
+            maxRows = defaultConfig.getMaxRows();
+        } else {
+            maxRows = null;
+        }
+        return maxRows;
+    }
+
+    protected void doReflectStatementOptions(PreparedStatement ps, StatementConfig actualConfig) {
+        if (actualConfig == null || !actualConfig.hasStatementOptions()) {
+            return;
+        }
         try {
-            if (config.hasQueryTimeout()) {
-                ps.setQueryTimeout(config.getQueryTimeout());
+            if (actualConfig.hasQueryTimeout()) {
+                final Integer queryTimeout = actualConfig.getQueryTimeout();
+                if (isInternalDebugEnabled()) {
+                    _log.debug("...Setting queryTimeout of statement: " + queryTimeout);
+                }
+                ps.setQueryTimeout(queryTimeout);
             }
-            if (config.hasFetchSize()) {
-                ps.setFetchSize(config.getFetchSize());
+            if (actualConfig.hasFetchSize()) {
+                final Integer fetchSize = actualConfig.getFetchSize();
+                if (isInternalDebugEnabled()) {
+                    _log.debug("...Setting fetchSize of statement: " + fetchSize);
+                }
+                ps.setFetchSize(fetchSize);
             }
-            if (config.hasMaxRows()) {
-                ps.setMaxRows(config.getMaxRows());
+            if (actualConfig.hasMaxRows()) {
+                final Integer maxRows = actualConfig.getMaxRows();
+                if (isInternalDebugEnabled()) {
+                    _log.debug("...Setting maxRows of statement: " + maxRows);
+                }
+                ps.setMaxRows(maxRows);
             }
         } catch (SQLException e) {
             handleSQLException(e, ps);
         }
     }
 
-    protected CallableStatement prepareCall(Connection conn, String sql) {
+    // ===================================================================================
+    //                                                                   CallableStatement
+    //                                                                   =================
+    public CallableStatement createCallableStatement(Connection conn, String sql) {
+        final StatementConfig config = findStatementConfigOnThread();
+        final int resultSetType = getResultSetType(config);
+        final int resultSetConcurrency = getResultSetConcurrency(config);
+        if (isInternalDebugEnabled()) {
+            _log.debug("...Preparing callable:(sql, " + resultSetType + ", " + resultSetConcurrency + ")");
+        }
+        final CallableStatement cs = prepareCall(conn, sql, resultSetType, resultSetConcurrency);
+        reflectStatementOptions(cs, config);
+        return cs;
+    }
+
+    protected CallableStatement prepareCall(Connection conn, String sql, int resultSetType, int resultSetConcurrency) {
         try {
-            return conn.prepareCall(sql);
+            return conn.prepareCall(sql, resultSetType, resultSetConcurrency);
         } catch (SQLException e) {
             handleSQLException(e, null);
             return null;// unreachable
         }
     }
 
+    // ===================================================================================
+    //                                                               SQLException Handling
+    //                                                               =====================
     protected void handleSQLException(SQLException e, Statement statement) {
         createSQLExceptionHandler().handleSQLException(e, statement);
     }
 
     protected SQLExceptionHandler createSQLExceptionHandler() {
         return ResourceContext.createSQLExceptionHandler();
+    }
+
+    // ===================================================================================
+    //                                                                        Command Info
+    //                                                                        ============
+    protected boolean isSelectCursorCommand() {
+        if (!ResourceContext.isExistResourceContextOnThread()) {
+            return false;
+        }
+        return ResourceContext.behaviorCommand().isSelectCursor();
     }
 
     // ===================================================================================
@@ -161,10 +291,14 @@ public class TnStatementFactoryImpl implements StatementFactory {
     //                                                                            Accessor
     //                                                                            ========
     public void setDefaultStatementConfig(StatementConfig defaultStatementConfig) {
-        this._defaultStatementConfig = defaultStatementConfig;
+        _defaultStatementConfig = defaultStatementConfig;
     }
 
     public void setInternalDebug(boolean internalDebug) {
-        this._internalDebug = internalDebug;
+        _internalDebug = internalDebug;
+    }
+
+    public void setCursorSelectFetchSize(Integer cursorSelectFetchSize) {
+        _cursorSelectFetchSize = cursorSelectFetchSize;
     }
 }

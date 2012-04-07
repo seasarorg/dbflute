@@ -91,4 +91,11 @@ public interface BehaviorCommandMeta {
      * @return The determination, true or false.
      */
     boolean isSelectCount();
+
+    /**
+     * Does the command handle its cursor?
+     * e.g. selectCursor(cb), outsideSql().cursorHandling().selectCursor(pmb)
+     * @return The determination, true or false.
+     */
+    boolean isSelectCursor();
 }

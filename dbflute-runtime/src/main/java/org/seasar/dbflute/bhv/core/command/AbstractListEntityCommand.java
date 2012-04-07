@@ -71,6 +71,10 @@ public abstract class AbstractListEntityCommand extends AbstractBehaviorCommand<
         return false;
     }
 
+    public boolean isSelectCursor() {
+        return false;
+    }
+
     // ===================================================================================
     //                                                                             Factory
     //                                                                             =======

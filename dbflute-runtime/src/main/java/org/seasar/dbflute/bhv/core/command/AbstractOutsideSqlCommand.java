@@ -58,7 +58,7 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
     //                                                                  Detail Information
     //                                                                  ==================
     public boolean isConditionBean() {
-        return false; // When the command is for outside-SQL, it always be false.
+        return false; // when the command is for outside-SQL, it always be false
     }
 
     public boolean isOutsideSql() {
@@ -66,7 +66,11 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
     }
 
     public boolean isSelectCount() {
-        return false; // When the command is for outside-SQL, it always be false.
+        return false; // when the command is for outside-SQL, it always be false
+    }
+
+    public boolean isSelectCursor() {
+        return false; // as default (selectCursor() should override this)
     }
 
     // ===================================================================================

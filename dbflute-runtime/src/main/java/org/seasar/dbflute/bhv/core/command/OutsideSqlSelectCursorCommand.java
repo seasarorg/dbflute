@@ -46,6 +46,14 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
     }
 
     // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isSelectCursor() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================
     @Override
