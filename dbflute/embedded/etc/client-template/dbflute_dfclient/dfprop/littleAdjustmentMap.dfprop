@@ -29,6 +29,7 @@
 # o quoteTableNameList: (NotRequired - Default list:{})
 # o quoteColumnNameList: (NotRequired - Default list:{})
 # o relationalNullObjectMap: (NotRequired - Default map:{})
+# o cursorSelectFetchSize: (NotRequired - Default null)
 #
 # *The line that starts with '#' means comment-out.
 #
@@ -331,6 +332,14 @@ map:{
     #        ; MEMBER_SECURITY = CachedMemberSecurity.get($$PrimaryKey$$)
     #    }
     #}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o cursorSelectFetchSize: (NotRequired - Default null)
+    #  The fetch size of JDBC parameter for cursor select.
+    #  For example, specify Integer.MIN_VALUE to enable fetch of MySQL.
+    #
+    #; cursorSelectFetchSize = Integer.MIN_VALUE
     # - - - - - - - - - -/
 }
 # ----------------/

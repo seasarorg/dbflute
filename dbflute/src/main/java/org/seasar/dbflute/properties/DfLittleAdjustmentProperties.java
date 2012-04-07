@@ -417,6 +417,17 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                        CursorSelect
+    //                                                                        ============
+    public boolean isCursorSelectFetchSizeValid() {
+        return getCursorSelectFetchSize() != null;
+    }
+
+    public String getCursorSelectFetchSize() {
+        return getProperty("cursorSelectFetchSize", null);
+    }
+
+    // ===================================================================================
     //                                                                 PG Reservation Word
     //                                                                 ===================
     protected List<String> _pgReservColumnList;

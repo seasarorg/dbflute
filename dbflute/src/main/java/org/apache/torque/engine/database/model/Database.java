@@ -1742,6 +1742,14 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().getShortCharHandlingModeCode();
     }
 
+    public boolean isCursorSelectFetchSizeValid() {
+        return getProperties().getLittleAdjustmentProperties().isCursorSelectFetchSizeValid();
+    }
+
+    public String getCursorSelectFetchSize() {
+        return getProperties().getLittleAdjustmentProperties().getCursorSelectFetchSize();
+    }
+
     public boolean isStopGenerateExtendedBhv() {
         return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedBhv();
     }
