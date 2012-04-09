@@ -38,7 +38,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.exception.DfXlsDataColumnDefFailureException;
+import org.seasar.dbflute.exception.DfXlsDataEmptyColumnDefException;
 import org.seasar.dbflute.exception.DfXlsDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfXlsDataTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -123,6 +123,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
+    // -----------------------------------------------------
+    //                                               DataSet
+    //                                               -------
     protected void doWriteDataSet(DfXlsDataResource resource, File file, DfDataSet dataSet) {
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable dataTable = dataSet.getTable(i);
@@ -130,6 +133,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
+    // -----------------------------------------------------
+    //                                             DataTable
+    //                                             ---------
     protected void doWriteDataTable(DfXlsDataResource resource, File file, DfDataTable dataTable) {
         final String tableDbName = dataTable.getTableDbName();
         if (dataTable.getRowSize() == 0) {
@@ -164,17 +170,23 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         DfDataRow retryDataRow = null;
         try {
             conn = _dataSource.getConnection();
-            for (int i = 0; i < dataTable.getRowSize(); i++) {
+            int loadedRowCount = 0;
+            final int rowSize = dataTable.getRowSize();
+            for (int i = 0; i < rowSize; i++) {
                 final DfDataRow dataRow = dataTable.getRow(i);
                 if (ps == null) {
                     final MyCreatedState myCreatedState = new MyCreatedState();
                     preparedSql = myCreatedState.buildPreparedSql(dataRow);
                     ps = conn.prepareStatement(preparedSql);
                 }
-                doWriteDataRow(resource, file, dataTable, dataRow // basic resources
+                if (doWriteDataRow(resource, file, dataTable, dataRow // basic resources
                         , columnMetaMap, columnNameList // meta data
                         , conn, ps // JDBC resources
-                        , loggingInsertType, suppressBatchUpdate); // option
+                        , loggingInsertType, suppressBatchUpdate)) { // option
+                    ++loadedRowCount;
+                } else {
+                    _log.info("...Skipping the terminal empty row: rowNumber=" + dataRow.getRowNumber());
+                }
             }
             if (!suppressBatchUpdate) {
                 boolean transactionClosed = false;
@@ -191,7 +203,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     }
                     _log.info("...Retrying by suppressing batch update: " + tableDbName);
                     final PreparedStatement retryPs = conn.prepareStatement(preparedSql);
-                    for (int i = 0; i < dataTable.getRowSize(); i++) {
+                    for (int i = 0; i < rowSize; i++) {
                         final DfDataRow dataRow = dataTable.getRow(i);
                         try {
                             doWriteDataRow(resource, file, dataTable, dataRow // basic resources
@@ -215,7 +227,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     }
                 }
             }
-            noticeLoadedRowSize(tableDbName, dataTable.getRowSize());
+            noticeLoadedRowSize(tableDbName, loadedRowCount);
             checkImplicitClassification(file, tableDbName, columnNameList, conn);
         } catch (SQLException e) {
             handleWriteTableException(file, dataTable, e, retryEx, retryDataRow, columnNameList);
@@ -251,86 +263,6 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         if (_dataWritingInterceptor != null) {
             _dataWritingInterceptor.processFinallyHandlingTable(tableDbName, columnInfoMap);
         }
-    }
-
-    protected void doWriteDataRow(DfXlsDataResource resource, File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMeta> columnMetaMap, List<String> columnNameList, Connection conn,
-            PreparedStatement ps, LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
-        final String tableDbName = dataTable.getTableDbName();
-        // ColumnValue and ColumnObject
-        final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
-        final Map<String, Object> columnValueMap;
-        {
-            Map<String, Object> plainMap = columnContainer.getColumnValueMap();
-            if (plainMap.isEmpty()) {
-                throwXlsDataColumnDefFailureException(file, dataTable);
-            }
-            columnValueMap = convertColumnValue(tableDbName, resource.getDataDirectory(), plainMap, columnMetaMap);
-        }
-
-        final int rowNumber = dataRow.getRowNumber();
-        handleLoggingInsert(tableDbName, columnNameList, columnValueMap, loggingInsertType, rowNumber);
-
-        int bindCount = 1;
-        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
-            final String columnName = entry.getKey();
-            final Object obj = entry.getValue();
-
-            // - - - - - - - - - - - - - - - - - - -
-            // Process Null (against Null Headache)
-            // - - - - - - - - - - - - - - - - - - -
-            if (processNull(tableDbName, columnName, obj, ps, bindCount, columnMetaMap)) {
-                bindCount++;
-                continue;
-            }
-
-            // - - - - - - - - - - - - - - -
-            // Process NotNull and NotString
-            // - - - - - - - - - - - - - - -
-            // If the value is not null and the value has the own type except string,
-            // It registers the value to statement by the type.
-            if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap)) {
-                bindCount++;
-                continue;
-            }
-
-            // - - - - - - - - - - - - - - - - - - -
-            // Process NotNull and StringExpression
-            // - - - - - - - - - - - - - - - - - - -
-            final String value = (String) obj;
-            processNotNullString(file, tableDbName, columnName, value, conn, ps, bindCount, columnMetaMap);
-            bindCount++;
-        }
-        if (suppressBatchUpdate) {
-            ps.execute();
-        } else {
-            ps.addBatch();
-        }
-    }
-
-    protected void throwXlsDataColumnDefFailureException(File file, DfDataTable dataTable) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The table specified on the xls file does not have (writable) columns.");
-        br.addItem("Advice");
-        br.addElement("Please confirm the column names about their spellings.");
-        br.addElement("And confirm the column definition of the table.");
-        br.addItem("Xls File");
-        br.addElement(file);
-        br.addItem("Table");
-        br.addElement(dataTable.getTableDbName());
-        br.addItem("Defined Column");
-        final int columnSize = dataTable.getColumnSize();
-        if (columnSize > 0) {
-            for (int i = 0; i < dataTable.getColumnSize(); i++) {
-                final DfDataColumn dataColumn = dataTable.getColumn(i);
-                br.addElement(dataColumn.getColumnDbName());
-            }
-        } else {
-            br.addElement("(no column)");
-        }
-        final String msg = br.buildExceptionMessage();
-        throw new DfXlsDataColumnDefFailureException(msg);
     }
 
     protected void handleWriteTableException(File file, DfDataTable dataTable // basic
@@ -412,6 +344,102 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 _log.info("Connection#close() threw the exception!", ignored);
             }
         }
+    }
+
+    // -----------------------------------------------------
+    //                                               DataRow
+    //                                               -------
+    protected boolean doWriteDataRow(DfXlsDataResource resource, File file, DfDataTable dataTable, DfDataRow dataRow,
+            Map<String, DfColumnMeta> columnMetaMap, List<String> columnNameList, Connection conn,
+            PreparedStatement ps, LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
+        final String tableDbName = dataTable.getTableDbName();
+        // ColumnValue and ColumnObject
+        final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
+        final Map<String, Object> columnValueMap;
+        {
+            final Map<String, Object> plainMap = columnContainer.getColumnValueMap();
+            if (plainMap.isEmpty()) {
+                throwXlsDataColumnDefFailureException(file, dataTable);
+            }
+            if (isColumnValueAllNull(plainMap)) { // against Excel Devil
+                return false;
+            }
+            columnValueMap = convertColumnValue(tableDbName, resource.getDataDirectory(), plainMap, columnMetaMap);
+        }
+
+        final int rowNumber = dataRow.getRowNumber();
+        handleLoggingInsert(tableDbName, columnNameList, columnValueMap, loggingInsertType, rowNumber);
+
+        int bindCount = 1;
+        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final String columnName = entry.getKey();
+            final Object obj = entry.getValue();
+
+            // - - - - - - - - - - - - - - - - - - -
+            // Process Null (against Null Headache)
+            // - - - - - - - - - - - - - - - - - - -
+            if (processNull(tableDbName, columnName, obj, ps, bindCount, columnMetaMap)) {
+                bindCount++;
+                continue;
+            }
+
+            // - - - - - - - - - - - - - - -
+            // Process NotNull and NotString
+            // - - - - - - - - - - - - - - -
+            // If the value is not null and the value has the own type except string,
+            // It registers the value to statement by the type.
+            if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap)) {
+                bindCount++;
+                continue;
+            }
+
+            // - - - - - - - - - - - - - - - - - - -
+            // Process NotNull and StringExpression
+            // - - - - - - - - - - - - - - - - - - -
+            final String value = (String) obj;
+            processNotNullString(file, tableDbName, columnName, value, conn, ps, bindCount, columnMetaMap);
+            bindCount++;
+        }
+        if (suppressBatchUpdate) {
+            ps.execute();
+        } else {
+            ps.addBatch();
+        }
+        return true;
+    }
+
+    protected void throwXlsDataColumnDefFailureException(File file, DfDataTable dataTable) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table specified on the xls file does not have (writable) columns.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the column names about their spellings.");
+        br.addElement("And confirm the column definition of the table.");
+        br.addItem("Xls File");
+        br.addElement(file);
+        br.addItem("Table");
+        br.addElement(dataTable.getTableDbName());
+        br.addItem("Defined Column");
+        final int columnSize = dataTable.getColumnSize();
+        if (columnSize > 0) {
+            for (int i = 0; i < dataTable.getColumnSize(); i++) {
+                final DfDataColumn dataColumn = dataTable.getColumn(i);
+                br.addElement(dataColumn.getColumnDbName());
+            }
+        } else {
+            br.addElement("(no column)");
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfXlsDataEmptyColumnDefException(msg);
+    }
+
+    protected boolean isColumnValueAllNull(Map<String, Object> plainMap) { // default columns should not be contained
+        for (Object value : plainMap.values()) {
+            if (value != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // ===================================================================================
