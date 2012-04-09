@@ -39,6 +39,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.exception.DfXlsDataEmptyColumnDefException;
+import org.seasar.dbflute.exception.DfXlsDataEmptyRowDataException;
 import org.seasar.dbflute.exception.DfXlsDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfXlsDataTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -172,6 +173,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             conn = _dataSource.getConnection();
             int loadedRowCount = 0;
             final int rowSize = dataTable.getRowSize();
+            boolean existsEmptyRow = false;
             for (int i = 0; i < rowSize; i++) {
                 final DfDataRow dataRow = dataTable.getRow(i);
                 if (ps == null) {
@@ -184,9 +186,16 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                         , conn, ps // JDBC resources
                         , loggingInsertType, suppressBatchUpdate)) { // option
                     ++loadedRowCount;
+                    if (existsEmptyRow) {
+                        final int emptyRowNumber = dataRow.getRowNumber() - 1;
+                        throwXlsDataEmptyRowDataException(file, dataTable, emptyRowNumber);
+                    }
                 } else {
-                    _log.info("...Skipping the terminal empty row: rowNumber=" + dataRow.getRowNumber());
+                    existsEmptyRow = true;
                 }
+            }
+            if (existsEmptyRow) {
+                _log.info("...Skipping the terminal garbage row");
             }
             if (!suppressBatchUpdate) {
                 boolean transactionClosed = false;
@@ -263,6 +272,22 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         if (_dataWritingInterceptor != null) {
             _dataWritingInterceptor.processFinallyHandlingTable(tableDbName, columnInfoMap);
         }
+    }
+
+    protected void throwXlsDataEmptyRowDataException(File file, DfDataTable dataTable, int rowNumber) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The empty row data on the xls file was found.");
+        br.addItem("Advice");
+        br.addElement("Please remove the empty row.");
+        br.addElement("ReplaceSchema does not allow empty row on xls data.");
+        br.addItem("Xls File");
+        br.addElement(file);
+        br.addItem("Table");
+        br.addElement(dataTable.getTableDbName());
+        br.addItem("Row Number");
+        br.addElement(rowNumber);
+        final String msg = br.buildExceptionMessage();
+        throw new DfXlsDataEmptyRowDataException(msg);
     }
 
     protected void handleWriteTableException(File file, DfDataTable dataTable // basic
