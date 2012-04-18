@@ -42,4 +42,16 @@ public interface DtoMapper<ENTITY extends Entity, DTO> {
      * @return The list of mapped entity. (NotNull)
      */
     List<ENTITY> mappingToEntityList(List<DTO> dtoList);
+
+    /**
+     * Set the option whether base-only mapping or not.
+     * @param baseOnlyMapping Does the mapping ignore all references? (true: base-only mapping, false: all relations are valid)
+     */
+    void setBaseOnlyMapping(boolean baseOnlyMapping);
+
+    /**
+     * Set the option whether reverse reference or not.
+     * @param reverseReference Does the mapping contain reverse references? (true: reverse reference, false: one-way reference)
+     */
+    void setReverseReference(boolean reverseReference);
 }
