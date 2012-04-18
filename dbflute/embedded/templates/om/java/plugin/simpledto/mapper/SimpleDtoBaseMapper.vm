@@ -435,13 +435,47 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
     }
 #end
 #end
+    protected void doSuppressAll() { // internal
+#foreach ($fk in $table.foreignKeys)
+        suppress${fk.foreignJavaBeansRulePropertyNameInitCap}();
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+        suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}();
+#else
+        suppress${referrer.referrerJavaBeansRulePropertyNameInitCap}();
+#end
+#end
+    }
+    protected void doSuppressClear() { // internal
+#foreach ($fk in $table.foreignKeys)
+        _suppress${fk.foreignJavaBeansRulePropertyNameInitCap} = false;
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+        _suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} = false;
+#else
+        _suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} = false;
+#end
+#end
+    }
 
     // ===================================================================================
     //                                                                      Mapping Option
     //                                                                      ==============
     /**
-     * Set the option whether reverse reference or not.
-     * @param reverseReference Does the mapping contain reverse reference? (true: reverse reference, false: one-way reference)
+     * {@inheritDoc}
+     */
+    public void setBaseOnlyMapping(boolean baseOnlyMapping) {
+        if (baseOnlyMapping) {
+            doSuppressAll();
+        } else {
+            doSuppressClear();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public void setReverseReference(boolean reverseReference) {
         _reverseReference = reverseReference;
