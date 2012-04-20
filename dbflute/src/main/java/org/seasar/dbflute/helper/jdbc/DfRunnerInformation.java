@@ -33,6 +33,7 @@ public class DfRunnerInformation {
     protected boolean _autoCommit;
     protected boolean _rollbackOnly;
     protected boolean _ignoreTxError;
+    protected boolean _suppressLoggingSql;
     protected String _encoding;
 
     // ===================================================================================
@@ -120,6 +121,14 @@ public class DfRunnerInformation {
 
     public void setIgnoreTxError(boolean ignoreTxError) {
         this._ignoreTxError = ignoreTxError;
+    }
+
+    public boolean isSuppressLoggingSql() {
+        return _suppressLoggingSql;
+    }
+
+    public void setSuppressLoggingSql(boolean suppressLoggingSql) {
+        this._suppressLoggingSql = suppressLoggingSql;
     }
 
     public String getEncoding() {

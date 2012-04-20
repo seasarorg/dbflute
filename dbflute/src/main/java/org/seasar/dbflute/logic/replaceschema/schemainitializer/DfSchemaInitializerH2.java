@@ -21,8 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.util.Srl;
@@ -31,11 +29,6 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSchemaInitializerH2.class);
 
     // ===================================================================================
     //                                                                       Drop Sequence
@@ -62,7 +55,7 @@ public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
         for (String sequenceName : sequenceNameList) {
             final String sequenceSqlName = _unifiedSchema.buildSqlName(sequenceName);
             final String dropSequenceSql = "drop sequence " + sequenceSqlName;
-            _log.info(dropSequenceSql);
+            logReplaceSql(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);
         }
     }

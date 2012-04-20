@@ -111,7 +111,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 }
                 _totalSqlCount++;
                 final String realSql = filterSql(sql);
-                traceSql(realSql);
+                if (!_runInfo.isSuppressLoggingSql()) {
+                    traceSql(realSql);
+                }
                 execSQL(realSql);
             }
             rollbackOrCommit();

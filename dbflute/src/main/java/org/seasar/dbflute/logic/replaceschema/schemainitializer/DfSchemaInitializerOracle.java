@@ -158,7 +158,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             for (String objectName : objectNameList) {
                 final String prefix = schemaPrefix ? schema + "." : "";
                 final String dropSql = "drop " + sqlName + " " + prefix + objectName;
-                _log.info(dropSql);
+                logReplaceSql(dropSql);
                 try {
                     st.execute(dropSql);
                 } catch (SQLException e) {

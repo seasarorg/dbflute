@@ -123,6 +123,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         _log.warn(sb.toString());
     }
 
+    @Override
     protected String extractMessage(SQLException e) {
         final String message = e.getMessage();
 

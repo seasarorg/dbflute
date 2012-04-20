@@ -126,6 +126,9 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
                 customizeEntityInfo = processCustomizeEntity(sql, columnMetaInfoMap);
             }
             if (isTargetParameterBeanMakingSql(sql)) {
+                if (customizeEntityInfo == null) {
+                    _log.info("*Only parameter-bean is created: the SQL was not executed.");
+                }
                 if (!alreadyIncrementGoodSqlCount) {
                     _goodSqlCount++;
                 }

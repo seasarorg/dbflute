@@ -134,6 +134,7 @@ public class DfSchemaInitializerFactory {
             initializer.setDataSource(_dataSource);
             initializer.setUnifiedSchema(_databaseProperties.getDatabaseSchema());
             initializer.setDropObjectTypeList(_replaceSchemaProperties.getObjectTypeTargetList());
+            initializer.setInitializeFirstSqlList(_replaceSchemaProperties.getInitializeFirstSqlList());
             return;
         }
 
@@ -147,6 +148,8 @@ public class DfSchemaInitializerFactory {
             final UnifiedSchema unifiedSchema = getAdditionalDropSchema(_additionalDropMap);
             initializer.setUnifiedSchema(unifiedSchema);
             initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(_additionalDropMap));
+            // unsupported for additional
+            //initializer.setInitializeFirstSqlList(null);
             return;
         }
 
@@ -187,6 +190,7 @@ public class DfSchemaInitializerFactory {
         initializer.setSuppressDropSequence(_replaceSchemaProperties.isSuppressDropSequence());
         initializer.setSuppressDropProcedure(_replaceSchemaProperties.isSuppressDropProcedure());
         initializer.setSuppressDropDBLink(_replaceSchemaProperties.isSuppressDropDBLink());
+        initializer.setSuppressLoggingSql(_replaceSchemaProperties.isSuppressLoggingReplaceSql());
     }
 
     // ===================================================================================

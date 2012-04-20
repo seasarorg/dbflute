@@ -23,6 +23,7 @@
 # o isSuppressDropSequence: (NotRequired - Default false)
 # o isSuppressDropProcedure: (NotRequired - Default false)
 # o isSuppressDropDBLink: (NotRequired - Default false)
+# o initializeFirstSqlList: (NotRequired - Default list:{})
 #
 # *The line that starts with '#' means comment-out.
 #
@@ -41,6 +42,13 @@ map:{
     #  Does it show insert values on log?
     #
     #; isLoggingInsertSql = true
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isLoggingReplaceSql: (NotRequired - Default true)
+    #  Does it show replace-SQL on log?
+    #
+    #; isLoggingReplaceSql = true
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

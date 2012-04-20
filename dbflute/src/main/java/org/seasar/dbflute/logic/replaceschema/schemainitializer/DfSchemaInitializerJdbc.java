@@ -33,6 +33,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
@@ -59,7 +60,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected UnifiedSchema _unifiedSchema;
     protected boolean _useFullQualifiedTableName;
     protected List<String> _dropObjectTypeList;
-    protected StringSet _droppedPackageSet = StringSet.createAsCaseInsensitive();
+    protected List<String> _initializeFirstSqlList;
+    protected final StringSet _droppedPackageSet = StringSet.createAsCaseInsensitive();
 
     // /= = = = = = = = = = = = =
     // Detail execution handling!
@@ -70,6 +72,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected boolean _suppressDropSequence;
     protected boolean _suppressDropProcedure;
     protected boolean _suppressDropDBLink;
+    protected boolean _suppressLoggingSql;
 
     // ===================================================================================
     //                                                                   Initialize Schema
@@ -112,6 +115,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected void executeObject(Connection conn, List<DfTableMeta> tableMetaList) {
+        executeFirstSqlProcess(conn, tableMetaList);
         final boolean procedureBeforeTable = isDropProcedureBeforeTable();
         if (procedureBeforeTable) {
             executeProcedureProcess(conn, tableMetaList);
@@ -121,6 +125,17 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             executeProcedureProcess(conn, tableMetaList);
         }
         executeVariousProcess(conn, tableMetaList);
+    }
+
+    protected void executeFirstSqlProcess(Connection conn, List<DfTableMeta> tableMetaList) {
+        if (_initializeFirstSqlList == null || _initializeFirstSqlList.isEmpty()) {
+            return;
+        }
+        final DfJdbcFacade jdbcFacade = new DfJdbcFacade(conn);
+        for (String firstSql : _initializeFirstSqlList) {
+            logReplaceSql(firstSql);
+            jdbcFacade.execute(firstSql);
+        }
     }
 
     protected void executeTableProcess(Connection conn, List<DfTableMeta> tableMetaList) {
@@ -146,22 +161,22 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected void executeProcedureProcess(Connection conn, List<DfTableMeta> tableMetaInfoList) {
+    protected void executeProcedureProcess(Connection conn, List<DfTableMeta> tableMetaList) {
         if (!_suppressDropProcedure) {
-            dropProcedure(conn, tableMetaInfoList);
+            dropProcedure(conn, tableMetaList);
         } else {
             _log.info("*Suppress dropping procedures");
         }
     }
 
-    protected void executeVariousProcess(Connection conn, List<DfTableMeta> tableMetaInfoList) {
+    protected void executeVariousProcess(Connection conn, List<DfTableMeta> tableMetaList) {
         if (!_suppressDropDBLink) {
-            dropDBLink(conn, tableMetaInfoList);
+            dropDBLink(conn, tableMetaList);
         } else {
             _log.info("*Suppress dropping DB links");
         }
         if (!_suppressTruncateTable || !_suppressDropProcedure) { // belongs to the two
-            dropTypeObject(conn, tableMetaInfoList);
+            dropTypeObject(conn, tableMetaList);
         } else {
             _log.info("*Suppress dropping type objectss");
         }
@@ -174,7 +189,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     // ===================================================================================
     //                                                                      Truncate Table
     //                                                                      ==============
-    protected void truncateTableIfPossible(Connection connection, List<DfTableMeta> tableMetaInfoList) {
+    protected void truncateTableIfPossible(Connection connection, List<DfTableMeta> tableMetaList) {
         final DfTruncateTableByJdbcCallback callback = new DfTruncateTableByJdbcCallback() {
             public String buildTruncateTableSql(DfTableMeta metaInfo) {
                 final StringBuilder sb = new StringBuilder();
@@ -182,7 +197,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 return sb.toString();
             }
         };
-        callbackTruncateTableByJdbc(connection, tableMetaInfoList, callback);
+        callbackTruncateTableByJdbc(connection, tableMetaList, callback);
     }
 
     protected static interface DfTruncateTableByJdbcCallback {
@@ -197,7 +212,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             try {
                 st = conn.createStatement();
                 st.execute(truncateTableSql);
-                _log.info(truncateTableSql);
+                logReplaceSql(truncateTableSql);
             } catch (Exception e) {
                 continue;
             } finally {
@@ -245,7 +260,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 for (String foreignKeyName : keySet) {
                     final DfForeignKeyMeta foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);
                     final String dropForeignKeySql = callback.buildDropForeignKeySql(foreignKeyMetaInfo);
-                    _log.info(dropForeignKeySql);
+                    logReplaceSql(dropForeignKeySql);
                     st.execute(dropForeignKeySql);
                 }
             }
@@ -319,7 +334,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             for (DfTableMeta tableMeta : tableMetaList) {
                 final String dropTableSql = callback.buildDropTableSql(tableMeta);
                 currentSql = dropTableSql;
-                _log.info(dropTableSql);
+                logReplaceSql(dropTableSql);
                 try {
                     st.execute(dropTableSql);
                 } catch (SQLException e) {
@@ -329,9 +344,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(tableMeta);
                     try {
                         st.execute(dropMaterializedViewSql);
-                        _log.info("  (o) retry: " + dropMaterializedViewSql);
+                        logReplaceSql("  (o) retry: " + dropMaterializedViewSql);
                     } catch (SQLException ignored) {
-                        _log.info("  (x) retry: " + dropMaterializedViewSql);
+                        logReplaceSql("  (x) retry: " + dropMaterializedViewSql);
                         throw e;
                     }
                 }
@@ -410,18 +425,18 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     handlePackageProcedure(procedureMeta, st, currentSql);
                     continue;
                 }
-                final String dropProcedureSql = callback.buildDropProcedureSql(procedureMeta);
-                currentSql = dropProcedureSql;
-                _log.info(dropProcedureSql);
+                final String dropFirstSql = buildDropProcedureFirstSql(callback, procedureMeta);
+                currentSql = dropFirstSql;
+                logReplaceSql(dropFirstSql);
                 try {
-                    st.execute(dropProcedureSql);
+                    st.execute(dropFirstSql);
                 } catch (SQLException e) {
-                    final String dropFunctionSql = callback.buildDropFunctionSql(procedureMeta);
+                    final String dropSecondSql = buildDropProcedureSecondSql(callback, procedureMeta);
                     try {
-                        st.execute(dropFunctionSql);
-                        _log.info("  (o) retry: " + dropFunctionSql);
+                        st.execute(dropSecondSql);
+                        logReplaceSql("  (o) retry: " + dropSecondSql);
                     } catch (SQLException ignored) {
-                        _log.info("  (x) retry: " + dropFunctionSql);
+                        logReplaceSql("  (x) retry: " + dropSecondSql);
                         throw e;
                     }
                 }
@@ -432,6 +447,24 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         } finally {
             closeStatement(st);
         }
+    }
+
+    protected String buildDropProcedureFirstSql(DfDropProcedureByJdbcCallback callback, DfProcedureMeta procedureMeta) {
+        if (isDropFunctionFirst()) {
+            return callback.buildDropFunctionSql(procedureMeta);
+        }
+        return callback.buildDropProcedureSql(procedureMeta);
+    }
+
+    protected String buildDropProcedureSecondSql(DfDropProcedureByJdbcCallback callback, DfProcedureMeta procedureMeta) {
+        if (isDropFunctionFirst()) {
+            return callback.buildDropProcedureSql(procedureMeta);
+        }
+        return callback.buildDropFunctionSql(procedureMeta);
+    }
+
+    protected boolean isDropFunctionFirst() {
+        return false; // default is procedure first
     }
 
     protected void handlePackageProcedure(DfProcedureMeta procedureMeta, Statement st, String sql) throws SQLException {
@@ -502,6 +535,15 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     // ===================================================================================
+    //                                                                      Logging Helper
+    //                                                                      ==============
+    protected void logReplaceSql(String sql) {
+        if (!_suppressLoggingSql) {
+            _log.info(sql);
+        }
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String ln() {
@@ -521,6 +563,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setDropObjectTypeList(List<String> dropObjectTypeList) {
         _dropObjectTypeList = dropObjectTypeList;
+    }
+
+    public void setInitializeFirstSqlList(List<String> initializeFirstSqlList) {
+        _initializeFirstSqlList = initializeFirstSqlList;
     }
 
     // /= = = = = = = = = = = = =
@@ -573,5 +619,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setSuppressDropDBLink(boolean suppressDropDBLink) {
         this._suppressDropDBLink = suppressDropDBLink;
+    }
+
+    public boolean isSuppressLoggingSql() {
+        return _suppressLoggingSql;
+    }
+
+    public void setSuppressLoggingSql(boolean suppressLoggingSql) {
+        this._suppressLoggingSql = suppressLoggingSql;
     }
 }

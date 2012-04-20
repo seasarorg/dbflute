@@ -30,7 +30,7 @@ public class DfAbstractReplaceSchemaProcess {
         runInfo.setUrl(prop.getDatabaseUrl());
         runInfo.setUser(prop.getDatabaseUser());
         runInfo.setPassword(prop.getDatabasePassword());
-        runInfo.setEncoding(getReplaceSchemaProperties().getSqlFileEncoding());
+        runInfo.setEncoding(getSqlFileEncoding());
         runInfo.setBreakCauseThrow(false); // save break cause to prepare messages
         runInfo.setErrorContinue(isErrorContinue());
         if (isRollbackTransaction()) { // basically take-assert
@@ -40,7 +40,12 @@ public class DfAbstractReplaceSchemaProcess {
             runInfo.setAutoCommit(true);
             runInfo.setRollbackOnly(false);
         }
+        runInfo.setSuppressLoggingSql(isSuppressLoggingReplaceSql());
         return runInfo;
+    }
+
+    protected String getSqlFileEncoding() {
+        return getReplaceSchemaProperties().getSqlFileEncoding();
     }
 
     protected boolean isErrorContinue() {
@@ -49,6 +54,10 @@ public class DfAbstractReplaceSchemaProcess {
 
     protected boolean isRollbackTransaction() {
         return false; // as default
+    }
+
+    protected boolean isSuppressLoggingReplaceSql() {
+        return getReplaceSchemaProperties().isSuppressLoggingReplaceSql();
     }
 
     protected String resolveTerminater4Tool() {

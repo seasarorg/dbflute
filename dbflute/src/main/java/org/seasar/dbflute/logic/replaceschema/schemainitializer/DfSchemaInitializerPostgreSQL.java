@@ -21,8 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
@@ -36,15 +34,10 @@ import org.seasar.dbflute.util.Srl;
 public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSchemaInitializerPostgreSQL.class);
-
-    // ===================================================================================
     //                                                                       Drop Sequence
     //                                                                       =============
     @Override
-    protected void dropSequence(Connection conn, List<DfTableMeta> tableMetaInfoList) {
+    protected void dropSequence(Connection conn, List<DfTableMeta> tableMetaList) {
         final String catalog = _unifiedSchema.existsPureCatalog() ? _unifiedSchema.getPureCatalog() : null;
         final String schema = _unifiedSchema.getPureSchema();
         final List<String> sequenceNameList = new ArrayList<String>();
@@ -65,7 +58,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         for (String sequenceName : sequenceNameList) {
             final String sequenceSqlName = _unifiedSchema.buildSqlName(sequenceName);
             final String dropSequenceSql = "drop sequence " + sequenceSqlName;
-            _log.info(dropSequenceSql);
+            logReplaceSql(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);
         }
     }
@@ -77,6 +70,11 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {
         final String expression = "(" + buildProcedureArgExpression(metaInfo) + ")";
         return super.buildProcedureSqlName(metaInfo) + expression;
+    }
+
+    @Override
+    protected boolean isDropFunctionFirst() {
+        return true; // because PostgreSQL supports function only
     }
 
     protected String buildProcedureArgExpression(DfProcedureMeta metaInfo) {

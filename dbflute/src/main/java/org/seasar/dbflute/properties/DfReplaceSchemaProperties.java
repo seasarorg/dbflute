@@ -378,6 +378,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return isProperty("isLoggingInsertSql", true, getReplaceSchemaDefinitionMap());
     }
 
+    protected boolean isLoggingReplaceSql() {
+        return isProperty("isLoggingReplaceSql", true, getReplaceSchemaDefinitionMap());
+    }
+
+    public boolean isSuppressLoggingReplaceSql() {
+        return !isLoggingReplaceSql();
+    }
+
     // ===================================================================================
     //                                                                            Continue
     //                                                                            ========
@@ -1030,6 +1038,24 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     protected boolean doHasMigrationMark(String markPath) {
         return new File(markPath).exists();
+    }
+
+    // ===================================================================================
+    //                                                                  InitializeFirstSql
+    //                                                                  ==================
+    public List<String> getInitializeFirstSqlList() {
+        final Object obj = getReplaceSchemaDefinitionMap().get("initializeFirstSqlList");
+        if (obj == null) {
+            return DfCollectionUtil.emptyList();
+        }
+        if (!(obj instanceof List<?>)) {
+            String msg = "The property 'initializeFirstSqlList' should be List<String>:";
+            msg = msg + " type=" + obj.getClass();
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        @SuppressWarnings("unchecked")
+        final List<String> strList = (List<String>) obj;
+        return strList;
     }
 
     // ===================================================================================
