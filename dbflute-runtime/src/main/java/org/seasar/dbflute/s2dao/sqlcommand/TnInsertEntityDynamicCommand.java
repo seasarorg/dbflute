@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -107,10 +108,23 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             typeList.add(pt);
         }
         if (typeList.isEmpty()) {
-            String msg = "The target property type was not found in the bean: " + bean;
-            throw new IllegalStateException(msg);
+            throwEntityInsertPropertyNotFoundException(bmd, bean);
         }
         return (TnPropertyType[]) typeList.toArray(new TnPropertyType[typeList.size()]);
+    }
+
+    protected void throwEntityInsertPropertyNotFoundException(TnBeanMetaData bmd, Object bean) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The insert property of the entity was not found.");
+        br.addItem("Advice");
+        br.addElement("The entity should have one or more insert properties.");
+        br.addElement("For example, an identity-column-only table is unsupported.");
+        br.addItem("Table");
+        br.addElement(bmd.getTableName());
+        br.addItem("Entity");
+        br.addElement(bean != null ? bean.getClass() : null);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     protected boolean isExceptProperty(Object bean, TnPropertyType pt, String timestampPropertyName,

@@ -574,7 +574,7 @@ public class ConditionBeanExceptionThrower {
         msg = msg + "For example:" + ln();
         msg = msg + "  (x):" + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
+        msg = msg + "    cb.query().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
         msg = msg + "        public void query(PurchaseCB subCB) {" + ln();
         msg = msg + "            // *NG, it should not be empty" + ln();
         msg = msg + "        }" + ln();
@@ -582,7 +582,7 @@ public class ConditionBeanExceptionThrower {
         msg = msg + ln();
         msg = msg + "  (x):" + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
+        msg = msg + "    cb.query().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
         msg = msg + "        public void query(PurchaseCB subCB) {" + ln();
         msg = msg + "            // *NG, it should be the only one" + ln();
         msg = msg + "            subCB.specify().columnPurchaseDatetime();" + ln();
@@ -592,7 +592,7 @@ public class ConditionBeanExceptionThrower {
         msg = msg + ln();
         msg = msg + "  (o):" + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
+        msg = msg + "    cb.query().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
         msg = msg + "        public void query(PurchaseCB subCB) {" + ln();
         msg = msg + "            subCB.specify().columnPurchaseDatetime(); // OK" + ln();
         msg = msg + "        }" + ln();
