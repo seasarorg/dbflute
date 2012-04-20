@@ -5,6 +5,7 @@
 #
 # o repsEnvType: (NotRequired - Default inherits or 'ut')
 # o isLoggingInsertSql: (NotRequired - Default true)
+# o isLoggingReplaceSql: (NotRequired - Default true)
 # o isErrorSqlContinue: (NotRequired - Default false)
 # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
 # o skipSheet: (NotRequired - Default '')
@@ -42,6 +43,13 @@ map:{
     #  Does it show insert values on log?
     #
     #; isLoggingInsertSql = true
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isLoggingReplaceSql: (NotRequired - Default true)
+    #  Does it show replace-SQL on log?
+    #
+    #; isLoggingReplaceSql = true
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -221,6 +229,13 @@ map:{
     #  You can suppress dropping DB links at initializing schema.
     #
     #; isSuppressDropDBLink = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o initializeFirstSqlList: (NotRequired - Default list:{})
+    #  You can execute the SQL statements before initializing schema.
+    #
+    #; initializeFirstSqlList = list:{}
     # - - - - - - - - - -/
 }
 # ----------------/
