@@ -98,7 +98,6 @@ public class DfClassificationTop {
     }
 
     public boolean isSisterBooleanHandling() {
-        System.out.println("isSisterBooleanHandling(): " + _elementList.size() + ", " + _classificationName);
         if (_elementList.size() != 2) {
             return false;
         }
@@ -116,8 +115,6 @@ public class DfClassificationTop {
                 secondSet.add(sister.toLowerCase());
             }
         }
-        System.out.println("firstSet: " + firstSet);
-        System.out.println("secondSet: " + secondSet);
         return (firstSet.contains("true") && secondSet.contains("false") // first true
         || firstSet.contains("false") && secondSet.contains("true")); // first false
     }
