@@ -28,9 +28,9 @@ public interface ${glCDef} {
      * @return The map of sub-items. (NotNull, EmptyAllowed, ReadOnly)
      */
     Map<String, Object> subItemMap();
-
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
+
 #if ($classificationTop.hasTopComment())
     /**
      * ${classificationTop.topComment}
@@ -118,4 +118,5 @@ public interface ${glCDef} {
         @Override public String toString() { return code(); }
 #end
     }
+#end
 }
