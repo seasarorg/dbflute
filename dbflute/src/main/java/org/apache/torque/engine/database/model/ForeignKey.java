@@ -1185,17 +1185,8 @@ public class ForeignKey {
         final Table foreignTable = getForeignTable();
         sb.append(foreignTable.getAliasExpression());
         sb.append(foreignTable.getName());
-        sb.append(" by ");
-        final List<String> localColumnNameList = getLocalColumnNameList();
-        int index = 0;
-        for (String localColumnName : localColumnNameList) {
-            if (index > 0) {
-                sb.append(", ");
-            }
-            sb.append(localColumnName);
-            ++index;
-        }
-        sb.append(" named '").append(getForeignJavaBeansRulePropertyName()).append("'");
+        sb.append(" by my ").append(getLocalColumnNameCommaString());
+        sb.append(", named '").append(getForeignJavaBeansRulePropertyName()).append("'");
         return sb.toString();
     }
 
@@ -1224,7 +1215,8 @@ public class ForeignKey {
         final StringBuilder sb = new StringBuilder();
         sb.append(getTable().getAliasExpression());
         sb.append(getTable().getName());
-        sb.append(" as '").append(getReferrerJavaBeansRulePropertyNameAsOne()).append("'");
+        sb.append(" by your ").append(getLocalColumnNameCommaString());
+        sb.append(", named '").append(getReferrerJavaBeansRulePropertyNameAsOne()).append("'");
         return sb.toString();
     }
 
@@ -1253,7 +1245,8 @@ public class ForeignKey {
         final StringBuilder sb = new StringBuilder();
         sb.append(getTable().getAliasExpression());
         sb.append(getTable().getName());
-        sb.append(" as '").append(getReferrerJavaBeansRulePropertyName()).append("'");
+        sb.append(" by your ").append(getLocalColumnNameCommaString());
+        sb.append(", named '").append(getReferrerJavaBeansRulePropertyName()).append("'");
         return sb.toString();
     }
 

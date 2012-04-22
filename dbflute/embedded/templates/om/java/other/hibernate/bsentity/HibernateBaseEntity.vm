@@ -14,8 +14,8 @@ import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #if ($table.hasClassification())
 import ${glPackageBaseCommon}.${glCDef};
 #end
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignEntityClassName = "${foreignKey.foreignTable.javaName}")
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignEntityClassName = "${fk.foreignTable.javaName}")
 import ${myExtendedEntityPackageName}.${foreignEntityClassName};
 #end
 #foreach ($referrer in $table.referrers)
@@ -230,35 +230,35 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignTable = $foreignKey.foreignTable)
-#set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
-#set ($foreignVariableName = "${foreignKey.foreignPropertyName}")
-    /** ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'. */
-#if ($foreignKey.isOneToOne())
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignTable = $fk.foreignTable)
+#set ($foreignEntityClassName = "${fk.foreignTableExtendedEntityClassName}")
+#set ($foreignVariableName = "${fk.foreignPropertyName}")
+    /** ${fk.foreignSimpleDisp}. */
+#if ($fk.isOneToOne())
     @OneToOne(fetch=FetchType.${database.hibernateManyToOneFetch})
 #else
     @ManyToOne(fetch=FetchType.${database.hibernateManyToOneFetch})
 #end
-#if ($foreignKey.isSimpleKeyFK())
-    @JoinColumn(name="${foreignKey.localColumnNameAsOne}")
+#if ($fk.isSimpleKeyFK())
+    @JoinColumn(name="${fk.localColumnNameAsOne}")
 #end
     protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
-     * ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'.
-     * @return The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (NullAllowed: If the foreign key does not have 'NotNull' constraint, please check null.)
+     * ${fk.foreignDispForJavaDoc}
+     * @return The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NullAllowed: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
-    public ${foreignEntityClassName} get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${foreignEntityClassName} get${fk.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
     /**
-     * ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'.
-     * @param ${foreignKey.foreignPropertyName} The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (NullAllowed)
+     * ${fk.foreignDispForJavaDoc}
+     * @param ${fk.foreignPropertyName} The entity of foreign property '${fk.foreignJavaBeansRulePropertyName}'. (NullAllowed)
      */
-    public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
-        this.${foreignVariableName} = ${foreignKey.foreignPropertyName};
+    public void set${fk.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${fk.foreignPropertyName}) {
+        this.${foreignVariableName} = ${fk.foreignPropertyName};
     }
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
@@ -268,12 +268,12 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "${referrer.referrerPropertyNameAsOne}")
 #if ($referrer.isOneToOne())
-    /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
+    /** ${referrer.referrerSimpleDispAsOne}. */
     @OneToOne(mappedBy = "${referrer.foreignPropertyName}", fetch=FetchType.${database.hibernateOneToOneFetch})
     protected ${referrerEntityClassName} ${referrerVariableName};
 
     /**
-     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed: If the foreign key does not have 'NotNull' constraint, please check null.)
      */
     public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
@@ -281,7 +281,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     }
 
     /**
-     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
+     * ${referrer.referrerDispAsOneForJavaDoc}
      * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (NullAllowed)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
@@ -299,13 +299,13 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "${referrer.referrerPropertyName}")
 #if (!${referrer.isOneToOne()})
-    /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. */
+    /** ${referrer.referrerSimpleDisp}. */
     @OneToMany(mappedBy = "${referrer.foreignPropertyName}", fetch=FetchType.${database.hibernateOneToManyFetch})
     @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
-     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. <br />
+     * ${referrer.referrerDispForJavaDoc}
      * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
     public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
@@ -313,7 +313,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     }
 
     /**
-     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * ${referrer.referrerDispForJavaDoc}
      * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NullAllowed)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
@@ -455,10 +455,10 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
         sb.append(toString());
 #if ($table.hasRelation())
         String l = "\n  ";
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignVariableName = "${foreignKey.foreignPropertyName}")
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignVariableName = "${fk.foreignPropertyName}")
         if (${foreignVariableName} != null)
-        { sb.append(l).append(xbRDS(${foreignVariableName}, "${foreignKey.foreignPropertyName}")); }
+        { sb.append(l).append(xbRDS(${foreignVariableName}, "${fk.foreignPropertyName}")); }
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
@@ -514,9 +514,9 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if ($table.hasRelation())
         StringBuilder sb = new StringBuilder();
         String c = ",";
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignVariableName = "${foreignKey.foreignPropertyName}")
-        if (${foreignVariableName} != null) { sb.append(c).append("${foreignKey.foreignPropertyName}"); }
+#foreach ($fk in $table.foreignKeys)
+#set ($foreignVariableName = "${fk.foreignPropertyName}")
+        if (${foreignVariableName} != null) { sb.append(c).append("${fk.foreignPropertyName}"); }
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
