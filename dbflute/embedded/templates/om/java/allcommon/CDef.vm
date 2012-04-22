@@ -40,7 +40,7 @@ public interface ${glCDef} extends Classification {
 #if ($database.hasClassificationSubItemMap($classificationName))
         private static final Map<String, Map<String, Object>> _subItemMapMap = new HashMap<String, Map<String, Object>>();
         static {
-#foreach ($classificationElement in $classificationElement.classificationElementList)
+#foreach ($classificationElement in $classificationTop.classificationElementList)
 #set ($subItemMap = $classificationElement.subItemMap)
             {
                 Map<String, Object> subItemMap = new HashMap<String, Object>();
