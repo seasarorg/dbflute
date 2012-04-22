@@ -36,7 +36,7 @@ public class DfClassificationElement {
     protected String _name;
     protected String _alias;
     protected String _comment;
-    protected String[] _sisters;
+    protected String[] _sisters = new String[] {}; // as default
     protected Map<String, Object> _subItemMap;
 
     // ===================================================================================

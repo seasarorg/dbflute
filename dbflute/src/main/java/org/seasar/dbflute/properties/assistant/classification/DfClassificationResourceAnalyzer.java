@@ -418,6 +418,7 @@ public class DfClassificationResourceAnalyzer {
         classificationElement.setName(name);
         classificationElement.setAlias(alias);
         classificationElement.setComment(comment);
+        classificationElement.setSisters(new String[] {}); // unsupported here
         return classificationElement;
     }
 

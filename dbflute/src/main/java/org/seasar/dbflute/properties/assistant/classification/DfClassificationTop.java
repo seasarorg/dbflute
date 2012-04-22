@@ -104,16 +104,14 @@ public class DfClassificationTop {
         }
         final Set<String> firstSet = new HashSet<String>();
         {
-            final DfClassificationElement firstElement = _elementList.get(0);
-            final String[] firstSisters = firstElement.getSisters();
+            final String[] firstSisters = _elementList.get(0).getSisters();
             for (String sister : firstSisters) {
                 firstSet.add(sister.toLowerCase());
             }
         }
         final Set<String> secondSet = new HashSet<String>();
         {
-            final DfClassificationElement secondElement = _elementList.get(1);
-            final String[] secondSisters = secondElement.getSisters();
+            final String[] secondSisters = _elementList.get(1).getSisters();
             for (String sister : secondSisters) {
                 secondSet.add(sister.toLowerCase());
             }
