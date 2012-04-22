@@ -39,50 +39,50 @@ public interface ${database.simpleCDefClass} {
     DefMeta meta();
 
 #foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
-#set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
-#set ($existTop = false)
-#if ($database.hasClassificationTop($classificationName))
 #set ($classificationTop = $database.getClassificationTop($classificationName))
-#set ($existTop = true)
-#end
-#if ($existTop && $classificationTop.hasTopComment())
+#if ($classificationTop.hasTopComment())
     /**
      * $classificationTop.topComment
      */
 #end
     public enum ${classificationName} implements ${database.simpleCDefClass} {
 #set ($count = 0)
-#foreach ($classificationMap in $classificationMapList)
+#foreach ($classificationElement in $classificationTop.classificationElementList)
 #if ($count != 0)
         ,
 #end
-        /** $database.buildClassificationApplicationComment($classificationMap) */
-        ${classificationMap.get('name')}($database.buildClassificationCodeAliasVariables($classificationMap))
+        /** $database.buildClassificationApplicationComment($classificationElement) */
+        ${classificationElement.name}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement))
 #set ($count = $count + 1)
 #end
         ;
         private static final Map<String, ${classificationName}> _codeValueMap = new HashMap<String, ${classificationName}>();
-        static { for (${classificationName} value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
+        static {
+            for (${classificationName} value : values()) {
+                _codeValueMap.put(value.code().toLowerCase(), value);
+                for (String sister : value.sisters()) { _codeValueMap.put(sister.toLowerCase(), value); }
+            }
+        }
 #if ($database.hasClassificationSubItemMap($classificationName))
         private static final Map<String, Map<String, Object>> _subItemMapMap = new HashMap<String, Map<String, Object>>();
         static {
-#foreach ($classificationMap in $classificationMapList)
-#set ($subItemList = $database.getClassificationSubItemList($classificationMap))
-#set ($subItemMap = $classificationMap.get('subItemMap'))
+#foreach ($classificationElement in $classificationElement.classificationElementList)
+#set ($subItemMap = $classificationElement.subItemMap)
             {
                 Map<String, Object> subItemMap = new HashMap<String, Object>();
-#foreach ($subItemKey in $subItemList)
-#set ($subItemValue = $subItemMap.get($subItemKey))
-                subItemMap.put("${subItemKey}", "${subItemValue}");
+#foreach ($entry in $subItemMap.entrySet())
+                subItemMap.put("${entry.key}", "${entry.value}");
 #end
-                _subItemMapMap.put(${classificationMap.get('name')}.code(), Collections.unmodifiableMap(subItemMap));
+                _subItemMapMap.put(${classificationElement.name}.code(), Collections.unmodifiableMap(subItemMap));
             }
 #end
         }
 #end
-        private String _code; private String _alias;
-        private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
+        private String _code; private String _alias; private String[] _sisters;
+        private ${classificationName}(String code, String alias, String[] sisters)
+        { _code = code; _alias = alias; _sisters = sisters; }
         public String code() { return _code; } public String alias() { return _alias; }
+        private String[] sisters() { return _sisters; }
 #if ($database.hasClassificationSubItemMap($classificationName))
         public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
 #else
@@ -130,15 +130,11 @@ public interface ${database.simpleCDefClass} {
     public enum DefMeta {
 #set ($count = 0)
 #foreach ($classificationName in $database.simpleCDefTargetClassificationNameList)
-#set ($existTop = false)
-#if ($database.hasClassificationTop($classificationName))
 #set ($classificationTop = $database.getClassificationTop($classificationName))
-#set ($existTop = true)
-#end
 #if ($count != 0)
         ,
 #end
-#if ($existTop && $classificationTop.hasTopComment())
+#if ($classificationTop.hasTopComment())
         /** $classificationTop.topComment */
 #end
         ${classificationName}

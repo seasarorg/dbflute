@@ -154,15 +154,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                                             =======================
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
     /**
      * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed)
      */
@@ -175,11 +171,24 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         set${col.javaName}(cdef != null ? cdef.code() : null);
 #end
     }
+#if ($classificationTop.isSisterBooleanHandling())
+
+    /**
+     * Set the value of ${col.uncapitalisedJavaName} as boolean. <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
+#end
+     * @param determination The determination, true or false. (NullAllowed)
+     */
+    public void set${col.javaName}AsBoolean(Boolean determination) {
+        set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
+    }
+#end
 
     /**
      * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
      * @return The instance of classification definition (as ENUM type). (NullAllowed)
@@ -195,22 +204,22 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                                              ======================
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
-#foreach ($classificationMap in $col.classificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')} (${classificationMap.get('code')}). <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name} (${classificationElement.code}). <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    public void set${col.javaName}_${classificationMap.get('name')}() {
-        set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+    public void set${col.javaName}_${classificationElement.name}() {
+        set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 
 #if ($database.isMakeEntityOldStyleClassify())
     /**
-     * Same as set${col.javaName}_${classificationMap.get('name')}. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Same as set${col.javaName}_${classificationElement.name}. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    public void classify${col.javaName}${classificationMap.get('name')}() {
-        set${col.javaName}_${classificationMap.get('name')}();
+    public void classify${col.javaName}${classificationElement.name}() {
+        set${col.javaName}_${classificationElement.name}();
     }
 
 #end
@@ -232,16 +241,16 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                                        ============================
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
-#foreach ($classificationMap in $col.classificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Is the value of ${col.uncapitalisedJavaName} ${classificationMap.get('name')}? <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Is the value of ${col.uncapitalisedJavaName} ${classificationElement.name}? <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
      */
-    public boolean is${col.JavaName}${classificationMap.get('name')}() {
+    public boolean is${col.JavaName}${classificationElement.name}() {
         ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
-        return cdef != null ? cdef.equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
+        return cdef != null ? cdef.equals(${glCDef}.${col.classificationName}.${classificationElement.name}) : false;
     }
 
 #end

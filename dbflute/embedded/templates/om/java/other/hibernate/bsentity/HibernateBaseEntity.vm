@@ -114,15 +114,11 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     //                                                          ==========================
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
-  #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-  #set ($existTop = true)
-#end
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
     /**
      * Classify the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NullAllowed)
      */
@@ -148,13 +144,13 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #end
     }
 
-#foreach ($classificationMap in $col.classificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Classify the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    public void classify${col.javaName}${classificationMap.get('name')}() {
-        classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+    public void classify${col.javaName}${classificationElement.name}() {
+        classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 
 #end
@@ -165,14 +161,10 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     //                                                        ============================
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
-  #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-  #set ($existTop = true)
-#end
+#set ($classificationTop = $database.getClassificationTop($col.classificationName))
     /**
      * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTop.hasTopComment())
+#if ($classificationTop.hasTopComment())
      * $classificationTop.topComment
 #end
      * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NullAllowed)
@@ -185,19 +177,19 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #end
     }
 
-#foreach ($classificationMap in $col.classificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      * <p>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!
      * </p>
      * @return The determination, true or false.
      */
-    public boolean is${col.JavaName}${classificationMap.get('name')}() {
+    public boolean is${col.JavaName}${classificationElement.name}() {
         ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
-        return cls != null ? cls.equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
+        return cls != null ? cls.equals(${glCDef}.${col.classificationName}.${classificationElement.name}) : false;
     }
 
 #end

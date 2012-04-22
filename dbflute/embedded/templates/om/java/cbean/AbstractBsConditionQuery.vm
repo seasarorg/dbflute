@@ -70,30 +70,39 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #end
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
 
     /**
      * Equal(=). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
         doSet${tmpJavaName}_Equal(cdef != null ? cdef.code() : null);
     }
-#foreach ($classificationMap in $col.classificationMapList)
+#if ($classificationTop.isSisterBooleanHandling())
 
     /**
-     * Equal(=). As ${classificationMap.get('name')} (${classificationMap.get('code')}). And OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Equal(=). As boolean for ${col.classificationName}. <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
+#end
+     * @param determination The determination, true or false. (NullAllowed)
      */
-    public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+    public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
+    }
+#end
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+
+    /**
+     * Equal(=). As ${classificationElement.name} (${classificationElement.code}). And OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
+     */
+    public void set${tmpJavaName}_Equal_${classificationElement.name}() {
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 #end
 #end
@@ -126,30 +135,26 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 #end
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
 
     /**
      * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
         doSet${tmpJavaName}_NotEqual(cdef != null ? cdef.code() : null);
     }
-#foreach ($classificationMap in $col.ClassificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
 
     /**
-     * NotEqual(&lt;&gt;). As ${classificationMap.get('name')} (${classificationMap.get('code')}). And OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * NotEqual(&lt;&gt;). As ${classificationElement.name} (${classificationElement.code}). And OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
-        set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+    public void set${tmpJavaName}_NotEqual_${classificationElement.name}() {
+        set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 #end
 #end
@@ -217,16 +222,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
 
     /**
      * InScope {in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -250,16 +251,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
 
     /**
      * NotInScope {not in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -553,30 +550,39 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         doSet${tmpJavaName}_Equal(${tmpUncapitalisedJavaName});
     }
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
 
     /**
      * Equal(=). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
         doSet${tmpJavaName}_Equal(cTNum(cdef != null ? cdef.code() : null, ${col.javaNative}.class));
     }
-#foreach ($classificationMap in $col.classificationMapList)
+#if ($classificationTop.isSisterBooleanHandling())
 
     /**
-     * Equal(=). As ${classificationMap.get('name')} (${classificationMap.get('code')}). And NullIgnored, OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Equal(=). As boolean for ${col.classificationName}. <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
+#end
+     * @param determination The determination, true or false. (NullAllowed)
      */
-    public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+    public void set${col.javaName}_Equal_AsBoolean(Boolean determination) {
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.codeOf(determination));
+    }
+#end
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
+
+    /**
+     * Equal(=). As ${classificationElement.name} (${classificationElement.code}). And NullIgnored, OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
+     */
+    public void set${tmpJavaName}_Equal_${classificationElement.name}() {
+        set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 #end
 #end
@@ -595,30 +601,26 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         doSet${tmpJavaName}_NotEqual(${tmpUncapitalisedJavaName});
     }
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
 
     /**
      * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
     public void set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
         doSet${tmpJavaName}_NotEqual(cTNum(cdef != null ? cdef.code() : null, ${col.javaNative}.class));
     }
-#foreach ($classificationMap in $col.classificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
 
     /**
-     * NotEqual(&lt;&gt;). As ${classificationMap.get('name')} (${classificationMap.get('code')}). And NullIgnored, OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * NotEqual(&lt;&gt;). As ${classificationElement.name} (${classificationElement.code}). And NullIgnored, OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
-        set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+    public void set${tmpJavaName}_NotEqual_${classificationElement.name}() {
+        set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
 #end
 #end
@@ -697,16 +699,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         doSet${tmpJavaName}_InScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
 
     /**
      * InScope {in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -730,16 +728,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         doSet${tmpJavaName}_NotInScope(${tmpUncapitalisedJavaName}List);
     }
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
 
     /**
      * NotInScope {not in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -1130,14 +1124,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
     }
 #if ($col.hasClassification())
-#foreach ($classificationMap in $col.classificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
 
     /**
-     * Equal(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Equal(=). As ${classificationElement.name}. And OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_EQ, ${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
+    public void set${tmpJavaName}_Equal_${classificationElement.name}() {
+        reg${tmpJavaName}(CK_EQ, ${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationElement.name}.code()));
     }
 #end
 #end

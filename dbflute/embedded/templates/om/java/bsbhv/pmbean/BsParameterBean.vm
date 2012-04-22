@@ -540,17 +540,19 @@ public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClas
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))
-#foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
+#foreach ($classificationElement in $database.getPmbMetaDataPropertyOptionClassificationTop($pmbClassName, $propertyName).classificationElementList)
 
     /**
-     * [set as ${classificationMap.get('name')}] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as ${classificationElement.name}] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
 #if ($database.hasPropertyOptionComment($pmbClassName, $propertyName))
      * ${database.getPropertyOptionComment($pmbClassName, $propertyName)} <br />
 #end
-     * ${database.getMapValue($classificationMap, 'comment')}
+#if ($classificationElement.hasComment())
+     * ${classificationElement.comment}
+#end
      */
-    public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
-        ${variableName} = ${database.getPmbMetaDataPropertyOptionClassificationSettingElementValueExp($pmbClassName, $propertyName, $classificationMap.get('name'))};
+    public void set${database.initCap($propertyName)}_${classificationElement.name}() {
+        ${variableName} = ${database.getPmbMetaDataPropertyOptionClassificationSettingElementValueExp($pmbClassName, $propertyName, $classificationElement.name)};
     }
 #end
 #end

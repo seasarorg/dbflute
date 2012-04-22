@@ -95,7 +95,7 @@ $database.info("    parse('AccessContext');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glAccessContext}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/HibernateAccessContext.${glTemplateFileExtension}",$path ,"", "")
 
-#if ($database.hasClassificationDefinitionMap())
+#if ($database.hasClassificationDefinition())
   $database.info("    parse('CDef');")
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/allcommon/HibernateCDef.${glTemplateFileExtension}",$path ,"" ,"")

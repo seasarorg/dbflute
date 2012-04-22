@@ -16,13 +16,13 @@ namespace ${glPackageBaseCommon} {
         ${javaNative} ${javaName} { get; set; }
 #if (${database.isAllClassificationColumn($filteredColumnName)})
 #set ($classificationName = $database.getAllClassificationName($filteredColumnName))
-#set ($classificationList = $database.getClassificationMapList($classificationName))
-#foreach ($classificationMap in $classificationList)
-        void Set${javaName}_${classificationMap.get('name')}();
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+#foreach ($classificationElement in $classificationTop.classificationElementList)
+        void Set${javaName}_${classificationElement.name}();
 #if ($database.isMakeEntityOldStyleClassify())
-        void Classify${javaName}${classificationMap.get('name')}();
+        void Classify${javaName}${classificationElement.name}();
 #end
-        bool Is${javaName}${classificationMap.get('name')} { get; }
+        bool Is${javaName}${classificationElement.name} { get; }
 #end
 #end
 #end

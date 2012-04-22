@@ -37,6 +37,7 @@ import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -677,14 +678,14 @@ public class DfPmbMetaData {
         }
     }
 
-    public List<Map<String, Object>> getPropertyOptionClassificationMapList(String propertyName, AppData schemaData) {
+    public DfClassificationTop getPropertyOptionClassificationTop(String propertyName, AppData schemaData) {
         // should be called when it has classification
         if (isPropertyOptionSpecifiedClassification(propertyName)) {
             final DfPmbPropertyOptionClassification obj = createPropertyOptionClassification(propertyName);
-            return obj.getPropertyOptionClassificationMapList();
+            return obj.getPropertyOptionClassificationTop();
         }
         final Column column = getPropertyOptionClassificationColumn(propertyName, schemaData);
-        return column.getClassificationMapList();
+        return column.getClassificationTop();
     }
 
     public String getPropertyOptionClassificationSettingElementValueExp(String propertyName, String element,

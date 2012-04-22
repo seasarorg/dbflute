@@ -27,25 +27,25 @@ public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName});
 #if (${database.isAllClassificationColumn($filteredColumnName)})
 #set ($classificationName = $database.getAllClassificationName($filteredColumnName))
-#set ($classificationList = $database.getClassificationMapList($classificationName))
-#foreach ($classificationMap in $classificationList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+#foreach ($classificationElement in $classificationTop.classificationElementList)
 
     /**
-     * Classify the value of ${uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Classify the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    public void classify${javaName}${classificationMap.get('name')}();
+    public void classify${javaName}${classificationElement.name}();
 
     /**
-     * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      * <p>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!
      * </p>
      * @return The determination, true or false.
      */
-    public boolean is${javaName}${classificationMap.get('name')}();
+    public boolean is${javaName}${classificationElement.name}();
 #end
 #end
 #end

@@ -1,8 +1,10 @@
 package org.seasar.dbflute.properties.assistant.classification;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -34,7 +36,7 @@ public class DfClassificationTop {
     protected String _topComment;
     protected String _codeType = DfClassificationTop.CODE_TYPE_STRING; // as default
     protected String _relatedColumnName;
-    protected List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
+    protected final List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
     protected boolean _tableClassification;
     protected boolean _checkImplicitSet;
     protected boolean _useDocumentOnly;
@@ -43,7 +45,7 @@ public class DfClassificationTop {
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    public void acceptClassificationTopElementMap(Map<?, ?> elementMap) {
+    public void acceptClassificationTopBasicItemMap(Map<?, ?> elementMap) {
         acceptTopMap(elementMap, KEY_TOP_COMMENT, KEY_CODE_TYPE, KEY_DATA_TYPE);
     }
 
@@ -87,16 +89,46 @@ public class DfClassificationTop {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
-    public boolean isValidTop() {
-        return hasTopComment(); // top comment is a key element
-    }
-
     public boolean hasTopComment() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_topComment);
     }
 
     public boolean hasCodeType() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_codeType);
+    }
+
+    public boolean isSisterBooleanHandling() {
+        System.out.println("isSisterBooleanHandling(): " + _elementList.size() + ", " + _classificationName);
+        if (_elementList.size() != 2) {
+            return false;
+        }
+        final Set<String> firstSet = new HashSet<String>();
+        {
+            final DfClassificationElement firstElement = _elementList.get(0);
+            final String[] firstSisters = firstElement.getSisters();
+            for (String sister : firstSisters) {
+                firstSet.add(sister.toLowerCase());
+            }
+        }
+        final Set<String> secondSet = new HashSet<String>();
+        {
+            final DfClassificationElement secondElement = _elementList.get(1);
+            final String[] secondSisters = secondElement.getSisters();
+            for (String sister : secondSisters) {
+                secondSet.add(sister.toLowerCase());
+            }
+        }
+        System.out.println("firstSet: " + firstSet);
+        System.out.println("secondSet: " + secondSet);
+        return (firstSet.contains("true") && secondSet.contains("false") // first true
+        || firstSet.contains("false") && secondSet.contains("true")); // first false
+    }
+
+    // ===================================================================================
+    //                                                              Classification Element
+    //                                                              ======================
+    public int getElementSize() {
+        return _elementList.size();
     }
 
     // ===================================================================================
@@ -153,6 +185,10 @@ public class DfClassificationTop {
 
     public void addClassificationElement(DfClassificationElement classificationElement) {
         this._elementList.add(classificationElement);
+    }
+
+    public void addClassificationElementAll(List<DfClassificationElement> classificationElementList) {
+        this._elementList.addAll(classificationElementList);
     }
 
     public boolean isTableClassification() {

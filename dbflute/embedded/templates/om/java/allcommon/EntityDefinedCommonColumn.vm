@@ -31,30 +31,30 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 #end
 #if ($database.isAllClassificationColumn($filteredColumnName))
 #set ($classificationName = $database.getAllClassificationName($filteredColumnName))
-#set ($classificationList = $database.getClassificationMapList($classificationName))
-#foreach ($classificationMap in $classificationList)
+#set ($classificationTop = $database.getClassificationTop($classificationName))
+#foreach ($classificationElement in $classificationTop.classificationElementList)
 
     /**
-     * Set the value of ${uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Set the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    void set${javaName}_${classificationMap.get('name')}();
+    void set${javaName}_${classificationElement.name}();
 #if ($database.isMakeEntityOldStyleClassify())
 
     /**
-     * Same as set${javaName}_${classificationMap.get('name')}. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Same as set${javaName}_${classificationElement.name}. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    void classify${javaName}${classificationMap.get('name')}();
+    void classify${javaName}${classificationElement.name}();
 #end
 
     /**
-     * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
      */
-    boolean is${javaName}${classificationMap.get('name')}();
+    boolean is${javaName}${classificationElement.name}();
 #end
 #end
 #end

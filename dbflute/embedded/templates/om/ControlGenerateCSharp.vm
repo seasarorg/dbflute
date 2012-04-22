@@ -1168,7 +1168,7 @@ $database.info("}")
 #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
 $database.makeDirectory($path)
 
-#if ($database.hasClassificationDefinitionMap())
+#if ($database.hasClassificationDefinition())
   $database.info("parseAllcommonClassification() {")
 
   $database.info("    parse('CDef');")

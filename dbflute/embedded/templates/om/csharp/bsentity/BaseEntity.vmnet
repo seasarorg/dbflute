@@ -110,11 +110,7 @@ namespace ${myExtendedEntityPackageName} {
         #region Classification Property
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
         public ${glCDef}.${col.classificationName} ${col.javaName}As${col.classificationName} { get {
             return ${glCDef}.${col.classificationName}.CodeOf(_${col.uncapitalisedJavaName});
         } set {
@@ -141,26 +137,26 @@ namespace ${myExtendedEntityPackageName} {
         }
 
 #end
-#foreach ($classificationMap in $col.classificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
         /// <summary>
-        /// Set the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}.
+        /// Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}.
         /// <![CDATA[
-        /// $database.buildClassificationApplicationComment($classificationMap)
+        /// $database.buildClassificationApplicationComment($classificationElement)
         /// ]]>
         /// </summary>
-        public void Set${col.javaName}_${classificationMap.get('name')}() {
-            ${col.javaName}As${col.classificationName} = ${glCDef}.${col.classificationName}.${classificationMap.get('name')};
+        public void Set${col.javaName}_${classificationElement.name}() {
+            ${col.javaName}As${col.classificationName} = ${glCDef}.${col.classificationName}.${classificationElement.name};
         }
 
 #if ($database.isMakeEntityOldStyleClassify())
         /// <summary>
-        /// Same as Set${col.javaName}_${classificationMap.get('name')}().
+        /// Same as Set${col.javaName}_${classificationElement.name}().
         /// <![CDATA[
-        /// $database.buildClassificationApplicationComment($classificationMap)
+        /// $database.buildClassificationApplicationComment($classificationElement)
         /// ]]>
         /// </summary>
-        public void Classify${col.javaName}${classificationMap.get('name')}() {
-            Set${col.javaName}_${classificationMap.get('name')}();
+        public void Classify${col.javaName}${classificationElement.name}() {
+            Set${col.javaName}_${classificationElement.name}();
         }
 
 #end
@@ -175,19 +171,19 @@ namespace ${myExtendedEntityPackageName} {
         #region Classification Determination
 #foreach ($col in $table.columns)
 #if (${col.hasClassification()})
-#foreach ($classificationMap in $col.ClassificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
         /// <summary>
-        /// Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'?
+        /// Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'?
         /// <![CDATA[
         /// The difference of capital letters and small letters is NOT distinguished.
         /// If the value is null, this method returns false!
-        /// $database.buildClassificationApplicationComment($classificationMap)
+        /// $database.buildClassificationApplicationComment($classificationElement)
         /// ]]>
         /// </summary>
-        public bool Is${col.javaName}${classificationMap.get('name')} {
+        public bool Is${col.javaName}${classificationElement.name} {
             get {
                 ${glCDef}.${col.classificationName} cls = ${col.javaName}As${col.classificationName};
-                return cls != null ? cls.Equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
+                return cls != null ? cls.Equals(${glCDef}.${col.classificationName}.${classificationElement.name}) : false;
             }
         }
 

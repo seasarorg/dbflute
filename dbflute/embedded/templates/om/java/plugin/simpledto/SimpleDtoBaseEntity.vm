@@ -100,15 +100,11 @@ public abstract class $myClassName implements Serializable {
     //                                                             =======================
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.hasClassificationTop($col.classificationName))
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
-#set ($existTop = true)
-#end
     /**
      * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed)
      */
@@ -124,8 +120,8 @@ public abstract class $myClassName implements Serializable {
 
     /**
      * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTop.hasTopComment())
-     * $classificationTop.topComment
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
 #end
      * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
      * @return The instance of classification definition (as ENUM type). (NullAllowed)
@@ -141,13 +137,13 @@ public abstract class $myClassName implements Serializable {
     //                                                              ======================
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
-#foreach ($classificationMap in $col.classificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}. <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      */
-    public void set${col.javaName}_${classificationMap.get('name')}() {
-        set${col.javaName}As${col.classificationName}(${database.simpleCDefClass}.${col.classificationName}.${classificationMap.get('name')});
+    public void set${col.javaName}_${classificationElement.name}() {
+        set${col.javaName}As${col.classificationName}(${database.simpleCDefClass}.${col.classificationName}.${classificationElement.name});
     }
 
 #end
@@ -158,16 +154,16 @@ public abstract class $myClassName implements Serializable {
     //                                                        ============================
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
-#foreach ($classificationMap in $col.classificationMapList)
+#foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
-     * Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
+     * Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'? <br />
+     * $database.buildClassificationApplicationComment($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
      */
-    public boolean is${col.JavaName}${classificationMap.get('name')}() {
+    public boolean is${col.JavaName}${classificationElement.name}() {
         ${database.simpleCDefClass}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
-        return cdef != null ? cdef.equals(${database.simpleCDefClass}.${col.classificationName}.${classificationMap.get('name')}) : false;
+        return cdef != null ? cdef.equals(${database.simpleCDefClass}.${col.classificationName}.${classificationElement.name}) : false;
     }
 
 #end

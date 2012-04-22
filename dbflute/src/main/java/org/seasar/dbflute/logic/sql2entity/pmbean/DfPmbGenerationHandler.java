@@ -19,7 +19,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +31,7 @@ import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -387,9 +387,9 @@ public class DfPmbGenerationHandler {
         return findPmbMetaData(className).getPropertyOptionClassificationFixedElementValueExp(propertyName);
     }
 
-    public List<Map<String, Object>> getPropertyOptionClassificationMapList(String className, String propertyName,
+    public DfClassificationTop getPropertyOptionClassificationTop(String className, String propertyName,
             AppData schemaData) {
-        return findPmbMetaData(className).getPropertyOptionClassificationMapList(propertyName, schemaData);
+        return findPmbMetaData(className).getPropertyOptionClassificationTop(propertyName, schemaData);
     }
 
     public String getPropertyOptionClassificationSettingElementValueExp(String className, String propertyName,

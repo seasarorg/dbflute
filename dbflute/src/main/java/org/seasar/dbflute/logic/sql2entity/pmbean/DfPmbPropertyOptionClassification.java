@@ -16,10 +16,10 @@
 package org.seasar.dbflute.logic.sql2entity.pmbean;
 
 import java.util.List;
-import java.util.Map;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
 
@@ -89,14 +89,14 @@ public class DfPmbPropertyOptionClassification {
         return Srl.splitListTrimmed(fixedElement, ",");
     }
 
-    public List<Map<String, Object>> getPropertyOptionClassificationMapList() {
+    public DfClassificationTop getPropertyOptionClassificationTop() {
         final String classificationName = extractClassificationNameFromOption(true);
-        final List<Map<String, Object>> classificationMapList = _classificationProperties
-                .getClassificationMapList(classificationName);
-        if (classificationMapList == null) {
+        final DfClassificationTop classificationTop = _classificationProperties
+                .getClassificationTop(classificationName);
+        if (classificationTop == null) {
             throwClassificationNotFoundException(classificationName);
         }
-        return classificationMapList;
+        return classificationTop;
     }
 
     protected void throwClassificationNotFoundException(String classificationName) {

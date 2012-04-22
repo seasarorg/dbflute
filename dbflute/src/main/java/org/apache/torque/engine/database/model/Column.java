@@ -77,6 +77,7 @@ import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
@@ -1631,7 +1632,7 @@ public class Column {
     }
 
     protected boolean hasQueryRestrictionByFlgClassification() {
-        return hasQueryRestrictionByClassification() && getClassificationMapList().size() <= 2;
+        return hasQueryRestrictionByClassification() && getClassificationTop().getElementSize() <= 2;
     }
 
     // -----------------------------------------------------
@@ -1843,12 +1844,8 @@ public class Column {
     // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============
-    public Map<String, Map<String, String>> getClassificationDeploymentMap() {
-        return getClassificationProperties().getClassificationDeploymentMap();
-    }
-
-    public Map<String, List<Map<String, Object>>> getClassificationDefinitionMap() {
-        return getClassificationProperties().getClassificationDefinitionMap();
+    protected Map<String, DfClassificationTop> getClassificationTopMap() {
+        return getClassificationProperties().getClassificationTopMap();
     }
 
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1915,14 +1912,14 @@ public class Column {
         return isForceClassificationSetting() ? "protected" : "public";
     }
 
-    public List<Map<String, Object>> getClassificationMapList() {
-        final Map<String, List<Map<String, Object>>> definitionMap = getClassificationDefinitionMap();
+    public DfClassificationTop getClassificationTop() {
+        final Map<String, DfClassificationTop> definitionMap = getClassificationTopMap();
         final String classificationName = getClassificationName();
-        final List<Map<String, Object>> classificationMapList = definitionMap.get(classificationName);
-        if (classificationMapList == null) {
+        final DfClassificationTop classificationTop = definitionMap.get(classificationName);
+        if (classificationTop == null) {
             throwClassificationDeploymentClassificationNotFoundException(classificationName);
         }
-        return classificationMapList;
+        return classificationTop;
     }
 
     protected void throwClassificationDeploymentClassificationNotFoundException(String classificationName) {
@@ -1938,7 +1935,7 @@ public class Column {
         br.addItem("Related Classification");
         br.addElement(classificationName);
         br.addItem("Defined Classification List");
-        br.addElement(getClassificationDefinitionMap().keySet());
+        br.addElement(getClassificationTopMap().keySet());
         final String msg = br.buildExceptionMessage();
         throw new DfClassificationDeploymentClassificationNotFoundException(msg);
     }

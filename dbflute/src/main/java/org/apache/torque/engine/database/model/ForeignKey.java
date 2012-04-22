@@ -876,32 +876,30 @@ public class ForeignKey {
         }
         final String classificationName = parameterType.substring(0, parameterType.indexOf("."));
         final String elementName = parameterType.substring(parameterType.indexOf(".") + ".".length());
-        final Map<String, List<Map<String, Object>>> definitionMap = getClassificationProperties()
-                .getClassificationDefinitionMap();
-        final List<Map<String, Object>> elementMapList = definitionMap.get(classificationName);
-        if (elementMapList == null) {
+        final Map<String, DfClassificationTop> topMap = getClassificationProperties().getClassificationTopMap();
+        final DfClassificationTop classificationTop = topMap.get(classificationName);
+        if (classificationTop == null) {
             String msg = "The classification name was NOT FOUND:";
             msg = msg + " classificationName=" + classificationName + " embeddedComment=" + peace;
-            msg = msg + " classificationList=" + definitionMap.keySet();
+            msg = msg + " classificationList=" + topMap.keySet();
             throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
         }
+        final List<DfClassificationElement> elementList = classificationTop.getClassificationElementList();
         String code = null;
-        for (Map<String, Object> elementMap : elementMapList) {
-            String name = (String) elementMap.get(DfClassificationElement.KEY_NAME);
+        for (DfClassificationElement element : elementList) {
+            final String name = element.getName();
             if (elementName.equals(name)) {
-                code = (String) elementMap.get(DfClassificationElement.KEY_CODE);
+                code = element.getCode();
                 break;
             }
         }
         if (code == null) {
             String msg = "The classification element name was NOT FOUND:";
             msg = msg + " elementName=" + elementName + " embeddedComment=" + peace;
-            msg = msg + " elementMapList=" + elementMapList;
+            msg = msg + " classificationTop=" + classificationTop;
             throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
         }
-        final Map<String, DfClassificationTop> topMap = getClassificationProperties().getClassificationTopMap();
-        final DfClassificationTop top = topMap.get(classificationName);
-        final String codeType = top.getCodeType();
+        final String codeType = classificationTop.getCodeType();
         if (codeType == null || !codeType.equals(DfClassificationTop.CODE_TYPE_NUMBER)) {
             code = "'" + code + "'";
         }
@@ -1184,9 +1182,20 @@ public class ForeignKey {
 
     public String getForeignSimpleDisp() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(getForeignTable().getAliasExpression());
-        sb.append(getForeignTable().getName());
-        sb.append(" as '").append(getForeignJavaBeansRulePropertyName()).append("'");
+        final Table foreignTable = getForeignTable();
+        sb.append(foreignTable.getAliasExpression());
+        sb.append(foreignTable.getName());
+        sb.append(" by ");
+        final List<String> localColumnNameList = getLocalColumnNameList();
+        int index = 0;
+        for (String localColumnName : localColumnNameList) {
+            if (index > 0) {
+                sb.append(", ");
+            }
+            sb.append(localColumnName);
+            ++index;
+        }
+        sb.append(" named '").append(getForeignJavaBeansRulePropertyName()).append("'");
         return sb.toString();
     }
 

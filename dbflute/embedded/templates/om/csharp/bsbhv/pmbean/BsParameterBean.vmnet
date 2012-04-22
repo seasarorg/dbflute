@@ -196,13 +196,13 @@ namespace ${glPackageExtendedParameterBean} {
 #if ($database.isPmbMetaDataPropertyOptionClassificationSetter($pmbClassName, $propertyName))
 #set ($classificationName = $database.getPmbMetaDataPropertyOptionClassificationName($pmbClassName, $propertyName))
 #set ($propertyTypeRemovedCSharpNullable = $database.getPmbMetaDataPropertyTypeRemovedCSharpNullable($pmbClassName, $propertyName))
-#foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
+#foreach ($classificationTop in $database.getPmbMetaDataPropertyOptionClassificationTop($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
+        public void Set${database.initCap($propertyName)}_${classificationTop.name}() {
 #if ($database.isPmbMetaDataPropertyJavaNativeStringObject($pmbClassName, $propertyName))
-            this.${database.initCap($propertyName)} = ${glCDef}.${classificationName}.${classificationMap.get('name')}.Code;
+            this.${database.initCap($propertyName)} = ${glCDef}.${classificationName}.${classificationTop.name}.Code;
 #else
-            this.${database.initCap($propertyName)} = ${propertyTypeRemovedCSharpNullable}.Parse(${glCDef}.${classificationName}.${classificationMap.get('name')}.Code);
+            this.${database.initCap($propertyName)} = ${propertyTypeRemovedCSharpNullable}.Parse(${glCDef}.${classificationName}.${classificationTop.name}.Code);
 #end
         }
 #end

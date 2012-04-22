@@ -101,6 +101,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.assistant.DfTableDeterminator;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.DfTableListProvider;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.seasar.dbflute.properties.initializer.DfAdditionalForeignKeyInitializer;
@@ -642,10 +643,8 @@ public class Database {
         return getPmbBasicHandler().getPropertyOptionClassificationFixedElementValueExp(className, propertyName);
     }
 
-    public List<Map<String, Object>> getPmbMetaDataPropertyOptionClassificationMapList(String className,
-            String propertyName) {
-        return getPmbBasicHandler().getPropertyOptionClassificationMapList(className, propertyName,
-                _sql2entitySchemaData);
+    public DfClassificationTop getPmbMetaDataPropertyOptionClassificationTop(String className, String propertyName) {
+        return getPmbBasicHandler().getPropertyOptionClassificationTop(className, propertyName, _sql2entitySchemaData);
     }
 
     public String getPmbMetaDataPropertyOptionClassificationSettingElementValueExp(String className,
@@ -1538,12 +1537,12 @@ public class Database {
     // -----------------------------------------------------
     //                                            Definition
     //                                            ----------
-    public boolean hasClassificationDefinitionMap() {
-        return getClassificationProperties().hasClassificationDefinitionMap();
+    public boolean hasClassificationDefinition() {
+        return getClassificationProperties().hasClassificationDefinition();
     }
 
-    public Map<String, DfClassificationTop> getClassificationTopMap() {
-        return getClassificationProperties().getClassificationTopMap();
+    public List<String> getClassificationNameList() {
+        return getClassificationProperties().getClassificationNameList();
     }
 
     public boolean hasClassificationTop(String classificationName) {
@@ -1554,37 +1553,24 @@ public class Database {
         return getClassificationProperties().getClassificationTop(classificationName);
     }
 
+    public String buildClassificationApplicationComment(DfClassificationElement classificationElement) {
+        return getClassificationProperties().buildClassificationApplicationComment(classificationElement);
+    }
+
+    public String buildClassificationCodeAliasVariables(DfClassificationElement classificationElement) {
+        return getClassificationProperties().buildClassificationCodeAliasVariables(classificationElement);
+    }
+
+    public String buildClassificationCodeAliasSisterCodeVariables(DfClassificationElement classificationElement) {
+        return getClassificationProperties().buildClassificationCodeAliasSisterCodeVariables(classificationElement);
+    }
+
+    public String buildClassificationCodeNameAliasVariables(DfClassificationElement classificationElement) {
+        return getClassificationProperties().buildClassificationCodeNameAliasVariables(classificationElement);
+    }
+
     public boolean isCheckImplicitSetClassification(String classificationName) {
         return getClassificationProperties().isCheckImplicitSet(classificationName);
-    }
-
-    public Map<String, List<Map<String, Object>>> getClassificationDefinitionMap() {
-        return getClassificationProperties().getClassificationDefinitionMap();
-    }
-
-    public List<String> getClassificationNameList() {
-        return getClassificationProperties().getClassificationNameList();
-    }
-
-    public String getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getClassificationProperties()
-                .getClassificationDefinitionMapAsStringRemovedLineSeparatorFilteredQuotation();
-    }
-
-    public List<Map<String, Object>> getClassificationMapList(String classificationName) {
-        return getClassificationProperties().getClassificationMapList(classificationName);
-    }
-
-    public String buildClassificationApplicationComment(Map<String, String> classificationMap) {
-        return getClassificationProperties().buildClassificationApplicationComment(classificationMap);
-    }
-
-    public String buildClassificationCodeAliasVariables(Map<String, String> classificationMap) {
-        return getClassificationProperties().buildClassificationCodeAliasVariables(classificationMap);
-    }
-
-    public String buildClassificationCodeNameAliasVariables(Map<String, String> classificationMap) {
-        return getClassificationProperties().buildClassificationCodeNameAliasVariables(classificationMap);
     }
 
     public boolean isTableClassification(String classificationName) {
@@ -1595,22 +1581,9 @@ public class Database {
         return getClassificationProperties().hasClassificationSubItemMap(classificationName);
     }
 
-    public List<String> getClassificationSubItemList(Map<String, Object> classificationMap) {
-        return getClassificationProperties().getClassificationSubItemList(classificationMap);
-    }
-
     // -----------------------------------------------------
     //                                            Deployment
     //                                            ----------
-    public Map<String, Map<String, String>> getClassificationDeploymentMap() {
-        return getClassificationProperties().getClassificationDeploymentMap();
-    }
-
-    public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {
-        return getClassificationProperties()
-                .getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation();
-    }
-
     public boolean hasClassification(String tableName, String columnName) {
         return getClassificationProperties().hasClassification(tableName, columnName);
     }
