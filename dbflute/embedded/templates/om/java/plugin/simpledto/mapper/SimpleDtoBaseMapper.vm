@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.bhv.InstanceKeyEntity;
 import org.seasar.dbflute.bhv.DtoMapper;
 #if ($table.hasClassification())
 import ${glPackageBaseCommon}.${glCDef};
@@ -72,6 +73,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #else
     protected boolean _reverseReference; // default: one-way reference
 #end
+    protected boolean _instanceCache = true; // default: cached
 #foreach ($fk in $table.foreignKeys)
     protected boolean _suppress${fk.foreignJavaBeansRulePropertyNameInitCap};
 #end
@@ -110,8 +112,9 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             return null;
         }
 #if ($table.hasRelation())
-        Entity localKey = entity;
-        Object cachedLocalDto = _relationDtoMap.get(localKey);
+        boolean instanceCache = _instanceCache;
+        Entity localKey = createInstanceKeyEntity(entity);
+        Object cachedLocalDto = instanceCache ? _relationDtoMap.get(localKey) : null;
         if (cachedLocalDto != null) {
             return (${myExtendedObjectClassName})cachedLocalDto;
         }
@@ -121,7 +124,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         dto.set${col.javaName}(entity.get${col.javaName}());
 #end
 #if ($table.hasRelation())
-        if (entity.hasPrimaryKeyValue()) { // caches only a DTO that has a primary key value
+        if (instanceCache && entity.hasPrimaryKeyValue()) { // caches only a DTO that has a primary key value
             _relationDtoMap.put(localKey, dto);
         }
         boolean reverseReference = _reverseReference;
@@ -129,8 +132,8 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
         if (!_suppress${fk.foreignJavaBeansRulePropertyNameInitCap} && entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
             ${fk.foreignTableExtendedEntityClassName} relationEntity = entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}();
-            Entity relationKey = relationEntity;
-            Object cachedDto = _relationDtoMap.get(relationKey);
+            Entity relationKey = createInstanceKeyEntity(relationEntity);
+            Object cachedDto = instanceCache ? _relationDtoMap.get(relationKey) : null;
             if (cachedDto != null) {
                 ${foreignDtoClassName} relationDto = (${foreignDtoClassName})cachedDto;
                 dto.set${fk.foreignJavaBeansRulePropertyNameInitCap}(relationDto);
@@ -147,6 +150,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             } else {
                 ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
                 mapper.setReverseReference(reverseReference);
+                if (!instanceCache) { mapper.disableInstanceCache(); }
 #if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
                 mapper.suppress${fk.referrerJavaBeansRulePropertyNameAsOneInitCap}();
@@ -165,7 +169,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #end
 #end
                 }
-                if (relationEntity.hasPrimaryKeyValue()) {
+                if (instanceCache && relationEntity.hasPrimaryKeyValue()) {
                     _relationDtoMap.put(relationKey, dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}());
                 }
             }
@@ -176,8 +180,8 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #if ($referrer.isOneToOne())
         if (!_suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} && entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() != null) {
             ${referrer.referrerTableExtendedEntityClassName} relationEntity = entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}();
-            Entity relationKey = relationEntity;
-            Object cachedDto = _relationDtoMap.get(relationKey);
+            Entity relationKey = createInstanceKeyEntity(relationEntity);
+            Object cachedDto = instanceCache ? _relationDtoMap.get(relationKey) : null;
             if (cachedDto != null) {
                 ${referrerDtoClassName} relationDto = (${referrerDtoClassName})cachedDto;
                 dto.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(relationDto);
@@ -187,13 +191,14 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             } else {
                 ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
                 mapper.setReverseReference(reverseReference);
+                if (!instanceCache) { mapper.disableInstanceCache(); }
                 mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
                 ${referrerDtoClassName} relationDto = mapper.mappingToDto(relationEntity);
                 dto.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(relationDto);
                 if (reverseReference) {
                     relationDto.set${referrer.foreignJavaBeansRulePropertyNameInitCap}(dto);
                 }
-                if (relationEntity.hasPrimaryKeyValue()) {
+                if (instanceCache && relationEntity.hasPrimaryKeyValue()) {
                     _relationDtoMap.put(relationKey, dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
                 }
             }
@@ -202,6 +207,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         if (!_suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} && !entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
             ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
             mapper.setReverseReference(reverseReference);
+            if (!instanceCache) { mapper.disableInstanceCache(); }
             mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
             List<${referrerDtoClassName}> relationDtoList = mapper.mappingToDtoList(entity.get${referrer.referrerJavaBeansRulePropertyNameInitCap}());
             dto.set${referrer.referrerJavaBeansRulePropertyNameInitCap}(relationDtoList);
@@ -249,8 +255,9 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             return null;
         }
 #if ($table.hasRelation())
-        Object localKey = dto;
-        Entity cachedLocalEntity = _relationEntityMap.get(localKey);
+        boolean instanceCache = _instanceCache;
+        Object localKey = dto.instanceHash();
+        Entity cachedLocalEntity = instanceCache ? _relationEntityMap.get(localKey) : null;
         if (cachedLocalEntity != null) {
             return (${table.extendedEntityClassName})cachedLocalEntity;
         }
@@ -266,7 +273,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         }
 #end
 #if ($table.hasRelation())
-        if (entity.hasPrimaryKeyValue()) { // caches only an entity that has a primary key value
+        if (instanceCache && entity.hasPrimaryKeyValue()) { // caches only an entity that has a primary key value
             _relationEntityMap.put(localKey, entity);
         }
         boolean reverseReference = _reverseReference;
@@ -274,8 +281,8 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
         if (!_suppress${fk.foreignJavaBeansRulePropertyNameInitCap} && dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
             ${foreignDtoClassName} relationDto = dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}();
-            Object relationKey = relationDto;
-            Entity cachedEntity = _relationEntityMap.get(relationKey);
+            Object relationKey = relationDto.instanceHash();
+            Entity cachedEntity = instanceCache ? _relationEntityMap.get(relationKey) : null;
             if (cachedEntity != null) {
                 ${fk.foreignTableExtendedEntityClassName} relationEntity = (${fk.foreignTableExtendedEntityClassName})cachedEntity;
                 entity.set${fk.foreignJavaBeansRulePropertyNameInitCap}(relationEntity);
@@ -292,6 +299,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             } else {
                 ${foreignDtoClassName}Mapper mapper = new ${foreignDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
                 mapper.setReverseReference(reverseReference);
+                if (!instanceCache) { mapper.disableInstanceCache(); }
 #if ($fk.canBeReferrer())
 #if ($fk.isOneToOne())
                 mapper.suppress${fk.referrerJavaBeansRulePropertyNameAsOneInitCap}();
@@ -311,7 +319,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #end
 #end
                 }
-                if (entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}().hasPrimaryKeyValue()) {
+                if (instanceCache && entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}().hasPrimaryKeyValue()) {
                     _relationEntityMap.put(relationKey, entity.get${fk.foreignJavaBeansRulePropertyNameInitCap}());
                 }
             }
@@ -322,8 +330,8 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #if (${referrer.isOneToOne()})
         if (!_suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} && dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() != null) {
             ${referrerDtoClassName} relationDto = dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}();
-            Object relationKey = relationDto;
-            Entity cachedEntity = _relationEntityMap.get(relationKey);
+            Object relationKey = relationDto.instanceHash();
+            Entity cachedEntity = instanceCache ? _relationEntityMap.get(relationKey) : null;
             if (cachedEntity != null) {
                 ${referrer.referrerTableExtendedEntityClassName} relationEntity = (${referrer.referrerTableExtendedEntityClassName})cachedEntity;
                 entity.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(relationEntity);
@@ -333,13 +341,14 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
             } else {
                 ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
                 mapper.setReverseReference(reverseReference);
+                if (!instanceCache) { mapper.disableInstanceCache(); }
                 mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
                 ${referrer.referrerTableExtendedEntityClassName} relationEntity = mapper.mappingToEntity(relationDto);
                 entity.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(relationEntity);
                 if (reverseReference) {
                     relationEntity.set${referrer.foreignJavaBeansRulePropertyNameInitCap}(entity);
                 }
-                if (entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}().hasPrimaryKeyValue()) {
+                if (instanceCache && entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}().hasPrimaryKeyValue()) {
                     _relationEntityMap.put(relationKey, entity.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
                 }
             }
@@ -348,6 +357,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         if (!_suppress${referrer.referrerJavaBeansRulePropertyNameInitCap} && !dto.get${referrer.referrerJavaBeansRulePropertyNameInitCap}().isEmpty()) {
             ${referrerDtoClassName}Mapper mapper = new ${referrerDtoClassName}Mapper(_relationDtoMap, _relationEntityMap);
             mapper.setReverseReference(reverseReference);
+            if (!instanceCache) { mapper.disableInstanceCache(); }
             mapper.suppress${referrer.foreignJavaBeansRulePropertyNameInitCap}();
             List<${referrer.referrerTableExtendedEntityClassName}> relationEntityList = mapper.mappingToEntityList(dto.get${referrer.referrerJavaBeansRulePropertyNameInitCap}());
             entity.set${referrer.referrerJavaBeansRulePropertyNameInitCap}(relationEntityList);
@@ -413,6 +423,17 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 
     protected boolean isAcceptNullElementOnList() {
         return true; // as default
+    }
+
+    // -----------------------------------------------------
+    //                                          Instance Key
+    //                                          ------------
+    protected InstanceKeyEntity createInstanceKeyEntity(Entity entity) {
+        return new InstanceKeyEntity(entity);
+    }
+
+    public void disableInstanceCache() { // internal option
+        _instanceCache = false;
     }
 
     // ===================================================================================

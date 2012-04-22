@@ -566,6 +566,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public int instanceHash() {
+        return super.hashCode();
+    }
+
+    /**
      * Convert to display string of entity's data. (no relation data)
      * @return The display string of all columns and relation existences. (NotNull)
      */
@@ -574,8 +581,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
-     * Convert to display string of entity's data with relation data.
-     * @return The display string of basic informations with one-nested relation values. (NotNull)
+     * {@inheritDoc}
      */
     public String toStringWithRelation() {
         StringBuilder sb = new StringBuilder();
@@ -607,11 +613,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
 
     /**
-     * Build display string with custom options.
-     * @param name The name for display. (NullAllowed: If it's null, it does not have a name)
-     * @param column Does it contains column values or not?
-     * @param relation Does it contains relation existences or not?
-     * @return The display string for this entity. (NotNull)
+     * {@inheritDoc}
      */
     public String buildDisplayString(String name, boolean column, boolean relation) {
         StringBuilder sb = new StringBuilder();

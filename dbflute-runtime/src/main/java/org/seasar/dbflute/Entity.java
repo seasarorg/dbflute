@@ -150,8 +150,14 @@ public interface Entity {
     }
 
     // ===================================================================================
-    //                                                                      Display String
-    //                                                                      ==============
+    //                                                                    Extension Method
+    //                                                                    ================
+    /**
+     * Calculate the hash-code, which is a default hash code, to identify the instance.
+     * @return The hash-code from super.hashCode().
+     */
+    int instanceHash();
+
     /**
      * Convert the entity to display string with relation information.
      * @return The display string of basic informations with one-nested relation values. (NotNull)
@@ -168,7 +174,7 @@ public interface Entity {
     String buildDisplayString(String name, boolean column, boolean relation);
 
     // ===================================================================================
-    //                                                                      Display String
+    //                                                                      Internal Class
     //                                                                      ==============
     public static final class InternalUtil {
 

@@ -277,6 +277,10 @@ public abstract class $myClassName implements Serializable {
         return (31 * result) + (value instanceof byte[] ? ((byte[]) value).length : value.hashCode());
     }
 
+    public int instanceHash() {
+        return super.hashCode();
+    }
+
     public String toString() {
         String c = ", ";
         StringBuilder sb = new StringBuilder();
