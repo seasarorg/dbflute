@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The definition of classification.
@@ -81,7 +80,6 @@ public interface ${glCDef} {
         @SuppressWarnings("unchecked")
         public Map<String, Object> subItemMap() { return (Map<String, Object>)Collections.EMPTY_MAP; }
 #end
-        public ClassificationMeta meta() { return ${glCDef}.DefMeta.${classificationName}; }
 
         /**
          * Get the classification by the code. (CaseInsensitive)
