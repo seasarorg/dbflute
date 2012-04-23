@@ -53,13 +53,6 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isLoggingReplaceSql: (NotRequired - Default true)
-    #  Does it show replace-SQL on log?
-    #
-    #; isLoggingReplaceSql = true
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isErrorSqlContinue: (NotRequired - Default false)
     #  Does it continue the task when error SQL exists?
     #
