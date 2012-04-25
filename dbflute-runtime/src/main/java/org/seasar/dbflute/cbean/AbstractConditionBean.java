@@ -27,6 +27,7 @@ import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -61,24 +62,36 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                             SqlClause
+    //                                             ---------
     /** SQL clause instance. */
     protected final SqlClause _sqlClause;
     {
         _sqlClause = createSqlClause();
     }
 
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
     /** Safety max result size. {Internal} */
     private int _safetyMaxResultSize;
 
     /** The configuration of statement. {Internal} (NullAllowed) */
     private StatementConfig _statementConfig;
 
+    // -----------------------------------------------------
+    //                                                Paging
+    //                                                ------
     /** Is the count executed later? {Internal} */
     private boolean _pagingCountLater; // the default value is on the DBFlute generator
 
     /** Can the paging re-select? {Internal} */
     private boolean _pagingReSelect = true;
 
+    // -----------------------------------------------------
+    //                                                 Union
+    //                                                 -----
     /** The list of condition-bean for union. {Internal} (NullAllowed) */
     private List<ConditionBean> _unionCBeanList;
 
@@ -90,6 +103,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                          ------------
     /** The purpose of condition-bean. (NotNull) */
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
+
+    // -----------------------------------------------------
+    //                                          Dream Cruise
+    //                                          ------------
+    protected HpSpecifiedColumn _dreamCruiseColumn;
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -213,11 +231,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
         final HpCalcSpecification<CB> leftCalcSp = xcreateCalcSpecification(leftSp);
         leftCalcSp.specify(leftCB);
-        final String leftColumn = xbuildLeftColumn(leftCB, leftCalcSp);
+        final String leftColumn = xbuildColQyLeftColumn(leftCB, leftCalcSp);
 
         final HpCalcSpecification<CB> rightCalcSp = xcreateCalcSpecification(rightSp);
         rightCalcSp.specify(rightCB);
-        final String rightColumn = xbuildRightColumn(rightCB, rightCalcSp);
+        final String rightColumn = xbuildColQyRightColumn(rightCB, rightCalcSp);
         rightCalcSp.setLeftCalcSp(leftCalcSp);
 
         final QueryClause queryClause = xcreateColQyClause(leftColumn, operand, rightColumn, rightCalcSp);
@@ -225,20 +243,23 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return rightCalcSp;
     }
 
-    protected <CB extends ConditionBean> String xbuildLeftColumn(CB leftCB, HpCalcSpecification<CB> leftCalcSp) {
-        final ColumnRealName realName = leftCalcSp.getResolvedSpecifiedColumnRealName();
-        if (realName == null) {
-            createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
-        }
+    protected <CB extends ConditionBean> String xbuildColQyLeftColumn(CB leftCB, HpCalcSpecification<CB> leftCalcSp) {
+        final ColumnRealName realName = xextractColQyColumnRealName(leftCB, leftCalcSp);
         return xbuildColQyColumn(leftCB, realName.toString(), "left");
     }
 
-    protected <CB extends ConditionBean> String xbuildRightColumn(CB rightCB, HpCalcSpecification<CB> rightCalcSp) {
-        final ColumnRealName realName = rightCalcSp.getResolvedSpecifiedColumnRealName();
+    protected <CB extends ConditionBean> String xbuildColQyRightColumn(CB rightCB, HpCalcSpecification<CB> rightCalcSp) {
+        final ColumnRealName realName = xextractColQyColumnRealName(rightCB, rightCalcSp);
+        return xbuildColQyColumn(rightCB, realName.toString(), "right");
+    }
+
+    protected <CB extends ConditionBean> ColumnRealName xextractColQyColumnRealName(CB cb,
+            HpCalcSpecification<CB> calcSp) {
+        final ColumnRealName realName = calcSp.getResolvedSpecifiedColumnRealName();
         if (realName == null) {
             createCBExThrower().throwColumnQueryInvalidColumnSpecificationException();
         }
-        return xbuildColQyColumn(rightCB, realName.toString(), "right");
+        return realName;
     }
 
     protected <CB extends ConditionBean> String xbuildColQyColumn(CB cb, String source, String themeKey) {
@@ -246,8 +267,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return Srl.replace(source, "/*pmb.conditionQuery.", bindingExp);
     }
 
-    protected <CB extends ConditionBean> HpCalcSpecification<CB> xcreateCalcSpecification(SpecifyQuery<CB> rightSp) {
-        return new HpCalcSpecification<CB>(rightSp, this);
+    protected <CB extends ConditionBean> HpCalcSpecification<CB> xcreateCalcSpecification(SpecifyQuery<CB> calcSp) {
+        return new HpCalcSpecification<CB>(calcSp, this);
     }
 
     protected <CB extends ConditionBean> QueryClause xcreateColQyClause(final String leftColumn, final String operand,
@@ -345,20 +366,41 @@ public abstract class AbstractConditionBean implements ConditionBean {
         // it has a possible to be inner-join in various case
         // but it is hard to analyze in detail so simplify it
         // = = = = = = = = = =/
-        final String leftAlias = leftCalcSp.getResolvedSpecifiedTableAliasName();
-        final String rightAlias = rightCalcSp.getResolvedSpecifiedTableAliasName();
-        final QueryUsedAliasInfo leftInfo = xcreateColQyAlsInfo(leftAlias, leftCalcSp);
-        final QueryUsedAliasInfo rightInfo = xcreateColQyAlsInfo(rightAlias, rightCalcSp);
+        final QueryUsedAliasInfo leftInfo = xcreateColQyAliasInfo(leftCalcSp);
+        final QueryUsedAliasInfo rightInfo = xcreateColQyAliasInfo(rightCalcSp);
         getSqlClause().registerWhereClause(queryClause, leftInfo, rightInfo);
     }
 
-    protected <CB extends ConditionBean> QueryUsedAliasInfo xcreateColQyAlsInfo(final String usedAliasName,
-            final HpCalcSpecification<CB> calcSp) {
+    protected <CB extends ConditionBean> QueryUsedAliasInfo xcreateColQyAliasInfo(final HpCalcSpecification<CB> calcSp) {
+        final String usedAliasName = calcSp.getResolvedSpecifiedTableAliasName();
         return new QueryUsedAliasInfo(usedAliasName, new InnerJoinNoWaySpeaker() {
             public boolean isNoWayInner() {
                 return calcSp.mayNullRevived();
             }
         });
+    }
+
+    // [DBFlute-0.9.9.4C]
+    // ===================================================================================
+    //                                                                        Dream Cruise
+    //                                                                        ============
+    /**
+     * @param dreamCruiseColumn The specified column by your dream cruise. (NotNull)
+     */
+    public void overTheWaves(HpSpecifiedColumn dreamCruiseColumn) {
+        if (dreamCruiseColumn == null) {
+            String msg = "The argument 'dreamCruiseColumn' should not be null.";
+            throw new IllegalStateException(msg);
+        }
+        _dreamCruiseColumn = dreamCruiseColumn;
+    }
+
+    public boolean hasDreamCruiseTicket() {
+        return _dreamCruiseColumn != null;
+    }
+
+    public HpSpecifiedColumn xshowDreamCruiseTicket() {
+        return _dreamCruiseColumn;
     }
 
     // [DBFlute-0.9.6.3]
@@ -1092,6 +1134,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void xsetupForColumnQuery(ConditionBean mainCB) {
         xinheritSubQueryInfo(mainCB.localCQ());
         xchangePurposeSqlClause(HpCBPurpose.COLUMN_QUERY, mainCB.localCQ());
+
+        // inherits a parent query to synchronize real name
+        // (and also for suppressing query check) 
+        xprepareSyncQyCall(mainCB);
+    }
+
+    public void xsetupForDreamCruise(ConditionBean mainCB) {
+        xinheritSubQueryInfo(mainCB.localCQ());
+        xchangePurposeSqlClause(HpCBPurpose.DREAM_CRUISE, mainCB.localCQ());
 
         // inherits a parent query to synchronize real name
         // (and also for suppressing query check) 

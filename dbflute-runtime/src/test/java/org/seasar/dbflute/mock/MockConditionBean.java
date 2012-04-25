@@ -9,6 +9,7 @@ import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
@@ -271,5 +272,13 @@ public class MockConditionBean implements ConditionBean {
 
     public boolean hasSelectAllPossible() {
         return false;
+    }
+
+    public boolean hasDreamCruiseTicket() {
+        return false;
+    }
+
+    public HpSpecifiedColumn xshowDreamCruiseTicket() {
+        return null;
     }
 }

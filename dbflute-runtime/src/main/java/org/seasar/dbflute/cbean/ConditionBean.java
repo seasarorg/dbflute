@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -98,6 +99,59 @@ public interface ConditionBean extends PagingBean {
     void allowInnerJoinAutoDetect(); // DBFlute default
 
     // ===================================================================================
+    //                                                                        Dream Cruise
+    //                                                                        ============
+    /**
+     * Do you have a dream cruise ticket? <br />
+     * (whether this CB has the specified column by dream cruise or not)
+     * @return The determination, true or false.
+     */
+    boolean hasDreamCruiseTicket();
+
+    /**
+     * Show me your dream cruise ticket. <br />
+     * (get the specified column by dream cruise)
+     * @return The information of specified column. (NullAllowed)
+     */
+    HpSpecifiedColumn xshowDreamCruiseTicket();
+
+    // ===================================================================================
+    //                                                                       Invalid Query
+    //                                                                       =============
+    /**
+     * Allow an empty string for query. <br />
+     * (you can use an empty string as condition) <br />
+     * You should call this before registrations of where clause and other queries. <br />
+     * Union and SubQuery and other sub condition-bean inherit this.
+     */
+    void allowEmptyStringQuery();
+
+    /**
+     * Check an invalid query when a query is set. <br />
+     * (it throws an exception if a set query is invalid) <br />
+     * You should call this before registrations of where clause and other queries. <br />
+     * Union and SubQuery and other sub condition-bean inherit this.
+     */
+    void checkInvalidQuery();
+
+    // ===================================================================================
+    //                                                                      Paging Setting
+    //                                                                      ==============
+    /**
+     * Enable paging count-least-join, which means least joined on count select. <br />
+     * You can use it by default on DBFlute so you don't need to call this basically.
+     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
+     * You should call this before execution of selectPage().
+     */
+    void enablePagingCountLeastJoin();
+
+    /**
+     * Disable paging count-least-join, which means least joined on count select. <br />
+     * You should call this before execution of selectPage().
+     */
+    void disablePagingCountLeastJoin();
+
+    // ===================================================================================
     //                                                                        Lock Setting
     //                                                                        ============
     /**
@@ -141,42 +195,6 @@ public interface ConditionBean extends PagingBean {
      * @param option The option for ScalarSelect. (NullAllowed)
      */
     void xacceptScalarSelectOption(ScalarSelectOption option);
-
-    // ===================================================================================
-    //                                                                       Invalid Query
-    //                                                                       =============
-    /**
-     * Allow an empty string for query. <br />
-     * (you can use an empty string as condition) <br />
-     * You should call this before registrations of where clause and other queries. <br />
-     * Union and SubQuery and other sub condition-bean inherit this.
-     */
-    void allowEmptyStringQuery();
-
-    /**
-     * Check an invalid query when a query is set. <br />
-     * (it throws an exception if a set query is invalid) <br />
-     * You should call this before registrations of where clause and other queries. <br />
-     * Union and SubQuery and other sub condition-bean inherit this.
-     */
-    void checkInvalidQuery();
-
-    // ===================================================================================
-    //                                                                      Paging Setting
-    //                                                                      ==============
-    /**
-     * Enable paging count-least-join, which means least joined on count select. <br />
-     * You can use it by default on DBFlute so you don't need to call this basically.
-     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
-     * You should call this before execution of selectPage().
-     */
-    void enablePagingCountLeastJoin();
-
-    /**
-     * Disable paging count-least-join, which means least joined on count select. <br />
-     * You should call this before execution of selectPage().
-     */
-    void disablePagingCountLeastJoin();
 
     // ===================================================================================
     //                                                                    Statement Config

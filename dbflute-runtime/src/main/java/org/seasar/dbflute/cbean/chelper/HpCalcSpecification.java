@@ -53,6 +53,9 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     public ColumnInfo getSpecifiedColumnInfo() { // only when plain
+        if (_specifedCB.hasDreamCruiseTicket()) {
+            return _specifedCB.xshowDreamCruiseTicket().getColumnInfo();
+        }
         return _specifedCB.getSqlClause().getSpecifiedColumnInfoAsOne();
     }
 
@@ -61,37 +64,47 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     public ColumnInfo getResolvedSpecifiedColumnInfo() { // resolved plain or deriving sub-query
-        ColumnInfo columnInfo = getSpecifiedColumnInfo();
+        final ColumnInfo columnInfo = getSpecifiedColumnInfo();
         return columnInfo != null ? columnInfo : getSpecifiedDerivingColumnInfo();
     }
 
     public ColumnRealName getResolvedSpecifiedColumnRealName() { // resolved plain or deriving sub-query
+        if (_specifedCB.hasDreamCruiseTicket()) {
+            final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
+            return new ColumnRealName(ticket.getTableAliasName(), ticket.getColumnInfo().getColumnSqlName());
+        }
         final ColumnRealName columnRealName = _specifedCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
         if (columnRealName != null) {
             return columnRealName;
         }
         final String subQuery = _specifedCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
-        if (subQuery != null) {
-            // basically for (Specify)DerivedReferrer in ColumnQuery
+        if (subQuery != null) { // basically for (Specify)DerivedReferrer in ColumnQuery
             return new ColumnRealName(null, new ColumnSqlName(subQuery));
         }
         return null;
     }
 
     public ColumnSqlName getResolvedSpecifiedColumnSqlName() { // resolved plain or deriving sub-query
+        if (_specifedCB.hasDreamCruiseTicket()) {
+            final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
+            return ticket.getColumnInfo().getColumnSqlName();
+        }
         final ColumnSqlName columnSqlName = _specifedCB.getSqlClause().getSpecifiedColumnSqlNameAsOne();
         if (columnSqlName != null) {
             return columnSqlName;
         }
         final String subQuery = _specifedCB.getSqlClause().getSpecifiedDerivingSubQueryAsOne();
-        if (subQuery != null) {
-            // basically for (Specify)DerivedReferrer in ColumnQuery
+        if (subQuery != null) { // basically for (Specify)DerivedReferrer in ColumnQuery
             return new ColumnSqlName(subQuery);
         }
         return null;
     }
 
     public String getResolvedSpecifiedTableAliasName() { // resolved plain or deriving sub-query
+        if (_specifedCB.hasDreamCruiseTicket()) {
+            final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
+            return ticket.getTableAliasName();
+        }
         final ColumnRealName columnRealName = _specifedCB.getSqlClause().getSpecifiedColumnRealNameAsOne();
         if (columnRealName != null) {
             return columnRealName.getTableAliasName();
@@ -298,8 +311,8 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     }
 
     public boolean mayNullRevived() { // basically for auto-detect of inner-join
-        if (isDerivedReferrer()) {
-            return true;
+        if (_specifedCB.hasDreamCruiseTicket() || isDerivedReferrer()) {
+            return true; // because it is so difficult to judge it accurately
         }
         for (CalculationElement calculationElement : _calculationList) {
             final ColumnConversionOption option = calculationElement.getColumnConversionOption();
