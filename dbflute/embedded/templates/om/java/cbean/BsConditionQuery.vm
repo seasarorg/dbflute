@@ -41,12 +41,19 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @return The condition-query for InlineView query. (NotNull)
      */
     public ${myConditionInlineQueryClassName} inline() {
-        if (_inlineQuery == null) { _inlineQuery = createInlineQuery(); }
+        if (_inlineQuery == null) { _inlineQuery = xcreateCIQ(); }
         _inlineQuery.xsetOnClause(false); return _inlineQuery;
     }
 
-    protected ${myConditionInlineQueryClassName} createInlineQuery()
-    { return new ${myConditionInlineQueryClassName}(xgetReferrerQuery(), xgetSqlClause(), xgetAliasName(), xgetNestLevel(), this); }
+    protected ${myConditionInlineQueryClassName} xcreateCIQ() {
+        ${myConditionInlineQueryClassName} ciq = xnewCIQ();
+        ciq.xsetBaseCB(_baseCB);
+        return ciq;
+    }
+
+    protected ${myConditionInlineQueryClassName} xnewCIQ() {
+        return new ${myConditionInlineQueryClassName}(xgetReferrerQuery(), xgetSqlClause(), xgetAliasName(), xgetNestLevel(), this);
+    }
 
     /**
      * Prepare OnClause query. <br />
@@ -520,6 +527,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String nrp = resolveNextRelationPath("${table.name}", "${fk.foreignPropertyName}");
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
         ${foreignCQClassName} cq = new ${foreignCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
+        cq.xsetBaseCB(_baseCB);
         cq.xsetForeignPropertyName("${fk.foreignPropertyName}");
         cq.xsetRelationPath(nrp); return cq;
     }
@@ -568,6 +576,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String nrp = resolveNextRelationPath("${table.name}", "${referrer.referrerPropertyNameAsOne}");
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
         ${relatedCQClassName} cq = new ${relatedCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
+        cq.xsetBaseCB(_baseCB);
         cq.xsetForeignPropertyName("${referrer.referrerPropertyNameAsOne}");
         cq.xsetRelationPath(nrp); return cq;
     }

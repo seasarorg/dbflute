@@ -207,6 +207,12 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     protected ${myConditionQueryClassName} xcreateCQ(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
+        ${myConditionQueryClassName} cq = xnewCQ(childQuery, sqlClause, aliasName, nestLevel);
+        cq.xsetBaseCB(this);
+        return cq;
+    }
+
+    protected ${myConditionQueryClassName} xnewCQ(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
         return new ${myConditionQueryClassName}(childQuery, sqlClause, aliasName, nestLevel);
     }
 
@@ -613,6 +619,10 @@ public class ${myClassName} extends AbstractConditionBean {
         ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
         cb.xsetupForDreamCruise((${myConditionBeanClassName}) this);
         return cb;
+    }
+
+    protected ConditionBean xdoCreateDreamCruiseCB() {
+        return dreamCruiseCB();
     }
 
     // [DBFlute-0.9.6.3]

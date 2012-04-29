@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.DfClassificationIllegalPropertyTypeException;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -110,13 +112,23 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
         final String key = "torque." + KEY_classificationDefinitionMap;
         final Map<String, Object> plainDefinitionMap = mapProp(key, DEFAULT_EMPTY_MAP);
-        final Set<String> classificationNameSet = plainDefinitionMap.keySet();
         final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
         final boolean docOnlyTask = isDocOnlyTask();
+        String allInOneSql = null;
+        for (Entry<String, Object> entry : plainDefinitionMap.entrySet()) {
+            final String classificationName = entry.getKey();
+            final Object objValue = entry.getValue();
 
-        for (String classificationName : classificationNameSet) {
+            // - - - - - - - - - - - -
+            // Handle special elements
+            // - - - - - - - - - - - -
+            if (classificationName.equalsIgnoreCase("$$SQL$$")) {
+                allInOneSql = (String) objValue;
+                continue;
+            }
+
             // - - - - - - - - - - - - - - - - -
-            // Check a duplicate classification.
+            // Check a duplicate classification
             // - - - - - - - - - - - - - - - - -
             if (_classificationTopMap.containsKey(classificationName)) {
                 String msg = "Duplicate classification: " + classificationName;
@@ -126,23 +138,13 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             classificationTop.setClassificationName(classificationName);
             _classificationTopMap.put(classificationName, classificationTop);
 
-            // - - - - - - - - - - - - -
-            // Handle special elements.
-            // - - - - - - - - - - - - -
-            if (classificationName.equalsIgnoreCase("$$SQL$$")) {
-                final String topSql = (String) plainDefinitionMap.get(classificationName);
-                processAllInOneTableClassification(classificationTop, topSql);
-                continue;
-            }
-
             // - - - - - - - - - - - - - - - -
-            // Handle classification elements.
+            // Handle classification elements
             // - - - - - - - - - - - - - - - -
-            final Object value = plainDefinitionMap.get(classificationName);
-            if (!(value instanceof List<?>)) {
-                throwClassificationMapValueIllegalListTypeException(value);
+            if (!(objValue instanceof List<?>)) {
+                throwClassificationMapValueIllegalListTypeException(objValue);
             }
-            final List<?> plainList = (List<?>) value;
+            final List<?> plainList = (List<?>) objValue;
             final List<Map<String, Object>> elementMapList = new ArrayList<Map<String, Object>>();
             final List<DfClassificationElement> elementList = new ArrayList<DfClassificationElement>();
             boolean tableClassification = false;
@@ -189,6 +191,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 classificationTop.setTableClassification(tableClassification);
                 _classificationTopMap.put(classificationName, classificationTop);
             }
+        }
+
+        if (allInOneSql != null) {
+            processAllInOneTableClassification(allInOneSql);
         }
 
         // - - - - - - - - - - - - - - - -
@@ -516,45 +522,46 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // -----------------------------------------------------
     //                       All-in-One Table Classification
     //                       -------------------------------
-    protected void processAllInOneTableClassification(DfClassificationTop classificationTop, String sql) {
+    protected void processAllInOneTableClassification(String sql) {
         final DfClassificationAllInOneSqlExecutor executor = new DfClassificationAllInOneSqlExecutor();
         final Connection conn = getDatabaseProperties().createMainSchemaConnection();
         final List<Map<String, String>> resultList = executor.executeAllInOneSql(conn, sql);
-
+        final Set<String> alreadySet = new HashSet<String>(_classificationTopMap.keySet());
         for (Map<String, String> map : resultList) {
             final String classificationName = map.get("classificationName");
-
-            final String code = map.get(DfClassificationElement.KEY_CODE);
-            final String name = map.get(DfClassificationElement.KEY_NAME);
-            final String alias = map.get(DfClassificationElement.KEY_ALIAS);
-            final String comment = map.get(DfClassificationElement.KEY_COMMENT);
-            final List<DfClassificationElement> elementList = new ArrayList<DfClassificationElement>();
-            final Map<String, Object> elementMap = newLinkedHashMap();
-            elementMap.put(DfClassificationElement.KEY_CODE, code);
-            elementMap.put(DfClassificationElement.KEY_NAME, name);
-            elementMap.put(DfClassificationElement.KEY_ALIAS, alias);
-            if (comment != null) {
-                elementMap.put(DfClassificationElement.KEY_COMMENT, comment);
-            }
-            DfClassificationElement element = new DfClassificationElement();
-            element.setClassificationName(classificationName);
-            element.acceptBasicItemMap(elementMap);
-            elementList.add(element);
-
-            final String topComment = map.get(DfClassificationTop.KEY_TOP_COMMENT);
-            classificationTop.setTopComment(topComment);
-
-            final String codeType;
+            final DfClassificationTop classificationTop;
             {
-                String tmpType = map.get(DfClassificationTop.KEY_CODE_TYPE);
-                if (Srl.is_Null_or_TrimmedEmpty(tmpType)) {
-                    // for compatibility
-                    tmpType = map.get(DfClassificationTop.KEY_DATA_TYPE);
+                DfClassificationTop tmpTop = _classificationTopMap.get(classificationName);
+                if (tmpTop == null) {
+                    tmpTop = new DfClassificationTop();
+                    tmpTop.setClassificationName(classificationName);
+                    _classificationTopMap.put(classificationName, tmpTop);
                 }
-                codeType = tmpType;
+                classificationTop = tmpTop;
             }
-            classificationTop.setCodeType(codeType);
-            classificationTop.addClassificationElementAll(elementList);
+            if (alreadySet.contains(classificationName)) {
+                throwClassificationAlreadyExistsInDfPropException(classificationName, "All-in-One");
+            }
+            if (!classificationTop.hasTopComment()) {
+                final String topComment = map.get(DfClassificationTop.KEY_TOP_COMMENT);
+                classificationTop.setTopComment(topComment);
+            }
+            if (!classificationTop.hasCodeType()) {
+                final String codeType;
+                {
+                    String tmpType = map.get(DfClassificationTop.KEY_CODE_TYPE);
+                    if (Srl.is_Null_or_TrimmedEmpty(tmpType)) {
+                        // for compatibility
+                        tmpType = map.get(DfClassificationTop.KEY_DATA_TYPE);
+                    }
+                    codeType = tmpType;
+                }
+                classificationTop.setCodeType(codeType);
+            }
+            final DfClassificationElement element = new DfClassificationElement();
+            element.setClassificationName(classificationName);
+            element.acceptBasicItemMap(map);
+            classificationTop.addClassificationElement(element);
         }
     }
 
@@ -1013,16 +1020,28 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     }
 
     protected void reflectClassificationResourceToDefinition() {
+        final Set<String> alreadySet = new HashSet<String>(_classificationTopMap.keySet());
         final List<DfClassificationTop> classificationTopList = getClassificationResourceList();
         for (DfClassificationTop classificationTop : classificationTopList) {
             final String classificationName = classificationTop.getClassificationName();
-            if (_classificationTopMap.containsKey(classificationName)) {
-                continue;
+            if (alreadySet.contains(classificationName)) {
+                throwClassificationAlreadyExistsInDfPropException(classificationName, "ClassificationResource");
             }
-
-            // Reflect to classification top definition.
+            // reflect to classification top definition
             _classificationTopMap.put(classificationName, classificationTop);
         }
+    }
+
+    protected void throwClassificationAlreadyExistsInDfPropException(String classificationName, String settingName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The classification already exists in dfprop settings.");
+        br.addItem("Advice");
+        br.addElement("Check the classification names in '" + settingName + "' settings.");
+        br.addElement("The settings may contain classifications existing in dfprop.");
+        br.addItem("Classification");
+        br.addElement(classificationName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     protected void reflectClassificationResourceToDeployment() {
