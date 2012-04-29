@@ -1,5 +1,6 @@
 package org.seasar.dbflute.cbean;
 
+import org.seasar.dbflute.mock.MockColumnInfo;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
@@ -12,7 +13,7 @@ public class ResultBeanBuilderTest extends PlainTestCase {
         // ## Arrange ##
         SimplePagingBean pb = new SimplePagingBean();
         pb.fetchFirst(30);
-        pb.getSqlClause().registerOrderBy("aaa", true);
+        pb.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         ResultBeanBuilder<String> tgt = createTarget();
 
         // ## Act ##

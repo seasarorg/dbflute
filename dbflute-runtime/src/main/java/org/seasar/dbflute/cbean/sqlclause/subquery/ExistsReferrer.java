@@ -75,7 +75,7 @@ public class ExistsReferrer extends AbstractSubQuery {
         final String localAliasName = getSubQueryLocalAliasName();
         final String selectClause;
         {
-            final ColumnRealName relatedColumnRealName = new ColumnRealName(localAliasName, relatedColumnSqlName);
+            final ColumnRealName relatedColumnRealName = ColumnRealName.create(localAliasName, relatedColumnSqlName);
             selectClause = "select " + relatedColumnRealName;
         }
         final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, localAliasName,
@@ -95,7 +95,8 @@ public class ExistsReferrer extends AbstractSubQuery {
         final String selectClause;
         {
             // because sub-query may be only allowed to return a single column.
-            final ColumnRealName relatedColumnRealName = new ColumnRealName(localAliasName, relatedColumnSqlNames[0]);
+            final ColumnRealName relatedColumnRealName = ColumnRealName
+                    .create(localAliasName, relatedColumnSqlNames[0]);
             selectClause = "select " + relatedColumnRealName;
         }
         final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, localAliasName,

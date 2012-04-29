@@ -75,7 +75,7 @@ public class FunctionFilterOption implements ParameterOption {
     // -----------------------------------------------------
     //                                    called by internal
     //                                    ------------------
-    protected ColumnInfo _targetColumnInfo;
+    protected ColumnInfo _targetColumnInfo; // not required
     protected boolean _databaseMySQL;
     protected boolean _databasePostgreSQL;
     protected boolean _databaseOracle;

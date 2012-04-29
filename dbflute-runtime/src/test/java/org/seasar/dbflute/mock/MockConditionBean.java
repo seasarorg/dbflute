@@ -274,8 +274,23 @@ public class MockConditionBean implements ConditionBean {
         return false;
     }
 
-    public boolean hasDreamCruiseTicket() {
+    public boolean xhasDreamCruiseTicket() {
         return false;
+    }
+
+    public void overTheWaves(HpSpecifiedColumn dreamCruiseTicket) {
+    }
+
+    public ConditionBean xcreateDreamCruiseCB() {
+        return null;
+    }
+
+    public boolean xisDreamCruiseShip() {
+        return false;
+    }
+
+    public ConditionBean xgetDreamCruiseDeparturePort() {
+        return null;
     }
 
     public HpSpecifiedColumn xshowDreamCruiseTicket() {

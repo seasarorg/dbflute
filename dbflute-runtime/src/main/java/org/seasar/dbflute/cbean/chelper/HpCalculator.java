@@ -18,11 +18,25 @@ public interface HpCalculator {
     HpCalculator plus(Number plusValue);
 
     /**
+     * Plus the specified column with the plus column. (+)
+     * @param plusColumn The plus column specified by Dream Cruise. (NotNull)
+     * @return this. (NotNull)
+     */
+    HpCalculator plus(HpSpecifiedColumn plusColumn);
+
+    /**
      * Minus the specified column with the value. (-)
      * @param minusValue The number value for minus. (NotNull)
      * @return this. (NotNull)
      */
     HpCalculator minus(Number minusValue);
+
+    /**
+     * Minus the specified column with the minus column. (-)
+     * @param minusColumn The minus column specified by Dream Cruise. (NotNull)
+     * @return this. (NotNull)
+     */
+    HpCalculator minus(HpSpecifiedColumn minusColumn);
 
     /**
      * Multiply the value to the specified column. (*)
@@ -32,11 +46,25 @@ public interface HpCalculator {
     HpCalculator multiply(Number multiplyValue);
 
     /**
+     * Multiply the specified column with the multiply column. (*)
+     * @param multiplyColumn The multiply column specified by Dream Cruise. (NotNull)
+     * @return this. (NotNull)
+     */
+    HpCalculator multiply(HpSpecifiedColumn multiplyColumn);
+
+    /**
      * Divide the specified column by the value. (/)
      * @param divideValue The number value for divide. (NotNull)
      * @return this. (NotNull)
      */
     HpCalculator divide(Number divideValue);
+
+    /**
+     * Divide the specified column with the divide column. (/)
+     * @param divideColumn The divide column specified by Dream Cruise. (NotNull)
+     * @return this. (NotNull)
+     */
+    HpCalculator divide(HpSpecifiedColumn divideColumn);
 
     /**
      * Convert the value of right column by function.
@@ -60,67 +88,4 @@ public interface HpCalculator {
      * @return this. (NotNull)
      */
     HpCalculator right();
-
-    // ===================================================================================
-    //                                                                       Related Class
-    //                                                                       =============
-    public static class CalculationElement {
-        protected CalculationType _calculationType;
-        protected Number _calculationValue;
-        protected ColumnConversionOption _columnConversionOption;
-        protected boolean _preparedConvOption;
-
-        protected String buildExp(String targetExp) {
-            if (_calculationType.equals(CalculationType.CONV)) {
-                return _columnConversionOption.filterFunction(targetExp);
-            } else {
-                return targetExp + " " + _calculationType.operand() + " " + _calculationValue;
-            }
-        }
-
-        public CalculationType getCalculationType() {
-            return _calculationType;
-        }
-
-        public void setCalculationType(CalculationType calculationType) {
-            this._calculationType = calculationType;
-        }
-
-        public Number getCalculationValue() {
-            return _calculationValue;
-        }
-
-        public void setCalculationValue(Number calculationValue) {
-            this._calculationValue = calculationValue;
-        }
-
-        public ColumnConversionOption getColumnConversionOption() {
-            return _columnConversionOption;
-        }
-
-        public void setColumnConversionOption(ColumnConversionOption columnConversionOption) {
-            this._columnConversionOption = columnConversionOption;
-        }
-
-        public boolean isPreparedConvOption() {
-            return _preparedConvOption;
-        }
-
-        public void setPreparedConvOption(boolean preparedConvOption) {
-            this._preparedConvOption = preparedConvOption;
-        }
-    }
-
-    public static enum CalculationType {
-        CONV("$$FUNC$$"), PLUS("+"), MINUS("-"), MULTIPLY("*"), DIVIDE("/");
-        private String _operand;
-
-        private CalculationType(String operand) {
-            _operand = operand;
-        }
-
-        public String operand() {
-            return _operand;
-        }
-    }
 }

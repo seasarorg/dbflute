@@ -77,7 +77,7 @@ public class ScalarCondition extends AbstractSubQuery {
             throwScalarConditionInvalidColumnSpecificationException(function);
         }
         final ColumnSqlName derivedColumnSqlName = _subQuerySqlClause.getSpecifiedColumnSqlNameAsOne();
-        final ColumnRealName derivedColumnRealName = new ColumnRealName(tableAliasName, derivedColumnSqlName);
+        final ColumnRealName derivedColumnRealName = ColumnRealName.create(tableAliasName, derivedColumnSqlName);
         assertScalarConditionColumnType(function, derivedColumnDbName);
         ColumnRealName partitionByCorrelatedColumnRealName = null;
         ColumnSqlName partitionByRelatedColumnSqlName = null;
@@ -113,14 +113,14 @@ public class ScalarCondition extends AbstractSubQuery {
         final String mainSql;
         {
             final ColumnSqlName pkSqlName = _subQueryDBMeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
-            final ColumnRealName pkRealName = new ColumnRealName(tableAliasName, pkSqlName);
+            final ColumnRealName pkRealName = ColumnRealName.create(tableAliasName, pkSqlName);
             final String selectClause = "select " + pkRealName + ", " + derivedColumnRealName;
             final String fromWhereClause = buildFromWhereClause(selectClause, tableAliasName,
                     partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
             mainSql = selectClause + " " + fromWhereClause;
         }
         final String mainAlias = buildSubQueryMainAliasName();
-        final ColumnRealName mainDerivedColumnRealName = new ColumnRealName(mainAlias, derivedColumnSqlName);
+        final ColumnRealName mainDerivedColumnRealName = ColumnRealName.create(mainAlias, derivedColumnSqlName);
         final ColumnInfo columnInfo = _subQuerySqlClause.getSpecifiedColumnInfoAsOne();
         final String specifiedExp = decrypt(columnInfo, mainDerivedColumnRealName.toString());
         return "select " + function + "(" + specifiedExp + ")" + ln() // select

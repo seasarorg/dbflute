@@ -19,9 +19,14 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ManualOrderBean;
 import org.seasar.dbflute.cbean.ManualOrderBean.CaseWhenElement;
+import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
+import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.resource.DBFluteSystem;
 
@@ -39,23 +44,59 @@ public class OrderByElement implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The value of alias name. */
-    protected String _aliasName;
+    /** The value of alias name. (NullAllowed) */
+    protected final String _aliasName;
 
-    /** The value of column name. */
-    protected String _columnName;
+    /** The value of column name. (NotNull) */
+    protected final String _columnName;
 
-    /** The value of ascDesc. */
+    /** The column info of the order column. (NotNull) */
+    protected transient final ColumnInfo _columnInfo;
+    // transient but serializing is already bankrupt
+
+    /** Is this derived order-by? */
+    protected final boolean _derivedOrderBy;
+
+    /** The value of ascDesc. (NotNull, Changeable) */
     protected String _ascDesc = "asc";
 
-    /** The set-upper of order-by nulls. */
+    /** The manager of geared cipher. (NullAllowed) */
+    protected transient GearedCipherManager _gearedCipherManager;
+
+    /** The set-upper of order-by nulls. (NullAllowed, SetupLater) */
     protected transient OrderByClause.OrderByNullsSetupper _orderByNullsSetupper;
 
-    /** Is nulls ordered first? */
+    /** Is nulls ordered first? (SetupLater) */
     protected boolean _nullsFirst;
 
-    /** The bean of manual order. */
+    /** The bean of manual order. (NullAllowed, SetupLater) */
     protected transient ManualOrderBean _manualOrderBean;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public OrderByElement(String aliasName, String columnName, ColumnInfo columnInfo, boolean derivedOrderBy) {
+        assertColumnName(aliasName, columnName);
+        assertColumnInfo(aliasName, columnInfo);
+        _aliasName = aliasName;
+        _columnName = columnName;
+        _columnInfo = columnInfo;
+        _derivedOrderBy = derivedOrderBy;
+    }
+
+    protected void assertColumnName(String aliasName, String columnName) {
+        if (columnName == null) {
+            String msg = "The argument 'columnName' should not be null: aliasName=" + aliasName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertColumnInfo(String aliasName, ColumnInfo columnInfo) {
+        if (columnInfo == null) {
+            String msg = "The argument 'columnInfo' should not be null: aliasName=" + aliasName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
 
     // ===================================================================================
     //                                                                        Manipulation
@@ -114,44 +155,43 @@ public class OrderByElement implements Serializable {
         return sb.toString();
     }
 
-    public String getElementClause() {
+    public String getElementClause() { // needs cipher
         if (_ascDesc == null) {
             String msg = "The attribute[ascDesc] should not be null.";
             throw new IllegalStateException(msg);
         }
         final StringBuilder sb = new StringBuilder();
+        final String columnFullName = getColumnFullName();
         if (_manualOrderBean != null && _manualOrderBean.hasManualOrder()) {
-            setupManualOrderClause(sb, getColumnFullName());
+            setupManualOrderClause(sb, columnFullName, null);
             return sb.toString();
         } else {
-            sb.append(getColumnFullName()).append(" ").append(_ascDesc);
+            sb.append(decryptIfNeeds(_columnInfo, columnFullName)).append(" ").append(_ascDesc);
+            final String clause = sb.toString();
             if (_orderByNullsSetupper != null) {
-                return _orderByNullsSetupper.setup(getColumnFullName(), sb.toString(), _nullsFirst);
+                return _orderByNullsSetupper.setup(columnFullName, clause, _nullsFirst);
             } else {
-                return sb.toString();
+                return clause;
             }
         }
     }
 
-    public String getElementClause(Map<String, String> selectClauseRealColumnAliasMap) {
+    public String getElementClause(Map<String, String> selectClauseRealColumnAliasMap) { // basically for union
         if (selectClauseRealColumnAliasMap == null) {
-            String msg = "The argument[selectClauseRealColumnAliasMap] should not be null.";
+            String msg = "The argument 'selectClauseRealColumnAliasMap' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         if (_ascDesc == null) {
-            String msg = "The attribute[ascDesc] should not be null.";
+            String msg = "The attribute 'ascDesc' should not be null.";
             throw new IllegalStateException(msg);
         }
-        final String columnAlias = selectClauseRealColumnAliasMap.get(getColumnFullName());
-        if (columnAlias == null || columnAlias.trim().length() == 0) {
-            throwOrderByColumnNotFoundException(getColumnFullName(), selectClauseRealColumnAliasMap);
-        }
+        final String columnAlias = mappingToRealColumnAlias(selectClauseRealColumnAliasMap, getColumnFullName());
         final StringBuilder sb = new StringBuilder();
         if (_manualOrderBean != null && _manualOrderBean.hasManualOrder()) {
-            setupManualOrderClause(sb, columnAlias);
+            setupManualOrderClause(sb, columnAlias, selectClauseRealColumnAliasMap);
             return sb.toString();
         } else {
-            sb.append(columnAlias).append(" ").append(_ascDesc);
+            sb.append(columnAlias).append(" ").append(_ascDesc); // no need to cipher because of union
             if (_orderByNullsSetupper != null) {
                 return _orderByNullsSetupper.setup(columnAlias, sb.toString(), _nullsFirst);
             } else {
@@ -160,22 +200,46 @@ public class OrderByElement implements Serializable {
         }
     }
 
-    protected void setupManualOrderClause(StringBuilder sb, String columnAlias) {
-        final List<CaseWhenElement> caseWhenList = _manualOrderBean.getCaseWhenBoundList();
-        sb.append(ln()).append("   case").append(ln());
-        int index = 0;
-        for (CaseWhenElement element : caseWhenList) {
-            sb.append("     when ");
-            doSetupManualOrderClause(sb, columnAlias, element);
-            final List<CaseWhenElement> connectedElementList = element.getConnectedElementList();
-            for (CaseWhenElement connectedElement : connectedElementList) {
-                doSetupManualOrderClause(sb, columnAlias, connectedElement);
-            }
-            sb.append(" then ").append(index).append(ln());
-            ++index;
+    protected String mappingToRealColumnAlias(Map<String, String> selectClauseRealColumnAliasMap, String columnFullName) {
+        final String columnAlias = selectClauseRealColumnAliasMap.get(columnFullName);
+        if (columnAlias == null || columnAlias.trim().length() == 0) {
+            throwOrderByColumnNotFoundException(getColumnFullName(), selectClauseRealColumnAliasMap);
         }
-        sb.append("     else ").append(index).append(ln());
-        sb.append("   end ").append(_ascDesc);
+        return columnAlias;
+    }
+
+    protected void setupManualOrderClause(StringBuilder sb, String columnAlias,
+            Map<String, String> selectClauseRealColumnAliasMap) {
+        final String realAlias;
+        if (_manualOrderBean.hasCalculationOrder()) {
+            final HpCalcSpecification<ConditionBean> calculationOrder = _manualOrderBean.getCalculationOrder();
+            realAlias = calculationOrder.buildStatementToSpecifidName(columnAlias, selectClauseRealColumnAliasMap);
+        } else {
+            if (selectClauseRealColumnAliasMap != null) { // means union
+                realAlias = columnAlias;
+            } else {
+                realAlias = decryptIfNeeds(_columnInfo, columnAlias);
+            }
+        }
+        final List<CaseWhenElement> caseWhenList = _manualOrderBean.getCaseWhenBoundList();
+        if (!caseWhenList.isEmpty()) {
+            sb.append(ln()).append("   case").append(ln());
+            int index = 0;
+            for (CaseWhenElement element : caseWhenList) {
+                sb.append("     when ");
+                doSetupManualOrderClause(sb, realAlias, element);
+                final List<CaseWhenElement> connectedElementList = element.getConnectedElementList();
+                for (CaseWhenElement connectedElement : connectedElementList) {
+                    doSetupManualOrderClause(sb, realAlias, connectedElement);
+                }
+                sb.append(" then ").append(index).append(ln());
+                ++index;
+            }
+            sb.append("     else ").append(index).append(ln());
+            sb.append("   end ").append(_ascDesc);
+        } else {
+            sb.append(realAlias);
+        }
     }
 
     protected void doSetupManualOrderClause(StringBuilder sb, String columnAlias, CaseWhenElement element) {
@@ -244,6 +308,17 @@ public class OrderByElement implements Serializable {
     }
 
     // ===================================================================================
+    //                                                                       Geared Cipher
+    //                                                                       =============
+    protected String decryptIfNeeds(ColumnInfo columnInfo, String valueExp) {
+        if (_gearedCipherManager == null) {
+            return valueExp;
+        }
+        final ColumnFunctionCipher cipher = _gearedCipherManager.findColumnFunctionCipher(columnInfo);
+        return cipher != null ? cipher.decrypt(valueExp) : valueExp;
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     /**
@@ -265,24 +340,24 @@ public class OrderByElement implements Serializable {
         return _aliasName;
     }
 
-    public void setAliasName(String value) {
-        _aliasName = value;
-    }
-
     public String getColumnName() {
         return _columnName;
     }
 
-    public void setColumnName(String value) {
-        _columnName = value;
+    public ColumnInfo getColumnInfo() {
+        return _columnInfo;
+    }
+
+    public boolean isDerivedOrderBy() {
+        return _derivedOrderBy;
     }
 
     public String getAscDesc() {
         return _ascDesc;
     }
 
-    public void setAscDesc(String value) {
-        _ascDesc = value;
+    public void setGearedCipherManager(GearedCipherManager gearedCipherManager) {
+        this._gearedCipherManager = gearedCipherManager;
     }
 
     public void setOrderByNullsSetupper(OrderByClause.OrderByNullsSetupper value, boolean nullsFirst) {

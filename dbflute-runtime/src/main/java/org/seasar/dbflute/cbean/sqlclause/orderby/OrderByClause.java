@@ -107,8 +107,14 @@ public class OrderByClause implements Serializable {
         if (_orderByList.isEmpty()) {
             return;
         }
-        final OrderByElement last = _orderByList.get(_orderByList.size() - 1);
-        last.setManualOrderBean(manumalOrderBean);
+        getOrderByLastElement().setManualOrderBean(manumalOrderBean);
+    }
+
+    public OrderByElement getOrderByLastElement() {
+        if (_orderByList.isEmpty()) {
+            return null;
+        }
+        return _orderByList.get(_orderByList.size() - 1);
     }
 
     // ===================================================================================
@@ -126,10 +132,9 @@ public class OrderByClause implements Serializable {
         if (_orderByList.isEmpty()) {
             return "";
         }
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final String delimiter = ", ";
-        for (final Iterator<OrderByElement> ite = _orderByList.iterator(); ite.hasNext();) {
-            final OrderByElement element = ite.next();
+        for (OrderByElement element : _orderByList) {
             sb.append(delimiter);
             if (selectClauseRealColumnAliasMap != null) {
                 sb.append(element.getElementClause(selectClauseRealColumnAliasMap));

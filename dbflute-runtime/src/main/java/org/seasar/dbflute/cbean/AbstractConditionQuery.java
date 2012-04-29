@@ -33,6 +33,7 @@ import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpQDRParameter;
 import org.seasar.dbflute.cbean.chelper.HpSSQOption;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
@@ -49,6 +50,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
@@ -130,6 +132,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /** The level of subQuery. */
     protected int _subQueryLevel;
 
+    /** The base condition-bean of this query. */
+    protected ConditionBean _baseCB;
+
     // -----------------------------------------------------
     //                                          Foreign Info
     //                                          ------------
@@ -172,6 +177,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         _sqlClause = sqlClause;
         _aliasName = aliasName;
         _nestLevel = nestLevel;
+    }
+
+    // constructor can not be changed so set it up later
+    public void xsetBaseCB(ConditionBean baseCB) {
+        _baseCB = baseCB;
     }
 
     // ===================================================================================
@@ -258,14 +268,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * {@inheritDoc}
      */
-    public ColumnRealName toColumnRealName(String columnDbName) {
-        return new ColumnRealName(xgetAliasName(), toColumnSqlName(columnDbName));
+    public ColumnRealName toColumnRealName(String columnDbName) { // with finding DBMeta
+        return ColumnRealName.create(xgetAliasName(), toColumnSqlName(columnDbName));
     }
 
     /**
      * {@inheritDoc}
      */
-    public ColumnSqlName toColumnSqlName(String columnDbName) {
+    public ColumnRealName toColumnRealName(ColumnInfo columnInfo) { // without finding DBMeta
+        return ColumnRealName.create(xgetAliasName(), columnInfo.getColumnSqlName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ColumnSqlName toColumnSqlName(String columnDbName) { // with finding DBMeta
         return findDBMeta(getTableDbName()).findColumnInfo(columnDbName).getColumnSqlName();
     }
 
@@ -1264,28 +1281,31 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                               OrderBy
     //                                               -------
     protected void registerOrderBy(String columnDbName, boolean ascOrDesc) {
-        xgetSqlClause().registerOrderBy(toColumnRealName(columnDbName).toString(), ascOrDesc);
+        final DBMeta dbmeta = findDBMeta(getTableDbName());
+        final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
+        final ColumnRealName columnRealName = toColumnRealName(columnInfo);
+        xgetSqlClause().registerOrderBy(columnRealName.toString(), ascOrDesc, columnInfo);
     }
 
-    protected void regOBA(String columnName) {
-        assertOrderByPurpose(columnName);
-        registerOrderBy(columnName, true);
+    protected void regOBA(String columnDbName) {
+        assertOrderByPurpose(columnDbName);
+        registerOrderBy(columnDbName, true);
     }
 
-    protected void regOBD(String columnName) {
-        assertOrderByPurpose(columnName);
-        registerOrderBy(columnName, false);
+    protected void regOBD(String columnDbName) {
+        assertOrderByPurpose(columnDbName);
+        registerOrderBy(columnDbName, false);
     }
 
-    protected void assertOrderByPurpose(String columnName) {
+    protected void assertOrderByPurpose(String columnDbName) {
         if (xgetSqlClause().getPurpose().isNoOrderBy()) {
-            throwOrderByIllegalPurposeException(columnName);
+            throwOrderByIllegalPurposeException(columnDbName);
         }
     }
 
-    protected void throwOrderByIllegalPurposeException(String columnName) {
+    protected void throwOrderByIllegalPurposeException(String columnDbName) {
         createCBExThrower().throwOrderByIllegalPurposeException(xgetSqlClause().getPurpose(), getTableDbName(),
-                columnName);
+                columnDbName);
     }
 
     /**
@@ -1361,21 +1381,37 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 return xregisterManualOrderParameterToThemeList(themeKey, orderValue);
             }
         });
+        if (manualOrderBean.hasCalculationOrder()) {
+            // cipher adjustment is unsupported at order-by
+            // so it does not use column info here
+            final ConditionBean dreamCruiseCB = _baseCB.xcreateDreamCruiseCB();
+            dreamCruiseCB.overTheWaves(xcreateManualOrderSpecifiedColumn(dreamCruiseCB));
+            manualOrderBean.xinitCalculationOrder(_baseCB, dreamCruiseCB);
+        }
         xgetSqlClause().addManualOrderToPreviousOrderByElement(manualOrderBean);
+    }
+
+    protected HpSpecifiedColumn xcreateManualOrderSpecifiedColumn(ConditionBean dreamCruiseCB) {
+        final OrderByElement orderByLastElement = xgetSqlClause().getOrderByLastElement();
+        final String aliasName = orderByLastElement.getAliasName();
+        final String columnName = orderByLastElement.getColumnName();
+        final ColumnInfo columnInfo = orderByLastElement.getColumnInfo();
+        final boolean derived = orderByLastElement.isDerivedOrderBy();
+        return new HpSpecifiedColumn(aliasName, columnInfo, dreamCruiseCB, columnName, derived);
     }
 
     protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
         if (!xgetSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
-        xgetSqlClause().registerOrderBy(aliasName, true);
+        xgetSqlClause().registerSpecifiedDerivedOrderBy(aliasName, true);
     }
 
     protected void registerSpecifiedDerivedOrderBy_Desc(String aliasName) {
         if (!xgetSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
-        xgetSqlClause().registerOrderBy(aliasName, false);
+        xgetSqlClause().registerSpecifiedDerivedOrderBy(aliasName, false);
     }
 
     protected void throwSpecifiedDerivedOrderByAliasNameNotFoundException(String aliasName) {

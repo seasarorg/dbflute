@@ -576,7 +576,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             } else {
                 onQueryName = columnSqlName.toString();
             }
-            sb.append(decryptSelect(columnInfo, realColumnName)).append(" as ").append(onQueryName);
+            sb.append(decryptSelectColumnIfNeeds(columnInfo, realColumnName)).append(" as ").append(onQueryName);
             getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
             if (validSpecifiedLocal && localSpecifiedMap.containsKey(columnDbName)) {
@@ -620,7 +620,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                     finishedForeignIndent = true;
                 }
                 sb.append(", ");
-                sb.append(decryptSelect(columnInfo, realColumnName)).append(" as ").append(onQueryName);
+                sb.append(decryptSelectColumnIfNeeds(columnInfo, realColumnName)).append(" as ").append(onQueryName);
                 getSelectClauseRealColumnAliasMap().put(realColumnName, onQueryName);
 
                 if (validSpecifiedForeign && foreginSpecifiedMap.containsKey(columnDbName)) {
@@ -736,14 +736,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final ColumnInfo columnInfo = getSpecifiedColumnInfoAsOne();
         if (columnSqlName != null) {
             final String valueExp = aliasName + "." + columnSqlName;
-            final String functionExp = doBuildFunctionExp(function, decryptSelect(columnInfo, valueExp));
+            final String functionExp = doBuildFunctionExp(function, decryptSelectColumnIfNeeds(columnInfo, valueExp));
             return "select " + functionExp + " as " + columnAlias;
         }
         final String subQuery = getSpecifiedDerivingSubQueryAsOne();
         if (subQuery != null) {
             if (hasUnionQuery()) {
                 final String valueExp = aliasName + "." + columnAlias;
-                return "select " + doBuildFunctionExp(function, decryptSelect(columnInfo, valueExp));
+                return "select " + doBuildFunctionExp(function, decryptSelectColumnIfNeeds(columnInfo, valueExp));
             } else {
                 // adjusts alias definition target (move to function's scope)
                 final String aliasDef = " as " + columnAlias;
@@ -1575,7 +1575,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             , ColumnFunctionCipher cipher, ConditionOption option) { // optional resources
         final List<QueryClause> clauseList = getBaseTableInlineWhereClauseList4Register();
         final String inlineBaseAlias = getInlineViewBasePointAlias();
-        final ColumnRealName columnRealName = new ColumnRealName(inlineBaseAlias, columnSqlName);
+        final ColumnRealName columnRealName = ColumnRealName.create(inlineBaseAlias, columnSqlName);
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, true, false);
     }
 
@@ -1625,7 +1625,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         assertNotYetOuterJoin(foreignAliasName);
         final List<QueryClause> clauseList = getOuterJoinInlineWhereClauseList4Register(foreignAliasName, onClause);
         final String tableAliasName = onClause ? foreignAliasName : getInlineViewBasePointAlias();
-        final ColumnRealName columnRealName = new ColumnRealName(tableAliasName, columnSqlName);
+        final ColumnRealName columnRealName = ColumnRealName.create(tableAliasName, columnSqlName);
         doRegisterWhereClause(clauseList, columnRealName, key, value, cipher, option, true, onClause);
     }
 
@@ -1818,6 +1818,20 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return getOrderBy();
     }
 
+    protected OrderByClause getOrderBy() {
+        if (_orderByClause == null) {
+            _orderByClause = new OrderByClause();
+        }
+        return _orderByClause;
+    }
+
+    public OrderByElement getOrderByLastElement() {
+        if (_orderByClause == null) {
+            return null;
+        }
+        return _orderByClause.getOrderByLastElement();
+    }
+
     public void clearOrderBy() {
         _orderByEffective = false;
         getOrderBy().clear();
@@ -1833,7 +1847,21 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _orderByEffective = false;
     }
 
-    public void registerOrderBy(String orderByProperty, boolean ascOrDesc) {
+    public void registerOrderBy(String orderByProperty, boolean ascOrDesc, ColumnInfo columnInfo) {
+        doRegisterOrderBy(orderByProperty, ascOrDesc, columnInfo, false);
+    }
+
+    public void registerSpecifiedDerivedOrderBy(String orderByProperty, boolean ascOrDesc) {
+        final HpDerivingSubQueryInfo specifiedDerivingInfo = getSpecifiedDerivingInfo(orderByProperty);
+        if (specifiedDerivingInfo == null) { // basically no way because of already checked
+            String msg = "The deriving column was not found by the property: " + orderByProperty;
+            throw new IllegalStateException(msg);
+        }
+        final ColumnInfo columnInfo = getSpecifiedDerivingColumnInfo(specifiedDerivingInfo);
+        doRegisterOrderBy(orderByProperty, ascOrDesc, columnInfo, true);
+    }
+
+    protected void doRegisterOrderBy(String orderByProperty, boolean ascOrDesc, ColumnInfo columnInfo, boolean derived) {
         try {
             _orderByEffective = true;
             final List<String> orderByList = new ArrayList<String>();
@@ -1843,45 +1871,32 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                     orderByList.add(st.nextToken());
                 }
             }
-
             for (String orderBy : orderByList) {
                 _orderByEffective = true;
-                String aliasName = null;
-                String columnName = null;
-
+                final String aliasName;
+                final String columnName;
                 if (orderBy.indexOf(".") < 0) {
+                    aliasName = null;
                     columnName = orderBy;
                 } else {
                     aliasName = orderBy.substring(0, orderBy.lastIndexOf("."));
                     columnName = orderBy.substring(orderBy.lastIndexOf(".") + 1);
                 }
-
-                final OrderByElement element = new OrderByElement();
-                element.setAliasName(aliasName);
-                element.setColumnName(columnName);
+                final OrderByElement element = new OrderByElement(aliasName, columnName, columnInfo, derived);
                 if (ascOrDesc) {
                     element.setupAsc();
                 } else {
                     element.setupDesc();
                 }
+                element.setGearedCipherManager(_gearedCipherManager);
                 getOrderBy().addOrderByElement(element);
+
             }
         } catch (RuntimeException e) {
             String msg = "Failed to register order-by:";
             msg = msg + " orderByProperty=" + orderByProperty + " ascOrDesc=" + ascOrDesc;
             msg = msg + " table=" + _tableDbName;
             throw new IllegalStateException(msg, e);
-        }
-    }
-
-    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, boolean ascOrDesc) {
-        _orderByEffective = true;
-        final OrderByClause orderBy = getOrderBy();
-        if (!orderBy.isSameOrderByColumn(orderByProperty)) {
-            clearOrderBy();
-            registerOrderBy(orderByProperty, ascOrDesc);
-        } else {
-            orderBy.reverseAll();
         }
     }
 
@@ -1920,13 +1935,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             throw new IllegalConditionBeanOperationException(msg);
         }
         getOrderBy().addManualOrderByElement(manualOrderBean);
-    }
-
-    protected OrderByClause getOrderBy() {
-        if (_orderByClause == null) {
-            _orderByClause = new OrderByClause();
-        }
-        return _orderByClause;
     }
 
     public boolean hasOrderByClause() {
@@ -2341,7 +2349,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             final Map<String, HpSpecifiedColumn> elementMap = StringKeyMap.createAsFlexibleOrdered();
             _specifiedSelectColumnMap.put(tableAliasName, elementMap);
         }
-        final String columnDbName = specifiedColumn.getColumnInfo().getColumnDbName();
+        final String columnDbName = specifiedColumn.getColumnDbName();
         final Map<String, HpSpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
         elementMap.put(columnDbName, specifiedColumn);
     }
@@ -2396,7 +2404,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public ColumnRealName getSpecifiedColumnRealNameAsOne() {
         final ColumnSqlName columnSqlName = getSpecifiedColumnSqlNameAsOne();
         if (columnSqlName != null) {
-            return new ColumnRealName(getSpecifiedColumnTableAliasNameAsOne(), columnSqlName);
+            return ColumnRealName.create(getSpecifiedColumnTableAliasNameAsOne(), columnSqlName);
         }
         return null;
     }
@@ -2444,20 +2452,28 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return new ArrayList<String>(_specifiedDerivingSubQueryMap.keySet());
     }
 
-    // -----------------------------------------------------
-    //                                       Deriving as One
-    //                                       ---------------
-    public ColumnInfo getSpecifiedDerivingColumnInfoAsOne() {
-        final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
-        if (derivingInfo == null) {
+    public HpDerivingSubQueryInfo getSpecifiedDerivingInfo(String aliasName) {
+        if (_specifiedDerivingSubQueryMap == null) {
             return null;
         }
+        return _specifiedDerivingSubQueryMap.get(aliasName);
+    }
+
+    protected ColumnInfo getSpecifiedDerivingColumnInfo(HpDerivingSubQueryInfo derivingInfo) {
         final SqlClause subQuerySqlClause = derivingInfo.getDerivedReferrer().getSubQuerySqlClause();
         final ColumnInfo columnInfo = subQuerySqlClause.getSpecifiedColumnInfoAsOne();
         if (columnInfo != null) {
             return columnInfo;
         }
         return subQuerySqlClause.getSpecifiedDerivingColumnInfoAsOne(); // nested
+    }
+
+    // -----------------------------------------------------
+    //                                       Deriving as One
+    //                                       ---------------
+    public ColumnInfo getSpecifiedDerivingColumnInfoAsOne() {
+        final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
+        return derivingInfo != null ? getSpecifiedDerivingColumnInfo(derivingInfo) : null;
     }
 
     public String getSpecifiedDerivingAliasNameAsOne() {
@@ -2578,7 +2594,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             } else if (fixedValueQueryExpMap.containsKey(columnDbName)) {
                 final String fixedValueQueryExp = fixedValueQueryExpMap.get(columnDbName);
                 if (fixedValueQueryExp != null) {
-                    onQueryName = encrypt(columnInfo, fixedValueQueryExp);
+                    onQueryName = encryptIfNeeds(columnInfo, fixedValueQueryExp);
                 } else {
                     // it uses null literal on query
                     // because the SQL analyzer blocks null parameters
@@ -2650,7 +2666,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 sb.append("     , ");
             }
             sb.append(columnSqlName).append(" = ");
-            sb.append(encrypt(columnInfo, parameter)).append(ln());
+            sb.append(encryptIfNeeds(columnInfo, parameter)).append(ln());
             ++index;
         }
         if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasCompoundPrimaryKey()) {
@@ -2875,18 +2891,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _suppressSelectColumnDecryption = true;
     }
 
-    protected String encrypt(ColumnInfo columnInfo, String valueExp) {
+    protected String encryptIfNeeds(ColumnInfo columnInfo, String valueExp) {
         final ColumnFunctionCipher cipher = findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.encrypt(valueExp) : valueExp;
     }
 
-    protected String decrypt(ColumnInfo columnInfo, String valueExp) {
+    protected String decryptSelectColumnIfNeeds(ColumnInfo columnInfo, String valueExp) {
+        if (_suppressSelectColumnDecryption) {
+            return valueExp;
+        }
         final ColumnFunctionCipher cipher = findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.decrypt(valueExp) : valueExp;
-    }
-
-    protected String decryptSelect(ColumnInfo columnInfo, String valueExp) {
-        return !_suppressSelectColumnDecryption ? decrypt(columnInfo, valueExp) : valueExp;
     }
 
     // [DBFlute-0.9.8.4]

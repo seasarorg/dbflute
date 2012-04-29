@@ -555,7 +555,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     protected boolean processBeforeQueryUpdate(Entity entity, ConditionBean cb,
             UpdateOption<? extends ConditionBean> option) {
         assertEntityNotNull(entity); // query-update doesn't need to check primary key
-        assertCBNotNull(cb);
+        assertCBStateValid(cb);
         frameworkFilterEntityOfUpdate(entity, option);
         filterEntityOfUpdate(entity, option);
         assertEntityOfUpdate(entity, option);
@@ -671,7 +671,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeQueryDelete(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
-        assertCBNotNull(cb);
+        assertCBStateValid(cb);
         assertQueryDeleteStatus(cb, option);
         return true;
     }

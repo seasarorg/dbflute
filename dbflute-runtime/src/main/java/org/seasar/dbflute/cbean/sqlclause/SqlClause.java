@@ -32,6 +32,7 @@ import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
@@ -435,6 +436,8 @@ public interface SqlClause {
     //                                                                             =======
     OrderByClause getOrderByComponent();
 
+    OrderByElement getOrderByLastElement();
+
     void clearOrderBy();
 
     void makeOrderByEffective();
@@ -444,14 +447,15 @@ public interface SqlClause {
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnSqlName/aliasName.columnSqlName/...' (NotNull)
      * @param ascOrDesc Is it ascend or descend?
+     * @param columnInfo The information of the column for the order. (NotNull)
      */
-    void registerOrderBy(String orderByProperty, boolean ascOrDesc);
+    void registerOrderBy(String orderByProperty, boolean ascOrDesc, ColumnInfo columnInfo);
 
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnSqlName/aliasName.columnSqlName/...' (NotNull)
      * @param ascOrDesc Is it ascend or descend?
      */
-    void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, boolean ascOrDesc);
+    void registerSpecifiedDerivedOrderBy(String orderByProperty, boolean ascOrDesc);
 
     void addNullsFirstToPreviousOrderBy();
 
@@ -754,6 +758,8 @@ public interface SqlClause {
     boolean hasSpecifiedDerivingSubQuery(String aliasName);
 
     List<String> getSpecifiedDerivingAliasList();
+
+    HpDerivingSubQueryInfo getSpecifiedDerivingInfo(String aliasName);
 
     // -----------------------------------------------------
     //                                       Deriving as One

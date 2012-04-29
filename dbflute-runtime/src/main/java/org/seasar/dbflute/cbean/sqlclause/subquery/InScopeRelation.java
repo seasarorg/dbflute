@@ -48,7 +48,7 @@ public class InScopeRelation extends AbstractSubQuery {
         {
             final ColumnRealName localRealName = _localRealNameProvider.provide(columnDbName);
             if (_suppressLocalAliasName) {
-                columnRealName = new ColumnRealName(null, localRealName.getColumnSqlName());
+                columnRealName = ColumnRealName.create(null, localRealName.getColumnSqlName());
             } else {
                 columnRealName = localRealName;
             }
@@ -61,7 +61,7 @@ public class InScopeRelation extends AbstractSubQuery {
         final String tableAliasName = getSubQueryLocalAliasName();
         final String selectClause;
         {
-            final ColumnRealName relatedColumnRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
+            final ColumnRealName relatedColumnRealName = ColumnRealName.create(tableAliasName, relatedColumnSqlName);
             selectClause = "select " + relatedColumnRealName;
         }
         final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);

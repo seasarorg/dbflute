@@ -20,7 +20,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
+import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.cbean.coption.ColumnConversionOption;
 import org.seasar.dbflute.cbean.coption.DateFromToOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
@@ -33,7 +37,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.9.8.2 (2011/04/08 Friday)
  */
-public class ManualOrderBean {
+public class ManualOrderBean implements HpCalculator {
 
     // ===================================================================================
     //                                                                          Definition
@@ -45,12 +49,15 @@ public class ManualOrderBean {
     //                                                                           =========
     protected final List<CaseWhenElement> _caseWhenAcceptedList = new ArrayList<CaseWhenElement>();
     protected final List<CaseWhenElement> _caseWhenBoundList = new ArrayList<CaseWhenElement>();
-
+    protected HpCalcSpecification<ConditionBean> _calcSpecification;
     protected ConnectionMode _connectionMode; // null means no connection
 
     // ===================================================================================
-    //                                                                      User Interface
-    //                                                                      ==============
+    //                                                                           Case When
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                              when_...
+    //                                              --------
     /**
      * Add 'when' element for 'case' statement as Equal.
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
@@ -142,6 +149,22 @@ public class ManualOrderBean {
         return doWhen_FromTo(fromDate, toDate, new DateFromToOption());
     }
 
+    // -----------------------------------------------------
+    //                                           Order Value
+    //                                           -----------
+    public void acceptOrderValueList(List<? extends Object> orderValueList) {
+        if (orderValueList == null) {
+            String msg = "The argument 'orderValueList' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        for (Object orderValue : orderValueList) {
+            when_Equal(orderValue);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
     protected ConnectedOrderBean doWhen_FromTo(Date fromDate, Date toDate, FromToOption option) {
         if (option == null) {
             String msg = "The argument 'option' should not be null.";
@@ -209,20 +232,128 @@ public class ManualOrderBean {
     }
 
     // ===================================================================================
-    //                                                               Internal Manipulation
-    //                                                               =====================
-    public void acceptOrderValueList(List<? extends Object> orderValueList) {
-        if (orderValueList == null) {
-            String msg = "The argument 'orderValueList' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        for (Object orderValue : orderValueList) {
-            when_Equal(orderValue);
+    //                                                                         Calculation
+    //                                                                         ===========
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator plus(Number plusValue) {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.plus(plusValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator plus(HpSpecifiedColumn plusColumn) {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.plus(plusColumn);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator minus(Number plusValue) {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.minus(plusValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator minus(HpSpecifiedColumn minusColumn) {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.minus(minusColumn);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator multiply(Number multiplyValue) {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.multiply(multiplyValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator multiply(HpSpecifiedColumn multiplyColumn) {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.multiply(multiplyColumn);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator divide(Number divideValue) {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.divide(divideValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator divide(HpSpecifiedColumn divideColumn) {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.divide(divideColumn);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator convert(ColumnConversionOption option) {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.convert(option);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator left() {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.left();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpCalculator right() {
+        initializeCalcSpecificationIfNeeds();
+        return _calcSpecification.right();
+    }
+
+    protected void initializeCalcSpecificationIfNeeds() {
+        if (_calcSpecification == null) {
+            _calcSpecification = createCalcSpecification();
         }
     }
 
-    public boolean hasManualOrder() {
-        return !_caseWhenAcceptedList.isEmpty();
+    protected HpCalcSpecification<ConditionBean> createCalcSpecification() {
+        return new HpCalcSpecification<ConditionBean>(createEmptySpecifyQuery());
+    }
+
+    protected SpecifyQuery<ConditionBean> createEmptySpecifyQuery() {
+        return new SpecifyQuery<ConditionBean>() {
+            public void specify(ConditionBean cb) {
+            }
+        };
+    }
+
+    public boolean hasCalculationOrder() {
+        return _calcSpecification != null;
+    }
+
+    public HpCalcSpecification<ConditionBean> getCalculationOrder() {
+        return _calcSpecification;
+    }
+
+    public void xinitCalculationOrder(ConditionBean baseCB, ConditionBean dreamCruiseCB) {
+        if (!dreamCruiseCB.xisDreamCruiseShip()) {
+            String msg = "The CB was not dream cruise: " + dreamCruiseCB.getClass();
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        _calcSpecification.setBaseCB(baseCB);
+        _calcSpecification.specify(dreamCruiseCB);
     }
 
     // ===================================================================================
@@ -481,6 +612,13 @@ public class ManualOrderBean {
 
     public static interface FreeParameterManualOrderThemeListHandler {
         String register(String themeKey, Object orderValue);
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean hasManualOrder() {
+        return !_caseWhenAcceptedList.isEmpty() || _calcSpecification != null;
     }
 
     // ===================================================================================

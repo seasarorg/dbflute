@@ -107,7 +107,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         } else {
             final String nestedSubQuery = _subQuerySqlClause.getSpecifiedDerivingSubQueryAsOne();
             if (nestedSubQuery != null) {
-                return new ColumnRealName(null, new ColumnSqlName(nestedSubQuery));
+                return ColumnRealName.create(null, new ColumnSqlName(nestedSubQuery));
             } else {
                 return null;
             }
@@ -133,17 +133,17 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
                 if (pkSb.length() > 0) {
                     pkSb.append(", ");
                 }
-                pkSb.append(new ColumnRealName(tableAliasName, pk.getColumnSqlName()));
+                pkSb.append(ColumnRealName.create(tableAliasName, pk.getColumnSqlName()));
             }
             final String pkExp = pkSb.length() > 0 ? pkSb.toString() + ", " : "";
-            final ColumnRealName relRealName = new ColumnRealName(tableAliasName, relatedColumnSqlName);
+            final ColumnRealName relRealName = ColumnRealName.create(tableAliasName, relatedColumnSqlName);
             final String selectClause = "select " + pkExp + relRealName + ", " + derivedColumnRealName;
             final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
             mainSql = selectClause + " " + fromWhereClause;
         }
         final String mainAlias = buildSubQueryMainAliasName();
         final String joinCondition = mainAlias + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
-        final ColumnRealName mainDerivedColumnRealName = new ColumnRealName(mainAlias, derivedColumnSqlName);
+        final ColumnRealName mainDerivedColumnRealName = ColumnRealName.create(mainAlias, derivedColumnSqlName);
         return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) + ln() // select
                 + "  from (" + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark + ln() // from
                 + " where " + joinCondition; // where

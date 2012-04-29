@@ -3,6 +3,7 @@ package org.seasar.dbflute.cbean;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.mock.MockColumnInfo;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
@@ -18,7 +19,7 @@ public class PagingInvokerTest extends PlainTestCase {
         // ## Arrange ##
         final List<String> selectedList = new ArrayList<String>();
         final SimplePagingBean pagingBean = new SimplePagingBean();
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -60,7 +61,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -96,7 +97,7 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 19);
         final SimplePagingBean pagingBean = new SimplePagingBean();
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -139,7 +140,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -182,7 +183,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -218,7 +219,7 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 20);
         final SimplePagingBean pagingBean = new SimplePagingBean();
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -261,7 +262,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         pagingBean.fetchPage(2);
         PagingInvoker<String> tgt = createTarget();
@@ -298,7 +299,7 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 20);
         final SimplePagingBean pagingBean = new SimplePagingBean();
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
 
@@ -341,7 +342,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         pagingBean.fetchPage(3);
         PagingInvoker<String> tgt = createTarget();
@@ -385,7 +386,7 @@ public class PagingInvokerTest extends PlainTestCase {
                 return true;
             }
         };
-        pagingBean.getSqlClause().registerOrderBy("aaa", true);
+        pagingBean.getSqlClause().registerOrderBy("aaa", true, new MockColumnInfo());
         pagingBean.fetchFirst(20);
         pagingBean.fetchPage(3);
         PagingInvoker<String> tgt = createTarget();

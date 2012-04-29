@@ -102,11 +102,34 @@ public interface ConditionBean extends PagingBean {
     //                                                                        Dream Cruise
     //                                                                        ============
     /**
+     * @param dreamCruiseTicket The specified column by your dream cruise. (NotNull)
+     */
+    void overTheWaves(HpSpecifiedColumn dreamCruiseTicket);
+
+    /**
+     * @return The created condition-bean for dream cruise.
+     */
+    ConditionBean xcreateDreamCruiseCB();
+
+    /**
+     * Is this condition-bean for dream cruise?
+     * @return The determination, true or false.
+     */
+    boolean xisDreamCruiseShip();
+
+    /**
+     * Get the departure port of dream cruise? <br />
+     * (condition-bean creating the condition-bean)
+     * @return The base condition-bean for dream cruise. (NullAllowed: when not dream cruise)
+     */
+    ConditionBean xgetDreamCruiseDeparturePort();
+
+    /**
      * Do you have a dream cruise ticket? <br />
      * (whether this CB has the specified column by dream cruise or not)
      * @return The determination, true or false.
      */
-    boolean hasDreamCruiseTicket();
+    boolean xhasDreamCruiseTicket();
 
     /**
      * Show me your dream cruise ticket. <br />

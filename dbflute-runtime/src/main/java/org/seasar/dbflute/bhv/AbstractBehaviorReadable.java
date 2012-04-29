@@ -54,6 +54,7 @@ import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.EntityPrimaryKeyNotFoundException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.IllegalBehaviorStateException;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.PagingOverSafetySizeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
@@ -85,7 +86,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * {@inheritDoc}
      */
     public int readCount(ConditionBean cb) {
-        assertCBNotNull(cb);
+        assertCBStateValid(cb);
         return doReadCount(cb);
     }
 
@@ -98,7 +99,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * {@inheritDoc}
      */
     public Entity readEntity(ConditionBean cb) {
-        assertCBNotNull(cb);
+        assertCBStateValid(cb);
         return doReadEntity(cb);
     }
 
@@ -108,7 +109,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * {@inheritDoc}
      */
     public Entity readEntityWithDeletedCheck(ConditionBean cb) {
-        assertCBNotNull(cb);
+        assertCBStateValid(cb);
         return doReadEntityWithDeletedCheck(cb);
     }
 
@@ -119,7 +120,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                       ---------------
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
             InternalSelectEntityCallback<ENTITY, CB> callback) {
-        assertCBNotNull(cb);
         if (cb.hasSelectAllPossible() && cb.getFetchSize() != 1) { // if no condition for one
             throwSelectEntityConditionNotFoundException(cb);
         }
@@ -146,7 +146,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityWithDeletedCheckInternally(
             CB cb, final InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
-        assertCBNotNull(cb);
         final ENTITY entity = helpSelectEntityInternally(cb, new InternalSelectEntityCallback<ENTITY, CB>() {
             public List<ENTITY> callbackSelectList(CB cb) {
                 return callback.callbackSelectList(cb);
@@ -177,7 +176,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * {@inheritDoc}
      */
     public <ENTITY extends Entity> ListResultBean<ENTITY> readList(ConditionBean cb) {
-        assertCBNotNull(cb);
+        assertCBStateValid(cb);
         @SuppressWarnings("unchecked")
         final ListResultBean<ENTITY> entityList = (ListResultBean<ENTITY>) doReadList(cb);
         return entityList;
@@ -219,6 +218,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected <ENTITY extends Entity, CB extends ConditionBean> ListResultBean<ENTITY> helpSelectListInternally(CB cb,
             Class<ENTITY> entityType, InternalSelectListCallback<ENTITY, CB> callback) {
+        assertCBNotDreamCruise(cb);
         try {
             return createListResultBean(cb, callback.callbackSelectList(cb, entityType));
         } catch (FetchingOverSafetySizeException e) {
@@ -239,7 +239,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * {@inheritDoc}
      */
     public <ENTITY extends Entity> PagingResultBean<ENTITY> readPage(final ConditionBean cb) {
-        assertCBNotNull(cb);
+        assertCBStateValid(cb);
         @SuppressWarnings("unchecked")
         final PagingResultBean<ENTITY> entityList = (PagingResultBean<ENTITY>) doReadPage(cb);
         return entityList;
@@ -258,6 +258,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected <ENTITY extends Entity, CB extends ConditionBean> PagingResultBean<ENTITY> helpSelectPageInternally(
             CB cb, Class<ENTITY> entityType, InternalSelectPageCallback<ENTITY, CB> callback) {
+        assertCBNotDreamCruise(cb);
         try {
             final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType, callback);
             final PagingInvoker<ENTITY> invoker = createPagingInvoker(cb);
@@ -1244,11 +1245,12 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
-     * Assert that the condition-bean is not null.
+     * Assert that the condition-bean state is valid.
      * @param cb Condition-bean. (NotNull)
      */
-    protected void assertConditionBeanNotNull(ConditionBean cb) {
+    protected void assertCBStateValid(ConditionBean cb) {
         assertCBNotNull(cb);
+        assertCBNotDreamCruise(cb);
     }
 
     /**
@@ -1257,6 +1259,17 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     protected void assertCBNotNull(ConditionBean cb) {
         assertObjectNotNull("cb", cb);
+    }
+
+    /**
+     * Assert that the condition-bean is not dream cruise.
+     * @param cb Condition-bean. (NotNull)
+     */
+    protected void assertCBNotDreamCruise(ConditionBean cb) {
+        if (cb.xisDreamCruiseShip()) {
+            String msg = "The condition-bean should not be dream cruise: " + cb.getClass();
+            throw new IllegalConditionBeanOperationException(msg);
+        }
     }
 
     /**

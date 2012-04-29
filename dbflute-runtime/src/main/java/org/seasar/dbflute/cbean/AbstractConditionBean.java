@@ -43,6 +43,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.ColumnQueryCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartUnsupportedOperationException;
 import org.seasar.dbflute.exception.thrower.ConditionBeanExceptionThrower;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -107,7 +108,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // -----------------------------------------------------
     //                                          Dream Cruise
     //                                          ------------
-    protected HpSpecifiedColumn _dreamCruiseColumn;
+    protected ConditionBean _dreamCruiseDeparturePort;
+    protected HpSpecifiedColumn _dreamCruiseTicket;
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -291,7 +293,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
                     } else {
                         final ColumnInfo columnInfo = calcSp.getSpecifiedColumnInfo();
                         if (columnInfo != null) { // means plain column
-                            resolvedExp = decrypt(columnInfo, columnExp);
+                            resolvedExp = decryptIfNeeds(columnInfo, columnExp);
                         } else { // deriving sub-query
                             resolvedExp = columnExp;
                         }
@@ -385,22 +387,55 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                        Dream Cruise
     //                                                                        ============
     /**
-     * @param dreamCruiseColumn The specified column by your dream cruise. (NotNull)
+     * {@inheritDoc}
      */
-    public void overTheWaves(HpSpecifiedColumn dreamCruiseColumn) {
-        if (dreamCruiseColumn == null) {
+    public void overTheWaves(HpSpecifiedColumn dreamCruiseTicket) {
+        if (dreamCruiseTicket == null) {
             String msg = "The argument 'dreamCruiseColumn' should not be null.";
-            throw new IllegalStateException(msg);
+            throw new IllegalArgumentException(msg);
         }
-        _dreamCruiseColumn = dreamCruiseColumn;
+        if (!dreamCruiseTicket.isDreamCruiseTicket()) {
+            String msg = "The specified column was not dream cruise ticket: " + dreamCruiseTicket;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        _dreamCruiseTicket = dreamCruiseTicket;
     }
 
-    public boolean hasDreamCruiseTicket() {
-        return _dreamCruiseColumn != null;
+    /**
+     * {@inheritDoc}
+     */
+    public ConditionBean xcreateDreamCruiseCB() {
+        return xdoCreateDreamCruiseCB();
     }
 
+    protected abstract ConditionBean xdoCreateDreamCruiseCB();
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean xisDreamCruiseShip() {
+        return HpCBPurpose.DREAM_CRUISE.equals(getPurpose());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ConditionBean xgetDreamCruiseDeparturePort() {
+        return _dreamCruiseDeparturePort;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean xhasDreamCruiseTicket() {
+        return _dreamCruiseTicket != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public HpSpecifiedColumn xshowDreamCruiseTicket() {
-        return _dreamCruiseColumn;
+        return _dreamCruiseTicket;
     }
 
     // [DBFlute-0.9.6.3]
@@ -1068,7 +1103,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                       Geared Cipher
     //                                                                       =============
-    protected String decrypt(ColumnInfo columnInfo, String valueExp) {
+    protected String decryptIfNeeds(ColumnInfo columnInfo, String valueExp) {
         final ColumnFunctionCipher cipher = getSqlClause().findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.decrypt(valueExp) : valueExp;
     }
@@ -1143,6 +1178,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void xsetupForDreamCruise(ConditionBean mainCB) {
         xinheritSubQueryInfo(mainCB.localCQ());
         xchangePurposeSqlClause(HpCBPurpose.DREAM_CRUISE, mainCB.localCQ());
+        _dreamCruiseDeparturePort = mainCB;
 
         // inherits a parent query to synchronize real name
         // (and also for suppressing query check) 

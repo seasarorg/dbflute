@@ -19,6 +19,7 @@ import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.ParameterOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
@@ -42,14 +43,24 @@ public interface ConditionQuery {
     // not to be same as column names 
 
     /**
-     * Convert to the column real name. (with real alias name)
+     * Convert to the column real name. (with real alias name) <br />
+     * With finding DBMeta.
      * @param columnDbName The DB name of column. (NotNull)
      * @return the column real name. (NotNull)
      */
     ColumnRealName toColumnRealName(String columnDbName);
 
     /**
-     * Convert to the column SQL name.
+     * Convert to the column real name. (with real alias name) <br />
+     * Without finding DBMeta.
+     * @param columnInfo The information of column. (NotNull)
+     * @return the column real name. (NotNull)
+     */
+    ColumnRealName toColumnRealName(ColumnInfo columnInfo);
+
+    /**
+     * Convert to the column SQL name. <br />
+     * With finding DBMeta.
      * @param columnDbName The DB name of column. (NotNull)
      * @return the column SQL name. (NotNull)
      */

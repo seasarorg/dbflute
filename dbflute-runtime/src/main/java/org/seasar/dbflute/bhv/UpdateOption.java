@@ -135,7 +135,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         _selfSpecificationMap = StringKeyMap.createAsFlexibleOrdered();
         for (HpCalcSpecification<CB> specification : _selfSpecificationList) {
             specification.specify(cb);
-            final String columnDbName = specification.getSpecifiedColumnInfo().getColumnDbName();
+            final String columnDbName = specification.getResolvedSpecifiedColumnDbName();
             assertSpecifiedColumn(cb, columnDbName);
             _selfSpecificationMap.put(columnDbName, specification);
         }

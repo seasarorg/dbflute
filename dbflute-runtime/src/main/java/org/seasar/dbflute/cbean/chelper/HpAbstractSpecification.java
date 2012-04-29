@@ -101,7 +101,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     protected HpSpecifiedColumn createSpecifiedColumn(String columnName, String tableAliasName) {
         final DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(_query.getTableDbName());
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
-        return new HpSpecifiedColumn(tableAliasName, columnInfo);
+        return new HpSpecifiedColumn(tableAliasName, columnInfo, _baseCB);
     }
 
     protected HpSpecifiedColumn getSpecifiedColumn(String columnName) {

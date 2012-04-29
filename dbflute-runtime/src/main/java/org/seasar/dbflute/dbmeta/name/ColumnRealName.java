@@ -17,6 +17,7 @@ package org.seasar.dbflute.dbmeta.name;
 
 import java.io.Serializable;
 
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -38,9 +39,17 @@ public class ColumnRealName implements Serializable {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ColumnRealName(String tableAliasName, ColumnSqlName columnSqlName) {
+    protected ColumnRealName(String tableAliasName, ColumnSqlName columnSqlName) {
         _tableAliasName = tableAliasName;
         _columnSqlName = columnSqlName;
+    }
+
+    public static ColumnRealName create(String tableAliasName, ColumnSqlName columnSqlName) {
+        return new ColumnRealName(tableAliasName, columnSqlName);
+    }
+
+    public static ColumnRealName create(String tableAliasName, ColumnInfo columnInfo) {
+        return new ColumnRealName(tableAliasName, columnInfo.getColumnSqlName());
     }
 
     // ===================================================================================
