@@ -174,6 +174,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      */
     public HpCalculator plus(HpSpecifiedColumn plusColumn) {
         assertObjectNotNull("plusColumn", plusColumn);
+        assertCalculationColumnNumber(plusColumn);
         assertSpecifiedDreamCruiseTicket(plusColumn);
         if (_leftMode) {
             assertLeftCalcSp();
@@ -203,6 +204,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      */
     public HpCalculator minus(HpSpecifiedColumn minusColumn) {
         assertObjectNotNull("minusColumn", minusColumn);
+        assertCalculationColumnNumber(minusColumn);
         assertSpecifiedDreamCruiseTicket(minusColumn);
         if (_leftMode) {
             assertLeftCalcSp();
@@ -232,6 +234,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      */
     public HpCalculator multiply(HpSpecifiedColumn multiplyColumn) {
         assertObjectNotNull("multiplyColumn", multiplyColumn);
+        assertCalculationColumnNumber(multiplyColumn);
         assertSpecifiedDreamCruiseTicket(multiplyColumn);
         if (_leftMode) {
             assertLeftCalcSp();
@@ -261,6 +264,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      */
     public HpCalculator divide(HpSpecifiedColumn divideColumn) {
         assertObjectNotNull("divideColumn", divideColumn);
+        assertCalculationColumnNumber(divideColumn);
         assertSpecifiedDreamCruiseTicket(divideColumn);
         if (_leftMode) {
             assertLeftCalcSp();
@@ -513,6 +517,17 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         }
         if (value == null) {
             String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertCalculationColumnNumber(HpSpecifiedColumn specifiedColumn) {
+        final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
+        if (columnInfo == null) { // basically not null but just in case
+            return;
+        }
+        if (!columnInfo.isPropertyTypeNumber()) {
+            String msg = "The type of the calculation column should be Number: " + specifiedColumn;
             throw new IllegalArgumentException(msg);
         }
     }

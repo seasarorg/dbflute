@@ -306,7 +306,8 @@ public interface ConditionBean extends PagingBean {
     //                                                                  Query Synchronizer
     //                                                                  ==================
     /**
-     * Register union-query synchronizer. {Internal}
+     * Register union-query synchronizer. {Internal} <br />
+     * Basically for reflecting LoadReferrer's InScope condition to union-queries in condition-bean set-upper.
      * @param unionQuerySynchronizer The synchronizer of union query. (NullAllowed)
      */
     void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer);

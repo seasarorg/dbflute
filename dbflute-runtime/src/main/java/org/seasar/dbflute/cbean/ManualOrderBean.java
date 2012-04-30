@@ -27,6 +27,7 @@ import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ColumnConversionOption;
 import org.seasar.dbflute.cbean.coption.DateFromToOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.Classification;
@@ -238,6 +239,7 @@ public class ManualOrderBean implements HpCalculator {
      * {@inheritDoc}
      */
     public HpCalculator plus(Number plusValue) {
+        assertObjectNotNull("plusValue", plusValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.plus(plusValue);
     }
@@ -246,6 +248,9 @@ public class ManualOrderBean implements HpCalculator {
      * {@inheritDoc}
      */
     public HpCalculator plus(HpSpecifiedColumn plusColumn) {
+        assertObjectNotNull("plusColumn", plusColumn);
+        assertCalculationColumnNumber(plusColumn);
+        assertSpecifiedDreamCruiseTicket(plusColumn);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.plus(plusColumn);
     }
@@ -253,15 +258,19 @@ public class ManualOrderBean implements HpCalculator {
     /**
      * {@inheritDoc}
      */
-    public HpCalculator minus(Number plusValue) {
+    public HpCalculator minus(Number minusValue) {
+        assertObjectNotNull("minusValue", minusValue);
         initializeCalcSpecificationIfNeeds();
-        return _calcSpecification.minus(plusValue);
+        return _calcSpecification.minus(minusValue);
     }
 
     /**
      * {@inheritDoc}
      */
     public HpCalculator minus(HpSpecifiedColumn minusColumn) {
+        assertObjectNotNull("minusColumn", minusColumn);
+        assertCalculationColumnNumber(minusColumn);
+        assertSpecifiedDreamCruiseTicket(minusColumn);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.minus(minusColumn);
     }
@@ -270,6 +279,7 @@ public class ManualOrderBean implements HpCalculator {
      * {@inheritDoc}
      */
     public HpCalculator multiply(Number multiplyValue) {
+        assertObjectNotNull("multiplyValue", multiplyValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.multiply(multiplyValue);
     }
@@ -278,6 +288,9 @@ public class ManualOrderBean implements HpCalculator {
      * {@inheritDoc}
      */
     public HpCalculator multiply(HpSpecifiedColumn multiplyColumn) {
+        assertObjectNotNull("multiplyColumn", multiplyColumn);
+        assertCalculationColumnNumber(multiplyColumn);
+        assertSpecifiedDreamCruiseTicket(multiplyColumn);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.multiply(multiplyColumn);
     }
@@ -286,6 +299,7 @@ public class ManualOrderBean implements HpCalculator {
      * {@inheritDoc}
      */
     public HpCalculator divide(Number divideValue) {
+        assertObjectNotNull("divideValue", divideValue);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.divide(divideValue);
     }
@@ -294,6 +308,9 @@ public class ManualOrderBean implements HpCalculator {
      * {@inheritDoc}
      */
     public HpCalculator divide(HpSpecifiedColumn divideColumn) {
+        assertObjectNotNull("divideColumn", divideColumn);
+        assertCalculationColumnNumber(divideColumn);
+        assertSpecifiedDreamCruiseTicket(divideColumn);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.divide(divideColumn);
     }
@@ -302,6 +319,7 @@ public class ManualOrderBean implements HpCalculator {
      * {@inheritDoc}
      */
     public HpCalculator convert(ColumnConversionOption option) {
+        assertObjectNotNull("option", option);
         initializeCalcSpecificationIfNeeds();
         return _calcSpecification.convert(option);
     }
@@ -619,6 +637,47 @@ public class ManualOrderBean implements HpCalculator {
     //                                                                       =============
     public boolean hasManualOrder() {
         return !_caseWhenAcceptedList.isEmpty() || _calcSpecification != null;
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
+    /**
+     * Assert that the object is not null.
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     * @exception IllegalArgumentException
+     */
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertCalculationColumnNumber(HpSpecifiedColumn specifiedColumn) {
+        final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
+        if (columnInfo == null) { // basically not null but just in case
+            return;
+        }
+        if (!columnInfo.isPropertyTypeNumber()) {
+            String msg = "The type of the calculation column should be Number: " + specifiedColumn;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertSpecifiedDreamCruiseTicket(HpSpecifiedColumn column) {
+        if (!column.isDreamCruiseTicket()) {
+            final String msg = "The specified column was not dream cruise ticket: " + column;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
     }
 
     // ===================================================================================

@@ -1930,10 +1930,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public void addManualOrderToPreviousOrderByElement(ManualOrderBean manualOrderBean) {
         assertObjectNotNull("manualOrderBean", manualOrderBean);
-        if (hasUnionQuery()) {
-            String msg = "ManualOrder with UnionQuery is unsupported: " + manualOrderBean;
-            throw new IllegalConditionBeanOperationException(msg);
-        }
+        // TODO jflute support?
+        //if (hasUnionQuery()) {
+        //    String msg = "ManualOrder with UnionQuery is unsupported: " + manualOrderBean;
+        //    throw new IllegalConditionBeanOperationException(msg);
+        //}
         getOrderBy().addManualOrderByElement(manualOrderBean);
     }
 
