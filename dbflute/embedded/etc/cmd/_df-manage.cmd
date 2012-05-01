@@ -33,3 +33,10 @@ if "%FIRST_ARG%"=="take-assert" (
   echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-take-assert.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 )
+
+if "%FIRST_ARG%"=="freegen" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the FreeGen task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-freegen.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
+)

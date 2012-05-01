@@ -38,6 +38,14 @@ if [ "$FIRST_ARG" = "take-assert" ];then
   taskReturnCode=$?
 fi
 
+if [ "$FIRST_ARG" = "freegen" ];then
+  echo "/nnnnnnnnnnnnnnnnnnnnnnnnnn"
+  echo "...Calling the FreeGen task"
+  echo "nnnnnnnnnn/"
+  sh $DBFLUTE_HOME/etc/cmd/_df-freegen.sh $NATIVE_PROPERTIES_PATH $SECOND_ARG
+  taskReturnCode=$?
+fi
+
 if [ $taskReturnCode -ne 0 ];then
   exit $taskReturnCode;
 fi

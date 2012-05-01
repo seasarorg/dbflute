@@ -35,7 +35,7 @@ public class DfDBFluteTaskStatus {
     //                                                                           Task Type
     //                                                                           =========
     public enum TaskType {
-        JDBC, Doc, Generate, Sql2Entity, OutsideSqlTest, ReplaceSchema, Refresh, TakeAssert
+        JDBC, Doc, Generate, Sql2Entity, OutsideSqlTest, ReplaceSchema, Refresh, TakeAssert, FreeGen
     }
 
     // ===================================================================================

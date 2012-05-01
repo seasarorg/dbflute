@@ -381,18 +381,19 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         } catch (BuildException e) {
             throw e;
         } catch (MethodInvocationException e) {
-            String msg = "Exception thrown by '" + e.getReferenceName() + "." + e.getMethodName() + "'.";
+            final String method = e.getReferenceName() + "." + e.getMethodName() + "()";
+            String msg = "Exception thrown by " + method + ": control=" + controlTemplate;
             throw new IllegalStateException(msg, e.getWrappedThrowable());
         } catch (ParseErrorException e) {
-            throw new IllegalStateException("Velocity syntax error.", e);
+            throw new IllegalStateException("Velocity syntax error: control=" + controlTemplate, e);
         } catch (ResourceNotFoundException e) {
-            throw new IllegalStateException("Resource not found.", e);
+            throw new IllegalStateException("Resource not found: control=" + controlTemplate, e);
         } catch (Exception e) {
-            throw new IllegalStateException("Generation failed.", e);
+            throw new IllegalStateException("Generation failed: control=" + controlTemplate, e);
         }
     }
 
-    private void assertBasicAntParameter() {
+    protected void assertBasicAntParameter() {
         if (templatePath == null && !useClasspath) {
             String msg = "The template path needs to be defined if you are not using the classpath for locating templates!";
             throw new IllegalStateException(msg);
@@ -410,7 +411,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         //}
     }
 
-    private void initializeVelocityInstance() {
+    protected void initializeVelocityInstance() {
         // /---------------------------
         // Initialize Velocity instance 
         // ----------/

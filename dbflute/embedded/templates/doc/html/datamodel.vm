@@ -297,7 +297,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 </table>
 
 #foreach ($table in $database.tableDisplaySortedList)
-$generator.parse("doc/html/table.vm", null, "table", $table)
+  $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 
 #if ($database.hasClassificationDefinition())

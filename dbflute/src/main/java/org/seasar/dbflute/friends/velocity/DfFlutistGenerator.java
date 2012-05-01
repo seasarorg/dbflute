@@ -179,6 +179,10 @@ public class DfFlutistGenerator extends DfGenerator {
      */
     public String parse(String inputTemplate, String specifiedInputEncoding, String outputFile,
             String specifiedOutputEncoding, String objectID, Object object) throws Exception {
+        if (inputTemplate == null) {
+            String msg = "The argument 'inputTemplate' should not be null: outputFile=" + outputFile;
+            throw new IllegalArgumentException(msg);
+        }
         if (objectID != null && object != null) {
             controlContext.put(objectID, object);
         }

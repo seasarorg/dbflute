@@ -73,6 +73,8 @@
     classname="org.seasar.dbflute.task.manage.DfRefreshTask"/>
   <taskdef name="df-take-assert" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.manage.DfTakeAssertTask"/>
+  <taskdef name="df-freegen" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.manage.DfFreeGenTask"/>
 
   <!--
     for Ant-Contrib
@@ -225,6 +227,14 @@
         environmentType="${dfenv}"
         sqlRootDir="${dfdir}">
     </df-take-assert>
+  </target>
+
+  <target name="freegen" description="FreeGen task">
+    <df-freegen
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        genTarget="${gentgt}">
+    </df-freegen>
   </target>
 
 </project>

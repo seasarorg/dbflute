@@ -23,7 +23,7 @@ public class DfPackagePathHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DfBasicProperties _basicProperties;
+    protected final DfBasicProperties _basicProperties; // not required
     protected boolean _fileSeparatorSlash;
 
     // ===================================================================================
@@ -41,11 +41,13 @@ public class DfPackagePathHandler {
             String msg = "The argument 'pckge' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        final String omitDirectoryPackage = _basicProperties.getOmitDirectoryPackage();
+        final String omitDirectoryPackage = _basicProperties != null ? _basicProperties.getOmitDirectoryPackage()
+                : null;
         if (omitDirectoryPackage != null && omitDirectoryPackage.trim().length() > 0) {
             pckge = removeOmitPackage(pckge, omitDirectoryPackage);
         }
-        final String flatDirectoryPackage = _basicProperties.getFlatDirectoryPackage();
+        final String flatDirectoryPackage = _basicProperties != null ? _basicProperties.getFlatDirectoryPackage()
+                : null;
         if (flatDirectoryPackage == null || flatDirectoryPackage.trim().length() == 0) {
             return resolvePackageAsPath(pckge);
         }

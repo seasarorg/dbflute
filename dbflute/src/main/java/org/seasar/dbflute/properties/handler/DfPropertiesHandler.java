@@ -16,6 +16,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDependencyInjectionProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
+import org.seasar.dbflute.properties.DfFreeGenProperties;
 import org.seasar.dbflute.properties.DfHibernateProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -227,6 +228,18 @@ public final class DfPropertiesHandler {
             _flexDtoProperties = new DfFlexDtoProperties(prop);
         }
         return _flexDtoProperties;
+    }
+
+    // -----------------------------------------------------
+    //                                               FreeGen
+    //                                               -------
+    protected DfFreeGenProperties _freeGenProperties;
+
+    public DfFreeGenProperties getFreeGenProperties(Properties prop) {
+        if (_freeGenProperties == null) {
+            _freeGenProperties = new DfFreeGenProperties(prop);
+        }
+        return _freeGenProperties;
     }
 
     // -----------------------------------------------------

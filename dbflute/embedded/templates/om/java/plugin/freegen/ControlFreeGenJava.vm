@@ -1,0 +1,8 @@
+
+$manager.info("requestList: ${requestList.size()}")
+#foreach ($request in $requestList)
+  $request.info("    parse('${request.outputPath}')")
+  #set ($path = $request.outputPath)
+  $database.makeDirectory($path)
+  $generator.parse($request.templatePath, $path, "", "")
+#end
