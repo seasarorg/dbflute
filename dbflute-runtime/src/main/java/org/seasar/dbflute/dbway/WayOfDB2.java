@@ -41,17 +41,10 @@ public class WayOfDB2 implements DBWay, Serializable {
     }
 
     // ===================================================================================
-    //                                                                       Identity Info
-    //                                                                       =============
+    //                                                                        Identity Way
+    //                                                                        ============
     public String getIdentitySelectSql() {
         return "values IDENTITY_VAL_LOCAL()";
-    }
-
-    // ===================================================================================
-    //                                                                 LikeSearch WildCard
-    //                                                                 ===================
-    public List<String> getOriginalWildCardList() {
-        return ORIGNAL_WILD_CARD_LIST;
     }
 
     // ===================================================================================
@@ -70,6 +63,20 @@ public class WayOfDB2 implements DBWay, Serializable {
     //                                                                        ============
     public boolean isScrollableCursorSupported() {
         return true;
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    public List<String> getOriginalWildCardList() {
+        return ORIGNAL_WILD_CARD_LIST;
+    }
+
+    // ===================================================================================
+    //                                                                    String Connector
+    //                                                                    ================
+    public StringConnector getStringConnector() {
+        return STANDARD_STRING_CONNECTOR;
     }
 
     // ===================================================================================

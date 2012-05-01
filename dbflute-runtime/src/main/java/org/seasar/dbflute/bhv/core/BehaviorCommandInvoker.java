@@ -152,8 +152,9 @@ public class BehaviorCommandInvoker {
         RuntimeException cause = null;
         RESULT result = null;
         try {
+            final ResourceContext parentContext = getParentContext();
             initializeContext();
-            setupResourceContext(behaviorCommand);
+            setupResourceContext(behaviorCommand, parentContext);
             processBeforeHook(behaviorCommand);
             result = dispatchInvoking(behaviorCommand);
         } catch (RuntimeException e) {
@@ -169,9 +170,10 @@ public class BehaviorCommandInvoker {
         }
     }
 
-    protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
+    protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand, ResourceContext parentContext) {
         assertInvokerAssistant();
         final ResourceContext resourceContext = new ResourceContext();
+        resourceContext.setParentContext(parentContext); // not null only when recursive call
         resourceContext.setBehaviorCommand(behaviorCommand);
         resourceContext.setCurrentDBDef(_invokerAssistant.assistCurrentDBDef());
         resourceContext.setDBMetaProvider(_invokerAssistant.assistDBMetaProvider());
@@ -863,11 +865,22 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      Context Helper
     //                                                                      ==============
+    protected ResourceContext getParentContext() {
+        if (isRecursiveInvoking()) {
+            return ResourceContext.getResourceContextOnThread();
+        }
+        return null;
+    }
+
     protected void initializeContext() {
-        if (ResourceContext.isExistResourceContextOnThread()) { // means recursive invoking
+        if (isRecursiveInvoking()) {
             saveAllContextOnThread();
         }
         clearAllCurrentContext();
+    }
+
+    protected boolean isRecursiveInvoking() { // should be called before initialization
+        return ResourceContext.isExistResourceContextOnThread();
     }
 
     protected void closeContext() {

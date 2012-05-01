@@ -60,13 +60,6 @@ public class WayOfSQLServer implements DBWay, Serializable {
     }
 
     // ===================================================================================
-    //                                                                 LikeSearch WildCard
-    //                                                                 ===================
-    public List<String> getOriginalWildCardList() {
-        return _originalWildCardList;
-    }
-
-    // ===================================================================================
     //                                                                         SQL Support
     //                                                                         ===========
     public boolean isBlockCommentSupported() {
@@ -82,6 +75,20 @@ public class WayOfSQLServer implements DBWay, Serializable {
     //                                                                        ============
     public boolean isScrollableCursorSupported() {
         return true;
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    public List<String> getOriginalWildCardList() {
+        return _originalWildCardList;
+    }
+
+    // ===================================================================================
+    //                                                                    String Connector
+    //                                                                    ================
+    public StringConnector getStringConnector() {
+        return PLUS_STRING_CONNECTOR;
     }
 
     // ===================================================================================

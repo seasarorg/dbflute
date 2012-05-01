@@ -30,12 +30,14 @@ import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
+import org.seasar.dbflute.cbean.sqlclause.union.UnionClauseProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
@@ -473,7 +475,7 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====
-    void registerUnionQuery(String unionClause, boolean unionAll);
+    void registerUnionQuery(UnionClauseProvider unionClauseProvider, boolean unionAll);
 
     boolean hasUnionQuery();
 
@@ -984,6 +986,12 @@ public interface SqlClause {
      */
     void disablePagingCountLeastJoin();
 
+    // [DBFlute-0.9.9.4C]
+    // ===================================================================================
+    //                                                                      Lazy Reflector
+    //                                                                      ==============
+    void registerClauseLazyReflector(ClauseLazyReflector clauseLazyReflector);
+
     // [DBFlute-0.9.7.2]
     // ===================================================================================
     //                                                                        Purpose Type
@@ -1006,7 +1014,7 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                   LikeSearch Escape
     //                                                                   =================
-    void adjustLikeSearchEscape(LikeSearchOption option);
+    void adjustLikeSearchDBWay(LikeSearchOption option);
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================

@@ -33,6 +33,23 @@ public class WayOfMySQL implements DBWay, Serializable {
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
+    protected static final StringConnector ORIGINAL_STRING_CONNECTOR = new StringConnector() {
+        public String connect(Object... elements) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("concat(");
+            int index = 0;
+            for (Object element : elements) {
+                if (index > 0) {
+                    sb.append(", ");
+                }
+                sb.append(element);
+                ++index;
+            }
+            sb.append(")");
+            return sb.toString();
+        }
+    };
+
     // ===================================================================================
     //                                                                        Sequence Way
     //                                                                        ============
@@ -71,6 +88,13 @@ public class WayOfMySQL implements DBWay, Serializable {
     @SuppressWarnings("unchecked")
     public List<String> getOriginalWildCardList() {
         return Collections.EMPTY_LIST;
+    }
+
+    // ===================================================================================
+    //                                                                    String Connector
+    //                                                                    ================
+    public StringConnector getStringConnector() {
+        return ORIGINAL_STRING_CONNECTOR;
     }
 
     // ===================================================================================

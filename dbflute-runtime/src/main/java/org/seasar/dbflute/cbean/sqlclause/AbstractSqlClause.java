@@ -41,6 +41,7 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
+import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinLazyReflector;
 import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinLazyReflectorBase;
@@ -56,6 +57,7 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.cbean.sqlclause.select.SelectedRelationColumn;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
+import org.seasar.dbflute.cbean.sqlclause.union.UnionClauseProvider;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -63,6 +65,7 @@ import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbmeta.name.TableSqlName;
+import org.seasar.dbflute.dbway.DBWay;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.resource.DBFluteSystem;
@@ -264,7 +267,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Is the clause for paging select? */
     protected boolean _pagingAdjustment;
 
-    /** Is the joins of count slimmed? */
+    /** Is the joins of count least? */
     protected boolean _pagingCountLeastJoin;
 
     /** Is the count executed later? */
@@ -275,6 +278,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                          ------------
     /** The purpose of condition-bean for check at condition-query. (NotNull) */
     protected HpCBPurpose _purpose = HpCBPurpose.NORMAL_USE; // as default
+
+    // -----------------------------------------------------
+    //                                        Lazy Reflector
+    //                                        --------------
+    protected List<ClauseLazyReflector> _clauseLazyReflectorList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -349,6 +357,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                       Complete Clause
     //                                       ---------------
     public String getClause() {
+        reflectClauseLazilyIdExists();
         final StringBuilder sb = new StringBuilder(512);
         final String selectClause = getSelectClause();
         sb.append(selectClause);
@@ -384,10 +393,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                       Fragment Clause
     //                                       ---------------
     public String getClauseFromWhereWithUnionTemplate() {
+        reflectClauseLazilyIdExists();
         return buildClauseFromWhereAsTemplate(false);
     }
 
     public String getClauseFromWhereWithWhereUnionTemplate() {
+        reflectClauseLazilyIdExists();
         return buildClauseFromWhereAsTemplate(true);
     }
 
@@ -406,13 +417,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             return "";
         }
         final StringBuilder sb = new StringBuilder();
-        for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext();) {
-            UnionQueryInfo unionQueryInfo = (UnionQueryInfo) ite.next();
-            String unionQueryClause = unionQueryInfo.getUnionQueryClause();
-            boolean unionAll = unionQueryInfo.isUnionAll();
-            sb.append(ln());
-            sb.append(unionAll ? " union all " : " union ");
-            sb.append(ln());
+        for (UnionQueryInfo unionQueryInfo : _unionQueryInfoList) {
+            final UnionClauseProvider unionClauseProvider = unionQueryInfo.getUnionClauseProvider();
+            final String unionQueryClause = unionClauseProvider.provide();
+            final boolean unionAll = unionQueryInfo.isUnionAll();
+            sb.append(ln()).append(unionAll ? " union all " : " union ").append(ln());
             sb.append(selectClause).append(" ").append(unionQueryClause);
         }
         return sb.toString();
@@ -498,6 +507,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                         Select Clause
     //                                         -------------
     public String getSelectClause() {
+        reflectClauseLazilyIdExists();
         if (isSelectClauseNonUnionScalar()) {
             return buildSelectClauseScalar(getBasePointAliasName());
         }
@@ -842,6 +852,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                           From Clause
     //                                           -----------
     public String getFromClause() {
+        reflectClauseLazilyIdExists();
         final StringBuilder sb = new StringBuilder();
         buildFromClause(sb);
         return sb.toString();
@@ -1071,6 +1082,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                          Where Clause
     //                                          ------------
     public String getWhereClause() {
+        reflectClauseLazilyIdExists();
         final StringBuilder sb = new StringBuilder();
         buildWhereClause(sb);
         return sb.toString();
@@ -1106,6 +1118,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                        OrderBy Clause
     //                                        --------------
     public String getOrderByClause() {
+        reflectClauseLazilyIdExists();
         final OrderByClause orderBy = getOrderBy();
         String orderByClause = null;
         if (hasUnionQuery()) {
@@ -1129,6 +1142,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                            SQL Suffix
     //                                            ----------
     public String getSqlSuffix() {
+        reflectClauseLazilyIdExists();
         String sqlSuffix = createSqlSuffix();
         if (sqlSuffix != null && sqlSuffix.trim().length() > 0) {
             return ln() + sqlSuffix;
@@ -1945,10 +1959,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                          UnionQuery
     //                                                                          ==========
-    public void registerUnionQuery(String unionQueryClause, boolean unionAll) {
-        assertStringNotNullAndNotTrimmedEmpty("unionQueryClause", unionQueryClause);
+    public void registerUnionQuery(UnionClauseProvider unionClauseProvider, boolean unionAll) {
+        assertObjectNotNull("unionClauseProvider", unionClauseProvider);
         UnionQueryInfo unionQueryInfo = new UnionQueryInfo();
-        unionQueryInfo.setUnionQueryClause(unionQueryClause);
+        unionQueryInfo.setUnionClauseProvider(unionClauseProvider);
         unionQueryInfo.setUnionAll(unionAll);
         addUnionQueryInfo(unionQueryInfo);
     }
@@ -1971,15 +1985,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected static class UnionQueryInfo {
-        protected String _unionQueryClause;
+        protected UnionClauseProvider _unionClauseProvider;
         protected boolean _unionAll;
 
-        public String getUnionQueryClause() {
-            return _unionQueryClause;
+        public UnionClauseProvider getUnionClauseProvider() {
+            return _unionClauseProvider;
         }
 
-        public void setUnionQueryClause(String unionQueryClause) {
-            _unionQueryClause = unionQueryClause;
+        public void setUnionClauseProvider(UnionClauseProvider unionClauseProvider) {
+            _unionClauseProvider = unionClauseProvider;
         }
 
         public boolean isUnionAll() {
@@ -2958,6 +2972,27 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _pagingAdjustment && _pagingCountLeastJoin;
     }
 
+    // [DBFlute-0.9.9.4C]
+    // ===================================================================================
+    //                                                                      Lazy Reflector
+    //                                                                      ==============
+    public void registerClauseLazyReflector(ClauseLazyReflector clauseLazyReflector) {
+        if (_clauseLazyReflectorList == null) {
+            _clauseLazyReflectorList = new ArrayList<ClauseLazyReflector>();
+        }
+        _clauseLazyReflectorList.add(clauseLazyReflector);
+    }
+
+    protected void reflectClauseLazilyIdExists() {
+        if (_clauseLazyReflectorList == null) {
+            return;
+        }
+        for (ClauseLazyReflector reflector : _clauseLazyReflectorList) {
+            reflector.reflect();
+        }
+        _clauseLazyReflectorList.clear();
+    }
+
     // [DBFlute-0.9.7.2]
     // ===================================================================================
     //                                                                        Purpose Type
@@ -2982,8 +3017,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                   LikeSearch Escape
     //                                                                   =================
-    public void adjustLikeSearchEscape(LikeSearchOption option) {
-        option.acceptOriginalWildCardList(dbway().getOriginalWildCardList());
+    public void adjustLikeSearchDBWay(LikeSearchOption option) {
+        final DBWay dbway = dbway();
+        option.acceptOriginalWildCardList(dbway.getOriginalWildCardList());
+        option.acceptStringConnector(dbway.getStringConnector());
     }
 
     // ===================================================================================

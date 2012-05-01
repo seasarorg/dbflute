@@ -134,7 +134,7 @@ public class SimpleStringOption implements ConditionOption, Serializable {
     // ===================================================================================
     //                                                                           Deep Copy
     //                                                                           =========
-    public Object createDeepCopy() {
+    public SimpleStringOption createDeepCopy() {
         final SimpleStringOption deepCopy = newDeepCopyInstance();
         if (_splitOptionParts != null) {
             deepCopy._splitOptionParts = (SplitOptionParts) _splitOptionParts;

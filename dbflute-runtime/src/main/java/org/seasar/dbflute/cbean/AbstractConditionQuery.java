@@ -49,6 +49,7 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
+import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -61,6 +62,7 @@ import org.seasar.dbflute.cbean.sqlclause.subquery.ScalarCondition;
 import org.seasar.dbflute.cbean.sqlclause.subquery.ScalarCondition.PartitionByProvider;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SpecifyDerivedReferrer;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryPath;
+import org.seasar.dbflute.cbean.sqlclause.union.UnionClauseProvider;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -491,12 +493,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         xsetupUnion(unionAllQuery, true, getInternalUnionAllQueryMap());
     }
 
-    protected void xsetupUnion(ConditionQuery unionQuery, boolean unionAll, SimpleMapPmb<ConditionQuery> unionQueryMap) {
+    protected void xsetupUnion(final ConditionQuery unionQuery, boolean unionAll,
+            SimpleMapPmb<ConditionQuery> unionQueryMap) {
         if (unionQuery == null) {
-            String msg = "The argument[unionQuery] should not be null.";
+            String msg = "The argument 'unionQuery' should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        reflectRelationOnUnionQuery(this, unionQuery); // Reflect Relation!
+        // needs to reflect lazily for:
+        // o SetupSelect(Relation) after Union (however, basically they should be called before union)
+        // o ManualOrder with Dream Cruise using Specify(Relation) after Union
+        final ConditionQuery selfCQ = this;
+        xgetSqlClause().registerClauseLazyReflector(new ClauseLazyReflector() {
+            public void reflect() {
+                reflectRelationOnUnionQuery(selfCQ, unionQuery); // reflect relations
+            }
+        });
         final String key = (unionAll ? "unionAllQuery" : "unionQuery") + unionQueryMap.size();
         unionQueryMap.addParameter(key, unionQuery);
         final String propName = "internalUnion" + (unionAll ? "All" : "") + "QueryMap." + key;
@@ -646,16 +657,67 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             option.notEscape();
         }
         // basically for DBMS that has original wild-cards
-        xgetSqlClause().adjustLikeSearchEscape(option);
+        xgetSqlClause().adjustLikeSearchDBWay(option);
 
         if (value == null || !option.isSplit()) {
-            // as normal condition
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
+            if (option.canOptimizeCompoundColumnLikePrefix()) {
+                // - - - - - - - - - -
+                // optimized compound
+                // - - - - - - - - - -
+                doRegisterLikeSearchQueryCompoundOptimized(value, cvalue, columnDbName, option);
+            } else {
+                // - - - - - - - - - - - - -
+                // normal or normal compound
+                // - - - - - - - - - - - - -
+                setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, option);
+            }
             return;
         }
-        // - - - - - - - - -
-        // Use splitByXxx().
-        // - - - - - - - - -
+        // - - - - - - -
+        // splitByXxx()
+        // - - - - - - -
+        doRegisterLikeSearchQuerySplitBy(key, value, cvalue, columnDbName, option);
+    }
+
+    protected void doRegisterLikeSearchQueryCompoundOptimized(String value, ConditionValue cvalue, String columnDbName,
+            LikeSearchOption option) {
+        // *char type only but no checked (cannot check)
+        final List<HpSpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
+        final List<Integer> sizeList = option.getCompoundColumnSizeList();
+        String currentValue = value;
+        int currentLength = value.length();
+        String currentColumn = null;
+        int eqCount = 0;
+        for (int i = 0; i < sizeList.size(); i++) { // should be same size as column count (checked in option)
+            final Integer columnSize = sizeList.get(i);
+            if (i == 0) { // first is main column
+                currentColumn = columnDbName;
+            } else { // compound columns
+                final HpSpecifiedColumn specifiedColumn = compoundColumnList.get(i - 1);
+                currentColumn = specifiedColumn.getColumnDbName();
+            }
+            if (currentLength >= columnSize) { // can treat current condition as equal
+                final String equalValue = currentValue.substring(0, columnSize);
+                invokeQueryEqual(currentColumn, equalValue);
+                currentValue = currentValue.substring(columnSize);
+                currentLength = currentValue.length();
+                ++eqCount;
+            } else {
+                break;
+            }
+        }
+        if (currentValue.length() > 0) {
+            final LikeSearchOption copyOption = option.createDeepCopy();
+            copyOption.clearCompoundColumn();
+            for (HpSpecifiedColumn specifiedColumn : compoundColumnList.subList(eqCount, compoundColumnList.size())) {
+                copyOption.addCompoundColumn(specifiedColumn);
+            }
+            invokeQueryLikeSearch(currentColumn, currentValue, copyOption);
+        }
+    }
+
+    protected void doRegisterLikeSearchQuerySplitBy(ConditionKey key, String value, ConditionValue cvalue,
+            String columnDbName, LikeSearchOption option) {
         // these values should be valid only (already filtered before)
         // and invalid values are ignored even at the check mode
         // but if all elements are invalid, it is an exception
@@ -1223,11 +1285,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                           Union Query
     //                                           -----------
-    public void registerUnionQuery(ConditionQuery unionQuery, boolean unionAll, String unionQueryPropertyName) {
-        final String unionQueryClause = xgetUnionQuerySql(unionQuery, unionQueryPropertyName);
-
-        // At the future, building SQL will be moved to sqlClause.
-        xgetSqlClause().registerUnionQuery(unionQueryClause, unionAll);
+    protected void registerUnionQuery(final ConditionQuery unionQuery, boolean unionAll,
+            final String unionQueryPropertyName) {
+        xgetSqlClause().registerUnionQuery(new UnionClauseProvider() {
+            public String provide() {
+                return xgetUnionQuerySql(unionQuery, unionQueryPropertyName);
+            }
+        }, unionAll);
     }
 
     protected String xgetUnionQuerySql(ConditionQuery unionQuery, String unionQueryPropertyName) {
@@ -1243,9 +1307,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 throw new IllegalStateException(msg);
             }
             final int clauseIndex = whereIndex + "where ".length();
+            final String front = whereClause.substring(0, clauseIndex);
             final String mark = xgetSqlClause().getUnionWhereFirstConditionMark();
-            final String markedClause = whereClause.substring(0, clauseIndex) + mark
-                    + whereClause.substring(clauseIndex);
+            final String rear = whereClause.substring(clauseIndex);
+            final String markedClause = front + mark + rear;
             unionQueryClause = fromClause + " " + markedClause;
         }
         final String oldStr = "/*pmb.conditionQuery.";

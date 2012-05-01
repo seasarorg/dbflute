@@ -122,11 +122,10 @@ public class CallbackContext {
     //                                         -------------
     /**
      * Set the handler of SQL log. <br />
-     * This handler is called back before executing the SQL. 
+     * This handler is called back before executing the SQL.
      * <pre>
      * context.setSqlLogHandler(new SqlLogHandler() {
-     *     public void handle(String executedSql, String displaySql
-     *                      , Object[] args, Class&lt;?&gt;[] argTypes) {
+     *     public void handle(SqlLogInfo info) {
      *         // You can get your SQL string here.
      *     }
      * });

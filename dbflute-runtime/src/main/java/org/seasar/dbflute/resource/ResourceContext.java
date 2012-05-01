@@ -327,6 +327,7 @@ public class ResourceContext {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected ResourceContext _parentContext; // not null only when recursive invoking
     protected BehaviorCommand<?> _behaviorCommand;
     protected DBDef _currentDBDef;
     protected DBMetaProvider _dbmetaProvider;
@@ -350,6 +351,14 @@ public class ResourceContext {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public ResourceContext getParentContext() {
+        return _parentContext;
+    }
+
+    public void setParentContext(ResourceContext parentContext) {
+        _parentContext = parentContext;
+    }
+
     public BehaviorCommand<?> getBehaviorCommand() {
         return _behaviorCommand;
     }

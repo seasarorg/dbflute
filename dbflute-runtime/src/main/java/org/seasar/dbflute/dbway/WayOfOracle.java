@@ -48,13 +48,6 @@ public class WayOfOracle implements DBWay, Serializable {
     }
 
     // ===================================================================================
-    //                                                                 LikeSearch WildCard
-    //                                                                 ===================
-    public List<String> getOriginalWildCardList() {
-        return ORIGNAL_WILD_CARD_LIST;
-    }
-
-    // ===================================================================================
     //                                                                         SQL Support
     //                                                                         ===========
     public boolean isBlockCommentSupported() {
@@ -70,6 +63,20 @@ public class WayOfOracle implements DBWay, Serializable {
     //                                                                        ============
     public boolean isScrollableCursorSupported() {
         return true;
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    public List<String> getOriginalWildCardList() {
+        return ORIGNAL_WILD_CARD_LIST;
+    }
+
+    // ===================================================================================
+    //                                                                    String Connector
+    //                                                                    ================
+    public StringConnector getStringConnector() {
+        return STANDARD_STRING_CONNECTOR;
     }
 
     // ===================================================================================

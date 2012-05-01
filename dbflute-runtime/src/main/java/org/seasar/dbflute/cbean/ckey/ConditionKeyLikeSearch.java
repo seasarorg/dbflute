@@ -15,8 +15,10 @@
  */
 package org.seasar.dbflute.cbean.ckey;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
@@ -25,7 +27,9 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbway.ExtensionOperand;
+import org.seasar.dbflute.dbway.StringConnector;
 
 /**
  * The condition-key of likeSearch.
@@ -89,14 +93,32 @@ public class ConditionKeyLikeSearch extends ConditionKey {
         final LikeSearchOption myOption = (LikeSearchOption) option;
         final String rearOption = myOption.getRearOption();
         final String realOperand = getRealOperand(myOption);
+        final ColumnRealName realRealName;
+        if (myOption.hasCompoundColumn()) {
+            if (!myOption.hasStringConnector()) { // basically no way
+                String msg = "The option should have string connector when compound column is specified: " + myOption;
+                throw new IllegalStateException(msg);
+            }
+            final List<HpSpecifiedColumn> compoundColumnList = myOption.getCompoundColumnList();
+            final List<ColumnRealName> realNameList = new ArrayList<ColumnRealName>();
+            realNameList.add(columnRealName);
+            for (HpSpecifiedColumn specifiedColumn : compoundColumnList) {
+                realNameList.add(specifiedColumn.toColumnRealName());
+            }
+            final StringConnector stringConnector = myOption.getStringConnector();
+            final String connected = stringConnector.connect(realNameList.toArray());
+            realRealName = ColumnRealName.create(null, new ColumnSqlName(connected));
+        } else {
+            realRealName = columnRealName;
+        }
         final QueryClauseArranger arranger = myOption.getWhereClauseArranger();
         final QueryClause clause;
         if (arranger != null) {
             final String bindExpression = buildBindExpression(location, null, cipher);
-            final String arranged = arranger.arrange(columnRealName, realOperand, bindExpression, rearOption);
+            final String arranged = arranger.arrange(realRealName, realOperand, bindExpression, rearOption);
             clause = new StringQueryClause(arranged);
         } else {
-            clause = buildBindClause(columnRealName, realOperand, location, rearOption, cipher);
+            clause = buildBindClause(realRealName, realOperand, location, rearOption, cipher);
         }
         conditionList.add(clause);
     }

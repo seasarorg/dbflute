@@ -46,14 +46,6 @@ public class WayOfSQLite implements DBWay, Serializable {
     }
 
     // ===================================================================================
-    //                                                                 LikeSearch WildCard
-    //                                                                 ===================
-    @SuppressWarnings("unchecked")
-    public List<String> getOriginalWildCardList() {
-        return Collections.EMPTY_LIST;
-    }
-
-    // ===================================================================================
     //                                                                         SQL Support
     //                                                                         ===========
     public boolean isBlockCommentSupported() {
@@ -69,6 +61,21 @@ public class WayOfSQLite implements DBWay, Serializable {
     //                                                                        ============
     public boolean isScrollableCursorSupported() {
         return false;
+    }
+    
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    @SuppressWarnings("unchecked")
+    public List<String> getOriginalWildCardList() {
+        return Collections.EMPTY_LIST;
+    }
+
+    // ===================================================================================
+    //                                                                    String Connector
+    //                                                                    ================
+    public StringConnector getStringConnector() {
+        return STANDARD_STRING_CONNECTOR;
     }
 
     // ===================================================================================

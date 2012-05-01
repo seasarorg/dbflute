@@ -15,10 +15,14 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
+import org.seasar.dbflute.dbway.StringConnector;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -50,6 +54,9 @@ public class LikeSearchOption extends SimpleStringOption {
     protected String _escape;
     protected boolean _asOrSplit;
     protected List<String> _originalWildCardList;
+    protected List<HpSpecifiedColumn> _compoundColumnList;
+    protected List<Integer> _compoundColumnSizeList;
+    protected StringConnector _stringConnector;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -117,6 +124,18 @@ public class LikeSearchOption extends SimpleStringOption {
         escape();
     }
 
+    public boolean isLikePrefix() {
+        return LIKE_PREFIX.equals(_like);
+    }
+
+    public boolean isLikeSuffix() {
+        return LIKE_SUFFIX.equals(_like);
+    }
+
+    public boolean isLikeContain() {
+        return LIKE_CONTAIN.equals(_like);
+    }
+
     // ===================================================================================
     //                                                                              Escape
     //                                                                              ======
@@ -176,6 +195,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitByBlank() {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitByBlank();
     }
 
@@ -185,6 +205,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitByBlank(int splitLimitCount) {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitByBlank(splitLimitCount);
     }
 
@@ -193,6 +214,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitBySpace() {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitBySpace();
     }
 
@@ -202,6 +224,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitBySpace(int splitLimitCount) {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitBySpace(splitLimitCount);
     }
 
@@ -210,6 +233,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitBySpaceContainsDoubleByte() {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitBySpaceContainsDoubleByte();
     }
 
@@ -219,6 +243,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitBySpaceContainsDoubleByte(int splitLimitCount) {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitBySpaceContainsDoubleByte(splitLimitCount);
     }
 
@@ -227,6 +252,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitByPipeLine() {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitByPipeLine();
     }
 
@@ -236,6 +262,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitByPipeLine(int splitLimitCount) {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitByPipeLine(splitLimitCount);
     }
 
@@ -245,6 +272,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitByVarious(List<String> delimiterList) {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitByVarious(delimiterList);
     }
 
@@ -255,7 +283,15 @@ public class LikeSearchOption extends SimpleStringOption {
      * @return this.
      */
     public LikeSearchOption splitByVarious(List<String> delimiterList, int splitLimitCount) {
+        assertSplitByPrecondition();
         return (LikeSearchOption) doSplitByVarious(delimiterList, splitLimitCount);
+    }
+
+    protected void assertSplitByPrecondition() {
+        if (hasCompoundColumn()) {
+            String msg = "The Split of LikeSearch is unsupported with CompoundColumn.";
+            throw new IllegalStateException(msg);
+        }
     }
 
     /**
@@ -270,6 +306,109 @@ public class LikeSearchOption extends SimpleStringOption {
 
     public boolean isAsOrSplit() {
         return _asOrSplit;
+    }
+
+    // ===================================================================================
+    //                                                                     Compound Column
+    //                                                                     ===============
+    // -----------------------------------------------------
+    //                                          Dream Cruise
+    //                                          ------------
+    /**
+     * Add compound column connected to main column. {Dream Cruise}
+     * @param compoundColumn The compound column specified by Dream Cruise. (NotNull)
+     * @return this. (NotNull)
+     */
+    public LikeSearchOption addCompoundColumn(HpSpecifiedColumn compoundColumn) {
+        assertCompoundColumnPrecondition(compoundColumn);
+        assertCompoundColumnSpecifiedColumn(compoundColumn);
+        if (_compoundColumnList == null) {
+            _compoundColumnList = new ArrayList<HpSpecifiedColumn>();
+        }
+        _compoundColumnList.add(compoundColumn);
+        return this;
+    }
+
+    protected void assertCompoundColumnPrecondition(HpSpecifiedColumn compoundColumn) {
+        if (isSplit()) {
+            String msg = "The CompoundColumn of LikeSearch is unsupported with Split: " + compoundColumn;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void assertCompoundColumnSpecifiedColumn(HpSpecifiedColumn compoundColumn) {
+        if (compoundColumn == null) {
+            String msg = "The argument 'compoundColumn' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (!compoundColumn.getColumnInfo().isPropertyTypeString()) {
+            String msg = "The type of the compound column should be String: " + compoundColumn;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    public boolean hasCompoundColumn() {
+        return _compoundColumnList != null && !_compoundColumnList.isEmpty();
+    }
+
+    public List<HpSpecifiedColumn> getCompoundColumnList() {
+        return _compoundColumnList;
+    }
+
+    public void clearCompoundColumn() {
+        if (_compoundColumnList != null) {
+            _compoundColumnList.clear();
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                          Optimization
+    //                                          ------------
+    public LikeSearchOption optimizeCompoundColumn(Integer... sizes) {
+        if (!hasCompoundColumn()) {
+            String msg = "The CompoundColumnOptimization needs CompoundColumn.";
+            throw new IllegalStateException(msg);
+        }
+        if (sizes.length != (_compoundColumnList.size() + 1)) {
+            String msg = "The length of argument 'sizes' should be count of compound columns + 1.";
+            msg = msg + " sizes.length=" + sizes.length;
+            msg = msg + " compoundColumnList.size()=" + _compoundColumnList.size();
+            throw new IllegalArgumentException(msg);
+        }
+        _compoundColumnSizeList = Arrays.asList(sizes);
+        return this;
+    }
+
+    public boolean canOptimizeCompoundColumnLikePrefix() {
+        return hasCompoundColumn() && hasCompoundColumnOptimization() && isLikePrefix();
+    }
+
+    public boolean hasCompoundColumnOptimization() {
+        return _compoundColumnSizeList != null && !_compoundColumnSizeList.isEmpty();
+    }
+
+    public List<Integer> getCompoundColumnSizeList() {
+        return _compoundColumnSizeList;
+    }
+
+    // -----------------------------------------------------
+    //                                       StringConnector
+    //                                       ---------------
+    // called after being set to condition-query or parameter-bean
+    // for DBMS that has original string connection way
+    //  e.g. MySQL, SQLServer
+
+    public LikeSearchOption acceptStringConnector(StringConnector stringConnector) {
+        _stringConnector = stringConnector;
+        return this;
+    }
+
+    public boolean hasStringConnector() {
+        return _stringConnector != null;
+    }
+
+    public StringConnector getStringConnector() {
+        return _stringConnector;
     }
 
     // ===================================================================================
@@ -323,8 +462,30 @@ public class LikeSearchOption extends SimpleStringOption {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                           Deep Copy
+    //                                                                           =========
     @Override
-    protected SimpleStringOption newDeepCopyInstance() {
+    public LikeSearchOption createDeepCopy() {
+        final LikeSearchOption copy = (LikeSearchOption) super.createDeepCopy();
+        copy._like = _like;
+        copy._escape = _escape;
+        copy._asOrSplit = _asOrSplit;
+        if (_originalWildCardList != null) {
+            copy._originalWildCardList = new ArrayList<String>(_originalWildCardList);
+        }
+        if (_compoundColumnList != null) {
+            copy._compoundColumnList = new ArrayList<HpSpecifiedColumn>(_compoundColumnList);
+        }
+        if (_compoundColumnSizeList != null) {
+            copy._compoundColumnSizeList = new ArrayList<Integer>(_compoundColumnSizeList);
+        }
+        copy._stringConnector = _stringConnector;
+        return copy;
+    }
+
+    @Override
+    protected LikeSearchOption newDeepCopyInstance() {
         return new LikeSearchOption();
     }
 

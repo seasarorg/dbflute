@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.dbway.DBWay;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
@@ -167,7 +168,7 @@ public class ValueAndTypeSetupper {
             }
             throwNotFoundPropertyException(clazz, currentName);
         }
-        adjustLikeSearchEscape(likeSearchOption);
+        adjustLikeSearchDBWay(likeSearchOption);
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
         valueAndType.setLikeSearchOption(likeSearchOption);
@@ -214,10 +215,11 @@ public class ValueAndTypeSetupper {
         return resourceName + LIKE_SEARCH_OPTION_SUFFIX;
     }
 
-    protected void adjustLikeSearchEscape(LikeSearchOption option) {
+    protected void adjustLikeSearchDBWay(LikeSearchOption option) {
         if (option != null) {
-            final List<String> wildCardList = ResourceContext.currentDBDef().dbway().getOriginalWildCardList();
-            option.acceptOriginalWildCardList(wildCardList);
+            final DBWay dbway = ResourceContext.currentDBDef().dbway();
+            option.acceptOriginalWildCardList(dbway.getOriginalWildCardList());
+            option.acceptStringConnector(dbway.getStringConnector());
         }
     }
 

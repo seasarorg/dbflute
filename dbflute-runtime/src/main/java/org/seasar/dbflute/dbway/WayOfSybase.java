@@ -62,18 +62,6 @@ public class WayOfSybase implements DBWay, Serializable {
     }
 
     // ===================================================================================
-    //                                                                 LikeSearch WildCard
-    //                                                                 ===================
-    @SuppressWarnings("unchecked")
-    public List<String> getOriginalWildCardList() {
-        return Collections.EMPTY_LIST;
-        // The original wild-cards '[' and ']' of Sybase
-        // have an original escape way, so DBFlute cannot
-        // handle them
-        //return _originalWildCardList;
-    }
-
-    // ===================================================================================
     //                                                                         SQL Support
     //                                                                         ===========
     public boolean isBlockCommentSupported() {
@@ -89,6 +77,25 @@ public class WayOfSybase implements DBWay, Serializable {
     //                                                                        ============
     public boolean isScrollableCursorSupported() {
         return true;
+    }
+
+    // ===================================================================================
+    //                                                                 LikeSearch WildCard
+    //                                                                 ===================
+    @SuppressWarnings("unchecked")
+    public List<String> getOriginalWildCardList() {
+        return Collections.EMPTY_LIST;
+        // The original wild-cards '[' and ']' of Sybase
+        // have an original escape way, so DBFlute cannot
+        // handle them
+        //return _originalWildCardList;
+    }
+
+    // ===================================================================================
+    //                                                                    String Connector
+    //                                                                    ================
+    public StringConnector getStringConnector() {
+        return STANDARD_STRING_CONNECTOR;
     }
 
     // ===================================================================================

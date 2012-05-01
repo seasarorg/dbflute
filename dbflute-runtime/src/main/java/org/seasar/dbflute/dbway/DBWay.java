@@ -60,6 +60,41 @@ public interface DBWay {
     List<String> getOriginalWildCardList();
 
     // ===================================================================================
+    //                                                                    String Connector
+    //                                                                    ================
+    StringConnector getStringConnector();
+
+    static final StringConnector STANDARD_STRING_CONNECTOR = new StringConnector() {
+        public String connect(Object... elements) {
+            final StringBuilder sb = new StringBuilder();
+            int index = 0;
+            for (Object element : elements) {
+                if (index > 0) {
+                    sb.append(" || ");
+                }
+                sb.append(element);
+                ++index;
+            }
+            return sb.toString();
+        }
+    };
+
+    static final StringConnector PLUS_STRING_CONNECTOR = new StringConnector() {
+        public String connect(Object... elements) {
+            final StringBuilder sb = new StringBuilder();
+            int index = 0;
+            for (Object element : elements) {
+                if (index > 0) {
+                    sb.append(" + ");
+                }
+                sb.append(element);
+                ++index;
+            }
+            return sb.toString();
+        }
+    };
+
+    // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
     /**

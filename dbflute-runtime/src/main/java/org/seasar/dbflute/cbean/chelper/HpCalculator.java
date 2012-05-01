@@ -18,8 +18,8 @@ public interface HpCalculator {
     HpCalculator plus(Number plusValue);
 
     /**
-     * Plus the specified column with the plus column. (+)
-     * @param plusColumn The plus column specified by Dream Cruise. (NotNull)
+     * Plus the specified column with the plus column. (+) {Dream Cruise}
+     * @param plusColumn The plus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
     HpCalculator plus(HpSpecifiedColumn plusColumn);
@@ -32,8 +32,8 @@ public interface HpCalculator {
     HpCalculator minus(Number minusValue);
 
     /**
-     * Minus the specified column with the minus column. (-)
-     * @param minusColumn The minus column specified by Dream Cruise. (NotNull)
+     * Minus the specified column with the minus column. (-) {Dream Cruise}
+     * @param minusColumn The minus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
     HpCalculator minus(HpSpecifiedColumn minusColumn);
@@ -46,8 +46,8 @@ public interface HpCalculator {
     HpCalculator multiply(Number multiplyValue);
 
     /**
-     * Multiply the specified column with the multiply column. (*)
-     * @param multiplyColumn The multiply column specified by Dream Cruise. (NotNull)
+     * Multiply the specified column with the multiply column. (*) {Dream Cruise}
+     * @param multiplyColumn The multiply column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
     HpCalculator multiply(HpSpecifiedColumn multiplyColumn);
@@ -60,8 +60,8 @@ public interface HpCalculator {
     HpCalculator divide(Number divideValue);
 
     /**
-     * Divide the specified column with the divide column. (/)
-     * @param divideColumn The divide column specified by Dream Cruise. (NotNull)
+     * Divide the specified column with the divide column. (/) {Dream Cruise}
+     * @param divideColumn The divide column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
     HpCalculator divide(HpSpecifiedColumn divideColumn);

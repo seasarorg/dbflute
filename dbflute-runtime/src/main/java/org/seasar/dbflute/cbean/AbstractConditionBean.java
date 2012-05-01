@@ -1047,12 +1047,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 propertyName = remainder.substring(0, deimiterIndex);
                 remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
             }
+            Class<?> targetType = currentObj.getClass();
             final String methodName = (count == 0 ? "setupSelect_" : "with") + initCap(propertyName);
-            final Method method = DfReflectionUtil
-                    .getPublicMethod(currentObj.getClass(), methodName, new Class<?>[] {});
+            final Method method = DfReflectionUtil.getPublicMethod(targetType, methodName, new Class<?>[] {});
             if (method == null) {
                 String msg = "Not found the method for setupSelect:";
                 msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
+                msg = msg + " targetType=" + targetType;
                 msg = msg + " methodName=" + methodName;
                 throw new ConditionInvokingFailureException(msg);
             }
@@ -1061,6 +1062,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             } catch (ReflectionFailureException e) {
                 String msg = "Failed to invoke the method:";
                 msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
+                msg = msg + " targetType=" + targetType;
                 msg = msg + " methodName=" + methodName;
                 throw new ConditionInvokingFailureException(msg, e);
             }
@@ -1086,9 +1088,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * Synchronize union-query. {Internal}
      * @param unionCB The condition-bean for union. (NotNull)
      */
-    protected void xsyncUQ(ConditionBean unionCB) { // synchronizeUnionQuery()
+    protected void xsyncUQ(final ConditionBean unionCB) { // synchronizeUnionQuery()
         if (_unionQuerySynchronizer != null) {
-            _unionQuerySynchronizer.query(unionCB);
+            _unionQuerySynchronizer.query(unionCB); // no lazy allowed
         }
     }
 
