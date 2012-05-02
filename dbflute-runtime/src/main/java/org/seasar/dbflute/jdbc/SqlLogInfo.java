@@ -63,6 +63,21 @@ public class SqlLogInfo {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("executedSql.length()=").append(_executedSql != null ? _executedSql.length() : null);
+        sb.append(", bindArgs.length=").append(_bindArgs != null ? _bindArgs.length : null);
+        sb.append(", bindArgTypes.length=").append(_bindArgTypes != null ? _bindArgTypes.length : null);
+        sb.append(", cachedDisplaySql.length()=").append(_cachedDisplaySql != null ? _cachedDisplaySql.length() : null);
+        sb.append("}");
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     /**

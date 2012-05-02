@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -28,7 +29,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.QLog;
+import org.seasar.dbflute.bhv.core.SqlFireHook;
+import org.seasar.dbflute.bhv.core.SqlFireReadyInfo;
+import org.seasar.dbflute.bhv.core.SqlFireResultInfo;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
+import org.seasar.dbflute.jdbc.ExecutionTimeInfo;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.SqlLogInfo.SqlLogDisplaySqlBuilder;
@@ -164,30 +169,32 @@ public abstract class TnAbstractBasicSqlHandler {
     //                                           -----------
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         final boolean logEnabled = isLogEnabled();
+        final boolean hasSqlFireHook = hasSqlFireHook();
         final boolean hasSqlLog = hasSqlLogHandler();
         final boolean hasSqlResult = hasSqlResultHandler();
         final Object sqlLogRegistry = getSqlLogRegistry();
         final boolean hasRegistry = sqlLogRegistry != null;
 
-        if (logEnabled || hasSqlLog || hasSqlResult || hasRegistry) {
+        if (logEnabled || hasSqlFireHook || hasSqlLog || hasSqlResult || hasRegistry) {
             if (isInternalDebugEnabled()) {
                 final String determination = logEnabled + ", " + hasSqlLog + ", " + hasSqlResult + ", " + hasRegistry;
                 _log.debug("...Logging SQL by " + determination);
             }
-            if (processBeforeLogging(args, argTypes, logEnabled, hasSqlLog, hasSqlResult, sqlLogRegistry)) {
+            if (processBeforeLogging(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult,
+                    sqlLogRegistry)) {
                 return; // processed by anyone
             }
-            doLogSql(args, argTypes, logEnabled, hasSqlLog, hasSqlResult, sqlLogRegistry);
+            doLogSql(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult, sqlLogRegistry);
         }
     }
 
-    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlLog,
-            boolean hasSqlResult, Object sqlLogRegistry) {
+    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled,
+            boolean hasSqlFireHook, boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
         return false;
     }
 
-    protected void doLogSql(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlLog,
-            boolean hasSqlResult, Object sqlLogRegistry) {
+    protected void doLogSql(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlFireHook,
+            boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
         final boolean hasRegistry = sqlLogRegistry != null;
         final String firstDisplaySql;
         if (logEnabled || hasRegistry) { // build at once
@@ -204,7 +211,7 @@ public abstract class TnAbstractBasicSqlHandler {
         } else {
             firstDisplaySql = null;
         }
-        if (hasSqlLog || hasSqlResult) { // build lazily
+        if (hasSqlFireHook || hasSqlLog || hasSqlResult) { // build lazily
             if (isInternalDebugEnabled()) {
                 _log.debug("...Handling SqlLog or SqlResult by " + hasSqlLog + ", " + hasSqlResult);
             }
@@ -213,7 +220,7 @@ public abstract class TnAbstractBasicSqlHandler {
                 if (hasSqlLog) {
                     getSqlLogHander().handle(sqlLogInfo);
                 }
-                if (hasSqlResult) {
+                if (hasSqlFireHook || hasSqlResult) {
                     saveResultSqlLogInfo(sqlLogInfo);
                 }
             }
@@ -243,6 +250,20 @@ public abstract class TnAbstractBasicSqlHandler {
         final String logDateFormat = ResourceContext.getLogDateFormat();
         final String logTimestampFormat = ResourceContext.getLogTimestampFormat();
         return new DisplaySqlBuilder(logDateFormat, logTimestampFormat);
+    }
+
+    // -----------------------------------------------------
+    //                                           SqlFireHook
+    //                                           -----------
+    protected SqlFireHook getSqlFireHook() {
+        if (!CallbackContext.isExistCallbackContextOnThread()) {
+            return null;
+        }
+        return CallbackContext.getCallbackContextOnThread().getSqlFireHook();
+    }
+
+    protected boolean hasSqlFireHook() {
+        return getSqlFireHook() != null;
     }
 
     // -----------------------------------------------------
@@ -398,45 +419,115 @@ public abstract class TnAbstractBasicSqlHandler {
     // -----------------------------------------------------
     //                                             Execution
     //                                             ---------
+    // four super stars:
+    // o executeQuery()
+    // o executeUpdate()
+    // o executeBatch()
+    // o executeProcedure()
+
     protected ResultSet executeQuery(PreparedStatement ps) throws SQLException {
-        final boolean saveMillis = hasSqlResultHandler();
+        final boolean saveMillis = isSaveMillis();
         if (saveMillis) {
             saveBeforeSqlTimeMillis();
         }
-        final ResultSet rs = ps.executeQuery();
-        if (saveMillis) {
-            saveAfterSqlTimeMillis();
+        hookSqlFireBefore();
+        ResultSet rs = null;
+        SQLException nativeCause = null;
+        try {
+            rs = ps.executeQuery();
+            if (saveMillis) {
+                saveAfterSqlTimeMillis();
+            }
+            return rs;
+        } catch (SQLException e) {
+            nativeCause = e;
+            throw e;
+        } finally {
+            hookSqlFireFinally(rs, nativeCause);
         }
-        return rs;
     }
 
     protected int executeUpdate(PreparedStatement ps) { // with SQLException handling
+        final boolean saveMillis = isSaveMillis();
+        if (saveMillis) {
+            saveBeforeSqlTimeMillis();
+        }
+        hookSqlFireBefore();
+        Integer updated = null;
+        SQLException nativeCause = null;
         try {
-            final boolean saveMillis = hasSqlResultHandler();
-            if (saveMillis) {
-                saveBeforeSqlTimeMillis();
-            }
-            final int updated = ps.executeUpdate();
+            updated = ps.executeUpdate();
             if (saveMillis) {
                 saveAfterSqlTimeMillis();
             }
             return updated;
         } catch (SQLException e) {
+            nativeCause = e;
             handleSQLException(e, ps, true);
             return -1; // unreachable
+        } finally {
+            hookSqlFireFinally(updated, nativeCause);
+        }
+    }
+
+    protected int[] executeBatch(PreparedStatement ps, List<?> list) {
+        final boolean saveMillis = isSaveMillis();
+        if (saveMillis) {
+            saveBeforeSqlTimeMillis();
+        }
+        hookSqlFireBefore();
+        int[] batchResult = null;
+        SQLException nativeCause = null;
+        try {
+            batchResult = ps.executeBatch();
+            if (saveMillis) {
+                saveAfterSqlTimeMillis();
+            }
+            return batchResult;
+        } catch (SQLException e) {
+            nativeCause = e;
+            handleSQLException(e, ps, true);
+            return null; // unreachable
+        } finally {
+            hookSqlFireFinally(batchResult, nativeCause);
+        }
+    }
+
+    protected void addBatch(PreparedStatement ps) {
+        try {
+            ps.addBatch();
+        } catch (SQLException e) {
+            handleSQLException(e, ps);
         }
     }
 
     protected boolean executeProcedure(CallableStatement cs) throws SQLException {
-        final boolean saveMillis = hasSqlResultHandler();
+        final boolean saveMillis = isSaveMillis();
         if (saveMillis) {
             saveBeforeSqlTimeMillis();
         }
-        final boolean executed = cs.execute();
-        if (saveMillis) {
-            saveAfterSqlTimeMillis();
+        hookSqlFireBefore();
+        Boolean executed = null;
+        SQLException nativeCause = null;
+        try {
+            executed = cs.execute();
+            if (saveMillis) {
+                saveAfterSqlTimeMillis();
+            }
+            return executed;
+        } catch (SQLException e) {
+            nativeCause = e;
+            throw e;
+        } finally {
+            hookSqlFireFinally(executed, nativeCause);
         }
-        return executed;
+    }
+
+    // -----------------------------------------------------
+    //                                            SaveMillis
+    //                                            ----------
+    protected boolean isSaveMillis() {
+        return hasSqlFireHook() || hasSqlResultHandler();
     }
 
     protected void saveBeforeSqlTimeMillis() {
@@ -445,6 +536,30 @@ public abstract class TnAbstractBasicSqlHandler {
 
     protected void saveAfterSqlTimeMillis() {
         InternalMapContext.setSqlAfterTimeMillis(systemTime());
+    }
+
+    // -----------------------------------------------------
+    //                                           SqlFireHook
+    //                                           -----------
+    protected void hookSqlFireBefore() {
+        if (!hasSqlFireHook()) {
+            return;
+        }
+        final SqlLogInfo sqlLogInfo = InternalMapContext.getResultSqlLogInfo();
+        final SqlFireReadyInfo fireReadyInfo = new SqlFireReadyInfo(sqlLogInfo);
+        getSqlFireHook().hookBefore(ResourceContext.behaviorCommand(), fireReadyInfo);
+    }
+
+    protected void hookSqlFireFinally(Object nativeResult, SQLException nativeCause) {
+        if (!hasSqlFireHook()) {
+            return;
+        }
+        final SqlLogInfo sqlLogInfo = InternalMapContext.getResultSqlLogInfo();
+        final Long sqlBefore = InternalMapContext.getSqlBeforeTimeMillis();
+        final Long sqlAfter = InternalMapContext.getSqlAfterTimeMillis();
+        final ExecutionTimeInfo timeInfo = new ExecutionTimeInfo(null, null, sqlBefore, sqlAfter);
+        final SqlFireResultInfo fireResultInfo = new SqlFireResultInfo(nativeResult, sqlLogInfo, timeInfo, nativeCause);
+        getSqlFireHook().hookFinally(ResourceContext.behaviorCommand(), fireResultInfo);
     }
 
     // -----------------------------------------------------

@@ -13,33 +13,26 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.jdbc;
+package org.seasar.dbflute.bhv.core;
+
+import org.seasar.dbflute.jdbc.SqlLogInfo;
 
 /**
- * The information of SQL result.
+ * The information of SQL fire ready.
  * @author jflute
  */
-public class SqlResultInfo {
+public class SqlFireReadyInfo {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Object _result;
-    protected final String _tableDbName;
-    protected final String _commandName;
     protected final SqlLogInfo _sqlLogInfo;
-    protected final ExecutionTimeInfo _executionTimeInfo;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SqlResultInfo(Object result, String tableDbName, String commandName, SqlLogInfo sqlLogInfo,
-            ExecutionTimeInfo millisInfo) {
-        _result = result;
-        _tableDbName = tableDbName;
-        _commandName = commandName;
+    public SqlFireReadyInfo(SqlLogInfo sqlLogInfo) {
         _sqlLogInfo = sqlLogInfo;
-        _executionTimeInfo = millisInfo;
     }
 
     // ===================================================================================
@@ -49,11 +42,7 @@ public class SqlResultInfo {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("{");
-        sb.append("result=").append(_result != null ? _result.getClass().getName() : null);
-        sb.append(", tableDbName=").append(_tableDbName);
-        sb.append(", commandName=").append(_commandName);
         sb.append(", sqlLogInfo=").append(_sqlLogInfo);
-        sb.append(", executionTimeInfo=").append(_executionTimeInfo);
         sb.append("}");
         return sb.toString();
     }
@@ -61,30 +50,6 @@ public class SqlResultInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    /**
-     * Get the result of SQL execution (mapped to entity if select). <br />
-     * @return The instance of result. (NullAllowed)
-     */
-    public Object getResult() {
-        return _result;
-    }
-
-    /**
-     * Get the table DB name for the behavior command.
-     * @return The DB name of table. (NotNull)
-     */
-    public String getTableDbName() {
-        return _tableDbName;
-    }
-
-    /**
-     * Get the name of the behavior command.
-     * @return The name of the behavior command. (NotNull)
-     */
-    public String getCommandName() {
-        return _commandName;
-    }
-
     /**
      * Get the information of SQL log info.
      * <pre>
@@ -98,20 +63,5 @@ public class SqlResultInfo {
      */
     public SqlLogInfo getSqlLogInfo() {
         return _sqlLogInfo;
-    }
-
-    /**
-     * Get the information of execution time info.
-     * <pre>
-     * [ExecutionTimeInfo]
-     * o commandBeforeTimeMillis : The time as millisecond before command invoking (before building SQL clause). (NotNull)
-     * o commandAfterTimeMillis : The time as millisecond after command invoking (after mapping to entity). (NotNull)
-     * o sqlBeforeTimeMillis : The time as millisecond before SQL execution (after building SQL clause). (basically NotNull but no guarantee)
-     * o sqlAfterTimeMillis : The time as millisecond after SQL execution (before mapping to entity). (basically NotNull but no guarantee)
-     * </pre>
-     * @return The information of execution time. (NotNull)
-     */
-    public ExecutionTimeInfo getExecutionTimeInfo() {
-        return _executionTimeInfo;
     }
 }

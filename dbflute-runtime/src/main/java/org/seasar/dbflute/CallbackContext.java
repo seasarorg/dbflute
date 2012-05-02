@@ -16,6 +16,7 @@
 package org.seasar.dbflute;
 
 import org.seasar.dbflute.bhv.core.BehaviorCommandHook;
+import org.seasar.dbflute.bhv.core.SqlFireHook;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 
@@ -111,6 +112,53 @@ public class CallbackContext {
         if (isExistCallbackContextOnThread()) {
             final CallbackContext context = getCallbackContextOnThread();
             context.setBehaviorCommandHook(null);
+            if (!context.hasAnyInterface()) {
+                clearCallbackContextOnThread();
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                           SqlFireHook
+    //                                           -----------
+    /**
+     * Set the hook interface of SQL fires. <br />
+     * This hook interface is called back before firing SQL and finally. <br /> 
+     * The hook methods may be called by nested process
+     * so you should pay attention to it when you implements this.
+     * <pre>
+     * context.setSqlFireHook(new SqlFireHook() {
+     *     public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+     *         // You can implement your favorite call-back here.
+     *     }
+     *     public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+     *         // You can implement your favorite call-back here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlFireHook The hook interface of behavior commands. (NullAllowed)
+     */
+    public static void setSqlFireHookOnThread(SqlFireHook sqlFireHook) {
+        final CallbackContext context = getOrCreateContext();
+        context.setSqlFireHook(sqlFireHook);
+    }
+
+    /**
+     * Is existing the hook interface of behavior commands on thread?
+     * @return The determination, true or false.
+     */
+    public static boolean isExistSqlFireHookOnThread() {
+        return isExistCallbackContextOnThread() && getCallbackContextOnThread().getSqlFireHook() != null;
+    }
+
+    /**
+     * Clear the hook interface of behavior commands from call-back context on thread. <br />
+     * If the call-back context has had the interface only, the context will also removed from thread.
+     */
+    public static void clearSqlFireHookOnThread() {
+        if (isExistCallbackContextOnThread()) {
+            final CallbackContext context = getCallbackContextOnThread();
+            context.setSqlFireHook(null);
             if (!context.hasAnyInterface()) {
                 clearCallbackContextOnThread();
             }
@@ -218,6 +266,7 @@ public class CallbackContext {
     //                                                                           Attribute
     //                                                                           =========
     protected BehaviorCommandHook _behaviorCommandHook;
+    protected SqlFireHook _sqlFireHook;
     protected SqlLogHandler _sqlLogHandler;
     protected SqlResultHandler _sqlResultHandler;
 
@@ -225,7 +274,8 @@ public class CallbackContext {
     //                                                                       Determination
     //                                                                       =============
     public boolean hasAnyInterface() {
-        return _behaviorCommandHook != null || _sqlLogHandler != null || _sqlResultHandler != null;
+        return _behaviorCommandHook != null || _sqlFireHook != null // hook
+                || _sqlLogHandler != null || _sqlResultHandler != null; // handler
     }
 
     // ===================================================================================
@@ -257,6 +307,34 @@ public class CallbackContext {
      */
     public void setBehaviorCommandHook(BehaviorCommandHook behaviorCommandHook) {
         this._behaviorCommandHook = behaviorCommandHook;
+    }
+
+    // -----------------------------------------------------
+    //                                           SqlFireHook
+    //                                           -----------
+    public SqlFireHook getSqlFireHook() {
+        return _sqlFireHook;
+    }
+
+    /**
+     * Set the hook interface of SQL fires. <br />
+     * This hook interface is called back before firing SQL and finally. <br /> 
+     * The hook methods may be called by nested process
+     * so you should pay attention to it when you implements this.
+     * <pre>
+     * context.setSqlFireHook(new SqlFireHook() {
+     *     public void hookBefore(BehaviorCommandMeta meta, SqlFireReadyInfo fireReadyInfo) {
+     *         // You can implement your favorite call-back here.
+     *     }
+     *     public void hookFinally(BehaviorCommandMeta meta, SqlFireResultInfo fireResultInfo) {
+     *         // You can implement your favorite call-back here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlFireHook The hook interface of SQL fires. (NullAllowed)
+     */
+    public void setSqlFireHook(SqlFireHook sqlFireHook) {
+        this._sqlFireHook = sqlFireHook;
     }
 
     // -----------------------------------------------------

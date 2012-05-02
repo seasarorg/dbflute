@@ -686,33 +686,44 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final List<Integer> sizeList = option.getCompoundColumnSizeList();
         String currentValue = value;
         int currentLength = value.length();
-        String currentColumn = null;
-        int eqCount = 0;
-        for (int i = 0; i < sizeList.size(); i++) { // should be same size as column count (checked in option)
-            final Integer columnSize = sizeList.get(i);
-            if (i == 0) { // first is main column
-                currentColumn = columnDbName;
-            } else { // compound columns
-                final HpSpecifiedColumn specifiedColumn = compoundColumnList.get(i - 1);
-                currentColumn = specifiedColumn.getColumnDbName();
-            }
-            if (currentLength >= columnSize) { // can treat current condition as equal
-                final String equalValue = currentValue.substring(0, columnSize);
-                invokeQueryEqual(currentColumn, equalValue);
-                currentValue = currentValue.substring(columnSize);
-                currentLength = currentValue.length();
-                ++eqCount;
-            } else {
-                break;
-            }
+        String currentColumn = columnDbName;
+        final boolean needsAndPart = isOrScopeQueryDirectlyUnder();
+        if (needsAndPart) {
+            xgetSqlClause().beginOrScopeQueryAndPart();
         }
-        if (currentValue.length() > 0) {
-            final LikeSearchOption copyOption = option.createDeepCopy();
-            copyOption.clearCompoundColumn();
-            for (HpSpecifiedColumn specifiedColumn : compoundColumnList.subList(eqCount, compoundColumnList.size())) {
-                copyOption.addCompoundColumn(specifiedColumn);
+        try {
+            final Iterator<HpSpecifiedColumn> compoundColumnIterator = compoundColumnList.iterator();
+            for (int i = 0; i < sizeList.size(); i++) { // should be less or equal column count (checked in option)
+                final Integer columnSize = sizeList.get(i);
+                if (currentLength >= columnSize) { // can treat current condition as equal
+                    final String equalValue = currentValue.substring(0, columnSize);
+                    invokeQueryEqual(currentColumn, equalValue);
+                    currentValue = currentValue.substring(columnSize);
+                    currentLength = currentValue.length();
+                    final HpSpecifiedColumn specifiedColumn;
+                    if (compoundColumnIterator.hasNext()) {
+                        specifiedColumn = compoundColumnIterator.next();
+                        currentColumn = specifiedColumn.getColumnDbName();
+                    } else { // means just size
+                        currentColumn = null; // means end
+                        break; // though basically no need to break because of size loop end
+                    }
+                } else { // short length condition value
+                    break;
+                }
             }
-            invokeQueryLikeSearch(currentColumn, currentValue, copyOption);
+            if (currentValue.length() > 0 && currentColumn != null) { // double check
+                final LikeSearchOption copyOption = option.createDeepCopy();
+                copyOption.clearCompoundColumn(); // also fixed sizes cleared
+                while (compoundColumnIterator.hasNext()) {
+                    copyOption.addCompoundColumn(compoundColumnIterator.next());
+                }
+                invokeQueryLikeSearch(currentColumn, currentValue, copyOption);
+            }
+        } finally {
+            if (needsAndPart) {
+                xgetSqlClause().endOrScopeQueryAndPart();
+            }
         }
     }
 

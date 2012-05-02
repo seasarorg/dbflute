@@ -153,14 +153,14 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     protected abstract Integer getBatchLoggingLimit();
 
     @Override
-    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled, boolean hasSqlLog,
-            boolean hasSqlResult, Object sqlLogRegistry) {
+    protected boolean processBeforeLogging(Object[] args, Class<?>[] argTypes, boolean logEnabled,
+            boolean hasSqlFireHook, boolean hasSqlLog, boolean hasSqlResult, Object sqlLogRegistry) {
         if (_batchLoggingSb == null) {
             _batchLoggingSb = new StringBuilder(1000);
         }
         final String displaySql = buildDisplaySql(_sql, args);
         saveBatchLoggingSql(displaySql);
-        doLogSql(args, argTypes, false, hasSqlLog, false, sqlLogRegistry); // process non-batch handling
+        doLogSql(args, argTypes, false, false, hasSqlLog, false, sqlLogRegistry); // process non-batch handling
         if (needsBreakLoggingScope()) {
             handleBatchLogging(); // and also cleared
         }
@@ -179,7 +179,7 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
 
     protected String handleBatchLogging() {
         if (_batchLoggingSb == null) { // may be limited by option
-            handleSqlResultHandler(null); // but SqlResultHandler handling is needed
+            handleBatchResultSqlSaving(null); // but SqlResultHandler handling is needed
             return null;
         }
         final String batchSql = _batchLoggingSb.toString();
@@ -187,12 +187,12 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
             log(batchSql); // batch logging (always starts with a line separator)
         }
         clearBatchLogging();
-        handleSqlResultHandler(batchSql);
+        handleBatchResultSqlSaving(batchSql);
         return batchSql;
     }
 
-    protected void handleSqlResultHandler(String batchSql) {
-        if (!_alreadySavedToResultInfo && hasSqlResultHandler()) { // only first scope is saved
+    protected void handleBatchResultSqlSaving(String batchSql) {
+        if (!_alreadySavedToResultInfo && (hasSqlFireHook() || hasSqlResultHandler())) { // only first scope is saved
             final Object[] bindArgs = _bindVariables;
             final Class<?>[] bindArgTypes = getArgTypes(bindArgs);
             final String savedDisplaySql = batchSql != null ? batchSql.trim() : null; // remove first line separator
@@ -346,25 +346,5 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
             _exceptionMessageSqlArgs = _bindVariables; // as current bean
         }
         return super.buildExceptionMessageSql();
-    }
-
-    // ===================================================================================
-    //                                                                      JDBC Delegator
-    //                                                                      ==============
-    protected int[] executeBatch(PreparedStatement ps, List<?> list) {
-        try {
-            return ps.executeBatch();
-        } catch (SQLException e) {
-            handleSQLException(e, ps, true);
-            return null; // unreachable
-        }
-    }
-
-    protected void addBatch(PreparedStatement ps) {
-        try {
-            ps.addBatch();
-        } catch (SQLException e) {
-            handleSQLException(e, ps);
-        }
     }
 }

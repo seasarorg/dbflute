@@ -80,10 +80,26 @@ public class ExecutionTimeInfo {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append("commandBefore=").append(_commandBeforeTimeMillis);
+        sb.append(", commandAfter=").append(_commandAfterTimeMillis);
+        sb.append(", sqlBefore=").append(_sqlBeforeTimeMillis);
+        sb.append(", sqlAfter=").append(_sqlAfterTimeMillis);
+        sb.append("}");
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Get the time as millisecond before command invoking (before building SQL clause).
+     * Get the time as millisecond before command invoking (before building SQL clause). <br />
+     * NotNull when SQL result handler, Null when SQLFireHook.
      * @return The long value of millisecond. (NotNull)
      */
     public Long getCommandBeforeTimeMillis() {
@@ -91,7 +107,8 @@ public class ExecutionTimeInfo {
     }
 
     /**
-     * Get the time as millisecond after command invoking (after mapping to entity).
+     * Get the time as millisecond after command invoking (after mapping to entity). <br />
+     * NotNull when SQL result handler, Null when SQLFireHook.
      * @return The long value of millisecond. (NotNull)
      */
     public Long getCommandAfterTimeMillis() {
@@ -113,7 +130,8 @@ public class ExecutionTimeInfo {
      * Get the time as millisecond after SQL execution (before mapping to entity). <br />
      * Basically NotNull but no guarantee, because this is additional info. <br />
      * For example, no-modified-column update execution does not have its SQL execution. <br />
-     * When batch execution, all statements is contained to the time.
+     * When batch execution, all statements is contained to the time. <br />
+     * Null in the SQLFireHook's finally call-back when SQL fire failed.
      * @return The long value of millisecond. (basically NotNull but no guarantee)
      */
     public Long getSqlAfterTimeMillis() {

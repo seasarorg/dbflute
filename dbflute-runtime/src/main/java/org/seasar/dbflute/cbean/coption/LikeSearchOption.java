@@ -359,18 +359,27 @@ public class LikeSearchOption extends SimpleStringOption {
         if (_compoundColumnList != null) {
             _compoundColumnList.clear();
         }
+        if (_compoundColumnSizeList != null) {
+            _compoundColumnSizeList.clear();
+        }
     }
 
     // -----------------------------------------------------
     //                                          Optimization
     //                                          ------------
-    public LikeSearchOption optimizeCompoundColumn(Integer... sizes) {
+    /**
+     * Optimize compound columns by fixed size. <br />
+     * The columns specified their sizes should be fixed-size string type 'char'. (but no check so attention)
+     * @param sizes The array of column size for main column and compound columns. (NotNull)
+     * @return this. (NotNull)
+     */
+    public LikeSearchOption optimizeCompoundColumnByFixedSize(Integer... sizes) {
         if (!hasCompoundColumn()) {
             String msg = "The CompoundColumnOptimization needs CompoundColumn.";
             throw new IllegalStateException(msg);
         }
-        if (sizes.length != (_compoundColumnList.size() + 1)) {
-            String msg = "The length of argument 'sizes' should be count of compound columns + 1.";
+        if (sizes.length > (_compoundColumnList.size() + 1)) {
+            String msg = "The length of argument 'sizes' should be less or equal count of compound columns + 1.";
             msg = msg + " sizes.length=" + sizes.length;
             msg = msg + " compoundColumnList.size()=" + _compoundColumnList.size();
             throw new IllegalArgumentException(msg);

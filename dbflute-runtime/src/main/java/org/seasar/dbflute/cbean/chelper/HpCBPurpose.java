@@ -37,7 +37,7 @@ public enum HpCBPurpose {
     , COLUMN_QUERY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
             .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // ColumnQuery
 
-    , DREAM_CRUISE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyColumnWithDerivedReferrer()
+    , DREAM_CRUISE(new HpSpec().noSetupSelect().noSpecifyColumnWithDerivedReferrer()
             .noSpecifyDerivedReferrerTwoOrMore().noQuery()) // DreamCruise
 
     , VARYING_UPDATE(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
