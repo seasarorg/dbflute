@@ -24,6 +24,7 @@ import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest;
 import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest.DfFreeGenerateResourceType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -52,7 +53,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     // resourceType = XLS
     // resourceFile = ../../...
     // templateFile = CsvDto.vm
-    // outputDirectory = ./freegen/...
+    // outputDirectory = ../src/main/java
     // package = org.seasar.dbflute...
     // className = FooDto
     // tableMap = map:{
@@ -156,17 +157,13 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             for (Entry<String, String> entry : attributeMap.entrySet()) {
                 final String key = entry.getKey();
                 final String value = entry.getValue();
-                final Integer cellNumber = Integer.valueOf(value) - 1;
-                final HSSFCell cell = row.getCell(cellNumber);
-                if (cell == null) {
-                    continue;
+                if (value == null) {
+                    String msg = "Not found the value of the key in FreeGen " + requestName + ": " + key;
+                    throw new DfIllegalPropertySettingException(msg);
                 }
-                final HSSFRichTextString cellValue = cell.getRichStringCellValue();
-                if (cellValue == null) {
-                    continue;
+                if (processAttributeValue(requestName, attributeMap, row, resultMap, key, value)) {
+                    exists = true;
                 }
-                exists = true;
-                resultMap.put(key, cellValue.getString());
             }
             if (exists) {
                 resultList.add(resultMap);
@@ -175,6 +172,50 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             }
         }
         return resultList;
+    }
+
+    protected boolean processAttributeValue(String requestName, final Map<String, String> attributeMap,
+            final HSSFRow row, final Map<String, String> resultMap, final String key, final String value) {
+        final String capitaliseBeginMark = "df:capCamel(";
+        final String uncapitaliseBeginMark = "df:uncapCamel(";
+        final String methodEndMark = ")";
+        boolean exists = false;
+        if (value.startsWith(capitaliseBeginMark) && value.endsWith(methodEndMark)) {
+            final ScopeInfo scopeInfo = Srl.extractScopeFirst(value, capitaliseBeginMark, methodEndMark);
+            final String content = scopeInfo.getContent();
+            final String refValue = attributeMap.get(content);
+            if (refValue == null) {
+                String msg = "Not found the reference value of the key in FreeGen " + requestName + ":";
+                msg = msg + " key=" + key + " ref=" + content;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+            final String camelizedValue = Srl.initCap(Srl.camelize(refValue));
+            resultMap.put(key, camelizedValue);
+        } else if (value.startsWith(uncapitaliseBeginMark) && value.endsWith(methodEndMark)) {
+            final ScopeInfo scopeInfo = Srl.extractScopeFirst(value, capitaliseBeginMark, methodEndMark);
+            final String content = scopeInfo.getContent();
+            final String refValue = attributeMap.get(content);
+            if (refValue == null) {
+                String msg = "Not found the reference value of the key in FreeGen " + requestName + ":";
+                msg = msg + " key=" + key + " ref=" + content;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+            final String uncamelizedValue = Srl.initUncap(Srl.camelize(refValue));
+            resultMap.put(key, uncamelizedValue);
+        } else {
+            final Integer cellNumber = Integer.valueOf(value) - 1;
+            final HSSFCell cell = row.getCell(cellNumber);
+            if (cell == null) {
+                return false;
+            }
+            final HSSFRichTextString cellValue = cell.getRichStringCellValue();
+            if (cellValue == null) {
+                return false;
+            }
+            exists = true;
+            resultMap.put(key, cellValue.getString());
+        }
+        return exists;
     }
 
     // ===================================================================================
