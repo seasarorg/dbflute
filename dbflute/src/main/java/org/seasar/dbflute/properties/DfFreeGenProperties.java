@@ -20,8 +20,10 @@ import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenManager;
+import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenOutput;
 import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest;
 import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest.DfFreeGenerateResourceType;
+import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenTable;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -64,14 +66,18 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     // ; tableMap = map:{
     //     ; sheetName = [sheet-name]
     //     ; rowBeginNumber = 3
-    //     ; rowMap = map:{
-    //         ; column = 3
-    //         ; type = 3
+    //     ; columnMap = map:{
+    //         ; name = 3
+    //         ; capName = df:cap(name)
+    //         ; uncapName = df:uncap(name)
+    //         ; capCamelName = df:capCamel(name)
+    //         ; uncapCamelName = df:uncapCamel(name)
+    //         ; type = 4
     //     }
     //     ; mappingMap = map:{
     //         ; type = map:{
-    //             ; int = Integer
-    //             ; char = String
+    //             ; INTEGER = Integer
+    //             ; VARCHAR = String
     //         }
     //     }
     // }
@@ -102,27 +108,20 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             @SuppressWarnings("unchecked")
             final Map<String, Object> elementMap = (Map<String, Object>) obj;
             final DfFreeGenRequest request = createFreeGenerateRequest(requestName, elementMap);
-            final String templateFile = (String) elementMap.get("templateFile");
-            final String outputDirectory = (String) elementMap.get("outputDirectory");
-            final String pkg = (String) elementMap.get("package");
-            final String className = (String) elementMap.get("className");
-            request.setTemplateFile(templateFile);
-            request.setOutputDirectory(outputDirectory);
-            request.setPackage(pkg);
-            request.setClassName(className);
 
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> tableMap = (Map<String, Object>) elementMap.get("tableMap");
+            final Map<String, Object> tableMap = extractTableMap(elementMap);
             try {
-                final DfFreeGenerateResourceType resourceType = request.getResourceType();
-                if (DfFreeGenerateResourceType.XLS.equals(resourceType)) {
-                    request.setTable(loadTableFromXls(requestName, request.getResourceFile(), tableMap));
+                final Map<String, Map<String, String>> mappingMap = extractMappingMap(tableMap);
+                final DfFreeGenResource resource = request.getResource();
+                if (resource.isResourceTypeXls()) {
+                    request.setTable(loadTableFromXls(requestName, resource.getResourceFile(), tableMap, mappingMap));
                 } else {
-                    String msg = "The resource type is unsupported: " + resourceType;
+                    String msg = "The resource type is unsupported: " + resource.getResourceType();
                     throw new DfIllegalPropertySettingException(msg);
                 }
             } catch (IOException e) {
-                throw new IllegalStateException(e);
+                String msg = "Failed to load table: request=" + request;
+                throw new IllegalStateException(msg, e);
             }
 
             final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
@@ -132,16 +131,51 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         return _freeGenRequestList;
     }
 
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> extractTableMap(Map<String, Object> elementMap) {
+        final Object obj = elementMap.get("tableMap");
+        if (obj == null) {
+            String msg = "Not found the tableMap in the FreeGen property: " + elementMap;
+            throw new DfRequiredPropertyNotFoundException(msg);
+        }
+        return (Map<String, Object>) obj;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Map<String, String>> extractMappingMap(Map<String, Object> tableMap) {
+        final Object obj = tableMap.get("mappingMap");
+        if (obj == null) {
+            return DfCollectionUtil.emptyMap();
+        }
+        return (Map<String, Map<String, String>>) obj;
+    }
+
     protected DfFreeGenRequest createFreeGenerateRequest(String requestName, Map<String, Object> elementMap) {
-        final String typeStr = (String) elementMap.get("resourceType");
-        final String resourceFile = (String) elementMap.get("resourceFile");
-        final DfFreeGenerateResourceType resourceType = DfFreeGenerateResourceType.valueOf(typeStr);
-        final DfFreeGenRequest request = new DfFreeGenRequest(_manager, requestName, resourceType, resourceFile);
+        final DfFreeGenResource resource;
+        {
+            @SuppressWarnings("unchecked")
+            final Map<String, String> resourceMap = (Map<String, String>) elementMap.get("resourceMap");
+            final String resourceTypeStr = resourceMap.get("resourceType");
+            final DfFreeGenerateResourceType resourceType = DfFreeGenerateResourceType.valueOf(resourceTypeStr);
+            final String resourceFile = resourceMap.get("resourceFile");
+            resource = new DfFreeGenResource(resourceType, resourceFile);
+        }
+        final DfFreeGenOutput output;
+        {
+            @SuppressWarnings("unchecked")
+            final Map<String, String> outputMap = (Map<String, String>) elementMap.get("outputMap");
+            final String templateFile = outputMap.get("templateFile");
+            final String outputDirectory = outputMap.get("outputDirectory");
+            final String pkg = outputMap.get("package");
+            final String className = outputMap.get("className");
+            output = new DfFreeGenOutput(templateFile, outputDirectory, pkg, className);
+        }
+        final DfFreeGenRequest request = new DfFreeGenRequest(_manager, requestName, resource, output);
         return request;
     }
 
-    protected DfFreeGenTable loadTableFromXls(String requestName, String resourceFile, Map<String, Object> tableMap)
-            throws IOException {
+    protected DfFreeGenTable loadTableFromXls(String requestName, String resourceFile, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap) throws IOException {
         final String sheetName = (String) tableMap.get("sheetName");
         if (sheetName == null) {
             String msg = "The sheetName was not found in the FreeGen property: " + requestName;
@@ -157,7 +191,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             rowBeginNumber = Integer.valueOf(numStr);
         }
         @SuppressWarnings("unchecked")
-        final Map<String, String> rowMap = (Map<String, String>) tableMap.get("rowMap");
+        final Map<String, String> columnMap = (Map<String, String>) tableMap.get("columnMap");
         final HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(new File(resourceFile)));
         final HSSFSheet sheet = workbook.getSheet(sheetName);
         if (sheet == null) {
@@ -171,15 +205,16 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
                 break;
             }
             final Map<String, String> resultMap = newLinkedHashMap();
+            final List<DfConvertMethodReflector> reflectorList = new ArrayList<DfConvertMethodReflector>();
             boolean exists = false;
-            for (Entry<String, String> entry : rowMap.entrySet()) {
+            for (Entry<String, String> entry : columnMap.entrySet()) {
                 final String key = entry.getKey();
                 final String value = entry.getValue();
                 if (value == null) {
                     String msg = "Not found the value of the key in FreeGen " + requestName + ": " + key;
                     throw new DfIllegalPropertySettingException(msg);
                 }
-                if (processAttributeValue(requestName, rowMap, row, resultMap, key, value)) {
+                if (processColumnValue(requestName, columnMap, row, resultMap, key, value, reflectorList, mappingMap)) {
                     exists = true;
                 }
             }
@@ -188,46 +223,21 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             } else { // means empty row
                 break;
             }
+            for (DfConvertMethodReflector reflector : reflectorList) {
+                reflector.reflect();
+            }
         }
         return new DfFreeGenTable(sheetName, rowList);
     }
 
-    protected boolean processAttributeValue(String requestName, final Map<String, String> attributeMap,
-            final HSSFRow row, final Map<String, String> resultMap, final String key, final String value) {
-        boolean exists = false;
-        final ScopeInfo capScope = Srl.extractScopeFirst(value, "df:cap(", ")");
-        if (capScope != null) {
-            final String content = capScope.getContent();
-            final String refValue = attributeMap.get(content);
-            assertAttributeRefValueExists(content, refValue, requestName, key, refValue);
-            resultMap.put(key, Srl.initCap(refValue));
-            return false;
-        }
-        final ScopeInfo uncapScope = Srl.extractScopeFirst(value, "df:uncap(", ")");
-        if (uncapScope != null) {
-            final String content = uncapScope.getContent();
-            final String refValue = attributeMap.get(content);
-            assertAttributeRefValueExists(content, refValue, requestName, key, refValue);
-            resultMap.put(key, Srl.initUncap(refValue));
-            return false;
-        }
-        final ScopeInfo capCamelScope = Srl.extractScopeFirst(value, "df:capCamel(", ")");
-        if (capCamelScope != null) {
-            final String content = capCamelScope.getContent();
-            final String refValue = attributeMap.get(content);
-            assertAttributeRefValueExists(content, refValue, requestName, key, refValue);
-            resultMap.put(key, Srl.initCap(Srl.camelize(refValue)));
-            return false;
-        }
-        final ScopeInfo uncapCamelScope = Srl.extractScopeFirst(value, "df:uncapCamel(", ")");
-        if (uncapCamelScope != null) {
-            final String content = uncapCamelScope.getContent();
-            final String refValue = attributeMap.get(content);
-            assertAttributeRefValueExists(content, refValue, requestName, key, refValue);
-            resultMap.put(key, Srl.initUncap(Srl.camelize(refValue)));
+    protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap,
+            final HSSFRow row, final Map<String, String> resultMap, final String key, final String value,
+            List<DfConvertMethodReflector> reflectorList, Map<String, Map<String, String>> mappingMap) {
+        if (processConvertMethod(requestName, resultMap, key, value, reflectorList)) {
             return false;
         }
         // normal setting (cell number)
+        boolean exists = false;
         final Integer cellNumber;
         try {
             cellNumber = Integer.valueOf(value) - 1;
@@ -245,11 +255,84 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             return false;
         }
         exists = true;
-        resultMap.put(key, cellValue.getString());
+        String resultValue = cellValue.getString();
+        final Map<String, String> mapping = mappingMap.get(key);
+        if (mapping != null) {
+            final String mappingValue = mapping.get(resultValue);
+            if (mappingValue != null) {
+                resultValue = mappingValue;
+            }
+        }
+        resultMap.put(key, resultValue);
         return exists;
     }
 
-    protected void assertAttributeRefValueExists(String content, String refValue, String requestName, final String key,
+    protected static interface DfConvertMethodReflector {
+        void reflect();
+    }
+
+    protected boolean processConvertMethod(final String requestName, final Map<String, String> resultMap,
+            final String key, final String value, List<DfConvertMethodReflector> reflectorList) {
+        {
+            final ScopeInfo capScope = Srl.extractScopeFirst(value, "df:cap(", ")");
+            if (capScope != null) {
+                reflectorList.add(new DfConvertMethodReflector() {
+                    public void reflect() {
+                        final String content = capScope.getContent();
+                        final String refValue = resultMap.get(content);
+                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
+                        resultMap.put(key, Srl.initCap(refValue));
+                    }
+                });
+                return true;
+            }
+        }
+        {
+            final ScopeInfo uncapScope = Srl.extractScopeFirst(value, "df:uncap(", ")");
+            if (uncapScope != null) {
+                reflectorList.add(new DfConvertMethodReflector() {
+                    public void reflect() {
+                        final String content = uncapScope.getContent();
+                        final String refValue = resultMap.get(content);
+                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
+                        resultMap.put(key, Srl.initUncap(refValue));
+                    }
+                });
+                return true;
+            }
+        }
+        {
+            final ScopeInfo capCamelScope = Srl.extractScopeFirst(value, "df:capCamel(", ")");
+            if (capCamelScope != null) {
+                reflectorList.add(new DfConvertMethodReflector() {
+                    public void reflect() {
+                        final String content = capCamelScope.getContent();
+                        final String refValue = resultMap.get(content);
+                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
+                        resultMap.put(key, Srl.initCap(Srl.camelize(refValue)));
+                    }
+                });
+                return true;
+            }
+        }
+        {
+            final ScopeInfo uncapCamelScope = Srl.extractScopeFirst(value, "df:uncapCamel(", ")");
+            if (uncapCamelScope != null) {
+                reflectorList.add(new DfConvertMethodReflector() {
+                    public void reflect() {
+                        final String content = uncapCamelScope.getContent();
+                        final String refValue = resultMap.get(content);
+                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
+                        resultMap.put(key, Srl.initUncap(Srl.camelize(refValue)));
+                    }
+                });
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void assertColumnRefValueExists(String content, String refValue, String requestName, final String key,
             final String value) {
         if (refValue == null) {
             String msg = "Not found the reference value of the key in FreeGen " + requestName + ":";

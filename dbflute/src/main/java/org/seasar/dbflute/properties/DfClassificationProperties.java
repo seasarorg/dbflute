@@ -461,7 +461,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     }
                     selectedMap.put(DfClassificationElement.KEY_SUB_ITEM_MAP, subItemMap);
                 }
-                DfClassificationElement element = new DfClassificationElement();
+                final DfClassificationElement element = new DfClassificationElement();
                 element.setClassificationName(classificationName);
                 element.acceptBasicItemMap(selectedMap);
                 elementList.add(element);
@@ -526,7 +526,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final DfClassificationAllInOneSqlExecutor executor = new DfClassificationAllInOneSqlExecutor();
         final Connection conn = getDatabaseProperties().createMainSchemaConnection();
         final List<Map<String, String>> resultList = executor.executeAllInOneSql(conn, sql);
-        final Set<String> alreadySet = new HashSet<String>(_classificationTopMap.keySet());
         for (Map<String, String> map : resultList) {
             final String classificationName = map.get("classificationName");
             final DfClassificationTop classificationTop;
@@ -539,9 +538,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 }
                 classificationTop = tmpTop;
             }
-            if (alreadySet.contains(classificationName)) {
-                throwClassificationAlreadyExistsInDfPropException(classificationName, "All-in-One");
-            }
+            // *no check and merge it
+            //if (alreadySet.contains(classificationName)) {
+            //    throwClassificationAlreadyExistsInDfPropException(classificationName, "All-in-One");
+            //}
             if (!classificationTop.hasTopComment()) {
                 final String topComment = map.get(DfClassificationTop.KEY_TOP_COMMENT);
                 classificationTop.setTopComment(topComment);

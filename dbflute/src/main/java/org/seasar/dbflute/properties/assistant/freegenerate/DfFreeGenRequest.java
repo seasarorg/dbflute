@@ -1,5 +1,8 @@
 package org.seasar.dbflute.properties.assistant.freegenerate;
 
+import java.util.List;
+import java.util.Map;
+
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -14,24 +17,20 @@ public class DfFreeGenRequest {
     //                                                                           =========
     protected final DfFreeGenManager _manager;
     protected final String _requestName;
-    protected final DfFreeGenerateResourceType _resourceType;
-    protected final String _resourceFile;
-    protected String _templateFile;
-    protected String _outputDirectory;
-    protected String _package;
-    protected String _className;
+    protected final DfFreeGenResource _resource;
+    protected final DfFreeGenOutput _output;
     protected DfFreeGenTable _table;
     protected DfPackagePathHandler _packagePathHandler;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenRequest(DfFreeGenManager manager, String requestName, DfFreeGenerateResourceType resourceType,
-            String resourceFile) {
+    public DfFreeGenRequest(DfFreeGenManager manager, String requestName, DfFreeGenResource resource,
+            DfFreeGenOutput output) {
         _manager = manager;
         _requestName = requestName;
-        _resourceType = resourceType;
-        _resourceFile = resourceFile;
+        _resource = resource;
+        _output = output;
     }
 
     // ===================================================================================
@@ -45,22 +44,22 @@ public class DfFreeGenRequest {
     //                                                                                Path
     //                                                                                ====
     public void enableOutputDirectory() {
-        _manager.setOutputDirectory(_outputDirectory);
+        _manager.setOutputDirectory(_output.getOutputDirectory());
     }
 
     public String getOutputPath() {
-        final String packageAsPath = getPackageAsPath(_package);
+        final String packageAsPath = getPackageAsPath(_output.getPackage());
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final String classExt = basicProp.getLanguageDependencyInfo().getGrammarInfo().getClassFileExtension();
-        return packageAsPath + "/" + _className + "." + classExt;
+        return packageAsPath + "/" + _output.getClassName() + "." + classExt;
+    }
+
+    protected String getPackageAsPath(String pkg) {
+        return _packagePathHandler.getPackageAsPath(pkg);
     }
 
     public String getTemplatePath() {
-        return _templateFile;
-    }
-
-    public String getPackageAsPath(String pkg) {
-        return _packagePathHandler.getPackageAsPath(pkg);
+        return _output.getTemplateFile();
     }
 
     // ===================================================================================
@@ -68,7 +67,7 @@ public class DfFreeGenRequest {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _requestName + ", " + _resourceType + ", " + _table + "}";
+        return "{" + _requestName + ", " + _resource + ", " + _output + ", " + _table + "}";
     }
 
     // ===================================================================================
@@ -78,56 +77,48 @@ public class DfFreeGenRequest {
         return _requestName;
     }
 
-    public String getResourceFile() {
-        return _resourceFile;
+    public DfFreeGenResource getResource() {
+        return _resource;
     }
 
     public DfFreeGenerateResourceType getResourceType() {
-        return _resourceType;
+        return _resource.getResourceType();
+    }
+
+    public String getResourceFile() {
+        return _resource.getResourceFile();
+    }
+
+    public DfFreeGenOutput getOutput() {
+        return _output;
     }
 
     public String getTemplateFile() {
-        return _templateFile;
-    }
-
-    public void setTemplateFile(String templateFile) {
-        this._templateFile = templateFile;
+        return _output.getTemplateFile();
     }
 
     public String getOutputDirectory() {
-        return _outputDirectory;
-    }
-
-    public void setOutputDirectory(String outputDirectory) {
-        this._outputDirectory = outputDirectory;
+        return _output.getOutputDirectory();
     }
 
     public String getPackage() {
-        return _package;
-    }
-
-    public void setPackage(String pkg) {
-        this._package = pkg;
+        return _output.getPackage();
     }
 
     public String getClassName() {
-        return _className;
-    }
-
-    public void setClassName(String className) {
-        this._className = className;
+        return _output.getClassName();
     }
 
     public DfFreeGenTable getTable() {
         return _table;
     }
 
-    public void setTable(DfFreeGenTable _table) {
-        this._table = _table;
+    public List<Map<String, String>> getColumnList() {
+        return _table.getColumnList();
     }
 
-    public DfPackagePathHandler getPackagePathHandler() {
-        return _packagePathHandler;
+    public void setTable(DfFreeGenTable _table) {
+        this._table = _table;
     }
 
     public void setPackagePathHandler(DfPackagePathHandler packagePathHandler) {
