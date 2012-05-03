@@ -1,12 +1,12 @@
 package org.seasar.dbflute.properties.assistant.freegenerate;
 
-import java.util.List;
-import java.util.Map;
-
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
+/**
+ * @author jflute
+ */
 public class DfFreeGenRequest {
 
     // ===================================================================================
@@ -20,8 +20,7 @@ public class DfFreeGenRequest {
     protected String _outputDirectory;
     protected String _package;
     protected String _className;
-    protected Map<String, Object> _tableMap;
-    protected List<Map<String, String>> _attributeList;
+    protected DfFreeGenTable _table;
     protected DfPackagePathHandler _packagePathHandler;
 
     // ===================================================================================
@@ -69,8 +68,7 @@ public class DfFreeGenRequest {
     //                                                                      ==============
     @Override
     public String toString() {
-        final String attrExp = (_tableMap != null ? _tableMap.keySet().toString() : "");
-        return "{" + _requestName + ", " + _resourceType + ", " + attrExp + "}";
+        return "{" + _requestName + ", " + _resourceType + ", " + _table + "}";
     }
 
     // ===================================================================================
@@ -120,20 +118,12 @@ public class DfFreeGenRequest {
         this._className = className;
     }
 
-    public List<Map<String, String>> getAttributeList() {
-        return _attributeList;
+    public DfFreeGenTable getTable() {
+        return _table;
     }
 
-    public void setAttributeList(List<Map<String, String>> attributeList) {
-        this._attributeList = attributeList;
-    }
-
-    public Map<String, Object> getTableMap() {
-        return _tableMap;
-    }
-
-    public void setTableMap(Map<String, Object> tableMap) {
-        _tableMap = tableMap;
+    public void setTable(DfFreeGenTable _table) {
+        this._table = _table;
     }
 
     public DfPackagePathHandler getPackagePathHandler() {

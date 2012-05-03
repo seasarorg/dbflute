@@ -22,6 +22,7 @@ import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenManager;
 import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest;
 import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest.DfFreeGenerateResourceType;
+import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenTable;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
@@ -50,18 +51,28 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
-    // resourceType = XLS
-    // resourceFile = ../../...
-    // templateFile = CsvDto.vm
-    // outputDirectory = ../src/main/java
-    // package = org.seasar.dbflute...
-    // className = FooDto
-    // tableMap = map:{
+    // ; resourceMap = map:{
+    //     ; resourceType = XLS
+    //     ; resourceFile = ../../...
+    // }
+    // ; outputMap = map:{
+    //     ; templateFile = CsvDto.vm
+    //     ; outputDirectory = ../src/main/java
+    //     ; package = org.seasar.dbflute...
+    //     ; className = FooDto
+    // }
+    // ; tableMap = map:{
     //     ; sheetName = [sheet-name]
-    //     ; rowStart = 3
-    //     ; attributeMap = map:{
+    //     ; rowBeginNumber = 3
+    //     ; rowMap = map:{
     //         ; column = 3
     //         ; type = 3
+    //     }
+    //     ; mappingMap = map:{
+    //         ; type = map:{
+    //             ; int = Integer
+    //             ; char = String
+    //         }
     //     }
     // }
     protected Map<String, Object> _freeGenDefinitionMap;
@@ -99,14 +110,21 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             request.setOutputDirectory(outputDirectory);
             request.setPackage(pkg);
             request.setClassName(className);
+
             @SuppressWarnings("unchecked")
             final Map<String, Object> tableMap = (Map<String, Object>) elementMap.get("tableMap");
-            request.setTableMap(tableMap);
             try {
-                request.setAttributeList(loadXls(requestName, request.getResourceFile(), tableMap));
+                final DfFreeGenerateResourceType resourceType = request.getResourceType();
+                if (DfFreeGenerateResourceType.XLS.equals(resourceType)) {
+                    request.setTable(loadTableFromXls(requestName, request.getResourceFile(), tableMap));
+                } else {
+                    String msg = "The resource type is unsupported: " + resourceType;
+                    throw new DfIllegalPropertySettingException(msg);
+                }
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
+
             final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
             request.setPackagePathHandler(packagePathHandler);
             _freeGenRequestList.add(request);
@@ -122,7 +140,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         return request;
     }
 
-    protected List<Map<String, String>> loadXls(String requestName, String resourceFile, Map<String, Object> tableMap)
+    protected DfFreeGenTable loadTableFromXls(String requestName, String resourceFile, Map<String, Object> tableMap)
             throws IOException {
         final String sheetName = (String) tableMap.get("sheetName");
         if (sheetName == null) {
@@ -139,14 +157,14 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             rowBeginNumber = Integer.valueOf(numStr);
         }
         @SuppressWarnings("unchecked")
-        final Map<String, String> attributeMap = (Map<String, String>) tableMap.get("attributeMap");
+        final Map<String, String> rowMap = (Map<String, String>) tableMap.get("rowMap");
         final HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(new File(resourceFile)));
         final HSSFSheet sheet = workbook.getSheet(sheetName);
         if (sheet == null) {
             String msg = "Not found the sheet name in the file: name=" + sheetName + " xls=" + resourceFile;
             throw new IllegalStateException(msg);
         }
-        final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+        final List<Map<String, String>> rowList = new ArrayList<Map<String, String>>();
         for (int i = (rowBeginNumber - 1); i < Integer.MAX_VALUE; i++) {
             final HSSFRow row = sheet.getRow(i);
             if (row == null) {
@@ -154,68 +172,90 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             }
             final Map<String, String> resultMap = newLinkedHashMap();
             boolean exists = false;
-            for (Entry<String, String> entry : attributeMap.entrySet()) {
+            for (Entry<String, String> entry : rowMap.entrySet()) {
                 final String key = entry.getKey();
                 final String value = entry.getValue();
                 if (value == null) {
                     String msg = "Not found the value of the key in FreeGen " + requestName + ": " + key;
                     throw new DfIllegalPropertySettingException(msg);
                 }
-                if (processAttributeValue(requestName, attributeMap, row, resultMap, key, value)) {
+                if (processAttributeValue(requestName, rowMap, row, resultMap, key, value)) {
                     exists = true;
                 }
             }
             if (exists) {
-                resultList.add(resultMap);
+                rowList.add(resultMap);
             } else { // means empty row
                 break;
             }
         }
-        return resultList;
+        return new DfFreeGenTable(sheetName, rowList);
     }
 
     protected boolean processAttributeValue(String requestName, final Map<String, String> attributeMap,
             final HSSFRow row, final Map<String, String> resultMap, final String key, final String value) {
-        final String capitaliseBeginMark = "df:capCamel(";
-        final String uncapitaliseBeginMark = "df:uncapCamel(";
-        final String methodEndMark = ")";
         boolean exists = false;
-        if (value.startsWith(capitaliseBeginMark) && value.endsWith(methodEndMark)) {
-            final ScopeInfo scopeInfo = Srl.extractScopeFirst(value, capitaliseBeginMark, methodEndMark);
-            final String content = scopeInfo.getContent();
+        final ScopeInfo capScope = Srl.extractScopeFirst(value, "df:cap(", ")");
+        if (capScope != null) {
+            final String content = capScope.getContent();
             final String refValue = attributeMap.get(content);
-            if (refValue == null) {
-                String msg = "Not found the reference value of the key in FreeGen " + requestName + ":";
-                msg = msg + " key=" + key + " ref=" + content;
-                throw new DfIllegalPropertySettingException(msg);
-            }
-            final String camelizedValue = Srl.initCap(Srl.camelize(refValue));
-            resultMap.put(key, camelizedValue);
-        } else if (value.startsWith(uncapitaliseBeginMark) && value.endsWith(methodEndMark)) {
-            final ScopeInfo scopeInfo = Srl.extractScopeFirst(value, capitaliseBeginMark, methodEndMark);
-            final String content = scopeInfo.getContent();
-            final String refValue = attributeMap.get(content);
-            if (refValue == null) {
-                String msg = "Not found the reference value of the key in FreeGen " + requestName + ":";
-                msg = msg + " key=" + key + " ref=" + content;
-                throw new DfIllegalPropertySettingException(msg);
-            }
-            final String uncamelizedValue = Srl.initUncap(Srl.camelize(refValue));
-            resultMap.put(key, uncamelizedValue);
-        } else {
-            final Integer cellNumber = Integer.valueOf(value) - 1;
-            final HSSFCell cell = row.getCell(cellNumber);
-            if (cell == null) {
-                return false;
-            }
-            final HSSFRichTextString cellValue = cell.getRichStringCellValue();
-            if (cellValue == null) {
-                return false;
-            }
-            exists = true;
-            resultMap.put(key, cellValue.getString());
+            assertAttributeRefValueExists(content, refValue, requestName, key, refValue);
+            resultMap.put(key, Srl.initCap(refValue));
+            return false;
         }
+        final ScopeInfo uncapScope = Srl.extractScopeFirst(value, "df:uncap(", ")");
+        if (uncapScope != null) {
+            final String content = uncapScope.getContent();
+            final String refValue = attributeMap.get(content);
+            assertAttributeRefValueExists(content, refValue, requestName, key, refValue);
+            resultMap.put(key, Srl.initUncap(refValue));
+            return false;
+        }
+        final ScopeInfo capCamelScope = Srl.extractScopeFirst(value, "df:capCamel(", ")");
+        if (capCamelScope != null) {
+            final String content = capCamelScope.getContent();
+            final String refValue = attributeMap.get(content);
+            assertAttributeRefValueExists(content, refValue, requestName, key, refValue);
+            resultMap.put(key, Srl.initCap(Srl.camelize(refValue)));
+            return false;
+        }
+        final ScopeInfo uncapCamelScope = Srl.extractScopeFirst(value, "df:uncapCamel(", ")");
+        if (uncapCamelScope != null) {
+            final String content = uncapCamelScope.getContent();
+            final String refValue = attributeMap.get(content);
+            assertAttributeRefValueExists(content, refValue, requestName, key, refValue);
+            resultMap.put(key, Srl.initUncap(Srl.camelize(refValue)));
+            return false;
+        }
+        // normal setting (cell number)
+        final Integer cellNumber;
+        try {
+            cellNumber = Integer.valueOf(value) - 1;
+        } catch (NumberFormatException e) {
+            String msg = "The property value should be Integer in FreeGen " + requestName + ":";
+            msg = msg + " key=" + key + " value=" + value;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        final HSSFCell cell = row.getCell(cellNumber);
+        if (cell == null) {
+            return false;
+        }
+        final HSSFRichTextString cellValue = cell.getRichStringCellValue();
+        if (cellValue == null) {
+            return false;
+        }
+        exists = true;
+        resultMap.put(key, cellValue.getString());
         return exists;
+    }
+
+    protected void assertAttributeRefValueExists(String content, String refValue, String requestName, final String key,
+            final String value) {
+        if (refValue == null) {
+            String msg = "Not found the reference value of the key in FreeGen " + requestName + ":";
+            msg = msg + " key=" + key + " ref=" + content;
+            throw new DfIllegalPropertySettingException(msg);
+        }
     }
 
     // ===================================================================================
