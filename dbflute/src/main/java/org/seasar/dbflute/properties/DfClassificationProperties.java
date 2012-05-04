@@ -113,7 +113,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final String key = "torque." + KEY_classificationDefinitionMap;
         final Map<String, Object> plainDefinitionMap = mapProp(key, DEFAULT_EMPTY_MAP);
         final DfClassificationLiteralArranger literalArranger = new DfClassificationLiteralArranger();
-        final boolean docOnlyTask = isDocOnlyTask();
         String allInOneSql = null;
         for (Entry<String, Object> entry : plainDefinitionMap.entrySet()) {
             final String classificationName = entry.getKey();
@@ -182,15 +181,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             // - - - - - - - - - - - - -
             // adjust Classification Top
             // - - - - - - - - - - - - -
-            if (!docOnlyTask && classificationTop.isUseDocumentOnly()) {
-                _log.info("...Skipping document-only classification: " + classificationName);
-                // e.g. Generate or Sql2Entity, and document-only classification
-                _documentOnlyClassificationSet.add(classificationName);
-            } else { // normally here
-                classificationTop.addClassificationElementAll(elementList);
-                classificationTop.setTableClassification(tableClassification);
-                _classificationTopMap.put(classificationName, classificationTop);
-            }
+            classificationTop.addClassificationElementAll(elementList);
+            classificationTop.setTableClassification(tableClassification);
+            _classificationTopMap.put(classificationName, classificationTop);
         }
 
         if (allInOneSql != null) {
@@ -201,6 +194,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         // reflect ClassificationResource
         // - - - - - - - - - - - - - - - -
         reflectClassificationResourceToDefinition(); // *Classification Resource Point!
+
+        // - - - - - - - - - - - -
+        // filter UseDocumentOnly
+        // - - - - - - - - - - - -
+        filterUseDocumentOnly();
 
         return _classificationTopMap;
     }
@@ -243,6 +241,23 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
         final String msg = br.buildExceptionMessage();
         throw new DfClassificationIllegalPropertyTypeException(msg);
+    }
+
+    protected void filterUseDocumentOnly() {
+        final boolean docOnlyTask = isDocOnlyTask();
+        for (Entry<String, DfClassificationTop> entry : _classificationTopMap.entrySet()) {
+            final String classificationName = entry.getKey();
+            final DfClassificationTop classificationTop = entry.getValue();
+            if (!docOnlyTask && classificationTop.isUseDocumentOnly()) {
+                _log.info("...Skipping document-only classification: " + classificationName);
+                // e.g. Generate or Sql2Entity, and document-only classification
+                _documentOnlyClassificationSet.add(classificationName);
+            }
+        }
+        for (String documentOnlyClassificationName : _documentOnlyClassificationSet) {
+            _classificationTopMap.remove(documentOnlyClassificationName);
+            _tableClassificationMap.remove(documentOnlyClassificationName);
+        }
     }
 
     // -----------------------------------------------------
@@ -730,8 +745,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (_classificationDeploymentMap != null) {
             return _classificationDeploymentMap;
         }
+        initializeClassificationDefinition(); // precondition
         final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
-
         _classificationDeploymentMap = StringKeyMap.createAsFlexibleOrdered();
         final Set<String> deploymentMapkeySet = map.keySet();
         for (String tableName : deploymentMapkeySet) {
@@ -748,6 +763,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             for (Object columnNameObj : tmpMapKeySet) {
                 final String columnName = (String) columnNameObj;
                 final String classificationName = (String) tmpMap.get(columnName);
+                if (_documentOnlyClassificationSet.contains(classificationName)) {
+                    continue;
+                }
                 columnClassificationMap.put(columnName, classificationName);
             }
             _classificationDeploymentMap.put(tableName, columnClassificationMap);
@@ -898,12 +916,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 if (isHitByTheHint(columnName, columnNameHint)) {
                     classificationName = plainMap.get(columnNameHint);
                 }
-            }
-        }
-        if (classificationName != null) {
-            if (!isDocOnlyTask() && _documentOnlyClassificationSet.contains(classificationName)) {
-                // e.g. Generate or Sql2Entity, and document-only classification
-                classificationName = null; // the classification is invalid at this task
             }
         }
         return classificationName;
