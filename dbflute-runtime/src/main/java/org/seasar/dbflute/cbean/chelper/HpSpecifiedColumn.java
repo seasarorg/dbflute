@@ -4,6 +4,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
  * @author jflute
@@ -65,6 +66,14 @@ public class HpSpecifiedColumn {
     //                                                                        ============
     public boolean isDreamCruiseTicket() {
         return _baseCB.xisDreamCruiseShip();
+    }
+
+    public void setupSelectDreamCruiseJourneyLogBookIfUnionExists() {
+        if (!isDreamCruiseTicket()) {
+            String msg = "This method is only allowed at Dream Cruise.";
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        _baseCB.xsetupSelectDreamCruiseJourneyLogBookIfUnionExists();
     }
 
     // ===================================================================================

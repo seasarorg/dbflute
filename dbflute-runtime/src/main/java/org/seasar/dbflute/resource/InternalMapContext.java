@@ -82,12 +82,13 @@ public class InternalMapContext {
     // ===================================================================================
     //                                                                        Regular Item
     //                                                                        ============
-    public static final String KEY_BEHAVIOR_INVOKE_NAME = "df:BehaviorInvokeName";
-    public static final String KEY_CLIENT_INVOKE_NAME = "df:ClientInvokeName";
-    public static final String KEY_BYPASS_INVOKE_NAME = "df:ByPassInvokeName";
-    public static final String KEY_RESULT_SQL_LOG_INFO = "df:SqlLogInfo";
-    public static final String KEY_SQL_BEFORE_TIME_MILLIS = "df:SqlBeforeTimeMillis";
-    public static final String KEY_SQL_AFTER_TIME_MILLIS = "df:SqlAfterTimeMillis";
+    protected static final String KEY_BEHAVIOR_INVOKE_NAME = "df:BehaviorInvokeName";
+    protected static final String KEY_CLIENT_INVOKE_NAME = "df:ClientInvokeName";
+    protected static final String KEY_BYPASS_INVOKE_NAME = "df:ByPassInvokeName";
+    protected static final String KEY_HOOK_SQL_LOG_INFO = "df:HookSqlLogInfo";
+    protected static final String KEY_RESULT_SQL_LOG_INFO = "df:ResultSqlLogInfo";
+    protected static final String KEY_SQL_BEFORE_TIME_MILLIS = "df:SqlBeforeTimeMillis";
+    protected static final String KEY_SQL_AFTER_TIME_MILLIS = "df:SqlAfterTimeMillis";
 
     public static String getBehaviorInvokeName() {
         return (String) getObject(KEY_BEHAVIOR_INVOKE_NAME);
@@ -111,6 +112,14 @@ public class InternalMapContext {
 
     public static void setByPassInvokeName(String byPassInvokeName) {
         setObject(KEY_BYPASS_INVOKE_NAME, byPassInvokeName);
+    }
+
+    public static SqlLogInfo getHookSqlLogInfo() {
+        return (SqlLogInfo) getObject(KEY_HOOK_SQL_LOG_INFO);
+    }
+
+    public static void setHookSqlLogInfo(SqlLogInfo sqlLogInfo) {
+        setObject(KEY_HOOK_SQL_LOG_INFO, sqlLogInfo);
     }
 
     public static SqlLogInfo getResultSqlLogInfo() {

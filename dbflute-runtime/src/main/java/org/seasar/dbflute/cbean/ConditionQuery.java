@@ -118,7 +118,7 @@ public interface ConditionQuery {
 
     /**
      * Get the path of foreign relation. e.g. _0_1
-     * @return The path of foreign relation. (NullAllowed)
+     * @return The path of foreign relation. (NullAllowed: if base query, returns null)
      */
     String xgetRelationPath();
 

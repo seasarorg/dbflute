@@ -102,11 +102,13 @@ public interface ConditionBean extends PagingBean {
     //                                                                        Dream Cruise
     //                                                                        ============
     /**
+     * DBFlute of Dreams.
      * @param dreamCruiseTicket The ticket column specified by your Dream Cruise. (NotNull)
      */
     void overTheWaves(HpSpecifiedColumn dreamCruiseTicket);
 
     /**
+     * Bon voyage!
      * @return The created condition-bean for Dream Cruise.
      */
     ConditionBean xcreateDreamCruiseCB();
@@ -137,6 +139,23 @@ public interface ConditionBean extends PagingBean {
      * @return The information of specified column. (NullAllowed)
      */
     HpSpecifiedColumn xshowDreamCruiseTicket();
+
+    /**
+     * Keep journey log-book of Dream Cruise. <br /> 
+     * (save the relation trace by Dream Cruise)
+     * @param relationPath The path of relation. (NotNull)
+     */
+    void xkeepDreamCruiseJourneyLogBook(String relationPath);
+
+    /**
+     * Set up select for journey log-book of Dream Cruise.
+     */
+    void xsetupSelectDreamCruiseJourneyLogBook();
+
+    /**
+     * Set up select for journey log-book of Dream Cruise if union query exists.
+     */
+    void xsetupSelectDreamCruiseJourneyLogBookIfUnionExists();
 
     // ===================================================================================
     //                                                                       Invalid Query

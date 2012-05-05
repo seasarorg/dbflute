@@ -63,13 +63,15 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             _alreadySpecifiedRequiredColumn = true;
             doSpecifyRequiredColumn();
         }
-        final String relationPath = _query.xgetRelationPath() != null ? _query.xgetRelationPath() : "";
         final SqlClause sqlClause = _baseCB.getSqlClause();
         final String tableAliasName;
         if (_query.isBaseQuery()) {
             tableAliasName = sqlClause.getBasePointAliasName();
         } else {
-            tableAliasName = sqlClause.resolveJoinAliasName(relationPath, _query.xgetNestLevel());
+            final String relationPath = _query.xgetRelationPath();
+            final int nestLevel = _query.xgetNestLevel();
+            tableAliasName = sqlClause.resolveJoinAliasName(relationPath, nestLevel);
+            keepDreamCruiseJourneyLogBookIfNeeds(relationPath);
         }
         final HpSpecifiedColumn specifiedColumn = createSpecifiedColumn(columnName, tableAliasName);
         sqlClause.specifySelectColumn(specifiedColumn);
@@ -117,6 +119,13 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             _specifiedColumnMap = new LinkedHashMap<String, HpSpecifiedColumn>();
         }
         _specifiedColumnMap.put(columnName, specifiedColumn);
+    }
+
+    protected void keepDreamCruiseJourneyLogBookIfNeeds(String relationPath) {
+        if (!_baseCB.xisDreamCruiseShip()) {
+            return;
+        }
+        _baseCB.xkeepDreamCruiseJourneyLogBook(relationPath);
     }
 
     // ===================================================================================

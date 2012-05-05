@@ -194,12 +194,20 @@ public interface DBMeta {
     DBMeta findForeignDBMeta(String foreignPropertyName);
 
     /**
-     * Find the information of foreign relation.
+     * Find the information of foreign relation by property name.
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return The information object of foreign relation. (NotNull)
      * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
      */
     ForeignInfo findForeignInfo(String foreignPropertyName);
+
+    /**
+     * Find the information of foreign relation by relation number.
+     * @param relationNo The relation number of the foreign property. (NotNull)
+     * @return The information object of foreign relation. (NotNull)
+     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the corresponding foreign info was not found.
+     */
+    ForeignInfo findForeignInfo(int relationNo);
 
     /**
      * Get the list of foreign info.

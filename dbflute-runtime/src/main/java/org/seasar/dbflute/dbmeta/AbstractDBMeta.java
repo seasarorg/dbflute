@@ -76,6 +76,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     private volatile StringKeyMap<ColumnInfo> _columnInfoFlexibleMap;
     private volatile List<ForeignInfo> _foreignInfoList;
     private volatile StringKeyMap<ForeignInfo> _foreignInfoFlexibleMap;
+    private volatile Map<Integer, ForeignInfo> _foreignInfoRelationNoKeyMap;
     private volatile List<ReferrerInfo> _referrerInfoList;
     private volatile StringKeyMap<ReferrerInfo> _referrerInfoFlexibleMap;
 
@@ -365,6 +366,17 @@ public abstract class AbstractDBMeta implements DBMeta {
         return foreignInfo;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public ForeignInfo findForeignInfo(int relationNo) {
+        final ForeignInfo foreignInfo = getForeignInfoRelationNoKeyMap().get(relationNo);
+        if (foreignInfo == null) {
+            throwDBMetaNotFoundException("The foreign info was not found.", "Relation No", relationNo);
+        }
+        return foreignInfo;
+    }
+
     // createForeignInfo()
     protected ForeignInfo cfi(String propName // property name
             , DBMeta localDbm, DBMeta foreignDbm // DB meta
@@ -416,6 +428,27 @@ public abstract class AbstractDBMeta implements DBMeta {
                 _foreignInfoFlexibleMap.put(foreignInfo.getForeignPropertyName(), foreignInfo);
             }
             return _foreignInfoFlexibleMap;
+        }
+    }
+
+    /**
+     * Get the relation-no key map of foreign information.
+     * @return The flexible map of foreign information. (NotNull)
+     */
+    protected Map<Integer, ForeignInfo> getForeignInfoRelationNoKeyMap() {
+        if (_foreignInfoRelationNoKeyMap != null) {
+            return _foreignInfoRelationNoKeyMap;
+        }
+        final List<ForeignInfo> foreignInfoList = getForeignInfoList();
+        synchronized (this) {
+            if (_foreignInfoRelationNoKeyMap != null) {
+                return _foreignInfoRelationNoKeyMap;
+            }
+            _foreignInfoRelationNoKeyMap = newLinkedHashMap();
+            for (ForeignInfo foreignInfo : foreignInfoList) {
+                _foreignInfoRelationNoKeyMap.put(foreignInfo.getRelationNo(), foreignInfo);
+            }
+            return _foreignInfoRelationNoKeyMap;
         }
     }
 
@@ -948,7 +981,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
-    protected void throwDBMetaNotFoundException(String notice, String keyName, String value) {
+    protected void throwDBMetaNotFoundException(String notice, String keyName, Object value) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(notice);
         br.addItem("Table");

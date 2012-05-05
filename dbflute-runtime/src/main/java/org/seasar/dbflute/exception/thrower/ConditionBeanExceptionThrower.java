@@ -33,7 +33,6 @@ import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.exception.ScalarConditionInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.ScalarConditionUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.ScalarSelectInvalidColumnSpecificationException;
-import org.seasar.dbflute.exception.SetupSelectAfterUnionException;
 import org.seasar.dbflute.exception.SetupSelectIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifiedDerivedOrderByAliasNameNotFoundException;
 import org.seasar.dbflute.exception.SpecifyColumnNotSetupSelectColumnException;
@@ -91,37 +90,38 @@ public class ConditionBeanExceptionThrower {
         throw new SetupSelectIllegalPurposeException(msg);
     }
 
-    public void throwSetupSelectAfterUnionException(ConditionBean baseCB, String foreignPropertyName) {
-        final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The setup-select was called after union.");
-        br.addItem("Advice");
-        br.addElement("The setup-select should be called before calling union().");
-        br.addElement("For example:");
-        br.addElement("  (x):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.query().setXxx...;");
-        br.addElement("    cb.union(new UnionQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB unionCB) {");
-        br.addElement("            unionCB.query().setXxx...;");
-        br.addElement("        }");
-        br.addElement("    });");
-        br.addElement("    cb.setupSelect_MemberStatus(); // *NG");
-        br.addElement("  (o):");
-        br.addElement("    MemberCB cb = new MemberCB();");
-        br.addElement("    cb.setupSelect_MemberStatus(); // you should call here");
-        br.addElement("    cb.query().setXxx...;");
-        br.addElement("    cb.union(new UnionQuery<MemberCB>() {");
-        br.addElement("        public void query(MemberCB unionCB) {");
-        br.addElement("            unionCB.query().setXxx...;");
-        br.addElement("        }");
-        br.addElement("    });");
-        br.addItem("ConditionBean");
-        br.addElement(baseCB.getClass().getName());
-        br.addItem("Setup Relation");
-        br.addElement(foreignPropertyName);
-        final String msg = br.buildExceptionMessage();
-        throw new SetupSelectAfterUnionException(msg);
-    }
+    // unused because it has been allowed
+    //public void throwSetupSelectAfterUnionException(ConditionBean baseCB, String foreignPropertyName) {
+    //    final ExceptionMessageBuilder br = createExceptionMessageBuilder();
+    //    br.addNotice("The setup-select was called after union.");
+    //    br.addItem("Advice");
+    //    br.addElement("The setup-select should be called before calling union().");
+    //    br.addElement("For example:");
+    //    br.addElement("  (x):");
+    //    br.addElement("    MemberCB cb = new MemberCB();");
+    //    br.addElement("    cb.query().setXxx...;");
+    //    br.addElement("    cb.union(new UnionQuery<MemberCB>() {");
+    //    br.addElement("        public void query(MemberCB unionCB) {");
+    //    br.addElement("            unionCB.query().setXxx...;");
+    //    br.addElement("        }");
+    //    br.addElement("    });");
+    //    br.addElement("    cb.setupSelect_MemberStatus(); // *NG");
+    //    br.addElement("  (o):");
+    //    br.addElement("    MemberCB cb = new MemberCB();");
+    //    br.addElement("    cb.setupSelect_MemberStatus(); // you should call here");
+    //    br.addElement("    cb.query().setXxx...;");
+    //    br.addElement("    cb.union(new UnionQuery<MemberCB>() {");
+    //    br.addElement("        public void query(MemberCB unionCB) {");
+    //    br.addElement("            unionCB.query().setXxx...;");
+    //    br.addElement("        }");
+    //    br.addElement("    });");
+    //    br.addItem("ConditionBean");
+    //    br.addElement(baseCB.getClass().getName());
+    //    br.addItem("Setup Relation");
+    //    br.addElement(foreignPropertyName);
+    //    final String msg = br.buildExceptionMessage();
+    //    throw new SetupSelectAfterUnionException(msg);
+    //}
 
     // ===================================================================================
     //                                                                             Specify

@@ -252,6 +252,7 @@ public class ManualOrderBean implements HpCalculator {
         assertCalculationColumnNumber(plusColumn);
         assertSpecifiedDreamCruiseTicket(plusColumn);
         initializeCalcSpecificationIfNeeds();
+        setupSelectDreamCruiseJourneyLogBookIfUnionExists(plusColumn);
         return _calcSpecification.plus(plusColumn);
     }
 
@@ -272,6 +273,7 @@ public class ManualOrderBean implements HpCalculator {
         assertCalculationColumnNumber(minusColumn);
         assertSpecifiedDreamCruiseTicket(minusColumn);
         initializeCalcSpecificationIfNeeds();
+        setupSelectDreamCruiseJourneyLogBookIfUnionExists(minusColumn);
         return _calcSpecification.minus(minusColumn);
     }
 
@@ -292,6 +294,7 @@ public class ManualOrderBean implements HpCalculator {
         assertCalculationColumnNumber(multiplyColumn);
         assertSpecifiedDreamCruiseTicket(multiplyColumn);
         initializeCalcSpecificationIfNeeds();
+        setupSelectDreamCruiseJourneyLogBookIfUnionExists(multiplyColumn);
         return _calcSpecification.multiply(multiplyColumn);
     }
 
@@ -312,6 +315,7 @@ public class ManualOrderBean implements HpCalculator {
         assertCalculationColumnNumber(divideColumn);
         assertSpecifiedDreamCruiseTicket(divideColumn);
         initializeCalcSpecificationIfNeeds();
+        setupSelectDreamCruiseJourneyLogBookIfUnionExists(divideColumn);
         return _calcSpecification.divide(divideColumn);
     }
 
@@ -344,6 +348,10 @@ public class ManualOrderBean implements HpCalculator {
         if (_calcSpecification == null) {
             _calcSpecification = createCalcSpecification();
         }
+    }
+
+    protected void setupSelectDreamCruiseJourneyLogBookIfUnionExists(HpSpecifiedColumn column) {
+        column.setupSelectDreamCruiseJourneyLogBookIfUnionExists();
     }
 
     protected HpCalcSpecification<ConditionBean> createCalcSpecification() {

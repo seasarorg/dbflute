@@ -296,4 +296,13 @@ public class MockConditionBean implements ConditionBean {
     public HpSpecifiedColumn xshowDreamCruiseTicket() {
         return null;
     }
+
+    public void xkeepDreamCruiseJourneyLogBook(String relationPath) {
+    }
+
+    public void xsetupSelectDreamCruiseJourneyLogBook() {
+    }
+
+    public void xsetupSelectDreamCruiseJourneyLogBookIfUnionExists() {
+    }
 }

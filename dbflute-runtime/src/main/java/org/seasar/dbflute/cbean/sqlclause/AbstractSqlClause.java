@@ -357,11 +357,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                       Complete Clause
     //                                       ---------------
     public String getClause() {
-        reflectClauseLazilyIdExists();
+        reflectClauseLazilyIfExists();
         final StringBuilder sb = new StringBuilder(512);
         final String selectClause = getSelectClause();
         sb.append(selectClause);
-        sb.append(" ");
         buildClauseWithoutMainSelect(sb, selectClause);
         String sql = sb.toString();
         sql = filterEnclosingClause(sql);
@@ -372,7 +371,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     protected void buildClauseWithoutMainSelect(StringBuilder sb, String selectClause) {
         buildFromClause(sb);
         sb.append(getFromHint());
-        sb.append(" ");
         buildWhereClause(sb);
         sb.append(deleteUnionWhereTemplateMark(prepareUnionClause(selectClause)));
         if (!needsUnionNormalSelectEnclosing()) {
@@ -393,12 +391,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                       Fragment Clause
     //                                       ---------------
     public String getClauseFromWhereWithUnionTemplate() {
-        reflectClauseLazilyIdExists();
+        reflectClauseLazilyIfExists();
         return buildClauseFromWhereAsTemplate(false);
     }
 
     public String getClauseFromWhereWithWhereUnionTemplate() {
-        reflectClauseLazilyIdExists();
+        reflectClauseLazilyIfExists();
         return buildClauseFromWhereAsTemplate(true);
     }
 
@@ -406,7 +404,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final StringBuilder sb = new StringBuilder(256);
         buildFromClause(sb);
         sb.append(getFromHint());
-        sb.append(" ");
         buildWhereClause(sb, template);
         sb.append(prepareUnionClause(getUnionSelectClauseMark()));
         return sb.toString();
@@ -507,7 +504,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                         Select Clause
     //                                         -------------
     public String getSelectClause() {
-        reflectClauseLazilyIdExists();
+        reflectClauseLazilyIfExists();
         if (isSelectClauseNonUnionScalar()) {
             return buildSelectClauseScalar(getBasePointAliasName());
         }
@@ -852,7 +849,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                           From Clause
     //                                           -----------
     public String getFromClause() {
-        reflectClauseLazilyIdExists();
+        reflectClauseLazilyIfExists();
         final StringBuilder sb = new StringBuilder();
         buildFromClause(sb);
         return sb.toString();
@@ -1082,7 +1079,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                          Where Clause
     //                                          ------------
     public String getWhereClause() {
-        reflectClauseLazilyIdExists();
+        reflectClauseLazilyIfExists();
         final StringBuilder sb = new StringBuilder();
         buildWhereClause(sb);
         return sb.toString();
@@ -1096,7 +1093,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final List<QueryClause> whereList = getWhereList();
         if (whereList.isEmpty()) {
             if (template) {
-                sb.append(getWhereClauseMark());
+                sb.append(" ").append(getWhereClauseMark());
             }
             return;
         }
@@ -1118,7 +1115,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                        OrderBy Clause
     //                                        --------------
     public String getOrderByClause() {
-        reflectClauseLazilyIdExists();
+        reflectClauseLazilyIfExists();
         final OrderByClause orderBy = getOrderBy();
         String orderByClause = null;
         if (hasUnionQuery()) {
@@ -1142,7 +1139,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                            SQL Suffix
     //                                            ----------
     public String getSqlSuffix() {
-        reflectClauseLazilyIdExists();
+        reflectClauseLazilyIfExists();
         String sqlSuffix = createSqlSuffix();
         if (sqlSuffix != null && sqlSuffix.trim().length() > 0) {
             return ln() + sqlSuffix;
@@ -2983,7 +2980,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _clauseLazyReflectorList.add(clauseLazyReflector);
     }
 
-    protected void reflectClauseLazilyIdExists() {
+    protected void reflectClauseLazilyIfExists() {
         if (_clauseLazyReflectorList == null) {
             return;
         }

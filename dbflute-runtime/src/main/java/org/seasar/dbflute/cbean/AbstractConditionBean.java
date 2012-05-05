@@ -31,6 +31,7 @@ import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinNoWaySpeaker;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -40,6 +41,7 @@ import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.exception.ColumnQueryCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
@@ -110,6 +112,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                          ------------
     protected ConditionBean _dreamCruiseDeparturePort;
     protected HpSpecifiedColumn _dreamCruiseTicket;
+    protected List<String> _dreamCruiseJourneyLogBook;
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -152,7 +155,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected void doSetupSelect(SsCall callback) {
         final String foreignPropertyName = callback.qf().xgetForeignPropertyName();
         assertSetupSelectPurpose(foreignPropertyName);
-        assertSetupSelectBeforeUnion(foreignPropertyName);
+        // allowed since 0.9.9.4C but basically SetupSelect should be called before Union
+        // (basically for DBFlute internal operation, Dream Cruise)
+        //assertSetupSelectBeforeUnion(foreignPropertyName);
         final String foreignTableAliasName = callback.qf().xgetAliasName();
         final String localRelationPath = localCQ().xgetRelationPath();
         final String foreignRelationPath = callback.qf().xgetRelationPath();
@@ -175,15 +180,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
         createCBExThrower().throwSetupSelectIllegalPurposeException(_purpose, this, foreignPropertyName);
     }
 
-    protected void assertSetupSelectBeforeUnion(String foreignPropertyName) {
-        if (hasUnionQueryOrUnionAllQuery()) {
-            throwSetupSelectAfterUnionException(foreignPropertyName);
-        }
-    }
-
-    protected void throwSetupSelectAfterUnionException(String foreignPropertyName) {
-        createCBExThrower().throwSetupSelectAfterUnionException(this, foreignPropertyName);
-    }
+    // unused because it has been allowed
+    //protected void assertSetupSelectBeforeUnion(String foreignPropertyName) {
+    //    if (hasUnionQueryOrUnionAllQuery()) {
+    //        throwSetupSelectAfterUnionException(foreignPropertyName);
+    //    }
+    //}
+    //
+    //protected void throwSetupSelectAfterUnionException(String foreignPropertyName) {
+    //    createCBExThrower().throwSetupSelectAfterUnionException(this, foreignPropertyName);
+    //}
 
     // [DBFlute-0.9.5.3]
     // ===================================================================================
@@ -436,6 +442,78 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public HpSpecifiedColumn xshowDreamCruiseTicket() {
         return _dreamCruiseTicket;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void xkeepDreamCruiseJourneyLogBook(String relationPath) {
+        xassertDreamCruiseShip();
+        if (_dreamCruiseJourneyLogBook == null) {
+            _dreamCruiseJourneyLogBook = new ArrayList<String>();
+        }
+        _dreamCruiseJourneyLogBook.add(relationPath);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void xsetupSelectDreamCruiseJourneyLogBook() {
+        xassertDreamCruiseShip();
+        if (_dreamCruiseJourneyLogBook == null) {
+            return;
+        }
+        xgetDreamCruiseDeparturePort().getSqlClause().registerClauseLazyReflector(new ClauseLazyReflector() {
+            public void reflect() {
+                xdoSetupSelectDreamCruiseJourneyLogBook();
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void xsetupSelectDreamCruiseJourneyLogBookIfUnionExists() {
+        xassertDreamCruiseShip();
+        if (_dreamCruiseJourneyLogBook == null) {
+            return;
+        }
+        if (xgetDreamCruiseDeparturePort().hasUnionQueryOrUnionAllQuery()) {
+            xsetupSelectDreamCruiseJourneyLogBook();
+        }
+    }
+
+    protected void xdoSetupSelectDreamCruiseJourneyLogBook() {
+        // small waste exists but simple logic is best here
+        final ConditionBean departurePort = xgetDreamCruiseDeparturePort();
+        for (String relationPath : _dreamCruiseJourneyLogBook) {
+            final List<String> splitList = Srl.splitList(relationPath, "_"); // e.g. _2_5
+            final StringBuilder sb = new StringBuilder();
+            DBMeta currentMeta = getDBMeta();
+            int index = 0;
+            for (String element : splitList) {
+                if ("".equals(element)) {
+                    continue;
+                }
+                final Integer relationNo = Integer.valueOf(element);
+                final ForeignInfo foreignInfo = currentMeta.findForeignInfo(relationNo);
+                final String foreignPropertyName = foreignInfo.getForeignPropertyName();
+                if (index > 0) {
+                    sb.append(".");
+                }
+                sb.append(foreignPropertyName);
+                currentMeta = foreignInfo.getForeignDBMeta();
+                ++index;
+            }
+            departurePort.invokeSetupSelect(sb.toString());
+        }
+    }
+
+    protected void xassertDreamCruiseShip() {
+        if (!xisDreamCruiseShip()) {
+            String msg = "The operation is only allowed at Dream Cruise.";
+            throw new IllegalConditionBeanOperationException(msg);
+        }
     }
 
     // [DBFlute-0.9.6.3]
