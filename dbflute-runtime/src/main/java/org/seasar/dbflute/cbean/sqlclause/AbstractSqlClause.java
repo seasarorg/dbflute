@@ -2650,11 +2650,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (columnParameterMap.isEmpty()) {
             return null;
         }
-        final String aliasName = getBasePointAliasName();
         final DBMeta dbmeta = getDBMeta();
         final TableSqlName tableSqlName = dbmeta.getTableSqlName();
         final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
-        final String selectClause = "select " + aliasName + "." + primaryKeyName;
+        final String selectClause = "select " + getBasePointAliasName() + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
 
         // Replace template marks. These are very important!
@@ -2704,8 +2703,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = processSubQueryIndent(fromWhereClause);
-            subQuery = replace(subQuery, aliasName + ".", "");
-            subQuery = replace(subQuery, " " + aliasName + " ", " ");
+            subQuery = filterQueryUpdateBasePointAliasNameLocalUnsupported(subQuery);
             int whereIndex = subQuery.indexOf("where ");
             if (whereIndex < 0) {
                 return sb.toString();
@@ -2716,12 +2714,27 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
+    protected String filterQueryUpdateBasePointAliasNameLocalUnsupported(String subQuery) {
+        final String basePointAliasName = getBasePointAliasName();
+
+        // remove table alias prefix for column
+        subQuery = replace(subQuery, basePointAliasName + ".", "");
+
+        // remove table alias definition
+        final String tableAliasSymbol = " " + basePointAliasName;
+        subQuery = replace(subQuery, tableAliasSymbol + " ", " ");
+        subQuery = replace(subQuery, tableAliasSymbol + ln(), ln());
+        if (subQuery.endsWith(tableAliasSymbol)) {
+            subQuery = replace(subQuery, tableAliasSymbol, "");
+        }
+        return subQuery;
+    }
+
     public String getClauseQueryDelete() {
-        final String aliasName = getBasePointAliasName();
         final DBMeta dbmeta = getDBMeta();
         final TableSqlName tableSqlName = dbmeta.getTableSqlName();
         final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
-        final String selectClause = "select " + aliasName + "." + primaryKeyName;
+        final String selectClause = "select " + getBasePointAliasName() + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
 
         // Replace template marks. These are very important!
@@ -2754,8 +2767,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = processSubQueryIndent(fromWhereClause);
-            subQuery = replace(subQuery, aliasName + ".", "");
-            subQuery = replace(subQuery, " " + aliasName + " ", " ");
+            subQuery = filterQueryUpdateBasePointAliasNameLocalUnsupported(subQuery);
             subQuery = subQuery.substring(subQuery.indexOf("from "));
             return "delete " + subQuery;
         }
