@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -77,7 +78,12 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
 
     protected TnBasicSelectHandler createSelectHandler(DataSource ds, String sql) {
         // Use original statement factory for identifier generator.
-        return new TnBasicSelectHandler(ds, sql, _resultSetHandler, createStatementFactory(ds, sql));
+        return new TnBasicSelectHandler(ds, sql, _resultSetHandler, createStatementFactory(ds, sql)) {
+            @Override
+            protected void saveResultSqlLogInfo(SqlLogInfo sqlLogInfo) {
+                // do nothing because of recursive call
+            }
+        };
     }
 
     protected StatementFactory createStatementFactory(DataSource ds, String sql) {

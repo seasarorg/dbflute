@@ -177,7 +177,8 @@ public abstract class TnAbstractBasicSqlHandler {
 
         if (logEnabled || hasSqlFireHook || hasSqlLog || hasSqlResult || hasRegistry) {
             if (isInternalDebugEnabled()) {
-                final String determination = logEnabled + ", " + hasSqlLog + ", " + hasSqlResult + ", " + hasRegistry;
+                final String determination = logEnabled + ", " + hasSqlFireHook + ", " + hasSqlLog + ", "
+                        + hasSqlResult + ", " + hasRegistry;
                 _log.debug("...Logging SQL by " + determination);
             }
             if (processBeforeLogging(args, argTypes, logEnabled, hasSqlFireHook, hasSqlLog, hasSqlResult,
@@ -213,14 +214,18 @@ public abstract class TnAbstractBasicSqlHandler {
         }
         if (hasSqlFireHook || hasSqlLog || hasSqlResult) { // build lazily
             if (isInternalDebugEnabled()) {
-                _log.debug("...Handling SqlLog or SqlResult by " + hasSqlLog + ", " + hasSqlResult);
+                _log.debug("...Handling SqlFireHook or SqlLog or SqlResult by " + hasSqlFireHook + ", " + hasSqlLog
+                        + ", " + hasSqlResult);
             }
             final SqlLogInfo sqlLogInfo = prepareSqlLogInfo(args, argTypes, firstDisplaySql);
             if (sqlLogInfo != null) { // basically true (except override)
                 if (hasSqlLog) {
                     getSqlLogHander().handle(sqlLogInfo);
                 }
-                if (hasSqlFireHook || hasSqlResult) {
+                if (hasSqlFireHook) {
+                    saveHookSqlLogInfo(sqlLogInfo);
+                }
+                if (hasSqlResult) {
                     saveResultSqlLogInfo(sqlLogInfo);
                 }
             }
@@ -264,6 +269,10 @@ public abstract class TnAbstractBasicSqlHandler {
 
     protected boolean hasSqlFireHook() {
         return getSqlFireHook() != null;
+    }
+
+    protected void saveHookSqlLogInfo(SqlLogInfo sqlLogInfo) {
+        InternalMapContext.setHookSqlLogInfo(sqlLogInfo);
     }
 
     // -----------------------------------------------------
@@ -545,7 +554,7 @@ public abstract class TnAbstractBasicSqlHandler {
         if (!hasSqlFireHook()) {
             return;
         }
-        final SqlLogInfo sqlLogInfo = InternalMapContext.getResultSqlLogInfo();
+        final SqlLogInfo sqlLogInfo = InternalMapContext.getHookSqlLogInfo();
         final SqlFireReadyInfo fireReadyInfo = new SqlFireReadyInfo(sqlLogInfo);
         getSqlFireHook().hookBefore(ResourceContext.behaviorCommand(), fireReadyInfo);
     }
@@ -554,7 +563,7 @@ public abstract class TnAbstractBasicSqlHandler {
         if (!hasSqlFireHook()) {
             return;
         }
-        final SqlLogInfo sqlLogInfo = InternalMapContext.getResultSqlLogInfo();
+        final SqlLogInfo sqlLogInfo = InternalMapContext.getHookSqlLogInfo();
         final Long sqlBefore = InternalMapContext.getSqlBeforeTimeMillis();
         final Long sqlAfter = InternalMapContext.getSqlAfterTimeMillis();
         final ExecutionTimeInfo timeInfo = new ExecutionTimeInfo(null, null, sqlBefore, sqlAfter);

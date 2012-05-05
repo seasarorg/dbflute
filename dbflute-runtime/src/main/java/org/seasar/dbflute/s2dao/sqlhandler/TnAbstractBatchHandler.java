@@ -192,14 +192,26 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
     }
 
     protected void handleBatchResultSqlSaving(String batchSql) {
-        if (!_alreadySavedToResultInfo && (hasSqlFireHook() || hasSqlResultHandler())) { // only first scope is saved
+        final boolean hasSqlFireHook = hasSqlFireHook();
+        final boolean hasSqlResultHandler = hasSqlResultHandler();
+        if (!_alreadySavedToResultInfo && (hasSqlFireHook || hasSqlResultHandler)) { // only first scope is saved
             final Object[] bindArgs = _bindVariables;
             final Class<?>[] bindArgTypes = getArgTypes(bindArgs);
             final String savedDisplaySql = batchSql != null ? batchSql.trim() : null; // remove first line separator
             final SqlLogInfo sqlLogInfo = prepareSqlLogInfo(bindArgs, bindArgTypes, savedDisplaySql);
-            super.saveResultSqlLogInfo(sqlLogInfo); // super's because one of this class is overridden
+            if (hasSqlFireHook) {
+                super.saveHookSqlLogInfo(sqlLogInfo); // super's because one of this class is overridden
+            }
+            if (hasSqlResultHandler) {
+                super.saveResultSqlLogInfo(sqlLogInfo); // super's because one of this class is overridden
+            }
             _alreadySavedToResultInfo = true;
         }
+    }
+
+    @Override
+    protected void saveHookSqlLogInfo(SqlLogInfo sqlLogInfo) {
+        // do nothing because it saves later
     }
 
     @Override
