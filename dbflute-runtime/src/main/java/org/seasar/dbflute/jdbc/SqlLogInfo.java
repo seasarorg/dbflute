@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.jdbc;
 
+import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
+
 /**
  * The information of SQL log.
  * @author jflute
@@ -24,6 +26,7 @@ public class SqlLogInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final BehaviorCommandMeta _meta;
     protected final String _executedSql;
     protected final Object[] _bindArgs;
     protected final Class<?>[] _bindArgTypes;
@@ -33,8 +36,9 @@ public class SqlLogInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SqlLogInfo(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes,
+    public SqlLogInfo(BehaviorCommandMeta meta, String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes,
             SqlLogDisplaySqlBuilder displaySqlBuilder) {
+        _meta = meta;
         _executedSql = executedSql;
         _bindArgs = bindArgs;
         _bindArgTypes = bindArgTypes;
@@ -80,6 +84,14 @@ public class SqlLogInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    /**
+     * Get the meta information of the behavior command.
+     * @return The meta information of the behavior command. (NotNull)
+     */
+    public BehaviorCommandMeta getMeta() {
+        return _meta;
+    }
+
     /**
      * Get the actually-executed SQL, which JDBC can analyze.
      * @return The string of SQL. (basically NotNull: if no SQL execution, returns null)

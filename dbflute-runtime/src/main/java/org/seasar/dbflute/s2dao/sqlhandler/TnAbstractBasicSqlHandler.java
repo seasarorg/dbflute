@@ -291,7 +291,7 @@ public abstract class TnAbstractBasicSqlHandler {
 
     protected SqlLogInfo prepareSqlLogInfo(Object[] args, Class<?>[] argTypes, String alreadyBuiltDisplaySql) {
         final SqlLogDisplaySqlBuilder sqlLogDisplaySqlBuilder = createSqlLogDisplaySqlBuilder(alreadyBuiltDisplaySql);
-        return new SqlLogInfo(_sql, args, argTypes, sqlLogDisplaySqlBuilder);
+        return new SqlLogInfo(ResourceContext.behaviorCommand(), _sql, args, argTypes, sqlLogDisplaySqlBuilder);
     }
 
     protected SqlLogDisplaySqlBuilder createSqlLogDisplaySqlBuilder(final String alreadyBuiltDisplaySql) {

@@ -75,10 +75,10 @@ public class SqlFireResultInfo {
      * Get the information of SQL log info.
      * <pre>
      * [SqlLogInfo]
-     * o executedSql : The actually-executed SQL, which JDBC can analyze. (basically NotNull: if no SQL execution, null)
-     * o bindArgs : The argument values of bind variables. (NotNull, EmptyAllowed)
-     * o bindArgTypes : The argument types of bind variables. (NotNull, EmptyAllowed)
-     * o displaySql : The SQL string for display, bind variables are embedded. (basically NotNull: if no SQL execution, null)
+     * o executedSql : The actually-executed SQL, which JDBC can analyze.
+     * o bindArgs : The argument values of bind variables.
+     * o bindArgTypes : The argument types of bind variables.
+     * o displaySql : The SQL string for display, bind variables are embedded.
      * </pre>
      * @return The information of SQL info. (NotNull) 
      */
@@ -90,10 +90,8 @@ public class SqlFireResultInfo {
      * Get the information of execution time info.
      * <pre>
      * [ExecutionTimeInfo]
-     * o commandBeforeTimeMillis : The time as millisecond before command invoking (before building SQL clause). (Null)
-     * o commandAfterTimeMillis : The time as millisecond after command invoking (after mapping to entity). (Null)
-     * o sqlBeforeTimeMillis : The time as millisecond before SQL execution (after building SQL clause). (basically NotNull but no guarantee)
-     * o sqlAfterTimeMillis : The time as millisecond after SQL execution (before mapping to entity). (basically NotNull but no guarantee, and Null when SQL fire failed)
+     * o sqlBeforeTimeMillis : The time as millisecond before SQL execution (after building SQL clause).
+     * o sqlAfterTimeMillis : The time as millisecond after SQL execution (before mapping to entity).
      * </pre>
      * @return The information of execution time. (NotNull)
      */

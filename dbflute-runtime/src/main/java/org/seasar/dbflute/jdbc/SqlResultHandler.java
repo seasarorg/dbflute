@@ -33,14 +33,12 @@ public interface SqlResultHandler {
     /**
      * Handle the SQL result. <br />
      * This is called back per command execution.
-     * But when the command fails by exception, this is not called back.
      * <pre>
      * [SqlResultInfo]
      * o result : The result (mapped object) of executed SQL. (NullAllowed)
-     * o tableDbName : The DB name of table of executed behavior. (NotNull)
-     * o commandName : The name of executed command. (for display only) (NotNull)
      * o sqlLogInfo : The information of SQL log, which has executedSql, arguments, displaySql... (NotNull)
      * o executionTimeInfo : The information of execution time. (NotNull)
+     * o cause : The failure cause when the command failed. (NullAllowed)
      * </pre>
      * @param info The information of executed SQL result. (NotNull)
      */

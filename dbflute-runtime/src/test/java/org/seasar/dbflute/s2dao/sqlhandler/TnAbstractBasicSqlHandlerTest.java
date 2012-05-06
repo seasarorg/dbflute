@@ -8,7 +8,9 @@ import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
+import org.seasar.dbflute.mock.MockBehaviorCommand;
 import org.seasar.dbflute.resource.InternalMapContext;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
@@ -19,6 +21,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
 
     public void test_logSql_whitebox_nothing() {
         // ## Arrange ##
+        prepareMockBehaviorCommand();
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
             protected String buildDisplaySql(String sql, Object[] args) {
@@ -47,6 +50,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
 
     public void test_logSql_whitebox_logEnabledOnly() {
         // ## Arrange ##
+        prepareMockBehaviorCommand();
         final List<String> markList = new ArrayList<String>();
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, null) {
             @Override
@@ -96,6 +100,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
 
     public void test_logSql_whitebox_sqlLogHandlerOnly() {
         // ## Arrange ##
+        prepareMockBehaviorCommand();
         final List<String> markList = new ArrayList<String>();
         final Object[] args = new Object[] {};
         final Class<?>[] argsTypes = new Class<?>[] {};
@@ -160,6 +165,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
 
     public void test_logSql_whitebox_sqlResultHandlerOnly() {
         // ## Arrange ##
+        prepareMockBehaviorCommand();
         final List<String> markList = new ArrayList<String>();
         TnAbstractBasicSqlHandler handler = new TnAbstractBasicSqlHandler(null, null, "select ...") {
             @Override
@@ -220,6 +226,7 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
 
     public void test_logSql_whitebox_bigThree() {
         // ## Arrange ##
+        prepareMockBehaviorCommand();
         final List<String> markList = new ArrayList<String>();
         final Object[] args = new Object[] {};
         final Class<?>[] argsTypes = new Class<?>[] {};
@@ -293,5 +300,12 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
         assertEquals("log", markList.get(2));
         assertEquals("handle", markList.get(3));
         assertEquals("saveResultSqlLogInfo", markList.get(4));
+    }
+
+    protected void prepareMockBehaviorCommand() {
+        MockBehaviorCommand behaviorCommand = new MockBehaviorCommand();
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.setBehaviorCommand(behaviorCommand);
+        ResourceContext.setResourceContextOnThread(resourceContext);
     }
 }

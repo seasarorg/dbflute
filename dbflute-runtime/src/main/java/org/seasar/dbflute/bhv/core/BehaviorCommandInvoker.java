@@ -225,36 +225,38 @@ public class BehaviorCommandInvoker {
         final SqlResultHandler sqlResultHander = getSqlResultHander();
         final boolean hasSqlResultHandler = sqlResultHander != null;
         final long before = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, hasSqlResultHandler);
+        Long after = null;
         Object ret = null;
+        RuntimeException cause = null;
         try {
             final Object[] args = behaviorCommand.getSqlExecutionArgument();
             ret = executeSql(execution, args);
-        } catch (RuntimeException cause) {
-            handleExecutionException(cause);
+
+            final Class<?> retType = behaviorCommand.getCommandReturnType();
+            assertRetType(retType, ret);
+
+            after = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, hasSqlResultHandler);
+            if (logEnabled) {
+                logReturn(behaviorCommand, retType, ret, before, after);
+            }
+
+            ret = convertReturnValueIfNeeds(ret, retType);
+        } catch (RuntimeException e) {
+            try {
+                handleExecutionException(e); // always throw
+            } catch (RuntimeException handled) {
+                cause = handled;
+                throw handled;
+            }
         } finally {
             behaviorCommand.afterExecuting();
-        }
-        final Class<?> retType = behaviorCommand.getCommandReturnType();
-        assertRetType(retType, ret);
-        final long after = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, hasSqlResultHandler);
-        if (logEnabled) {
-            logReturn(behaviorCommand, retType, ret, before, after);
-        }
 
-        // - - - - - - - - - -
-        // Convert and Return!
-        // - - - - - - - - - -
-        if (retType.isPrimitive()) {
-            ret = convertPrimitiveWrapper(ret, retType);
-        } else if (Number.class.isAssignableFrom(retType)) {
-            ret = convertNumber(ret, retType);
-        }
-
-        // - - - - - - - - - - - -
-        // Call the handler back!
-        // - - - - - - - - - - - -
-        if (hasSqlResultHandler) {
-            callbackSqlResultHanler(behaviorCommand, sqlResultHander, ret, before, after);
+            // - - - - - - - - - - - -
+            // Call the handler back!
+            // - - - - - - - - - - - -
+            if (hasSqlResultHandler) {
+                callbackSqlResultHanler(behaviorCommand, sqlResultHander, ret, before, after, cause);
+            }
         }
 
         // - - - - - - - - -
@@ -277,6 +279,15 @@ public class BehaviorCommandInvoker {
         return DBFluteSystem.currentTimeMillis(); // for calculating performance
     }
 
+    protected Object convertReturnValueIfNeeds(Object ret, Class<?> retType) {
+        if (retType.isPrimitive()) {
+            return convertPrimitiveWrapper(ret, retType);
+        } else if (Number.class.isAssignableFrom(retType)) {
+            return convertNumber(ret, retType);
+        }
+        return ret;
+    }
+
     protected void handleExecutionException(RuntimeException cause) {
         if (cause instanceof SQLFailureException) {
             throw cause;
@@ -295,27 +306,26 @@ public class BehaviorCommandInvoker {
     }
 
     protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,
-            SqlResultHandler sqlResultHander, Object ret, long commandBefore, long commandAfter) {
-        final SqlLogInfo sqlLogInfo = getResultSqlLogInfo();
-        final String tableDbName = behaviorCommand.getTableDbName();
-        final String commandName = behaviorCommand.getCommandName();
+            SqlResultHandler sqlResultHander, Object ret, Long commandBefore, Long commandAfter, RuntimeException cause) {
+        final SqlLogInfo sqlLogInfo = getResultSqlLogInfo(behaviorCommand);
         final Long sqlBefore = InternalMapContext.getSqlBeforeTimeMillis();
         final Long sqlAfter = InternalMapContext.getSqlAfterTimeMillis();
         final ExecutionTimeInfo timeInfo = new ExecutionTimeInfo(commandBefore, commandAfter, sqlBefore, sqlAfter);
-        final SqlResultInfo info = new SqlResultInfo(ret, tableDbName, commandName, sqlLogInfo, timeInfo);
+        final SqlResultInfo info = new SqlResultInfo(behaviorCommand, ret, sqlLogInfo, timeInfo, cause);
         sqlResultHander.handle(info);
     }
 
-    protected SqlLogInfo getResultSqlLogInfo() {
+    protected <RESULT> SqlLogInfo getResultSqlLogInfo(BehaviorCommand<RESULT> behaviorCommand) {
         final SqlLogInfo sqlLogInfo = InternalMapContext.getResultSqlLogInfo();
         if (sqlLogInfo != null) {
             return sqlLogInfo;
         }
-        return new SqlLogInfo(null, new Object[] {}, new Class<?>[] {}, new SqlLogInfo.SqlLogDisplaySqlBuilder() {
-            public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
-                return null;
-            }
-        }); // as dummy
+        return new SqlLogInfo(behaviorCommand, null, new Object[] {}, new Class<?>[] {},
+                new SqlLogInfo.SqlLogDisplaySqlBuilder() {
+                    public String build(String executedSql, Object[] bindArgs, Class<?>[] bindArgTypes) {
+                        return null;
+                    }
+                }); // as dummy
     }
 
     // ===================================================================================
