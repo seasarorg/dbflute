@@ -61,7 +61,7 @@ public class QueryDerivedReferrer extends DerivedReferrer {
             }
             sb.append(" ").append(parameter);
         }
-        sb.append(" ").append(endMark);
+        sb.append(endMark);
         return sb.toString();
     }
 

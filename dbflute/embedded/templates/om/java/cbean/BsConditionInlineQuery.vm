@@ -283,6 +283,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if ($table.hasSinglePrimaryKey())
     public String keepScalarCondition(${myConditionQueryClassName} subQuery)
     { throwIICBOE("ScalarCondition"); return null; }
+    public String keepMyselfExists(${myConditionQueryClassName} subQuery)
+    { throwIICBOE("MyselfExists"); return null;}
     public String keepMyselfInScope(${myConditionQueryClassName} subQuery)
     { throwIICBOE("MyselfInScope"); return null;}
 #end

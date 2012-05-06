@@ -616,6 +616,17 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     // ===================================================================================
+    //                                                                        MyselfExists
+    //                                                                        ============
+    protected Map<String, ${myConditionQueryClassName}> _myselfExistsMap;
+    public Map<String, ${myConditionQueryClassName}> getMyselfExists() { return _myselfExistsMap; }
+    public String keepMyselfExists(${myConditionQueryClassName} subQuery) {
+        if (_myselfExistsMap == null) { _myselfExistsMap = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_myselfExistsMap.size() + 1);
+        _myselfExistsMap.put(key, subQuery); return "myselfExists." + key;
+    }
+
+    // ===================================================================================
     //                                                                       MyselfInScope
     //                                                                       =============
     protected Map<String, ${myConditionQueryClassName}> _myselfInScopeMap;

@@ -27,6 +27,8 @@ public enum HpCBPurpose {
     , SCALAR_CONDITION_PARTITION_BY(new HpSpec().noSetupSelect().noSpecifyColumnTwoOrMore().noSpecifyRelation()
             .noSpecifyDerivedReferrer().noOrderBy().subQuery()) // ScalarConditionPartitionBy
 
+    , MYSELF_EXISTS(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore()
+            .noSpecifyColumnWithDerivedReferrer().noOrderBy().subQuery()) // MyselfExists
     , MYSELF_IN_SCOPE(new HpSpec().noSetupSelect().noSpecifyRelation().noSpecifyColumnTwoOrMore()
             .noSpecifyColumnWithDerivedReferrer().noOrderBy().subQuery()) // MyselfInScope
 

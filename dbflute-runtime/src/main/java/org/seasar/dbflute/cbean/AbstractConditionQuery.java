@@ -1205,6 +1205,26 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // -----------------------------------------------------
+    //                                          MyselfExists
+    //                                          ------------
+    protected void registerMyselfExists(ConditionQuery subQuery, String subQueryPropertyName) {
+        final String relatedColumnDbName;
+        {
+            subQuery.xgetSqlClause().getSpecifiedColumnInfoAsOne();
+            final String specifiedDbName = subQuery.xgetSqlClause().getSpecifiedColumnDbNameAsOne();
+            if (specifiedDbName != null) {
+                relatedColumnDbName = specifiedDbName;
+            } else { // as default
+                // this function is only allowed when only-one PK
+                final UniqueInfo primaryUniqueInfo = findDBMeta(subQuery.getTableDbName()).getPrimaryUniqueInfo();
+                final ColumnInfo primaryColumnInfo = primaryUniqueInfo.getFirstColumn();
+                relatedColumnDbName = primaryColumnInfo.getColumnDbName();
+            }
+        }
+        registerExistsReferrer(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName);
+    }
+
+    // -----------------------------------------------------
     //                                         MyselfInScope
     //                                         -------------
     protected void registerMyselfInScope(ConditionQuery subQuery, String subQueryPropertyName) {

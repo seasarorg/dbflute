@@ -1321,10 +1321,25 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     // ===================================================================================
+    //                                                                        MyselfExists
+    //                                                                        ============
+    /**
+     * Myself Exists (SubQuery).
+     * @param subQuery The implementation of sub query. (NotNull)
+     */
+    public void myselfExists(SubQuery<${myConditionBeanClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForMyselfExists(this); subQuery.query(cb);
+        String subQueryPropertyName = keepMyselfExists(cb.query()); // for saving query-value.
+        registerMyselfExists(cb.query(), subQueryPropertyName);
+    }
+    public abstract String keepMyselfExists(${myConditionQueryClassName} subQuery);
+
+    // ===================================================================================
     //                                                                       MyselfInScope
     //                                                                       =============
     /**
-     * Myself InScope (SubQuery). {mainly to avoid CLOB and Union problem or no master table}
+     * Myself InScope (SubQuery).
      * @param subQuery The implementation of sub query. (NotNull)
      */
     public void myselfInScope(SubQuery<${myConditionBeanClassName}> subQuery) {
