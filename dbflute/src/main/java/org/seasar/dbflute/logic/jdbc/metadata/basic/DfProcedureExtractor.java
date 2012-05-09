@@ -423,17 +423,24 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             throws SQLException {
         final List<DfProcedureMeta> metaInfoList = new ArrayList<DfProcedureMeta>();
         String procedureName = null;
-        ResultSet columnResultSet = null;
         Connection conn = null;
+        ResultSet procedureRs = null;
         try {
             conn = dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final ResultSet procedureRs = doGetProcedures(metaData, unifiedSchema);
+            procedureRs = doGetProcedures(metaData, unifiedSchema);
             setupProcedureMetaInfo(metaInfoList, procedureRs, unifiedSchema);
             for (DfProcedureMeta metaInfo : metaInfoList) {
                 procedureName = metaInfo.getProcedureName();
-                final ResultSet columnRs = doGetProcedureColumns(metaData, metaInfo);
-                setupProcedureColumnMetaInfo(metaInfo, columnRs);
+                ResultSet columnRs = null;
+                try {
+                    columnRs = doGetProcedureColumns(metaData, metaInfo);
+                    setupProcedureColumnMetaInfo(metaInfo, columnRs);
+                } catch (SQLException e) {
+                    throw e;
+                } finally {
+                    closeResult(columnRs);
+                }
             }
         } catch (SQLException e) {
             throwProcedureListGettingFailureException(unifiedSchema, procedureName, e);
@@ -442,18 +449,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             throwProcedureListGettingFailureException(unifiedSchema, procedureName, e);
             return null; // unreachable
         } finally {
-            if (columnResultSet != null) {
-                try {
-                    columnResultSet.close();
-                } catch (SQLException ignored) {
-                }
-            }
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                }
-            }
+            closeResult(procedureRs);
+            closeConnection(conn);
         }
         return metaInfoList;
     }
@@ -725,6 +722,24 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             throw new DfJDBCException(msg, (SQLException) e);
         } else {
             throw new DfProcedureListGettingFailureException(msg, e);
+        }
+    }
+
+    protected void closeResult(ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException ignored) {
+            }
+        }
+    }
+
+    protected void closeConnection(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ignored) {
+            }
         }
     }
 

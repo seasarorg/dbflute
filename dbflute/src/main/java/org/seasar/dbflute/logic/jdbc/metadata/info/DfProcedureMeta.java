@@ -272,11 +272,11 @@ public class DfProcedureMeta {
     public void setProcedureSynonym(boolean procedureSynonym) {
         this._procedureSynonym = procedureSynonym;
     }
-    
+
     public boolean isIncludedProcedureToDBLink() {
         return _includedProcedureToDBLink;
     }
-    
+
     public void setIncludedProcedureToDBLink(boolean includedProcedureToDBLink) {
         this._includedProcedureToDBLink = includedProcedureToDBLink;
     }

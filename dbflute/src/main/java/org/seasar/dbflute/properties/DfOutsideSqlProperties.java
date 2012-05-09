@@ -155,16 +155,28 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isTargetProcedureName(String procedureName) {
+        final String filteredName = filterMatchProcedureName(procedureName);
         final List<String> targetProcedureList = getTargetProcedureNameList();
         if (targetProcedureList == null || targetProcedureList.isEmpty()) {
             return true;
         }
         for (String procedureNameHint : targetProcedureList) {
-            if (isHitByTheHint(procedureName, procedureNameHint)) {
+            if (isHitByTheHint(filteredName, procedureNameHint)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public String filterMatchProcedureName(String procedureName) {
+        final String filteredName;
+        if (getBasicProperties().isDatabaseSQLServer()) {
+            // SQLServer returns 'sp_foo;1'
+            filteredName = Srl.substringLastFront(procedureName, ";");
+        } else {
+            filteredName = procedureName;
+        }
+        return filteredName;
     }
 
     public List<String> getTargetProcedureNameToDBLinkList() {
@@ -197,12 +209,13 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isExecutionMetaProcedureName(String procedureName) {
+        final String filteredName = filterMatchProcedureName(procedureName);
         final List<String> executionMetaProcedureList = getExecutionMetaProcedureNameList();
         if (executionMetaProcedureList == null || executionMetaProcedureList.isEmpty()) {
             return true;
         }
         for (String procedureNameHint : executionMetaProcedureList) {
-            if (isHitByTheHint(procedureName, procedureNameHint)) {
+            if (isHitByTheHint(filteredName, procedureNameHint)) {
                 return true;
             }
         }

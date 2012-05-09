@@ -112,7 +112,6 @@ public class DfProcedureExecutionMetaExtractor {
             cs = conn.prepareCall(sql);
             final List<DfProcedureColumnMeta> boundColumnList = DfCollectionUtil.newArrayList();
             setupBindParameter(conn, cs, columnList, testValueList, boundColumnList);
-            ResultSet rs = null;
 
             boolean executed;
             try {
@@ -136,26 +135,31 @@ public class DfProcedureExecutionMetaExtractor {
             if (executed) {
                 int closetIndex = 0;
                 do {
-                    rs = cs.getResultSet();
-                    if (rs == null) {
-                        break;
+                    ResultSet rs = null;
+                    try {
+                        rs = cs.getResultSet();
+                        if (rs == null) {
+                            break;
+                        }
+                        final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
+                        final DfProcedureNotParamResultMeta notParamResult = new DfProcedureNotParamResultMeta();
+                        final String propertyName;
+                        if (procedure.isCalledBySelect() && closetIndex == 0) {
+                            // for example, table valued function
+                            // if the procedure of this type does not have
+                            // second or more result set basically
+                            // but checks closetIndex just in case
+                            propertyName = "returnResult";
+                        } else { // basically here
+                            propertyName = "notParamResult" + (closetIndex + 1);
+                        }
+                        notParamResult.setPropertyName(propertyName);
+                        notParamResult.setResultSetColumnInfoMap(columnMetaInfoMap);
+                        procedure.addNotParamResult(notParamResult);
+                        ++closetIndex;
+                    } finally {
+                        closeResult(rs);
                     }
-                    final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
-                    final DfProcedureNotParamResultMeta notParamResult = new DfProcedureNotParamResultMeta();
-                    final String propertyName;
-                    if (procedure.isCalledBySelect() && closetIndex == 0) {
-                        // for example, table valued function
-                        // if the procedure of this type does not have
-                        // second or more result set basically
-                        // but checks closetIndex just in case
-                        propertyName = "returnResult";
-                    } else { // basically here
-                        propertyName = "notParamResult" + (closetIndex + 1);
-                    }
-                    notParamResult.setPropertyName(propertyName);
-                    notParamResult.setResultSetColumnInfoMap(columnMetaInfoMap);
-                    procedure.addNotParamResult(notParamResult);
-                    ++closetIndex;
                 } while (cs.getMoreResults());
             }
             int index = 0;
@@ -175,9 +179,14 @@ public class DfProcedureExecutionMetaExtractor {
                     obj = cs.getObject(paramIndex); // as default
                 }
                 if (obj instanceof ResultSet) {
-                    rs = (ResultSet) obj;
-                    final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
-                    column.setResultSetColumnInfoMap(columnMetaInfoMap);
+                    ResultSet rs = null;
+                    try {
+                        rs = (ResultSet) obj;
+                        final Map<String, DfColumnMeta> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
+                        column.setResultSetColumnInfoMap(columnMetaInfoMap);
+                    } finally {
+                        closeResult(rs);
+                    }
                 }
                 ++index;
             }
@@ -526,6 +535,15 @@ public class DfProcedureExecutionMetaExtractor {
             valueType = null;
         }
         return valueType;
+    }
+
+    protected void closeResult(ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException ignored) {
+            }
+        }
     }
 
     // ===================================================================================
