@@ -31,6 +31,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.jdbc.ClassificationCodeType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -631,9 +632,37 @@ public class ManualOrderBean implements HpCalculator {
     protected Object getResolvedOrderValue(CaseWhenElement element) {
         Object orderValue = element.getOrderValue();
         if (orderValue instanceof Classification) {
-            orderValue = ((Classification) orderValue).code();
+            final Classification cls = (Classification) orderValue;
+            orderValue = handleClassificationOrderValue(cls);
         }
         return orderValue;
+    }
+
+    protected Object handleClassificationOrderValue(Classification cls) {
+        final Object orderValue;
+        final String plainCode = cls.code();
+        final ClassificationCodeType codeType = cls.meta().codeType();
+        if (ClassificationCodeType.Number.equals(codeType)) {
+            if ("true".equalsIgnoreCase(plainCode) || "false".equalsIgnoreCase(plainCode)) {
+                // true or false of Number, e.g. MySQL's Boolean
+                orderValue = toClassificationBooleanValue(plainCode);
+            } else {
+                orderValue = toClassificationIntegerValue(plainCode);
+            }
+        } else if (ClassificationCodeType.Boolean.equals(codeType)) {
+            orderValue = toClassificationBooleanValue(plainCode);
+        } else {
+            orderValue = plainCode;
+        }
+        return orderValue;
+    }
+
+    protected Integer toClassificationIntegerValue(String plainCode) {
+        return (Integer) DfTypeUtil.toNumber(plainCode, Integer.class);
+    }
+
+    protected Boolean toClassificationBooleanValue(String plainCode) {
+        return DfTypeUtil.toBoolean(plainCode);
     }
 
     public static interface FreeParameterManualOrderThemeListHandler {
