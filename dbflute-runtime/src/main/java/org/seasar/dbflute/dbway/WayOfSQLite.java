@@ -62,7 +62,7 @@ public class WayOfSQLite implements DBWay, Serializable {
     public boolean isScrollableCursorSupported() {
         return false;
     }
-    
+
     // ===================================================================================
     //                                                                 LikeSearch WildCard
     //                                                                 ===================
