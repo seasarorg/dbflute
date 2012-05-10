@@ -86,6 +86,18 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         return false;
     }
 
+    public boolean isInsert() {
+        return false;
+    }
+
+    public boolean isUpdate() {
+        return false;
+    }
+
+    public boolean isDelete() {
+        return false;
+    }
+
     // ===================================================================================
     //                                                                    Process Callback
     //                                                                    ================

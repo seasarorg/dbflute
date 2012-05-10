@@ -41,6 +41,14 @@ public class UpdateEntityCommand extends AbstractEntityCommand {
     }
 
     // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isUpdate() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
     public SqlExecutionCreator createSqlExecutionCreator() {

@@ -39,6 +39,14 @@ public class QueryDeleteCBCommand extends AbstractQueryEntityCBCommand {
     }
 
     // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isDelete() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
 

@@ -83,4 +83,16 @@ public class MockBehaviorCommand implements BehaviorCommand<Object> {
     public boolean isSelectCursor() {
         return false;
     }
+
+    public boolean isInsert() {
+        return false;
+    }
+
+    public boolean isUpdate() {
+        return false;
+    }
+
+    public boolean isDelete() {
+        return false;
+    }
 }

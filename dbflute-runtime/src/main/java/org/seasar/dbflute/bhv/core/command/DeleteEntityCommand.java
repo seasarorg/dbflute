@@ -42,6 +42,14 @@ public class DeleteEntityCommand extends AbstractEntityCommand {
     }
 
     // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isDelete() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
     @Override

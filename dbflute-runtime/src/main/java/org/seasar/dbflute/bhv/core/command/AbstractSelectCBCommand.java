@@ -54,6 +54,18 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
         return true;
     }
 
+    public boolean isInsert() {
+        return false;
+    }
+
+    public boolean isUpdate() {
+        return false;
+    }
+
+    public boolean isDelete() {
+        return false;
+    }
+
     // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================

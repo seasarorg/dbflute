@@ -39,6 +39,14 @@ public class QueryUpdateCBCommand extends AbstractQueryEntityCBCommand {
     }
 
     // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isUpdate() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
 

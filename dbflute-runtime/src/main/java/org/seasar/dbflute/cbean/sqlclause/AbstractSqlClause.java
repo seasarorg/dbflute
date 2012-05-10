@@ -147,7 +147,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Is use select index? Default value is true. */
     protected boolean _useSelectIndex = true;
 
-    /** The map of outer join. */
+    /** The map of left-outer-join info. map:{ foreignAliasName : leftOuterJoinInfo } */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap;
 
     /** Does it allow to auto-detect joins that can be structural-possible inner-join? */
@@ -1206,7 +1206,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _selectedRelationBasicMap;
     }
 
-    protected Map<String, Map<String, SelectedRelationColumn>> getSelectedRelationColumnMap() {
+    public Map<String, Map<String, SelectedRelationColumn>> getSelectedRelationColumnMap() {
         if (_selectedRelationColumnMap == null) {
             _selectedRelationColumnMap = new LinkedHashMap<String, Map<String, SelectedRelationColumn>>();
         }
@@ -1279,14 +1279,17 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                   OuterJoin Attribute
     //                                   -------------------
-    protected Map<String, LeftOuterJoinInfo> getOuterJoinMap() {
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, LeftOuterJoinInfo> getOuterJoinMap() {
         if (_outerJoinMap == null) {
             _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>(4);
         }
         return _outerJoinMap;
     }
 
-    protected boolean hasOuterJoin() {
+    public boolean hasOuterJoin() {
         return _outerJoinMap != null && !_outerJoinMap.isEmpty();
     }
 
@@ -1941,11 +1944,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     public void addManualOrderToPreviousOrderByElement(ManualOrderBean manualOrderBean) {
         assertObjectNotNull("manualOrderBean", manualOrderBean);
-        // TODO jflute support?
-        //if (hasUnionQuery()) {
-        //    String msg = "ManualOrder with UnionQuery is unsupported: " + manualOrderBean;
-        //    throw new IllegalConditionBeanOperationException(msg);
-        //}
         getOrderBy().addManualOrderByElement(manualOrderBean);
     }
 

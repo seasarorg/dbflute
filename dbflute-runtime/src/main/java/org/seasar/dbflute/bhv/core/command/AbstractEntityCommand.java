@@ -72,6 +72,18 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
         return false;
     }
 
+    public boolean isInsert() {
+        return false; // as default
+    }
+
+    public boolean isUpdate() {
+        return false; // as default
+    }
+
+    public boolean isDelete() {
+        return false; // as default
+    }
+
     // ===================================================================================
     //                                                                             Factory
     //                                                                             =======

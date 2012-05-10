@@ -32,11 +32,13 @@ import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
+import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
+import org.seasar.dbflute.cbean.sqlclause.select.SelectedRelationColumn;
 import org.seasar.dbflute.cbean.sqlclause.union.UnionClauseProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
@@ -198,6 +200,13 @@ public interface SqlClause {
 
     boolean hasSelectedRelation(String relationPath);
 
+    /**
+     * Get the map of selected relation column. <br />
+     * Basically internal but public for analyzing.
+     * @return The map of selected relation column. map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}} (NotNull)
+     */
+    Map<String, Map<String, SelectedRelationColumn>> getSelectedRelationColumnMap();
+
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
@@ -235,6 +244,22 @@ public interface SqlClause {
     void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName,
             String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
             String fixedCondition, FixedConditionResolver fixedConditionResolver);
+
+    // -----------------------------------------------------
+    //                                   OuterJoin Attribute
+    //                                   -------------------
+    /**
+     * Get the information of left-outer-join. <br />
+     * Basically internal but public for analyzing.
+     * @return The map of left-outer-join info. map:{ foreignAliasName : leftOuterJoinInfo } (NotNull)
+     */
+    Map<String, LeftOuterJoinInfo> getOuterJoinMap();
+
+    /**
+     * Does outer-join (at least one) exist? (contains inner-join)
+     * @return The determination, true or false.
+     */
+    boolean hasOuterJoin();
 
     // -----------------------------------------------------
     //                                    InnerJoin Handling

@@ -42,6 +42,14 @@ public class QueryInsertCBCommand extends AbstractQueryEntityCBCommand {
     }
 
     // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isInsert() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
     @Override

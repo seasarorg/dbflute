@@ -98,4 +98,28 @@ public interface BehaviorCommandMeta {
      * @return The determination, true or false.
      */
     boolean isSelectCursor();
+
+    /**
+     * Does the command execute insert? <br />
+     * But if it's a procedure or an outside-SQL, it returns false. <br />
+     * e.g. insert(entity), queryInsert(setupper)
+     * @return The determination, true or false.
+     */
+    boolean isInsert();
+
+    /**
+     * Does the command execute update? <br />
+     * But if it's a procedure or an outside-SQL, it returns false. <br />
+     * e.g. update(entity), queryUpdate(entity, cb)
+     * @return The determination, true or false.
+     */
+    boolean isUpdate();
+
+    /**
+     * Does the command execute delete? <br />
+     * But if it's a procedure or an outside-SQL, it returns false. <br />
+     * e.g. delete(entity), queryDelete(cb)
+     * @return The determination, true or false.
+     */
+    boolean isDelete();
 }

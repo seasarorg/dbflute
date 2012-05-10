@@ -45,6 +45,14 @@ public class InsertEntityCommand extends AbstractEntityCommand {
     }
 
     // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    @Override
+    public boolean isInsert() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
     public SqlExecutionCreator createSqlExecutionCreator() {
