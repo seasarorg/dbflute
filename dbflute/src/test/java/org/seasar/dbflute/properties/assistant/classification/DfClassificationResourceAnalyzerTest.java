@@ -60,7 +60,7 @@ public class DfClassificationResourceAnalyzerTest {
         {
             final DfClassificationTop top = classificationTopList.get(0);
             assertEquals("MemberStatus", top.getClassificationName());
-            assertEquals("会員の状態を示す", top.getTopComment());
+            assertEquals("会員ステータス: 会員の状態を示す", top.getTopComment());
             assertEquals("MEMBER_STATUS_CODE", top.getRelatedColumnName());
             assertEquals(3, top.getClassificationElementList().size());
             final List<DfClassificationElement> classificationElementList = top.getClassificationElementList();
@@ -89,7 +89,7 @@ public class DfClassificationResourceAnalyzerTest {
         {
             final DfClassificationTop top = classificationTopList.get(1);
             assertEquals("MemberStatus2", top.getClassificationName());
-            assertEquals("会員の状態を示す", top.getTopComment());
+            assertEquals("会員ステータス2: 会員の状態を示す", top.getTopComment());
             assertEquals("suffix:_FLG", top.getRelatedColumnName());
             assertEquals(2, top.getClassificationElementList().size());
             final List<DfClassificationElement> classificationElementList = top.getClassificationElementList();
