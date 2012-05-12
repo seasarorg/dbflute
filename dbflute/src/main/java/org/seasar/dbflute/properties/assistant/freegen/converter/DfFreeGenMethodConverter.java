@@ -1,4 +1,4 @@
-package org.seasar.dbflute.properties.assistant.freegenerate.converter;
+package org.seasar.dbflute.properties.assistant.freegen.converter;
 
 import java.util.List;
 import java.util.Map;

@@ -25,8 +25,8 @@ import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
-import org.seasar.dbflute.properties.assistant.freegenerate.converter.DfFreeGenMethodConverter;
-import org.seasar.dbflute.properties.assistant.freegenerate.converter.DfFreeGenMethodConverter.DfConvertMethodReflector;
+import org.seasar.dbflute.properties.assistant.freegen.converter.DfFreeGenMethodConverter;
+import org.seasar.dbflute.properties.assistant.freegen.converter.DfFreeGenMethodConverter.DfConvertMethodReflector;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
