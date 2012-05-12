@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
+import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
 
@@ -18,6 +20,13 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
  * @author jflute
  */
 public class DfPropTableLoader {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected Method _convertMethod; // cached
+    protected boolean _convertMethodNotFound;
+    protected final Properties _reflectionProperties = new Properties();
 
     // ===================================================================================
     //                                                                          Load Table
@@ -98,16 +107,26 @@ public class DfPropTableLoader {
             columnMap.put("capCamelName", Srl.initCap(camelizedName));
             columnMap.put("uncapCamelName", Srl.initUncap(camelizedName));
 
-            final String value = prop.getProperty(key); // by Properties
-            columnMap.put("value", value); // basically unused
-            final List<ScopeInfo> scopeList = Srl.extractScopeList(value, "{", "}");
             final List<ScopeInfo> variableScopeList = new ArrayList<ScopeInfo>();
-            for (ScopeInfo scopeInfo : scopeList) {
-                final String content = scopeInfo.getContent();
-                try {
-                    Integer.valueOf(content);
-                    variableScopeList.add(scopeInfo);
-                } catch (NumberFormatException ignored) {
+            {
+                final String foundValue = prop.getProperty(key); // by Properties
+                final String registeredValue;
+                final List<ScopeInfo> scopeList;
+                if (foundValue != null) {
+                    registeredValue = loadConvert(foundValue);
+                    scopeList = Srl.extractScopeList(foundValue, "{", "}");
+                } else { // basically no way
+                    registeredValue = "";
+                    scopeList = new ArrayList<ScopeInfo>();
+                }
+                columnMap.put("value", registeredValue); // basically unused
+                for (ScopeInfo scopeInfo : scopeList) {
+                    final String content = scopeInfo.getContent();
+                    try {
+                        Integer.valueOf(content);
+                        variableScopeList.add(scopeInfo);
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
             }
             final List<Integer> variableNumberList = new ArrayList<Integer>();
@@ -120,15 +139,54 @@ public class DfPropTableLoader {
                 }
                 argSb.append("String arg").append(number);
             }
+            columnMap.put("variableArgDef", argSb.toString());
             columnMap.put("variableCount", variableScopeList.size());
             columnMap.put("variableNumberList", variableNumberList);
-            columnMap.put("variableScopeList", scopeList);
+            columnMap.put("variableScopeList", variableScopeList);
+            columnMap.put("hasVariable", !variableScopeList.isEmpty());
 
-            columnMap.put("comment", previousComment != null ? previousComment : "");
+            final String comment;
+            final boolean hasComment;
+            if (previousComment != null) {
+                comment = loadConvert(previousComment);
+                hasComment = true;
+            } else {
+                comment = "";
+                hasComment = false;
+            }
+            columnMap.put("comment", comment);
+            columnMap.put("hasComment", hasComment);
 
             columnList.add(columnMap);
             previousComment = null;
         }
         return columnList;
+    }
+
+    protected String loadConvert(String expression) {
+        final Method method = getConvertMethod();
+        if (method == null) {
+            return expression;
+        }
+        final char[] in = expression.toCharArray();
+        final Object[] args = new Object[] { in, 0, expression.length(), new char[] {} };
+        return (String) DfReflectionUtil.invoke(method, _reflectionProperties, args);
+    }
+
+    protected Method getConvertMethod() {
+        if (_convertMethod != null) {
+            return _convertMethod;
+        }
+        if (_convertMethodNotFound) {
+            return null;
+        }
+        final Class<?>[] argTypes = new Class<?>[] { char[].class, int.class, int.class, char[].class };
+        _convertMethod = DfReflectionUtil.getWholeMethod(Properties.class, "loadConvert", argTypes);
+        if (_convertMethod == null) {
+            _convertMethodNotFound = true;
+        } else {
+            _convertMethod.setAccessible(true);
+        }
+        return _convertMethod;
     }
 }
