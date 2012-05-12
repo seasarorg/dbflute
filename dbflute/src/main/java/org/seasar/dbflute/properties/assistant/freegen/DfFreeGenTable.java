@@ -1,26 +1,25 @@
-package org.seasar.dbflute.properties.assistant.freegenerate;
+package org.seasar.dbflute.properties.assistant.freegen;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author jflute
  */
-public class DfFreeGenOutput {
+public class DfFreeGenTable {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _templateFile;
-    protected final String _outputDirectory;
-    protected final String _package;
-    protected final String _className;
+    protected final String _tableName;
+    protected final List<Map<String, String>> _columnList;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenOutput(String templateFile, String outputDirectory, String pkg, String className) {
-        _templateFile = templateFile;
-        _outputDirectory = outputDirectory;
-        _package = pkg;
-        _className = className;
+    public DfFreeGenTable(String tableName, List<Map<String, String>> columnList) {
+        _tableName = tableName;
+        _columnList = columnList;
     }
 
     // ===================================================================================
@@ -28,26 +27,13 @@ public class DfFreeGenOutput {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{templateFile=" + _templateFile + ", outputDirectory=" + _outputDirectory + ", package=" + _package
-                + ", className=" + _className + "}";
+        return "{tableName=" + _tableName + ", rowList.size()=" + _columnList + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getTemplateFile() {
-        return _templateFile;
-    }
-
-    public String getOutputDirectory() {
-        return _outputDirectory;
-    }
-
-    public String getPackage() {
-        return _package;
-    }
-
-    public String getClassName() {
-        return _className;
+    public List<Map<String, String>> getColumnList() {
+        return _columnList;
     }
 }

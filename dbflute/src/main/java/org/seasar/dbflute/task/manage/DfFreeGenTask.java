@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.properties.DfFreeGenProperties;
-import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;

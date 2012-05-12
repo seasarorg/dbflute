@@ -1,4 +1,4 @@
-package org.seasar.dbflute.properties.assistant.freegenerate;
+package org.seasar.dbflute.properties.assistant.freegen;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

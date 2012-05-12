@@ -1,31 +1,26 @@
-package org.seasar.dbflute.properties.assistant.freegenerate;
-
-import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest.DfFreeGenerateResourceType;
+package org.seasar.dbflute.properties.assistant.freegen;
 
 /**
  * @author jflute
  */
-public class DfFreeGenResource {
+public class DfFreeGenOutput {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfFreeGenerateResourceType _resourceType;
-    protected final String _resourceFile;
+    protected final String _templateFile;
+    protected final String _outputDirectory;
+    protected final String _package;
+    protected final String _className;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenResource(DfFreeGenerateResourceType resourceType, String resourceFile) {
-        _resourceType = resourceType;
-        _resourceFile = resourceFile;
-    }
-
-    // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
-    public boolean isResourceTypeXls() {
-        return DfFreeGenerateResourceType.XLS.equals(_resourceType);
+    public DfFreeGenOutput(String templateFile, String outputDirectory, String pkg, String className) {
+        _templateFile = templateFile;
+        _outputDirectory = outputDirectory;
+        _package = pkg;
+        _className = className;
     }
 
     // ===================================================================================
@@ -33,17 +28,26 @@ public class DfFreeGenResource {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{resourceType=" + _resourceType + ", resourceFile=" + _resourceFile + "}";
+        return "{templateFile=" + _templateFile + ", outputDirectory=" + _outputDirectory + ", package=" + _package
+                + ", className=" + _className + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public DfFreeGenerateResourceType getResourceType() {
-        return _resourceType;
+    public String getTemplateFile() {
+        return _templateFile;
     }
 
-    public String getResourceFile() {
-        return _resourceFile;
+    public String getOutputDirectory() {
+        return _outputDirectory;
+    }
+
+    public String getPackage() {
+        return _package;
+    }
+
+    public String getClassName() {
+        return _className;
     }
 }

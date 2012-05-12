@@ -19,15 +19,16 @@ import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
-import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenManager;
-import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenOutput;
-import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest;
-import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenRequest.DfFreeGenerateResourceType;
-import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenResource;
-import org.seasar.dbflute.properties.assistant.freegenerate.DfFreeGenTable;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenManager;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenOutput;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
+import org.seasar.dbflute.properties.assistant.freegenerate.converter.DfFreeGenMethodConverter;
+import org.seasar.dbflute.properties.assistant.freegenerate.converter.DfFreeGenMethodConverter.DfConvertMethodReflector;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
-import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -49,6 +50,11 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     public DfFreeGenManager getFreeGenManager() {
         return _manager;
     }
+
+    // ===================================================================================
+    //                                                                           Converter
+    //                                                                           =========
+    protected final DfFreeGenMethodConverter _methodConverter = new DfFreeGenMethodConverter();
 
     // ===================================================================================
     //                                                                      Definition Map
@@ -267,78 +273,9 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         return exists;
     }
 
-    protected static interface DfConvertMethodReflector {
-        void reflect();
-    }
-
     protected boolean processConvertMethod(final String requestName, final Map<String, String> resultMap,
             final String key, final String value, List<DfConvertMethodReflector> reflectorList) {
-        {
-            final ScopeInfo capScope = Srl.extractScopeFirst(value, "df:cap(", ")");
-            if (capScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
-                    public void reflect() {
-                        final String content = capScope.getContent();
-                        final String refValue = resultMap.get(content);
-                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
-                        resultMap.put(key, Srl.initCap(refValue));
-                    }
-                });
-                return true;
-            }
-        }
-        {
-            final ScopeInfo uncapScope = Srl.extractScopeFirst(value, "df:uncap(", ")");
-            if (uncapScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
-                    public void reflect() {
-                        final String content = uncapScope.getContent();
-                        final String refValue = resultMap.get(content);
-                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
-                        resultMap.put(key, Srl.initUncap(refValue));
-                    }
-                });
-                return true;
-            }
-        }
-        {
-            final ScopeInfo capCamelScope = Srl.extractScopeFirst(value, "df:capCamel(", ")");
-            if (capCamelScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
-                    public void reflect() {
-                        final String content = capCamelScope.getContent();
-                        final String refValue = resultMap.get(content);
-                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
-                        resultMap.put(key, Srl.initCap(Srl.camelize(refValue)));
-                    }
-                });
-                return true;
-            }
-        }
-        {
-            final ScopeInfo uncapCamelScope = Srl.extractScopeFirst(value, "df:uncapCamel(", ")");
-            if (uncapCamelScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
-                    public void reflect() {
-                        final String content = uncapCamelScope.getContent();
-                        final String refValue = resultMap.get(content);
-                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
-                        resultMap.put(key, Srl.initUncap(Srl.camelize(refValue)));
-                    }
-                });
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected void assertColumnRefValueExists(String content, String refValue, String requestName, final String key,
-            final String value) {
-        if (refValue == null) {
-            String msg = "Not found the reference value of the key in FreeGen " + requestName + ":";
-            msg = msg + " key=" + key + " ref=" + content;
-            throw new DfIllegalPropertySettingException(msg);
-        }
+        return _methodConverter.processConvertMethod(requestName, resultMap, key, value, reflectorList);
     }
 
     // ===================================================================================

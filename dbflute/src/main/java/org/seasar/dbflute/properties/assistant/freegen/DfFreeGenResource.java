@@ -1,25 +1,31 @@
-package org.seasar.dbflute.properties.assistant.freegenerate;
+package org.seasar.dbflute.properties.assistant.freegen;
 
-import java.util.List;
-import java.util.Map;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
 
 /**
  * @author jflute
  */
-public class DfFreeGenTable {
+public class DfFreeGenResource {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _tableName;
-    protected final List<Map<String, String>> _columnList;
+    protected final DfFreeGenerateResourceType _resourceType;
+    protected final String _resourceFile;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenTable(String tableName, List<Map<String, String>> columnList) {
-        _tableName = tableName;
-        _columnList = columnList;
+    public DfFreeGenResource(DfFreeGenerateResourceType resourceType, String resourceFile) {
+        _resourceType = resourceType;
+        _resourceFile = resourceFile;
+    }
+
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isResourceTypeXls() {
+        return DfFreeGenerateResourceType.XLS.equals(_resourceType);
     }
 
     // ===================================================================================
@@ -27,13 +33,17 @@ public class DfFreeGenTable {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{tableName=" + _tableName + ", rowList.size()=" + _columnList + "}";
+        return "{resourceType=" + _resourceType + ", resourceFile=" + _resourceFile + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public List<Map<String, String>> getColumnList() {
-        return _columnList;
+    public DfFreeGenerateResourceType getResourceType() {
+        return _resourceType;
+    }
+
+    public String getResourceFile() {
+        return _resourceFile;
     }
 }
