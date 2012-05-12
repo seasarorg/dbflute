@@ -37,7 +37,7 @@ public class DfFreeGenRequest {
     //                                                                        ResourceType
     //                                                                        ============
     public enum DfFreeGenerateResourceType {
-        XLS
+        XLS, PROP
     }
 
     // ===================================================================================
@@ -113,7 +113,7 @@ public class DfFreeGenRequest {
         return _table;
     }
 
-    public List<Map<String, String>> getColumnList() {
+    public List<Map<String, Object>> getColumnList() {
         return _table.getColumnList();
     }
 

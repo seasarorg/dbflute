@@ -24,6 +24,10 @@ public class DfFreeGenResource {
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
+    public boolean isResourceTypeProp() {
+        return DfFreeGenerateResourceType.PROP.equals(_resourceType);
+    }
+
     public boolean isResourceTypeXls() {
         return DfFreeGenerateResourceType.XLS.equals(_resourceType);
     }

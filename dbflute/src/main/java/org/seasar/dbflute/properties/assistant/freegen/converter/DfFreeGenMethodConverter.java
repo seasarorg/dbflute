@@ -16,7 +16,7 @@ public class DfFreeGenMethodConverter {
         void reflect();
     }
 
-    public boolean processConvertMethod(final String requestName, final Map<String, String> resultMap,
+    public boolean processConvertMethod(final String requestName, final Map<String, Object> resultMap,
             final String key, final String value, List<DfConvertMethodReflector> reflectorList) {
         {
             final ScopeInfo capScope = Srl.extractScopeFirst(value, "df:cap(", ")");
@@ -24,7 +24,7 @@ public class DfFreeGenMethodConverter {
                 reflectorList.add(new DfConvertMethodReflector() {
                     public void reflect() {
                         final String content = capScope.getContent();
-                        final String refValue = resultMap.get(content);
+                        final String refValue = (String) resultMap.get(content);
                         assertColumnRefValueExists(content, refValue, requestName, key, refValue);
                         resultMap.put(key, Srl.initCap(refValue));
                     }
@@ -38,7 +38,7 @@ public class DfFreeGenMethodConverter {
                 reflectorList.add(new DfConvertMethodReflector() {
                     public void reflect() {
                         final String content = uncapScope.getContent();
-                        final String refValue = resultMap.get(content);
+                        final String refValue = (String) resultMap.get(content);
                         assertColumnRefValueExists(content, refValue, requestName, key, refValue);
                         resultMap.put(key, Srl.initUncap(refValue));
                     }
@@ -52,7 +52,7 @@ public class DfFreeGenMethodConverter {
                 reflectorList.add(new DfConvertMethodReflector() {
                     public void reflect() {
                         final String content = capCamelScope.getContent();
-                        final String refValue = resultMap.get(content);
+                        final String refValue = (String) resultMap.get(content);
                         assertColumnRefValueExists(content, refValue, requestName, key, refValue);
                         resultMap.put(key, Srl.initCap(Srl.camelize(refValue)));
                     }
@@ -66,7 +66,7 @@ public class DfFreeGenMethodConverter {
                 reflectorList.add(new DfConvertMethodReflector() {
                     public void reflect() {
                         final String content = uncapCamelScope.getContent();
-                        final String refValue = resultMap.get(content);
+                        final String refValue = (String) resultMap.get(content);
                         assertColumnRefValueExists(content, refValue, requestName, key, refValue);
                         resultMap.put(key, Srl.initUncap(Srl.camelize(refValue)));
                     }
@@ -85,5 +85,4 @@ public class DfFreeGenMethodConverter {
             throw new DfIllegalPropertySettingException(msg);
         }
     }
-
 }

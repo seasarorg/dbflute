@@ -1,7 +1,5 @@
 package org.seasar.dbflute.properties;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,23 +8,17 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
-import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenManager;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenOutput;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
-import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
-import org.seasar.dbflute.properties.assistant.freegen.converter.DfFreeGenMethodConverter;
-import org.seasar.dbflute.properties.assistant.freegen.converter.DfFreeGenMethodConverter.DfConvertMethodReflector;
+import org.seasar.dbflute.properties.assistant.freegen.prop.DfPropTableLoader;
+import org.seasar.dbflute.properties.assistant.freegen.xls.DfXlsTableLoader;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -52,13 +44,26 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                           Converter
-    //                                                                           =========
-    protected final DfFreeGenMethodConverter _methodConverter = new DfFreeGenMethodConverter();
+    //                                                                              Loader
+    //                                                                              ======
+    protected final DfPropTableLoader _propTableLoader = new DfPropTableLoader();
+    protected final DfXlsTableLoader _xlsTableLoader = new DfXlsTableLoader();
 
     // ===================================================================================
     //                                                                      Definition Map
     //                                                                      ==============
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - PROP
+    // ; resourceMap = map:{
+    //     ; resourceType = PROP
+    //     ; resourceFile = ../../.../foo.properties
+    // }
+    // ; outputMap = map:{
+    //     ; templateFile = MessageDef.vm
+    //     ; outputDirectory = ../src/main/java
+    //     ; package = org.seasar.dbflute...
+    //     ; className = MessageDef
+    // }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - XLS
     // ; resourceMap = map:{
     //     ; resourceType = XLS
     //     ; resourceFile = ../../...
@@ -115,12 +120,15 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
             final Map<String, Object> elementMap = (Map<String, Object>) obj;
             final DfFreeGenRequest request = createFreeGenerateRequest(requestName, elementMap);
 
-            final Map<String, Object> tableMap = extractTableMap(elementMap);
             try {
+                final Map<String, Object> tableMap = extractTableMap(elementMap);
                 final Map<String, Map<String, String>> mappingMap = extractMappingMap(tableMap);
                 final DfFreeGenResource resource = request.getResource();
-                if (resource.isResourceTypeXls()) {
-                    request.setTable(loadTableFromXls(requestName, resource.getResourceFile(), tableMap, mappingMap));
+                final String resourceFile = resource.getResourceFile();
+                if (resource.isResourceTypeProp()) {
+                    request.setTable(loadTableFromProp(requestName, resourceFile, tableMap, mappingMap));
+                } else if (resource.isResourceTypeXls()) {
+                    request.setTable(loadTableFromXls(requestName, resourceFile, tableMap, mappingMap));
                 } else {
                     String msg = "The resource type is unsupported: " + resource.getResourceType();
                     throw new DfIllegalPropertySettingException(msg);
@@ -141,8 +149,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     protected Map<String, Object> extractTableMap(Map<String, Object> elementMap) {
         final Object obj = elementMap.get("tableMap");
         if (obj == null) {
-            String msg = "Not found the tableMap in the FreeGen property: " + elementMap;
-            throw new DfRequiredPropertyNotFoundException(msg);
+            return DfCollectionUtil.emptyMap();
         }
         return (Map<String, Object>) obj;
     }
@@ -180,102 +187,14 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         return request;
     }
 
+    protected DfFreeGenTable loadTableFromProp(String requestName, String resourceFile, Map<String, Object> tableMap,
+            Map<String, Map<String, String>> mappingMap) throws IOException {
+        return _propTableLoader.loadTable(requestName, resourceFile, tableMap, mappingMap);
+    }
+
     protected DfFreeGenTable loadTableFromXls(String requestName, String resourceFile, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) throws IOException {
-        final String sheetName = (String) tableMap.get("sheetName");
-        if (sheetName == null) {
-            String msg = "The sheetName was not found in the FreeGen property: " + requestName;
-            throw new DfRequiredPropertyNotFoundException(msg);
-        }
-        final Integer rowBeginNumber;
-        {
-            final String numStr = (String) tableMap.get("rowBeginNumber");
-            if (numStr == null) {
-                String msg = "The rowBeginNumber was not found in the FreeGen property: " + requestName;
-                throw new DfRequiredPropertyNotFoundException(msg);
-            }
-            rowBeginNumber = Integer.valueOf(numStr);
-        }
-        @SuppressWarnings("unchecked")
-        final Map<String, String> columnMap = (Map<String, String>) tableMap.get("columnMap");
-        final HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(new File(resourceFile)));
-        final HSSFSheet sheet = workbook.getSheet(sheetName);
-        if (sheet == null) {
-            String msg = "Not found the sheet name in the file: name=" + sheetName + " xls=" + resourceFile;
-            throw new IllegalStateException(msg);
-        }
-        final List<Map<String, String>> rowList = new ArrayList<Map<String, String>>();
-        for (int i = (rowBeginNumber - 1); i < Integer.MAX_VALUE; i++) {
-            final HSSFRow row = sheet.getRow(i);
-            if (row == null) {
-                break;
-            }
-            final Map<String, String> resultMap = newLinkedHashMap();
-            final List<DfConvertMethodReflector> reflectorList = new ArrayList<DfConvertMethodReflector>();
-            boolean exists = false;
-            for (Entry<String, String> entry : columnMap.entrySet()) {
-                final String key = entry.getKey();
-                final String value = entry.getValue();
-                if (value == null) {
-                    String msg = "Not found the value of the key in FreeGen " + requestName + ": " + key;
-                    throw new DfIllegalPropertySettingException(msg);
-                }
-                if (processColumnValue(requestName, columnMap, row, resultMap, key, value, reflectorList, mappingMap)) {
-                    exists = true;
-                }
-            }
-            if (exists) {
-                rowList.add(resultMap);
-            } else { // means empty row
-                break;
-            }
-            for (DfConvertMethodReflector reflector : reflectorList) {
-                reflector.reflect();
-            }
-        }
-        return new DfFreeGenTable(sheetName, rowList);
-    }
-
-    protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap,
-            final HSSFRow row, final Map<String, String> resultMap, final String key, final String value,
-            List<DfConvertMethodReflector> reflectorList, Map<String, Map<String, String>> mappingMap) {
-        if (processConvertMethod(requestName, resultMap, key, value, reflectorList)) {
-            return false;
-        }
-        // normal setting (cell number)
-        boolean exists = false;
-        final Integer cellNumber;
-        try {
-            cellNumber = Integer.valueOf(value) - 1;
-        } catch (NumberFormatException e) {
-            String msg = "The property value should be Integer in FreeGen " + requestName + ":";
-            msg = msg + " key=" + key + " value=" + value;
-            throw new DfIllegalPropertySettingException(msg);
-        }
-        final HSSFCell cell = row.getCell(cellNumber);
-        if (cell == null) {
-            return false;
-        }
-        final HSSFRichTextString cellValue = cell.getRichStringCellValue();
-        if (cellValue == null) {
-            return false;
-        }
-        exists = true;
-        String resultValue = cellValue.getString();
-        final Map<String, String> mapping = mappingMap.get(key);
-        if (mapping != null) {
-            final String mappingValue = mapping.get(resultValue);
-            if (mappingValue != null) {
-                resultValue = mappingValue;
-            }
-        }
-        resultMap.put(key, resultValue);
-        return exists;
-    }
-
-    protected boolean processConvertMethod(final String requestName, final Map<String, String> resultMap,
-            final String key, final String value, List<DfConvertMethodReflector> reflectorList) {
-        return _methodConverter.processConvertMethod(requestName, resultMap, key, value, reflectorList);
+        return _xlsTableLoader.loadTable(requestName, resourceFile, tableMap, mappingMap);
     }
 
     // ===================================================================================
