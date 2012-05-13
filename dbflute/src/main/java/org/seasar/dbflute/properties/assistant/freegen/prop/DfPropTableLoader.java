@@ -47,7 +47,7 @@ public class DfPropTableLoader {
         try {
             final Properties prop = readProperties(resourceFile);
             br = new BufferedReader(new InputStreamReader(new FileInputStream(resourceFile), "ISO-8859-1"));
-            final List<Map<String, Object>> columnList = readColumnList(br, prop);
+            final List<Map<String, Object>> columnList = readColumnList(requestName, br, prop);
             final String tableName = Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")));
             return new DfFreeGenTable(tableName, columnList);
         } catch (IOException e) {
@@ -70,7 +70,8 @@ public class DfPropTableLoader {
         return prop;
     }
 
-    protected List<Map<String, Object>> readColumnList(BufferedReader br, Properties prop) throws IOException {
+    protected List<Map<String, Object>> readColumnList(String requestName, BufferedReader br, Properties prop)
+            throws IOException {
         final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>();
         String previousComment = null;
         while (true) {
@@ -130,16 +131,11 @@ public class DfPropTableLoader {
                 }
             }
             final List<Integer> variableNumberList = new ArrayList<Integer>();
-            final StringBuilder argSb = new StringBuilder();
             for (ScopeInfo scopeInfo : variableScopeList) {
-                final Integer number = Integer.valueOf(scopeInfo.getContent());
-                variableNumberList.add(number);
-                if (argSb.length() > 0) {
-                    argSb.append(", ");
-                }
-                argSb.append("String arg").append(number);
+                variableNumberList.add(valueOfVariableNumber(requestName, key, scopeInfo.getContent()));
             }
-            columnMap.put("variableArgDef", argSb.toString());
+            columnMap.put("variableArgDef", buildVariableArgDef(variableNumberList));
+            columnMap.put("variableArgSet", buildVariableArgSet(variableNumberList));
             columnMap.put("variableCount", variableScopeList.size());
             columnMap.put("variableNumberList", variableNumberList);
             columnMap.put("variableScopeList", variableScopeList);
@@ -161,6 +157,37 @@ public class DfPropTableLoader {
             previousComment = null;
         }
         return columnList;
+    }
+
+    protected Integer valueOfVariableNumber(String requestName, String key, String content) {
+        try {
+            return Integer.valueOf(content);
+        } catch (NumberFormatException e) {
+            String msg = "The NOT-number variable was found: requestName=" + requestName + " key=" + key;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    protected String buildVariableArgDef(List<Integer> variableNumberList) {
+        final StringBuilder sb = new StringBuilder();
+        for (Integer number : variableNumberList) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("String arg").append(number);
+        }
+        return sb.toString();
+    }
+
+    protected String buildVariableArgSet(List<Integer> variableNumberList) {
+        final StringBuilder sb = new StringBuilder();
+        for (Integer number : variableNumberList) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("arg").append(number);
+        }
+        return sb.toString();
     }
 
     protected String loadConvert(String expression) {
