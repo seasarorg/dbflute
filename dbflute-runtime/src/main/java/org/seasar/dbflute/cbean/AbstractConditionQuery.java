@@ -681,6 +681,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void doRegisterLikeSearchQueryCompoundOptimized(String value, ConditionValue cvalue, String columnDbName,
             LikeSearchOption option) {
+        if (!option.isLikePrefix()) {
+            String msg = "This optimization is only for LikePrefix: " + option;
+            throw new IllegalStateException(msg);
+        }
         // *char type only but no checked (cannot check)
         final List<HpSpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
         final List<Integer> sizeList = option.getCompoundColumnSizeList();
@@ -692,9 +696,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             xgetSqlClause().beginOrScopeQueryAndPart();
         }
         try {
+            boolean shortLengthBreak = false;
             final Iterator<HpSpecifiedColumn> compoundColumnIterator = compoundColumnList.iterator();
-            for (int i = 0; i < sizeList.size(); i++) { // should be less or equal column count (checked in option)
-                final Integer columnSize = sizeList.get(i);
+            for (Integer columnSize : sizeList) { // should be less or equal column count (checked in option)
                 if (currentLength >= columnSize) { // can treat current condition as equal
                     final String equalValue = currentValue.substring(0, columnSize);
                     invokeQueryEqual(currentColumn, equalValue);
@@ -709,14 +713,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                         break; // though basically no need to break because of size loop end
                     }
                 } else { // short length condition value
+                    shortLengthBreak = true;
                     break;
                 }
             }
             if (currentValue.length() > 0 && currentColumn != null) { // double check
                 final LikeSearchOption copyOption = option.createDeepCopy();
                 copyOption.clearCompoundColumn(); // also fixed sizes cleared
-                while (compoundColumnIterator.hasNext()) {
-                    copyOption.addCompoundColumn(compoundColumnIterator.next());
+                if (!shortLengthBreak) {
+                    while (compoundColumnIterator.hasNext()) {
+                        copyOption.addCompoundColumn(compoundColumnIterator.next());
+                    }
                 }
                 invokeQueryLikeSearch(currentColumn, currentValue, copyOption);
             }
