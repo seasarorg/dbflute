@@ -11,13 +11,15 @@ public class DfFreeGenTable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final Map<String, Object> _tableMap;
     protected final String _tableName;
     protected final List<Map<String, Object>> _columnList;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenTable(String tableName, List<Map<String, Object>> columnList) {
+    public DfFreeGenTable(Map<String, Object> tableMap, String tableName, List<Map<String, Object>> columnList) {
+        _tableMap = tableMap;
         _tableName = tableName;
         _columnList = columnList;
     }
@@ -33,6 +35,14 @@ public class DfFreeGenTable {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public Map<String, Object> getTableMap() {
+        return _tableMap;
+    }
+
+    public String getTableName() {
+        return _tableName;
+    }
+
     public List<Map<String, Object>> getColumnList() {
         return _columnList;
     }

@@ -16,6 +16,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.properties.assistant.freegen.converter.DfFreeGenMethodConverter;
 import org.seasar.dbflute.properties.assistant.freegen.converter.DfFreeGenMethodConverter.DfConvertMethodReflector;
@@ -61,7 +62,7 @@ public class DfXlsTableLoader {
     //         }
     //     }
     // }
-    public DfFreeGenTable loadTable(String requestName, String resourceFile, Map<String, Object> tableMap,
+    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) {
         if (tableMap == null || tableMap.isEmpty()) {
             String msg = "The tableMap was not found in the FreeGen property: " + requestName;
@@ -81,6 +82,7 @@ public class DfXlsTableLoader {
             }
             rowBeginNumber = Integer.valueOf(numStr);
         }
+        final String resourceFile = resource.getResourceFile();
         @SuppressWarnings("unchecked")
         final Map<String, String> columnMap = (Map<String, String>) tableMap.get("columnMap");
         HSSFWorkbook workbook;
@@ -124,7 +126,7 @@ public class DfXlsTableLoader {
                 reflector.reflect();
             }
         }
-        return new DfFreeGenTable(sheetName, rowList);
+        return new DfFreeGenTable(tableMap, sheetName, rowList);
     }
 
     protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap,

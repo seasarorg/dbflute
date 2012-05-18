@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -41,17 +42,20 @@ public class DfPropTableLoader {
     //     ; package = org.seasar.dbflute...
     //     ; className = MessageDef
     // }
-    public DfFreeGenTable loadTable(String requestName, String resourceFile, Map<String, Object> tableMap,
+    public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) {
+        final String resourceFile = resource.getResourceFile();
+        final String encoding = resource.hasEncoding() ? resource.getEncoding() : "ISO-8859-1";
         BufferedReader br = null;
         try {
             final Properties prop = readProperties(resourceFile);
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(resourceFile), "ISO-8859-1"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(resourceFile), encoding));
             final List<Map<String, Object>> columnList = readColumnList(requestName, br, prop);
             final String tableName = Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")));
-            return new DfFreeGenTable(tableName, columnList);
+            return new DfFreeGenTable(tableMap, tableName, columnList);
         } catch (IOException e) {
-            String msg = "Failed to read the properties: requestName=" + requestName + " resourceFile=" + resourceFile;
+            String msg = "Failed to read the properties:";
+            msg = msg + " requestName=" + requestName + " resourceFile=" + resourceFile;
             throw new IllegalStateException(msg, e);
         } finally {
             if (br != null) {

@@ -255,7 +255,8 @@ public class XmlToAppData extends DefaultHandler {
                 }
             }
         } catch (Exception e) {
-            String msg = "Failed to analyze schema data of the XML.";
+            String msg = "Failed to analyze schema data of the XML:";
+            msg = msg + " uri=" + uri + " localName=" + localName + " rawName=" + rawName;
             throw new IllegalStateException(msg, e);
         }
     }

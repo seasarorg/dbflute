@@ -37,7 +37,19 @@ public class DfFreeGenRequest {
     //                                                                        ResourceType
     //                                                                        ============
     public enum DfFreeGenerateResourceType {
-        XLS, PROP
+        PROP, XLS, SOLR
+    }
+
+    public boolean isResourceTypeProp() {
+        return _resource.isResourceTypeProp();
+    }
+
+    public boolean isResourceTypeXls() {
+        return _resource.isResourceTypeXls();
+    }
+
+    public boolean isResourceTypeSolr() {
+        return _resource.isResourceTypeSolr();
     }
 
     // ===================================================================================
@@ -47,11 +59,14 @@ public class DfFreeGenRequest {
         _manager.setOutputDirectory(_output.getOutputDirectory());
     }
 
-    public String getOutputPath() {
-        final String packageAsPath = getPackageAsPath(_output.getPackage());
+    public String getGenerateDirPath() {
+        return getPackageAsPath(_output.getPackage());
+    }
+
+    public String getGenerateFilePath() {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final String classExt = basicProp.getLanguageDependencyInfo().getGrammarInfo().getClassFileExtension();
-        return packageAsPath + "/" + _output.getClassName() + "." + classExt;
+        return getGenerateDirPath() + "/" + _output.getClassName() + "." + classExt;
     }
 
     protected String getPackageAsPath(String pkg) {
@@ -109,8 +124,12 @@ public class DfFreeGenRequest {
         return _output.getClassName();
     }
 
-    public DfFreeGenTable getTable() {
-        return _table;
+    public Map<String, Object> getTableMap() {
+        return _table.getTableMap();
+    }
+
+    public String getTableName() {
+        return _table.getTableName();
     }
 
     public List<Map<String, Object>> getColumnList() {
