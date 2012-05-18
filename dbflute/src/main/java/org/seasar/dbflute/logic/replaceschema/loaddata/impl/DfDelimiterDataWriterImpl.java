@@ -248,7 +248,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     processNotNullString(dataFile, tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
                     bindCount++;
                 }
-                if (_suppressBatchUpdate) {
+                if (isMergedSuppressBatchUpdate(dataDirectory)) {
                     ps.execute();
                 } else {
                     ps.addBatch();
