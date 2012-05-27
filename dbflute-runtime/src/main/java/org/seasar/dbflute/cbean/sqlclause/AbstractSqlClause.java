@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.seasar.dbflute.cbean.ManualOrderBean;
@@ -67,6 +66,7 @@ import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbmeta.name.TableSqlName;
 import org.seasar.dbflute.dbway.DBWay;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfAssertUtil;
@@ -2576,6 +2576,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // ===================================================================================
     //                                                                        Query Update
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                          Query Insert
+    //                                          ------------
     public String getClauseQueryInsert(Map<String, String> fixedValueQueryExpMap, SqlClause resourceSqlClause) {
         // at first, this should be called (before on-query name handling)
         // because an on-query name of mapped info are set in this process
@@ -2644,27 +2647,113 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return processSubQueryIndent(sql);
     }
 
+    // -----------------------------------------------------
+    //                                          Query Update
+    //                                          ------------
     public String getClauseQueryUpdate(Map<String, String> columnParameterMap) {
         if (columnParameterMap.isEmpty()) {
             return null;
         }
         final DBMeta dbmeta = getDBMeta();
-        final TableSqlName tableSqlName = dbmeta.getTableSqlName();
+        final StringBuilder sb = new StringBuilder();
+        sb.append("update ").append(dbmeta.getTableSqlName());
+        if (canUseQueryUpdateInScope(dbmeta)) {
+            buildQueryUpdateSetClause(columnParameterMap, dbmeta, sb, null);
+            return buildQueryUpdateInScopeClause(dbmeta, sb);
+        } else { // direct (unsupported or compound primary keys)
+            return buildQueryUpdateDirectClause(columnParameterMap, dbmeta, sb);
+        }
+    }
+
+    protected boolean canUseQueryUpdateInScope(final DBMeta dbmeta) {
+        return isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasCompoundPrimaryKey();
+    }
+
+    protected String buildQueryUpdateInScopeClause(final DBMeta dbmeta, final StringBuilder sb) {
         final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
         final String selectClause = "select " + getBasePointAliasName() + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
-
         // Replace template marks. These are very important!
         fromWhereClause = replace(fromWhereClause, getUnionSelectClauseMark(), selectClause);
         fromWhereClause = replace(fromWhereClause, getUnionWhereClauseMark(), "");
         fromWhereClause = replace(fromWhereClause, getUnionWhereFirstConditionMark(), "");
+        final String subQuery = processSubQueryIndent(selectClause + " " + fromWhereClause);
+        sb.append(ln());
+        sb.append(" where ").append(primaryKeyName);
+        sb.append(" in (").append(ln()).append(subQuery);
+        if (!subQuery.endsWith(ln())) {
+            sb.append(ln());
+        }
+        sb.append(")");
+        return sb.toString();
+    }
 
-        final StringBuilder sb = new StringBuilder();
-        sb.append("update ").append(tableSqlName).append(ln());
+    protected String buildQueryUpdateDirectClause(Map<String, String> columnParameterMap, DBMeta dbmeta,
+            StringBuilder sb) {
+        if (hasUnionQuery()) {
+            throwQueryUpdateUnavailableFunctionException("union", dbmeta);
+        }
+        final String whereClause = processSubQueryIndent(getWhereClause());
+        boolean useAlias = false;
+        if (isUpdateTableAliasNameSupported()) {
+            if (hasQueryUpdateSubQueryPossible(whereClause)) {
+                useAlias = true;
+            }
+        } else {
+            if (hasQueryUpdateSubQueryPossible(whereClause)) {
+                throwQueryUpdateUnavailableFunctionException("sub-query", dbmeta);
+            }
+        }
+        boolean directJoin = false;
+        if (isUpdateDirectJoinSupported()) {
+            if (hasOuterJoin()) {
+                useAlias = true; // use alias forcedly if direct join
+                directJoin = true;
+            }
+        } else { // queryDelete or direct join unsupported 
+            if (hasOuterJoin()) {
+                throwQueryUpdateUnavailableFunctionException("outer join", dbmeta);
+            }
+        }
+        final String basePointAliasName = useAlias ? getBasePointAliasName() : null;
+        if (useAlias) {
+            sb.append(" ").append(basePointAliasName);
+        }
+        if (directJoin) {
+            sb.append(getLeftOuterJoinClause());
+        }
+        if (columnParameterMap != null) {
+            final String setClauseAliasName = useAlias ? basePointAliasName + "." : null;
+            buildQueryUpdateSetClause(columnParameterMap, dbmeta, sb, setClauseAliasName);
+        }
+        if (Srl.is_Null_or_TrimmedEmpty(whereClause)) {
+            return sb.toString();
+        }
+        if (useAlias) {
+            sb.append(whereClause);
+        } else {
+            sb.append(filterQueryUpdateBasePointAliasNameLocalUnsupported(whereClause));
+        }
+        return sb.toString();
+    }
+
+    protected boolean hasQueryUpdateSubQueryPossible(String whereClause) {
+        if (Srl.is_Null_or_TrimmedEmpty(whereClause)) {
+            return false;
+        }
+        return whereClause.contains("exists (") || whereClause.contains("(select ");
+    }
+
+    protected void buildQueryUpdateSetClause(Map<String, String> columnParameterMap, DBMeta dbmeta, StringBuilder sb,
+            String aliasName) {
+        if (columnParameterMap == null) {
+            String msg = "The argument 'columnParameterMap' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        sb.append(ln());
         int index = 0;
-        // It is guaranteed that the map has one or more elements.
-        final Set<Entry<String, String>> entrySet = columnParameterMap.entrySet();
-        for (Entry<String, String> entry : entrySet) {
+        final int mapSize = columnParameterMap.size();
+        for (Entry<String, String> entry : columnParameterMap.entrySet()) {
             final String columnName = entry.getKey();
             final String parameter = entry.getValue();
             final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
@@ -2674,42 +2763,28 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             } else {
                 sb.append("     , ");
             }
+            if (aliasName != null) {
+                sb.append(aliasName);
+            }
             sb.append(columnSqlName).append(" = ");
-            sb.append(encryptIfNeeds(columnInfo, parameter)).append(ln());
-            ++index;
-        }
-        if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasCompoundPrimaryKey()) {
-            final String subQuery = processSubQueryIndent(selectClause + " " + fromWhereClause);
-            sb.append(" where ").append(primaryKeyName);
-            sb.append(" in (").append(ln()).append(subQuery);
-            if (!subQuery.endsWith(ln())) {
+            sb.append(encryptIfNeeds(columnInfo, parameter));
+            if (mapSize - 1 > index) { // non last loop
                 sb.append(ln());
             }
-            sb.append(")");
-            return sb.toString();
-        } else {
-            if (hasOuterJoin()) {
-                String msg = "The queryUpdate() with outer join is unavailable";
-                msg = msg + " because your DB does not support it or the table has compound primary key:";
-                msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
-                throw new IllegalConditionBeanOperationException(msg);
-            }
-            if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
-                String msg = "The queryUpdate() with union is unavailable";
-                msg = msg + " because your DB does not support it or the table has compound primary key:";
-                msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
-                throw new IllegalConditionBeanOperationException(msg);
-            }
-            String subQuery = processSubQueryIndent(fromWhereClause);
-            subQuery = filterQueryUpdateBasePointAliasNameLocalUnsupported(subQuery);
-            int whereIndex = subQuery.indexOf("where ");
-            if (whereIndex < 0) {
-                return sb.toString();
-            }
-            subQuery = subQuery.substring(whereIndex);
-            sb.append(" ").append(subQuery);
-            return sb.toString();
+            ++index;
         }
+    }
+
+    protected void throwQueryUpdateUnavailableFunctionException(String unavailableFunction, DBMeta dbmeta) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The queryUpdate() or queryDelete() with " + unavailableFunction + " is unavailable.");
+        br.addItem("Advice");
+        br.addElement("Your DB does not support QueryUpdateInScope and UpdateDirectJoin");
+        br.addElement("or the table has compound primary key");
+        br.addItem("Table");
+        br.addElement(dbmeta.getTableDbName());
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
     }
 
     protected String filterQueryUpdateBasePointAliasNameLocalUnsupported(String subQuery) {
@@ -2728,51 +2803,38 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return subQuery;
     }
 
+    // -----------------------------------------------------
+    //                                          Query Delete
+    //                                          ------------
     public String getClauseQueryDelete() {
         final DBMeta dbmeta = getDBMeta();
-        final TableSqlName tableSqlName = dbmeta.getTableSqlName();
-        final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
-        final String selectClause = "select " + getBasePointAliasName() + "." + primaryKeyName;
-        String fromWhereClause = getClauseFromWhereWithUnionTemplate();
-
-        // Replace template marks. These are very important!
-        fromWhereClause = replace(fromWhereClause, getUnionSelectClauseMark(), selectClause);
-        fromWhereClause = replace(fromWhereClause, getUnionWhereClauseMark(), "");
-        fromWhereClause = replace(fromWhereClause, getUnionWhereFirstConditionMark(), "");
-
-        if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasCompoundPrimaryKey()) {
-            final String subQuery = processSubQueryIndent(selectClause + " " + fromWhereClause);
-            final StringBuilder sb = new StringBuilder();
-            sb.append("delete from ").append(tableSqlName).append(ln());
-            sb.append(" where ").append(primaryKeyName);
-            sb.append(" in (").append(ln()).append(subQuery);
-            if (!subQuery.endsWith(ln())) {
-                sb.append(ln());
-            }
-            sb.append(")");
-            return sb.toString();
-        } else { // unsupported or compound primary keys
-            if (hasOuterJoin()) {
-                String msg = "The queryDelete() with outer join is unavailable";
-                msg = msg + " because your DB does not support it or the table has compound primary keys:";
-                msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
-                throw new IllegalConditionBeanOperationException(msg);
-            }
-            if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
-                String msg = "The queryDelete() with union is unavailable";
-                msg = msg + " because your DB does not support it or the table has compound primary keys:";
-                msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
-                throw new IllegalConditionBeanOperationException(msg);
-            }
-            String subQuery = processSubQueryIndent(fromWhereClause);
-            subQuery = filterQueryUpdateBasePointAliasNameLocalUnsupported(subQuery);
-            subQuery = subQuery.substring(subQuery.indexOf("from "));
-            return "delete " + subQuery;
+        final StringBuilder sb = new StringBuilder();
+        sb.append("delete from ").append(dbmeta.getTableSqlName());
+        if (canUseQueryUpdateInScope(dbmeta)) {
+            return buildQueryUpdateInScopeClause(dbmeta, sb);
+        } else { // direct (unsupported or compound primary keys)
+            return buildQueryUpdateDirectClause(null, dbmeta, sb);
         }
     }
 
+    // -----------------------------------------------------
+    //                                             Supported
+    //                                             ---------
     protected boolean isUpdateSubQueryUseLocalTableSupported() {
-        return true;
+        return true; // almost supported
+    }
+
+    protected boolean isUpdateDirectJoinSupported() {
+        // used only when QueryUpdateInScope unsupported
+        // so not need to be strict setting
+        // (but if this returns true, it should be UpdateTableAliasNameSupported)
+        return false; // almost unsupported
+    }
+
+    protected boolean isUpdateTableAliasNameSupported() {
+        // used only when QueryUpdateInScope unsupported
+        // so not need to be strict setting
+        return false; // almost unsupported? (unknown)
     }
 
     // [DBFlute-0.8.6]

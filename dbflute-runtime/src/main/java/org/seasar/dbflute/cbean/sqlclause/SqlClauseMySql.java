@@ -172,6 +172,16 @@ public class SqlClauseMySql extends AbstractSqlClause {
         return false;
     }
 
+    @Override
+    protected boolean isUpdateDirectJoinSupported() {
+        return true;
+    }
+
+    @Override
+    protected boolean isUpdateTableAliasNameSupported() {
+        return true; // almost unsupported (unknown)
+    }
+
     // [DBFlute-0.9.9.1C]
     // ===================================================================================
     //                                                                      Collate Clause
