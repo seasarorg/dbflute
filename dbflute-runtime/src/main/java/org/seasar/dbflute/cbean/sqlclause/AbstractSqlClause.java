@@ -2658,18 +2658,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final StringBuilder sb = new StringBuilder();
         sb.append("update ").append(dbmeta.getTableSqlName());
         if (canUseQueryUpdateInScope(dbmeta)) {
-            buildQueryUpdateSetClause(columnParameterMap, dbmeta, sb, null);
-            return buildQueryUpdateInScopeClause(dbmeta, sb);
+            buildQueryUpdateInScopeClause(columnParameterMap, dbmeta, sb);
         } else { // direct (unsupported or compound primary keys)
-            return buildQueryUpdateDirectClause(columnParameterMap, dbmeta, sb);
+            buildQueryUpdateDirectClause(columnParameterMap, dbmeta, sb);
         }
+        return sb.toString();
     }
 
     protected boolean canUseQueryUpdateInScope(final DBMeta dbmeta) {
         return isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasCompoundPrimaryKey();
     }
 
-    protected String buildQueryUpdateInScopeClause(final DBMeta dbmeta, final StringBuilder sb) {
+    protected void buildQueryUpdateInScopeClause(Map<String, String> columnParameterMap, DBMeta dbmeta, StringBuilder sb) {
+        buildQueryUpdateSetClause(columnParameterMap, dbmeta, sb, null);
         final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
         final String selectClause = "select " + getBasePointAliasName() + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
@@ -2685,11 +2686,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             sb.append(ln());
         }
         sb.append(")");
-        return sb.toString();
     }
 
-    protected String buildQueryUpdateDirectClause(Map<String, String> columnParameterMap, DBMeta dbmeta,
-            StringBuilder sb) {
+    protected void buildQueryUpdateDirectClause(Map<String, String> columnParameterMap, DBMeta dbmeta, StringBuilder sb) {
         if (hasUnionQuery()) {
             throwQueryUpdateUnavailableFunctionException("union", dbmeta);
         }
@@ -2727,14 +2726,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             buildQueryUpdateSetClause(columnParameterMap, dbmeta, sb, setClauseAliasName);
         }
         if (Srl.is_Null_or_TrimmedEmpty(whereClause)) {
-            return sb.toString();
+            return;
         }
         if (useAlias) {
             sb.append(whereClause);
         } else {
             sb.append(filterQueryUpdateBasePointAliasNameLocalUnsupported(whereClause));
         }
-        return sb.toString();
     }
 
     protected boolean hasQueryUpdateSubQueryPossible(String whereClause) {
@@ -2811,10 +2809,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final StringBuilder sb = new StringBuilder();
         sb.append("delete from ").append(dbmeta.getTableSqlName());
         if (canUseQueryUpdateInScope(dbmeta)) {
-            return buildQueryUpdateInScopeClause(dbmeta, sb);
+            buildQueryUpdateInScopeClause(null, dbmeta, sb);
         } else { // direct (unsupported or compound primary keys)
-            return buildQueryUpdateDirectClause(null, dbmeta, sb);
+            buildQueryUpdateDirectClause(null, dbmeta, sb);
         }
+        return sb.toString();
     }
 
     // -----------------------------------------------------
