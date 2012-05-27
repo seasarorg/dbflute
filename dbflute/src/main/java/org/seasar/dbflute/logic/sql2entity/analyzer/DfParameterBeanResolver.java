@@ -340,12 +340,18 @@ public class DfParameterBeanResolver {
         // add option if it exists
         // so it is enough to set an option to only one bind variable comment
         // if several bind variable comments for the same property exist
+        final String derivedOption = derivePropertyOptionFromTestValue(testValue);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(option)) {
-            propertyNameOptionMap.put(propertyName, option);
+            final String resolvedOption;
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(derivedOption)) {
+                resolvedOption = option + "|" + derivedOption; // merged
+            } else {
+                resolvedOption = option;
+            }
+            propertyNameOptionMap.put(propertyName, resolvedOption);
         } else {
-            final String parsedOption = derivePropertyOptionFromTestValue(testValue);
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(parsedOption)) {
-                propertyNameOptionMap.put(propertyName, parsedOption);
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(derivedOption)) {
+                propertyNameOptionMap.put(propertyName, derivedOption);
             }
         }
     }
