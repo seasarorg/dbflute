@@ -190,6 +190,11 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return getProperty("dbfluteBeansDataSourceName", "dataSource");
     }
 
+    public String getDBFluteBeansDefaultAttribute() { // Java Only
+        final String prop = getProperty("dbfluteBeansDefaultAttribute", null);
+        return prop != null ? " " + prop : "";
+    }
+
     // ===================================================================================
     //                                                             Quill DataSource(Quill)
     //                                                             =======================

@@ -472,7 +472,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     for (String subItemKey : subItemPropMap.keySet()) {
                         final String clsKey = "cls_" + subItemKey;
                         final String subItemValue = rs.getString(clsKey);
-                        subItemMap.put(clsKey, Srl.replace(subItemValue, "\n", "\\n"));
+                        subItemMap.put(subItemKey, Srl.replace(subItemValue, "\n", "\\n"));
                     }
                     selectedMap.put(DfClassificationElement.KEY_SUB_ITEM_MAP, subItemMap);
                 }

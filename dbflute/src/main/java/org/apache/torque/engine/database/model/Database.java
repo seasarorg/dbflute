@@ -1402,6 +1402,10 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().getDBFluteBeansDataSourceName();
     }
 
+    public String getDBFluteBeansDefaultAttribute() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteBeansDefaultAttribute();
+    }
+
     public String filterDBFluteBeansBhvAp(String filePath) { // as utility for application behavior
         if (filePath.endsWith(".xml")) {
             filePath = Srl.replace(filePath, ".xml", "BhvAp.xml");

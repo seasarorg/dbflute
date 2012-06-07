@@ -3,7 +3,7 @@
     PUBLIC "-//SPRING//DTD BEAN//EN"
     "http://www.springframework.org/dtd/spring-beans.dtd"
 >
-<beans>
+<beans${database.DBFluteBeansDefaultAttribute}>
     <!-- The components of DBFlute Runtime. -->
     <bean id="${database.DBFluteInitializerComponentName}" class="${database.DBFluteInitializerClass}">
         <constructor-arg index="0"><ref bean="${database.DBFluteBeansDataSourceName}"/></constructor-arg>
