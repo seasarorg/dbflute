@@ -1,5 +1,7 @@
 package org.seasar.dbflute.cbean.chelper;
 
+import java.io.Serializable;
+
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -120,7 +122,8 @@ public enum HpCBPurpose {
         return Srl.camelize(name());
     }
 
-    public static class HpSpec {
+    public static class HpSpec implements Serializable {
+        private static final long serialVersionUID = 1L;
         protected boolean _noSetupSelect;
         protected boolean _noSpecify;
         protected boolean _noSpecifyColumnTwoOrMore;

@@ -1,14 +1,22 @@
 package org.seasar.dbflute.jdbc;
 
+import java.sql.Array;
+import java.sql.Blob;
 import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.Struct;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * The connection wrapper that is not closed in the method 'close()'. <br />
@@ -203,5 +211,57 @@ public class NotClosingConnectionWrapper implements Connection {
 
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
         _actualConnection.setTypeMap(map);
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return _actualConnection.unwrap(iface);
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return _actualConnection.isWrapperFor(iface);
+    }
+
+    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+        return _actualConnection.createArrayOf(typeName, elements);
+    }
+
+    public Blob createBlob() throws SQLException {
+        return _actualConnection.createBlob();
+    }
+
+    public Clob createClob() throws SQLException {
+        return _actualConnection.createClob();
+    }
+
+    public NClob createNClob() throws SQLException {
+        return _actualConnection.createNClob();
+    }
+
+    public SQLXML createSQLXML() throws SQLException {
+        return _actualConnection.createSQLXML();
+    }
+
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+        return _actualConnection.createStruct(typeName, attributes);
+    }
+
+    public Properties getClientInfo() throws SQLException {
+        return _actualConnection.getClientInfo();
+    }
+
+    public String getClientInfo(String name) throws SQLException {
+        return _actualConnection.getClientInfo(name);
+    }
+
+    public boolean isValid(int timeout) throws SQLException {
+        return _actualConnection.isValid(timeout);
+    }
+
+    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+        _actualConnection.setClientInfo(properties);
+    }
+
+    public void setClientInfo(String name, String value) throws SQLClientInfoException {
+        _actualConnection.setClientInfo(name, value);
     }
 }

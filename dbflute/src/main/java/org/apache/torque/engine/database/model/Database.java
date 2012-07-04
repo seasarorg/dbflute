@@ -1279,6 +1279,7 @@ public class Database {
         // basically for parameter-bean
         // because it has become to need it since 0.9.7.0
         // (supported classes since older versions don't need this)
+        //  -> not called because it has become NOT to need it since 0.9.9.6
         final String outputPath = DfGenerator.getInstance().getOutputPath();
         final String absolutePath = outputPath + "/" + path;
         final String sourceCodeEncoding = getTemplateFileEncoding();

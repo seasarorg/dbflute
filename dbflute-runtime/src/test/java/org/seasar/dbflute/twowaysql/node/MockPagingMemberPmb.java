@@ -7,7 +7,6 @@ import org.seasar.dbflute.cbean.SimplePagingBean;
  */
 public class MockPagingMemberPmb extends SimplePagingBean {
 
-    private static final long serialVersionUID = 1L;
     protected Integer _memberId;
     protected String _memberName;
 

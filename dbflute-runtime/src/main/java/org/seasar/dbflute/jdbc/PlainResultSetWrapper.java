@@ -23,11 +23,14 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;
+import java.sql.NClob;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -630,5 +633,205 @@ public class PlainResultSetWrapper implements ResultSet {
 
     public Timestamp getTimestamp(String columnName, Calendar cal) throws SQLException {
         return original.getTimestamp(columnName, cal);
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return original.unwrap(iface);
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return original.isWrapperFor(iface);
+    }
+
+    public RowId getRowId(int i) throws SQLException {
+        return original.getRowId(i);
+    }
+
+    public RowId getRowId(String s) throws SQLException {
+        return original.getRowId(s);
+    }
+
+    public void updateRowId(int i, RowId rowid) throws SQLException {
+        original.updateRowId(i, rowid);
+    }
+
+    public void updateRowId(String s, RowId rowid) throws SQLException {
+        original.updateRowId(s, rowid);
+    }
+
+    public int getHoldability() throws SQLException {
+        return original.getHoldability();
+    }
+
+    public boolean isClosed() throws SQLException {
+        return original.isClosed();
+    }
+
+    public void updateNString(int i, String s) throws SQLException {
+        original.updateNString(i, s);
+    }
+
+    public void updateNString(String s, String s1) throws SQLException {
+        original.updateNString(s, s1);
+    }
+
+    public void updateNClob(int i, NClob nclob) throws SQLException {
+        original.updateNClob(i, nclob);
+    }
+
+    public void updateNClob(String s, NClob nclob) throws SQLException {
+        original.updateNClob(s, nclob);
+    }
+
+    public NClob getNClob(int i) throws SQLException {
+        return original.getNClob(i);
+    }
+
+    public NClob getNClob(String s) throws SQLException {
+        return original.getNClob(s);
+    }
+
+    public SQLXML getSQLXML(int i) throws SQLException {
+        return original.getSQLXML(i);
+    }
+
+    public SQLXML getSQLXML(String s) throws SQLException {
+        return original.getSQLXML(s);
+    }
+
+    public void updateSQLXML(int i, SQLXML sqlxml) throws SQLException {
+        original.updateSQLXML(i, sqlxml);
+    }
+
+    public void updateSQLXML(String s, SQLXML sqlxml) throws SQLException {
+        original.updateSQLXML(s, sqlxml);
+    }
+
+    public String getNString(int i) throws SQLException {
+        return original.getNString(i);
+    }
+
+    public String getNString(String s) throws SQLException {
+        return original.getNString(s);
+    }
+
+    public Reader getNCharacterStream(int i) throws SQLException {
+        return original.getNCharacterStream(i);
+    }
+
+    public Reader getNCharacterStream(String s) throws SQLException {
+        return original.getNCharacterStream(s);
+    }
+
+    public void updateNCharacterStream(int i, Reader reader, long l) throws SQLException {
+        original.updateNCharacterStream(i, reader, l);
+    }
+
+    public void updateNCharacterStream(String s, Reader reader, long l) throws SQLException {
+        original.updateNCharacterStream(s, reader, l);
+    }
+
+    public void updateAsciiStream(int i, InputStream inputstream, long l) throws SQLException {
+        original.updateAsciiStream(i, inputstream, l);
+    }
+
+    public void updateBinaryStream(int i, InputStream inputstream, long l) throws SQLException {
+        original.updateBinaryStream(i, inputstream, l);
+    }
+
+    public void updateCharacterStream(int i, Reader reader, long l) throws SQLException {
+        original.updateCharacterStream(i, reader, l);
+    }
+
+    public void updateAsciiStream(String s, InputStream inputstream, long l) throws SQLException {
+        original.updateAsciiStream(s, inputstream, l);
+    }
+
+    public void updateBinaryStream(String s, InputStream inputstream, long l) throws SQLException {
+        original.updateBinaryStream(s, inputstream, l);
+    }
+
+    public void updateCharacterStream(String s, Reader reader, long l) throws SQLException {
+        original.updateCharacterStream(s, reader, l);
+    }
+
+    public void updateBlob(int i, InputStream inputstream, long l) throws SQLException {
+        original.updateBlob(i, inputstream, l);
+    }
+
+    public void updateBlob(String s, InputStream inputstream, long l) throws SQLException {
+        original.updateBlob(s, inputstream, l);
+    }
+
+    public void updateClob(int i, Reader reader, long l) throws SQLException {
+        original.updateClob(i, reader, l);
+    }
+
+    public void updateClob(String s, Reader reader, long l) throws SQLException {
+        original.updateClob(s, reader, l);
+    }
+
+    public void updateNClob(int i, Reader reader, long l) throws SQLException {
+        original.updateNClob(i, reader, l);
+    }
+
+    public void updateNClob(String s, Reader reader, long l) throws SQLException {
+        original.updateNClob(s, reader, l);
+    }
+
+    public void updateNCharacterStream(int i, Reader reader) throws SQLException {
+        original.updateNCharacterStream(i, reader);
+    }
+
+    public void updateNCharacterStream(String s, Reader reader) throws SQLException {
+        original.updateNCharacterStream(s, reader);
+    }
+
+    public void updateAsciiStream(int i, InputStream inputstream) throws SQLException {
+        original.updateAsciiStream(i, inputstream);
+    }
+
+    public void updateBinaryStream(int i, InputStream inputstream) throws SQLException {
+        original.updateBinaryStream(i, inputstream);
+    }
+
+    public void updateCharacterStream(int i, Reader reader) throws SQLException {
+        original.updateCharacterStream(i, reader);
+    }
+
+    public void updateAsciiStream(String s, InputStream inputstream) throws SQLException {
+        original.updateAsciiStream(s, inputstream);
+    }
+
+    public void updateBinaryStream(String s, InputStream inputstream) throws SQLException {
+        original.updateBinaryStream(s, inputstream);
+    }
+
+    public void updateCharacterStream(String s, Reader reader) throws SQLException {
+        original.updateCharacterStream(s, reader);
+    }
+
+    public void updateBlob(int i, InputStream inputstream) throws SQLException {
+        original.updateBlob(i, inputstream);
+    }
+
+    public void updateBlob(String s, InputStream inputstream) throws SQLException {
+        original.updateBlob(s, inputstream);
+    }
+
+    public void updateClob(int i, Reader reader) throws SQLException {
+        original.updateClob(i, reader);
+    }
+
+    public void updateClob(String s, Reader reader) throws SQLException {
+        original.updateClob(s, reader);
+    }
+
+    public void updateNClob(int i, Reader reader) throws SQLException {
+        original.updateNClob(i, reader);
+    }
+
+    public void updateNClob(String s, Reader reader) throws SQLException {
+        original.updateNClob(s, reader);
     }
 }

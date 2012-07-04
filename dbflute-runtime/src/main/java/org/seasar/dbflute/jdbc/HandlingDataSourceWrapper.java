@@ -76,4 +76,12 @@ public class HandlingDataSourceWrapper implements DataSource {
     public void setLoginTimeout(int seconds) throws SQLException {
         _dataSource.setLoginTimeout(seconds);
     }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return _dataSource.unwrap(iface);
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return _dataSource.isWrapperFor(iface);
+    }
 }

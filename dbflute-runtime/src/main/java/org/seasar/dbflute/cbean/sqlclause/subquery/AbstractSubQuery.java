@@ -79,11 +79,13 @@ public abstract class AbstractSubQuery {
      * Build the clause of plain sub-query from from-where clause.
      * @param selectClause The clause of select for sub-query. (NotNull)
      * @param localAliasName The alias name of sub-query local table. (NotNull)
+     * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of plain sub-query. (NotNull)
      */
-    protected String buildPlainFromWhereClause(String selectClause, String localAliasName) {
+    protected String buildPlainFromWhereClause(String selectClause, String localAliasName,
+            String correlatedFixedCondition) {
         final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
-        return clause.buildPlainSubQueryFromWhereClause();
+        return clause.buildPlainSubQueryFromWhereClause(correlatedFixedCondition);
     }
 
     /**
@@ -92,12 +94,14 @@ public abstract class AbstractSubQuery {
      * @param localAliasName The alias name of sub-query local table. (NotNull)
      * @param correlatedColumnRealName The real name of correlated column that is main-query table's column. (NotNull)
      * @param relatedColumnSqlName The real name of related column that is sub-query table's column. (NotNull)
+     * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of correlation sub-query. (NotNull)
      */
     protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName,
-            ColumnRealName correlatedColumnRealName, ColumnSqlName relatedColumnSqlName) {
+            ColumnRealName correlatedColumnRealName, ColumnSqlName relatedColumnSqlName, String correlatedFixedCondition) {
         final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
-        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealName, relatedColumnSqlName);
+        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealName, relatedColumnSqlName,
+                correlatedFixedCondition);
     }
 
     /**
@@ -106,12 +110,15 @@ public abstract class AbstractSubQuery {
      * @param localAliasName The alias name of sub-query local table. (NotNull)
      * @param correlatedColumnRealNames The real names of correlated column that is main-query table's column. (NotNull)
      * @param relatedColumnSqlNames The real names of related column that is sub-query table's column. (NotNull)
+     * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of correlation sub-query. (NotNull)
      */
     protected String buildCorrelationFromWhereClause(String selectClause, String localAliasName,
-            ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames) {
+            ColumnRealName[] correlatedColumnRealNames, ColumnSqlName[] relatedColumnSqlNames,
+            String correlatedFixedCondition) {
         final SubQueryClause clause = createSubQueryClause(selectClause, localAliasName);
-        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealNames, relatedColumnSqlNames);
+        return clause.buildCorrelationSubQueryFromWhereClause(correlatedColumnRealNames, relatedColumnSqlNames,
+                correlatedFixedCondition);
     }
 
     protected SubQueryClause createSubQueryClause(String selectClause, String localAliasName) {

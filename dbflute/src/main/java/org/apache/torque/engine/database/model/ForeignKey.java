@@ -98,6 +98,7 @@ public class ForeignKey {
     protected String _fixedCondition;
     protected String _fixedSuffix;
     protected boolean _fixedInline;
+    protected boolean _fixedReferrer;
     protected String _comment;
 
     // -----------------------------------------------------
@@ -775,12 +776,45 @@ public class ForeignKey {
     // ===================================================================================
     //                                                                     Fixed Condition
     //                                                                     ===============
+    public String getFixedConditionArg() {
+        analyzeDynamicFixedConditionIfNeeds();
+        return _fixedCondition != null ? "\"" + _fixedCondition + "\"" : "null";
+    }
+
     public boolean hasFixedCondition() {
+        analyzeDynamicFixedConditionIfNeeds();
         return _fixedCondition != null && _fixedCondition.trim().length() > 0;
     }
 
     public boolean hasFixedSuffix() {
+        analyzeDynamicFixedConditionIfNeeds();
         return _fixedSuffix != null && _fixedSuffix.trim().length() > 0;
+    }
+
+    public String getDynamicFixedConditionArgs() {
+        analyzeDynamicFixedConditionIfNeeds();
+        return buildDynamicFixedConditionArgs(false);
+    }
+
+    public String getDynamicFixedConditionFinalArgs() {
+        analyzeDynamicFixedConditionIfNeeds();
+        return buildDynamicFixedConditionArgs(true);
+    }
+
+    protected String buildDynamicFixedConditionArgs(boolean finalArg) {
+        final Set<String> parameterNameSet = _dynamicFixedConditionMap.keySet();
+        final StringBuilder sb = new StringBuilder();
+        for (String parameterName : parameterNameSet) {
+            final String paramterType = _dynamicFixedConditionMap.get(parameterName);
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            if (finalArg) {
+                sb.append("final ");
+            }
+            sb.append(paramterType).append(" ").append(parameterName);
+        }
+        return sb.toString();
     }
 
     public boolean hasDynamicFixedCondition() {
@@ -788,12 +822,62 @@ public class ForeignKey {
         return hasFixedCondition() && !_dynamicFixedConditionMap.isEmpty();
     }
 
-    protected void analyzeDynamicFixedConditionIfNeeds() {
+    public String getDynamicFixedConditionVariables() {
+        analyzeDynamicFixedConditionIfNeeds();
+        final StringBuilder sb = new StringBuilder();
+        for (String parameterName : _dynamicFixedConditionMap.keySet()) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(parameterName);
+        }
+        return sb.toString();
+    }
+
+    public String getDynamicFixedConditionParameterMapSetup() {
+        analyzeDynamicFixedConditionIfNeeds();
+        final StringBuilder sb = new StringBuilder();
+        for (Entry<String, String> entry : _dynamicFixedConditionMap.entrySet()) {
+            final String parameterName = entry.getKey();
+            final String parameterType = entry.getValue();
+            sb.append("parameterMap.put(\"").append(parameterName).append("\", ");
+            if (java.util.Date.class.getName().equals(parameterType)) {
+                sb.append("fCTPD(").append(parameterName).append(")");
+            } else {
+                sb.append(parameterName);
+            }
+            sb.append(");");
+        }
+        return sb.toString();
+    }
+
+    public String getDynamicFixedConditionArgsJavaDocString() {
+        analyzeDynamicFixedConditionIfNeeds();
+        final StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (Entry<String, String> entry : _dynamicFixedConditionMap.entrySet()) {
+            final String parameterName = entry.getKey();
+            if (count > 0) {
+                sb.append("     * ");
+            }
+            sb.append("@param ").append(parameterName).append(" ");
+            sb.append("The bind parameter of fixed condition for ").append(parameterName).append(". (NotNull)");
+            sb.append(getBasicProperties().getSourceCodeLineSeparator());
+            ++count;
+        }
+        final String result = Srl.rtrim(sb.toString()); // trim last line separator
+        return result;
+    }
+
+    protected void analyzeDynamicFixedConditionIfNeeds() { // lazy called
         if (!_dynamicFixedConditionMap.isEmpty()) {
             return; // already initialized
         }
-        if (!hasFixedCondition() || !_fixedCondition.contains("/*") || !_fixedCondition.contains("*/")) {
-            return; // No fixedCondition or No dynamicFixedCondition
+        if (_fixedCondition == null || _fixedCondition.trim().length() == 0) {
+            return; // no fixed condition
+        }
+        if (!_fixedCondition.contains("/*") || !_fixedCondition.contains("*/")) {
+            return; //  no dynamic (no bind variable) fixed condition
         }
         final Map<String, String> fixedConditionReplacementMap = new LinkedHashMap<String, String>();
         String currentString = _fixedCondition;
@@ -860,11 +944,8 @@ public class ForeignKey {
         if (fixedConditionReplacementMap.isEmpty()) {
             return;
         }
-        final Set<Entry<String, String>> replaceSet = fixedConditionReplacementMap.entrySet();
-        for (Entry<String, String> replaceEntry : replaceSet) {
-            final String key = replaceEntry.getKey();
-            final String value = replaceEntry.getValue();
-            _fixedCondition = replace(_fixedCondition, key, value);
+        for (Entry<String, String> entry : fixedConditionReplacementMap.entrySet()) {
+            _fixedCondition = replace(_fixedCondition, entry.getKey(), entry.getValue());
         }
     }
 
@@ -909,77 +990,6 @@ public class ForeignKey {
     protected String filterDynamicFixedConditionParameterType(String parameterType) {
         final DfPropertyTypePackageResolver packageResolver = new DfPropertyTypePackageResolver();
         return packageResolver.resolvePackageName(parameterType);
-    }
-
-    public String getDynamicFixedConditionArgs() {
-        return buildDynamicFixedConditionArgs(false);
-    }
-
-    public String getDynamicFixedConditionFinalArgs() {
-        return buildDynamicFixedConditionArgs(true);
-    }
-
-    protected String buildDynamicFixedConditionArgs(boolean finalArg) {
-        final Set<String> parameterNameSet = _dynamicFixedConditionMap.keySet();
-        final StringBuilder sb = new StringBuilder();
-        for (String parameterName : parameterNameSet) {
-            final String paramterType = _dynamicFixedConditionMap.get(parameterName);
-            if (sb.length() > 0) {
-                sb.append(", ");
-            }
-            if (finalArg) {
-                sb.append("final ");
-            }
-            sb.append(paramterType).append(" ").append(parameterName);
-        }
-        return sb.toString();
-    }
-
-    public String getDynamicFixedConditionVariables() {
-        final Set<String> parameterNameSet = _dynamicFixedConditionMap.keySet();
-        final StringBuilder sb = new StringBuilder();
-        for (String parameterName : parameterNameSet) {
-            if (sb.length() > 0) {
-                sb.append(", ");
-            }
-            sb.append(parameterName);
-        }
-        return sb.toString();
-    }
-
-    public String getDynamicFixedConditionParameterMapSetup() {
-        final Set<Entry<String, String>> entrySet = _dynamicFixedConditionMap.entrySet();
-        final StringBuilder sb = new StringBuilder();
-        for (Entry<String, String> entry : entrySet) {
-            final String parameterName = entry.getKey();
-            final String parameterType = entry.getValue();
-            sb.append("parameterMap.put(\"").append(parameterName).append("\", ");
-            if (java.util.Date.class.getName().equals(parameterType)) {
-                sb.append("fCTPD(").append(parameterName).append(")");
-            } else {
-                sb.append(parameterName);
-            }
-            sb.append(");");
-        }
-        return sb.toString();
-    }
-
-    public String getDynamicFixedConditionArgsJavaDocString() {
-        final Set<Entry<String, String>> entrySet = _dynamicFixedConditionMap.entrySet();
-        final StringBuilder sb = new StringBuilder();
-        int count = 0;
-        for (Entry<String, String> entry : entrySet) {
-            final String parameterName = entry.getKey();
-            if (count > 0) {
-                sb.append("     * ");
-            }
-            sb.append("@param ").append(parameterName).append(" ");
-            sb.append("The bind parameter of fixed condition for ").append(parameterName).append(". (NotNull)");
-            sb.append(getBasicProperties().getSourceCodeLineSeparator());
-            ++count;
-        }
-        final String result = Srl.rtrim(sb.toString()); // trim last line separator
-        return result;
     }
 
     // ===================================================================================
@@ -1104,7 +1114,7 @@ public class ForeignKey {
     }
 
     public boolean canBeReferrer() {
-        if (hasFixedCondition()) {
+        if (hasFixedCondition() && !isFixedReferrer()) {
             return false;
         }
         return isForeignColumnPrimaryKey() || isForeignColumnUnique();
@@ -1463,6 +1473,14 @@ public class ForeignKey {
 
     public void setFixedInline(boolean fixedInline) {
         this._fixedInline = fixedInline;
+    }
+
+    public boolean isFixedReferrer() {
+        return _fixedReferrer;
+    }
+
+    public void setFixedReferrer(boolean fixedReferrer) {
+        this._fixedReferrer = fixedReferrer;
     }
 
     public String getComment() {

@@ -1,14 +1,22 @@
 package org.seasar.dbflute.helper.jdbc.connection;
 
+import java.sql.Array;
+import java.sql.Blob;
 import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.Struct;
 import java.util.Map;
+import java.util.Properties;
 
 public class DfSimpleConnection implements Connection {
 
@@ -23,7 +31,8 @@ public class DfSimpleConnection implements Connection {
     }
 
     public void close() throws SQLException {
-        // _realConnection.close();
+        // not close here to reuse
+        //_realConnection.close();
     }
 
     public void closeReally() throws SQLException {
@@ -168,5 +177,57 @@ public class DfSimpleConnection implements Connection {
 
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
         _realConnection.setTypeMap(map);
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return _realConnection.isWrapperFor(iface);
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return _realConnection.unwrap(iface);
+    }
+
+    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+        return _realConnection.createArrayOf(typeName, elements);
+    }
+
+    public Blob createBlob() throws SQLException {
+        return _realConnection.createBlob();
+    }
+
+    public Clob createClob() throws SQLException {
+        return _realConnection.createClob();
+    }
+
+    public NClob createNClob() throws SQLException {
+        return _realConnection.createNClob();
+    }
+
+    public SQLXML createSQLXML() throws SQLException {
+        return _realConnection.createSQLXML();
+    }
+
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+        return _realConnection.createStruct(typeName, attributes);
+    }
+
+    public Properties getClientInfo() throws SQLException {
+        return _realConnection.getClientInfo();
+    }
+
+    public String getClientInfo(String name) throws SQLException {
+        return _realConnection.getClientInfo(name);
+    }
+
+    public boolean isValid(int timeout) throws SQLException {
+        return _realConnection.isValid(timeout);
+    }
+
+    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+        _realConnection.setClientInfo(properties);
+    }
+
+    public void setClientInfo(String name, String value) throws SQLClientInfoException {
+        _realConnection.setClientInfo(name, value);
     }
 }

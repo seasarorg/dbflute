@@ -180,6 +180,14 @@ public class DfSchemaInitializerFactory {
             public Connection getConnection() throws SQLException {
                 return _replaceSchemaProperties.createAdditionalDropConnection(_additionalDropMap);
             }
+
+            public boolean isWrapperFor(Class<?> iface) throws SQLException {
+                return false;
+            }
+
+            public <T> T unwrap(Class<T> iface) throws SQLException {
+                return null;
+            }
         };
     }
 

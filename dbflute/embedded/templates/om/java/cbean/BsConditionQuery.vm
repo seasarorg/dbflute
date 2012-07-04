@@ -539,15 +539,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($foreignColumnName = $fk.getLocalForeignMapping().get($columnName))
         joinOnMap.put("${localColumn.name}", "${foreignColumnName}");
 #end
-#if ($fk.hasFixedCondition())
-#if ($fk.isFixedInline())
-        registerOuterJoinFixedInline(cq, joinOnMap, "${fk.foreignPropertyName}", "${fk.fixedCondition}");
-#else
-        registerOuterJoin(cq, joinOnMap, "${fk.foreignPropertyName}", "${fk.fixedCondition}");
-#end
-#else
         registerOuterJoin(cq, joinOnMap, "${fk.foreignPropertyName}");
-#end
     }
     public boolean hasConditionQuery${fk.ForeignPropertyNameInitCap}() {
         return _conditionQuery${fk.ForeignPropertyNameInitCap} != null;
@@ -588,15 +580,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($referrerColumnName = $referrer.getForeignLocalMapping().get($columnName))
         joinOnMap.put("${foreignColumn.name}", "${referrerColumnName}");
 #end
-#if ($referrer.hasFixedCondition())
-#if ($fk.isFixedInline())
-        registerOuterJoinFixedInline(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}", "${referrer.fixedCondition}");
-#else
-        registerOuterJoin(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}", "${referrer.fixedCondition}");
-#end
-#else
         registerOuterJoin(cq, joinOnMap, "${referrer.referrerPropertyNameAsOne}");
-#end
     }
     public boolean hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() {
         return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} != null;
@@ -649,10 +633,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
 #else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
 #set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
@@ -666,7 +652,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
-        registerExistsReferrer(cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", subQueryPropertyName);
+        registerExistsReferrer(cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", subQueryPropertyName, "${relationPropertyName}");
     }
     protected Map<String, ${relatedCQClassName}> _${subQueryPropertyName}Map;
     public Map<String, ${relatedCQClassName}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }

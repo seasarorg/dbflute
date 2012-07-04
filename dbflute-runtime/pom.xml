@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>0.9.9.5B</version><!-- Latest RC version is 00-SNAPSHOT -->
+	<version>0.9.9.6-RC1</version><!-- Latest RC version is 00-SNAPSHOT -->
 	<packaging>jar</packaging>
 
 	<name>DBFlute Runtime</name>
@@ -12,7 +12,7 @@
 
 	<properties>
 		<commons.logging.version>1.1.1</commons.logging.version>
-		<utflute.version>0.1.4</utflute.version>
+		<utflute.version>0.1.5</utflute.version>
 		<junit.version>3.8.2</junit.version>
 	</properties>
 
@@ -64,8 +64,8 @@
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<source>1.5</source>
-						<target>1.5</target>
+						<source>1.6</source>
+						<target>1.6</target>
 						<encoding>UTF-8</encoding>
 						<showDeprecation>true</showDeprecation>
 						<showWarnings>true</showWarnings>

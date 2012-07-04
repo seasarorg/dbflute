@@ -97,6 +97,14 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
     protected TnBasicParameterHandler newBasicParameterHandler(String executedSql) {
         return new TnBasicSelectHandler(_dataSource, executedSql, _resultSetHandler, _statementFactory);
     }
+    
+    // ===================================================================================
+    //                                                                              Filter
+    //                                                                              ======
+    @Override
+    protected String filterExecutedSql(String executedSql) {
+        return super.filterExecutedSql(executedSql);
+    }
 
     // ===================================================================================
     //                                                                        SQL Handling

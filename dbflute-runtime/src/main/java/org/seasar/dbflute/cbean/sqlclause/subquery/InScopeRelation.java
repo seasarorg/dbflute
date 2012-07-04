@@ -34,12 +34,13 @@ public class InScopeRelation extends AbstractSubQuery {
     // ===================================================================================
     //                                                                        Build Clause
     //                                                                        ============
-    public String buildInScopeRelation(String columnDbName, String relatedColumnDbName, String inScopeOption) {
+    public String buildInScopeRelation(String columnDbName, String relatedColumnDbName,
+            String correlatedFixedCondition, String inScopeOption) {
         inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
         final String subQueryClause;
         {
             final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
-            subQueryClause = getSubQueryClause(relatedColumnSqlName);
+            subQueryClause = getSubQueryClause(relatedColumnSqlName, correlatedFixedCondition);
         }
         final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
@@ -57,14 +58,14 @@ public class InScopeRelation extends AbstractSubQuery {
                 + endMark;
     }
 
-    protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName) {
+    protected String getSubQueryClause(ColumnSqlName relatedColumnSqlName, String correlatedFixedCondition) {
         final String tableAliasName = getSubQueryLocalAliasName();
         final String selectClause;
         {
             final ColumnRealName relatedColumnRealName = ColumnRealName.create(tableAliasName, relatedColumnSqlName);
             selectClause = "select " + relatedColumnRealName;
         }
-        final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
+        final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, correlatedFixedCondition);
         final String subQueryClause = selectClause + " " + fromWhereClause;
         return resolveSubQueryLevelVariable(subQueryClause);
     }

@@ -13,25 +13,27 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean.coption;
+package org.seasar.dbflute.jdbc;
 
 /**
- * The option of date-from-to.
+ * The filter of SQL string. <br />
+ * This filter is called back before executing the SQL.
  * <pre>
- * e.g. fromDate:{2007/04/10 08:24:53} toDate:{2007/04/16 14:36:29}
- *
- *   new DateFromToOption(); 
- *     --&gt; column &gt;= '2007/04/10 00:00:00'
- *     and column &lt; '2007/04/17 00:00:00'
+ * context.setSqlStringFilter(new SqlStringFilter() {
+ *     public void handle(String executedSql) {
+ *         // You can get your SQL string here.
+ *     }
+ * });
  * </pre>
  * @author jflute
  */
-public class DateFromToOption extends FromToOption {
+public interface SqlStringFilter {
 
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public DateFromToOption() {
-        compareAsDate();
-    }
+    String filterSelectCB(String executedSql);
+
+    String filterQueryUpdate(String executedSql);
+
+    String filterOutsideSql(String executedSql);
+
+    String filterProcedure(String executedSql);
 }

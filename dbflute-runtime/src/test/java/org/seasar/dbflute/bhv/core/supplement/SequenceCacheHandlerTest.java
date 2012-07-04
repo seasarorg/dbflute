@@ -417,6 +417,14 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
 
         public void setLoginTimeout(int i) throws SQLException {
         }
+
+        public <T> T unwrap(Class<T> class1) throws SQLException {
+            return null;
+        }
+
+        public boolean isWrapperFor(Class<?> class1) throws SQLException {
+            return false;
+        }
     }
 
     private <RESULT> List<RESULT> fireSameExecution(ExecutionCreator<RESULT> creator) {

@@ -40,12 +40,25 @@ public class SubQueryClause {
     // ===================================================================================
     //                                                                               Plain
     //                                                                               =====
-    public String buildPlainSubQueryFromWhereClause() {
-        String clause = _subQuerySqlClause.getClauseFromWhereWithUnionTemplate();
+    public String buildPlainSubQueryFromWhereClause(String correlatedFixedCondition) {
+        if (correlatedFixedCondition == null) { // basically here
+            String clause = _subQuerySqlClause.getClauseFromWhereWithUnionTemplate();
+            clause = resolveParameterLocationPath(clause, _subQueryPath);
+            clause = replaceString(clause, getUnionSelectClauseMark(), _selectClause);
+            clause = replaceString(clause, getUnionWhereClauseMark(), "");
+            clause = replaceString(clause, getUnionWhereFirstConditionMark(), "");
+            return clause;
+        }
+        // e.g. biz-many-to-one
+        final String correlationCondition = correlatedFixedCondition; // only fixed condition
+        final String firstConditionAfter = ln() + "   and ";
+        String clause = _subQuerySqlClause.getClauseFromWhereWithWhereUnionTemplate();
         clause = resolveParameterLocationPath(clause, _subQueryPath);
+        clause = replaceString(clause, getWhereClauseMark(), ln() + " where " + correlationCondition);
+        clause = replaceString(clause, getWhereFirstConditionMark(), correlationCondition + firstConditionAfter);
         clause = replaceString(clause, getUnionSelectClauseMark(), _selectClause);
-        clause = replaceString(clause, getUnionWhereClauseMark(), "");
-        clause = replaceString(clause, getUnionWhereFirstConditionMark(), "");
+        clause = replaceString(clause, getUnionWhereClauseMark(), ln() + " where " + correlationCondition);
+        clause = replaceString(clause, getUnionWhereFirstConditionMark(), correlationCondition + firstConditionAfter);
         return clause;
     }
 
@@ -56,23 +69,25 @@ public class SubQueryClause {
      * Build the clause of correlation sub-query from from-where clause.
      * @param correlatedColumnRealName The real name of correlated column that is main-query table's column. (NotNull)
      * @param relatedColumnSqlName The real name of related column that is sub-query table's column. (NotNull)
+     * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of correlation sub-query. (NotNull)
      */
     public String buildCorrelationSubQueryFromWhereClause(ColumnRealName correlatedColumnRealName,
-            ColumnSqlName relatedColumnSqlName) {
+            ColumnSqlName relatedColumnSqlName, String correlatedFixedCondition) {
         final String clause = xprepareCorrelationSubQueryFromWhereClause();
         final String joinCondition = _localAliasName + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
-        return xreplaceCorrelationSubQueryFromWhereClause(clause, joinCondition);
+        return xreplaceCorrelationSubQueryFromWhereClause(clause, joinCondition, correlatedFixedCondition);
     }
 
     /**
      * Build the clause of correlation sub-query from from-where clause.
      * @param correlatedColumnRealNames The real names of correlated column that is main-query table's column. (NotNull)
      * @param relatedColumnSqlNames The real names of related column that is sub-query table's column. (NotNull)
+     * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
      * @return The clause string of correlation sub-query. (NotNull)
      */
     public String buildCorrelationSubQueryFromWhereClause(ColumnRealName[] correlatedColumnRealNames,
-            ColumnSqlName[] relatedColumnSqlNames) {
+            ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition) {
         String clause = xprepareCorrelationSubQueryFromWhereClause();
 
         final String joinCondition;
@@ -86,7 +101,7 @@ public class SubQueryClause {
         }
         joinCondition = sb.toString();
 
-        clause = xreplaceCorrelationSubQueryFromWhereClause(clause, joinCondition);
+        clause = xreplaceCorrelationSubQueryFromWhereClause(clause, joinCondition, correlatedFixedCondition);
         return clause;
     }
 
@@ -95,13 +110,20 @@ public class SubQueryClause {
         return resolveParameterLocationPath(clause, _subQueryPath);
     }
 
-    protected String xreplaceCorrelationSubQueryFromWhereClause(String clause, String joinCondition) {
+    protected String xreplaceCorrelationSubQueryFromWhereClause(String clause, String joinCondition,
+            String fixedCondition) {
+        final String correlationCondition;
+        if (fixedCondition != null && fixedCondition.trim().length() > 0) {
+            correlationCondition = joinCondition + ln() + "   and " + fixedCondition;
+        } else {
+            correlationCondition = joinCondition;
+        }
         final String firstConditionAfter = ln() + "   and ";
-        clause = replaceString(clause, getWhereClauseMark(), ln() + " where " + joinCondition);
-        clause = replaceString(clause, getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        clause = replaceString(clause, getWhereClauseMark(), ln() + " where " + correlationCondition);
+        clause = replaceString(clause, getWhereFirstConditionMark(), correlationCondition + firstConditionAfter);
         clause = replaceString(clause, getUnionSelectClauseMark(), _selectClause);
-        clause = replaceString(clause, getUnionWhereClauseMark(), ln() + " where " + joinCondition);
-        clause = replaceString(clause, getUnionWhereFirstConditionMark(), joinCondition + firstConditionAfter);
+        clause = replaceString(clause, getUnionWhereClauseMark(), ln() + " where " + correlationCondition);
+        clause = replaceString(clause, getUnionWhereFirstConditionMark(), correlationCondition + firstConditionAfter);
         return clause;
     }
 

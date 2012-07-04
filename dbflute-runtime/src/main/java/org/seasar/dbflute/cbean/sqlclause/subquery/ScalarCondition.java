@@ -132,9 +132,9 @@ public class ScalarCondition extends AbstractSubQuery {
         final String fromWhereClause;
         if (partitionByCorrelatedColumnRealName != null) {
             fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
-                    partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName);
+                    partitionByCorrelatedColumnRealName, partitionByRelatedColumnSqlName, null);
         } else {
-            fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
+            fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, null);
         }
         return fromWhereClause;
     }

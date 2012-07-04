@@ -206,7 +206,6 @@ $database.info("public void parseParameterBean() {")
     $generator.parse("om/${glResourceDirectory}/exbhv/pmbean/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
   #end
   $database.reflectAllExCopyright($path)
-  $database.reflectAllExSerialVersionUID($path)
 #end
 $database.info("}")
 #end

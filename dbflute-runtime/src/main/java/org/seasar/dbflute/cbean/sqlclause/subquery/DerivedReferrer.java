@@ -39,12 +39,12 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     //                                                                        Build Clause
     //                                                                        ============
     public String buildDerivedReferrer(String function, String correlatedColumnDbName, String relatedColumnDbName,
-            DerivedReferrerOption option) {
+            String correlatedFixedCondition, DerivedReferrerOption option) {
         setupOptionAttribute(option);
         final ColumnRealName correlatedColumnRealName = _localRealNameProvider.provide(correlatedColumnDbName);
         final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
         final String subQueryClause = getSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName,
-                option);
+                correlatedFixedCondition, option);
         final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
         final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
         final String endIndent = "       ";
@@ -66,7 +66,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             String endIndent);
 
     protected String getSubQueryClause(String function, ColumnRealName correlatedColumnRealName,
-            ColumnSqlName relatedColumnSqlName, DerivedReferrerOption option) {
+            ColumnSqlName relatedColumnSqlName, String correlatedFixedCondition, DerivedReferrerOption option) {
         final String tableAliasName = getSubQueryLocalAliasName();
         final ColumnSqlName derivedColumnSqlName = getDerivedColumnSqlName();
         if (derivedColumnSqlName == null) {
@@ -80,7 +80,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         } else {
             final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option);
             final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
-                    correlatedColumnRealName, relatedColumnSqlName);
+                    correlatedColumnRealName, relatedColumnSqlName, correlatedFixedCondition);
             subQueryClause = selectClause + " " + fromWhereClause;
         }
         return resolveSubQueryLevelVariable(subQueryClause);
@@ -138,7 +138,7 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             final String pkExp = pkSb.length() > 0 ? pkSb.toString() + ", " : "";
             final ColumnRealName relRealName = ColumnRealName.create(tableAliasName, relatedColumnSqlName);
             final String selectClause = "select " + pkExp + relRealName + ", " + derivedColumnRealName;
-            final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName);
+            final String fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, null);
             mainSql = selectClause + " " + fromWhereClause;
         }
         final String mainAlias = buildSubQueryMainAliasName();

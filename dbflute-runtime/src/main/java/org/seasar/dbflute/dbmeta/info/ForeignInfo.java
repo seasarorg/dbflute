@@ -45,6 +45,8 @@ public class ForeignInfo implements RelationInfo {
     protected final boolean _oneToOne;
     protected final boolean _bizOneToOne;
     protected final boolean _additionalFK;
+    protected final String _fixedCondition;
+    protected final boolean _fixedInline;
     protected final String _reversePropertyName;
     protected final Method _readMethod;
     protected final Method _writeMethod;
@@ -54,7 +56,8 @@ public class ForeignInfo implements RelationInfo {
     //                                                                         ===========
     public ForeignInfo(String foreignPropertyName, DBMeta localDBMeta, DBMeta foreignDBMeta,
             Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, boolean oneToOne,
-            boolean bizOneToOne, boolean additionalFK, String reversePropertyName) {
+            boolean bizOneToOne, boolean additionalFK, String fixedCondition, boolean fixedInline,
+            String reversePropertyName) {
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("foreignDBMeta", foreignDBMeta);
@@ -74,6 +77,8 @@ public class ForeignInfo implements RelationInfo {
         _oneToOne = oneToOne;
         _bizOneToOne = bizOneToOne;
         _additionalFK = additionalFK;
+        _fixedCondition = fixedCondition;
+        _fixedInline = fixedInline;
         _reversePropertyName = reversePropertyName;
         _readMethod = findReadMethod();
         _writeMethod = findWriteMethod();
@@ -361,6 +366,22 @@ public class ForeignInfo implements RelationInfo {
      */
     public boolean isAdditionalFK() {
         return _additionalFK;
+    }
+
+    /**
+     * Get the fixed condition if it's additional foreign key.
+     * @return The string of fixed condition. (NullAllowed)
+     */
+    public String getFixedCondition() {
+        return _fixedCondition;
+    }
+
+    /**
+     * Does the fixed condition is for in-line view?
+     * @return The determination, true or false.
+     */
+    public boolean isFixedInline() {
+        return _fixedInline;
     }
 
     /**

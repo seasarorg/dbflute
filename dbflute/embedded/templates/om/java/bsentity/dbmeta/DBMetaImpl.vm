@@ -171,7 +171,7 @@ public class ${myClassName} extends AbstractDBMeta {
         map.put(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), map, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, ${fk.isAdditionalForeignKey()}, ${fk.foreignReverseRelationPropertyNameArg});
+        return cfi("${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), map, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
     }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
@@ -188,7 +188,7 @@ public class ${myClassName} extends AbstractDBMeta {
         map.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, ${referrer.isAdditionalForeignKey()}, ${referrer.referrerReverseRelationPropertyNameArg});
+        return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
     }
 #end
 

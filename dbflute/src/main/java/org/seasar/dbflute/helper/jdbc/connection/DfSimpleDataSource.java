@@ -43,6 +43,14 @@ public class DfSimpleDataSource implements DataSource {
         throw new UnsupportedOperationException("setLoginTimeout()");
     }
 
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        throw new UnsupportedOperationException("unwrap()");
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        throw new UnsupportedOperationException("isWrapperFor()");
+    }
+
     @Override
     public String toString() {
         return DfTypeUtil.toClassTitle(this) + ":" + _dataSourceProvider;

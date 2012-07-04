@@ -71,6 +71,14 @@ public class ManualThreadDataSourceTest extends PlainTestCase {
         public int getLoginTimeout() throws SQLException {
             return 0;
         }
+
+        public <T> T unwrap(Class<T> class1) throws SQLException {
+            return null;
+        }
+
+        public boolean isWrapperFor(Class<?> class1) throws SQLException {
+            return false;
+        }
     }
 
     // ===================================================================================

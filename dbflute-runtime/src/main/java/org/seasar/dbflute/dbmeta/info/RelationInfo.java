@@ -20,7 +20,7 @@ import java.util.Map;
 import org.seasar.dbflute.dbmeta.DBMeta;
 
 /**
- * The class of referrer information.
+ * The class of relation information.
  * @author jflute
  */
 public interface RelationInfo {

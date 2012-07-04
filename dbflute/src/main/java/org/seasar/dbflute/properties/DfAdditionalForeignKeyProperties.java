@@ -26,6 +26,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     public static final String KEY_FIXED_CONDITION = "fixedCondition";
     public static final String KEY_FIXED_SUFFIX = "fixedSuffix";
     public static final String KEY_FIXED_INLINE = "fixedInline";
+    public static final String KEY_FIXED_REFERRER = "fixedReferrer";
     public static final String KEY_COMMENT = "comment";
 
     // ===================================================================================
@@ -129,6 +130,10 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
 
     public String findFixedInline(String foreignKeyName) {
         return doFindAttributeValue(foreignKeyName, KEY_FIXED_INLINE);
+    }
+
+    public String findFixedReferrer(String foreignKeyName) {
+        return doFindAttributeValue(foreignKeyName, KEY_FIXED_REFERRER);
     }
 
     public String findComment(String foreignKeyName) {

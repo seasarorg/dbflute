@@ -19,6 +19,7 @@ import org.seasar.dbflute.bhv.core.BehaviorCommandHook;
 import org.seasar.dbflute.bhv.core.SqlFireHook;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
+import org.seasar.dbflute.jdbc.SqlStringFilter;
 
 /**
  * The context of call-back in DBFlute internal logic.
@@ -250,6 +251,48 @@ public class CallbackContext {
     }
 
     // -----------------------------------------------------
+    //                                       SqlStringFilter
+    //                                       ---------------
+    /**
+     * Set the filter of SQL string. <br />
+     * This handler is called back before executing the SQL. 
+     * <pre>
+     * context.setSqlStringFilter(new SqlStringFilter() {
+     *     public String filter(String executedSql) {
+     *         // You can filter your executed SQL string here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlStringFilter The filter of SQL string. (NullAllowed)
+     */
+    public static void setSqlStringFilterOnThread(SqlStringFilter sqlStringFilter) {
+        final CallbackContext context = getOrCreateContext();
+        context.setSqlStringFilter(sqlStringFilter);
+    }
+
+    /**
+     * Is existing the handler of SQL result on thread?
+     * @return The determination, true or false.
+     */
+    public static boolean isExistSqlStringFilterOnThread() {
+        return isExistCallbackContextOnThread() && getCallbackContextOnThread().getSqlStringFilter() != null;
+    }
+
+    /**
+     * Clear the filter of SQL string from call-back context on thread. <br />
+     * If the call-back context has had the interface only, the context will also removed from thread.
+     */
+    public static void clearSqlStringFilterOnThread() {
+        if (isExistCallbackContextOnThread()) {
+            final CallbackContext context = getCallbackContextOnThread();
+            context.setSqlStringFilter(null);
+            if (!context.hasAnyInterface()) {
+                clearCallbackContextOnThread();
+            }
+        }
+    }
+
+    // -----------------------------------------------------
     //                                         Assist Helper
     //                                         -------------
     protected static CallbackContext getOrCreateContext() {
@@ -269,13 +312,15 @@ public class CallbackContext {
     protected SqlFireHook _sqlFireHook;
     protected SqlLogHandler _sqlLogHandler;
     protected SqlResultHandler _sqlResultHandler;
+    protected SqlStringFilter _sqlStringFilter;
 
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean hasAnyInterface() {
         return _behaviorCommandHook != null || _sqlFireHook != null // hook
-                || _sqlLogHandler != null || _sqlResultHandler != null; // handler
+                || _sqlLogHandler != null || _sqlResultHandler != null // handler
+                || _sqlStringFilter != null; // filter
     }
 
     // ===================================================================================
@@ -382,5 +427,28 @@ public class CallbackContext {
      */
     public void setSqlResultHandler(SqlResultHandler sqlResultHandler) {
         this._sqlResultHandler = sqlResultHandler;
+    }
+
+    // -----------------------------------------------------
+    //                                       SqlStringFilter
+    //                                       ---------------
+    public SqlStringFilter getSqlStringFilter() {
+        return _sqlStringFilter;
+    }
+
+    /**
+     * Set the filter of SQL string. <br />
+     * This filter is called back before executing the SQL. 
+     * <pre>
+     * context.setSqlStringFilter(new SqlStringFilter() {
+     *     public String filter(String executedSql) {
+     *         // You can filter your executed SQL string here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlStringFilter The filter of SQL string. (NullAllowed)
+     */
+    public void setSqlStringFilter(SqlStringFilter sqlStringFilter) {
+        this._sqlStringFilter = sqlStringFilter;
     }
 }

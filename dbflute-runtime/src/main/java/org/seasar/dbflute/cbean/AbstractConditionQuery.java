@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.seasar.dbflute.cbean.ManualOrderBean.FreeParameterManualOrderThemeListHandler;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
@@ -67,6 +66,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
+import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
+import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
@@ -204,6 +205,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return xgetDBMetaProvider().provideDBMetaChecked(tableFlexibleName);
     }
 
+    /**
+     * Get the local DB meta.
+     * @return The instance of local DB meta. (NotNull)
+     */
+    protected DBMeta xgetLocalDBMeta() {
+        return findDBMeta(getTableDbName());
+    }
+
     // ===================================================================================
     //                                                                  Important Accessor
     //                                                                  ==================
@@ -285,7 +294,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * {@inheritDoc}
      */
     public ColumnSqlName toColumnSqlName(String columnDbName) { // with finding DBMeta
-        return findDBMeta(getTableDbName()).findColumnInfo(columnDbName).getColumnSqlName();
+        return xgetLocalDBMeta().findColumnInfo(columnDbName).getColumnSqlName();
     }
 
     // -----------------------------------------------------
@@ -376,46 +385,26 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                           OuterJoin
     //                                                                           =========
     /**
-     * Register outer-join. (no fixed condition)
+     * Register outer-join. <br />
+     * Optional info, fixed condition and fixed in-line, are resolved in this method.
      * @param foreignCQ The condition-query for foreign table. (NotNull)
      * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
-     * @param foreignPropertyName The property name of foreign corresponding to this join. (NotNull)
+     * @param foreignPropertyName The property name of foreign relation corresponding to this join. (NotNull)
      */
     protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
             String foreignPropertyName) {
-        registerOuterJoin(foreignCQ, joinOnResourceMap, foreignPropertyName, null);
-    }
-
-    /**
-     * Register outer-join with fixed-condition on on-clause.
-     * @param foreignCQ The condition-query for foreign table. (NotNull)
-     * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
-     * @param foreignPropertyName The property name of foreign relation corresponding to this join. (NotNull)
-     * @param fixedCondition The plain fixed condition. (NullAllowed: if null, no fixed condition)
-     */
-    protected void registerOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
-            String foreignPropertyName, String fixedCondition) {
-        doRegisterOuterJoin(foreignCQ, joinOnResourceMap, foreignPropertyName, fixedCondition, false);
-    }
-
-    /**
-     * Register outer-join with fixed-condition on in-line view.
-     * @param foreignCQ The condition-query for foreign table. (NotNull)
-     * @param joinOnResourceMap The resource map of join condition on on-clause. (NotNull)
-     * @param foreignPropertyName The property name of foreign relation corresponding to this join. (NotNull)
-     * @param fixedCondition The plain fixed condition. (NullAllowed: if null, no fixed condition)
-     */
-    protected void registerOuterJoinFixedInline(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
-            String foreignPropertyName, String fixedCondition) {
-        doRegisterOuterJoin(foreignCQ, joinOnResourceMap, foreignPropertyName, fixedCondition, true);
+        final DBMeta dbmeta = xgetLocalDBMeta();
+        final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
+        final String fixedCondition = foreignInfo.getFixedCondition();
+        final boolean fixedInline = foreignInfo.isFixedInline();
+        doRegisterOuterJoin(foreignCQ, joinOnResourceMap, foreignPropertyName, fixedCondition, fixedInline);
     }
 
     protected void doRegisterOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
             String foreignPropertyName, String fixedCondition, boolean fixedInline) {
         // translate join-on map using column real name
         final Map<ColumnRealName, ColumnRealName> joinOnMap = newLinkedHashMap();
-        final Set<Entry<String, String>> entrySet = joinOnResourceMap.entrySet();
-        for (Entry<String, String> entry : entrySet) {
+        for (Entry<String, String> entry : joinOnResourceMap.entrySet()) {
             final String local = entry.getKey();
             final String foreign = entry.getValue();
             joinOnMap.put(toColumnRealName(local), foreignCQ.toColumnRealName(foreign));
@@ -424,8 +413,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String foreignTable = foreignCQ.getTableDbName();
         final String localAlias = xgetAliasName();
         final String localTable = getTableDbName();
-        final ForeignInfo foreignInfo = findDBMeta(getTableDbName()).findForeignInfo(foreignPropertyName);
-        final FixedConditionResolver resolver = createFixedConditionResolver(foreignCQ, joinOnMap);
+        final ForeignInfo foreignInfo = xgetLocalDBMeta().findForeignInfo(foreignPropertyName);
+        final FixedConditionResolver resolver = createForeignFixedConditionResolver(foreignCQ);
         if (fixedInline) {
             xgetSqlClause().registerOuterJoinFixedInline(foreignAlias, foreignTable, localAlias, localTable // basic
                     , joinOnMap, foreignInfo // join objects
@@ -437,8 +426,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected FixedConditionResolver createFixedConditionResolver(ConditionQuery foreignCQ,
-            Map<ColumnRealName, ColumnRealName> joinOnMap) {
+    protected FixedConditionResolver createForeignFixedConditionResolver(ConditionQuery foreignCQ) {
         return new HpFixedConditionQueryResolver(this, foreignCQ, xgetDBMetaProvider());
     }
 
@@ -606,7 +594,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected HpInvalidQueryInfo xcreateInvalidQueryInfo(ConditionKey key, Object value, String columnDbName) {
         final String locationBase = xgetLocationBase();
-        final ColumnInfo targetColumn = findDBMeta(getTableDbName()).findColumnInfo(columnDbName);
+        final ColumnInfo targetColumn = xgetLocalDBMeta().findColumnInfo(columnDbName);
         final HpInvalidQueryInfo invalidQueryInfo = new HpInvalidQueryInfo(locationBase, targetColumn, key, value);
         if (_inline) {
             invalidQueryInfo.inlineView();
@@ -991,17 +979,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                        ExistsReferrer
     //                                        --------------
     protected void registerExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
-            String propertyName) {
-        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, false);
+            String propertyName, String referrerPropertyName) {
+        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, false);
     }
 
     protected void registerNotExistsReferrer(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
-            String propertyName) {
-        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, true);
+            String propertyName, String referrerPropertyName) {
+        registerExistsReferrer(subQuery, columnDbName, relatedColumnDbName, propertyName, referrerPropertyName, true);
     }
 
     protected void registerExistsReferrer(final ConditionQuery subQuery, String columnDbName,
-            String relatedColumnDbName, String propertyName, boolean notExists) {
+            String relatedColumnDbName, String propertyName, String referrerPropertyName, boolean notExists) {
         assertSubQueryNotNull("ExistsReferrer", relatedColumnDbName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -1017,8 +1005,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final GearedCipherManager cipherManager = xgetSqlClause().getGearedCipherManager();
         final ExistsReferrer existsReferrer = new ExistsReferrer(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta, cipherManager);
+        final String correlatedFixedCondition = xbuildReferrerCorrelatedFixedCondition(subQuery, referrerPropertyName);
         final String existsOption = notExists ? "not" : null;
-        final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName, existsOption);
+        final String clause = existsReferrer.buildExistsReferrer(columnDbName, relatedColumnDbName,
+                correlatedFixedCondition, existsOption);
 
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
         // Exists -> possible to be inner
@@ -1041,24 +1031,58 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         registerWhereClause(clause, noWayInner);
     }
 
-    // *unsupported ExistsReferrer as in-line because it's so dangerous
+    protected String xbuildReferrerCorrelatedFixedCondition(ConditionQuery subQuery, String referrerPropertyName) {
+        if (referrerPropertyName == null) {
+            return null;
+        }
+        final DBMeta localDBMeta = xgetLocalDBMeta();
+        if (!localDBMeta.hasReferrer(referrerPropertyName)) { // one-to-one referrer
+            return null;
+        }
+        final ReferrerInfo referrerInfo = localDBMeta.findReferrerInfo(referrerPropertyName);
+        return xdoBuildReferrerCorrelatedFixedCondition(subQuery, referrerInfo);
+    }
+
+    protected String xdoBuildReferrerCorrelatedFixedCondition(ConditionQuery subQuery, ReferrerInfo referrerInfo) {
+        final RelationInfo reverseRelation = referrerInfo.getReverseRelation();
+        if (reverseRelation == null) {
+            return null;
+        }
+        if (!(reverseRelation instanceof ForeignInfo)) {
+            String msg = "The reverse relation (referrer's reverse) should be foreign info: " + referrerInfo;
+            throw new IllegalStateException(msg);
+        }
+        final ForeignInfo foreignInfo = (ForeignInfo) reverseRelation;
+        final String fixedCondition = foreignInfo.getFixedCondition();
+        if (fixedCondition == null || fixedCondition.trim().length() == 0) {
+            return null;
+        }
+        final FixedConditionResolver resolver = createReferrerFixedConditionResolver(subQuery);
+        return resolver.resolveVariable(fixedCondition, false);
+    }
+
+    protected FixedConditionResolver createReferrerFixedConditionResolver(ConditionQuery referrerCQ) {
+        return new HpFixedConditionQueryResolver(referrerCQ, this, xgetDBMetaProvider());
+    }
+
+    // *unsupported ExistsReferrer as in-line because it's (or was) so dangerous
 
     // -----------------------------------------------------
     //                                       InScopeRelation
     //                                       ---------------
     // {Modified at DBFlute-0.7.5}
     protected void registerInScopeRelation(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
-            String propertyName) {
-        registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, null);
+            String propertyName, String relationPropertyName) {
+        registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, relationPropertyName, null);
     }
 
     protected void registerNotInScopeRelation(ConditionQuery subQuery, String columnDbName, String relatedColumnDbName,
-            String propertyName) {
-        registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, "not");
+            String propertyName, String relationPropertyName) {
+        registerInScopeRelation(subQuery, columnDbName, relatedColumnDbName, propertyName, relationPropertyName, "not");
     }
 
     protected void registerInScopeRelation(final ConditionQuery subQuery, String columnDbName,
-            String relatedColumnDbName, String propertyName, String inScopeOption) {
+            String relatedColumnDbName, String propertyName, String relationPropertyName, String inScopeOption) {
         assertSubQueryNotNull("InScopeRelation", columnDbName, subQuery);
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -1076,7 +1100,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final InScopeRelation inScopeRelation = new InScopeRelation(subQueryPath, localRealNameProvider,
                 subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity, subQueryDBMeta,
                 cipherManager, suppressLocalAliasName);
-        final String clause = inScopeRelation.buildInScopeRelation(columnDbName, relatedColumnDbName, inScopeOption);
+        final String correlatedFixedCondition = xbuildForeignCorrelatedFixedCondition(subQuery, relationPropertyName);
+        final String clause = inScopeRelation.buildInScopeRelation(columnDbName, relatedColumnDbName,
+                correlatedFixedCondition, inScopeOption);
         registerWhereClause(clause);
     }
 
@@ -1085,12 +1111,29 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return false; // as default
     }
 
+    protected String xbuildForeignCorrelatedFixedCondition(ConditionQuery subQuery, String relationPropertyName) {
+        if (relationPropertyName == null) {
+            return null;
+        }
+        final DBMeta localDBMeta = xgetLocalDBMeta();
+        final RelationInfo relationInfo = localDBMeta.findRelationInfo(relationPropertyName);
+        if (!relationInfo.isReferrer()) {
+            return null;
+        }
+        if (!(relationInfo instanceof ReferrerInfo)) {
+            return null;
+        }
+        final ReferrerInfo referrerInfo = (ReferrerInfo) relationInfo;
+        return xdoBuildReferrerCorrelatedFixedCondition(subQuery, referrerInfo);
+    }
+
     // [DBFlute-0.7.4]
     // -----------------------------------------------------
     //                              (Specify)DerivedReferrer
     //                              ------------------------
     protected void registerSpecifyDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
-            String relatedColumnDbName, String propertyName, String aliasName, DerivedReferrerOption option) {
+            String relatedColumnDbName, String propertyName, String referrerPropertyName, String aliasName,
+            DerivedReferrerOption option) {
         assertFunctionNotNull("SpecifyDerivedReferrer", columnDbName, function);
         assertSubQueryNotNull("SpecifyDerivedReferrer", columnDbName, subQuery);
         if (option == null) {
@@ -1113,7 +1156,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity,
                 subQueryDBMeta, cipherManager, mainSubQueryIdentity, aliasName);
         xregisterParameterOption(option);
-        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
+        final String correlatedFixedCondition = xbuildReferrerCorrelatedFixedCondition(subQuery, referrerPropertyName);
+        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName,
+                correlatedFixedCondition, option);
         final HpDerivingSubQueryInfo subQueryInfo = new HpDerivingSubQueryInfo(aliasName, clause, derivedReferrer);
         xgetSqlClause().specifyDerivingSubQuery(subQueryInfo);
     }
@@ -1123,7 +1168,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                (Query)DerivedReferrer
     //                                ----------------------
     protected void registerQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
-            String relatedColumnDbName, String propertyName, String operand, Object value,
+            String relatedColumnDbName, String propertyName, String referrerPropertyName, String operand, Object value,
             String parameterPropertyName, DerivedReferrerOption option) {
         assertFunctionNotNull("QueryDerivedReferrer", columnDbName, function);
         assertSubQueryNotNull("QueryDerivedReferrer", columnDbName, subQuery);
@@ -1148,7 +1193,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 localRealNameProvider, subQuerySqlNameProvider, subQueryLevel, subQueryClause, subQueryIdentity,
                 subQueryDBMeta, cipherManager, mainSubQueryIdentity, operand, value, parameterPath);
         xregisterParameterOption(option);
-        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName, option);
+        final String correlatedFixedCondition = xbuildReferrerCorrelatedFixedCondition(subQuery, referrerPropertyName);
+        final String clause = derivedReferrer.buildDerivedReferrer(function, columnDbName, relatedColumnDbName,
+                correlatedFixedCondition, option);
 
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
         // is null or null-revived conversion (coalesce) -> no way to be inner
@@ -1228,7 +1275,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
         }
-        registerExistsReferrer(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName);
+        registerExistsReferrer(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null);
     }
 
     // -----------------------------------------------------
@@ -1247,7 +1294,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 relatedColumnDbName = primaryColumnInfo.getColumnDbName();
             }
         }
-        registerInScopeRelation(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName);
+        registerInScopeRelation(subQuery, relatedColumnDbName, relatedColumnDbName, subQueryPropertyName, null);
     }
 
     // -----------------------------------------------------
@@ -1286,7 +1333,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void setupConditionValueAndRegisterWhereClause(final ConditionKey key, final Object value,
             final ConditionValue cvalue, final String columnDbName, final ConditionOption option) {
-        final DBMeta dbmeta = findDBMeta(getTableDbName());
+        final DBMeta dbmeta = xgetLocalDBMeta();
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final String propertyName = columnInfo.getPropertyName();
         final String uncapPropName = initUncap(propertyName);
@@ -1384,7 +1431,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                               OrderBy
     //                                               -------
     protected void registerOrderBy(String columnDbName, boolean ascOrDesc) {
-        final DBMeta dbmeta = findDBMeta(getTableDbName());
+        final DBMeta dbmeta = xgetLocalDBMeta();
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final ColumnRealName columnRealName = toColumnRealName(columnInfo);
         xgetSqlClause().registerOrderBy(columnRealName.toString(), ascOrDesc, columnInfo);
@@ -1557,7 +1604,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     public ConditionValue invokeValue(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
-        final DBMeta dbmeta = findDBMeta(getTableDbName());
+        final DBMeta dbmeta = xgetLocalDBMeta();
         final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
         final String methodName = "get" + columnCapPropName;
         final Method method = xhelpGettingCQMethod(this, methodName, new Class<?>[] {});
@@ -2220,8 +2267,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     public class PostgreSQLMatchLikeSearch extends LikeSearchOption {
-        private static final long serialVersionUID = 1L;
-
         @Override
         public ExtensionOperand getExtensionOperand() {
             return xgetPostgreSQLMatchOperand();
@@ -2238,8 +2283,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     public class OracleMatchLikeSearch extends LikeSearchOption {
-        private static final long serialVersionUID = 1L;
-
         @Override
         public QueryClauseArranger getWhereClauseArranger() {
             return ((SqlClauseOracle) xgetSqlClause()).createFullTextSearchClauseArranger();
