@@ -123,7 +123,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                       Write Converter
     //                                       ---------------
     // these are static to avoid the FindBugs headache
-    // (all implementations of PropertyGateway can be static class)
+    // (implementations of PropertyGateway can be static class)
     protected static Classification gcls(ColumnInfo columnInfo, Object code) { // getClassification
         if (code == null) {
             return null;
