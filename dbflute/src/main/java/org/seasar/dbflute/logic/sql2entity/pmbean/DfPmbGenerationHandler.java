@@ -134,7 +134,7 @@ public class DfPmbGenerationHandler {
         } else {
             sb.append("ParameterBean");
         }
-        sb.append(", ").append("FetchBean, Serializable");
+        sb.append(", ").append("FetchBean");
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         final String implementsStringMark = languageDependencyInfo.getGrammarInfo().getImplementsStringMark();
         return " " + implementsStringMark + " " + sb.toString();

@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.cbean;
 
-import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,13 +29,7 @@ import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
  * The simple implementation of paging-bean.
  * @author jflute
  */
-public class SimplePagingBean implements PagingBean, MapParameterBean<Object>, Serializable {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public class SimplePagingBean implements PagingBean, MapParameterBean<Object> {
 
     // ===================================================================================
     //                                                                           Attribute

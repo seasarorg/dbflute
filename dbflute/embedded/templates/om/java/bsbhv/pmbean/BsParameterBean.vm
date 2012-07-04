@@ -1,7 +1,6 @@
 ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
-import java.io.Serializable;
 import java.util.*;
 
 #if ($database.hasPmbMetaDataPagingExtension($pmbClassName))
@@ -63,18 +62,15 @@ import ${glPackageExtendedCustomizeEntity}.*;
  * @author ${database.classAuthor}
  */
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName} implements ProcedurePmb, FetchBean, Serializable {
+public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName} implements ProcedurePmb, FetchBean {
 #else
 public${database.getPmbMetaDataAbstractDefinition($pmbClassName)} class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}${database.getPmbMetaDataInterfaceDefinition($pmbClassName)} {
 #end
+#if ($database.isPmbMetaDataForProcedure($pmbClassName))
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
-#if ($database.isPmbMetaDataForProcedure($pmbClassName))
-
     // -----------------------------------------------------
     //                                   Procedure Parameter
     //                                   -------------------

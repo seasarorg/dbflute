@@ -122,8 +122,9 @@ public abstract class AbstractDBMeta implements DBMeta {
     // -----------------------------------------------------
     //                                       Write Converter
     //                                       ---------------
-    protected Classification gcls(ColumnInfo columnInfo, Object code) { // getClassification
-        assertObjectNotNull("columnInfo", columnInfo);
+    // these are static to avoid the FindBugs headache
+    // (all implementations of PropertyGateway can be static class)
+    protected static Classification gcls(ColumnInfo columnInfo, Object code) { // getClassification
         if (code == null) {
             return null;
         }
@@ -134,8 +135,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return classificationMeta.codeOf(code);
     }
 
-    protected void ccls(ColumnInfo columnInfo, Object code) { // checkClassification
-        assertObjectNotNull("columnInfo", columnInfo);
+    protected static void ccls(ColumnInfo columnInfo, Object code) { // checkClassification
         if (code == null) {
             return; // no check null value which means no existence on DB
         }
@@ -145,7 +145,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
-    protected void throwIllegalClassificationCodeException(ColumnInfo columnInfo, Object code) {
+    protected static void throwIllegalClassificationCodeException(ColumnInfo columnInfo, Object code) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to get the classification by the code.");
         br.addItem("Advice");
@@ -156,27 +156,27 @@ public abstract class AbstractDBMeta implements DBMeta {
         br.addItem("Classication");
         br.addElement(columnInfo.getClassificationMeta());
         br.addItem("Table");
-        br.addElement(getTableDbName());
+        br.addElement(columnInfo.getDBMeta().getTableDbName());
         br.addItem("Column");
         br.addElement(columnInfo.getColumnDbName());
         final String msg = br.buildExceptionMessage();
         throw new IllegalClassificationCodeException(msg);
     }
 
-    protected Integer cti(Object value) { // convertToInteger
+    protected static Integer cti(Object value) { // convertToInteger
         return DfTypeUtil.toInteger(value);
     }
 
-    protected Long ctl(Object value) { // convertToLong
+    protected static Long ctl(Object value) { // convertToLong
         return DfTypeUtil.toLong(value);
     }
 
-    protected BigDecimal ctb(Object value) { // convertToBigDecimal
+    protected static BigDecimal ctb(Object value) { // convertToBigDecimal
         return DfTypeUtil.toBigDecimal(value);
     }
 
     @SuppressWarnings("unchecked")
-    protected <NUMBER extends Number> NUMBER ctn(Object value, Class<NUMBER> type) { // convertToNumber
+    protected static <NUMBER extends Number> NUMBER ctn(Object value, Class<NUMBER> type) { // convertToNumber
         return (NUMBER) DfTypeUtil.toNumber(value, type);
     }
 

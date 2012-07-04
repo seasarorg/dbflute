@@ -48,7 +48,7 @@ public class ${myClassName} extends AbstractDBMeta {
     { return doFindEpg(_epgMap, propertyName); }
 #foreach ($col in $table.columns)
 #set ($setupperClassName = "Epg${col.javaName}")
-    public class ${setupperClassName} implements PropertyGateway {
+    public static class ${setupperClassName} implements PropertyGateway {
         public Object read(Entity e) { return ((${myExtendedObjectClassName})e).get${col.javaName}(); }
 #if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
         public void write(Entity e, Object v) {
