@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.parts.SplitOptionParts;
@@ -25,13 +24,7 @@ import org.seasar.dbflute.util.Srl;
  * The class of simple-string-option.
  * @author jflute
  */
-public class SimpleStringOption implements ConditionOption, Serializable {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public class SimpleStringOption implements ConditionOption {
 
     // ===================================================================================
     //                                                                           Attribute

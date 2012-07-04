@@ -40,9 +40,6 @@ public class LikeSearchOption extends SimpleStringOption {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
-
     protected static final String LIKE_PREFIX = "prefix";
     protected static final String LIKE_SUFFIX = "suffix";
     protected static final String LIKE_CONTAIN = "contain";

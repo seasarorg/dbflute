@@ -15,8 +15,6 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
-import java.io.Serializable;
-
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -24,13 +22,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * The option of range-of scope for Number type.
  * @author jflute
  */
-public class RangeOfOption implements ConditionOption, Serializable {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public class RangeOfOption implements ConditionOption {
 
     // ===================================================================================
     //                                                                           Attribute

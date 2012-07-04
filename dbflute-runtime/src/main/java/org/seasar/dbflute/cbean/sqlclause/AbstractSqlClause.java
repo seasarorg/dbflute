@@ -2651,6 +2651,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                          Query Update
     //                                          ------------
     public String getClauseQueryUpdate(Map<String, String> columnParameterMap) {
+        if (columnParameterMap == null) {
+            String msg = "The argument 'columnParameterMap' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
         if (columnParameterMap.isEmpty()) {
             return null;
         }
@@ -2670,7 +2674,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected void buildQueryUpdateInScopeClause(Map<String, String> columnParameterMap, DBMeta dbmeta, StringBuilder sb) {
-        buildQueryUpdateSetClause(columnParameterMap, dbmeta, sb, null);
+        if (columnParameterMap != null) {
+            buildQueryUpdateSetClause(columnParameterMap, dbmeta, sb, null);
+        }
         final ColumnSqlName primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnSqlName();
         final String selectClause = "select " + getBasePointAliasName() + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
