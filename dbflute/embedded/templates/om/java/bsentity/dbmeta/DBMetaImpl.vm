@@ -48,9 +48,9 @@ public class ${myClassName} extends AbstractDBMeta {
     { return doFindEpg(_epgMap, propertyName); }
 #foreach ($col in $table.columns)
 #set ($setupperClassName = "Epg${col.javaName}")
-    public static class ${setupperClassName} implements PropertyGateway {
-        public Object read(Entity e) { return ((${myExtendedObjectClassName})e).get${col.javaName}(); }
 #if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
+    public class ${setupperClassName} implements PropertyGateway {
+        public Object read(Entity e) { return ((${myExtendedObjectClassName})e).get${col.javaName}(); }
         public void write(Entity e, Object v) {
             ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
 #if ($col.isCheckSelectedClassification())
@@ -62,6 +62,8 @@ public class ${myClassName} extends AbstractDBMeta {
 ## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## for different type between relation (Integer, Long and BigDecimal are prior)
 ## - - - - - - - - - -/
+    public static class ${setupperClassName} implements PropertyGateway {
+        public Object read(Entity e) { return ((${myExtendedObjectClassName})e).get${col.javaName}(); }
 #if ($col.isJavaNativeNumberObject())
 #if ($col.isJavaNativeInteger())
         public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}(cti(v)); }
