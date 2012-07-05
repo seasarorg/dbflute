@@ -47,9 +47,14 @@ import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
+import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.ForeignInfo;
+import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
+import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.EntityPrimaryKeyNotFoundException;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
@@ -773,12 +778,22 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         // Select the list of referrer
         // - - - - - - - - - - - - - -
         callback.qyFKIn(cb, pkList);
+        final String referrerPropertyName = callback.getRfPrNm();
+        final String fixedCondition = xbuildReferrerCorrelatedFixedCondition(cb, referrerPropertyName);
+        final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
+        final boolean hasFixedCondition = fixedCondition != null && fixedCondition.trim().length() > 0;
+        if (hasFixedCondition) {
+            cb.getSqlClause().registerWhereClause(fixedCondition, basePointAliasName);
+        }
         cb.xregisterUnionQuerySynchronizer(new UnionQuery<ConditionBean>() {
             public void query(ConditionBean unionCB) {
                 @SuppressWarnings("unchecked")
                 REFERRER_CB referrerUnionCB = (REFERRER_CB) unionCB;
                 // for when application uses union query in condition-bean set-upper.
                 callback.qyFKIn(referrerUnionCB, pkList);
+                if (hasFixedCondition) {
+                    referrerUnionCB.getSqlClause().registerWhereClause(fixedCondition, basePointAliasName);
+                }
             }
         });
         if (pkList.size() > 1) {
@@ -786,7 +801,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             cb.getOrderByComponent().exchangeFirstOrderByElementForLastOne();
         }
         loadReferrerOption.delegateConditionBeanSettingUp(cb);
-        if (cb.getSqlClause().hasSpecifiedSelectColumn(cb.getSqlClause().getBasePointAliasName())) {
+        if (cb.getSqlClause().hasSpecifiedSelectColumn(basePointAliasName)) {
             callback.spFKCol(cb); // specify required columns for relation
         }
         final List<REFERRER_ENTITY> referrerList = callback.selRfLs(cb);
@@ -829,6 +844,37 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
+    protected String xbuildReferrerCorrelatedFixedCondition(ConditionBean cb, String referrerPropertyName) {
+        if (referrerPropertyName == null) {
+            return null;
+        }
+        final DBMeta localDBMeta = getDBMeta();
+        if (!localDBMeta.hasReferrer(referrerPropertyName)) { // one-to-one referrer
+            return null;
+        }
+        final ReferrerInfo referrerInfo = localDBMeta.findReferrerInfo(referrerPropertyName);
+        return xdoBuildReferrerCorrelatedFixedCondition(cb, referrerInfo);
+    }
+
+    protected String xdoBuildReferrerCorrelatedFixedCondition(ConditionBean cb, ReferrerInfo referrerInfo) {
+        final RelationInfo reverseRelation = referrerInfo.getReverseRelation();
+        if (reverseRelation == null) {
+            return null;
+        }
+        if (!(reverseRelation instanceof ForeignInfo)) {
+            String msg = "The reverse relation (referrer's reverse) should be foreign info: " + referrerInfo;
+            throw new IllegalStateException(msg);
+        }
+        final ForeignInfo foreignInfo = (ForeignInfo) reverseRelation;
+        final String fixedCondition = foreignInfo.getFixedCondition();
+        if (fixedCondition == null || fixedCondition.trim().length() == 0) {
+            return null;
+        }
+        final String localAliasMark = HpFixedConditionQueryResolver.LOCAL_ALIAS_MARK;
+        final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
+        return Srl.replace(fixedCondition, localAliasMark, basePointAliasName);
+    }
+
     /**
      * Convert the primary key to mapping key for load-referrer. <br />
      * This default implementation is to-lower if string type.
@@ -867,6 +913,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         PK getFKVal(REFERRER_ENTITY entity); // getForeignKeyValue()
 
         void setlcEt(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity); // setLocalEntity()
+
+        String getRfPrNm(); // getReferrerPropertyName()
     }
 
     // assertLoadReferrerArgument() as Internal
