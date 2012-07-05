@@ -63,7 +63,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
+import org.seasar.dbflute.exception.DfFixedConditionOptionConstraintFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
@@ -778,7 +781,52 @@ public class ForeignKey {
     //                                                                     ===============
     public String getFixedConditionArg() {
         analyzeDynamicFixedConditionIfNeeds();
+        checkOptionConstraints();
         return _fixedCondition != null ? "\"" + _fixedCondition + "\"" : "null";
+    }
+
+    protected void checkOptionConstraints() {
+        if (_fixedInline) {
+            final String localAliasMark = HpFixedConditionQueryResolver.LOCAL_ALIAS_MARK;
+            if (_fixedCondition != null && _fixedCondition.contains(localAliasMark)) {
+                String msg = "fixedInline with " + localAliasMark + " is not available.";
+                throwFixedConditionOptionConstraintFailureException(msg);
+            }
+        }
+        if (_fixedReferrer) {
+            if (_fixedInline) {
+                String msg = "fixedReferrer with fixedInline is not available.";
+                throwFixedConditionOptionConstraintFailureException(msg);
+            }
+            if (!_dynamicFixedConditionMap.isEmpty()) {
+                String msg = "fixedReferrer with bind variables is not available.";
+                throwFixedConditionOptionConstraintFailureException(msg);
+            }
+            final String foreignAliasMark = HpFixedConditionQueryResolver.FOREIGN_ALIAS_MARK;
+            if (_fixedCondition != null && _fixedCondition.contains(foreignAliasMark)) {
+                String msg = "fixedReferrer with " + foreignAliasMark + " is not available.";
+                throwFixedConditionOptionConstraintFailureException(msg);
+            }
+        }
+    }
+
+    protected void throwFixedConditionOptionConstraintFailureException(String notice) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("DBFlute Property");
+        br.addElement("additionalForeignKeyMap.dfprop");
+        br.addItem("FK Name");
+        br.addElement(_name);
+        br.addItem("fixedCondition");
+        br.addElement(_fixedCondition);
+        br.addItem("fixedSuffix");
+        br.addElement(_fixedSuffix);
+        br.addItem("fixedInline");
+        br.addElement(_fixedInline);
+        br.addItem("fixedReferrer");
+        br.addElement(_fixedReferrer);
+        final String msg = br.buildExceptionMessage();
+        throw new DfFixedConditionOptionConstraintFailureException(msg);
     }
 
     public boolean hasFixedCondition() {
