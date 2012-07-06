@@ -48,8 +48,8 @@ public class TnDeleteEntityStaticCommand extends TnAbstractEntityStaticCommand {
     }
 
     @Override
-    protected TnAbstractEntityHandler newEntityHandler() {
-        return new TnDeleteEntityHandler(_dataSource, _statementFactory, _sql, _beanMetaData, _propertyTypes);
+    protected TnAbstractEntityHandler newEntityHandler(String sql) {
+        return new TnDeleteEntityHandler(_dataSource, _statementFactory, sql, _beanMetaData, _propertyTypes);
     }
 
     @Override

@@ -56,7 +56,7 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
 
         final TnBeanMetaData bmd = _beanMetaData;
         final TnPropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, _propertyNames, option);
-        final String sql = createInsertSql(bmd, propertyTypes, option);
+        final String sql = filterExecutedSql(createInsertSql(bmd, propertyTypes, option));
         return doExecute(bean, propertyTypes, sql, option);
     }
 

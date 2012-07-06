@@ -15,11 +15,11 @@
  */
 package org.seasar.dbflute;
 
+import org.seasar.dbflute.bhv.SqlStringFilter;
 import org.seasar.dbflute.bhv.core.BehaviorCommandHook;
 import org.seasar.dbflute.bhv.core.SqlFireHook;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
-import org.seasar.dbflute.jdbc.SqlStringFilter;
 
 /**
  * The context of call-back in DBFlute internal logic.
@@ -441,8 +441,8 @@ public class CallbackContext {
      * This filter is called back before executing the SQL. 
      * <pre>
      * context.setSqlStringFilter(new SqlStringFilter() {
-     *     public String filter(String executedSql) {
-     *         // You can filter your executed SQL string here.
+     *     public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
+     *         // You can filter your SQL string here.
      *     }
      * });
      * </pre>

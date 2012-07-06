@@ -20,10 +20,14 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.CallbackContext;
+import org.seasar.dbflute.bhv.SqlStringFilter;
+import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlFilter;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureParameterType;
@@ -83,12 +87,39 @@ public class TnProcedureCommand extends TnAbstractBasicSqlCommand {
     }
 
     protected TnProcedureHandler createProcedureHandler(Object pmb) {
-        String sql = buildSql(pmb);
+        final String sql = filterExecutedSql(buildSql(pmb));
+        TnProcedureResultSetHandlerProvider provider = createProcedureResultSetHandlerProvider();
+        return new TnProcedureHandler(_dataSource, _statementFactory, sql, _procedureMetaData, provider);
+    }
+
+    protected String filterExecutedSql(String executedSql) {
+        executedSql = doFilterExecutedSqlByOutsideSqlFilter(executedSql);
+        executedSql = doFilterExecutedSqlByCallbackFilter(executedSql);
+        return executedSql;
+    }
+
+    protected String doFilterExecutedSqlByOutsideSqlFilter(String executedSql) {
         if (_outsideSqlFilter != null) {
-            sql = _outsideSqlFilter.filterExecution(sql, OutsideSqlFilter.ExecutionFilterType.PROCEDURE);
+            return _outsideSqlFilter.filterExecution(executedSql, OutsideSqlFilter.ExecutionFilterType.PROCEDURE);
         }
-        return new TnProcedureHandler(_dataSource, _statementFactory, sql, _procedureMetaData,
-                createProcedureResultSetHandlerFactory());
+        return executedSql;
+    }
+
+    protected String doFilterExecutedSqlByCallbackFilter(String executedSql) {
+        final SqlStringFilter sqlStringFilter = getSqlStringFilter();
+        if (sqlStringFilter != null) {
+            final BehaviorCommandMeta meta = ResourceContext.behaviorCommand();
+            final String filteredSql = sqlStringFilter.filterProcedure(meta, executedSql);
+            return filteredSql != null ? filteredSql : executedSql;
+        }
+        return executedSql;
+    }
+
+    protected SqlStringFilter getSqlStringFilter() {
+        if (!CallbackContext.isExistSqlStringFilterOnThread()) {
+            return null;
+        }
+        return CallbackContext.getCallbackContextOnThread().getSqlStringFilter();
     }
 
     protected String buildSql(Object pmb) {
@@ -152,7 +183,7 @@ public class TnProcedureCommand extends TnAbstractBasicSqlCommand {
         return sb.toString();
     }
 
-    protected TnProcedureResultSetHandlerProvider createProcedureResultSetHandlerFactory() {
+    protected TnProcedureResultSetHandlerProvider createProcedureResultSetHandlerProvider() {
         return new TnProcedureResultSetHandlerProvider() {
             public TnResultSetHandler provideResultSetHandler(TnProcedureParameterType ppt) {
                 final Class<?> parameterType = ppt.getParameterType();

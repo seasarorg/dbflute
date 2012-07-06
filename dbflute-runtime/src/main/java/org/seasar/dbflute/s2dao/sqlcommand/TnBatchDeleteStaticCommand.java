@@ -64,7 +64,7 @@ public class TnBatchDeleteStaticCommand extends TnDeleteEntityStaticCommand {
     //                                                                            Override
     //                                                                            ========
     @Override
-    protected TnAbstractEntityHandler newEntityHandler() {
-        return new TnBatchDeleteHandler(_dataSource, _statementFactory, _sql, _beanMetaData, _propertyTypes);
+    protected TnAbstractEntityHandler newEntityHandler(String sql) {
+        return new TnBatchDeleteHandler(_dataSource, _statementFactory, sql, _beanMetaData, _propertyTypes);
     }
 }

@@ -17,10 +17,14 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.bhv.DeleteOption;
+import org.seasar.dbflute.bhv.SqlStringFilter;
+import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
@@ -75,14 +79,14 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
     }
 
     protected TnAbstractEntityHandler createEntityHandler(Object[] args) {
-        final TnAbstractEntityHandler handler = newEntityHandler();
+        final TnAbstractEntityHandler handler = newEntityHandler(filterExecutedSql(_sql));
         handler.setOptimisticLockHandling(_optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(_versionNoAutoIncrementOnMemory);
         handler.setExceptionMessageSqlArgs(args);
         return handler;
     }
 
-    protected abstract TnAbstractEntityHandler newEntityHandler();
+    protected abstract TnAbstractEntityHandler newEntityHandler(String sql);
 
     protected void setupPropertyTypes(String[] propertyNames) { // called by constructor
         _propertyTypes = new TnPropertyType[] {}; // as default
@@ -146,5 +150,29 @@ public abstract class TnAbstractEntityStaticCommand extends TnAbstractBasicSqlCo
         @SuppressWarnings("unchecked")
         final DeleteOption<ConditionBean> option = (DeleteOption<ConditionBean>) args[1];
         return option;
+    }
+
+    // ===================================================================================
+    //                                                                       Filter Helper
+    //                                                                       =============
+    protected String filterExecutedSql(String executedSql) {
+        return doFilterExecutedSqlByCallbackFilter(executedSql);
+    }
+
+    protected String doFilterExecutedSqlByCallbackFilter(String executedSql) {
+        final SqlStringFilter sqlStringFilter = getSqlStringFilter();
+        if (sqlStringFilter != null) {
+            final BehaviorCommandMeta meta = ResourceContext.behaviorCommand();
+            final String filteredSql = sqlStringFilter.filterEntityUpdate(meta, executedSql);
+            return filteredSql != null ? filteredSql : executedSql;
+        }
+        return executedSql;
+    }
+
+    protected SqlStringFilter getSqlStringFilter() {
+        if (!CallbackContext.isExistSqlStringFilterOnThread()) {
+            return null;
+        }
+        return CallbackContext.getCallbackContextOnThread().getSqlStringFilter();
     }
 }

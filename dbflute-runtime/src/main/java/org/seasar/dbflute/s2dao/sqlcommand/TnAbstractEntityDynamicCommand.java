@@ -17,6 +17,9 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.CallbackContext;
+import org.seasar.dbflute.bhv.SqlStringFilter;
+import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -42,6 +45,30 @@ public abstract class TnAbstractEntityDynamicCommand extends TnAbstractBasicSqlC
     //                                                                         ===========
     public TnAbstractEntityDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
+    }
+
+    // ===================================================================================
+    //                                                                       Filter Helper
+    //                                                                       =============
+    protected String filterExecutedSql(String executedSql) {
+        return doFilterExecutedSqlByCallbackFilter(executedSql);
+    }
+
+    protected String doFilterExecutedSqlByCallbackFilter(String executedSql) {
+        final SqlStringFilter sqlStringFilter = getSqlStringFilter();
+        if (sqlStringFilter != null) {
+            final BehaviorCommandMeta meta = ResourceContext.behaviorCommand();
+            final String filteredSql = sqlStringFilter.filterEntityUpdate(meta, executedSql);
+            return filteredSql != null ? filteredSql : executedSql;
+        }
+        return executedSql;
+    }
+
+    protected SqlStringFilter getSqlStringFilter() {
+        if (!CallbackContext.isExistSqlStringFilterOnThread()) {
+            return null;
+        }
+        return CallbackContext.getCallbackContextOnThread().getSqlStringFilter();
     }
 
     // ===================================================================================

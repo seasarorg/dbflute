@@ -19,8 +19,12 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.CallbackContext;
+import org.seasar.dbflute.bhv.SqlStringFilter;
+import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicParameterHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
@@ -97,13 +101,30 @@ public class SelectCBExecution extends AbstractFixedArgExecution {
     protected TnBasicParameterHandler newBasicParameterHandler(String executedSql) {
         return new TnBasicSelectHandler(_dataSource, executedSql, _resultSetHandler, _statementFactory);
     }
-    
+
     // ===================================================================================
     //                                                                              Filter
     //                                                                              ======
     @Override
     protected String filterExecutedSql(String executedSql) {
-        return super.filterExecutedSql(executedSql);
+        return doFilterExecutedSqlByCallbackFilter(super.filterExecutedSql(executedSql));
+    }
+
+    protected String doFilterExecutedSqlByCallbackFilter(String executedSql) {
+        final SqlStringFilter sqlStringFilter = getSqlStringFilter();
+        if (sqlStringFilter != null) {
+            final BehaviorCommandMeta meta = ResourceContext.behaviorCommand();
+            final String filteredSql = sqlStringFilter.filterSelectCB(meta, executedSql);
+            return filteredSql != null ? filteredSql : executedSql;
+        }
+        return executedSql;
+    }
+
+    protected SqlStringFilter getSqlStringFilter() {
+        if (!CallbackContext.isExistSqlStringFilterOnThread()) {
+            return null;
+        }
+        return CallbackContext.getCallbackContextOnThread().getSqlStringFilter();
     }
 
     // ===================================================================================

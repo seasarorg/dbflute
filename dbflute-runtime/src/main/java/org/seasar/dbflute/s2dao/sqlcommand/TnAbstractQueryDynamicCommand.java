@@ -17,6 +17,9 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.CallbackContext;
+import org.seasar.dbflute.bhv.SqlStringFilter;
+import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
@@ -42,7 +45,25 @@ public abstract class TnAbstractQueryDynamicCommand extends TnAbstractBasicSqlCo
     //                                                                      CommandContext
     //                                                                      ==============
     protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
-        return new TnCommandContextHandler(_dataSource, _statementFactory, context.getSql(), context);
+        final String executedSql = filterSqlStringByCallbackFilter(context.getSql());
+        return new TnCommandContextHandler(_dataSource, _statementFactory, executedSql, context);
+    }
+
+    protected String filterSqlStringByCallbackFilter(String executedSql) {
+        final SqlStringFilter sqlStringFilter = getSqlStringFilter();
+        if (sqlStringFilter != null) {
+            final BehaviorCommandMeta meta = ResourceContext.behaviorCommand();
+            final String filteredSql = sqlStringFilter.filterQueryUpdate(meta, executedSql);
+            return filteredSql != null ? filteredSql : executedSql;
+        }
+        return executedSql;
+    }
+
+    protected SqlStringFilter getSqlStringFilter() {
+        if (!CallbackContext.isExistSqlStringFilterOnThread()) {
+            return null;
+        }
+        return CallbackContext.getCallbackContextOnThread().getSqlStringFilter();
     }
 
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,

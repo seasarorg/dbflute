@@ -74,7 +74,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             }
             return getNonUpdateReturn();
         }
-        final String sql = createUpdateSql(propertyTypes, option);
+        final String sql = filterExecutedSql(createUpdateSql(propertyTypes, option));
         return doExecute(bean, propertyTypes, sql, option);
     }
 
