@@ -643,6 +643,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
             { return ${table.getPrimaryKeyJavaNativeAsOne()}.valueOf(entity.getInternalPkValue().toString()); }
             public void setlcEt(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} localEntity)
             { referrerEntity.set${table.javaName}_${processName}(localEntity); }
+            public String getRfPrNm() { return "${referrer.referrerPropertyName}"; }
         });
     }
 
