@@ -1,5 +1,8 @@
 package org.seasar.dbflute.task;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -43,12 +46,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _lazyConnection = false;
+    protected boolean _lazyConnection;
     protected DfReplaceSchemaFinalInfo _replaceSchemaFinalInfo;
     protected DfCreateSchemaFinalInfo _createSchemaFinalInfo;
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
     protected DfAlterCheckFinalInfo _alterCheckFinalInfo;
+    protected boolean _cancelled;
 
     // ===================================================================================
     //                                                                           Beginning
@@ -102,6 +106,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
+        // TODO jflute impl
+        //final boolean letsGo = waitBeforeReps();
+        //if (!letsGo) {
+        //    _log.info("*The execution of ReplaceSchema was cancelled.");
+        //    _cancelled = true;
+        //    return;
+        //}
         arrangeBeforeReps();
         if (isAlterCheck()) {
             processAlterCheck();
@@ -241,8 +252,44 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     // ===================================================================================
-    //                                                                 Arrange before Reps
-    //                                                                 ===================
+    //                                                           Wait before ReplaceSchema 
+    //                                                           =========================
+    protected boolean waitBeforeReps() {
+        _log.info("...Waiting for your GO SIGN from stdin before ReplaceSchema:");
+        systemOutPrintLn("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+        systemOutPrintLn(getDatabaseProperties().getDatabaseUrl());
+        systemOutPrintLn("- - - - - - - - - -/");
+        systemOutPrintLn("(input on your console)");
+        systemOutPrint("The schema will be initialized. Are you ready? (y or n): ");
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
+            final String line = br.readLine();
+            return line != null && "y".equals(line);
+        } catch (IOException e) {
+            String msg = "Failed to read system input.";
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    protected void systemOutPrint(Object msg) {
+        System.out.print(msg);
+    }
+
+    protected void systemOutPrintLn(Object msg) {
+        System.out.println(msg);
+    }
+
+    // ===================================================================================
+    //                                                        Arrange before ReplaceSchema
+    //                                                        ============================
     protected void arrangeBeforeReps() {
         final DfArrangeBeforeRepsProcess process = new DfArrangeBeforeRepsProcess();
         process.arrangeBeforeReps();
@@ -257,8 +304,14 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected String buildReplaceSchemaFinalMessage() {
-        final DfReplaceSchemaFinalInfo finalInfo = _replaceSchemaFinalInfo; // null allowed
         final StringBuilder sb = new StringBuilder();
+        if (_cancelled) {
+            sb.append("    * * * * * * *").append(ln());
+            sb.append("    * Cancelled *").append(ln());
+            sb.append("    * * * * * * *");
+            return sb.toString();
+        }
+        final DfReplaceSchemaFinalInfo finalInfo = _replaceSchemaFinalInfo; // null allowed
         boolean firstDone = false;
 
         // AlterSchema

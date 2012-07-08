@@ -102,6 +102,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
     protected UnifiedSchema _mainSchema = null;
 
+    /**
+     * @return The unified schema. (NotNull)
+     */
     public UnifiedSchema getDatabaseSchema() { // as main schema
         if (_mainSchema != null) {
             return _mainSchema;
