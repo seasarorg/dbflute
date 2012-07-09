@@ -188,11 +188,13 @@ public abstract class DfAbstractTask extends Task {
         sb.append(ln).append("    package   = " + getBasicProperties().getPackageBase());
         sb.append(ln);
         sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + environmentType + "}");
-        sb.append(ln).append("    driver = " + _driver);
-        sb.append(ln).append("    url    = " + _url);
-        sb.append(ln).append("    schema = " + _mainSchema);
-        sb.append(ln).append("    user   = " + _user);
-        sb.append(ln).append("    props  = " + _connectionProperties);
+        if (_driver != null) { // basically true except cancelled
+            sb.append(ln).append("    driver = " + _driver);
+            sb.append(ln).append("    url    = " + _url);
+            sb.append(ln).append("    schema = " + _mainSchema);
+            sb.append(ln).append("    user   = " + _user);
+            sb.append(ln).append("    props  = " + _connectionProperties);
+        }
 
         final String additionalSchemaDisp = buildAdditionalSchemaDisp();
         sb.append(ln).append("    additionalSchema = " + additionalSchemaDisp);

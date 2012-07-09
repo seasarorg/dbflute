@@ -261,7 +261,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         }
         _log.info("...Waiting for your GO SIGN from stdin before ReplaceSchema:");
         systemOutPrintLn("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-        systemOutPrintLn("DB URL: " + getDatabaseProperties().getDatabaseUrl());
+        systemOutPrintLn("Database: " + getDatabaseProperties().getDatabaseUrl());
         systemOutPrintLn("Schema: " + getDatabaseProperties().getDatabaseSchema().getLoggingSchema());
         systemOutPrintLn("- - - - - - - - - -/");
         systemOutPrintLn("(input on your console)");
