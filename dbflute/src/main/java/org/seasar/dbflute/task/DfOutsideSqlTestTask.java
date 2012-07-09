@@ -55,13 +55,14 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     //                                                                           Beginning
     //                                                                           =========
     @Override
-    protected void begin() {
+    protected boolean begin() {
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|              OutsideSqlTest              |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.OutsideSqlTest);
+        return true;
     }
 
     // ===================================================================================

@@ -52,13 +52,14 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     //                                                                           Beginning
     //                                                                           =========
     @Override
-    protected void begin() {
+    protected boolean begin() {
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|                 Free Gen                 |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.FreeGen);
+        return true;
     }
 
     // ===================================================================================

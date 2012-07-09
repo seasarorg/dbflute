@@ -110,7 +110,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         Throwable cause = null;
         long before = getTaskBeforeTimeMillis();
         try {
-            begin();
+            final boolean letsGo = begin();
+            if (!letsGo) {
+                return;
+            }
             initializeDatabaseInfo();
             if (isUseDataSource()) {
                 setupDataSource();
@@ -160,7 +163,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         }
     }
 
-    protected abstract void begin();
+    protected abstract boolean begin();
 
     protected long getTaskBeforeTimeMillis() {
         return System.currentTimeMillis();

@@ -113,7 +113,8 @@
   <target name="replace-schema" description="ReplaceSchema task">
     <df-replace-schema
         contextProperties="${torque.contextProperties}"
-        environmentType="${dfenv}">
+        environmentType="${dfenv}"
+    	areYouReadyAnswer="${dfans}">
     </df-replace-schema>
   </target>
 

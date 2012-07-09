@@ -45,7 +45,11 @@ public interface ${glCDef} extends Classification {
             {
                 Map<String, Object> subItemMap = new HashMap<String, Object>();
 #foreach ($entry in $subItemMap.entrySet())
+#if ($entry.value != "null")
                 subItemMap.put("${entry.key}", "${entry.value}");
+#else
+                subItemMap.put("${entry.key}", null);
+#end
 #end
                 _subItemMapMap.put(${classificationElement.name}.code(), Collections.unmodifiableMap(subItemMap));
             }

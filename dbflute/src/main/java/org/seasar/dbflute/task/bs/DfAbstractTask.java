@@ -89,7 +89,10 @@ public abstract class DfAbstractTask extends Task {
         Throwable cause = null;
         long before = getTaskBeforeTimeMillis();
         try {
-            begin();
+            final boolean letsGo = begin();
+            if (!letsGo) {
+                return;
+            }
             initializeDatabaseInfo();
             if (isUseDataSource()) {
                 setupDataSource();
@@ -139,7 +142,7 @@ public abstract class DfAbstractTask extends Task {
         }
     }
 
-    protected abstract void begin();
+    protected abstract boolean begin();
 
     protected long getTaskBeforeTimeMillis() {
         return System.currentTimeMillis();

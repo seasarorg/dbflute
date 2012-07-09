@@ -58,13 +58,14 @@ public class DfTakeAssertTask extends DfAbstractTask {
     //                                                                           Beginning
     //                                                                           =========
     @Override
-    protected void begin() {
+    protected boolean begin() {
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|               Take Assert                |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.TakeAssert);
+        return true;
     }
 
     // ===================================================================================

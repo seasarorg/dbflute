@@ -75,13 +75,14 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                           Beginning
     //                                                                           =========
     @Override
-    protected void begin() {
+    protected boolean begin() {
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|                   JDBC                   |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.JDBC);
+        return true;
     }
 
     // ===================================================================================

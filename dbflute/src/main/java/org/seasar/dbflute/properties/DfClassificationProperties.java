@@ -472,7 +472,13 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     for (String subItemKey : subItemPropMap.keySet()) {
                         final String clsKey = "cls_" + subItemKey;
                         final String subItemValue = rs.getString(clsKey);
-                        subItemMap.put(subItemKey, Srl.replace(subItemValue, "\n", "\\n"));
+                        final String subItemVeloFriendlyValue;
+                        if (subItemValue != null) {
+                            subItemVeloFriendlyValue = Srl.replace(subItemValue, "\n", "\\n");
+                        } else {
+                            subItemVeloFriendlyValue = "null"; // for determination in templates
+                        }
+                        subItemMap.put(subItemKey, subItemVeloFriendlyValue);
                     }
                     selectedMap.put(DfClassificationElement.KEY_SUB_ITEM_MAP, subItemMap);
                 }

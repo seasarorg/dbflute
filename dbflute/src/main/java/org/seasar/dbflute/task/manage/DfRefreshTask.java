@@ -41,7 +41,7 @@ public class DfRefreshTask extends DfAbstractTask {
     //                                                                           Beginning
     //                                                                           =========
     @Override
-    protected void begin() {
+    protected boolean begin() {
         // Refresh task is for utility so it's to be quietly as it can
         //_log.info("+------------------------------------------+");
         //_log.info("|                                          |");
@@ -49,6 +49,7 @@ public class DfRefreshTask extends DfAbstractTask {
         //_log.info("|                                          |");
         //_log.info("+------------------------------------------+");
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.Refresh);
+        return true;
     }
 
     // ===================================================================================

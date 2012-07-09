@@ -80,13 +80,14 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     //                                                                           Beginning
     //                                                                           =========
     @Override
-    protected void begin() {
+    protected boolean begin() {
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|                 Generate                 |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.Generate);
+        return true;
     }
 
     // ===================================================================================

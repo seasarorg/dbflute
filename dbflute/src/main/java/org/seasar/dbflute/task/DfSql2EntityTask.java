@@ -96,13 +96,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                           Beginning
     //                                                                           =========
     @Override
-    protected void begin() {
+    protected boolean begin() {
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|                Sql2Entity                |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.Sql2Entity);
+        return true;
     }
 
     // ===================================================================================

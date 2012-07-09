@@ -52,19 +52,27 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected DfLoadDataFinalInfo _loadDataFinalInfo;
     protected DfTakeFinallyFinalInfo _takeFinallyFinalInfo;
     protected DfAlterCheckFinalInfo _alterCheckFinalInfo;
+    protected String _areYouReadyAnswer; // from environment variable
     protected boolean _cancelled;
 
     // ===================================================================================
     //                                                                           Beginning
     //                                                                           =========
     @Override
-    protected void begin() {
+    protected boolean begin() {
         _log.info("+------------------------------------------+");
         _log.info("|                                          |");
         _log.info("|              ReplaceSchema               |");
         _log.info("|                                          |");
         _log.info("+------------------------------------------+");
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.ReplaceSchema);
+        final boolean letsGo = waitBeforeReps();
+        if (!letsGo) {
+            _log.info("*The execution of ReplaceSchema was cancelled.");
+            _cancelled = true;
+            return false;
+        }
+        return true;
     }
 
     // ===================================================================================
@@ -106,13 +114,6 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        // TODO jflute impl
-        //final boolean letsGo = waitBeforeReps();
-        //if (!letsGo) {
-        //    _log.info("*The execution of ReplaceSchema was cancelled.");
-        //    _cancelled = true;
-        //    return;
-        //}
         arrangeBeforeReps();
         if (isAlterCheck()) {
             processAlterCheck();
@@ -255,9 +256,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     //                                                           Wait before ReplaceSchema 
     //                                                           =========================
     protected boolean waitBeforeReps() {
+        if (_areYouReadyAnswer != null && "y".equals(_areYouReadyAnswer)) {
+            return true;
+        }
         _log.info("...Waiting for your GO SIGN from stdin before ReplaceSchema:");
         systemOutPrintLn("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-        systemOutPrintLn(getDatabaseProperties().getDatabaseUrl());
+        systemOutPrintLn("DB URL: " + getDatabaseProperties().getDatabaseUrl());
+        systemOutPrintLn("Schema: " + getDatabaseProperties().getDatabaseSchema().getLoggingSchema());
         systemOutPrintLn("- - - - - - - - - -/");
         systemOutPrintLn("(input on your console)");
         systemOutPrint("The schema will be initialized. Are you ready? (y or n): ");
@@ -415,5 +420,12 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     public boolean hasMigrationSavePreviousMark() {
         return getReplaceSchemaProperties().hasMigrationSavePreviousMark();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setAreYouReadyAnswer(String areYouReadyAnswer) {
+        _areYouReadyAnswer = areYouReadyAnswer;
     }
 }
