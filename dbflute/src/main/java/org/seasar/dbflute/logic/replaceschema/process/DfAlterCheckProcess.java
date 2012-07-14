@@ -10,8 +10,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -28,6 +30,7 @@ import org.seasar.dbflute.exception.DfAlterCheckRollbackSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckSavePreviousFailureException;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.io.compress.DfZipArchiver;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
@@ -41,6 +44,7 @@ import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -146,12 +150,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         processReady();
         final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
         finalInfo.setResultMessage("{Save Previous}");
-        deletePreviousResource();
+        deleteExtractedPreviousResource();
         final List<File> copyToFileList = copyToPreviousResource();
-        checkSavedResource(finalInfo);
-        if (finalInfo.isFailure()) {
-            finalInfo.addDetailMessage("x (save failure)");
-            return finalInfo;
+        compressPreviousResource();
+        deleteExtractedPreviousResource();
+        if (!checkSavedResource(finalInfo)) {
+            return finalInfo; // failure
         }
         markPreviousOK(copyToFileList);
         deleteSavePreviousMark();
@@ -159,16 +163,84 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return finalInfo;
     }
 
-    protected void deletePreviousResource() {
-        final List<File> previousFileList = findHierarchyFileList(getMigrationPreviousDir());
-        if (!previousFileList.isEmpty()) {
-            _log.info("...Deleting the previous resources");
-            for (File previousFile : previousFileList) {
-                deleteFile(previousFile, null);
+    // -----------------------------------------------------
+    //                                              Compress
+    //                                              --------
+    protected void compressPreviousResource() {
+        deleteExistingPreviousZip();
+        final File previousZip = getCurrentTargetPreviousZip();
+        _log.info("...Compressing the previous resources to zip: " + previousZip.getPath());
+        final DfZipArchiver archiver = new DfZipArchiver(previousZip);
+        archiver.compress(new File(getMigrationPreviousDir()), new FileFilter() {
+            public boolean accept(File file) {
+                final String name = file.getName();
+                final boolean result;
+                if (file.isDirectory()) {
+                    result = !name.startsWith(".");
+                } else {
+                    result = !name.endsWith(".zip");
+                }
+                if (result) {
+                    _log.info("  " + file.getPath());
+                }
+                return result;
             }
+        });
+    }
+
+    protected File getCurrentTargetPreviousZip() {
+        final String date = DfTypeUtil.toString(DBFluteSystem.currentDate(), "yyyyMMdd-HHmm");
+        return new File(getMigrationPreviousDir() + "/previous-" + date + ".zip");
+    }
+
+    protected void deleteExistingPreviousZip() {
+        final List<File> zipFiles = findPreviousZipList();
+        for (File zipFile : zipFiles) {
+            zipFile.delete();
         }
     }
 
+    protected List<File> findPreviousZipList() {
+        final File previousDir = new File(getMigrationPreviousDir());
+        final File[] zipFiles = previousDir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return isPreviousZip(file);
+            }
+        });
+        final List<File> fileList;
+        if (zipFiles != null) {
+            fileList = Arrays.asList(zipFiles);
+        } else {
+            fileList = DfCollectionUtil.emptyList();
+        }
+        return fileList;
+    }
+
+    protected boolean isPreviousZip(File file) {
+        final String name = file.getName();
+        return name.startsWith("previous-") && name.endsWith(".zip");
+    }
+
+    // -----------------------------------------------------
+    //                                                Delete
+    //                                                ------
+    protected void deleteExtractedPreviousResource() {
+        final List<File> previousFileList = findHierarchyFileList(getMigrationPreviousDir());
+        if (previousFileList.isEmpty()) {
+            return;
+        }
+        _log.info("...Deleting the extracted previous resources");
+        for (File previousFile : previousFileList) {
+            if (isPreviousZip(previousFile)) {
+                continue;
+            }
+            deleteFile(previousFile, null);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                  Copy
+    //                                                  ----
     protected List<File> copyToPreviousResource() {
         final List<File> copyToFileList = new ArrayList<File>();
         final String previousDir = getMigrationPreviousDir();
@@ -204,7 +276,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         copyToFileList.add(copyToFile);
     }
 
-    protected void checkSavedResource(DfAlterCheckFinalInfo finalInfo) {
+    // -----------------------------------------------------
+    //                                                 Check
+    //                                                 -----
+    protected boolean checkSavedResource(DfAlterCheckFinalInfo finalInfo) {
+        final boolean unzipped = extractPreviousResource();
         _log.info("...Checking the previous resources by replacing");
         try {
             playPreviousSchema();
@@ -212,8 +288,58 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             markPreviousNG(getAlterCheckSavePreviousFailureNotice());
             setupAlterCheckSavePreviousFailureException(finalInfo, threwLater);
         }
+        if (finalInfo.isFailure()) {
+            finalInfo.addDetailMessage("x (save failure)");
+            return false;
+        }
+        if (unzipped) {
+            deleteExtractedPreviousResource();
+        }
+        return true;
     }
 
+    protected boolean extractPreviousResource() {
+        final File previousZip = findLatestPreviousZip();
+        if (previousZip == null) {
+            _log.info("*Not found the zip for previous resources");
+            return false;
+        }
+        _log.info("...Extracting the previous resources from zip: " + previousZip.getPath());
+        final DfZipArchiver archiver = new DfZipArchiver(previousZip);
+        final Set<String> traceSet = new HashSet<String>();
+        archiver.extract(new File(getMigrationPreviousDir()), new FileFilter() {
+            public boolean accept(File file) {
+                final String path = file.getPath();
+                traceSet.add(path);
+                _log.info("  " + path);
+                return true;
+            }
+        });
+        if (traceSet.isEmpty()) {
+            String msg = "Not found the files in the zip: " + previousZip.getPath();
+            throw new IllegalStateException(msg);
+        }
+        return true;
+    }
+
+    protected File findLatestPreviousZip() {
+        List<File> previousZipList = findPreviousZipList();
+        if (previousZipList.isEmpty()) {
+            return null;
+        }
+        File latestFile = null;
+        for (File previousZip : previousZipList) {
+            final String name = previousZip.getName();
+            if (latestFile == null || latestFile.getName().compareTo(name) < 0) {
+                latestFile = previousZip;
+            }
+        }
+        return latestFile;
+    }
+
+    // -----------------------------------------------------
+    //                                                  Mark
+    //                                                  ----
     protected void markPreviousOK(List<File> copyToFileList) {
         final String okMark = getMigrationPreviousOKMark();
         try {
@@ -275,7 +401,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         try {
+            final boolean unzipped = extractPreviousResource();
             playPreviousSchema();
+            if (unzipped) {
+                deleteExtractedPreviousResource();
+            }
         } catch (RuntimeException e) { // basically no way because of checked before saving
             markPreviousNG(getAlterCheckRollbackSchemaFailureNotice());
             throwAlterCheckRollbackSchemaFailureException(e);
