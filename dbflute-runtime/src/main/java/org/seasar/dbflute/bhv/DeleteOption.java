@@ -29,7 +29,8 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _allowNonQueryDelete;
+    protected boolean _nonQueryDeleteAllowed;
+    protected boolean _queryDeleteForcedDirectAllowed;
     protected Integer _batchLoggingDeleteLimit;
 
     // ===================================================================================
@@ -42,20 +43,33 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     // ===================================================================================
-    //                                                                    Non Query Delete
-    //                                                                    ================
+    //                                                                        Query Delete
+    //                                                                        ============
     /**
      * Allow you to non-query-delete (means query-delete without a query condition). <br />
      * Normally it is not allowed, so you can do it by this option if you want.
      * @return The option of delete. (NotNull: returns this)
      */
     public DeleteOption<CB> allowNonQueryDelete() {
-        _allowNonQueryDelete = true;
+        _nonQueryDeleteAllowed = true;
         return this;
     }
 
     public boolean isNonQueryDeleteAllowed() {
-        return _allowNonQueryDelete;
+        return _nonQueryDeleteAllowed;
+    }
+
+    /**
+     * Allow you to use direct clause in query delete forcedly.
+     * @return The option of update. (NotNull: returns this)
+     */
+    public DeleteOption<CB> allowQueryDeleteForcedDirect() {
+        _queryDeleteForcedDirectAllowed = true;
+        return this;
+    }
+
+    public boolean isQueryDeleteForcedDirectAllowed() {
+        return _queryDeleteForcedDirectAllowed;
     }
 
     // ===================================================================================
@@ -81,7 +95,7 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        if (_allowNonQueryDelete) {
+        if (_nonQueryDeleteAllowed) {
             if (sb.length() > 0) {
                 sb.append(", ");
             }

@@ -59,7 +59,8 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected boolean _exceptCommonColumnForcedSpecified;
 
     protected boolean _disableCommonColumnAutoSetup;
-    protected boolean _allowNonQueryUpdate;
+    protected boolean _nonQueryUpdateAllowed;
+    protected boolean _queryUpdateForcedDirectAllowed;
     protected Integer _batchLoggingUpdateLimit;
 
     // ===================================================================================
@@ -420,20 +421,33 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     // ===================================================================================
-    //                                                                    Non Query Update
-    //                                                                    ================
+    //                                                                        Query Update
+    //                                                                        ============
     /**
      * Allow you to non-query-update (means query-update without a query condition). <br />
      * Normally it is not allowed, so you can do it by this option if you want.
      * @return The option of update. (NotNull: returns this)
      */
     public UpdateOption<CB> allowNonQueryUpdate() {
-        _allowNonQueryUpdate = true;
+        _nonQueryUpdateAllowed = true;
         return this;
     }
 
     public boolean isNonQueryUpdateAllowed() {
-        return _allowNonQueryUpdate;
+        return _nonQueryUpdateAllowed;
+    }
+
+    /**
+     * Allow you to use direct clause in query update forcedly.
+     * @return The option of update. (NotNull: returns this)
+     */
+    public UpdateOption<CB> allowQueryUpdateForcedDirect() {
+        _queryUpdateForcedDirectAllowed = true;
+        return this;
+    }
+
+    public boolean isQueryUpdateForcedDirectAllowed() {
+        return _queryUpdateForcedDirectAllowed;
     }
 
     // ===================================================================================
@@ -474,7 +488,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
             }
             sb.append("CommonColumnDisabled");
         }
-        if (_allowNonQueryUpdate) {
+        if (_nonQueryUpdateAllowed) {
             if (sb.length() > 0) {
                 sb.append(", ");
             }

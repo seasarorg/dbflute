@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.bhv.DeleteOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
@@ -41,6 +42,7 @@ public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
     public Object execute(Object[] args) {
         // analyze arguments
         final ConditionBean cb = extractConditionBeanWithCheck(args);
+        final DeleteOption<ConditionBean> option = extractUpdateOptionWithCheck(args);
 
         // arguments for execution (not contains an option)
         final String[] argNames = new String[] { "pmb" };
@@ -50,7 +52,7 @@ public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
         // prepare context
         final CommandContext context;
         {
-            final String twoWaySql = buildQueryDeleteTwoWaySql(cb);
+            final String twoWaySql = buildQueryDeleteTwoWaySql(cb, option);
             context = createCommandContext(twoWaySql, argNames, argTypes, realArgs);
         }
 
@@ -75,6 +77,25 @@ public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
         return (ConditionBean) fisrtArg;
     }
 
+    protected DeleteOption<ConditionBean> extractUpdateOptionWithCheck(Object[] args) {
+        assertArgument(args);
+        if (args.length < 2) {
+            return null;
+        }
+        final Object secondArg = args[1];
+        if (secondArg == null) {
+            return null;
+        }
+        if (!(secondArg instanceof DeleteOption<?>)) {
+            String msg = "The type of second argument should be " + DeleteOption.class + ":";
+            msg = msg + " type=" + secondArg.getClass();
+            throw new IllegalArgumentException(msg);
+        }
+        @SuppressWarnings("unchecked")
+        final DeleteOption<ConditionBean> option = (DeleteOption<ConditionBean>) secondArg;
+        return option;
+    }
+
     protected void assertArgument(Object[] args) {
         if (args == null || args.length <= 1) {
             String msg = "The arguments should have two argument at least! But:";
@@ -86,7 +107,10 @@ public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
     // ===================================================================================
     //                                                                           Build SQL
     //                                                                           =========
-    protected String buildQueryDeleteTwoWaySql(ConditionBean cb) {
+    protected String buildQueryDeleteTwoWaySql(ConditionBean cb, DeleteOption<ConditionBean> option) {
+        if (option != null && option.isQueryDeleteForcedDirectAllowed()) {
+            cb.getSqlClause().allowQueryUpdateForcedDirect();
+        }
         return cb.getSqlClause().getClauseQueryDelete();
     }
 }

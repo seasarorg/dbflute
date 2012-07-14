@@ -818,28 +818,6 @@ public interface SqlClause {
 
     void saveInvalidQuery(HpInvalidQueryInfo invalidQueryInfo);
 
-    // [DBFlute-0.7.5]
-    // ===================================================================================
-    //                                                                        Query Update
-    //                                                                        ============
-    /**
-     * @param fixedValueQueryExpMap The map of query expression for fixed values. (NotNull)
-     * @param resourceSqlClause The SQL clause for resource. (NotNull)
-     * @return The clause of query-insert. (NotNull)
-     */
-    String getClauseQueryInsert(Map<String, String> fixedValueQueryExpMap, SqlClause resourceSqlClause);
-
-    /**
-     * @param columnParameterMap The map of column parameters. (NotNull)
-     * @return The clause of query-update. (NullAllowed: If columnParameterMap is empty, return null)
-     */
-    String getClauseQueryUpdate(Map<String, String> columnParameterMap);
-
-    /**
-     * @return The clause of query-delete. (NotNull)
-     */
-    String getClauseQueryDelete();
-
     // [DBFlute-0.8.6]
     // ===================================================================================
     //                                                                  Select Clause Type
@@ -1016,6 +994,35 @@ public interface SqlClause {
     //                                                                      Lazy Reflector
     //                                                                      ==============
     void registerClauseLazyReflector(ClauseLazyReflector clauseLazyReflector);
+
+    // [DBFlute-0.7.5]
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    /**
+     * @param fixedValueQueryExpMap The map of query expression for fixed values. (NotNull)
+     * @param resourceSqlClause The SQL clause for resource. (NotNull)
+     * @return The clause of query-insert. (NotNull)
+     */
+    String getClauseQueryInsert(Map<String, String> fixedValueQueryExpMap, SqlClause resourceSqlClause);
+
+    /**
+     * @param columnParameterMap The map of column parameters. (NotNull)
+     * @return The clause of query-update. (NullAllowed: If columnParameterMap is empty, return null)
+     */
+    String getClauseQueryUpdate(Map<String, String> columnParameterMap);
+
+    /**
+     * @return The clause of query-delete. (NotNull)
+     */
+    String getClauseQueryDelete();
+
+    /**
+     * Allow you to use direct clause in query update forcedly (contains query delete).
+     * You cannot use join, sub-query, union and so on, by calling this. <br />
+     * So you may have the painful SQLException by this, attention!
+     */
+    void allowQueryUpdateForcedDirect();
 
     // [DBFlute-0.9.7.2]
     // ===================================================================================

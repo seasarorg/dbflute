@@ -202,6 +202,9 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
             // add bound property type
             boundPropTypeList.add(_beanMetaData.getPropertyType(propertyName));
         }
+        if (option != null && option.isQueryUpdateForcedDirectAllowed()) {
+            cb.getSqlClause().allowQueryUpdateForcedDirect();
+        }
         return cb.getSqlClause().getClauseQueryUpdate(columnParameterMap);
     }
 
