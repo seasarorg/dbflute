@@ -153,7 +153,6 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         deleteExtractedPreviousResource();
         final List<File> copyToFileList = copyToPreviousResource();
         compressPreviousResource();
-        deleteExtractedPreviousResource();
         if (!checkSavedResource(finalInfo)) {
             return finalInfo; // failure
         }
@@ -298,12 +297,16 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return true;
     }
 
+    // -----------------------------------------------------
+    //                                               Extract
+    //                                               -------
     protected boolean extractPreviousResource() {
         final File previousZip = findLatestPreviousZip();
         if (previousZip == null) {
             _log.info("*Not found the zip for previous resources");
             return false;
         }
+        deleteExtractedPreviousResource();
         _log.info("...Extracting the previous resources from zip: " + previousZip.getPath());
         final DfZipArchiver archiver = new DfZipArchiver(previousZip);
         final Set<String> traceSet = new HashSet<String>();
