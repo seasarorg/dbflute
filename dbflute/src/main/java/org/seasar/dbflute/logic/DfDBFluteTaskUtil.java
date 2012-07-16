@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfDBFluteTaskCancelledException;
 import org.seasar.dbflute.exception.DfDBFluteTaskFailureException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -231,9 +232,16 @@ public final class DfDBFluteTaskUtil {
         }
     }
 
+    public static DfDBFluteTaskCancelledException createTaskCancelledException(String displayTaskName) {
+        String msg = ln() + "/* * * * * * * * * * * * * * * * * * * * *";
+        msg = msg + ln() + "Cancelled the DBFlute task: " + displayTaskName;
+        msg = msg + ln() + "* * * * * * * * * */";
+        return new DfDBFluteTaskCancelledException(msg);
+    }
+
     public static void throwTaskFailure(String displayTaskName) {
-        String msg = ln() + "/* * * * * * * * * * * * * * * * * * * * * * *";
-        msg = msg + ln() + "Failed to execute DBFlute task: " + displayTaskName;
+        String msg = ln() + "/* * * * * * * * * * * * * * * * * * * * * * * * *";
+        msg = msg + ln() + "Failed to execute the DBFlute task: " + displayTaskName;
         msg = msg + ln() + "Look at the log: console or dbflute.log";
         msg = msg + ln() + "* * * * * * * * * */";
         throw new DfDBFluteTaskFailureException(msg);

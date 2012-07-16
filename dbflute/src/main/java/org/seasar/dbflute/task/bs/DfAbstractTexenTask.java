@@ -42,6 +42,7 @@ import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
+import org.seasar.dbflute.exception.DfDBFluteTaskCancelledException;
 import org.seasar.dbflute.friends.velocity.DfFlutistLog4JLogSystem;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
@@ -112,6 +113,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         try {
             final boolean letsGo = begin();
             if (!letsGo) {
+                cause = createTaskCancelledException();
                 return;
             }
             initializeDatabaseInfo();
@@ -158,7 +160,11 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 }
             }
             if (cause != null) {
-                throwTaskFailure();
+                if (cause instanceof DfDBFluteTaskCancelledException) {
+                    throw (DfDBFluteTaskCancelledException) cause;
+                } else {
+                    throwTaskFailure();
+                }
             }
         }
     }
@@ -298,6 +304,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     protected String getFinalInformation() {
         return null; // as default
+    }
+
+    protected DfDBFluteTaskCancelledException createTaskCancelledException() {
+        return DfDBFluteTaskUtil.createTaskCancelledException(getDisplayTaskName());
     }
 
     protected void throwTaskFailure() {

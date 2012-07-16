@@ -28,6 +28,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
+import org.seasar.dbflute.exception.DfDBFluteTaskCancelledException;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
@@ -91,6 +92,7 @@ public abstract class DfAbstractTask extends Task {
         try {
             final boolean letsGo = begin();
             if (!letsGo) {
+                cause = createTaskCancelledException();
                 return;
             }
             initializeDatabaseInfo();
@@ -137,7 +139,11 @@ public abstract class DfAbstractTask extends Task {
                 }
             }
             if (cause != null) {
-                throwTaskFailure();
+                if (cause instanceof DfDBFluteTaskCancelledException) {
+                    throw (DfDBFluteTaskCancelledException) cause;
+                } else {
+                    throwTaskFailure();
+                }
             }
         }
     }
@@ -277,6 +283,10 @@ public abstract class DfAbstractTask extends Task {
 
     protected String getFinalInformation() {
         return null; // as default
+    }
+
+    protected DfDBFluteTaskCancelledException createTaskCancelledException() {
+        return DfDBFluteTaskUtil.createTaskCancelledException(getDisplayTaskName());
     }
 
     protected void throwTaskFailure() {
