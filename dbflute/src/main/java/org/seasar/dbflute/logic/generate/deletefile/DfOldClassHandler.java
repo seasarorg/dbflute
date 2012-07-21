@@ -264,7 +264,7 @@ public class DfOldClassHandler {
             final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
             if (file.exists()) {
                 file.delete();
-                _log.info("    delete('" + extendedClassName + "');");
+                info("    delete('" + extendedClassName + "');");
             }
         }
     }

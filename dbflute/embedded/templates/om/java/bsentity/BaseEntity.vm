@@ -60,17 +60,27 @@ import ${table.relationalNullObjectProviderPackage}.*;
  * [version-no]
  *     ${table.versionNoColumnName}
  * 
- * [foreign-table]
+ * [foreign table]
  *     ${table.foreignTableNameCommaString}
  * 
- * [referrer-table]
+ * [referrer table]
  *     ${table.referrerTableNameCommaString}
  * 
- * [foreign-property]
+ * [foreign property]
  *     ${table.foreignPropertyNameCommaString}
  * 
- * [referrer-property]
+ * [referrer property]
  *     ${table.referrerPropertyNameCommaString}
+ * 
+ * [get/set template]
+ * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+#foreach ($col in $table.columns)
+ * ${col.javaNative} ${col.uncapitalisedJavaName} = entity.get${col.javaName}();
+#end
+#foreach ($col in $table.columns)
+ * entity.set${col.javaName}(${col.uncapitalisedJavaName});
+#end
+ * = = = = = = = = = =/
  * </pre>
  * @author ${database.classAuthor}
  */
@@ -248,9 +258,22 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
      */
-    public boolean is${col.JavaName}${classificationElement.name}() {
+    public boolean is${col.javaName}${classificationElement.name}() {
         ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
         return cdef != null ? cdef.equals(${glCDef}.${col.classificationName}.${classificationElement.name}) : false;
+    }
+
+#end
+#foreach ($group in $col.classificationTop.groupList)
+#if ($group.hasGroupComment())
+    /**
+     * ${group.groupComment}
+     * @return The determination, true or false.
+     */
+#end
+    public boolean is${col.javaName}_${group.groupNameInitCap}() {
+        ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
+        return cdef != null && is${group.groupNameInitCap}();
     }
 
 #end

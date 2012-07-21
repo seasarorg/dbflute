@@ -1,7 +1,7 @@
 ${database.allClassCopyright}package ${glPackageBaseCQ};
 
 #set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
-import java.util.Collection;
+import java.util.*;
 
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.cbean.chelper.*;
@@ -234,6 +234,21 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void set${tmpJavaName}_InScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
         doSet${tmpJavaName}_InScope(cTStrL(cdefList));
     }
+#foreach ($group in $classificationTop.groupList)
+
+    /**
+     * InScope {in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
+#end
+#if ($group.hasGroupComment())
+     * ${group.groupComment}
+#end
+     */
+    public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
+        set${tmpJavaName}_InScope_As${col.classificationName}(Arrays.asList(${group.buildCDefArgExp($glCDef)}));
+    }
+#end
 #end
 
     public void doSet${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
@@ -718,6 +733,21 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      */
     public void set${tmpJavaName}_InScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
         doSet${tmpJavaName}_InScope(cTNumL(cdefList, ${col.javaNative}.class));
+    }
+#end
+#foreach ($group in $classificationTop.groupList)
+
+    /**
+     * InScope {in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+#if ($classificationTop.hasTopComment())
+     * ${classificationTop.topComment}
+#end
+#if ($group.hasGroupComment())
+     * ${group.groupComment}
+#end
+     */
+    public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
+        set${tmpJavaName}_InScope_As${col.classificationName}(Arrays.asList(${group.buildCDefArgExp($glCDef)}));
     }
 #end
 

@@ -525,6 +525,14 @@ public class Column {
         return _defaultValue;
     }
 
+    public String getDefaultValueSettingExpression() {
+        final String defaultValue = getDefaultValue();
+        if (defaultValue == null) {
+            return "null";
+        }
+        return "\"" + defaultValue + "\"";
+    }
+
     // -----------------------------------------------------
     //                                        Column Comment
     //                                        --------------

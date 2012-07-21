@@ -276,6 +276,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         classificationTop.setCheckImplicitSet(isClassificationCheckImplicitSet(elementMap));
         classificationTop.setUseDocumentOnly(isClassificationUseDocumentOnly(elementMap));
         classificationTop.setSuppressAutoDeploy(isClassificationSuppressAutoDeploy(elementMap));
+        classificationTop.putGroupingAll(getGroupingMap(elementMap));
     }
 
     @SuppressWarnings("unchecked")
@@ -323,6 +324,16 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return true; // quoted
         }
         return codeType.equalsIgnoreCase(DfClassificationTop.CODE_TYPE_STRING);
+    }
+
+    protected Map<String, Map<String, Object>> getGroupingMap(Map<?, ?> elementMap) {
+        final Object obj = elementMap.get(DfClassificationTop.KEY_GROUPING_MAP);
+        if (obj == null) {
+            return DfCollectionUtil.emptyMap();
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, Object>> groupingMap = (Map<String, Map<String, Object>>) obj;
+        return groupingMap;
     }
 
     // ===================================================================================

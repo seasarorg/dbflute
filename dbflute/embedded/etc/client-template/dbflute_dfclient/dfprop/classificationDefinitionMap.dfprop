@@ -11,6 +11,12 @@
 #             ; isCheckImplicitSet=[true or false(default)]
 #             ; isUseDocumentOnly=[true or false(default)]
 #             ; isSuppressAutoDeploy=[true or false(default)]
+#             ; groupingMap = map:{
+#                 ; [group-name] = map:{
+#                     ; groupComment=[comment]
+#                     ; elementList=list:{[the list of classification element's name]}
+#                 }
+#             }
 #         }
 #         # classification elements for implicit classification
 #         ; map:{

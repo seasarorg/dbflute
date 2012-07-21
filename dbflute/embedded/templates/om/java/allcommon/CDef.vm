@@ -69,6 +69,18 @@ public interface ${glCDef} extends Classification {
 #end
         public ClassificationMeta meta() { return ${glCDef}.DefMeta.${classificationName}; }
 
+#foreach ($group in $classificationTop.groupList)
+#if ($group.hasGroupComment())
+        /**
+         * ${group.groupComment}
+         * @return The determination, true or false.
+         */
+#end
+        public boolean is${group.groupNameInitCap}() {
+            return ${group.buildReturnExpThis()};
+        }
+
+#end
         /**
          * Get the classification by the code. (CaseInsensitive)
          * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)

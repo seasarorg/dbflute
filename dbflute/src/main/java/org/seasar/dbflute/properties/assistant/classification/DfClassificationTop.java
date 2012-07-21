@@ -2,8 +2,10 @@ package org.seasar.dbflute.properties.assistant.classification;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
@@ -29,6 +31,8 @@ public class DfClassificationTop {
     public static final String CODE_TYPE_BOOLEAN = "Boolean";
     public static final String DEFAULT_CODE_TYPE = CODE_TYPE_STRING;
 
+    public static final String KEY_GROUPING_MAP = "groupingMap";
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -41,6 +45,7 @@ public class DfClassificationTop {
     protected boolean _checkImplicitSet;
     protected boolean _useDocumentOnly;
     protected boolean _suppressAutoDeploy;
+    protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
 
     // ===================================================================================
     //                                                                              Accept
@@ -117,6 +122,104 @@ public class DfClassificationTop {
         }
         return (firstSet.contains("true") && secondSet.contains("false") // first true
         || firstSet.contains("false") && secondSet.contains("true")); // first false
+    }
+
+    // ===================================================================================
+    //                                                                        Grouping Map
+    //                                                                        ============
+    public List<DfClassificationGroup> getGroupList() {
+        final List<DfClassificationGroup> groupList = new ArrayList<DfClassificationGroup>();
+        for (Entry<String, Map<String, Object>> entry : _groupingMap.entrySet()) {
+            final String groupName = entry.getKey();
+            final Map<String, Object> attrMap = entry.getValue();
+            final String groupComment = (String) attrMap.get("groupComment");
+            @SuppressWarnings("unchecked")
+            final List<String> elementList = (List<String>) attrMap.get("elementList");
+            if (elementList == null) {
+                String msg = "The elementList in grouping map is required: " + getClassificationName();
+                throw new DfClassificationRequiredAttributeNotFoundException(msg);
+            }
+            final DfClassificationGroup group = new DfClassificationGroup(_classificationName, groupName);
+            group.setGroupComment(groupComment);
+            group.setElementNameList(elementList);
+            groupList.add(group);
+        }
+        return groupList;
+    }
+
+    public static class DfClassificationGroup {
+        protected final String _classificationName;
+        protected final String _groupName;
+        protected String _groupComment;
+        protected List<String> _elementNameList;
+
+        public DfClassificationGroup(String classificationName, String groupName) {
+            _classificationName = classificationName;
+            _groupName = groupName;
+        }
+
+        public String getGroupNameInitCap() {
+            return Srl.initCap(_groupName);
+        }
+
+        public boolean hasGroupComment() {
+            return _groupComment != null;
+        }
+
+        public String buildReturnExpThis() {
+            return doBuildReturnExp("this");
+        }
+
+        protected String doBuildReturnExp(String target) {
+            final StringBuilder sb = new StringBuilder();
+            int index = 0;
+            for (String elementName : _elementNameList) {
+                if (index > 0) {
+                    sb.append(" || ");
+                }
+                sb.append(elementName).append(".equals(").append(target).append(")");
+                ++index;
+            }
+            return sb.toString();
+        }
+
+        public String buildCDefArgExp(String cdefClassName) {
+            final StringBuilder sb = new StringBuilder();
+            int index = 0;
+            for (String elementName : _elementNameList) {
+                if (index > 0) {
+                    sb.append(", ");
+                }
+                sb.append(cdefClassName).append(".").append(_classificationName);
+                sb.append(".").append(elementName);
+                ++index;
+            }
+            return sb.toString();
+        }
+
+        public String getClassificationName() {
+            return _classificationName;
+        }
+
+        public String getGroupName() {
+            return _groupName;
+        }
+
+        public String getGroupComment() {
+            return _groupComment;
+        }
+
+        public void setGroupComment(String groupComment) {
+            this._groupComment = groupComment;
+        }
+
+        public List<String> getElementNameList() {
+            return _elementNameList;
+        }
+
+        public void setElementNameList(List<String> elementNameList) {
+            this._elementNameList = elementNameList;
+        }
     }
 
     // ===================================================================================
@@ -216,5 +319,13 @@ public class DfClassificationTop {
 
     public void setSuppressAutoDeploy(boolean suppressAutoDeploy) {
         this._suppressAutoDeploy = suppressAutoDeploy;
+    }
+
+    public Map<String, Map<String, Object>> getGroupingAll() {
+        return this._groupingMap;
+    }
+
+    public void putGroupingAll(Map<String, Map<String, Object>> groupingMap) {
+        this._groupingMap.putAll(groupingMap);
     }
 }
