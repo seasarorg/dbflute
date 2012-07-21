@@ -25,6 +25,18 @@ import org.seasar.dbflute.dbmeta.DBMeta;
  */
 public interface RelationInfo {
 
+    /**
+     * Get the name of the relation constraint. <br />
+     * The foreign info and the referrer info of the same relation have the same name.
+     * @return The name of the relation constraint. (NotNull)
+     */
+    String getConstraintName();
+
+    /**
+     * Get the property name of the relation. <br />
+     * This is unique name in the table.
+     * @return The property name of the relation. (NotNull)
+     */
     String getRelationPropertyName();
 
     DBMeta getLocalDBMeta();

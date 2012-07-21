@@ -36,6 +36,7 @@ public class ForeignInfo implements RelationInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final String _constraintName;
     protected final String _foreignPropertyName;
     protected final DBMeta _localDBMeta;
     protected final DBMeta _foreignDBMeta;
@@ -44,6 +45,7 @@ public class ForeignInfo implements RelationInfo {
     protected final int _relationNo;
     protected final boolean _oneToOne;
     protected final boolean _bizOneToOne;
+    protected final boolean _referrerAsOne;
     protected final boolean _additionalFK;
     protected final String _fixedCondition;
     protected final boolean _fixedInline;
@@ -54,14 +56,16 @@ public class ForeignInfo implements RelationInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ForeignInfo(String foreignPropertyName, DBMeta localDBMeta, DBMeta foreignDBMeta,
+    public ForeignInfo(String constraintName, String foreignPropertyName, DBMeta localDBMeta, DBMeta foreignDBMeta,
             Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, boolean oneToOne,
-            boolean bizOneToOne, boolean additionalFK, String fixedCondition, boolean fixedInline,
-            String reversePropertyName) {
+            boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK, String fixedCondition,
+            boolean fixedInline, String reversePropertyName) {
+        assertObjectNotNull("constraintName", constraintName);
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("foreignDBMeta", foreignDBMeta);
         assertObjectNotNull("localForeignColumnInfoMap", localForeignColumnInfoMap);
+        _constraintName = constraintName;
         _foreignPropertyName = foreignPropertyName;
         _localDBMeta = localDBMeta;
         _foreignDBMeta = foreignDBMeta;
@@ -76,6 +80,7 @@ public class ForeignInfo implements RelationInfo {
         _relationNo = relationNo;
         _oneToOne = oneToOne;
         _bizOneToOne = bizOneToOne;
+        _referrerAsOne = referrerAsOne;
         _additionalFK = additionalFK;
         _fixedCondition = fixedCondition;
         _fixedInline = fixedInline;
@@ -295,7 +300,15 @@ public class ForeignInfo implements RelationInfo {
     //                                                                            Accessor
     //                                                                            ========
     /**
+     * {@inheritDoc}
+     */
+    public String getConstraintName() {
+        return _constraintName;
+    }
+
+    /**
      * Get the property name of the foreign relation. <br />
+     * This is unique name in the table. <br />
      * For example, if the member entity has getMemberStatus(), this returns 'memberStatus'.
      * @return The string for property name. (NotNull)
      */
@@ -361,6 +374,14 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
+     * Does the relation is referrer-as-one?
+     * @return The determination, true or false.
+     */
+    public boolean isReferrerAsOne() {
+        return _referrerAsOne;
+    }
+
+    /**
      * Does the relation is from additional foreign key?
      * @return The determination, true or false.
      */
@@ -399,7 +420,7 @@ public class ForeignInfo implements RelationInfo {
      * @return The determination, true or false.
      */
     public boolean isPureFK() { // derived property
-        return !_oneToOne && !_additionalFK;
+        return !_additionalFK && !_referrerAsOne;
     }
 
     /**

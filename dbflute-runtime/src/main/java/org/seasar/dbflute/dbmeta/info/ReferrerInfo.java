@@ -36,6 +36,7 @@ public class ReferrerInfo implements RelationInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final String _constraintName;
     protected final String _referrerPropertyName;
     protected final DBMeta _localDBMeta;
     protected final DBMeta _referrerDBMeta;
@@ -49,12 +50,14 @@ public class ReferrerInfo implements RelationInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ReferrerInfo(String referrerPropertyName, DBMeta localDBMeta, DBMeta referrerDBMeta,
+    public ReferrerInfo(String constraintName, String referrerPropertyName, DBMeta localDBMeta, DBMeta referrerDBMeta,
             Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap, boolean oneToOne, String reversePropertyName) {
+        assertObjectNotNull("constraintName", constraintName);
         assertObjectNotNull("referrerPropertyName", referrerPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("referrerDBMeta", referrerDBMeta);
         assertObjectNotNull("localReferrerColumnInfoMap", localReferrerColumnInfoMap);
+        _constraintName = constraintName;
         _referrerPropertyName = referrerPropertyName;
         _localDBMeta = localDBMeta;
         _referrerDBMeta = referrerDBMeta;
@@ -283,7 +286,15 @@ public class ReferrerInfo implements RelationInfo {
     //                                                                            Accessor
     //                                                                            ========
     /**
+     * {@inheritDoc}
+     */
+    public String getConstraintName() {
+        return _constraintName;
+    }
+
+    /**
      * Get the property name of the foreign relation. <br />
+     * This is unique name in the table. <br />
      * For example, if the relation MEMBER and PURCHASE, this returns 'purchaseList'.
      * @return The string for property name. (NotNull)
      */

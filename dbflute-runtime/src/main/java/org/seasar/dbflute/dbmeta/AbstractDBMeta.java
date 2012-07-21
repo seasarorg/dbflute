@@ -256,7 +256,7 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected ColumnInfo cci(String columnDbName, String columnSqlName, String columnSynonym, String columnAlias,
             boolean notNull, String propertyName, Class<?> propertyType, boolean primary, boolean autoIncrement,
-            String columnDbType, Integer columnSize, Integer decimalDigits, boolean commonColumn,
+            String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue, boolean commonColumn,
             OptimisticLockType optimisticLockType, String columnComment, String foreignListExp, String referrerListExp,
             ClassificationMeta classificationMeta) { // createColumnInfo()
         final String delimiter = ",";
@@ -269,8 +269,8 @@ public abstract class AbstractDBMeta implements DBMeta {
             referrerPropList = splitListTrimmed(referrerListExp, delimiter);
         }
         return new ColumnInfo(this, columnDbName, columnSqlName, columnSynonym, columnAlias, notNull, propertyName,
-                propertyType, primary, autoIncrement, columnDbType, columnSize, decimalDigits, commonColumn,
-                optimisticLockType, columnComment, foreignPropList, referrerPropList, classificationMeta);
+                propertyType, primary, autoIncrement, columnDbType, columnSize, decimalDigits, defaultValue,
+                commonColumn, optimisticLockType, columnComment, foreignPropList, referrerPropList, classificationMeta);
     }
 
     /**
@@ -378,13 +378,13 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     // createForeignInfo()
-    protected ForeignInfo cfi(String propName // property name
+    protected ForeignInfo cfi(String consName, String propName // name
             , DBMeta localDbm, DBMeta foreignDbm // DB meta
             , Map<ColumnInfo, ColumnInfo> locFrColMap, int relNo // relation info
-            , boolean oneToOne, boolean bizOne // one-to-one info
+            , boolean oneToOne, boolean bizOne, boolean asOne // one-to-one info
             , boolean addFK, String fixedCond, boolean fixedInl, String revsName) { // additional & reverse info
-        return new ForeignInfo(propName, localDbm, foreignDbm, locFrColMap, relNo, oneToOne, bizOne, addFK, fixedCond,
-                fixedInl, revsName);
+        return new ForeignInfo(consName, propName, localDbm, foreignDbm, locFrColMap, relNo, oneToOne, bizOne, asOne,
+                addFK, fixedCond, fixedInl, revsName);
     }
 
     /**
@@ -484,11 +484,11 @@ public abstract class AbstractDBMeta implements DBMeta {
         return referrerInfo;
     }
 
-    protected ReferrerInfo cri(String propName // property name
+    protected ReferrerInfo cri(String consName, String propName // name
             , DBMeta localDbm, DBMeta referrerDbm // DB meta
             , Map<ColumnInfo, ColumnInfo> locRfColMap // relation info
             , boolean oneToOne, String revsName) { // createReferrerInfo()
-        return new ReferrerInfo(propName, localDbm, referrerDbm, locRfColMap, oneToOne, revsName);
+        return new ReferrerInfo(consName, propName, localDbm, referrerDbm, locRfColMap, oneToOne, revsName);
     }
 
     /**

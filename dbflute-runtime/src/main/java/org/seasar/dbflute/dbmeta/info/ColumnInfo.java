@@ -65,6 +65,7 @@ public class ColumnInfo {
     protected final String _columnDbType;
     protected final Integer _columnSize;
     protected final Integer _decimalDigits;
+    protected final String _defaultValue;
     protected final boolean _commonColumn;
     protected final OptimisticLockType _optimisticLockType;
     protected final String _columnComment;
@@ -80,7 +81,7 @@ public class ColumnInfo {
     //                                                                         ===========
     public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnSqlName, String columnSynonym,
             String columnAlias, boolean notNull, String propertyName, Class<?> propertyType, boolean primary,
-            boolean autoIncrement, String columnDbType, Integer columnSize, Integer decimalDigits,
+            boolean autoIncrement, String columnDbType, Integer columnSize, Integer decimalDigits, String defaultValue,
             boolean commonColumn, OptimisticLockType optimisticLockType, String columnComment,
             List<String> foreignPropList, List<String> referrerPropList, ClassificationMeta classificationMeta) {
         assertObjectNotNull("dbmeta", dbmeta);
@@ -101,6 +102,7 @@ public class ColumnInfo {
         _columnSize = columnSize;
         _columnDbType = columnDbType;
         _decimalDigits = decimalDigits;
+        _defaultValue = defaultValue;
         _commonColumn = commonColumn;
         _optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
         _columnComment = columnComment;
@@ -397,7 +399,7 @@ public class ColumnInfo {
      * @return The DB name of the column. (NotNull)
      */
     public String getColumnDbName() {
-        return this._columnDbName;
+        return _columnDbName;
     }
 
     /**
@@ -406,7 +408,7 @@ public class ColumnInfo {
      * @return The SQL-name object of the column. (NotNull)
      */
     public ColumnSqlName getColumnSqlName() {
-        return this._columnSqlName;
+        return _columnSqlName;
     }
 
     /**
@@ -415,7 +417,7 @@ public class ColumnInfo {
      * @return The synonym of the column. (NullAllowed: when the column does not have its synonym)
      */
     public String getColumnSynonym() {
-        return this._columnSynonym;
+        return _columnSynonym;
     }
 
     /**
@@ -423,7 +425,7 @@ public class ColumnInfo {
      * @return The alias of the column. (NullAllowed: when it cannot get an alias from meta)
      */
     public String getColumnAlias() {
-        return this._columnAlias;
+        return _columnAlias;
     }
 
     /**
@@ -431,7 +433,7 @@ public class ColumnInfo {
      * @return The determination, true or false.
      */
     public boolean isNotNull() {
-        return this._notNull;
+        return _notNull;
     }
 
     /**
@@ -439,7 +441,7 @@ public class ColumnInfo {
      * @return The name of property for the column. (NotNull)
      */
     public String getPropertyName() {
-        return this._propertyName;
+        return _propertyName;
     }
 
     /**
@@ -447,7 +449,7 @@ public class ColumnInfo {
      * @return The type of property for the column. (NotNull)
      */
     public Class<?> getPropertyType() {
-        return this._propertyType;
+        return _propertyType;
     }
 
     /**
@@ -479,7 +481,7 @@ public class ColumnInfo {
      * @return The determination, true or false.
      */
     public boolean isPrimary() {
-        return this._primary;
+        return _primary;
     }
 
     /**
@@ -487,7 +489,7 @@ public class ColumnInfo {
      * @return The determination, true or false.
      */
     public boolean isAutoIncrement() {
-        return this._autoIncrement;
+        return _autoIncrement;
     }
 
     /**
@@ -495,7 +497,7 @@ public class ColumnInfo {
      * @return The DB type of the column. (NotNull: If the type is unknown, it returns 'UnknownType'.)
      */
     public String getColumnDbType() {
-        return this._columnDbType;
+        return _columnDbType;
     }
 
     /**
@@ -503,15 +505,23 @@ public class ColumnInfo {
      * @return The size of the column. (NullAllowed: If the type does not have size, it returns null.)
      */
     public Integer getColumnSize() {
-        return this._columnSize;
+        return _columnSize;
     }
 
     /**
      * Get the decimal digits of the column.
-     * @return The decimal digits of the column. (NullAllowed: If the type does not have disits, it returns null.)
+     * @return The decimal digits of the column. (NullAllowed: If the type does not have digits, it returns null.)
      */
     public Integer getDecimalDigits() {
-        return this._decimalDigits;
+        return _decimalDigits;
+    }
+
+    /**
+     * Get the default value of the column. (as string)
+     * @return The default value of the column. (NullAllowed)
+     */
+    public String getDefaultValue() {
+        return _defaultValue;
     }
 
     /**
@@ -519,7 +529,7 @@ public class ColumnInfo {
      * @return The determination, true or false.
      */
     public boolean isCommonColumn() {
-        return this._commonColumn;
+        return _commonColumn;
     }
 
     /**
@@ -553,7 +563,7 @@ public class ColumnInfo {
      * @return The comment of the column. (NullAllowed: when it cannot get an alias from meta)
      */
     public String getColumnComment() {
-        return this._columnComment;
+        return _columnComment;
     }
 
     /**

@@ -10,7 +10,7 @@ public class MockColumnInfo extends ColumnInfo {
 
     public MockColumnInfo() {
         super(new MockDBMeta(), "mock", "mock", null, "mock", true, "mock", Integer.class, true, false, "INTEGER", 3,
-                0, false, OptimisticLockType.NONE, "mock", null, null, null);
+                0, null, false, OptimisticLockType.NONE, "mock", null, null, null);
     }
 
     @Override
