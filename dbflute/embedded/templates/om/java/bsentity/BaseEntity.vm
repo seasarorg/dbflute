@@ -273,7 +273,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
     public boolean is${col.javaName}_${group.groupNameInitCap}() {
         ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
-        return cdef != null && is${group.groupNameInitCap}();
+        return cdef != null && cdef.is${group.groupNameInitCap}();
     }
 
 #end
