@@ -43,6 +43,19 @@ public class AlterGeneratorMySql extends AbstractAlterGenerator {
         return sb.toString();
     }
 
+    // alter table [table_name] drop column [column_name]
+    public String generateColumnDrop(ColumnInfo columnInfo) {
+        return generateColumnDrop(columnInfo.getDBMeta(), columnInfo.getColumnSqlName().toString());
+    }
+
+    // alter table [table_name] drop column [column_name]
+    public String generateColumnDrop(DBMeta dbmeta, String columnName) {
+        final StringBuilder sb = new StringBuilder();
+        doBuildAlterTable(sb, dbmeta);
+        sb.append(" drop column ").append(columnName);
+        return sb.toString();
+    }
+
     // alter table [table_name] change column [column_name] [column_type] [column_constraints]
     public String generateColumnRename(String oldColumnName, ColumnInfo newColumnInfo) {
         final StringBuilder sb = new StringBuilder();
