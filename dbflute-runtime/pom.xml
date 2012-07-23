@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>0.9.9.7A-RC1</version><!-- Latest RC version is 00-SNAPSHOT -->
+	<version>0.9.9.7A</version><!-- Latest RC version is 00-SNAPSHOT -->
 	<packaging>jar</packaging>
 
 	<name>DBFlute Runtime</name>

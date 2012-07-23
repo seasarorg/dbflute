@@ -39,7 +39,16 @@ public class AlterGeneratorMySql extends AbstractAlterGenerator {
         final StringBuilder sb = new StringBuilder();
         doBuildAlterTable(sb, columnInfo.getDBMeta());
         sb.append(" modify ").append(columnInfo.getColumnSqlName());
-        doBuildColumnDef(sb, columnInfo);
+        doBuildColumnDef(sb, columnInfo, null);
+        return sb.toString();
+    }
+
+    // alter table [table_name] modify [column_name] [column_type] [column_constraints] after [after-column-name]
+    public String generateColumnDefChange(ColumnInfo columnInfo, String afterColumnName) { // MySQL original
+        final StringBuilder sb = new StringBuilder();
+        doBuildAlterTable(sb, columnInfo.getDBMeta());
+        sb.append(" modify ").append(columnInfo.getColumnSqlName());
+        doBuildColumnDef(sb, columnInfo, afterColumnName);
         return sb.toString();
     }
 
@@ -62,7 +71,7 @@ public class AlterGeneratorMySql extends AbstractAlterGenerator {
         doBuildAlterTable(sb, newColumnInfo.getDBMeta());
         sb.append(" change column ").append(oldColumnName);
         sb.append(" ").append(newColumnInfo.getColumnSqlName());
-        doBuildColumnDef(sb, newColumnInfo);
+        doBuildColumnDef(sb, newColumnInfo, null);
         return sb.toString();
     }
 
@@ -72,11 +81,11 @@ public class AlterGeneratorMySql extends AbstractAlterGenerator {
         doBuildAlterTable(sb, oldColumnInfo.getDBMeta());
         sb.append(" change column ").append(oldColumnInfo.getColumnSqlName());
         sb.append(" ").append(newColumnName);
-        doBuildColumnDef(sb, oldColumnInfo);
+        doBuildColumnDef(sb, oldColumnInfo, null);
         return sb.toString();
     }
 
-    protected void doBuildColumnDef(StringBuilder sb, ColumnInfo columnInfo) {
+    protected void doBuildColumnDef(StringBuilder sb, ColumnInfo columnInfo, String afterColumnName) {
         sb.append(" ").append(columnInfo.getColumnDbType());
         final Integer columnSize = columnInfo.getColumnSize();
         final Integer decimalDigits = columnInfo.getDecimalDigits();
@@ -101,6 +110,9 @@ public class AlterGeneratorMySql extends AbstractAlterGenerator {
                     sb.append(" DEFAULT ").append(defaultValue);
                 }
             }
+        }
+        if (afterColumnName != null) {
+            sb.append(" after ").append(afterColumnName);
         }
     }
 
