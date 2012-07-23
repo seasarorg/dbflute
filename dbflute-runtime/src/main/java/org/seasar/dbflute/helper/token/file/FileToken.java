@@ -37,7 +37,6 @@ import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * File-Token.
  * @author jflute
  */
 public class FileToken {
@@ -82,7 +81,8 @@ public class FileToken {
     }
 
     /**
-     * Tokenize token-file data of a specified file.
+     * Tokenize token-file data of a specified file. <br />
+     * CR + LF is treated as LF.
      * <pre>
      * This method uses java.io.InputStreamReader and java.io.BufferedReader that wrap the argument[inputStream].
      * These objects are closed. (Invoking close() at finally)
