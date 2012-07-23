@@ -153,7 +153,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         final Database database = _schemaData.getDatabase();
-        _log.info("...Outputting load data: tables=" + database.getTableList().size());
         outputLoadDataReverse(database);
         _log.info("");
     }

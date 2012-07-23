@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.mapstring.MapListString;
+import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -51,6 +55,10 @@ public class DfLReverseProcess {
     //                                                                             Execute
     //                                                                             =======
     public void execute(Database database) {
+        final List<String> sectionInfoList = new ArrayList<String>();
+        final String beginTitle = "...Outputting load data: tables=" + database.getTableList().size();
+        _log.info(beginTitle);
+        sectionInfoList.add(beginTitle);
         final List<List<Table>> orderedList = analyzeOrder(database);
         int sectionNo = 1;
         final File baseDir = new File(_outputDir);
@@ -65,15 +73,18 @@ public class DfLReverseProcess {
             }
             final String number = (sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo));
             final String mainName = extractMainName(tableList);
-            _log.info("[Section " + sectionNo + "]: " + mainName);
+            final String sectionTitle = "[Section " + sectionNo + "]: " + mainName;
+            _log.info(sectionTitle);
+            sectionInfoList.add(sectionTitle);
             final File xlsFile = new File(buildXlsFilePath(number, mainName));
-            _outputHandler.outputData(tableInfoMap, _limit, xlsFile);
+            _outputHandler.outputData(tableInfoMap, _limit, xlsFile, sectionInfoList);
             ++sectionNo;
         }
         final Map<String, Table> tableNameMap = _outputHandler.getTableNameMap();
         if (!tableNameMap.isEmpty()) {
             outputTableNameMap(tableNameMap);
         }
+        outputResultMark(sectionInfoList);
     }
 
     protected void deletePreviousDataFile(File baseDir) {
@@ -146,5 +157,47 @@ public class DfLReverseProcess {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                         Result Mark
+    //                                                                         ===========
+    protected void outputResultMark(List<String> sectionInfoList) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(ln()).append("* * * * * * * * * * *");
+        sb.append(ln()).append("*                   *");
+        sb.append(ln()).append("* Load Data Reverse *");
+        sb.append(ln()).append("*                   *");
+        sb.append(ln()).append("* * * * * * * * * * *");
+        for (String sectionInfo : sectionInfoList) {
+            sb.append(ln()).append(sectionInfo);
+        }
+        final Date currentDate = DfTypeUtil.toDate(DBFluteSystem.currentTimeMillis());
+        final String currentExp = DfTypeUtil.toString(currentDate, "yyyy/MM/dd HH:mm:ss");
+        sb.append(ln()).append(ln()).append("Output Date: ").append(currentExp);
+        final File dataPropFile = new File(_outputDir + "/load-data-result.dfmark");
+        if (dataPropFile.exists()) {
+            dataPropFile.delete();
+        }
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataPropFile), "UTF-8"));
+            bw.write(sb.toString());
+            bw.flush();
+        } catch (IOException e) {
+            String msg = "Failed to write tableNameMap.dataprop: " + dataPropFile;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    protected String ln() {
+        return "\n";
     }
 }

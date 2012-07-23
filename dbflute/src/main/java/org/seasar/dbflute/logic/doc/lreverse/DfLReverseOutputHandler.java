@@ -72,14 +72,15 @@ public class DfLReverseOutputHandler {
      * @param tableInfoMap The map of table. (NotNull)
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param xlsFile The file of xls. (NotNull)
+     * @param sectionInfoList The list of section info. (NotNull)
      */
-    public void outputData(Map<String, Table> tableInfoMap, int limit, File xlsFile) {
+    public void outputData(Map<String, Table> tableInfoMap, int limit, File xlsFile, List<String> sectionInfoList) {
         filterUnsupportedTable(tableInfoMap);
         final DfLReverseDataExtractor extractor = new DfLReverseDataExtractor(_dataSource);
         extractor.setExtractingLimit(limit);
         extractor.setLargeBorder(_xlsLimit);
         final Map<String, DfLReverseDataResult> loadDataMap = extractor.extractData(tableInfoMap);
-        transferToXls(tableInfoMap, loadDataMap, limit, xlsFile);
+        transferToXls(tableInfoMap, loadDataMap, limit, xlsFile, sectionInfoList);
     }
 
     protected void filterUnsupportedTable(Map<String, Table> tableInfoMap) {
@@ -100,9 +101,10 @@ public class DfLReverseOutputHandler {
      * @param loadDataMap The map of load data. (NotNull)
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param xlsFile The file of xls. (NotNull)
+     * @param sectionInfoList The list of section info. (NotNull)
      */
     protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int limit,
-            File xlsFile) {
+            File xlsFile, List<String> sectionInfoList) {
         final DfDataSet dataSet = new DfDataSet();
         int index = 0;
         for (Entry<String, Table> entry : tableMap.entrySet()) {
@@ -114,10 +116,10 @@ public class DfLReverseOutputHandler {
             }
             final DfLReverseDataResult dataResult = loadDataMap.get(tableDbName);
             if (dataResult.isLargeData()) {
-                outputDelimiterData(table, dataResult, limit);
+                outputDelimiterData(table, dataResult, limit, sectionInfoList);
             } else {
                 final List<Map<String, String>> extractedList = dataResult.getResultList();
-                setupXlsDataTable(dataSet, table, extractedList, index);
+                setupXlsDataTable(dataSet, table, extractedList, index, sectionInfoList);
             }
         }
         if (dataSet.getTableSize() > 0) {
@@ -128,12 +130,15 @@ public class DfLReverseOutputHandler {
     // ===================================================================================
     //                                                                            Xls Data
     //                                                                            ========
-    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList, int index) {
+    protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList,
+            int index, List<String> sectionInfoList) {
         final String tableDbName = table.getName();
         final int xlsLimit = _xlsLimit;
         final List<Map<String, String>> recordList;
         {
-            _log.info("  " + tableDbName + " (" + extractedList.size() + ")");
+            final String tableInfo = "  " + tableDbName + " (" + extractedList.size() + ")";
+            _log.info(tableInfo);
+            sectionInfoList.add(tableInfo);
             if (extractedList.size() > xlsLimit) {
                 recordList = extractedList.subList(0, xlsLimit); // just in case
             } else {
@@ -214,7 +219,8 @@ public class DfLReverseOutputHandler {
     // ===================================================================================
     //                                                                      Delimiter Data
     //                                                                      ==============
-    protected void outputDelimiterData(Table table, DfLReverseDataResult templateDataResult, final int limit) {
+    protected void outputDelimiterData(Table table, DfLReverseDataResult templateDataResult, final int limit,
+            final List<String> sectionInfoList) {
         if (_delimiterDataDir == null) {
             return;
         }
@@ -223,7 +229,9 @@ public class DfLReverseOutputHandler {
         final FileMakingOption option = new FileMakingOption().encodeAsUTF8().separateLf();
         option.delimitateByTab();
         final String tableDbName = table.getName();
-        _log.info("...Outputting the over-xls-limit table: " + tableDbName);
+        final String outputInfo = "...Outputting the over-xls-limit table: " + tableDbName;
+        _log.info(outputInfo);
+        sectionInfoList.add(outputInfo);
         if (!delimiterDir.exists()) {
             delimiterDir.mkdirs();
         }
@@ -270,7 +278,9 @@ public class DfLReverseOutputHandler {
                     msg = msg + " table=" + tableDbName + " file=" + delimiterFilePath;
                     throw new IllegalStateException(msg, e);
                 }
-                _log.info(" -> " + delimiterFilePath + " (" + count + ")");
+                final String delimiterInfo = " -> " + delimiterFilePath + " (" + count + ")";
+                _log.info(delimiterInfo);
+                sectionInfoList.add(delimiterInfo);
             }
         });
     }

@@ -138,7 +138,7 @@ map:{
     #   o isOutputToPlaySql: Does it output the data to playsql? (NotRequired - Default false)
     #
     #; loadDataReverseMap = map:{
-    #    ; recordLimit = 10
+    #    ; recordLimit = -1
     #    ; isContainsCommonColumn = false
     #    ; isOutputToPlaySql = false
     #}
