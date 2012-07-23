@@ -18,9 +18,9 @@ public class FileTokenTest extends PlainTestCase {
     public void test_tokenize() throws Exception {
         // ## Arrange ##
         FileToken impl = new FileToken();
-        String first = "\"a\",\"b,\",\"cc\",\"\"\"\",\"e\n,\n,\n\"\",,\"";
-        String second = "\"a\",\"\",\"c\"\"c\",\"d\"\"\",\"e\"";
-        String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
+        final String first = "\"a\",\"b,\",\"cc\",\"\"\"\",\"e\n,\n,\n\"\",,\"";
+        final String second = "\"a\",\"\",\"c\"\"c\",\"d\"\"\",\"e\"";
+        final String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
         String all = first + ln() + second + ln() + third;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(all.getBytes("UTF-8"));
 
@@ -39,18 +39,21 @@ public class FileTokenTest extends PlainTestCase {
                     assertEquals("cc", valueList.get(2));
                     assertEquals("\"", valueList.get(3));
                     assertEquals("e\n,\n,\n\",,", valueList.get(4));
+                    assertEquals(first, fileTokenizingRowResource.getRowString());
                 } else if (index == 1) {
                     assertEquals("a", valueList.get(0));
                     assertEquals("", valueList.get(1));
                     assertEquals("c\"c", valueList.get(2));
                     assertEquals("d\"", valueList.get(3));
                     assertEquals("e", valueList.get(4));
+                    assertEquals(second, fileTokenizingRowResource.getRowString());
                 } else if (index == 2) {
                     assertEquals("a", valueList.get(0));
                     assertEquals("b,b", valueList.get(1));
                     assertEquals("c\",c", valueList.get(2));
                     assertEquals("d\n", valueList.get(3));
                     assertEquals("e", valueList.get(4));
+                    assertEquals(third, fileTokenizingRowResource.getRowString());
                     markSet.add("done");
                 }
                 ++index;

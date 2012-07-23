@@ -115,6 +115,7 @@ public class FileToken {
             ir = new InputStreamReader(inputStream, encoding);
             br = new BufferedReader(ir);
 
+            final StringBuilder realRowStringSb = new StringBuilder();
             FileTokenizingHeaderInfo fileTokenizingHeaderInfo = null;
             int count = -1;
             int rowNumber = 1;
@@ -140,9 +141,11 @@ public class FileToken {
                 final String rowString;
                 if (preContinueString.equals("")) {
                     rowString = lineString;
+                    realRowStringSb.append(lineString);
                 } else {
                     final String lineSeparator = "\n";
                     rowString = preContinueString + lineSeparator + lineString;
+                    realRowStringSb.append(lineSeparator).append(lineString);
                 }
                 final ValueLineInfo valueLineInfo = arrangeValueList(rowString, delimiter);
                 final List<String> ls = valueLineInfo.getValueList();
@@ -171,7 +174,9 @@ public class FileToken {
                         fileTokenizingRowResource.setValueList(temporaryValueList);
                     }
 
-                    fileTokenizingRowResource.setRowString(rowString);
+                    final String realRowString = realRowStringSb.toString();
+                    realRowStringSb.setLength(0);
+                    fileTokenizingRowResource.setRowString(realRowString);
                     fileTokenizingRowResource.setRowNumber(rowNumber);
                     fileTokenizingRowResource.setLineNumber(lineNumber);
                     fileTokenizingCallback.handleRowResource(fileTokenizingRowResource);
