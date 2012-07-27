@@ -276,22 +276,29 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         classificationTop.setCheckImplicitSet(isClassificationCheckImplicitSet(elementMap));
         classificationTop.setUseDocumentOnly(isClassificationUseDocumentOnly(elementMap));
         classificationTop.setSuppressAutoDeploy(isClassificationSuppressAutoDeploy(elementMap));
+        classificationTop.setDeprecated(isClassificationDeprecated(elementMap));
         classificationTop.putGroupingAll(getGroupingMap(elementMap));
     }
 
     @SuppressWarnings("unchecked")
     protected boolean isClassificationCheckImplicitSet(Map<?, ?> elementMap) {
-        return isProperty("isCheckImplicitSet", false, (Map<String, ? extends Object>) elementMap);
+        return isProperty(DfClassificationTop.KEY_CHECK_IMPLICIT_SET, false, (Map<String, ? extends Object>) elementMap);
     }
 
     @SuppressWarnings("unchecked")
     protected boolean isClassificationUseDocumentOnly(Map<?, ?> elementMap) {
-        return isProperty("isUseDocumentOnly", false, (Map<String, ? extends Object>) elementMap);
+        return isProperty(DfClassificationTop.KEY_USE_DOCUMENT_ONLY, false, (Map<String, ? extends Object>) elementMap);
     }
 
     @SuppressWarnings("unchecked")
     protected boolean isClassificationSuppressAutoDeploy(Map<?, ?> elementMap) {
-        return isProperty("isSuppressAutoDeploy", false, (Map<String, ? extends Object>) elementMap);
+        return isProperty(DfClassificationTop.KEY_SUPPRESS_AUTO_DEPLOY, false,
+                (Map<String, ? extends Object>) elementMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isClassificationDeprecated(Map<?, ?> elementMap) {
+        return isProperty(DfClassificationTop.KEY_DEPRECATED, false, (Map<String, ? extends Object>) elementMap);
     }
 
     public boolean isCheckImplicitSet(String classificationName) {

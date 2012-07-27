@@ -31,6 +31,10 @@ public class DfClassificationTop {
     public static final String CODE_TYPE_BOOLEAN = "Boolean";
     public static final String DEFAULT_CODE_TYPE = CODE_TYPE_STRING;
 
+    public static final String KEY_CHECK_IMPLICIT_SET = "isCheckImplicitSet";
+    public static final String KEY_USE_DOCUMENT_ONLY = "isUseDocumentOnly";
+    public static final String KEY_SUPPRESS_AUTO_DEPLOY = "isSuppressAutoDeploy";
+    public static final String KEY_DEPRECATED = "isDeprecated";
     public static final String KEY_GROUPING_MAP = "groupingMap";
 
     // ===================================================================================
@@ -45,6 +49,7 @@ public class DfClassificationTop {
     protected boolean _checkImplicitSet;
     protected boolean _useDocumentOnly;
     protected boolean _suppressAutoDeploy;
+    protected boolean _deprecated;
     protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
 
     // ===================================================================================
@@ -319,6 +324,14 @@ public class DfClassificationTop {
 
     public void setSuppressAutoDeploy(boolean suppressAutoDeploy) {
         this._suppressAutoDeploy = suppressAutoDeploy;
+    }
+
+    public boolean isDeprecated() {
+        return _deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this._deprecated = deprecated;
     }
 
     public Map<String, Map<String, Object>> getGroupingAll() {
