@@ -734,7 +734,6 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void set${tmpJavaName}_InScope_As${col.classificationName}(Collection<${glCDef}.${col.classificationName}> cdefList) {
         doSet${tmpJavaName}_InScope(cTNumL(cdefList, ${col.javaNative}.class));
     }
-#end
 #foreach ($group in $classificationTop.groupList)
 
     /**
@@ -749,6 +748,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
         set${tmpJavaName}_InScope_As${col.classificationName}(Arrays.asList(${group.buildCDefArgExp($glCDef)}));
     }
+#end
 #end
 
     protected void doSet${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {

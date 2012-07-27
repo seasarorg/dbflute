@@ -19,6 +19,9 @@ public interface ${glCDef} extends Classification {
      * ${classificationTop.topComment}
      */
 #end
+#if ($classificationTop.isDeprecated())
+    @Deprecated
+#end
     public enum ${classificationName} implements ${glCDef} {
 #set ($count = 0)
 #foreach ($classificationElement in $classificationTop.classificationElementList)
