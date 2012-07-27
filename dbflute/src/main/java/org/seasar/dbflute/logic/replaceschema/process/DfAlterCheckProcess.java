@@ -99,7 +99,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     public static interface CoreProcessPlayer {
-        void play(String sqlRootDir);
+        void playNext(String sqlRootDir);
+
+        void playPrevious(String sqlRootDir);
     }
 
     // ===================================================================================
@@ -416,7 +418,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void playPreviousSchema() {
-        _coreProcessPlayer.play(getMigrationPreviousDir());
+        _coreProcessPlayer.playPrevious(getMigrationPreviousDir());
     }
 
     protected void markPreviousNG(String notice) {
@@ -577,7 +579,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void playMainProcess() {
-        _coreProcessPlayer.play(getPlaySqlDir());
+        _coreProcessPlayer.playNext(getPlaySqlDir());
     }
 
     protected void markNextNG(String notice) {

@@ -54,6 +54,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     protected DataSource _dataSource;
     protected UnifiedSchema _unifiedSchema;
     protected boolean _suppressBatchUpdate;
+    protected boolean _suppressCheckImplicitSet;
     protected DfDataWritingInterceptor _dataWritingInterceptor;
 
     // ===================================================================================
@@ -106,6 +107,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     writer.setConvertValueMap(convertValueMap);
                     writer.setDefaultValueMap(defaultValueMap);
                     writer.setSuppressBatchUpdate(isSuppressBatchUpdate());
+                    writer.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
                     writer.setDataWritingInterceptor(_dataWritingInterceptor);
                     writer.writeData(resultInfo);
 
@@ -183,6 +185,14 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
 
     public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
         this._suppressBatchUpdate = suppressBatchUpdate;
+    }
+
+    public boolean isSuppressCheckImplicitSet() {
+        return _suppressCheckImplicitSet;
+    }
+
+    public void setSuppressCheckImplicitSet(boolean suppressCheckImplicitSet) {
+        this._suppressCheckImplicitSet = suppressCheckImplicitSet;
     }
 
     public DfDataWritingInterceptor getDataWritingInterceptor() {

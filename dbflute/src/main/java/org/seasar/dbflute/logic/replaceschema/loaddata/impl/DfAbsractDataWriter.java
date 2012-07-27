@@ -89,7 +89,10 @@ public abstract class DfAbsractDataWriter {
     /** Does it suppress batch updates? */
     protected boolean _suppressBatchUpdate;
 
-    /** The interceptor of data writing. (NullAllowed) */
+    /** Does it suppress check for classification implicit set? */
+    protected boolean _suppressCheckImplicitSet;
+
+    /** The intercepter of data writing. (NullAllowed) */
     protected DfDataWritingInterceptor _dataWritingInterceptor;
 
     /** The handler of columns for getting column meta information(as helper). */
@@ -1023,6 +1026,9 @@ public abstract class DfAbsractDataWriter {
 
     protected void checkImplicitClassification(File file, String tableDbName, List<String> columnDbNameList,
             Connection conn) throws SQLException {
+        if (_suppressCheckImplicitSet) {
+            return;
+        }
         final DfClassificationProperties prop = getClassificationProperties();
         if (!prop.hasImplicitSetCheck()) {
             return;
@@ -1150,6 +1156,14 @@ public abstract class DfAbsractDataWriter {
 
     public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
         this._suppressBatchUpdate = suppressBatchUpdate;
+    }
+
+    public boolean isSuppressCheckImplicitSet() {
+        return _suppressCheckImplicitSet;
+    }
+
+    public void setSuppressCheckImplicitSet(boolean suppressCheckImplicitSet) {
+        this._suppressCheckImplicitSet = suppressCheckImplicitSet;
     }
 
     public DfDataWritingInterceptor getDataWritingInterceptor() {

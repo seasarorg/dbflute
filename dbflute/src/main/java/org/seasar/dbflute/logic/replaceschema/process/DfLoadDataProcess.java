@@ -64,6 +64,11 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     /** The info of loaded data. This info has loaded files when it fails too. */
     protected final DfLoadedDataInfo _loadedDataInfo = new DfLoadedDataInfo();
 
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
+    protected boolean _suppressCheckImplicitSet;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -73,9 +78,13 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         _mainSchema = mainSchema;
     }
 
-    public static DfLoadDataProcess createAsCore(String sqlRootDir, DataSource dataSource) {
+    public static DfLoadDataProcess createAsCore(String sqlRootDir, DataSource dataSource, boolean previous) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfLoadDataProcess(sqlRootDir, dataSource, mainSchema);
+        DfLoadDataProcess process = new DfLoadDataProcess(sqlRootDir, dataSource, mainSchema);
+        if (previous) {
+            process.suppressCheckImplicitSet();
+        }
+        return process;
     }
 
     // ===================================================================================
@@ -127,6 +136,10 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().isSuppressBatchUpdate();
     }
 
+    public boolean isSuppressCheckImplicitSet() {
+        return _suppressCheckImplicitSet;
+    }
+
     // --------------------------------------------
     //                               Delimiter Data
     //                               --------------
@@ -163,6 +176,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         handler.setDataSource(_dataSource);
         handler.setUnifiedSchema(_mainSchema);
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
+        handler.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
         handler.setDataWritingInterceptor(getDataWritingInterceptor());
         _delimiterDataHandlerImpl = handler;
         return _delimiterDataHandlerImpl;
@@ -296,6 +310,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         handler.setUnifiedSchema(_mainSchema); // for getting database meta data
         handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
+        handler.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
         handler.setSkipSheet(getReplaceSchemaProperties().getSkipSheet());
         handler.setDataWritingInterceptor(getDataWritingInterceptor());
         _xlsDataHandlerImpl = handler;
@@ -428,5 +443,12 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
             final String mark = etcWarned ? "v " : "o ";
             detailMessageList.add(mark + "(and other " + fileType4Etc + " files...)");
         }
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void suppressCheckImplicitSet() {
+        this._suppressCheckImplicitSet = true;
     }
 }
