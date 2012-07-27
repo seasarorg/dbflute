@@ -577,6 +577,9 @@ public class DfSchemaXmlSerializer {
     }
 
     protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMeta> tableList) throws SQLException {
+        if (_suppressAdditionalSchema) {
+            return;
+        }
         final List<UnifiedSchema> schemaList = getDatabaseProperties().getAdditionalSchemaList();
         for (UnifiedSchema additionalSchema : schemaList) {
             final List<DfTableMeta> additionalTableList = _tableExtractor.getTableList(dbMeta, additionalSchema);
@@ -914,9 +917,6 @@ public class DfSchemaXmlSerializer {
     //                                                                    Additional Table
     //                                                                    ================
     protected boolean setupAddtionalTableIfNeeds() {
-        if (_suppressAdditionalSchema) {
-            return false;
-        }
         boolean exists = false;
         final String tableType = "TABLE";
         final DfAdditionalTableProperties prop = getProperties().getAdditionalTableProperties();
