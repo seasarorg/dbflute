@@ -119,6 +119,11 @@ public class DfSchemaXmlSerializer {
     //                                          ------------
     protected Map<String, DfTableMeta> _generatedTableMap;
 
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
+    protected boolean _suppressAdditionalSchema;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -149,7 +154,8 @@ public class DfSchemaXmlSerializer {
 
     public static DfSchemaXmlSerializer createAsManage(DataSource dataSource, UnifiedSchema mainSchema,
             String schemaXml, String historyFile) {
-        return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile).suppressExceptTarget();
+        DfSchemaXmlSerializer serializer = new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
+        return serializer.suppressExceptTarget().suppressAdditionalSchema();
     }
 
     protected DfSchemaXmlSerializer suppressExceptTarget() {
@@ -159,6 +165,11 @@ public class DfSchemaXmlSerializer {
         _indexExtractor.suppressExceptTarget();
         _foreignKeyExtractor.suppressExceptTarget();
         _autoIncrementExtractor.suppressExceptTarget();
+        return this;
+    }
+
+    protected DfSchemaXmlSerializer suppressAdditionalSchema() {
+        _suppressAdditionalSchema = true;
         return this;
     }
 
@@ -903,6 +914,9 @@ public class DfSchemaXmlSerializer {
     //                                                                    Additional Table
     //                                                                    ================
     protected boolean setupAddtionalTableIfNeeds() {
+        if (_suppressAdditionalSchema) {
+            return false;
+        }
         boolean exists = false;
         final String tableType = "TABLE";
         final DfAdditionalTableProperties prop = getProperties().getAdditionalTableProperties();
