@@ -148,35 +148,39 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
 
     protected DfAlterCheckProcess createAlterCheckProcess() {
         return DfAlterCheckProcess.createAsMain(getDataSource(), new CoreProcessPlayer() {
-            public void play(String sqlRootDirectory) {
-                executeCoreProcess(sqlRootDirectory);
+            public void playNext(String sqlRootDirectory) {
+                executeCoreProcess(sqlRootDirectory, false);
+            }
+
+            public void playPrevious(String sqlRootDirectory) {
+                executeCoreProcess(sqlRootDirectory, true);
             }
         });
     }
 
     protected void processMain() {
-        executeCoreProcess(getPlaySqlDir());
+        executeCoreProcess(getPlaySqlDir(), false);
     }
 
     // ===================================================================================
     //                                                                        Core Process
     //                                                                        ============
-    protected void executeCoreProcess(String sqlRootDir) {
-        doExecuteCoreProcess(sqlRootDir);
+    protected void executeCoreProcess(String sqlRootDir, boolean previous) {
+        doExecuteCoreProcess(sqlRootDir, previous);
     }
 
-    protected void doExecuteCoreProcess(String sqlRootDir) {
+    protected void doExecuteCoreProcess(String sqlRootDir, boolean previous) {
         try {
-            createSchema(sqlRootDir);
-            loadData(sqlRootDir);
-            takeFinally(sqlRootDir);
+            createSchema(sqlRootDir, previous);
+            loadData(sqlRootDir, previous);
+            takeFinally(sqlRootDir, previous);
         } finally {
             setupReplaceSchemaFinalInfo();
         }
         handleSchemaContinuedFailure();
     }
 
-    protected void createSchema(String sqlRootDir) {
+    protected void createSchema(String sqlRootDir, boolean previous) {
         final DfCreateSchemaProcess process = createCreateSchemaProcess(sqlRootDir);
         _createSchemaFinalInfo = process.execute();
         final SQLFailureException breakCause = _createSchemaFinalInfo.getBreakCause();
@@ -202,8 +206,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         };
     }
 
-    protected void loadData(String sqlRootDir) {
-        final DfLoadDataProcess process = createLoadDataProcess(sqlRootDir);
+    protected void loadData(String sqlRootDir, boolean previous) {
+        final DfLoadDataProcess process = createLoadDataProcess(sqlRootDir, previous);
         _loadDataFinalInfo = process.execute();
         final RuntimeException loadEx = _loadDataFinalInfo.getLoadEx();
         if (loadEx != null) { // high priority exception
@@ -211,11 +215,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         }
     }
 
-    protected DfLoadDataProcess createLoadDataProcess(String sqlRootDir) {
-        return DfLoadDataProcess.createAsCore(sqlRootDir, getDataSource());
+    protected DfLoadDataProcess createLoadDataProcess(String sqlRootDir, boolean previous) {
+        return DfLoadDataProcess.createAsCore(sqlRootDir, getDataSource(), previous);
     }
 
-    protected void takeFinally(String sqlRootDir) {
+    protected void takeFinally(String sqlRootDir, boolean previous) {
         final DfTakeFinallyProcess process = createTakeFinallyProcess(sqlRootDir);
         _takeFinallyFinalInfo = process.execute();
         final SQLFailureException breakCause = _takeFinallyFinalInfo.getBreakCause();
