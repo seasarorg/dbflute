@@ -68,6 +68,7 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The DBFlute task generating documentations, SchemaHTML, HistoryHTML and DataXlsTemplate.
@@ -80,6 +81,11 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(TorqueDocumentationTask.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected String _varyingArg;
 
     // ===================================================================================
     //                                                                           Beginning
@@ -117,21 +123,23 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        processSchemaHtml();
-
-        if (isLoadDataReverseValid()) {
+        if (isLoadDataReverseOnly()) {
+            _log.info("/- - - - - - - - - - - - -");
+            _log.info("*LoadDataReverse only here");
+            _log.info("- - - - - - - - - -/");
+            initializeSchemaData(); // needed
             processLoadDataReverse();
+            return;
+        } else if (isSchemaSyncCheckOnly()) {
+            _log.info("/- - - - - - - - - - - - -");
+            _log.info("*SchemaSyncCheck only here");
+            _log.info("- - - - - - - - - -/");
+            processSchemaSyncCheck();
+            return;
         }
-
-        if (isSchemaSyncCheckValid()) {
-            try {
-                processSchemaSyncCheck();
-            } catch (DfSchemaSyncCheckTragedyResultException e) {
-                refreshResources();
-                throw e;
-            }
-        }
-
+        processSchemaHtml();
+        processLoadDataReverse();
+        processSchemaSyncCheck();
         refreshResources();
     }
 
@@ -143,10 +151,13 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         super.doExecute();
-        _log.info("");
     }
 
     protected void processLoadDataReverse() {
+        if (!isLoadDataReverseValid()) {
+            return;
+        }
+        _log.info("");
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
         _log.info("* Load Data Reverse *");
@@ -154,7 +165,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("* * * * * * * * * * *");
         final Database database = _schemaData.getDatabase();
         outputLoadDataReverse(database);
-        _log.info("");
     }
 
     protected void outputLoadDataReverse(Database database) {
@@ -176,6 +186,19 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void processSchemaSyncCheck() {
+        try {
+            doProcessSchemaSyncCheck();
+        } catch (DfSchemaSyncCheckTragedyResultException e) {
+            refreshResources();
+            throw e;
+        }
+    }
+
+    protected void doProcessSchemaSyncCheck() {
+        if (!isSchemaSyncCheckValid()) {
+            return;
+        }
+        _log.info("");
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
         _log.info("* Schema Sync Check *");
@@ -183,7 +206,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("* * * * * * * * * * *");
         final DfSchemaSyncChecker checker = new DfSchemaSyncChecker(getDataSource());
         checker.checkSync();
-        _log.info("");
     }
 
     // ===================================================================================
@@ -234,6 +256,17 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     // ===================================================================================
+    //                                                                      Varying Option
+    //                                                                      ==============
+    protected boolean isLoadDataReverseOnly() {
+        return _varyingArg != null && _varyingArg.equals("load-data-reverse");
+    }
+
+    protected boolean isSchemaSyncCheckOnly() {
+        return _varyingArg != null && _varyingArg.equals("schema-sync-check");
+    }
+
+    // ===================================================================================
     //                                                                       Task Override
     //                                                                       =============
     @Override
@@ -241,5 +274,15 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         super.initControlContext();
         _context.put("escape", new Escape());
         return _context;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setVaryingArg(String varyingArg) {
+        if (Srl.is_Null_or_TrimmedEmpty(varyingArg)) {
+            return;
+        }
+        _varyingArg = varyingArg;
     }
 }

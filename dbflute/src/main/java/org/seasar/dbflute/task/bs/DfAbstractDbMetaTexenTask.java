@@ -48,13 +48,21 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     //                                                                 ===================
     @Override
     public Context initControlContext() throws Exception {
-        final DfSchemaXmlReader schemaXmlReader = createSchemaXmlReader();
-        _schemaData = schemaXmlReader.read();
-        _context = createVelocityContext(_schemaData);
+        initializeSchemaData();
+        initializeVelocityContext();
         return _context;
     }
 
+    protected void initializeSchemaData() {
+        final DfSchemaXmlReader schemaXmlReader = createSchemaXmlReader();
+        _schemaData = schemaXmlReader.read();
+    }
+
     protected abstract DfSchemaXmlReader createSchemaXmlReader();
+
+    protected void initializeVelocityContext() {
+        _context = createVelocityContext(_schemaData);
+    }
 
     protected DfSchemaXmlReader createSchemaXmlReaderAsCoreToGenerate() {
         return DfSchemaXmlReader.createAsCoreToGenerate();

@@ -46,6 +46,38 @@ if [ "$FIRST_ARG" = "freegen" ];then
   taskReturnCode=$?
 fi
 
+if [ "$FIRST_ARG" = "load-data-reverse" ];then
+  echo "/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+  echo "...Calling the LoadDataReverse task"
+  echo "nnnnnnnnnn/"
+  sh $DBFLUTE_HOME/etc/cmd/_df-doc.sh $NATIVE_PROPERTIES_PATH load-data-reverse $SECOND_ARG
+  taskReturnCode=$?
+fi
+
+if [ "$FIRST_ARG" = "schema-sync-check" ];then
+  echo "/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+  echo "...Calling the SchemaSyncCheck task"
+  echo "nnnnnnnnnn/"
+  sh $DBFLUTE_HOME/etc/cmd/_df-doc.sh $NATIVE_PROPERTIES_PATH schema-sync-check $SECOND_ARG
+  taskReturnCode=$?
+fi
+
+if [ "$FIRST_ARG" = "alter-check" ];then
+  echo "/nnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+  echo "...Calling the AlterCheck task"
+  echo "nnnnnnnnnn/"
+  sh $DBFLUTE_HOME/etc/cmd/_df-replace-schema.sh $NATIVE_PROPERTIES_PATH alter-check $SECOND_ARG
+  taskReturnCode=$?
+fi
+
+if [ "$FIRST_ARG" = "save-previous" ];then
+  echo "/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+  echo "...Calling the SavePrevious task"
+  echo "nnnnnnnnnn/"
+  sh $DBFLUTE_HOME/etc/cmd/_df-replace-schema.sh $NATIVE_PROPERTIES_PATH save-previous $SECOND_ARG
+  taskReturnCode=$?
+fi
+
 if [ $taskReturnCode -ne 0 ];then
   exit $taskReturnCode;
 fi

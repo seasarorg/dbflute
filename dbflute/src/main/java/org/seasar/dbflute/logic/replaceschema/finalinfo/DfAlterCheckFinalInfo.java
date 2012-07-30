@@ -1,9 +1,14 @@
 package org.seasar.dbflute.logic.replaceschema.finalinfo;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.seasar.dbflute.exception.DfAlterCheckAlterSqlFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckDifferenceFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckSavePreviousFailureException;
+import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.SQLFailureException;
 
 /**
@@ -12,9 +17,12 @@ import org.seasar.dbflute.exception.SQLFailureException;
 public class DfAlterCheckFinalInfo extends DfAbstractSchemaTaskFinalInfo {
 
     // one exists, the others always does not exist
+    protected final List<File> _alterSqlFileList = new ArrayList<File>();
+    protected final List<File> _submittedDraftFileList = new ArrayList<File>();
     protected SQLFailureException _breakCause;
     protected DfAlterCheckSavePreviousFailureException _savePreviousFailureEx;
     protected DfAlterCheckAlterSqlFailureException _alterSqlFailureEx;
+    protected DfTakeFinallyAssertionFailureException _takeFinallyAssertionEx;
     protected DfAlterCheckReplaceSchemaFailureException _replaceSchemaFailureEx;
     protected DfAlterCheckDifferenceFoundException _diffFoundEx;
 
@@ -28,12 +36,31 @@ public class DfAlterCheckFinalInfo extends DfAbstractSchemaTaskFinalInfo {
         if (_alterSqlFailureEx != null) {
             throw _alterSqlFailureEx;
         }
+        if (_takeFinallyAssertionEx != null) {
+            throw _takeFinallyAssertionEx;
+        }
         if (_replaceSchemaFailureEx != null) {
             throw _replaceSchemaFailureEx;
         }
         if (_diffFoundEx != null) {
             throw _diffFoundEx;
         }
+    }
+
+    public List<File> getAlterSqlFileList() {
+        return _alterSqlFileList;
+    }
+
+    public void addAlterSqlFileAll(List<File> alterSqlFileList) {
+        this._alterSqlFileList.addAll(alterSqlFileList);
+    }
+
+    public List<File> getSubmittedDraftFileList() {
+        return _submittedDraftFileList;
+    }
+
+    public void addSubmittedDraftFileAll(List<File> submittedDraftFileList) {
+        this._submittedDraftFileList.addAll(submittedDraftFileList);
     }
 
     public SQLFailureException getBreakCause() {
@@ -58,6 +85,14 @@ public class DfAlterCheckFinalInfo extends DfAbstractSchemaTaskFinalInfo {
 
     public void setAlterSqlFailureEx(DfAlterCheckAlterSqlFailureException alterSqlFailureEx) {
         this._alterSqlFailureEx = alterSqlFailureEx;
+    }
+
+    public DfTakeFinallyAssertionFailureException getTakeFinallyAssertionEx() {
+        return _takeFinallyAssertionEx;
+    }
+
+    public void setTakeFinallyAssertionEx(DfTakeFinallyAssertionFailureException takeFinallyAssertionEx) {
+        this._takeFinallyAssertionEx = takeFinallyAssertionEx;
     }
 
     public DfAlterCheckReplaceSchemaFailureException getReplaceSchemaFailureEx() {

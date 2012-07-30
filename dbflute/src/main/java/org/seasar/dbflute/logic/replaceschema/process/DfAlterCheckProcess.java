@@ -22,12 +22,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfAlterCheckAlterScriptSQLException;
-import org.seasar.dbflute.exception.DfAlterCheckAlterSqlFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckDifferenceFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckRollbackSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckSavePreviousFailureException;
+import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.io.compress.DfZipArchiver;
@@ -44,6 +44,7 @@ import org.seasar.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
+import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -71,6 +72,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected final DataSource _dataSource;
     protected final UnifiedSchema _mainSchema;
     protected final CoreProcessPlayer _coreProcessPlayer;
+
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
+    protected boolean _useDraftSpace;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -139,9 +145,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         if (schemaDiff.hasDiff()) {
             processDifference(finalInfo, schemaDiff);
         } else {
-            processSuccess();
+            processSuccess(finalInfo);
         }
 
+        deleteSubmittedDraftFile(finalInfo);
         deleteSchemaXml(); // not finally because of trace when abort
         return finalInfo;
     }
@@ -507,29 +514,79 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                         AlterSchema
     //                                                                         ===========
-    protected DfAlterCheckFinalInfo alterSchema(DfAlterCheckFinalInfo finalInfo) {
+    protected void alterSchema(DfAlterCheckFinalInfo finalInfo) {
         _log.info("");
         _log.info("+------------------+");
         _log.info("|                  |");
         _log.info("|   Alter Schema   |");
         _log.info("|                  |");
         _log.info("+------------------+");
+        submitDraftFile(finalInfo);
         executeAlterSql(finalInfo);
         if (finalInfo.isFailure()) {
             markAlterNG(getAlterCheckAlterSqlFailureNotice());
-            setupAlterCheckAlterSqlFailureException(finalInfo); // with handling break cause
+            deleteSubmittedDraftFile(finalInfo);
+        } else {
+            takeFinally(finalInfo);
+            if (finalInfo.isFailure()) {
+                markAlterNG(getAlterCheckTakeFinallySqlFailureNotice());
+                deleteSubmittedDraftFile(finalInfo);
+            }
         }
-        return finalInfo;
     }
 
+    // -----------------------------------------------------
+    //                                            Draft File
+    //                                            ----------
+    protected List<File> submitDraftFile(DfAlterCheckFinalInfo finalInfo) {
+        if (!_useDraftSpace) {
+            return DfCollectionUtil.emptyList();
+        }
+        final List<File> submittedFileList = new ArrayList<File>();
+        final List<File> draftAlterSqlFileList = getMigrationDraftAlterSqlFileList();
+        draftAlterSqlFileList.addAll(getMigrationDraftTakeFinallySqlFileList());
+        for (File draftAlterSqlFile : draftAlterSqlFileList) {
+            final String draftFilePath = draftAlterSqlFile.getPath();
+            final String dirBase = Srl.substringLastFront(draftFilePath, "/alter/draft/");
+            String pureFileName = Srl.substringLastRear(draftFilePath, "/draft/");
+            if (pureFileName.startsWith("draft-")) {
+                pureFileName = Srl.substringFirstRear(pureFileName, "draft-");
+            }
+            final File dest = new File(dirBase + "/alter/" + pureFileName);
+            submittedFileList.add(dest);
+            _log.info("...Submitting the draft file to " + dest.getPath());
+            copyFile(draftAlterSqlFile, dest);
+        }
+        finalInfo.addSubmittedDraftFileAll(submittedFileList);
+        return submittedFileList;
+    }
+
+    protected void deleteSubmittedDraftFile(DfAlterCheckFinalInfo finalInfo) {
+        final List<File> submittedFileList = finalInfo.getSubmittedDraftFileList();
+        if (submittedFileList == null) {
+            return;
+        }
+        for (File submittedFile : submittedFileList) {
+            deleteFile(submittedFile, "...Deleting the submitted draft file");
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            Alter Fire
+    //                                            ----------
     protected void executeAlterSql(DfAlterCheckFinalInfo finalInfo) {
         final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
+        if (alterSqlFileList.isEmpty()) {
+            String msg = "Not found the AlterDDL under the alter directory.";
+            throw new IllegalStateException(msg);
+        }
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
         fireMan.setExecutorName("Alter Schema");
         final DfSqlFileRunner runner = new DfSqlFileRunnerExecute(runInfo, _dataSource);
         final DfSqlFileFireResult result = fireMan.fire(runner, alterSqlFileList);
-        reflectFireResultToFinalInfo(finalInfo, result);
+        finalInfo.addAlterSqlFileAll(alterSqlFileList);
+        reflectAlterResultToFinalInfo(finalInfo, result);
     }
 
     protected DfSqlFileFireMan createSqlFileFireMan() {
@@ -571,28 +628,52 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         };
     }
 
-    protected void setupAlterCheckAlterSqlFailureException(DfAlterCheckFinalInfo finalInfo) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice(getAlterCheckAlterSqlFailureNotice());
-        br.addItem("Advice");
-        setupFixedAlterAdviceMessage(br);
-        br.addElement("Look at the final info in the log for DBFlute task.");
-        br.addItem("Message");
-        br.addElement(finalInfo.getResultMessage());
-        String msg = br.buildExceptionMessage();
-        final DfAlterCheckAlterSqlFailureException failureEx;
-        final SQLFailureException breakCause = finalInfo.getBreakCause();
-        if (breakCause != null) {
-            failureEx = new DfAlterCheckAlterSqlFailureException(msg, breakCause);
-        } else {
-            failureEx = new DfAlterCheckAlterSqlFailureException(msg);
+    protected void reflectAlterResultToFinalInfo(DfAlterCheckFinalInfo finalInfo, DfSqlFileFireResult fireResult) {
+        finalInfo.setResultMessage(fireResult.getResultMessage());
+        final List<String> detailMessageList = extractDetailMessageList(fireResult);
+        for (String detailMessage : detailMessageList) {
+            finalInfo.addDetailMessage(detailMessage);
         }
-        finalInfo.setAlterSqlFailureEx(failureEx);
-        finalInfo.setFailure(true);
+        finalInfo.setBreakCause(fireResult.getBreakCause());
+        finalInfo.setFailure(fireResult.isExistsError());
     }
 
     protected String getAlterCheckAlterSqlFailureNotice() {
         return "Failed to execute the AlterDDL statements.";
+    }
+
+    // -----------------------------------------------------
+    //                                          Take Finally
+    //                                          ------------
+    protected void takeFinally(DfAlterCheckFinalInfo finalInfo) {
+        final String sqlRootDir = getMigrationAlterDirectory();
+        final DfTakeFinallyProcess process = DfTakeFinallyProcess.createAsAlterCheck(sqlRootDir, _dataSource);
+        final DfTakeFinallyFinalInfo takeFinally = process.execute();
+        finalInfo.addAlterSqlFileAll(takeFinally.getTakeFinallySqlFileList());
+        reflectTakeFinallyResultToFinalInfo(finalInfo, takeFinally);
+    }
+
+    protected void reflectTakeFinallyResultToFinalInfo(DfAlterCheckFinalInfo finalInfo,
+            DfTakeFinallyFinalInfo takeFinally) {
+        final List<String> detailMessageList = takeFinally.getDetailMessageList();
+        for (String detailMessage : detailMessageList) {
+            finalInfo.addDetailMessage(detailMessage);
+        }
+        final SQLFailureException breakCause = takeFinally.getBreakCause();
+        if (breakCause != null) {
+            finalInfo.setBreakCause(breakCause);
+        }
+        final DfTakeFinallyAssertionFailureException assertionEx = takeFinally.getAssertionEx();
+        if (assertionEx != null) {
+            finalInfo.setTakeFinallyAssertionEx(assertionEx);
+        }
+        if (takeFinally.isFailure()) {
+            finalInfo.setFailure(true);
+        }
+    }
+
+    protected String getAlterCheckTakeFinallySqlFailureNotice() {
+        return "Failed to assert the AlterDDL's TakeFinally statements.";
     }
 
     // ===================================================================================
@@ -694,7 +775,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final String msg = br.buildExceptionMessage();
         finalInfo.setDiffFoundEx(new DfAlterCheckDifferenceFoundException(msg));
         finalInfo.setFailure(true);
-        finalInfo.addDetailMessage("x (found diff)");
+        finalInfo.addDetailMessage("x (found alter diff)");
     }
 
     protected String getAlterDiffNotice() {
@@ -709,26 +790,28 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                       Success Story
     //                                                                       =============
-    protected void processSuccess() {
+    protected void processSuccess(DfAlterCheckFinalInfo finalInfo) {
         _log.info("");
         _log.info("+-------------------+");
         _log.info("|                   |");
         _log.info("|   Success Story   |");
         _log.info("|                   |");
         _log.info("+-------------------+");
-        saveHistory();
+        saveHistory(finalInfo);
         deleteAllNGMark();
         deleteDiffResult();
     }
 
-    protected void saveHistory() {
+    protected void saveHistory(DfAlterCheckFinalInfo finalInfo) {
         final String currentDir = getHistoryCurrentDir();
-        final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
-        _log.info("...Saving history to " + currentDir);
-        for (File sqlFile : alterSqlFileList) {
-            final File historyTo = new File(currentDir + "/" + sqlFile.getName());
-            _log.info(" " + historyTo.getName());
-            sqlFile.renameTo(historyTo); // no check here
+        final List<File> alterSqlFileList = finalInfo.getAlterSqlFileList();
+        if (alterSqlFileList != null) { // just in case
+            _log.info("...Saving history to " + currentDir);
+            for (File sqlFile : alterSqlFileList) {
+                final File historyTo = new File(currentDir + "/" + sqlFile.getName());
+                _log.info(" " + historyTo.getName());
+                sqlFile.renameTo(historyTo); // no check here
+            }
         }
     }
 
@@ -794,19 +877,6 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected void deleteAlterCheckResultDiff() {
         final String diff = getMigrationAlterCheckResultDiff();
         deleteFile(new File(diff), "...Deleting the AlterCheck result diff");
-    }
-
-    // ===================================================================================
-    //                                                                          Final Info
-    //                                                                          ==========
-    protected void reflectFireResultToFinalInfo(DfAlterCheckFinalInfo finalInfo, DfSqlFileFireResult fireResult) {
-        finalInfo.setResultMessage(fireResult.getResultMessage());
-        final List<String> detailMessageList = extractDetailMessageList(fireResult);
-        for (String detailMessage : detailMessageList) {
-            finalInfo.addDetailMessage(detailMessage);
-        }
-        finalInfo.setBreakCause(fireResult.getBreakCause());
-        finalInfo.setFailure(fireResult.isExistsError());
     }
 
     // ===================================================================================
@@ -917,8 +987,20 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                        Alter Resource
     //                                        --------------
+    protected String getMigrationAlterDirectory() {
+        return getReplaceSchemaProperties().getMigrationAlterDirectory();
+    }
+
     protected List<File> getMigrationAlterSqlFileList() {
         return getReplaceSchemaProperties().getMigrationAlterSqlFileList();
+    }
+
+    protected List<File> getMigrationDraftAlterSqlFileList() {
+        return getReplaceSchemaProperties().getMigrationDraftAlterSqlFileList();
+    }
+
+    protected List<File> getMigrationDraftTakeFinallySqlFileList() {
+        return getReplaceSchemaProperties().getMigrationDraftTakeFinallySqlFileList();
     }
 
     // -----------------------------------------------------
@@ -990,5 +1072,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected String resolvePath(File file) {
         return Srl.replace(file.getPath(), "\\", "/");
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void useDraftSpace() {
+        _useDraftSpace = true;
     }
 }

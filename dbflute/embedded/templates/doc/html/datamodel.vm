@@ -239,7 +239,6 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #if ($database.hasDatabaseSchema())
 <p class="mainschema">generated from <strong>${database.databaseSchema.catalogSchema}</strong></p>
 #end
-<p class="updatedate">${database.timestampExpression}</p>
 #if ($database.hasClassificationDefinition())
 <p class="sublink"><a href="#cdef">Classification Definition</a></p>
 #end

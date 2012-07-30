@@ -30,6 +30,7 @@ import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -54,17 +55,27 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected DfAlterCheckFinalInfo _alterCheckFinalInfo;
     protected String _areYouReadyAnswer; // from environment variable
     protected boolean _cancelled;
+    protected String _varyingArg;
 
     // ===================================================================================
     //                                                                           Beginning
     //                                                                           =========
     @Override
     protected boolean begin() {
-        _log.info("+------------------------------------------+");
-        _log.info("|                                          |");
-        _log.info("|              ReplaceSchema               |");
-        _log.info("|                                          |");
-        _log.info("+------------------------------------------+");
+        {
+            _log.info("+------------------------------------------+");
+            _log.info("|                                          |");
+            _log.info("|              ReplaceSchema               |");
+        }
+        if (isAlterCheck()) {
+            _log.info("|              (AlterCheck)                |");
+        } else if (isSavePrevious()) {
+            _log.info("|              (SavePrevious)              |");
+        }
+        {
+            _log.info("|                                          |");
+            _log.info("+------------------------------------------+");
+        }
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.ReplaceSchema);
         final boolean letsGo = waitBeforeReps();
         if (!letsGo) {
@@ -115,15 +126,23 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     @Override
     protected void doExecute() {
         arrangeBeforeReps();
-        if (isAlterCheck()) {
+        if (isAlterProcess()) {
             processAlterCheck();
         } else {
             processMain();
         }
     }
 
+    protected boolean isAlterProcess() {
+        return isAlterCheck() || isSavePrevious();
+    }
+
     protected boolean isAlterCheck() {
-        return hasMigrationSavePreviousMark() || hasMigrationAlterSqlResource();
+        return hasMigrationAlterSqlResource() || isForcedAlterCheck();
+    }
+
+    protected boolean isSavePrevious() {
+        return hasMigrationSavePreviousMark() || isForcedSavePrevious();
     }
 
     protected void processAlterCheck() {
@@ -133,10 +152,13 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     protected void doProcessAlterCheck() {
         final DfAlterCheckProcess process = createAlterCheckProcess();
         try {
-            if (hasMigrationSavePreviousMark()) {
-                _alterCheckFinalInfo = process.savePrevious();
-            } else { // has alter-SQL resources
+            if (isAlterCheck()) {
+                if (isForcedAlterCheck()) {
+                    process.useDraftSpace();
+                }
                 _alterCheckFinalInfo = process.checkAlter();
+            } else if (isSavePrevious()) {
+                _alterCheckFinalInfo = process.savePrevious();
             }
             _alterCheckFinalInfo.throwAlterCheckExceptionIfExists();
         } finally {
@@ -434,9 +456,27 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     // ===================================================================================
+    //                                                                      Varying Option
+    //                                                                      ==============
+    protected boolean isForcedAlterCheck() {
+        return _varyingArg != null && _varyingArg.equals("alter-check");
+    }
+
+    protected boolean isForcedSavePrevious() {
+        return _varyingArg != null && _varyingArg.equals("save-previous");
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public void setAreYouReadyAnswer(String areYouReadyAnswer) {
         _areYouReadyAnswer = areYouReadyAnswer;
+    }
+
+    public void setVaryingArg(String varyingArg) {
+        if (Srl.is_Null_or_TrimmedEmpty(varyingArg)) {
+            return;
+        }
+        _varyingArg = varyingArg;
     }
 }

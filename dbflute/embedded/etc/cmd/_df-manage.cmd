@@ -40,3 +40,31 @@ if "%FIRST_ARG%"=="freegen" (
   echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-freegen.cmd %NATIVE_PROPERTIES_PATH% %SECOND_ARG%
 )
+
+if "%FIRST_ARG%"=="load-data-reverse" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the LoadDataReverse task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-doc.cmd %NATIVE_PROPERTIES_PATH% load-data-reverse %SECOND_ARG%
+)
+
+if "%FIRST_ARG%"=="schema-sync-check" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the SchemaSyncCheck task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-doc.cmd %NATIVE_PROPERTIES_PATH% schema-sync-check %SECOND_ARG%
+)
+
+if "%FIRST_ARG%"=="alter-check" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the AlterCheck task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-replace-schema.cmd %NATIVE_PROPERTIES_PATH% alter-check %SECOND_ARG%
+)
+
+if "%FIRST_ARG%"=="save-previous" (
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the AlterCheck task
+  echo nnnnnnnnnn/
+  call %DBFLUTE_HOME%\etc\cmd\_df-replace-schema.cmd %NATIVE_PROPERTIES_PATH% save-previous %SECOND_ARG%
+)
