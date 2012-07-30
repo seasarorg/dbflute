@@ -924,7 +924,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final List<String> suffixList = new ArrayList<String>();
         suffixList.add(".sql");
         suffixList.addAll(SystemScript.getSupportedExtList());
-        return doGetResourceFileList(targetDir, sqlTitle, suffixList.toArray(new String[] {}));
+        final String[] suffixes = suffixList.toArray(new String[] {});
+        final List<File> fileList = doGetResourceFileList(targetDir, sqlTitle, suffixes);
+        fileList.addAll(doGetResourceFileList(targetDir, "draft-" + sqlTitle, suffixes));
+        return fileList;
     }
 
     public List<File> getMigrationDraftTakeFinallySqlFileList() {
@@ -932,7 +935,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final String sqlTitle = getMigrationTakeFinallySqlTitle();
         final List<String> suffixList = new ArrayList<String>();
         suffixList.add(".sql");
-        return doGetResourceFileList(targetDir, sqlTitle, suffixList.toArray(new String[] {}));
+        final String[] suffixes = suffixList.toArray(new String[] {});
+        final List<File> fileList = doGetResourceFileList(targetDir, sqlTitle, suffixes);
+        fileList.addAll(doGetResourceFileList(targetDir, "draft-" + sqlTitle, suffixes));
+        return fileList;
     }
 
     public String getMigrationTakeFinallySqlTitle() {
