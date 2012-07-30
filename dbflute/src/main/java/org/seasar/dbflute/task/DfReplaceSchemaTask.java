@@ -323,16 +323,11 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         final DfReplaceSchemaFinalInfo finalInfo = _replaceSchemaFinalInfo; // null allowed
         boolean firstDone = false;
 
-        // AlterSchema
+        // AlterFailure
         boolean alterFailure = false;
         {
             final DfAlterCheckFinalInfo alterCheckFinalInfo = _alterCheckFinalInfo;
             if (alterCheckFinalInfo != null && alterCheckFinalInfo.isValidInfo()) {
-                if (firstDone) {
-                    sb.append(ln()).append(ln());
-                }
-                firstDone = true;
-                buildSchemaTaskContents(sb, alterCheckFinalInfo);
                 alterFailure = alterCheckFinalInfo.isFailure();
             }
         }
@@ -380,6 +375,18 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
                         buildSchemaTaskContents(sb, takeFinallyFinalInfo);
                     }
                 }
+            }
+        }
+
+        // AlterSchema
+        {
+            final DfAlterCheckFinalInfo alterCheckFinalInfo = _alterCheckFinalInfo;
+            if (alterCheckFinalInfo != null && alterCheckFinalInfo.isValidInfo()) {
+                if (firstDone) {
+                    sb.append(ln()).append(ln());
+                }
+                firstDone = true;
+                buildSchemaTaskContents(sb, alterCheckFinalInfo);
             }
         }
 
