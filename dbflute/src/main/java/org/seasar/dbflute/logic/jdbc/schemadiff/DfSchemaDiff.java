@@ -201,10 +201,6 @@ public class DfSchemaDiff extends DfAbstractDiff {
         return new DfSchemaDiff(previousReader, nextReader);
     }
 
-    public static DfSchemaDiff createAsPlain(DfSchemaXmlReader previousReader, DfSchemaXmlReader nextReader) {
-        return new DfSchemaDiff(previousReader, nextReader);
-    }
-
     // ===================================================================================
     //                                                                         Load Schema
     //                                                                         ===========
@@ -258,6 +254,14 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                        Analyze Diff
     //                                                                        ============
+    /**
+     * Analyze schema difference between previous and next.
+     * <pre>
+     * schemaDiff.loadPreviousSchema();
+     * schemaDiff.loadNextSchema();
+     * schemaDiff.analyzeDiff();
+     * </pre>
+     */
     public void analyzeDiff() {
         processAddedTable();
         processChangedTable();

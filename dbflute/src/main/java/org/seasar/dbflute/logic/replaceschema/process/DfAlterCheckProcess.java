@@ -39,6 +39,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
 import org.seasar.dbflute.helper.process.ProcessResult;
 import org.seasar.dbflute.helper.process.SystemScript;
+import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
@@ -112,20 +113,26 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     public DfAlterCheckFinalInfo checkAlter() {
-        processReady();
+        deleteAllNGMark();
+        deleteSchemaXml(); // if remains
 
-        // to be previous DB
-        rollbackSchema();
+        final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
 
-        final DfAlterCheckFinalInfo finalInfo = alterSchema();
+        // after AlterCheck, the database has altered schema
+        // so you can check your application on the environment
+
+        replaceSchema(finalInfo); // to be next DB
         if (finalInfo.isFailure()) {
             return finalInfo;
         }
+        serializeNextSchema();
 
-        replaceSchema(finalInfo);
+        rollbackSchema(); // to be previous DB
+        alterSchema(finalInfo);
         if (finalInfo.isFailure()) {
             return finalInfo;
         }
+        serializePreviousSchema();
 
         deleteAlterCheckResultDiff(); // to replace the result file
         final DfSchemaDiff schemaDiff = schemaDiff();
@@ -135,7 +142,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             processSuccess();
         }
 
-        processClosing();
+        deleteSchemaXml(); // not finally because of trace when abort
         return finalInfo;
     }
 
@@ -144,12 +151,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                ====================
     protected DfAlterCheckFinalInfo doSavePrevious() {
         _log.info("");
-        _log.info("* * * * * * * * *");
-        _log.info("*               *");
-        _log.info("* Save Previous *");
-        _log.info("*               *");
-        _log.info("* * * * * * * * *");
-        processReady();
+        _log.info("+-------------------+");
+        _log.info("|                   |");
+        _log.info("|   Save Previous   |");
+        _log.info("|                   |");
+        _log.info("+-------------------+");
+        deleteAllNGMark();
         final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
         finalInfo.setResultMessage("{Save Previous}");
         deleteExtractedPreviousResource();
@@ -388,11 +395,57 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // ===================================================================================
-    //                                                                               Ready
-    //                                                                               =====
-    protected void processReady() {
-        deleteAllNGMark();
-        deleteSchemaXml(); // resources may remain if previous execution aborts
+    //                                                                       ReplaceSchema
+    //                                                                       =============
+    protected void replaceSchema(DfAlterCheckFinalInfo finalInfo) {
+        _log.info("");
+        _log.info("+--------------------+");
+        _log.info("|                    |");
+        _log.info("|   Replace Schema   |");
+        _log.info("|                    |");
+        _log.info("+--------------------+");
+        try {
+            playMainProcess();
+        } catch (RuntimeException threwLater) {
+            markNextNG(getAlterCheckReplaceSchemaFailureNotice());
+            setupAlterCheckReplaceSchemaFailureException(finalInfo, threwLater);
+        }
+    }
+
+    protected void playMainProcess() {
+        _coreProcessPlayer.playNext(getPlaySqlDir());
+    }
+
+    protected void markNextNG(String notice) {
+        final String ngMark = getMigrationNextNGMark();
+        try {
+            final File markFile = new File(ngMark);
+            if (!markFile.exists()) {
+                _log.info("...Marking next-NG: " + ngMark);
+                markFile.createNewFile();
+                writeNotice(markFile, notice);
+            }
+        } catch (IOException e) {
+            String msg = "Failed to create a file for next-NG mark: " + ngMark;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    protected void setupAlterCheckReplaceSchemaFailureException(DfAlterCheckFinalInfo finalInfo, RuntimeException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(getAlterCheckReplaceSchemaFailureNotice());
+        br.addItem("Advice");
+        br.addElement("Make sure your NextDDL or data for ReplaceSchema are correct,");
+        br.addElement("resources just below 'playsql' directory, are correct.");
+        br.addElement("and after that, execute ReplaceSchema again to check AlterDDL");
+        String msg = br.buildExceptionMessage();
+        finalInfo.setReplaceSchemaFailureEx(new DfAlterCheckReplaceSchemaFailureException(msg, e));
+        finalInfo.setFailure(true);
+        finalInfo.addDetailMessage("x (replace failure)");
+    }
+
+    protected String getAlterCheckReplaceSchemaFailureNotice() {
+        return "Failed to replace the schema using NextDDL.";
     }
 
     // ===================================================================================
@@ -400,11 +453,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                    ================
     protected void rollbackSchema() {
         _log.info("");
-        _log.info("* * * * * * * * * * *");
-        _log.info("*                   *");
-        _log.info("* Roll-back Schema  *");
-        _log.info("*                   *");
-        _log.info("* * * * * * * * * * *");
+        _log.info("+----------------------+");
+        _log.info("|                      |");
+        _log.info("|   Roll-back Schema   |");
+        _log.info("|                      |");
+        _log.info("+----------------------+");
         try {
             final boolean unzipped = extractPreviousResource();
             playPreviousSchema();
@@ -454,31 +507,29 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                         AlterSchema
     //                                                                         ===========
-    protected DfAlterCheckFinalInfo alterSchema() {
+    protected DfAlterCheckFinalInfo alterSchema(DfAlterCheckFinalInfo finalInfo) {
         _log.info("");
-        _log.info("* * * * * * * * *");
-        _log.info("*               *");
-        _log.info("* Alter Schema  *");
-        _log.info("*               *");
-        _log.info("* * * * * * * * *");
-        final DfAlterCheckFinalInfo finalInfo = executeAlterSql();
+        _log.info("+------------------+");
+        _log.info("|                  |");
+        _log.info("|   Alter Schema   |");
+        _log.info("|                  |");
+        _log.info("+------------------+");
+        executeAlterSql(finalInfo);
         if (finalInfo.isFailure()) {
             markAlterNG(getAlterCheckAlterSqlFailureNotice());
             setupAlterCheckAlterSqlFailureException(finalInfo); // with handling break cause
-        } else {
-            serializeAlteredSchema();
         }
         return finalInfo;
     }
 
-    protected DfAlterCheckFinalInfo executeAlterSql() {
+    protected void executeAlterSql(DfAlterCheckFinalInfo finalInfo) {
         final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
         fireMan.setExecutorName("Alter Schema");
         final DfSqlFileRunner runner = new DfSqlFileRunnerExecute(runInfo, _dataSource);
         final DfSqlFileFireResult result = fireMan.fire(runner, alterSqlFileList);
-        return createFinalInfo(result);
+        reflectFireResultToFinalInfo(finalInfo, result);
     }
 
     protected DfSqlFileFireMan createSqlFileFireMan() {
@@ -520,22 +571,6 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         };
     }
 
-    protected void serializeAlteredSchema() {
-        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer();
-        serializer.serialize();
-    }
-
-    protected DfSchemaXmlSerializer createSchemaXmlSerializer() {
-        final String schemaXml = getMigrationAlterCheckSchemaXml();
-        final String diffFile = getMigrationAlterCheckResultDiff();
-        return DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema, schemaXml, diffFile);
-    }
-
-    protected DfSchemaXmlSerializer createSchemaXmlSerializer(String diffFile) {
-        final String schemaXml = getMigrationAlterCheckSchemaXml();
-        return DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema, schemaXml, diffFile);
-    }
-
     protected void setupAlterCheckAlterSqlFailureException(DfAlterCheckFinalInfo finalInfo) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice(getAlterCheckAlterSqlFailureNotice());
@@ -561,57 +596,23 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // ===================================================================================
-    //                                                                       ReplaceSchema
-    //                                                                       =============
-    protected void replaceSchema(DfAlterCheckFinalInfo finalInfo) {
-        _log.info("");
-        _log.info("* * * * * * * * * *");
-        _log.info("*                 *");
-        _log.info("* Replace Schema  *");
-        _log.info("*                 *");
-        _log.info("* * * * * * * * * *");
-        try {
-            playMainProcess();
-        } catch (RuntimeException threwLater) {
-            markNextNG(getAlterCheckReplaceSchemaFailureNotice());
-            setupAlterCheckReplaceSchemaFailureException(finalInfo, threwLater);
-        }
+    //                                                                    Serialize Schema
+    //                                                                    ================
+    protected void serializePreviousSchema() {
+        final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
+        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(previousXml);
+        serializer.serialize();
     }
 
-    protected void playMainProcess() {
-        _coreProcessPlayer.playNext(getPlaySqlDir());
+    protected void serializeNextSchema() {
+        final String nextXml = getMigrationAlterCheckNextSchemaXml();
+        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(nextXml);
+        serializer.serialize();
     }
 
-    protected void markNextNG(String notice) {
-        final String ngMark = getMigrationNextNGMark();
-        try {
-            final File markFile = new File(ngMark);
-            if (!markFile.exists()) {
-                _log.info("...Marking next-NG: " + ngMark);
-                markFile.createNewFile();
-                writeNotice(markFile, notice);
-            }
-        } catch (IOException e) {
-            String msg = "Failed to create a file for next-NG mark: " + ngMark;
-            throw new IllegalStateException(msg, e);
-        }
-    }
-
-    protected void setupAlterCheckReplaceSchemaFailureException(DfAlterCheckFinalInfo finalInfo, RuntimeException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice(getAlterCheckReplaceSchemaFailureNotice());
-        br.addItem("Advice");
-        br.addElement("Make sure your NextDDL or data for ReplaceSchema are correct,");
-        br.addElement("resources just below 'playsql' directory, are correct.");
-        br.addElement("and after that, execute ReplaceSchema again to check AlterDDL");
-        String msg = br.buildExceptionMessage();
-        finalInfo.setReplaceSchemaFailureEx(new DfAlterCheckReplaceSchemaFailureException(msg, e));
-        finalInfo.setFailure(true);
-        finalInfo.addDetailMessage("x (replace failure)");
-    }
-
-    protected String getAlterCheckReplaceSchemaFailureNotice() {
-        return "Failed to replace the schema using NextDDL.";
+    protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml) {
+        final String historyFile = null; // no use history here (use SchemaDiff directly later)
+        return DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema, schemaXml, historyFile);
     }
 
     // ===================================================================================
@@ -619,14 +620,18 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                          ==========
     protected DfSchemaDiff schemaDiff() {
         _log.info("");
-        _log.info("* * * * * * * *");
-        _log.info("*             *");
-        _log.info("* Schema Diff *");
-        _log.info("*             *");
-        _log.info("* * * * * * * *");
-        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer();
-        serializer.serialize();
-        return serializer.getSchemaDiff();
+        _log.info("+-----------------+");
+        _log.info("|                 |");
+        _log.info("|   Schema Diff   |");
+        _log.info("|                 |");
+        _log.info("+-----------------|");
+        final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
+        final String nextXml = getMigrationAlterCheckNextSchemaXml();
+        final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsFlexible(previousXml, nextXml);
+        schemaDiff.loadPreviousSchema();
+        schemaDiff.loadNextSchema();
+        schemaDiff.analyzeDiff();
+        return schemaDiff;
     }
 
     // ===================================================================================
@@ -634,13 +639,26 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                     ===============
     protected void processDifference(DfAlterCheckFinalInfo finalInfo, DfSchemaDiff schemaDiff) {
         _log.info("");
-        _log.info("* * * * * * * * * *");
-        _log.info("*                 *");
-        _log.info("* Different Story *");
-        _log.info("*                 *");
-        _log.info("* * * * * * * * * *");
+        _log.info("+---------------------+");
+        _log.info("|                     |");
+        _log.info("|   Different Story   |");
+        _log.info("|                     |");
+        _log.info("+---------------------+");
+        serializeSchemaDiff(schemaDiff);
         markAlterNG(getAlterDiffNotice());
         handleAlterDiff(finalInfo, schemaDiff);
+    }
+
+    protected void serializeSchemaDiff(DfSchemaDiff schemaDiff) {
+        final String resultDiff = getMigrationAlterCheckResultDiff();
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(resultDiff);
+        try {
+            _log.info("...Serializing schema diff: " + resultDiff);
+            schemaHistory.serializeSchemaDiff(schemaDiff);
+        } catch (IOException e) {
+            String msg = "Failed to serialize schema diff: resultDiff=" + resultDiff;
+            throw new IllegalStateException(msg, e);
+        }
     }
 
     protected void markAlterNG(String notice) {
@@ -693,11 +711,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                       =============
     protected void processSuccess() {
         _log.info("");
-        _log.info("* * * * * * * * *");
-        _log.info("*               *");
-        _log.info("* Success Story *");
-        _log.info("*               *");
-        _log.info("* * * * * * * * *");
+        _log.info("+-------------------+");
+        _log.info("|                   |");
+        _log.info("|   Success Story   |");
+        _log.info("|                   |");
+        _log.info("+-------------------+");
         saveHistory();
         deleteAllNGMark();
         deleteDiffResult();
@@ -781,8 +799,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
-    protected DfAlterCheckFinalInfo createFinalInfo(DfSqlFileFireResult fireResult) {
-        final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
+    protected void reflectFireResultToFinalInfo(DfAlterCheckFinalInfo finalInfo, DfSqlFileFireResult fireResult) {
         finalInfo.setResultMessage(fireResult.getResultMessage());
         final List<String> detailMessageList = extractDetailMessageList(fireResult);
         for (String detailMessage : detailMessageList) {
@@ -790,7 +807,6 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         }
         finalInfo.setBreakCause(fireResult.getBreakCause());
         finalInfo.setFailure(fireResult.isExistsError());
-        return finalInfo;
     }
 
     // ===================================================================================
@@ -801,8 +817,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void deleteSchemaXml() {
-        final String schemaXml = getMigrationAlterCheckSchemaXml();
-        deleteFile(new File(schemaXml), "...Deleting the SchemaXml file");
+        final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
+        final String nextXml = getMigrationAlterCheckNextSchemaXml();
+        deleteFile(new File(previousXml), "...Deleting the SchemaXml file for previous schema");
+        deleteFile(new File(nextXml), "...Deleting the SchemaXml file for next schema");
     }
 
     // ===================================================================================
@@ -932,8 +950,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().getMigrationAlterCheckResultDiff();
     }
 
-    protected String getMigrationAlterCheckSchemaXml() {
-        return getReplaceSchemaProperties().getMigrationAlterCheckSchemaXml();
+    protected String getMigrationAlterCheckPreviousSchemaXml() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckPreviousSchemaXml();
+    }
+
+    protected String getMigrationAlterCheckNextSchemaXml() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckNextSchemaXml();
     }
 
     // -----------------------------------------------------

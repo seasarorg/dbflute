@@ -267,7 +267,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #foreach ($group in $col.classificationTop.groupList)
 #if ($group.hasGroupComment())
     /**
-     * ${group.groupComment}
+     * ${group.groupComment} <br />
+     * ${group.buildElementDisp()}
      * @return The determination, true or false.
      */
 #end

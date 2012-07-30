@@ -742,7 +742,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${classificationTop.topComment}
 #end
 #if ($group.hasGroupComment())
-     * ${group.groupComment}
+     * ${group.groupComment} <br />
+     * ${group.buildElementDisp()}
 #end
      */
     public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {

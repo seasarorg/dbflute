@@ -81,7 +81,7 @@ public class DfSchemaXmlSerializer {
     protected final DataSource _dataSource;
     protected final UnifiedSchema _mainSchema;
     protected final String _schemaXml;
-    protected final String _historyFile;
+    protected final String _historyFile; // NullAllowed
     protected final DfSchemaDiff _schemaDiff;
 
     // -----------------------------------------------------
@@ -127,6 +127,12 @@ public class DfSchemaXmlSerializer {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * @param dataSource The data source of the database. (NotNull)
+     * @param mainSchema The main schema as unified schema. (NotNull)
+     * @param schemaXml The XML file to output meta info of the schema. (NotNull)
+     * @param historyFile The history file of schema-diff. (NullAllowed: if null, no action for schema-diff)
+     */
     protected DfSchemaXmlSerializer(DataSource dataSource, UnifiedSchema mainSchema, String schemaXml,
             String historyFile) {
         _dataSource = dataSource;
@@ -144,6 +150,11 @@ public class DfSchemaXmlSerializer {
         }
     }
 
+    /**
+     * @param dataSource The data source of the database. (NotNull)
+     * @param mainSchema The main schema as unified schema. (NotNull)
+     * @return The new instance. (NotNull)
+     */
     public static DfSchemaXmlSerializer createAsCore(DataSource dataSource, UnifiedSchema mainSchema) {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
@@ -152,6 +163,13 @@ public class DfSchemaXmlSerializer {
         return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
     }
 
+    /**
+     * @param dataSource The data source of the database. (NotNull)
+     * @param mainSchema The main schema as unified schema. (NotNull)
+     * @param schemaXml The XML file to output meta info of the schema. (NotNull)
+     * @param historyFile The history file of schema-diff. (NullAllowed: if null, no action for schema-diff)
+     * @return The new instance. (NotNull)
+     */
     public static DfSchemaXmlSerializer createAsManage(DataSource dataSource, UnifiedSchema mainSchema,
             String schemaXml, String historyFile) {
         DfSchemaXmlSerializer serializer = new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
@@ -1006,6 +1024,9 @@ public class DfSchemaXmlSerializer {
     //                                                                         Schema Diff
     //                                                                         ===========
     protected void loadPreviousSchema() {
+        if (_historyFile == null) {
+            return;
+        }
         try {
             doLoadPreviousSchema();
         } catch (RuntimeException continued) {
@@ -1022,6 +1043,9 @@ public class DfSchemaXmlSerializer {
     }
 
     protected void loadNextSchema() {
+        if (_historyFile == null) {
+            return;
+        }
         try {
             doLoadNextSchema();
         } catch (RuntimeException continued) {

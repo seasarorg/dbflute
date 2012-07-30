@@ -2,9 +2,13 @@ package org.seasar.dbflute.properties.assistant.classification;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop.DfClassificationGroup;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -30,6 +34,7 @@ public class DfClassificationElement {
     //                                                                           =========
     protected String _classificationName; // required
     protected String _table; // table classification only
+    protected DfClassificationTop _classificationTop; // after registered to top
 
     // basic items
     protected String _code;
@@ -110,6 +115,52 @@ public class DfClassificationElement {
     }
 
     // ===================================================================================
+    //                                                                         SubItem Map
+    //                                                                         ===========
+    public String buildSubItemExpForSchemaHtml() {
+        if (_subItemMap == null || _subItemMap.isEmpty()) {
+            return "&nbsp;";
+        }
+        final StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (Entry<String, Object> entry : _subItemMap.entrySet()) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
+            if (index > 0) {
+                sb.append("\n, ");
+            }
+            sb.append(key).append("=").append(value);
+            ++index;
+        }
+        return filterSubItemForSchemaHtml(sb.toString());
+    }
+
+    protected String filterSubItemForSchemaHtml(String str) {
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        return prop.resolveTextForSchemaHtml(Srl.replace(str, "\\n", "\n"));
+    }
+
+    // ===================================================================================
+    //                                                                        Grouping Map
+    //                                                                        ============
+    public boolean isGroup(String groupName) {
+        if (_classificationTop == null) {
+            return false;
+        }
+        final List<DfClassificationGroup> groupList = _classificationTop.getGroupList();
+        for (DfClassificationGroup group : groupList) {
+            if (groupName.equals(group.getGroupName())) {
+                final List<String> elementNameList = group.getElementNameList();
+                if (elementNameList.contains(_name)) {
+                    return true;
+                }
+                break;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
@@ -135,6 +186,14 @@ public class DfClassificationElement {
 
     public void setTable(String table) {
         this._table = table;
+    }
+
+    public DfClassificationTop getClassificationTop() {
+        return _classificationTop;
+    }
+
+    public void setClassificationTop(DfClassificationTop classificationTop) {
+        this._classificationTop = classificationTop;
     }
 
     public String getCode() {

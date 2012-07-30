@@ -72,10 +72,26 @@ public interface ${glCDef} extends Classification {
 #end
         public ClassificationMeta meta() { return ${glCDef}.DefMeta.${classificationName}; }
 
+#foreach ($regularSubItem in $classificationTop.regularSubItemList)
+#set ($subItemMap = $classificationElement.subItemMap)
+#set ($subItemType = "Object")
+#if ($regularSubItem.isSubItemTypeString())
+#set ($subItemType = "String")
+#end
+        public ${subItemType} ${regularSubItem.subItemName}() {
+#if ($regularSubItem.isSubItemTypeObject())
+            return subItemMap().get("${regularSubItem.subItemName}");
+#else
+            return (${subItemType})subItemMap().get("${regularSubItem.subItemName}");
+#end
+        }
+
+#end
 #foreach ($group in $classificationTop.groupList)
 #if ($group.hasGroupComment())
         /**
-         * ${group.groupComment}
+         * ${group.groupComment} <br />
+         * ${group.buildElementDisp()}
          * @return The determination, true or false.
          */
 #end

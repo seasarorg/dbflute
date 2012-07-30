@@ -130,6 +130,99 @@ public class DfClassificationTop {
     }
 
     // ===================================================================================
+    //                                                                         SubItem Map
+    //                                                                         ===========
+    public boolean hasSubItem() {
+        final List<DfClassificationElement> elementList = getClassificationElementList();
+        for (DfClassificationElement element : elementList) {
+            Map<String, Object> subItemMap = element.getSubItemMap();
+            if (subItemMap != null && !subItemMap.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<DfClassificationRegularSubItem> getRegularSubItemList() {
+        final List<DfClassificationElement> elementList = getClassificationElementList();
+        final Map<String, List<Object>> subItemListMap = new LinkedHashMap<String, List<Object>>();
+        for (DfClassificationElement element : elementList) {
+            final Map<String, Object> subItemMap = element.getSubItemMap();
+            if (subItemMap == null) {
+                continue;
+            }
+            for (Entry<String, Object> entry : subItemMap.entrySet()) {
+                final String subItemKey = entry.getKey();
+                final Object subItemValue = entry.getValue();
+                List<Object> subItemList = subItemListMap.get(subItemKey);
+                if (subItemList == null) {
+                    subItemList = new ArrayList<Object>();
+                    subItemListMap.put(subItemKey, subItemList);
+                }
+                subItemList.add(subItemValue);
+            }
+        }
+        final String typeObject = DfClassificationRegularSubItem.TYPE_OBJECT;
+        final String typeString = DfClassificationRegularSubItem.TYPE_STRING;
+        final List<DfClassificationRegularSubItem> regularSubItemList = new ArrayList<DfClassificationRegularSubItem>();
+        final int elementSize = elementList.size();
+        for (Entry<String, List<Object>> entry : subItemListMap.entrySet()) {
+            final String subItemKey = entry.getKey();
+            final List<Object> subItemList = entry.getValue();
+            if (subItemList != null && subItemList.size() == elementSize) {
+                String subItemType = null;
+                for (Object value : subItemList) {
+                    if (value == null) {
+                        continue;
+                    }
+                    if (!(value instanceof String)) {
+                        subItemType = typeObject;
+                        break;
+                    } else if (Srl.startsWith((String) value, "map:", "list:")) {
+                        subItemType = typeObject;
+                        break;
+                    }
+                }
+                if (subItemType == null) {
+                    subItemType = typeString;
+                }
+                regularSubItemList.add(new DfClassificationRegularSubItem(subItemKey, subItemType));
+            }
+        }
+        return regularSubItemList;
+    }
+
+    public static class DfClassificationRegularSubItem {
+        // Object or String only supported
+        public static final String TYPE_OBJECT = "Object";
+        public static final String TYPE_STRING = "String";
+
+        protected final String _subItemName;
+        protected final String _subItemType;
+
+        public DfClassificationRegularSubItem(String subItemName, String subItemType) {
+            _subItemName = subItemName;
+            _subItemType = subItemType;
+        }
+
+        public boolean isSubItemTypeObject() {
+            return _subItemType.equals(TYPE_OBJECT);
+        }
+
+        public boolean isSubItemTypeString() {
+            return _subItemType.equals(TYPE_STRING);
+        }
+
+        public String getSubItemName() {
+            return _subItemName;
+        }
+
+        public String getSubItemType() {
+            return _subItemType;
+        }
+    }
+
+    // ===================================================================================
     //                                                                        Grouping Map
     //                                                                        ============
     public List<DfClassificationGroup> getGroupList() {
@@ -200,6 +293,10 @@ public class DfClassificationTop {
                 ++index;
             }
             return sb.toString();
+        }
+
+        public String buildElementDisp() {
+            return "The group elements:" + _elementNameList;
         }
 
         public String getClassificationName() {
@@ -287,10 +384,14 @@ public class DfClassificationTop {
     }
 
     public void addClassificationElement(DfClassificationElement classificationElement) {
+        classificationElement.setClassificationTop(this);
         this._elementList.add(classificationElement);
     }
 
     public void addClassificationElementAll(List<DfClassificationElement> classificationElementList) {
+        for (DfClassificationElement element : classificationElementList) {
+            element.setClassificationTop(this);
+        }
         this._elementList.addAll(classificationElementList);
     }
 
@@ -334,7 +435,7 @@ public class DfClassificationTop {
         this._deprecated = deprecated;
     }
 
-    public Map<String, Map<String, Object>> getGroupingAll() {
+    public Map<String, Map<String, Object>> getGroupingMap() {
         return this._groupingMap;
     }
 
