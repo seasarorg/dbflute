@@ -92,11 +92,20 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                           =========
     @Override
     protected boolean begin() {
-        _log.info("+------------------------------------------+");
-        _log.info("|                                          |");
-        _log.info("|                   Doc                    |");
-        _log.info("|                                          |");
-        _log.info("+------------------------------------------+");
+        {
+            _log.info("+------------------------------------------+");
+            _log.info("|                                          |");
+            _log.info("|                   Doc                    |");
+        }
+        if (isLoadDataReverseOnly()) {
+            _log.info("|            (LoadDataReverse)             |");
+        } else if (isSchemaSyncCheckOnly()) {
+            _log.info("|            (SchemaSyncCheck)             |");
+        }
+        {
+            _log.info("|                                          |");
+            _log.info("+------------------------------------------+");
+        }
         DfDBFluteTaskStatus.getInstance().setTaskType(TaskType.Doc);
         return true;
     }
