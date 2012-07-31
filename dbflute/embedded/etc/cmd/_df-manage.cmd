@@ -63,8 +63,8 @@ if "%FIRST_ARG%"=="alter-check" (
 )
 
 if "%FIRST_ARG%"=="save-previous" (
-  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnn
-  echo ...Calling the AlterCheck task
+  echo /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+  echo ...Calling the SavePrevious task
   echo nnnnnnnnnn/
   call %DBFLUTE_HOME%\etc\cmd\_df-replace-schema.cmd %NATIVE_PROPERTIES_PATH% save-previous %SECOND_ARG%
 )
