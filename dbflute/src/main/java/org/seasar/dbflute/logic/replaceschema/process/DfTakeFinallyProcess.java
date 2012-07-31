@@ -13,6 +13,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
+import org.seasar.dbflute.exception.DfTakeFinallyNonAssertionSqlFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
@@ -53,41 +55,59 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     protected final String _sqlRootDir;
     protected final DataSource _dataSource;
     protected final UnifiedSchema _mainSchema;
+    protected final DfTakeFinallySqlFileProvider _sqlFileProvider; // NullAllowed: if null, use default
+
+    // -----------------------------------------------------
+    //                                                Option
+    //                                                ------
     protected boolean _suppressSequenceIncrement;
-    protected boolean _suppressApplicationPlaySql;
     protected boolean _skipIfNonAssetionSql;
+    protected boolean _restrictIfNonAssetionSql;
     protected boolean _rollbackTransaction;
     protected boolean _continueIfAssetionFailure;
 
+    // -----------------------------------------------------
+    //                                                Result
+    //                                                ------
     protected final List<File> _executedSqlFileList = DfCollectionUtil.newArrayList();
     protected final List<DfTakeFinallyAssertionFailureException> _continuedExList = DfCollectionUtil.newArrayList();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfTakeFinallyProcess(String sqlRootDir, DataSource dataSource, UnifiedSchema mainSchema) {
+    protected DfTakeFinallyProcess(String sqlRootDir, DataSource dataSource, UnifiedSchema mainSchema,
+            DfTakeFinallySqlFileProvider sqlFileProvider) {
         _sqlRootDir = sqlRootDir;
         _dataSource = dataSource;
         _mainSchema = mainSchema;
+        _sqlFileProvider = sqlFileProvider;
+    }
+
+    public static interface DfTakeFinallySqlFileProvider {
+        List<File> provide();
     }
 
     public static DfTakeFinallyProcess createAsCore(String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema);
+        return new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
     }
 
     public static DfTakeFinallyProcess createAsTakeAssert(String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema);
-        return process.suppressSequenceIncrement().suppressApplicationPlaySql().skipIfNonAssetionSql()
-                .rollbackTransaction().continueIfAssetionFailure();
+        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, null);
+        return process.suppressSequenceIncrement().skipIfNonAssetionSql().rollbackTransaction()
+                .continueIfAssetionFailure();
     }
 
-    public static DfTakeFinallyProcess createAsAlterCheck(String sqlRootDir, DataSource dataSource) {
+    public static DfTakeFinallyProcess createAsAlterCheck(final String sqlRootDir, DataSource dataSource) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema);
-        return process.suppressSequenceIncrement().suppressApplicationPlaySql().skipIfNonAssetionSql()
-                .rollbackTransaction();
+        final DfTakeFinallySqlFileProvider provider = new DfTakeFinallySqlFileProvider() {
+            public List<File> provide() {
+                return getReplaceSchemaProperties().getMigrationAlterTakeFinallySqlFileList(sqlRootDir);
+            }
+        };
+        final DfTakeFinallyProcess process = new DfTakeFinallyProcess(sqlRootDir, dataSource, mainSchema, provider);
+        return process.suppressSequenceIncrement().restrictIfNonAssetionSql().rollbackTransaction();
     }
 
     protected DfTakeFinallyProcess suppressSequenceIncrement() {
@@ -95,13 +115,13 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return this;
     }
 
-    protected DfTakeFinallyProcess suppressApplicationPlaySql() {
-        _suppressApplicationPlaySql = true;
+    protected DfTakeFinallyProcess skipIfNonAssetionSql() {
+        _skipIfNonAssetionSql = true;
         return this;
     }
 
-    protected DfTakeFinallyProcess skipIfNonAssetionSql() {
-        _skipIfNonAssetionSql = true;
+    protected DfTakeFinallyProcess restrictIfNonAssetionSql() {
+        _restrictIfNonAssetionSql = true;
         return this;
     }
 
@@ -246,6 +266,8 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
                     if (_skipIfNonAssetionSql) {
                         _log.info("*Skipped the statement because of not assertion SQL");
                         return DfRunnerDispatchResult.SKIPPED;
+                    } else if (_restrictIfNonAssetionSql) {
+                        throwTakeFinallyNonAssertionSqlFoundException(sqlFile, sql);
                     } else {
                         return DfRunnerDispatchResult.NONE;
                     }
@@ -265,6 +287,20 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         return runnerExecute;
     }
 
+    protected void throwTakeFinallyNonAssertionSqlFoundException(File sqlFile, String sql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found the non-assertion SQL.");
+        br.addItem("Advice");
+        br.addElement("Confirm your SQL files for TakeFinally.");
+        br.addElement("For example, non-assertion SQL on AlterCheck's TakeFinally is restricted.");
+        br.addItem("SQL File");
+        br.addElement(sqlFile.getPath());
+        br.addItem("non-assertion SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
+        throw new DfTakeFinallyNonAssertionSqlFoundException(msg);
+    }
+
     protected void handleAssertionFailureException(DfTakeFinallyAssertionFailureException e) {
         if (_continueIfAssetionFailure) { // save for final message
             _continuedExList.add(e);
@@ -274,11 +310,12 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected List<File> getTakeFinallySqlFileList() {
+        if (_sqlFileProvider != null) {
+            return _sqlFileProvider.provide();
+        }
         final List<File> fileList = new ArrayList<File>();
         fileList.addAll(getReplaceSchemaProperties().getTakeFinallySqlFileList(_sqlRootDir));
-        if (!_suppressApplicationPlaySql) {
-            fileList.addAll(getReplaceSchemaProperties().getAppcalitionTakeFinallySqlFileList());
-        }
+        fileList.addAll(getReplaceSchemaProperties().getAppcalitionTakeFinallySqlFileList());
         return fileList;
     }
 

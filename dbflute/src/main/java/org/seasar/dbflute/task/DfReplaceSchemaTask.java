@@ -68,7 +68,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
             _log.info("|              ReplaceSchema               |");
         }
         if (isAlterCheck()) {
-            _log.info("|              (AlterCheck)                |");
+            _log.info("|               (AlterCheck)               |");
         } else if (isSavePrevious()) {
             _log.info("|              (SavePrevious)              |");
         }

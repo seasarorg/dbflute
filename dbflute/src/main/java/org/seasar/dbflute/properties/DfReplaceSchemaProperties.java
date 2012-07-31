@@ -891,8 +891,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // -----------------------------------------------------
-    //                                        Alter Resource
-    //                                        --------------
+    //                                          Alter Schema
+    //                                          ------------
     public String getMigrationAlterDirectory() {
         return getMigrationDir() + "/alter";
     }
@@ -914,6 +914,20 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return !getMigrationAlterSqlFileList().isEmpty();
     }
 
+    // -----------------------------------------------------
+    //                                     Alter TakeFinally
+    //                                     -----------------
+    public List<File> getMigrationAlterTakeFinallySqlFileList(String sqlRootDir) {
+        return doGetSchemaSqlFileList(sqlRootDir, getMigrationAlterTakeFinallySqlTitle());
+    }
+
+    public String getMigrationAlterTakeFinallySqlTitle() {
+        return "alter-take-finally"; // same as normal
+    }
+
+    // -----------------------------------------------------
+    //                                           Alter Draft
+    //                                           -----------
     public String getMigrationDraftAlterDirectory() {
         return getMigrationDir() + "/alter/draft";
     }
@@ -932,17 +946,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public List<File> getMigrationDraftTakeFinallySqlFileList() {
         final String targetDir = getMigrationDraftAlterDirectory();
-        final String sqlTitle = getMigrationTakeFinallySqlTitle();
+        final String sqlTitle = getMigrationAlterTakeFinallySqlTitle();
         final List<String> suffixList = new ArrayList<String>();
         suffixList.add(".sql");
         final String[] suffixes = suffixList.toArray(new String[] {});
         final List<File> fileList = doGetResourceFileList(targetDir, sqlTitle, suffixes);
         fileList.addAll(doGetResourceFileList(targetDir, "draft-" + sqlTitle, suffixes));
         return fileList;
-    }
-
-    public String getMigrationTakeFinallySqlTitle() {
-        return getTakeFinallySqlTitle(); // same as normal
     }
 
     // -----------------------------------------------------
