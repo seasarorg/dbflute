@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.seasar.dbflute.util.DfCollectionUtil;
-
 /**
  * @author jflute
  * @since 0.9.8.3 (2011/04/30 Saturday)
@@ -66,7 +64,7 @@ public class DfReplaceSchemaResourceFinder {
                 }
             }
         } else {
-            resourceFileList = DfCollectionUtil.emptyList();
+            resourceFileList = new ArrayList<File>();
         }
         return resourceFileList;
     }
