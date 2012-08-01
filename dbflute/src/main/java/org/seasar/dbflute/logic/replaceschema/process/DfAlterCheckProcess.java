@@ -546,7 +546,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final List<File> draftAlterSqlFileList = getMigrationDraftAlterSqlFileList();
         draftAlterSqlFileList.addAll(getMigrationDraftTakeFinallySqlFileList());
         for (File draftAlterSqlFile : draftAlterSqlFileList) {
-            final String draftFilePath = draftAlterSqlFile.getPath();
+            final String draftFilePath = resolvePath(draftAlterSqlFile);
             final String dirBase = Srl.substringLastFront(draftFilePath, "/alter/draft/");
             String pureFileName = Srl.substringLastRear(draftFilePath, "/draft/");
             if (pureFileName.startsWith("draft-")) {
