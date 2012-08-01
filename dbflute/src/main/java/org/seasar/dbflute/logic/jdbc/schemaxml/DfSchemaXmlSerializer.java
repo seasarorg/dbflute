@@ -210,6 +210,7 @@ public class DfSchemaXmlSerializer {
 
         final String filePath = _schemaXml;
         final String encoding = getSchemaXmlEncoding();
+        OutputStreamWriter writer = null;
         try {
             initializeIdentityMapIfNeeds();
             generateXML();
@@ -220,8 +221,7 @@ public class DfSchemaXmlSerializer {
             final XMLSerializer xmlSerializer;
             {
                 mkdirIfNotExists(filePath);
-                final FileOutputStream fis = new FileOutputStream(filePath);
-                final OutputStreamWriter writer = new OutputStreamWriter(fis, encoding);
+                writer = new OutputStreamWriter(new FileOutputStream(filePath), encoding);
                 final OutputFormat outputFormar = new OutputFormat(Method.XML, encoding, true);
                 xmlSerializer = new XMLSerializer(writer, outputFormar);
             }
@@ -236,6 +236,13 @@ public class DfSchemaXmlSerializer {
             throw new IllegalStateException(e);
         } catch (Exception e) {
             throw new IllegalStateException(e);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
 
         loadNextSchema();
