@@ -138,7 +138,7 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
     }
 
     protected boolean isAlterCheck() {
-        return hasMigrationAlterSqlResource() || isForcedAlterCheck();
+        return hasMigrationAlterCheckMark() || isForcedAlterCheck();
     }
 
     protected boolean isSavePrevious() {
@@ -447,8 +447,8 @@ public class DfReplaceSchemaTask extends DfAbstractTask {
         return getReplaceSchemaProperties().getPlaySqlDir();
     }
 
-    public boolean hasMigrationAlterSqlResource() {
-        return getReplaceSchemaProperties().hasMigrationAlterSqlResource();
+    public boolean hasMigrationAlterCheckMark() {
+        return getReplaceSchemaProperties().hasMigrationAlterCheckMark();
     }
 
     public boolean hasMigrationSavePreviousMark() {

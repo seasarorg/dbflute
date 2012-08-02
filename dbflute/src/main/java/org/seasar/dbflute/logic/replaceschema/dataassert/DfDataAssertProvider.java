@@ -137,18 +137,22 @@ public class DfDataAssertProvider {
     // ===================================================================================
     //                                                                              Assert
     //                                                                              ======
-    protected void assertCountZero(File sqlFile, Statement statement, String sql) throws SQLException {
-        assertCount(sqlFile, statement, sql, false);
+    protected void assertCountZero(File sqlFile, Statement st, String sql) throws SQLException {
+        assertCount(sqlFile, st, sql, false);
     }
 
-    protected void assertCountExists(File sqlFile, Statement statement, String sql) throws SQLException {
-        assertCount(sqlFile, statement, sql, true);
+    protected void assertCountExists(File sqlFile, Statement st, String sql) throws SQLException {
+        assertCount(sqlFile, st, sql, true);
     }
 
-    protected void assertCount(File sqlFile, Statement statement, String sql, boolean exists) throws SQLException {
+    protected void assertCount(File sqlFile, Statement st, String sql, boolean exists) throws SQLException {
+        if (st == null) {
+            String msg = "The argument 'st' should not be null: sqlFile=" + sqlFile;
+            throw new IllegalStateException(msg);
+        }
         ResultSet rs = null;
         try {
-            rs = statement.executeQuery(sql);
+            rs = st.executeQuery(sql);
             int count = 0;
             while (rs.next()) {// One loop only!
                 count = rs.getInt(1);
@@ -173,18 +177,22 @@ public class DfDataAssertProvider {
         }
     }
 
-    protected void assertListZero(File sqlFile, Statement statement, String sql) throws SQLException {
-        assertList(sqlFile, statement, sql, false);
+    protected void assertListZero(File sqlFile, Statement st, String sql) throws SQLException {
+        assertList(sqlFile, st, sql, false);
     }
 
-    protected void assertListExists(File sqlFile, Statement statement, String sql) throws SQLException {
-        assertList(sqlFile, statement, sql, true);
+    protected void assertListExists(File sqlFile, Statement st, String sql) throws SQLException {
+        assertList(sqlFile, st, sql, true);
     }
 
-    protected void assertList(File sqlFile, Statement statement, String sql, boolean exists) throws SQLException {
+    protected void assertList(File sqlFile, Statement st, String sql, boolean exists) throws SQLException {
+        if (st == null) {
+            String msg = "The argument 'st' should not be null: sqlFile=" + sqlFile;
+            throw new IllegalStateException(msg);
+        }
         ResultSet rs = null;
         try {
-            rs = statement.executeQuery(sql);
+            rs = st.executeQuery(sql);
             final ResultSetMetaData metaData = rs.getMetaData();
             final int columnCount = metaData.getColumnCount();
             final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();

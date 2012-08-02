@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -35,7 +36,9 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
 import org.seasar.dbflute.helper.process.ProcessResult;
 import org.seasar.dbflute.helper.process.SystemScript;
@@ -43,6 +46,8 @@ import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
+import org.seasar.dbflute.logic.replaceschema.dataassert.DfDataAssertHandler;
+import org.seasar.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.resource.DBFluteSystem;
@@ -583,7 +588,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
         fireMan.setExecutorName("Alter Schema");
-        final DfSqlFileRunner runner = new DfSqlFileRunnerExecute(runInfo, _dataSource);
+        final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
         final DfSqlFileFireResult result = fireMan.fire(runner, alterSqlFileList);
         finalInfo.addAlterSqlFileAll(alterSqlFileList);
         reflectAlterResultToFinalInfo(finalInfo, result);
@@ -626,6 +631,23 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                 }
             }
         };
+    }
+
+    protected DfSqlFileRunner createSqlFileRunner(final DfRunnerInformation runInfo) {
+        final String loadType = getReplaceSchemaProperties().getRepsEnvType();
+        final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(loadType);
+        final DfSqlFileRunnerExecute runnerExecute = new DfSqlFileRunnerExecute(runInfo, _dataSource);
+        runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
+            public DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException {
+                final DfDataAssertHandler dataAssertHandler = dataAssertProvider.provideDataAssertHandler(sql);
+                if (dataAssertHandler == null) {
+                    return DfRunnerDispatchResult.NONE;
+                }
+                dataAssertHandler.handle(sqlFile, st, sql);
+                return DfRunnerDispatchResult.DISPATCHED;
+            }
+        });
+        return runnerExecute;
     }
 
     protected void reflectAlterResultToFinalInfo(DfAlterCheckFinalInfo finalInfo, DfSqlFileFireResult fireResult) {

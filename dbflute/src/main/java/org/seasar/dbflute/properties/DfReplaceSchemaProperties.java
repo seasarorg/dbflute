@@ -1032,6 +1032,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // -----------------------------------------------------
     //                                         Mark Resource
     //                                         -------------
+    public String getMigrationAlterCheckMark() {
+        return doGetMigrationMark("alter-check.dfmark");
+    }
+
+    public boolean hasMigrationAlterCheckMark() {
+        return doHasMigrationMark(getMigrationAlterCheckMark());
+    }
+
     public String getMigrationSavePreviousMark() {
         return doGetMigrationMark("save-previous.dfmark");
     }

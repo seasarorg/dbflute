@@ -133,22 +133,17 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     @Override
     protected void doExecute() {
         if (isLoadDataReverseOnly()) {
-            _log.info("/- - - - - - - - - - - - -");
-            _log.info("*LoadDataReverse only here");
-            _log.info("- - - - - - - - - -/");
             initializeSchemaData(); // needed
             processLoadDataReverse();
             return;
         } else if (isSchemaSyncCheckOnly()) {
-            _log.info("/- - - - - - - - - - - - -");
-            _log.info("*SchemaSyncCheck only here");
-            _log.info("- - - - - - - - - -/");
             processSchemaSyncCheck();
             return;
         }
         processSchemaHtml();
-        processLoadDataReverse();
-        processSchemaSyncCheck();
+        // these processes are independent since 0.9.9.7B
+        //processLoadDataReverse();
+        //processSchemaSyncCheck();
         refreshResources();
     }
 

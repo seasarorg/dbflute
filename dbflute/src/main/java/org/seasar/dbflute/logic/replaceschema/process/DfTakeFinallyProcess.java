@@ -257,10 +257,10 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
                 return getReplaceSchemaProperties().isTargetRepsFile(sql);
             }
         };
+        final String loadType = getReplaceSchemaProperties().getRepsEnvType();
+        final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(loadType);
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
             public DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException {
-                final String loadType = getReplaceSchemaProperties().getRepsEnvType();
-                final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(loadType);
                 final DfDataAssertHandler dataAssertHandler = dataAssertProvider.provideDataAssertHandler(sql);
                 if (dataAssertHandler == null) {
                     if (_skipIfNonAssetionSql) {
@@ -271,10 +271,6 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
                     } else {
                         return DfRunnerDispatchResult.NONE;
                     }
-                }
-                if (st == null) {
-                    String msg = "The statement was null: sqlFile=" + sqlFile;
-                    throw new IllegalStateException(msg);
                 }
                 try {
                     dataAssertHandler.handle(sqlFile, st, sql);
