@@ -31,6 +31,8 @@ rm ./log/*.log
 . doc.sh
 . generate.sh
 . sql2entity.sh
+. manage.sh load-data-reverse
+. manage.sh schema-sync-check
 
 cd ../../dbflute-mysql-example/dbflute_exampledb
 rm ./log/*.log
@@ -39,6 +41,7 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
+. manage.sh load-data-reverse
 
 cd ../../dbflute-postgresql-example/dbflute_exampledb
 rm ./log/*.log
@@ -47,3 +50,4 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
+. manage.sh load-data-reverse

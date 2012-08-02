@@ -19,6 +19,7 @@ import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureCountNotZeroExc
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureListNotExistsException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureListNotZeroException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionInvalidMarkException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -228,82 +229,72 @@ public class DfDataAssertProvider {
     }
 
     protected void throwAssertionFailureCountNotZeroException(File sqlFile, String sql, int resultCount) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects ZERO but the result was NOT ZERO!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your test data!" + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL File]" + ln() + sqlFile + ln();
-        msg = msg + ln();
-        msg = msg + "[Executed SQL]" + ln() + sql + ln();
-        msg = msg + ln();
-        msg = msg + "[Result Count]" + ln() + resultCount + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The SQL expects ZERO but the result was NOT ZERO.");
+        br.addItem("Advice");
+        br.addElement("Make sure your business data constraints.");
+        br.addItem("SQL File");
+        br.addElement(sqlFile);
+        br.addItem("Executed SQL");
+        br.addElement(sql);
+        br.addItem("Result Count");
+        br.addElement(resultCount);
+        final String msg = br.buildExceptionMessage();
         throw new DfTakeFinallyAssertionFailureCountNotZeroException(msg);
     }
 
     protected void throwAssertionFailureCountNotExistsException(File sqlFile, String sql, int resultCount) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects EXISTS but the result was NOT EXISTS!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your test data!" + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL File]" + ln() + sqlFile + ln();
-        msg = msg + ln();
-        msg = msg + "[Executed SQL]" + ln() + sql + ln();
-        msg = msg + ln();
-        msg = msg + "[Result Count]" + ln() + resultCount + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The SQL expects EXISTS but the result was NOT EXISTS.");
+        br.addItem("Advice");
+        br.addElement("Make sure your business data constraints.");
+        br.addItem("SQL File");
+        br.addElement(sqlFile);
+        br.addItem("Executed SQL");
+        br.addElement(sql);
+        br.addItem("Result Count");
+        br.addElement(resultCount);
+        final String msg = br.buildExceptionMessage();
         throw new DfTakeFinallyAssertionFailureCountNotExistsException(msg);
     }
 
     protected void throwAssertionFailureListNotZeroException(File sqlFile, String sql, int resultCount,
             List<Map<String, String>> resultList) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects ZERO but the result was NOT ZERO!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your test data!" + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL File]" + ln() + sqlFile + ln();
-        msg = msg + ln();
-        msg = msg + "[Executed SQL]" + ln() + sql + ln();
-        msg = msg + ln();
-        msg = msg + "[Result Count]" + ln() + resultCount + ln();
-        msg = msg + ln();
-        msg = msg + "[Result List]" + ln();
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The SQL expects ZERO but the result was NOT ZERO.");
+        br.addItem("Advice");
+        br.addElement("Make sure your business data constraints.");
+        br.addItem("SQL File");
+        br.addElement(sqlFile);
+        br.addItem("Executed SQL");
+        br.addElement(sql);
+        br.addItem("Result Count");
+        br.addElement(resultCount);
+        br.addItem("Result List");
         for (Map<String, String> recordMap : resultList) {
-            msg = msg + recordMap + ln();
+            br.addElement(recordMap);
         }
-        msg = msg + "* * * * * * * * * */";
+        final String msg = br.buildExceptionMessage();
         throw new DfTakeFinallyAssertionFailureListNotZeroException(msg);
     }
 
     protected void throwAssertionFailureListNotExistsException(File sqlFile, String sql, int resultCount,
             List<Map<String, String>> resultList) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects EXISTS but the result was NOT EXISTS!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your test data!" + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL File]" + ln() + sqlFile + ln();
-        msg = msg + ln();
-        msg = msg + "[Executed SQL]" + ln() + sql + ln();
-        msg = msg + ln();
-        msg = msg + "[Result Count]" + ln() + resultCount + ln();
-        msg = msg + ln();
-        msg = msg + "[Result List]" + ln();
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The SQL expects EXISTS but the result was NOT EXISTS.");
+        br.addItem("Advice");
+        br.addElement("Make sure your business data constraints.");
+        br.addItem("SQL File");
+        br.addElement(sqlFile);
+        br.addItem("Executed SQL");
+        br.addElement(sql);
+        br.addItem("Result Count");
+        br.addElement(resultCount);
+        br.addItem("Result List");
         for (Map<String, String> recordMap : resultList) {
-            msg = msg + recordMap + ln();
+            br.addElement(recordMap);
         }
-        msg = msg + "* * * * * * * * * */";
+        final String msg = br.buildExceptionMessage();
         throw new DfTakeFinallyAssertionFailureListNotExistsException(msg);
     }
 

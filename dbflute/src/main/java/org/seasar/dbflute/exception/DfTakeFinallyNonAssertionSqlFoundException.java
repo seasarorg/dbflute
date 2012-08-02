@@ -3,7 +3,7 @@ package org.seasar.dbflute.exception;
 /**
  * @author jflute
  */
-public class DfTakeFinallyNonAssertionSqlFoundException extends DfTakeFinallyAssertionFailureException {
+public class DfTakeFinallyNonAssertionSqlFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

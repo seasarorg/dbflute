@@ -79,6 +79,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     protected final CoreProcessPlayer _coreProcessPlayer;
 
     // -----------------------------------------------------
+    //                                                 Trace
+    //                                                 -----
+    protected final List<File> _executedAlterSqlFileList = DfCollectionUtil.newArrayList();
+
+    // -----------------------------------------------------
     //                                                Option
     //                                                ------
     protected boolean _useDraftSpace;
@@ -151,6 +156,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             processDifference(finalInfo, schemaDiff);
         } else {
             processSuccess(finalInfo);
+            deleteAlterCheckMark();
         }
 
         deleteSubmittedDraftFile(finalInfo);
@@ -589,9 +595,13 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
         fireMan.setExecutorName("Alter Schema");
         final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
-        final DfSqlFileFireResult result = fireMan.fire(runner, alterSqlFileList);
         finalInfo.addAlterSqlFileAll(alterSqlFileList);
-        reflectAlterResultToFinalInfo(finalInfo, result);
+        try {
+            final DfSqlFileFireResult result = fireMan.fire(runner, alterSqlFileList);
+            reflectAlterResultToFinalInfo(finalInfo, result);
+        } catch (DfTakeFinallyAssertionFailureException e) {
+            handleTakeFinallyAssertionFailureException(finalInfo, e);
+        }
     }
 
     protected DfSqlFileFireMan createSqlFileFireMan() {
@@ -600,6 +610,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return new DfSqlFileFireMan() {
             @Override
             protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
+                _executedAlterSqlFileList.add(sqlFile);
                 final String path = resolvePath(sqlFile);
                 if (!Srl.endsWith(path, scriptExtAry)) { // SQL file
                     return super.processSqlFile(runner, sqlFile);
@@ -664,6 +675,29 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return "Failed to execute the AlterDDL statements.";
     }
 
+    protected void handleTakeFinallyAssertionFailureException(DfAlterCheckFinalInfo finalInfo,
+            DfTakeFinallyAssertionFailureException e) {
+        finalInfo.setResultMessage("{Alter Schema}: *asserted");
+        final int fileListSize = _executedAlterSqlFileList.size();
+        int index = 0;
+        for (File executedAlterSqlFile : _executedAlterSqlFileList) {
+            final StringBuilder sb = new StringBuilder();
+            final String pureFileName = Srl.substringLastRear(executedAlterSqlFile.getPath(), "/");
+            if (index == fileListSize - 1) { // last loop
+                sb.append("x ");
+            } else {
+                sb.append("o ");
+            }
+            sb.append(pureFileName);
+            finalInfo.addDetailMessage(sb.toString());
+            ++index;
+        }
+        finalInfo.addDetailMessage(" >> " + DfTypeUtil.toClassTitle(e));
+        finalInfo.addDetailMessage(" (Look at the exception message: console or dbflute.log)");
+        finalInfo.setTakeFinallyAssertionEx(e);
+        finalInfo.setFailure(true);
+    }
+
     // -----------------------------------------------------
     //                                          Take Finally
     //                                          ------------
@@ -696,6 +730,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected String getAlterCheckTakeFinallySqlFailureNotice() {
         return "Failed to assert the AlterDDL's TakeFinally statements.";
+    }
+
+    protected void deleteAlterCheckMark() {
+        final String mark = getMigrationAlterCheckMark();
+        deleteFile(new File(mark), "...Deleting the alter-check mark");
     }
 
     // ===================================================================================
@@ -1065,6 +1104,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                         Mark Resource
     //                                         -------------
+    protected String getMigrationAlterCheckMark() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckMark();
+    }
+
     protected String getMigrationSavePreviousMark() {
         return getReplaceSchemaProperties().getMigrationSavePreviousMark();
     }
