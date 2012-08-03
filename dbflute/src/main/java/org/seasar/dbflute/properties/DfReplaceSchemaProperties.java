@@ -1080,6 +1080,18 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return doHasMigrationMark(getMigrationPreviousNGMark());
     }
 
+    public String getMigrationCheckedAlterMarkBasicName() {
+        return "checked-alter";
+    }
+
+    public String getMigrationSkippedAlterMarkBasicName() {
+        return "skipped-alter";
+    }
+
+    public String getMigrationFinishedAlterMarkBasicName() {
+        return "finished-alter";
+    }
+
     protected String doGetMigrationMark(String pureName) {
         return getMigrationDir() + "/" + pureName;
     }

@@ -27,9 +27,9 @@
 #     ; isCheckColumnDefOrderDiff = true
 #     ; isCheckDbCommentDiff = true
 #     ; loadDataReverseMap = map:{
-#         ; recordLimit = 10
-#         ; isContainsCommonColumn = false
-#         ; isOutputToPlaySql = false
+#         ; recordLimit = -1
+#         ; isContainsCommonColumn = true
+#         ; isOutputToPlaySql = true
 #     }
 #     ; schemaSyncCheckMap = map:{
 #         ; url = jdbc:...

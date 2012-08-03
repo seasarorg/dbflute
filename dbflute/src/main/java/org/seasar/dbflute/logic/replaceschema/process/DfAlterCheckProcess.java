@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
@@ -23,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfAlterCheckAlterScriptSQLException;
+import org.seasar.dbflute.exception.DfAlterCheckAlterSqlNotFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckDifferenceFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
@@ -177,6 +179,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         deleteAllNGMark();
         final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
         finalInfo.setResultMessage("{Save Previous}");
+        finishPreviousCheckedAlter();
         deleteExtractedPreviousResource();
         final List<File> copyToFileList = copyToPreviousResource();
         compressPreviousResource();
@@ -189,13 +192,35 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return finalInfo;
     }
 
+    protected void finishPreviousCheckedAlter() {
+        final String previousDate = findLatestPreviousDate();
+        if (previousDate == null) {
+            return;
+        }
+        final List<File> checkedAlterZipList = findCheckedAlterZipList(previousDate);
+        if (checkedAlterZipList == null) {
+            return;
+        }
+        final String checkedAlterMarkBasicName = getMigrationCheckedAlterMarkBasicName();
+        final String finishedAlterMarkBasicName = getMigrationFinishedAlterMarkBasicName();
+        for (File checkedAlterZip : checkedAlterZipList) {
+            final String path = resolvePath(checkedAlterZip);
+            final String baseDir = Srl.substringLastFront(path, "/");
+            final String pureName = Srl.substringLastRear(path, "/");
+            final String renamedName = Srl.replace(pureName, checkedAlterMarkBasicName, finishedAlterMarkBasicName);
+            final File renamedFile = new File(baseDir + "/" + renamedName);
+            _log.info("...Finishing the previous history (renamed to): " + resolvePath(renamedFile));
+            checkedAlterZip.renameTo(renamedFile);
+        }
+    }
+
     // -----------------------------------------------------
     //                                              Compress
     //                                              --------
     protected void compressPreviousResource() {
         deleteExistingPreviousZip();
         final File previousZip = getCurrentTargetPreviousZip();
-        _log.info("...Compressing the previous resources to zip: " + previousZip.getPath());
+        _log.info("...Compressing the previous resources to zip: " + resolvePath(previousZip));
         final DfZipArchiver archiver = new DfZipArchiver(previousZip);
         archiver.compress(new File(getMigrationPreviousDir()), new FileFilter() {
             public boolean accept(File file) {
@@ -207,7 +232,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                     result = !name.endsWith(".zip");
                 }
                 if (result) {
-                    _log.info("  " + file.getPath());
+                    _log.info("  " + resolvePath(file));
                 }
                 return result;
             }
@@ -297,7 +322,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         if (copyToFile.exists()) {
             copyToFile.delete();
         }
-        _log.info("...Saving the file to " + copyToFile.getPath());
+        _log.info("...Saving the file to " + resolvePath(copyToFile));
         copyFile(mainFile, copyToFile);
         copyToFileList.add(copyToFile);
     }
@@ -334,37 +359,30 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             return false;
         }
         deleteExtractedPreviousResource();
-        _log.info("...Extracting the previous resources from zip: " + previousZip.getPath());
+        _log.info("...Extracting the previous resources from zip: " + resolvePath(previousZip));
         final DfZipArchiver archiver = new DfZipArchiver(previousZip);
         final Set<String> traceSet = new HashSet<String>();
         archiver.extract(new File(getMigrationPreviousDir()), new FileFilter() {
             public boolean accept(File file) {
-                final String path = file.getPath();
+                final String path = resolvePath(file);
                 traceSet.add(path);
                 _log.info("  " + path);
                 return true;
             }
         });
         if (traceSet.isEmpty()) {
-            String msg = "Not found the files in the zip: " + previousZip.getPath();
+            String msg = "Not found the files in the zip: " + resolvePath(previousZip);
             throw new IllegalStateException(msg);
         }
         return true;
     }
 
     protected File findLatestPreviousZip() {
-        List<File> previousZipList = findPreviousZipList();
+        final List<File> previousZipList = findPreviousZipList();
         if (previousZipList.isEmpty()) {
             return null;
         }
-        File latestFile = null;
-        for (File previousZip : previousZipList) {
-            final String name = previousZip.getName();
-            if (latestFile == null || latestFile.getName().compareTo(name) < 0) {
-                latestFile = previousZip;
-            }
-        }
-        return latestFile;
+        return findLatestNameFile(previousZipList);
     }
 
     // -----------------------------------------------------
@@ -379,7 +397,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             final StringBuilder sb = new StringBuilder();
             sb.append("[Saved Previous Resources]: " + currentDate());
             for (File moveToFile : copyToFileList) {
-                sb.append(ln()).append(moveToFile.getPath());
+                sb.append(ln()).append(resolvePath(moveToFile));
             }
             sb.append(ln()).append("(" + copyToFileList.size() + " files)");
             sb.append(ln());
@@ -549,9 +567,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                            Draft File
     //                                            ----------
-    protected List<File> submitDraftFile(DfAlterCheckFinalInfo finalInfo) {
+    protected void submitDraftFile(DfAlterCheckFinalInfo finalInfo) {
         if (!_useDraftSpace) {
-            return DfCollectionUtil.emptyList();
+            return;
         }
         final List<File> submittedFileList = new ArrayList<File>();
         final List<File> draftAlterSqlFileList = getMigrationDraftAlterSqlFileList();
@@ -565,11 +583,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             }
             final File dest = new File(dirBase + "/alter/" + pureFileName);
             submittedFileList.add(dest);
-            _log.info("...Submitting the draft file to " + dest.getPath());
+            _log.info("...Submitting the draft file to " + resolvePath(dest));
             copyFile(draftAlterSqlFile, dest);
         }
         finalInfo.addSubmittedDraftFileAll(submittedFileList);
-        return submittedFileList;
     }
 
     protected void deleteSubmittedDraftFile(DfAlterCheckFinalInfo finalInfo) {
@@ -586,10 +603,13 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                            Alter Fire
     //                                            ----------
     protected void executeAlterSql(DfAlterCheckFinalInfo finalInfo) {
-        final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
+        List<File> alterSqlFileList = getMigrationAlterSqlFileList();
         if (alterSqlFileList.isEmpty()) {
-            String msg = "Not found the AlterDDL under the alter directory.";
-            throw new IllegalStateException(msg);
+            restoreLatestCheckedAlterSql();
+            alterSqlFileList = getMigrationAlterSqlFileList();
+            if (alterSqlFileList.isEmpty()) {
+                throwAlterCheckAlterSqlNotFoundException();
+            }
         }
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = createSqlFileFireMan();
@@ -602,6 +622,41 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         } catch (DfTakeFinallyAssertionFailureException e) {
             handleTakeFinallyAssertionFailureException(finalInfo, e);
         }
+    }
+
+    protected void throwAlterCheckAlterSqlNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the AlterDDL under the alter directory.");
+        br.addItem("Advice");
+        br.addElement("You should put AlterDDL under the alter directory like this:");
+        br.addElement("  playsql");
+        br.addElement("   |-data");
+        br.addElement("   |-migration");
+        br.addElement("   |  |-alter");
+        br.addElement("   |  |  |-alter-schema.sql");
+        br.addElement("   |  |-previous");
+        br.addElement("   |  |-schema");
+        final String msg = br.buildExceptionMessage();
+        throw new DfAlterCheckAlterSqlNotFoundException(msg);
+    }
+
+    protected void restoreLatestCheckedAlterSql() {
+        final String previousDate = findLatestPreviousDate();
+        if (previousDate == null) {
+            return;
+        }
+        final File checkedAlterZip = findLatestCheckedAlterZip(previousDate);
+        if (checkedAlterZip == null) {
+            return;
+        }
+        _log.info("...Restoring the latest checked-alter: " + resolvePath(checkedAlterZip));
+        final DfZipArchiver archiver = new DfZipArchiver(checkedAlterZip);
+        archiver.extract(new File(getMigrationAlterDirectory()), new FileFilter() {
+            public boolean accept(File file) {
+                _log.info("  " + resolvePath(file));
+                return true;
+            }
+        });
     }
 
     protected DfSqlFileFireMan createSqlFileFireMan() {
@@ -682,7 +737,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         int index = 0;
         for (File executedAlterSqlFile : _executedAlterSqlFileList) {
             final StringBuilder sb = new StringBuilder();
-            final String pureFileName = Srl.substringLastRear(executedAlterSqlFile.getPath(), "/");
+            final String pureFileName = Srl.substringLastRear(resolvePath(executedAlterSqlFile), "/");
             if (index == fileListSize - 1) { // last loop
                 sb.append("x ");
             } else {
@@ -864,16 +919,36 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void saveHistory(DfAlterCheckFinalInfo finalInfo) {
-        final String currentDir = getHistoryCurrentDir();
+        final String previousDate = findLatestPreviousDate(); // may be null
         final List<File> alterSqlFileList = finalInfo.getAlterSqlFileList();
-        if (alterSqlFileList != null) { // just in case
-            _log.info("...Saving history to " + currentDir);
-            for (File sqlFile : alterSqlFileList) {
-                final File historyTo = new File(currentDir + "/" + sqlFile.getName());
-                _log.info(" " + historyTo.getName());
-                sqlFile.renameTo(historyTo); // no check here
-            }
+        if (alterSqlFileList == null) { // just in case
+            return;
         }
+        final String checkedAlterZipName;
+        if (previousDate != null) {
+            checkedAlterZipName = buildCheckedAlterZipName(previousDate);
+        } else {
+            checkedAlterZipName = getMigrationCheckedAlterMarkBasicName() + ".zip";
+        }
+        skipSameStoryHistory(checkedAlterZipName, previousDate);
+        final String currentDir = getHistoryCurrentDir();
+        final String checkedAlterZipPath = currentDir + "/" + checkedAlterZipName;
+        _log.info("...Saving the history to " + checkedAlterZipPath);
+        final DfZipArchiver archiver = new DfZipArchiver(new File(checkedAlterZipPath));
+        archiver.suppressSubDir();
+        archiver.compress(new File(getMigrationAlterDirectory()), new FileFilter() {
+            public boolean accept(File file) {
+                _log.info("  " + resolvePath(file));
+                return true;
+            }
+        });
+        for (File sqlFile : alterSqlFileList) {
+            sqlFile.delete(); // no check here
+        }
+    }
+
+    protected String buildCheckedAlterZipName(String previousDate) {
+        return getMigrationCheckedAlterMarkBasicName() + "-to-" + previousDate + ".zip";
     }
 
     protected String getHistoryCurrentDir() {
@@ -888,23 +963,123 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return currentDir;
     }
 
-    protected void mkdirsDirIfNotExists(String dirPath) {
-        final File dir = new File(dirPath);
-        if (!dir.exists()) {
-            dir.mkdirs();
+    protected void skipSameStoryHistory(String checkedAlterZipName, String previousDate) {
+        if (previousDate == null) { // basically for compatible
+            return;
         }
-    }
-
-    protected void mkdirsFileIfNotExists(String filePath) {
-        final File dir = new File(Srl.substringLastFront(filePath, "/"));
-        if (!dir.exists()) {
-            dir.mkdirs();
+        final List<File> firstLevelDirList = findHistoryFirstLevelDirList();
+        final String markBasicName = getMigrationSkippedAlterMarkBasicName();
+        for (File firstLevelDir : firstLevelDirList) {
+            final List<File> secondLevelDirList = findHistorySecondLevelDirList(firstLevelDir);
+            for (File secondLevelDir : secondLevelDirList) {
+                final String basePath = resolvePath(secondLevelDir);
+                final File successStoryFile = new File(basePath + "/" + checkedAlterZipName);
+                if (successStoryFile.exists()) {
+                    _log.info("...Skipping the same story: " + basePath);
+                    final String skippedZipName = basePath + "/" + markBasicName + "-to-" + previousDate + ".zip";
+                    successStoryFile.renameTo(new File(skippedZipName));
+                }
+            }
         }
     }
 
     // ===================================================================================
-    //                                                                       Mark Resource
-    //                                                                       =============
+    //                                                                   Previous Resource
+    //                                                                   =================
+    protected String findLatestPreviousDate() {
+        return doExtractPreviousDate(findLatestPreviousZip());
+    }
+
+    protected String doExtractPreviousDate(File previousZip) {
+        if (previousZip == null) {
+            return null;
+        }
+        final String previousName = Srl.substringLastFront(previousZip.getName(), ".");
+        return Srl.substringFirstRear(previousName, "previous-");
+    }
+
+    // ===================================================================================
+    //                                                                    History Resource
+    //                                                                    ================
+    protected File findCheckedAlterZip(File secondLevelDir, String previousDate) {
+        if (secondLevelDir == null) {
+            return null;
+        }
+        final String checkedAlterZipName = buildCheckedAlterZipName(previousDate);
+        final File[] listFiles = secondLevelDir.listFiles(new FilenameFilter() {
+            public boolean accept(File file, String name) {
+                return name.equals(checkedAlterZipName);
+            }
+        });
+        if (listFiles == null || listFiles.length == 0) {
+            return null;
+        }
+        return listFiles[0]; // must be only one
+    }
+
+    protected List<File> findCheckedAlterZipList(String previousDate) {
+        final List<File> fisrtLevelDirList = findHistoryFirstLevelDirList();
+        final List<File> checkedAlterZipList = DfCollectionUtil.newArrayList();
+        for (File fisrtLevelDir : fisrtLevelDirList) {
+            final List<File> secondLevelDirList = findHistorySecondLevelDirList(fisrtLevelDir);
+            for (File secondLevelDir : secondLevelDirList) {
+                final File checkedAlter = findCheckedAlterZip(secondLevelDir, previousDate);
+                if (checkedAlter != null) {
+                    checkedAlterZipList.add(checkedAlter);
+                }
+            }
+        }
+        return checkedAlterZipList;
+    }
+
+    protected File findLatestCheckedAlterZip(String previousDate) {
+        final List<File> fisrtLevelDirList = findHistoryFirstLevelDirList();
+        final File latestFisrtLevelDir = findLatestNameFile(fisrtLevelDirList);
+        if (latestFisrtLevelDir == null) {
+            return null;
+        }
+        final List<File> secondLevelDirList = findHistorySecondLevelDirList(latestFisrtLevelDir);
+        final File latestSecondLevelDir = findLatestNameFile(secondLevelDirList);
+        if (latestSecondLevelDir == null) {
+            return null;
+        }
+        return findCheckedAlterZip(latestSecondLevelDir, previousDate);
+    }
+
+    protected List<File> findHistoryFirstLevelDirList() {
+        final File historyDir = new File(getMigrationHistoryDir());
+        if (!historyDir.isDirectory() || !historyDir.exists()) {
+            return DfCollectionUtil.newArrayList();
+        }
+        final File[] firstLevelDirList = historyDir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isDirectory();
+            }
+        });
+        if (firstLevelDirList == null) {
+            return DfCollectionUtil.newArrayList();
+        }
+        return DfCollectionUtil.newArrayList(firstLevelDirList);
+    }
+
+    protected List<File> findHistorySecondLevelDirList(File firstLevelDir) {
+        if (firstLevelDir == null) {
+            return DfCollectionUtil.newArrayList();
+        }
+        final File[] secondLevelDirList = firstLevelDir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isDirectory();
+            }
+        });
+        if (secondLevelDirList == null) {
+            return DfCollectionUtil.newArrayList();
+        }
+        return DfCollectionUtil.newArrayList(secondLevelDirList);
+    }
+
+    // ===================================================================================
+    //                                                                         Delete Mark
+    //                                                                         ===========
     protected void deleteAllNGMark() {
         deleteNextNGMark();
         deleteAlterNGMark();
@@ -985,10 +1160,20 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         }
     }
 
+    protected File findLatestNameFile(List<File> fileList) {
+        File latestFile = null;
+        for (File currentFile : fileList) {
+            if (latestFile == null || latestFile.getName().compareTo(currentFile.getName()) < 0) {
+                latestFile = currentFile;
+            }
+        }
+        return latestFile;
+    }
+
     protected void deleteFile(File file, String msg) {
         if (file.exists()) {
             if (msg != null) {
-                _log.info(msg + ": " + file.getPath());
+                _log.info(msg + ": " + resolvePath(file));
             }
             file.delete();
         }
@@ -1016,6 +1201,13 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                 } catch (IOException ignored) {
                 }
             }
+        }
+    }
+
+    protected void mkdirsDirIfNotExists(String dirPath) {
+        final File dir = new File(dirPath);
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
     }
 
@@ -1126,6 +1318,18 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected String getMigrationPreviousNGMark() {
         return getReplaceSchemaProperties().getMigrationPreviousNGMark();
+    }
+
+    public String getMigrationCheckedAlterMarkBasicName() {
+        return getReplaceSchemaProperties().getMigrationCheckedAlterMarkBasicName();
+    }
+
+    public String getMigrationSkippedAlterMarkBasicName() {
+        return getReplaceSchemaProperties().getMigrationSkippedAlterMarkBasicName();
+    }
+
+    public String getMigrationFinishedAlterMarkBasicName() {
+        return getReplaceSchemaProperties().getMigrationFinishedAlterMarkBasicName();
     }
 
     // ===================================================================================

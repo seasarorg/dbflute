@@ -17,14 +17,15 @@ import org.apache.commons.compress.utils.IOUtils;
 
 /**
  * @author jflute
- * @since 0.9.9.6 (2012/07/15 Sunday)
+ * @since 0.9.9.7A (2012/07/15 Sunday)
  */
 public class DfZipArchiver {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected File _zipFile;
+    protected final File _zipFile;
+    protected boolean _suppressSubDir;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -36,12 +37,12 @@ public class DfZipArchiver {
     // ===================================================================================
     //                                                                            Compress
     //                                                                            ========
-    public void compress(File baseDir, FileFilter filter) {
-        if (baseDir == null) {
-            throw new IllegalArgumentException("The argument 'baseDir' should not be null.");
+    public void compress(File targetFile, FileFilter filter) {
+        if (targetFile == null) {
+            throw new IllegalArgumentException("The argument 'targetFile' should not be null.");
         }
-        if (!baseDir.exists()) {
-            throw new IllegalArgumentException("The baseDir was not found in the file system: " + baseDir);
+        if (!targetFile.exists()) {
+            throw new IllegalArgumentException("The targetFile was not found in the file system: " + targetFile);
         }
         OutputStream out = null;
         ZipArchiveOutputStream archive = null;
@@ -50,8 +51,8 @@ public class DfZipArchiver {
             archive = new ZipArchiveOutputStream(out);
             archive.setEncoding("UTF-8");
 
-            final String basePath = baseDir.getAbsolutePath();
-            addAll(archive, basePath, baseDir, filter);
+            final File topDir = targetFile.isDirectory() ? targetFile : targetFile.getParentFile();
+            addAll(archive, topDir, targetFile, filter);
 
             archive.finish();
             archive.flush();
@@ -75,37 +76,44 @@ public class DfZipArchiver {
         }
     }
 
-    protected void addAll(ArchiveOutputStream archive, String basePath, File targetFile, FileFilter filter)
+    protected void addAll(ArchiveOutputStream archive, File topDir, File targetFile, FileFilter filter)
             throws IOException {
+        if (_suppressSubDir && isSubDir(topDir, targetFile)) {
+            return;
+        }
         if (!filter.accept(targetFile)) {
             return;
         }
         if (targetFile.isDirectory()) {
             final File[] listFiles = targetFile.listFiles();
             if (listFiles == null || listFiles.length == 0) {
-                addDir(archive, basePath, targetFile);
+                addDir(archive, topDir, targetFile);
             } else {
-                for (File file : listFiles) {
-                    addAll(archive, basePath, file, filter);
+                for (File elementFile : listFiles) {
+                    addAll(archive, topDir, elementFile, filter);
                 }
             }
         } else {
-            addFile(archive, basePath, targetFile);
+            addFile(archive, topDir, targetFile);
         }
     }
 
-    protected void addDir(ArchiveOutputStream archive, String basePath, File file) throws IOException {
-        final String path = file.getAbsolutePath();
-        final String name = path.substring(basePath.length());
+    protected boolean isSubDir(File topFile, File targetFile) {
+        return targetFile.isDirectory() && !topFile.equals(targetFile);
+    }
+
+    protected void addDir(ArchiveOutputStream archive, File topDir, File targetDir) throws IOException {
+        final String path = targetDir.getAbsolutePath();
+        final String name = path.substring(topDir.getAbsolutePath().length());
         archive.putArchiveEntry(new ZipArchiveEntry(name + "/"));
         archive.closeArchiveEntry();
     }
 
-    protected void addFile(ArchiveOutputStream archive, String basePath, File file) throws IOException {
-        final String path = file.getAbsolutePath();
-        final String name = path.substring(basePath.length());
+    protected void addFile(ArchiveOutputStream archive, File topDir, File targetFile) throws IOException {
+        final String path = targetFile.getAbsolutePath();
+        final String name = path.substring(topDir.getAbsolutePath().length());
         archive.putArchiveEntry(new ZipArchiveEntry(name));
-        IOUtils.copy(new FileInputStream(file), archive);
+        IOUtils.copy(new FileInputStream(targetFile), archive);
         archive.closeArchiveEntry();
     }
 
@@ -173,5 +181,13 @@ public class DfZipArchiver {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public DfZipArchiver suppressSubDir() {
+        _suppressSubDir = true;
+        return this;
     }
 }

@@ -59,7 +59,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.exception.DfSchemaSyncCheckTragedyResultException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseOutputHandler;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.seasar.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
@@ -132,12 +134,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        if (isLoadDataReverseOnly()) {
-            initializeSchemaData(); // needed
-            processLoadDataReverse();
-            return;
-        } else if (isSchemaSyncCheckOnly()) {
-            processSchemaSyncCheck();
+        if (processSubTask()) {
             return;
         }
         processSchemaHtml();
@@ -145,6 +142,24 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         //processLoadDataReverse();
         //processSchemaSyncCheck();
         refreshResources();
+    }
+
+    protected boolean processSubTask() {
+        if (isLoadDataReverseOnly()) {
+            if (!isLoadDataReverseValid()) {
+                throwLoadDataReversePropertyNotFoundException();
+            }
+            initializeSchemaData(); // needed
+            processLoadDataReverse();
+            return true;
+        } else if (isSchemaSyncCheckOnly()) {
+            if (!isSchemaSyncCheckValid()) {
+                throwSchemaSyncCheckPropertyNotFoundException();
+            }
+            processSchemaSyncCheck();
+            return true;
+        }
+        return false;
     }
 
     protected void processSchemaHtml() {
@@ -189,6 +204,21 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         process.execute(database);
     }
 
+    protected void throwLoadDataReversePropertyNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the property for LoadDataReverse.");
+        br.addItem("Advice");
+        br.addElement("You should set the property like this:");
+        br.addElement("[documentDefinitionMap.dfprop]");
+        br.addElement("  ; loadDataReverseMap = map:{");
+        br.addElement("      ; recordLimit = -1");
+        br.addElement("      ; isContainsCommonColumn = true");
+        br.addElement("      ; isOutputToPlaySql = true");
+        br.addElement("  }");
+        final String msg = br.buildExceptionMessage();
+        throw new DfRequiredPropertyNotFoundException(msg);
+    }
+
     protected void processSchemaSyncCheck() {
         try {
             doProcessSchemaSyncCheck();
@@ -210,6 +240,22 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("* * * * * * * * * * *");
         final DfSchemaSyncChecker checker = new DfSchemaSyncChecker(getDataSource());
         checker.checkSync();
+    }
+
+    protected void throwSchemaSyncCheckPropertyNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the property for SchemaSyncCheck.");
+        br.addItem("Advice");
+        br.addElement("You should set the property like this:");
+        br.addElement("[documentDefinitionMap.dfprop]");
+        br.addElement("  ; schemaSyncCheckMap = map:{");
+        br.addElement("      ; url = jdbc:...");
+        br.addElement("      ; schema = EXAMPLEDB");
+        br.addElement("      ; user = exampuser");
+        br.addElement("      ; password = exampword");
+        br.addElement("  }");
+        final String msg = br.buildExceptionMessage();
+        throw new DfRequiredPropertyNotFoundException(msg);
     }
 
     // ===================================================================================
