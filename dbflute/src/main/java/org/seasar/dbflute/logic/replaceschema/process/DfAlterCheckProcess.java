@@ -197,21 +197,19 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         if (previousDate == null) {
             return;
         }
-        final List<File> checkedAlterZipList = findCheckedAlterZipList(previousDate);
-        if (checkedAlterZipList == null) {
+        final File checkedAlterZip = findLatestCheckedAlterZip(previousDate);
+        if (checkedAlterZip == null) {
             return;
         }
         final String checkedAlterMarkBasicName = getMigrationCheckedAlterMarkBasicName();
         final String finishedAlterMarkBasicName = getMigrationFinishedAlterMarkBasicName();
-        for (File checkedAlterZip : checkedAlterZipList) {
-            final String path = resolvePath(checkedAlterZip);
-            final String baseDir = Srl.substringLastFront(path, "/");
-            final String pureName = Srl.substringLastRear(path, "/");
-            final String renamedName = Srl.replace(pureName, checkedAlterMarkBasicName, finishedAlterMarkBasicName);
-            final File renamedFile = new File(baseDir + "/" + renamedName);
-            _log.info("...Finishing the previous history (renamed to): " + resolvePath(renamedFile));
-            checkedAlterZip.renameTo(renamedFile);
-        }
+        final String path = resolvePath(checkedAlterZip);
+        final String baseDir = Srl.substringLastFront(path, "/");
+        final String pureName = Srl.substringLastRear(path, "/");
+        final String renamedName = Srl.replace(pureName, checkedAlterMarkBasicName, finishedAlterMarkBasicName);
+        final File renamedFile = new File(baseDir + "/" + renamedName);
+        _log.info("...Finishing the previous history (renamed to): " + resolvePath(renamedFile));
+        checkedAlterZip.renameTo(renamedFile);
     }
 
     // -----------------------------------------------------
