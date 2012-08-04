@@ -14,6 +14,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -103,18 +104,43 @@ public class DfZipArchiver {
     }
 
     protected void addDir(ArchiveOutputStream archive, File topDir, File targetDir) throws IOException {
-        final String path = targetDir.getAbsolutePath();
-        final String name = path.substring(topDir.getAbsolutePath().length());
-        archive.putArchiveEntry(new ZipArchiveEntry(name + "/"));
+        final String name = buildEntryName(topDir, targetDir, true);
+        archive.putArchiveEntry(new ZipArchiveEntry(name));
         archive.closeArchiveEntry();
     }
 
     protected void addFile(ArchiveOutputStream archive, File topDir, File targetFile) throws IOException {
-        final String path = targetFile.getAbsolutePath();
-        final String name = path.substring(topDir.getAbsolutePath().length());
+        final String name = buildEntryName(topDir, targetFile, false);
         archive.putArchiveEntry(new ZipArchiveEntry(name));
-        IOUtils.copy(new FileInputStream(targetFile), archive);
+        FileInputStream ins = null;
+        try {
+            ins = new FileInputStream(targetFile);
+            IOUtils.copy(ins, archive);
+        } finally {
+            if (ins != null) {
+                try {
+                    ins.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
         archive.closeArchiveEntry();
+    }
+
+    protected String buildEntryName(File topDir, File targetFile, boolean dir) {
+        final String path = resolveAbsolutePath(targetFile);
+        String name = path.substring(resolveAbsolutePath(topDir).length());
+        if (name.startsWith("/")) {
+            name = name.substring("/".length());
+        }
+        if (dir) {
+            name = name + "/";
+        }
+        return name;
+    }
+
+    protected String resolveAbsolutePath(File file) {
+        return Srl.replace(file.getAbsolutePath(), "\\", "/");
     }
 
     // ===================================================================================

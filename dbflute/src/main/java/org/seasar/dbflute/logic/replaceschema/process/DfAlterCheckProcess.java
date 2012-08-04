@@ -984,8 +984,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected void deleteAlterSqlFile(final List<File> alterSqlFileList) {
         for (File alterSqlFile : alterSqlFileList) {
-            // if normal delete, cannot delete on Windows (I don't know why...cannot close?)
-            deleteFileOnExit(alterSqlFile, "...Deleting (on exit) the executed alterSqlFile");
+            deleteFile(alterSqlFile, "...Deleting the executed alterSqlFile");
         }
     }
 
@@ -1182,15 +1181,6 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                 _log.info(msg + ": " + resolvePath(file));
             }
             file.delete();
-        }
-    }
-
-    protected void deleteFileOnExit(File file, String msg) {
-        if (file.exists()) {
-            if (msg != null) {
-                _log.info(msg + ": " + resolvePath(file));
-            }
-            file.deleteOnExit();
         }
     }
 
