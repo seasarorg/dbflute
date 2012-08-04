@@ -973,7 +973,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final String checkedAlterZipPath = getHistoryCurrentDir() + "/" + checkedAlterZipName;
         _log.info("...Saving the history to " + checkedAlterZipPath);
         final DfZipArchiver archiver = new DfZipArchiver(new File(checkedAlterZipPath));
-        archiver.suppressSubDir();
+        archiver.suppressCompressSubDir();
         archiver.compress(new File(getMigrationAlterDirectory()), new FileFilter() {
             public boolean accept(File file) {
                 _log.info("  " + resolvePath(file));

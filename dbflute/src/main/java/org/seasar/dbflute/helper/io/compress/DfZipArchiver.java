@@ -26,7 +26,7 @@ public class DfZipArchiver {
     //                                                                           Attribute
     //                                                                           =========
     protected final File _zipFile;
-    protected boolean _suppressSubDir;
+    protected boolean _suppressCompressSubDir;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -79,7 +79,7 @@ public class DfZipArchiver {
 
     protected void addAll(ArchiveOutputStream archive, File topDir, File targetFile, FileFilter filter)
             throws IOException {
-        if (_suppressSubDir && isSubDir(topDir, targetFile)) {
+        if (_suppressCompressSubDir && isSubDir(topDir, targetFile)) {
             return;
         }
         if (!filter.accept(targetFile)) {
@@ -224,8 +224,8 @@ public class DfZipArchiver {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public DfZipArchiver suppressSubDir() {
-        _suppressSubDir = true;
+    public DfZipArchiver suppressCompressSubDir() {
+        _suppressCompressSubDir = true;
         return this;
     }
 }
