@@ -94,10 +94,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
 
         String currentSql = null;
-        Reader reader = null;
+        BufferedReader br = null;
         try {
-            reader = newInputStreamReader();
-            final List<String> sqlList = extractSqlList(reader);
+            br = new BufferedReader(newInputStreamReader());
+            final List<String> sqlList = extractSqlList(br);
 
             setupConnection();
             setupStatement();
@@ -137,7 +137,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             }
             closeStatement();
             closeConnection();
-            closeReader(reader);
+            closeReader(br);
         }
         // re-calculate total count with skipped count
         _totalSqlCount = _totalSqlCount - _skippedSqlCount;
@@ -325,9 +325,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     // ===================================================================================
     //                                                                         Extract SQL
     //                                                                         ===========
-    protected List<String> extractSqlList(Reader reader) {
+    protected List<String> extractSqlList(BufferedReader br) {
         final List<String> sqlList = new ArrayList<String>();
-        final BufferedReader br = new BufferedReader(reader);
         final DelimiterChanger delimiterChanger = newDelimterChanger();
         try {
             String sql = "";
@@ -450,14 +449,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         } catch (IOException e) {
             String msg = "The method 'extractSqlList()' threw the IOException!";
             throw new IllegalStateException(msg, e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignore) {
-                    ignore.printStackTrace();
-                }
-            }
         }
         return sqlList;
     }

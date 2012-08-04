@@ -941,7 +941,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             }
         });
         for (File sqlFile : alterSqlFileList) {
-            sqlFile.delete(); // no check here
+            deleteFile(sqlFile, "...Deleting executed alter-SQL-file");
         }
     }
 
