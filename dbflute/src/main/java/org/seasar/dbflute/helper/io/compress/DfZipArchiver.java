@@ -139,10 +139,6 @@ public class DfZipArchiver {
         return name;
     }
 
-    protected String resolveAbsolutePath(File file) {
-        return Srl.replace(file.getAbsolutePath(), "\\", "/");
-    }
-
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
@@ -154,7 +150,7 @@ public class DfZipArchiver {
             throw new IllegalArgumentException("The baseDir was not directory: " + baseDir);
         }
         baseDir.mkdirs();
-        final String baseDirPath = baseDir.getPath();
+        final String baseDirPath = resolvePath(baseDir);
         InputStream ins = null;
         ZipArchiveInputStream archive = null;
         try {
@@ -162,7 +158,8 @@ public class DfZipArchiver {
             archive = new ZipArchiveInputStream(ins, "UTF-8", true);
             ZipArchiveEntry entry;
             while ((entry = archive.getNextZipEntry()) != null) {
-                final File file = new File(baseDirPath + "/" + entry.getName());
+                final String entryName = resolveFileSeparator(entry.getName()); // just in case
+                final File file = new File(baseDirPath + "/" + entryName);
                 if (!filter.accept(file)) {
                     continue;
                 }
@@ -207,6 +204,21 @@ public class DfZipArchiver {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected String resolvePath(File file) {
+        return resolveFileSeparator(file.getPath());
+    }
+
+    protected String resolveAbsolutePath(File file) {
+        return resolveFileSeparator(file.getAbsolutePath());
+    }
+
+    protected String resolveFileSeparator(String path) {
+        return Srl.replace(path, "\\", "/");
     }
 
     // ===================================================================================
