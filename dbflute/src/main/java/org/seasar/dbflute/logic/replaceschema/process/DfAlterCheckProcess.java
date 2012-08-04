@@ -929,20 +929,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             checkedAlterZipName = getMigrationCheckedAlterMarkBasicName() + ".zip";
         }
         skipSameStoryHistory(checkedAlterZipName, previousDate);
-        final String currentDir = getHistoryCurrentDir();
-        final String checkedAlterZipPath = currentDir + "/" + checkedAlterZipName;
-        _log.info("...Saving the history to " + checkedAlterZipPath);
-        final DfZipArchiver archiver = new DfZipArchiver(new File(checkedAlterZipPath));
-        archiver.suppressSubDir();
-        archiver.compress(new File(getMigrationAlterDirectory()), new FileFilter() {
-            public boolean accept(File file) {
-                _log.info("  " + resolvePath(file));
-                return true;
-            }
-        });
-        for (File sqlFile : alterSqlFileList) {
-            deleteFile(sqlFile, "...Deleting executed alter-SQL-file");
-        }
+        compressCheckedAlterZip(checkedAlterZipName);
+        deleteAlterSqlFile(alterSqlFileList);
     }
 
     protected String buildCheckedAlterZipName(String previousDate) {
@@ -978,6 +966,25 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                     successStoryFile.renameTo(new File(skippedZipName));
                 }
             }
+        }
+    }
+
+    protected void compressCheckedAlterZip(final String checkedAlterZipName) {
+        final String checkedAlterZipPath = getHistoryCurrentDir() + "/" + checkedAlterZipName;
+        _log.info("...Saving the history to " + checkedAlterZipPath);
+        final DfZipArchiver archiver = new DfZipArchiver(new File(checkedAlterZipPath));
+        archiver.suppressSubDir();
+        archiver.compress(new File(getMigrationAlterDirectory()), new FileFilter() {
+            public boolean accept(File file) {
+                _log.info("  " + resolvePath(file));
+                return true;
+            }
+        });
+    }
+
+    protected void deleteAlterSqlFile(final List<File> alterSqlFileList) {
+        for (File alterSqlFile : alterSqlFileList) {
+            deleteFile(alterSqlFile, "...Deleting executed alterSqlFile");
         }
     }
 
