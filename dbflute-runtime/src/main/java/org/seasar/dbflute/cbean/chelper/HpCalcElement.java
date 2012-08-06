@@ -44,6 +44,14 @@ public class HpCalcElement {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override 
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _calculationType + ", number=" + _calculationValue + ", column=" + _calculationColumn + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public CalculationType getCalculationType() {

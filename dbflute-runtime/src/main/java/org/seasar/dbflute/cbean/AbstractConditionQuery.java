@@ -219,6 +219,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /**
      * {@inheritDoc}
      */
+    public ConditionBean xgetBaseCB() {
+        return _baseCB;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public ConditionQuery xgetBaseQuery() {
         ConditionQuery currentQuery = this;
         while (true) {
@@ -1131,13 +1138,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                              (Specify)DerivedReferrer
     //                              ------------------------
-    protected void registerSpecifyDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
+    protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String referrerPropertyName, String aliasName,
             DerivedReferrerOption option) {
+        doRegisterSpecifyDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName,
+                referrerPropertyName, aliasName, option != null ? option : new DerivedReferrerOption());
+    }
+
+    protected void doRegisterSpecifyDerivedReferrer(String function, final ConditionQuery subQuery,
+            String columnDbName, String relatedColumnDbName, String propertyName, String referrerPropertyName,
+            String aliasName, DerivedReferrerOption option) {
         assertFunctionNotNull("SpecifyDerivedReferrer", columnDbName, function);
         assertSubQueryNotNull("SpecifyDerivedReferrer", columnDbName, subQuery);
-        if (option == null) {
-            option = new DerivedReferrerOption(); // as default
+        option.xacceptBaseCB(_baseCB);
+        if (isDerivedReferrerSelectAllPossible(subQuery, option)) {
+            createCBExThrower().throwSpecifyDerivedReferrerSelectAllPossibleException(function, subQuery, aliasName);
         }
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -1163,17 +1178,43 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         xgetSqlClause().specifyDerivingSubQuery(subQueryInfo);
     }
 
+    protected boolean isDerivedReferrerSelectAllPossible(final ConditionQuery subQuery, DerivedReferrerOption option) {
+        return option.isSuppressCorrelation() && subQuery.xgetBaseCB().hasSelectAllPossible();
+    }
+
+    protected void registerSpecifyMyselfDerived(String function, ConditionQuery subQuery, String columnDbName,
+            String relatedColumnDbName, String propertyName, String referrerPropertyName, String aliasName,
+            DerivedReferrerOption option) {
+        doRegisterSpecifyDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName,
+                referrerPropertyName, aliasName, resolveMyselfDerivedReferrerOption(option));
+    }
+
+    protected DerivedReferrerOption resolveMyselfDerivedReferrerOption(DerivedReferrerOption option) {
+        final DerivedReferrerOption resolvedOption = option != null ? option : new DerivedReferrerOption();
+        resolvedOption.suppressCorrelation();
+        return resolvedOption;
+    }
+
     // [DBFlute-0.8.8.1]
     // -----------------------------------------------------
     //                                (Query)DerivedReferrer
     //                                ----------------------
-    protected void registerQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
+    protected void registerQueryDerivedReferrer(String function, ConditionQuery subQuery, String columnDbName,
+            String relatedColumnDbName, String propertyName, String referrerPropertyName, String operand, Object value,
+            String parameterPropertyName, DerivedReferrerOption option) {
+        doRegisterQueryDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName,
+                referrerPropertyName, operand, value, parameterPropertyName, option != null ? option
+                        : new DerivedReferrerOption());
+    }
+
+    protected void doRegisterQueryDerivedReferrer(String function, final ConditionQuery subQuery, String columnDbName,
             String relatedColumnDbName, String propertyName, String referrerPropertyName, String operand, Object value,
             String parameterPropertyName, DerivedReferrerOption option) {
         assertFunctionNotNull("QueryDerivedReferrer", columnDbName, function);
         assertSubQueryNotNull("QueryDerivedReferrer", columnDbName, subQuery);
-        if (option == null) {
-            option = new DerivedReferrerOption(); // as default
+        option.xacceptBaseCB(_baseCB);
+        if (isDerivedReferrerSelectAllPossible(subQuery, option)) {
+            createCBExThrower().throwQueryDerivedReferrerSelectAllPossibleException(function, subQuery);
         }
         final SubQueryPath subQueryPath = new SubQueryPath(xgetLocation(propertyName));
         final GeneralColumnRealNameProvider localRealNameProvider = new GeneralColumnRealNameProvider();
@@ -1218,6 +1259,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // = = = = = = = = = =/
         final boolean noWayInner = HpQDRParameter.isOperandIsNull(operand) || option.mayNullRevived();
         registerWhereClause(clause, noWayInner);
+    }
+
+    protected void registerQueryMyselfDerived(String function, ConditionQuery subQuery, String columnDbName,
+            String relatedColumnDbName, String propertyName, String referrerPropertyName, String operand, Object value,
+            String parameterPropertyName, DerivedReferrerOption option) {
+        doRegisterQueryDerivedReferrer(function, subQuery, columnDbName, relatedColumnDbName, propertyName,
+                referrerPropertyName, operand, value, parameterPropertyName, resolveMyselfDerivedReferrerOption(option));
     }
 
     // [DBFlute-0.8.8]

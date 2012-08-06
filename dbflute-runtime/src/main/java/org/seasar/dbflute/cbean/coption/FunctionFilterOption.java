@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
@@ -198,7 +199,7 @@ public class FunctionFilterOption implements ParameterOption {
                 filtered = entry.getValue().callback(filtered);
             }
         }
-        return processVarious(filtered);
+        return processVarious(processCalculation(filtered));
     }
 
     protected static interface ProcessCallback {
@@ -564,6 +565,15 @@ public class FunctionFilterOption implements ParameterOption {
     //                                               Various
     //                                               -------
     /**
+     * Process calculation filters defined by sub-class. (for extension)
+     * @param functionExp The expression of derived function. (NotNull)
+     * @return The filtered expression. (NotNull)
+     */
+    protected String processCalculation(String functionExp) { // for extension
+        return functionExp;
+    }
+
+    /**
      * Process various filters defined by user. (for extension)
      * @param functionExp The expression of derived function. (NotNull)
      * @return The filtered expression. (NotNull)
@@ -662,6 +672,47 @@ public class FunctionFilterOption implements ParameterOption {
     //                                                                      ==============
     protected final String ln() {
         return DBFluteSystem.getBasicLn();
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
+    /**
+     * Assert that the object is not null.
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     * @exception IllegalArgumentException
+     */
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertCalculationColumnNumber(HpSpecifiedColumn specifiedColumn) {
+        final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
+        if (columnInfo == null) { // basically not null but just in case
+            return;
+        }
+        if (!columnInfo.isPropertyTypeNumber()) {
+            String msg = "The type of the calculation column should be Number: " + specifiedColumn;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void assertSpecifiedDreamCruiseTicket(HpSpecifiedColumn column) {
+        if (!column.isDreamCruiseTicket()) {
+            final String msg = "The specified column was not dream cruise ticket: " + column;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
     }
 
     // ===================================================================================

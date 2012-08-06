@@ -79,8 +79,13 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
                     tableAliasName, derivedColumnRealName, derivedColumnSqlName);
         } else {
             final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option);
-            final String fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
-                    correlatedColumnRealName, relatedColumnSqlName, correlatedFixedCondition);
+            final String fromWhereClause;
+            if (option.isSuppressCorrelation()) { // e.g. myselfDerived
+                fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, correlatedFixedCondition);
+            } else { // basically here
+                fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
+                        correlatedColumnRealName, relatedColumnSqlName, correlatedFixedCondition);
+            }
             subQueryClause = selectClause + " " + fromWhereClause;
         }
         return resolveSubQueryLevelVariable(subQueryClause);
@@ -142,11 +147,16 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
             mainSql = selectClause + " " + fromWhereClause;
         }
         final String mainAlias = buildSubQueryMainAliasName();
-        final String joinCondition = mainAlias + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
+        final String whereJoinCondition;
+        if (option.isSuppressCorrelation()) { // e.g. myselfDerived
+            whereJoinCondition = "";
+        } else { // basically here
+            whereJoinCondition = ln() + mainAlias + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
+        }
         final ColumnRealName mainDerivedColumnRealName = ColumnRealName.create(mainAlias, derivedColumnSqlName);
-        return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) + ln() // select
-                + "  from (" + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark + ln() // from
-                + " where " + joinCondition; // where
+        return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) // select
+                + ln() + "  from (" + beginMark + mainSql + ln() + "       ) " + mainAlias + endMark // from
+                + whereJoinCondition; // where
     }
 
     protected String buildFunctionPart(String function, ColumnRealName columnRealName, DerivedReferrerOption option) {

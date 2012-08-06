@@ -35,7 +35,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public HpCalcSpecification(SpecifyQuery<CB> specifyQuery) { // e.g. called by Update Calculation, ManualOrder
+    public HpCalcSpecification(SpecifyQuery<CB> specifyQuery) { // e.g. called by Update Calculation, ManualOrder, DerivedReferrer
         _specifyQuery = specifyQuery;
     }
 
@@ -63,6 +63,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * @return The column info of specified column. (NullAllowed)
      */
     public ColumnInfo getSpecifiedColumnInfo() { // only when plain (or dream cruise)
+        checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
             return _specifedCB.xshowDreamCruiseTicket().getColumnInfo();
         }
@@ -73,6 +74,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * @return The column info of specified deriving column. (NullAllowed)
      */
     public ColumnInfo getSpecifiedDerivingColumnInfo() { // only when deriving sub-query
+        checkSpecifiedCB();
         return _specifedCB.getSqlClause().getSpecifiedDerivingColumnInfoAsOne();
     }
 
@@ -80,6 +82,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * @return The column info of specified resolved column. (NullAllowed)
      */
     public ColumnInfo getResolvedSpecifiedColumnInfo() { // resolved plain or deriving sub-query
+        checkSpecifiedCB();
         final ColumnInfo columnInfo = getSpecifiedColumnInfo();
         return columnInfo != null ? columnInfo : getSpecifiedDerivingColumnInfo();
     }
@@ -91,6 +94,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * @return The column DB name of specified resolved column. (NullAllowed)
      */
     public String getResolvedSpecifiedColumnDbName() { // resolved plain or deriving sub-query
+        checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
             final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
             return ticket.getColumnDbName();
@@ -103,6 +107,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * @return The column real name of specified resolved column. (NullAllowed)
      */
     public ColumnRealName getResolvedSpecifiedColumnRealName() { // resolved plain or deriving sub-query
+        checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
             final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
             return ticket.toColumnRealName();
@@ -122,6 +127,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * @return The column SQL name of specified resolved column. (NullAllowed)
      */
     public ColumnSqlName getResolvedSpecifiedColumnSqlName() { // resolved plain or deriving sub-query
+        checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
             final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
             return ticket.toColumnSqlName();
@@ -141,6 +147,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     //                                           Table Alias
     //                                           -----------
     public String getResolvedSpecifiedTableAliasName() { // resolved plain or deriving sub-query
+        checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
             final HpSpecifiedColumn ticket = _specifedCB.xshowDreamCruiseTicket();
             return ticket.getTableAliasName();
@@ -150,6 +157,34 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             return columnRealName.getTableAliasName();
         }
         return _specifedCB.getSqlClause().getSpecifiedDerivingAliasNameAsOne();
+    }
+
+    // -----------------------------------------------------
+    //                                          Check Status
+    //                                          ------------
+    protected void checkSpecifiedCB() {
+        if (_specifedCB == null) {
+            throwSpecifiedConditionBeanNotFoundException();
+        }
+    }
+
+    protected void throwSpecifiedConditionBeanNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the specified condition-bean.");
+        br.addItem("Advice");
+        br.addElement("You should call specify(cb) before building statements.");
+        br.addItem("Specify Query");
+        br.addElement(_specifyQuery);
+        br.addItem("Calculation List");
+        if (!_calculationList.isEmpty()) {
+            for (HpCalcElement element : _calculationList) {
+                br.addElement(element);
+            }
+        } else {
+            br.addElement("*No calculation");
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
     }
 
     // ===================================================================================
@@ -377,7 +412,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public String buildStatementAsSqlName() {
+    public String buildStatementAsSqlName() { // e.g. VaryingUpdate
         final ColumnSqlName columnSqlName = getResolvedSpecifiedColumnSqlName();
         final String columnExp = columnSqlName.toString();
         return doBuildStatement(columnExp, null);
@@ -386,14 +421,14 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public String buildStatementToSpecifidName(String columnExp) {
+    public String buildStatementToSpecifidName(String columnExp) { // e.g. ColumnQuery, DerivedReferrer
         return doBuildStatement(columnExp, null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public String buildStatementToSpecifidName(String columnExp, Map<String, String> columnAliasMap) {
+    public String buildStatementToSpecifidName(String columnExp, Map<String, String> columnAliasMap) { // e.g. ManualOrder
         return doBuildStatement(columnExp, columnAliasMap);
     }
 
@@ -443,7 +478,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             if (columnAliasMap != null) { // e.g. ManualOrder on union
                 final String mappedAlias = columnAliasMap.get(columnExp);
                 calcValueExp = mappedAlias != null ? mappedAlias : columnExp;
-            } else { // e.g. ColumnQuery, UpdateOption, non-union ManualOrder
+            } else { // e.g. ColumnQuery, UpdateOption, non-union ManualOrder, DerivedReferrer
                 final ColumnInfo columnInfo = calculationColumn.getColumnInfo();
                 calcValueExp = !calculationColumn.isDerived() ? decryptIfNeeds(columnInfo, columnExp) : columnExp;
             }

@@ -67,6 +67,12 @@ public interface ConditionQuery {
     ColumnSqlName toColumnSqlName(String columnDbName);
 
     /**
+     * Get the base condition-bean.
+     * @return The base condition-bean of this query. (NotNull)
+     */
+    ConditionBean xgetBaseCB();
+
+    /**
      * Get the base query.
      * @return The condition-query of base table. (NotNull: if this is base query, returns this)
      */

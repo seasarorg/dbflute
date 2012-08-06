@@ -27,6 +27,7 @@ import org.seasar.dbflute.exception.OrScopeQueryAndPartNotOrScopeException;
 import org.seasar.dbflute.exception.OrderByIllegalPurposeException;
 import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerInvalidColumnSpecificationException;
+import org.seasar.dbflute.exception.QueryDerivedReferrerSelectAllPossibleException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.QueryIllegalPurposeException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
@@ -42,6 +43,7 @@ import org.seasar.dbflute.exception.SpecifyDerivedReferrerEntityPropertyNotFound
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecificationException;
+import org.seasar.dbflute.exception.SpecifyDerivedReferrerSelectAllPossibleException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerTwoOrMoreException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.SpecifyIllegalPurposeException;
@@ -399,31 +401,29 @@ public class ConditionBeanExceptionThrower {
     //                                                            Specify Derived Referrer
     //                                                            ========================
     public void throwSpecifyDerivedReferrerInvalidAliasNameException(ConditionQuery localCQ) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The alias name for specify derived-referrer was INVALID!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "You should set valid alias name. {NotNull, NotEmpty}" + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x):" + ln();
-        msg = msg + "      MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "      cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
-        msg = msg + "          public void query(PurchaseCB subCB) {" + ln();
-        msg = msg + "              subCB.specify().columnPurchaseDatetime();" + ln();
-        msg = msg + "          }" + ln();
-        msg = msg + "      }, null); // *No! {null, \"\", \"   \"} are NG!" + ln();
-        msg = msg + ln();
-        msg = msg + "    (o):" + ln();
-        msg = msg + "      MemberCB cb = new MemberCB();" + ln();
-        msg = msg + "      cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
-        msg = msg + "          public void query(PurchaseCB subCB) {" + ln();
-        msg = msg + "              subCB.specify().columnPurchaseDatetime();" + ln();
-        msg = msg + "          }" + ln();
-        msg = msg + "      }, Member.ALIAS_latestPurchaseDatetime); // OK" + ln();
-        msg = msg + ln();
-        msg = msg + "[Local Table]" + ln() + localCQ.getTableDbName() + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The alias name for specify derived-referrer was INVALID.");
+        br.addItem("Advice");
+        br.addElement("You should set valid alias name. {NotNull, NotEmpty}");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {");
+        br.addElement("        public void query(PurchaseCB subCB) {");
+        br.addElement("            subCB.specify().columnPurchaseDatetime();");
+        br.addElement("        }");
+        br.addElement("    }, null); // *No! {null, \"\", \"   \"} are NG!");
+        br.addElement("");
+        br.addElement("  (o):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {");
+        br.addElement("        public void query(PurchaseCB subCB) {");
+        br.addElement("            subCB.specify().columnPurchaseDatetime();");
+        br.addElement("        }");
+        br.addElement("    }, Member.ALIAS_latestPurchaseDatetime); // OK");
+        br.addItem("Local Table");
+        br.addElement(localCQ.getTableDbName());
+        final String msg = br.buildExceptionMessage();
         throw new SpecifyDerivedReferrerInvalidAliasNameException(msg);
     }
 
@@ -526,6 +526,22 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyDerivedReferrerUnmatchedColumnTypeException(msg);
     }
 
+    public void throwSpecifyDerivedReferrerSelectAllPossibleException(String function, ConditionQuery subQuery,
+            String aliasName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The specify derived-referrer might select all.");
+        br.addItem("Advice");
+        br.addElement("If you suppress correlation, set your original correlation condition.");
+        br.addItem("Function");
+        br.addElement(function);
+        br.addItem("Referrer");
+        br.addElement(subQuery.getTableDbName());
+        br.addItem("Alias Name");
+        br.addElement(aliasName);
+        final String msg = br.buildExceptionMessage();
+        throw new SpecifyDerivedReferrerSelectAllPossibleException(msg);
+    }
+
     // ===================================================================================
     //                                                           Specified Derived OrderBy
     //                                                           =========================
@@ -624,6 +640,19 @@ public class ConditionBeanExceptionThrower {
         msg = msg + "[Parameter Type]" + ln() + (value != null ? value.getClass() : null) + ln();
         msg = msg + "* * * * * * * * * */";
         throw new QueryDerivedReferrerUnmatchedColumnTypeException(msg);
+    }
+
+    public void throwQueryDerivedReferrerSelectAllPossibleException(String function, ConditionQuery subQuery) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The query derived-referrer might select all.");
+        br.addItem("Advice");
+        br.addElement("If you suppress correlation, set your original correlation condition.");
+        br.addItem("Function");
+        br.addElement(function);
+        br.addItem("Referrer");
+        br.addElement(subQuery.getTableDbName());
+        final String msg = br.buildExceptionMessage();
+        throw new QueryDerivedReferrerSelectAllPossibleException(msg);
     }
 
     // ===================================================================================
