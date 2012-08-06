@@ -281,6 +281,10 @@ public class MockConditionBean implements ConditionBean {
     public void overTheWaves(HpSpecifiedColumn dreamCruiseTicket) {
     }
 
+    public HpSpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias) {
+        return null;
+    }
+
     public ConditionBean xcreateDreamCruiseCB() {
         return null;
     }

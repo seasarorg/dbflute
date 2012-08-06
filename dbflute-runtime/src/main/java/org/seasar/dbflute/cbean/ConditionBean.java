@@ -108,6 +108,13 @@ public interface ConditionBean extends PagingBean {
     void overTheWaves(HpSpecifiedColumn dreamCruiseTicket);
 
     /**
+     * Invite the derived column to dream cruise. (returns the ticket)
+     * @param derivedAlias The alias name for derived column. (NotNull)
+     * @return The ticket column specified by your Dream Cruise. (NotNull)
+     */
+    HpSpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias);
+
+    /**
      * Bon voyage!
      * @return The created condition-bean for Dream Cruise.
      */

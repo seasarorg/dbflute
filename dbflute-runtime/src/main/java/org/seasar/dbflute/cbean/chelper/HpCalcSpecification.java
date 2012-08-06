@@ -65,7 +65,8 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     public ColumnInfo getSpecifiedColumnInfo() { // only when plain (or dream cruise)
         checkSpecifiedCB();
         if (_specifedCB.xhasDreamCruiseTicket()) {
-            return _specifedCB.xshowDreamCruiseTicket().getColumnInfo();
+            final HpSpecifiedColumn dreamCruiseTicket = _specifedCB.xshowDreamCruiseTicket();
+            return !dreamCruiseTicket.isDerived() ? dreamCruiseTicket.getColumnInfo() : null;
         }
         return _specifedCB.getSqlClause().getSpecifiedColumnInfoAsOne();
     }
@@ -75,6 +76,10 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      */
     public ColumnInfo getSpecifiedDerivingColumnInfo() { // only when deriving sub-query
         checkSpecifiedCB();
+        if (_specifedCB.xhasDreamCruiseTicket()) {
+            final HpSpecifiedColumn dreamCruiseTicket = _specifedCB.xshowDreamCruiseTicket();
+            return dreamCruiseTicket.isDerived() ? dreamCruiseTicket.getColumnInfo() : null;
+        }
         return _specifedCB.getSqlClause().getSpecifiedDerivingColumnInfoAsOne();
     }
 

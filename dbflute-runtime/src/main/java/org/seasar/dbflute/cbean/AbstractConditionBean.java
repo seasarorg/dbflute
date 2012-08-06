@@ -410,6 +410,23 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
+    public HpSpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias) {
+        if (!xisDreamCruiseShip()) {
+            String msg = "This invitation is only allowed by Dream Cruise Ship: " + derivedAlias;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        final SqlClause portClause = xgetDreamCruiseDeparturePort().getSqlClause();
+        if (!portClause.hasSpecifiedDerivingSubQuery(derivedAlias)) {
+            String msg = "Not found the derived info by the argument 'derivedAlias': " + derivedAlias;
+            throw new IllegalArgumentException(msg);
+        }
+        final ColumnInfo columnInfo = portClause.getSpecifiedDerivingColumnInfoAsOne();
+        return new HpSpecifiedColumn(null, columnInfo, this, derivedAlias, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public ConditionBean xcreateDreamCruiseCB() {
         return xdoCreateDreamCruiseCB();
     }
