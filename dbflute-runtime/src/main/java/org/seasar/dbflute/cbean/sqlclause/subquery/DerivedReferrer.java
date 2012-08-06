@@ -151,7 +151,8 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         if (option.isSuppressCorrelation()) { // e.g. myselfDerived
             whereJoinCondition = "";
         } else { // basically here
-            whereJoinCondition = ln() + mainAlias + "." + relatedColumnSqlName + " = " + correlatedColumnRealName;
+            whereJoinCondition = ln() + " where " // line separator and where
+                    + mainAlias + "." + relatedColumnSqlName + " = " + correlatedColumnRealName; // correlation
         }
         final ColumnRealName mainDerivedColumnRealName = ColumnRealName.create(mainAlias, derivedColumnSqlName);
         return "select " + buildFunctionPart(function, mainDerivedColumnRealName, option) // select
