@@ -549,7 +549,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         /**
-         * Prepare for '(Specify)DerivedReferrer'. <br />
+         * Prepare for (Specify)DerivedReferrer. <br />
          * {select max(FOO) from ${referrer.table.name} where ...) as FOO_MAX} <br />
          * ${referrer.referrerDispForJavaDocNest}
          * <pre>
@@ -569,6 +569,18 @@ public class ${myClassName} extends AbstractConditionBean {
                     cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName, option); } }, _dbmetaProvider);
         }
 #end
+#end
+#if ($table.hasSinglePrimaryKey())
+        /**
+         * Prepare for (Specify)MyselfDerived (SubQuery).
+         * @return The object to set up a function for myself table. (NotNull)
+         */
+        public HpSDRFunction<${myConditionBeanClassName}, ${myConditionQueryClassName}> myselfDerived() {
+            assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
+            return new HpSDRFunction<${myConditionBeanClassName}, ${myConditionQueryClassName}>(_baseCB, _qyCall.qy(), new HpSDRSetupper<${myConditionBeanClassName}, ${myConditionQueryClassName}>() {
+                public void setup(String function, SubQuery<${myConditionBeanClassName}> subQuery, ${myConditionQueryClassName} cq, String aliasName, DerivedReferrerOption option) {
+                    cq.xsmyselfDerive(function, subQuery, aliasName, option); } }, _dbmetaProvider);
+        }
 #end
     }
 

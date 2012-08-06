@@ -600,6 +600,32 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     // ===================================================================================
+    //                                                                       MyselfDerived
+    //                                                                       =============
+    protected Map<String, ${myConditionQueryClassName}> _specifyMyselfDerivedMap;
+    public Map<String, ${myConditionQueryClassName}> getSpecifyMyselfDerived() { return _specifyMyselfDerivedMap; }
+    public String keepSpecifyMyselfDerived(${myConditionQueryClassName} subQuery) {
+        if (_specifyMyselfDerivedMap == null) { _specifyMyselfDerivedMap = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_specifyMyselfDerivedMap.size() + 1);
+        _specifyMyselfDerivedMap.put(key, subQuery); return "specifyMyselfDerived." + key;
+    }
+
+    protected Map<String, ${myConditionQueryClassName}> _queryMyselfDerivedMap;
+    public Map<String, ${myConditionQueryClassName}> getQueryMyselfDerived() { return _queryMyselfDerivedMap; }
+    public String keepQueryMyselfDerived(${myConditionQueryClassName} subQuery) {
+        if (_queryMyselfDerivedMap == null) { _queryMyselfDerivedMap = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_queryMyselfDerivedMap.size() + 1);
+        _queryMyselfDerivedMap.put(key, subQuery); return "queryMyselfDerived." + key;
+    }
+    protected Map<String, Object> _qyeryMyselfDerivedParameterMap;
+    public Map<String, Object> getQueryMyselfDerivedParameter() { return _qyeryMyselfDerivedParameterMap; }
+    public String keepQueryMyselfDerivedParameter(Object parameterValue) {
+        if (_qyeryMyselfDerivedParameterMap == null) { _qyeryMyselfDerivedParameterMap = newLinkedHashMap(); }
+        String key = "subQueryParameterKey" + (_qyeryMyselfDerivedParameterMap.size() + 1);
+        _qyeryMyselfDerivedParameterMap.put(key, parameterValue); return "queryMyselfDerivedParameter." + key;
+    }
+
+    // ===================================================================================
     //                                                                        MyselfExists
     //                                                                        ============
     protected Map<String, ${myConditionQueryClassName}> _myselfExistsMap;

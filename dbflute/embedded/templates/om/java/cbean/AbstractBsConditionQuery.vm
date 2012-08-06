@@ -1368,10 +1368,45 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     // ===================================================================================
+    //                                                                       MyselfDerived
+    //                                                                       =============
+    public void xsmyselfDerive(String function, SubQuery<${myConditionBeanClassName}> subQuery, String aliasName, DerivedReferrerOption option) {
+        assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this); subQuery.query(cb);
+        String subQueryPropertyName = keepSpecifyMyselfDerived(cb.query()); // for saving query-value.
+        registerSpecifyMyselfDerived(function, cb.query(), "${table.primaryKeyAsOne.name}", "${table.primaryKeyAsOne.name}", subQueryPropertyName, "myselfDerived", aliasName, option);
+    }
+    public abstract String keepSpecifyMyselfDerived(${myConditionQueryClassName} subQuery);
+
+    /**
+     * Prepare for (Query)MyselfDerived (SubQuery).
+     * @return The object to set up a function for myself table. (NotNull)
+     */
+    public HpQDRFunction<${myConditionBeanClassName}> myselfDerived() {
+        return xcreateQDRFunctionMyselfDerived();
+    }
+    protected HpQDRFunction<${myConditionBeanClassName}> xcreateQDRFunctionMyselfDerived() {
+        return new HpQDRFunction<${myConditionBeanClassName}>(new HpQDRSetupper<${myConditionBeanClassName}>() {
+            public void setup(String function, SubQuery<${myConditionBeanClassName}> subQuery, String operand, Object value, DerivedReferrerOption option) {
+                xqderiveMyselfDerived(function, subQuery, operand, value, option);
+            }
+        });
+    }
+    public void xqderiveMyselfDerived(String function, SubQuery<${myConditionBeanClassName}> subQuery, String operand, Object value, DerivedReferrerOption option) {
+        assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this); subQuery.query(cb);
+        String subQueryPropertyName = keepQueryMyselfDerived(cb.query()); // for saving query-value.
+        String parameterPropertyName = keepQueryMyselfDerivedParameter(value);
+        registerQueryMyselfDerived(function, cb.query(), "${table.primaryKeyAsOne.name}", "${table.primaryKeyAsOne.name}", subQueryPropertyName, "myselfDerived", operand, value, parameterPropertyName, option);
+    }
+    public abstract String keepQueryMyselfDerived(${myConditionQueryClassName} subQuery);
+    public abstract String keepQueryMyselfDerivedParameter(Object parameterValue);
+
+    // ===================================================================================
     //                                                                        MyselfExists
     //                                                                        ============
     /**
-     * Myself Exists (SubQuery).
+     * Prepare for MyselfExists (SubQuery).
      * @param subQuery The implementation of sub query. (NotNull)
      */
     public void myselfExists(SubQuery<${myConditionBeanClassName}> subQuery) {
@@ -1386,7 +1421,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     //                                                                       MyselfInScope
     //                                                                       =============
     /**
-     * Myself InScope (SubQuery).
+     * Prepare for MyselfInScope (SubQuery).
      * @param subQuery The implementation of sub query. (NotNull)
      */
     public void myselfInScope(SubQuery<${myConditionBeanClassName}> subQuery) {
