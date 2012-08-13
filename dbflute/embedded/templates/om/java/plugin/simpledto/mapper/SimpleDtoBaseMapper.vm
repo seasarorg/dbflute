@@ -9,8 +9,9 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.bhv.InstanceKeyEntity;
 import org.seasar.dbflute.bhv.DtoMapper;
+import org.seasar.dbflute.bhv.InstanceKeyDto;
+import org.seasar.dbflute.bhv.InstanceKeyEntity;
 #if ($table.hasClassification())
 import ${glPackageBaseCommon}.${glCDef};
 #end
@@ -256,7 +257,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
         }
 #if ($table.hasRelation())
         boolean instanceCache = _instanceCache;
-        Object localKey = dto.instanceHash();
+        Object localKey = createInstanceKeyDto(dto, dto.instanceHash());
         Entity cachedLocalEntity = instanceCache ? _relationEntityMap.get(localKey) : null;
         if (cachedLocalEntity != null) {
             return (${table.extendedEntityClassName})cachedLocalEntity;
@@ -281,7 +282,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #set ($foreignDtoClassName = "${fk.foreignTableExtendedSimpleDtoClassName}")
         if (!_suppress${fk.foreignJavaBeansRulePropertyNameInitCap} && dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}() != null) {
             ${foreignDtoClassName} relationDto = dto.get${fk.foreignJavaBeansRulePropertyNameInitCap}();
-            Object relationKey = relationDto.instanceHash();
+            Object relationKey = createInstanceKeyDto(relationDto, relationDto.instanceHash());
             Entity cachedEntity = instanceCache ? _relationEntityMap.get(relationKey) : null;
             if (cachedEntity != null) {
                 ${fk.foreignTableExtendedEntityClassName} relationEntity = (${fk.foreignTableExtendedEntityClassName})cachedEntity;
@@ -330,7 +331,7 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
 #if (${referrer.isOneToOne()})
         if (!_suppress${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap} && dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() != null) {
             ${referrerDtoClassName} relationDto = dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}();
-            Object relationKey = relationDto.instanceHash();
+            Object relationKey = createInstanceKeyDto(relationDto, relationDto.instanceHash());
             Entity cachedEntity = instanceCache ? _relationEntityMap.get(relationKey) : null;
             if (cachedEntity != null) {
                 ${referrer.referrerTableExtendedEntityClassName} relationEntity = (${referrer.referrerTableExtendedEntityClassName})cachedEntity;
@@ -428,6 +429,10 @@ public abstract class ${myClassName} implements DtoMapper<${table.extendedEntity
     // -----------------------------------------------------
     //                                          Instance Key
     //                                          ------------
+    protected Object createInstanceKeyDto(final Object dto, final int instanceHash) {
+        return new InstanceKeyDto(dto, instanceHash);
+    }
+
     protected InstanceKeyEntity createInstanceKeyEntity(Entity entity) {
         return new InstanceKeyEntity(entity);
     }
