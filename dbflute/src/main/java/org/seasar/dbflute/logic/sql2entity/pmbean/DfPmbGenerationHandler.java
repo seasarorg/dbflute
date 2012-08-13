@@ -197,8 +197,8 @@ public class DfPmbGenerationHandler {
 
     public String getPropertyTypeRemovedCSharpNullable(String className, String propertyName) {
         assertArgumentPmbMetaDataClassName(className);
-        assertArgumentPmbMetaDataPropertyName(propertyName);
-        return getPropertyTypeRemovedCSharpNullable(className, propertyName);
+        final DfPmbMetaData metaData = findPmbMetaData(className);
+        return metaData.getPropertyTypeRemovedCSharpNullable(propertyName);
     }
 
     public boolean isPmbMetaDataPropertyJavaNativeStringObject(String className, String propertyName) {
