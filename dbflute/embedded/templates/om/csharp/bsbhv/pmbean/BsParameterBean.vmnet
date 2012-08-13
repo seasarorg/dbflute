@@ -58,7 +58,11 @@ namespace ${glPackageExtendedParameterBean} {
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($database.isPmbMetaDataPropertyOptionClassificationFixedElement($pmbClassName, $propertyName))
+        protected ${propertyType} ${variableName} = ${database.getPmbMetaDataPropertyOptionClassificationFixedElementValueExp($pmbClassName, $propertyName)};
+#else
         protected ${propertyType} ${variableName};
+#end
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
         protected ${glLikeSearchOption} ${variableName}InternalLikeSearchOption;
 

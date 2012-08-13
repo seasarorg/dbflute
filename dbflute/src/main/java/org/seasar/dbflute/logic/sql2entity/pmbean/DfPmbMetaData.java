@@ -242,6 +242,12 @@ public class DfPmbMetaData {
         return Srl.containsAll(propertyType, "List<", ">");
     }
 
+    public String getPropertyTypeRemovedCSharpNullable(String propertyName) {
+        assertArgumentPmbMetaDataPropertyName(propertyName);
+        final String propertyType = getPropertyType(propertyName);
+        return propertyType.endsWith("?") ? Srl.substringLastFront(propertyType, "?") : propertyType;
+    }
+
     // ===================================================================================
     //                                                                  TypedParameterBean
     //                                                                  ==================
@@ -599,6 +605,7 @@ public class DfPmbMetaData {
         }
         final String classificationName = getPropertyOptionSpecifiedClassificationName(propertyName);
         if (isPropertyTypeList(propertyName)) {
+            final String listArg;
             if (isPropertyOptionClassificationFixedElementList(propertyName)) {
                 final List<String> fixedElementList = getPropertyOptionClassificationFixedElementList(propertyName);
                 final StringBuilder sb = new StringBuilder();
@@ -609,12 +616,19 @@ public class DfPmbMetaData {
                     sb.append(buildPropertyOptionClassificationElementValueExp(propertyName, classificationName,
                             fixedElement));
                 }
-                return "newArrayList(" + sb.toString() + ")";
+                listArg = sb.toString();
             } else { // property is list but specified one
                 final String fixedElement = getPropertyOptionClassificationFixedElement(propertyName);
                 final String valueExp = buildPropertyOptionClassificationElementValueExp(propertyName,
                         classificationName, fixedElement);
-                return "newArrayList(" + valueExp + ")";
+                listArg = valueExp;
+            }
+            if (getBasicProperties().isTargetLanguageJava()) {
+                return "newArrayList(" + listArg + ")";
+            } else if (getBasicProperties().isTargetLanguageCSharp()) {
+                return null; // unsupported yet
+            } else {
+                return null;
             }
         } else {
             if (isPropertyOptionClassificationFixedElementList(propertyName)) {
@@ -662,8 +676,9 @@ public class DfPmbMetaData {
         } else {
             valueType = getPropertyType(propertyName);
         }
+        final String cdefBase = projectPrefix + "CDef." + classificationName + "." + element;
         if (getBasicProperties().isTargetLanguageJava()) {
-            final String cdefCode = projectPrefix + "CDef." + classificationName + "." + element + ".code()";
+            final String cdefCode = cdefBase + ".code()";
             if (isPropertyJavaNativeNumberObjectIncludingListElement(propertyName)) {
                 return "toNumber(" + cdefCode + ", " + valueType + ".class)";
             } else if (isPropertyJavaNativeBooleanObjectIncludingListElement(propertyName)) {
@@ -672,7 +687,16 @@ public class DfPmbMetaData {
                 return cdefCode;
             }
         } else if (getBasicProperties().isTargetLanguageCSharp()) {
-            return null; // unsupported yet
+            final String cdefCode = cdefBase + ".Code";
+            if (isPropertyJavaNativeNumberObjectIncludingListElement(propertyName)) {
+                final String propertyType = getPropertyTypeRemovedCSharpNullable(propertyName);
+                return propertyType + ".Parse(" + cdefCode + ")";
+            } else if (isPropertyJavaNativeBooleanObjectIncludingListElement(propertyName)) {
+                final String propertyType = getPropertyTypeRemovedCSharpNullable(propertyName);
+                return propertyType + ".Parse(" + cdefCode + ")";
+            } else {
+                return cdefCode;
+            }
         } else {
             return null;
         }
