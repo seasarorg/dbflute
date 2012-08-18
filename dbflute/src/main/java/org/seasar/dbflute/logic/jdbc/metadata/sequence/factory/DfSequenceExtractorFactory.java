@@ -12,6 +12,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractorOracle
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractorPostgreSQL;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -21,6 +22,7 @@ public class DfSequenceExtractorFactory {
     protected final DataSource _dataSource;
     protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected final DfDatabaseProperties _databaseProperties;
+    protected boolean _suppressAdditionalSchema;
 
     public DfSequenceExtractorFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
             DfDatabaseProperties databaseProperties) {
@@ -44,6 +46,16 @@ public class DfSequenceExtractorFactory {
     }
 
     protected List<UnifiedSchema> createTargetSchemaList() { // not only main schema but also additional schemas
-        return _databaseProperties.getTargetSchemaList();
+        final List<UnifiedSchema> schemaList;
+        if (_suppressAdditionalSchema) {
+            schemaList = DfCollectionUtil.newArrayList(_databaseProperties.getDatabaseSchema());
+        } else {
+            schemaList = _databaseProperties.getTargetSchemaList();
+        }
+        return schemaList;
+    }
+
+    public void suppressAdditionalSchema() {
+        _suppressAdditionalSchema = true;
     }
 }

@@ -106,6 +106,16 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //            }
     //        }
     //    }
+    //    ; sequenceDiff = map:{
+    //        ; [sequence-name] = map:{
+    //            ; diffType = [ADD or CHANGE or DELETE]
+    //            ; unifiedSchemaDiff = map:{ next = [schema] ; previous = [schema] }
+    //            ; minimumValue = map:{ next = [value] ; previous = [value] }
+    //            ; maximumValue = map:{ next = [value] ; previous = [value] }
+    //            ; incrementSize = map:{ next = [value] ; previous = [value] }
+    //            ; sequenceComment = map:{ next = [comment] ; previous = [comment] }
+    //        }
+    //    }
     //}
 
     // ===================================================================================
@@ -1012,6 +1022,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processSequenceComment(Sequence next, Sequence previous, DfSequenceDiff sequenceDiff) {
+        if (!_checkDbComment) {
+            return;
+        }
         diffNextPrevious(next, previous, sequenceDiff, new StringNextPreviousDiffer<Sequence, DfSequenceDiff>() {
             public String provide(Sequence obj) {
                 return DfTypeUtil.toString(obj.getSequenceComment());

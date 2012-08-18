@@ -53,6 +53,8 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.factory.DfSynonymExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
@@ -60,7 +62,6 @@ import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -569,8 +570,10 @@ public class DfSchemaXmlSerializer {
     //                                              Sequence
     //                                              --------
     protected void processSequence(Connection conn, DatabaseMetaData metaData) throws SQLException {
-        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
-        final Map<String, DfSequenceMeta> sequenceMap = prop.getSequenceMap(_dataSource);
+        final Map<String, DfSequenceMeta> sequenceMap = extractSequenceMap();
+        if (sequenceMap == null) {
+            return;
+        }
         _log.info("...Processing sequences: " + sequenceMap.size());
         final Element sequenceGroupElement = _doc.createElement("sequenceGroup");
         for (Entry<String, DfSequenceMeta> entry : sequenceMap.entrySet()) {
@@ -578,6 +581,28 @@ public class DfSchemaXmlSerializer {
             doProcessSequence(sequenceGroupElement, sequenceMeta);
         }
         _databaseNode.appendChild(sequenceGroupElement);
+    }
+
+    protected Map<String, DfSequenceMeta> extractSequenceMap() {
+        final DfSequenceExtractorFactory factory = createSequenceExtractorFactory(_dataSource);
+        if (_suppressAdditionalSchema) {
+            factory.suppressAdditionalSchema();
+        }
+        final DfSequenceExtractor sequenceExtractor = factory.createSequenceExtractor();
+        Map<String, DfSequenceMeta> sequenceMap = null;
+        if (sequenceExtractor != null) {
+            try {
+                sequenceMap = sequenceExtractor.getSequenceMap();
+            } catch (RuntimeException continued) { // because of supplement
+                _log.info("*Failed to get sequence map: " + continued.getMessage());
+            }
+        }
+        return sequenceMap;
+    }
+
+    protected DfSequenceExtractorFactory createSequenceExtractorFactory(DataSource dataSource) {
+        final DfDatabaseTypeFacadeProp facadeProp = getProperties().getBasicProperties().getDatabaseTypeFacadeProp();
+        return new DfSequenceExtractorFactory(dataSource, facadeProp, getDatabaseProperties());
     }
 
     protected void doProcessSequence(Element sequenceGroupElement, final DfSequenceMeta sequenceMeta) {
