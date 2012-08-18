@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
+import java.util.List;
+
 /**
  * @author jflute
  */
@@ -25,7 +27,7 @@ public class FileTokenizingRowResource {
     //                                                                             =========
     protected FileTokenizingHeaderInfo fileTokenizingHeaderInfo;
 
-    protected java.util.List<String> valueList;
+    protected List<String> valueList;
 
     protected String rowString;
 
@@ -46,11 +48,11 @@ public class FileTokenizingRowResource {
         this.fileTokenizingHeaderInfo = fileTokenizingHeaderInfo;
     }
 
-    public java.util.List<String> getValueList() {
+    public List<String> getValueList() {
         return valueList;
     }
 
-    public void setValueList(java.util.List<String> valueList) {
+    public void setValueList(List<String> valueList) {
         this.valueList = valueList;
     }
 

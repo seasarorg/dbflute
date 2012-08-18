@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class FileTokenizingHeaderInfo {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected List<String> _columnNameList = new java.util.ArrayList<String>();
+    protected List<String> _columnNameList = new ArrayList<String>();
 
     // =====================================================================================
     //                                                                           Easy-to-Use

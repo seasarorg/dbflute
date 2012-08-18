@@ -141,18 +141,17 @@ public class ColumnMapString {
         protected List<String> _columnNameList;
         protected List<String> _valueList;
 
-        public DifferentDelimiterCountException(String msg, List<String> columnNameList,
-                java.util.List<String> valueList) {
+        public DifferentDelimiterCountException(String msg, List<String> columnNameList, List<String> valueList) {
             super(msg);
             _columnNameList = columnNameList;
             _valueList = valueList;
         }
 
-        public java.util.List<String> getColumnNameList() {
+        public List<String> getColumnNameList() {
             return _columnNameList;
         }
 
-        public java.util.List<String> getValueList() {
+        public List<String> getValueList() {
             return _valueList;
         }
     }
