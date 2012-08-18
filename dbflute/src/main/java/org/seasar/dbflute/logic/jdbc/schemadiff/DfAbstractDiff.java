@@ -41,6 +41,10 @@ public abstract class DfAbstractDiff {
         return DfIndexDiff.createFromDiffMap(indexDiffMap);
     }
 
+    protected DfSequenceDiff createSequenceDiff(Map<String, Object> sequenceDiffMap) {
+        return DfSequenceDiff.createFromDiffMap(sequenceDiffMap);
+    }
+
     // ===================================================================================
     //                                                                  Next Previous Diff
     //                                                                  ==================

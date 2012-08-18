@@ -225,7 +225,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //                                                            ========================
     protected Map<String, DfSequenceMeta> _sequenceMap;
 
-    protected Map<String, DfSequenceMeta> getSequenceMap(DataSource dataSource) {
+    public Map<String, DfSequenceMeta> getSequenceMap(DataSource dataSource) {
         if (_sequenceMap != null) {
             return _sequenceMap;
         }

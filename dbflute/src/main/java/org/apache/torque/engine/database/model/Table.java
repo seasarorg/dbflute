@@ -189,14 +189,14 @@ public class Table {
     /**
      * Load the table object from an XML tag.
      * @param attrib XML attributes. (NotNull)
-     * @param tableFilter The filter of table by name when reading XML. (NullAllowed)
+     * @param readingFilter The filter of table by name when reading XML. (NullAllowed)
      * @return Should be the table excepted?
      */
-    public boolean loadFromXML(Attributes attrib, XmlReadingFilter tableFilter) {
+    public boolean loadFromXML(Attributes attrib, XmlReadingFilter readingFilter) {
         _name = attrib.getValue("name"); // table name
         _type = attrib.getValue("type"); // TABLE, VIEW, SYNONYM...
         _unifiedSchema = UnifiedSchema.createAsDynamicSchema(attrib.getValue("schema"));
-        if (tableFilter != null && tableFilter.isTableExcept(_unifiedSchema, _name)) {
+        if (readingFilter != null && readingFilter.isTableExcept(_unifiedSchema, _name)) {
             return false;
         }
         _plainComment = attrib.getValue("comment");

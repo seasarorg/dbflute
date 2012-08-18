@@ -144,8 +144,16 @@ public class Database {
     //                                                 -----
     // use duplicate collection to suppress a little performance cost
     // because tables are frequently referred
-    protected List<Table> _tableList = new ArrayList<Table>(100); // for ordering
-    protected StringKeyMap<Table> _tableMap = StringKeyMap.createAsFlexible(); // for key-map
+    protected final List<Table> _tableList = new ArrayList<Table>(100); // for ordering
+    protected final StringKeyMap<Table> _tableMap = StringKeyMap.createAsFlexible(); // for key-map
+
+    // -----------------------------------------------------
+    //                                              Sequence
+    //                                              --------
+    // same reason as table's reason
+    protected final List<Sequence> _sequenceList = new ArrayList<Sequence>(100);
+    protected final StringKeyMap<Sequence> _sequenceMap = StringKeyMap.createAsFlexible(); // for key-map
+    protected boolean _sequenceGroupMarked;
 
     // -----------------------------------------------------
     //                                         ParameterBean
@@ -333,6 +341,41 @@ public class Database {
             }
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                            Sequence
+    //                                                                            ========
+    public void markSequenceGroup() {
+        _sequenceGroupMarked = true;
+    }
+
+    public boolean hasSequenceGroup() {
+        return _sequenceGroupMarked;
+    }
+
+    public List<Sequence> getSequenceList() {
+        return _sequenceList;
+    }
+
+    public Sequence getSequence(String sequenceUniqueName) {
+        return _sequenceMap.get(sequenceUniqueName);
+    }
+
+    public Sequence addSequence(Attributes attrib, XmlReadingFilter tableFilter) {
+        final Sequence seq = new Sequence();
+        seq.setDatabase(this);
+        if (!seq.loadFromXML(attrib, tableFilter)) {
+            return null;
+        }
+        addSequence(seq);
+        return seq;
+    }
+
+    public void addSequence(Sequence seq) {
+        seq.setDatabase(this);
+        _sequenceList.add(seq);
+        _sequenceMap.put(seq.getUniqueName(), seq);
     }
 
     // ===================================================================================

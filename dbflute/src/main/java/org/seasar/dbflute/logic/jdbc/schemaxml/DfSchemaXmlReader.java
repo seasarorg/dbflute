@@ -110,6 +110,10 @@ public class DfSchemaXmlReader {
         protected boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
             return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
         }
+
+        public boolean isSequenceExcept(UnifiedSchema unifiedSchema, String sequenceName) {
+            return false; // fixed (for the future)
+        }
     }
 
     /**

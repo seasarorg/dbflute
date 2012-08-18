@@ -50,6 +50,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.identity.factory.DfIdentityExtract
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractor;
@@ -59,8 +60,10 @@ import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
@@ -302,13 +305,29 @@ public class DfSchemaXmlSerializer {
         _databaseNode = _doc.createElement("database");
         _databaseNode.setAttribute("name", _mainSchema.getPureSchema()); // as main schema
 
+        processTable(conn, metaData, tableList);
+        final boolean additionalTableExists = setupAddtionalTableIfNeeds();
+        if (tableList.isEmpty() && !additionalTableExists) {
+            throwSchemaEmptyException();
+        }
+
+        processSequence(conn, metaData);
+
+        _doc.appendChild(_databaseNode);
+    }
+
+    // -----------------------------------------------------
+    //                                                 Table
+    //                                                 -----
+    protected void processTable(final Connection conn, final DatabaseMetaData metaData,
+            final List<DfTableMeta> tableList) throws SQLException {
         _log.info("");
         _log.info("$ /= = = = = = = = = = = = = = = = = = = = = = = = = =");
         _log.info("$ [Table List]");
         int tableCount = 0;
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMeta tableInfo = tableList.get(i);
-            if (processTable(conn, metaData, tableInfo)) {
+            if (doProcessTable(conn, metaData, tableInfo)) {
                 ++tableCount;
             }
         } // end of table loop
@@ -317,18 +336,9 @@ public class DfSchemaXmlSerializer {
         _log.info("$ " + tableCount);
         _log.info("$ = = = = = = = = = =/");
         _log.info("");
-
-        final boolean additionalTableExists = setupAddtionalTableIfNeeds();
-        if (tableList.isEmpty() && !additionalTableExists) {
-            throwSchemaEmptyException();
-        }
-        _doc.appendChild(_databaseNode);
     }
 
-    // -----------------------------------------------------
-    //                                                 Table
-    //                                                 -----
-    protected boolean processTable(Connection conn, DatabaseMetaData metaData, DfTableMeta tableMeta)
+    protected boolean doProcessTable(Connection conn, DatabaseMetaData metaData, DfTableMeta tableMeta)
             throws SQLException {
         if (tableMeta.isOutOfGenerateTarget()) {
             // for example, sequence synonym and so on...
@@ -553,6 +563,43 @@ public class DfSchemaXmlSerializer {
         br.addElement("schema = " + _mainSchema);
         final String msg = br.buildExceptionMessage();
         throw new DfSchemaEmptyException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                              Sequence
+    //                                              --------
+    protected void processSequence(Connection conn, DatabaseMetaData metaData) throws SQLException {
+        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
+        final Map<String, DfSequenceMeta> sequenceMap = prop.getSequenceMap(_dataSource);
+        _log.info("...Processing sequences: " + sequenceMap.size());
+        final Element sequenceGroupElement = _doc.createElement("sequenceGroup");
+        for (Entry<String, DfSequenceMeta> entry : sequenceMap.entrySet()) {
+            final DfSequenceMeta sequenceMeta = entry.getValue();
+            doProcessSequence(sequenceGroupElement, sequenceMeta);
+        }
+        _databaseNode.appendChild(sequenceGroupElement);
+    }
+
+    protected void doProcessSequence(Element sequenceGroupElement, final DfSequenceMeta sequenceMeta) {
+        final Element sequenceElement = _doc.createElement("sequence");
+        sequenceElement.setAttribute("name", sequenceMeta.getSequenceName());
+        final String sequenceCatalog = sequenceMeta.getSequenceCatalog();
+        final String sequenceSchema = sequenceMeta.getSequenceSchema();
+        final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(sequenceCatalog, sequenceSchema);
+        if (unifiedSchema.hasSchema()) {
+            sequenceElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
+        }
+        setupSequenceAttributeNumber(sequenceMeta, sequenceElement, "minimumValue", sequenceMeta.getMinimumValue());
+        setupSequenceAttributeNumber(sequenceMeta, sequenceElement, "maximumValue", sequenceMeta.getMaximumValue());
+        setupSequenceAttributeNumber(sequenceMeta, sequenceElement, "incrementSize", sequenceMeta.getIncrementSize());
+        sequenceGroupElement.appendChild(sequenceElement);
+    }
+
+    protected void setupSequenceAttributeNumber(DfSequenceMeta sequenceMeta, Element tableElement, String key,
+            Number number) {
+        if (number != null) {
+            tableElement.setAttribute(key, DfTypeUtil.toString(number));
+        }
     }
 
     // ===================================================================================

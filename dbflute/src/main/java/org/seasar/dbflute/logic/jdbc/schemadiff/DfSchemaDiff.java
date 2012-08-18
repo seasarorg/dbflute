@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
+import org.apache.torque.engine.database.model.Sequence;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfConstraintKeyDiffer;
@@ -115,6 +116,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public static final String COMMENT_KEY = "comment";
     public static final String TABLE_COUNT_KEY = "tableCount";
     public static final String TABLE_DIFF_KEY = "tableDiff";
+    public static final String SEQUENCE_DIFF_KEY = "sequenceDiff";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -167,7 +169,28 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 addTableDiff(createTableDiff(diff));
             }
         });
+        _nestDiffList.add(new NestDiffSetupper() {
+            public String propertyName() {
+                return SEQUENCE_DIFF_KEY;
+            }
+
+            public List<? extends DfNestDiff> provide() {
+                return _sequenceDiffAllList;
+            }
+
+            public void setup(Map<String, Object> diff) {
+                addSequenceDiff(createSequenceDiff(diff));
+            }
+        });
     }
+
+    // -----------------------------------------------------
+    //                                         Sequence Diff
+    //                                         -------------
+    protected final List<DfSequenceDiff> _sequenceDiffAllList = DfCollectionUtil.newArrayList();
+    protected final List<DfSequenceDiff> _addedSequenceDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfSequenceDiff> _changedSequenceDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfSequenceDiff> _deletedSequenceDiffList = DfCollectionUtil.newArrayList();
 
     // -----------------------------------------------------
     //                                             Meta Info
@@ -263,14 +286,19 @@ public class DfSchemaDiff extends DfAbstractDiff {
      * </pre>
      */
     public void analyzeDiff() {
-        processAddedTable();
-        processChangedTable();
-        processDeletedTable();
+        processTable();
+        processSequence();
     }
 
     // ===================================================================================
     //                                                                       Table Process
     //                                                                       =============
+    protected void processTable() {
+        processAddedTable();
+        processChangedTable();
+        processDeletedTable();
+    }
+
     // -----------------------------------------------------
     //                                                 Added
     //                                                 -----
@@ -883,6 +911,150 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     // ===================================================================================
+    //                                                                    Sequence Process
+    //                                                                    ================
+    protected void processSequence() {
+        if (_previousDb.hasSequenceGroup() && _nextDb.hasSequenceGroup()) {
+            processAddedSequence();
+            processChangedSequence();
+            processDeletedSequence();
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                 Added
+    //                                                 -----
+    protected void processAddedSequence() {
+        final List<Sequence> sequenceList = _nextDb.getSequenceList();
+        for (Sequence sequence : sequenceList) {
+            final Sequence found = findPreviousSequence(sequence);
+            if (found == null || !isSameSequenceName(sequence, found)) { // added
+                addSequenceDiff(DfSequenceDiff.createAdded(sequence.getUniqueName()));
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                               Changed
+    //                                               -------
+    protected void processChangedSequence() {
+        final List<Sequence> sequenceList = _nextDb.getSequenceList();
+        for (Sequence next : sequenceList) {
+            final Sequence previous = findPreviousSequence(next);
+            if (previous == null || !isSameSequenceName(next, previous)) {
+                continue;
+            }
+            // found
+            final DfSequenceDiff sequenceDiff = DfSequenceDiff.createChanged(next.getUniqueName());
+
+            // direct attributes
+            processUnifiedSchema(next, previous, sequenceDiff);
+            processMinimumValue(next, previous, sequenceDiff);
+            processMaximumValue(next, previous, sequenceDiff);
+            processIncrementSize(next, previous, sequenceDiff);
+            processSequenceComment(next, previous, sequenceDiff);
+
+            if (sequenceDiff.hasDiff()) { // changed
+                addSequenceDiff(sequenceDiff);
+            }
+        }
+    }
+
+    protected void processUnifiedSchema(Sequence next, Sequence previous, DfSequenceDiff sequenceDiff) {
+        if (_suppressUnifiedSchema) {
+            return;
+        }
+        diffNextPrevious(next, previous, sequenceDiff, new StringNextPreviousDiffer<Sequence, DfSequenceDiff>() {
+            public String provide(Sequence obj) {
+                return obj.getUnifiedSchema().getCatalogSchema();
+            }
+
+            public void diff(DfSequenceDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setUnifiedSchemaDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processMinimumValue(Sequence next, Sequence previous, DfSequenceDiff sequenceDiff) {
+        diffNextPrevious(next, previous, sequenceDiff, new StringNextPreviousDiffer<Sequence, DfSequenceDiff>() {
+            public String provide(Sequence obj) {
+                return DfTypeUtil.toString(obj.getMinimumValue());
+            }
+
+            public void diff(DfSequenceDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setMinimumValueDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processMaximumValue(Sequence next, Sequence previous, DfSequenceDiff sequenceDiff) {
+        diffNextPrevious(next, previous, sequenceDiff, new StringNextPreviousDiffer<Sequence, DfSequenceDiff>() {
+            public String provide(Sequence obj) {
+                return DfTypeUtil.toString(obj.getMaximumValue());
+            }
+
+            public void diff(DfSequenceDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setMaximumValueDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processIncrementSize(Sequence next, Sequence previous, DfSequenceDiff sequenceDiff) {
+        diffNextPrevious(next, previous, sequenceDiff, new StringNextPreviousDiffer<Sequence, DfSequenceDiff>() {
+            public String provide(Sequence obj) {
+                return DfTypeUtil.toString(obj.getIncrementSize());
+            }
+
+            public void diff(DfSequenceDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setIncrementSizeDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processSequenceComment(Sequence next, Sequence previous, DfSequenceDiff sequenceDiff) {
+        diffNextPrevious(next, previous, sequenceDiff, new StringNextPreviousDiffer<Sequence, DfSequenceDiff>() {
+            public String provide(Sequence obj) {
+                return DfTypeUtil.toString(obj.getSequenceComment());
+            }
+
+            public void diff(DfSequenceDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setSequenceCommentDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected <TYPE> void diffNextPrevious(Sequence next, Sequence previous, DfSequenceDiff diff,
+            NextPreviousDiffer<Sequence, DfSequenceDiff, TYPE> differ) {
+        final TYPE nextValue = differ.provide(next);
+        final TYPE previousValue = differ.provide(previous);
+        if (!differ.isMatch(nextValue, previousValue)) {
+            final String nextDisp = differ.disp(nextValue, true);
+            final String previousDisp = differ.disp(previousValue, false);
+            differ.diff(diff, createNextPreviousDiff(nextDisp, previousDisp));
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                               Deleted
+    //                                               -------
+    protected void processDeletedSequence() {
+        final List<Sequence> sequenceList = _previousDb.getSequenceList();
+        for (Sequence sequence : sequenceList) {
+            final Sequence found = findNextSequence(sequence);
+            if (found == null || !isSameSequenceName(sequence, found)) { // deleted
+                addSequenceDiff(DfSequenceDiff.createDeleted(sequence.getUniqueName()));
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                           Same Helper
+    //                                           -----------
+    protected boolean isSameSequenceName(Sequence next, Sequence previous) {
+        return isSame(next.getSequenceName(), previous.getSequenceName()); // not unique name
+    }
+
+    // ===================================================================================
     //                                                                         Find Object
     //                                                                         ===========
     protected Table findNextTable(Table table) {
@@ -891,6 +1063,14 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     protected Table findPreviousTable(Table table) {
         return _previousDb.getTable(table.getName());
+    }
+
+    protected Sequence findNextSequence(Sequence sequence) {
+        return _nextDb.getSequence(sequence.getUniqueName());
+    }
+
+    protected Sequence findPreviousSequence(Sequence sequence) {
+        return _previousDb.getSequence(sequence.getUniqueName());
     }
 
     // ===================================================================================
@@ -1071,6 +1251,41 @@ public class DfSchemaDiff extends DfAbstractDiff {
             String msg = "Unknown diff-type of table: ";
             msg = msg + " diffType=" + tableDiff.getDiffType();
             msg = msg + " tableDiff=" + tableDiff;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         Sequence Diff
+    //                                         -------------
+    public List<DfSequenceDiff> getSequenceDiffAllList() {
+        return _sequenceDiffAllList;
+    }
+
+    public List<DfSequenceDiff> getAddedSequenceDiffList() {
+        return _addedSequenceDiffList;
+    }
+
+    public List<DfSequenceDiff> getChangedSequenceDiffList() {
+        return _changedSequenceDiffList;
+    }
+
+    public List<DfSequenceDiff> getDeletedSequenceDiffList() {
+        return _deletedSequenceDiffList;
+    }
+
+    public void addSequenceDiff(DfSequenceDiff sequenceDiff) {
+        _sequenceDiffAllList.add(sequenceDiff);
+        if (sequenceDiff.isAdded()) {
+            _addedSequenceDiffList.add(sequenceDiff);
+        } else if (sequenceDiff.isChanged()) {
+            _changedSequenceDiffList.add(sequenceDiff);
+        } else if (sequenceDiff.isDeleted()) {
+            _deletedSequenceDiffList.add(sequenceDiff);
+        } else {
+            String msg = "Unknown diff-type of sequence: ";
+            msg = msg + " diffType=" + sequenceDiff.getDiffType();
+            msg = msg + " tableDiff=" + sequenceDiff;
             throw new IllegalStateException(msg);
         }
     }

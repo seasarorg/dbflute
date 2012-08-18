@@ -176,6 +176,36 @@ ${database.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
+#if (!$schemaDiff.addedSequenceDiffList.isEmpty())
+	<h3>Add Sequence</h3>
+	<ul class="table-content">
+#foreach ($sequenceDiff in $schemaDiff.addedSequenceDiffList)
+		<li>${sequenceDiff.sequenceDispName}</li>
+#end
+	</ul>
+#end
+#if (!$schemaDiff.changedSequenceDiffList.isEmpty())
+	<h3>Change Sequence</h3>
+	<div class="table-content">
+#foreach ($sequenceDiff in $schemaDiff.changedSequenceDiffList)
+		<h4>${sequenceDiff.sequenceDispName}</h4>
+		<div class="change-table-content">
+#foreach ($handler in $sequenceDiff.nextPreviousDiffList)
+			<h5>$handler.titleName()</h5>
+			<div class="column-content">$handler.provide().displayForHtml</div>
+#end
+		</div>
+#end
+	</div>
+#end
+#if (!$schemaDiff.deletedSequenceDiffList.isEmpty())
+	<h3>Delete Sequence</h3>
+	<ul class="table-content">
+#foreach ($sequenceDiff in $schemaDiff.deletedSequenceDiffList)
+		<li>${sequenceDiff.sequenceDispName}</li>
+#end
+	</ul>
+#end
 </div>
 #end
 

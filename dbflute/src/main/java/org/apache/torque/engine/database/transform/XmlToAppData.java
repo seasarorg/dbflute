@@ -134,6 +134,8 @@ public class XmlToAppData extends DefaultHandler {
         boolean isTableExcept(UnifiedSchema unifiedSchema, String tableName);
 
         boolean isColumnExcept(UnifiedSchema unifiedSchema, String tableName, String columnName);
+
+        boolean isSequenceExcept(UnifiedSchema unifiedSchema, String sequenceName);
     }
 
     // ===================================================================================
@@ -235,6 +237,10 @@ public class XmlToAppData extends DefaultHandler {
             } else if (rawName.equals("table")) { // contains additional schema's tables
                 clearCurrentTableElements();
                 _currentTable = _currentDB.addTable(attributes, _readingFilter); // null allowed
+            } else if (rawName.equals("sequenceGroup")) {
+                _currentDB.markSequenceGroup();
+            } else if (rawName.equals("sequence")) { // may contain additional schema's sequences
+                _currentDB.addSequence(attributes, _readingFilter);
             } else if (_currentTable != null) { // check because the table may be filtered
                 // handle table elements
                 if (rawName.equals("column")) {

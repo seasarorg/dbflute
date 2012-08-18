@@ -342,11 +342,11 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
     }
 
     public String getTableName() {
-        return _tableName;
+        return _tableName != null ? _tableName : "";
     }
 
     public String getLowerTableName() {
-        return _tableName != null ? _tableName.toLowerCase() : "";
+        return getTableName().toLowerCase();
     }
 
     public String getTableDispName() {
@@ -354,7 +354,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
         // The best way is to save display names on a DiffMap file,
         // but DiffMap files are looked directly by human at AlterCheck and so on.
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-        return prop.filterTableDispNameIfNeeds(_tableName);
+        return prop.filterTableDispNameIfNeeds(getTableName());
     }
 
     public DfDiffType getDiffType() {
