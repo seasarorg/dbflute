@@ -428,6 +428,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    public boolean isCheckCountBeforeQueryUpdate() { // closet
+        return isProperty("isCheckCountBeforeQueryUpdate", false);
+    }
+
+    // ===================================================================================
     //                                                                 PG Reservation Word
     //                                                                 ===================
     protected List<String> _pgReservColumnList;

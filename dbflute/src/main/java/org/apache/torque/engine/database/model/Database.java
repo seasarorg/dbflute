@@ -1787,6 +1787,10 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().getCursorSelectFetchSize();
     }
 
+    public boolean isCheckCountBeforeQueryUpdate() {
+        return getProperties().getLittleAdjustmentProperties().isCheckCountBeforeQueryUpdate();
+    }
+
     public boolean isStopGenerateExtendedBhv() {
         return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedBhv();
     }
