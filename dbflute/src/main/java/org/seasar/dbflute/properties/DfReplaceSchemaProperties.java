@@ -1023,13 +1023,18 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return baseDirectory + "/migration-next-schema.xml";
     }
 
-    public String getMigrationAlterCheckResultDiff() {
+    public String getMigrationAlterCheckDiffMapFile() {
         final String baseDirectory = getMigrationSchemaDirectory();
         return baseDirectory + "/project-alter-check.diffmap";
     }
 
-    public String getMigrationAlterCheckDiffHtmlFileName() {
-        return "alter-check-diff.html";
+    public String getMigrationAlterCheckResultFileName() {
+        return "alter-check-result.html";
+    }
+
+    public String getMigrationAlterCheckResultFilePath() {
+        final String baseDirectory = getMigrationSchemaDirectory();
+        return baseDirectory + "/" + getMigrationAlterCheckResultFileName();
     }
 
     // -----------------------------------------------------

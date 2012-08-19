@@ -845,13 +845,13 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void serializeSchemaDiff(DfSchemaDiff schemaDiff) {
-        final String resultDiff = getMigrationAlterCheckResultDiff();
-        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(resultDiff);
+        final String diffMapFile = getMigrationAlterCheckDiffMapFile();
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(diffMapFile);
         try {
-            _log.info("...Serializing schema diff: " + resultDiff);
+            _log.info("...Serializing schema diff: " + diffMapFile);
             schemaHistory.serializeSchemaDiff(schemaDiff);
         } catch (IOException e) {
-            String msg = "Failed to serialize schema diff: resultDiff=" + resultDiff;
+            String msg = "Failed to serialize schema diff: file=" + diffMapFile;
             throw new IllegalStateException(msg, e);
         }
     }
@@ -878,7 +878,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         setupFixedAlterAdviceMessage(br);
         br.addElement("");
         br.addElement("You can see the details at");
-        br.addElement(" '" + getMigrationAlterCheckResultDiff() + "',");
+        br.addElement(" '" + getMigrationAlterCheckResultFilePath() + "'.");
         br.addItem("Diff Date");
         br.addElement(schemaDiff.getDiffDate());
         final DfNextPreviousDiff tableCountDiff = schemaDiff.getTableCount();
@@ -1116,7 +1116,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void deleteAlterCheckResultDiff() {
-        final String diff = getMigrationAlterCheckResultDiff();
+        final String diff = getMigrationAlterCheckDiffMapFile();
         deleteFile(new File(diff), "...Deleting the AlterCheck result diff");
     }
 
@@ -1286,8 +1286,16 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                       Schema Resource
     //                                       ---------------
-    protected String getMigrationAlterCheckResultDiff() {
-        return getReplaceSchemaProperties().getMigrationAlterCheckResultDiff();
+    protected String getMigrationAlterCheckDiffMapFile() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckDiffMapFile();
+    }
+
+    protected String getMigrationAlterCheckResultFileName() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckResultFileName();
+    }
+
+    protected String getMigrationAlterCheckResultFilePath() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckResultFilePath();
     }
 
     protected String getMigrationAlterCheckPreviousSchemaXml() {

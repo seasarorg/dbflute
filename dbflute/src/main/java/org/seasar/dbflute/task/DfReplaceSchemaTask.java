@@ -175,10 +175,13 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
                 }
                 _alterCheckFinalInfo = process.checkAlter();
                 if (_alterCheckFinalInfo.hasAlterCheckDiff()) {
-                    outputAlterCheckDiffHtml();
+                    outputAlterCheckResultHtml();
                 }
             } else if (isSavePrevious()) {
                 _alterCheckFinalInfo = process.savePrevious();
+            } else { // no way
+                String msg = "Failed to process alter-check.";
+                throw new IllegalStateException(msg);
             }
             _alterCheckFinalInfo.throwAlterCheckExceptionIfExists();
         } finally {
@@ -200,7 +203,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         });
     }
 
-    protected void outputAlterCheckDiffHtml() {
+    protected void outputAlterCheckResultHtml() {
         _selector.selectAlterCheckDiffHtml();
         fireVelocityProcess();
     }

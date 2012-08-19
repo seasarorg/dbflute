@@ -155,6 +155,6 @@ public class DfSchemaSyncChecker {
     }
 
     protected String getDiffHtmlFileName() {
-        return getDocumentProperties().getSchemaSyncCheckDiffHtmlFileName();
+        return getDocumentProperties().getSchemaSyncCheckResultFileName();
     }
 }

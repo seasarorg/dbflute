@@ -93,12 +93,12 @@ public class DfDocumentSelector {
         return getDocumentProperties().getHistoryHtmlFileName(projectName);
     }
 
-    public String getSchemaSyncCheckDiffHtmlFileName() {
-        return getDocumentProperties().getSchemaSyncCheckDiffHtmlFileName();
+    public String getSchemaSyncCheckResultFileName() {
+        return getDocumentProperties().getSchemaSyncCheckResultFileName();
     }
 
-    public String getAlterCheckDiffHtmlFileName() {
-        return getReplaceSchemaProperties().getMigrationAlterCheckDiffHtmlFileName();
+    public String getAlterCheckResultFileName() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckResultFileName();
     }
 
     // ===================================================================================
@@ -129,7 +129,7 @@ public class DfDocumentSelector {
     }
 
     protected String getAlterCheckDiffMapFile() {
-        return getReplaceSchemaProperties().getMigrationAlterCheckResultDiff();
+        return getReplaceSchemaProperties().getMigrationAlterCheckDiffMapFile();
     }
 
     // ===================================================================================
