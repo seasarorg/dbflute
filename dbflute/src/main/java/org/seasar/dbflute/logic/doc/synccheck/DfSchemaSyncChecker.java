@@ -46,7 +46,7 @@ public class DfSchemaSyncChecker {
     //                                                                          Check Sync
     //                                                                          ==========
     public void checkSync() {
-        clearPreviousResource();
+        clearOutputResource();
         serializeMainSchema();
         final DfSchemaXmlSerializer targetSerializer = serializeTargetSchema();
         _log.info("...Checking the schema synchronized");
@@ -56,25 +56,22 @@ public class DfSchemaSyncChecker {
             throwSchemaSyncCheckTragedyResultException();
         } else { // synchronized
             _log.info(" -> the schema is synchronized");
-            clearTemporaryResource();
+            clearOutputResource();
         }
     }
 
-    protected void clearPreviousResource() {
+    protected void clearOutputResource() {
         final File schemaXml = new File(getSchemaXml());
         if (schemaXml.exists()) {
             schemaXml.delete();
         }
-        final File historyFile = new File(getDiffMapFile());
-        if (historyFile.exists()) {
-            historyFile.delete();
+        final File diffMapFile = new File(getDiffMapFile());
+        if (diffMapFile.exists()) {
+            diffMapFile.delete();
         }
-    }
-
-    protected void clearTemporaryResource() {
-        final File schemaXml = new File(getSchemaXml());
-        if (schemaXml.exists()) {
-            schemaXml.delete();
+        final File resultFile = new File(getResultFilePath());
+        if (resultFile.exists()) {
+            resultFile.delete();
         }
     }
 
@@ -111,7 +108,7 @@ public class DfSchemaSyncChecker {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The schema was not synchronized with another schema.");
         br.addItem("Advice");
-        br.addElement("You can confirm the result at 'output/doc/" + getDiffHtmlFileName() + "'.");
+        br.addElement("You can confirm the result at '" + getResultFilePath() + "'.");
         br.addElement("'Previous' means the main schema, defined at databaseInfoMap.dfprop.");
         br.addElement("'Next' means the sync-check target schema, defined at schemaSyncCheckMap property.");
         final String msg = br.buildExceptionMessage();
@@ -154,7 +151,11 @@ public class DfSchemaSyncChecker {
         return getDocumentProperties().getSchemaSyncCheckDiffMapFile();
     }
 
-    protected String getDiffHtmlFileName() {
+    protected String getResultFileName() {
         return getDocumentProperties().getSchemaSyncCheckResultFileName();
+    }
+
+    protected String getResultFilePath() {
+        return getDocumentProperties().getSchemaSyncCheckResultFilePath();
     }
 }

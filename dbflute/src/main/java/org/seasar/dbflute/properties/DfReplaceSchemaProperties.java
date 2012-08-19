@@ -1025,7 +1025,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public String getMigrationAlterCheckDiffMapFile() {
         final String baseDirectory = getMigrationSchemaDirectory();
-        return baseDirectory + "/project-alter-check.diffmap";
+        return baseDirectory + "/migration-alter-check.diffmap";
     }
 
     public String getMigrationAlterCheckResultFileName() {

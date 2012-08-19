@@ -1116,8 +1116,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     protected void deleteAlterCheckResultDiff() {
-        final String diff = getMigrationAlterCheckDiffMapFile();
-        deleteFile(new File(diff), "...Deleting the AlterCheck result diff");
+        final String diffMap = getMigrationAlterCheckDiffMapFile();
+        deleteFile(new File(diffMap), "...Deleting the AlterCheck diffmap file");
+        final String resultFile = getMigrationAlterCheckResultFilePath();
+        deleteFile(new File(resultFile), "...Deleting the AlterCheck result file");
     }
 
     // ===================================================================================

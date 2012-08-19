@@ -225,8 +225,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         try {
             doProcessSchemaSyncCheck();
         } catch (DfSchemaSyncCheckTragedyResultException e) {
-            refreshResources();
             throw e;
+        } finally {
+            refreshResources();
         }
     }
 

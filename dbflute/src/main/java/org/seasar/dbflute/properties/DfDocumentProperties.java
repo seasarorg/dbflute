@@ -31,7 +31,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     protected static final String STYLE_SHEET_EMBEDDED_MARK = "$";
     protected static final String JAVA_SCRIPT_EMBEDDED_MARK = "$";
 
-    protected static final String SCHEMA_SYNC_CHECK_SCHEMA_XML = "./schema/project-sync-check-schema.xml";
+    protected static final String SCHEMA_SYNC_CHECK_SCHEMA_XML = "./schema/project-sync-schema.xml";
     protected static final String SCHEMA_SYNC_CHECK_DIFF_MAP_FILE = "./schema/project-sync-check.diffmap";
     protected static final String SCHEMA_SYNC_CHECK_RESULT_FILE_NAME = "sync-check-result.html";
 
@@ -592,6 +592,11 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public String getSchemaSyncCheckResultFileName() {
         return SCHEMA_SYNC_CHECK_RESULT_FILE_NAME;
+    }
+
+    public String getSchemaSyncCheckResultFilePath() {
+        final String outputDirectory = getDocumentOutputDirectory();
+        return outputDirectory + "/" + getSchemaSyncCheckResultFileName();
     }
 
     // ===================================================================================

@@ -179,15 +179,10 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
                 }
             } else if (isSavePrevious()) {
                 _alterCheckFinalInfo = process.savePrevious();
-            } else { // no way
-                String msg = "Failed to process alter-check.";
-                throw new IllegalStateException(msg);
             }
             _alterCheckFinalInfo.throwAlterCheckExceptionIfExists();
         } finally {
-            // because the alter check process
-            // may output alter NG mark file
-            refreshResources();
+            refreshResources(); // for output files by alter check
         }
     }
 
