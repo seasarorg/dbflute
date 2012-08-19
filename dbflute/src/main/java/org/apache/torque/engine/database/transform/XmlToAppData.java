@@ -235,13 +235,16 @@ public class XmlToAppData extends DefaultHandler {
             if (rawName.equals("database")) { // basically only one on DBFlute
                 _currentDB = _appData.addDatabase(attributes); // two or more calls throws Exception
             } else if (rawName.equals("table")) { // contains additional schema's tables
-                clearCurrentTableElements();
+                clearCurrentElements();
                 _currentTable = _currentDB.addTable(attributes, _readingFilter); // null allowed
             } else if (rawName.equals("sequenceGroup")) {
+                clearCurrentElements();
                 _currentDB.markSequenceGroup();
             } else if (rawName.equals("sequence")) { // may contain additional schema's sequences
+                clearCurrentElements();
                 _currentDB.addSequence(attributes, _readingFilter);
-            } else if (_currentTable != null) { // check because the table may be filtered
+            }
+            if (_currentTable != null) { // check because the table may be filtered
                 // handle table elements
                 if (rawName.equals("column")) {
                     _currentColumn = _currentTable.addColumn(attributes, _readingFilter);
@@ -267,7 +270,8 @@ public class XmlToAppData extends DefaultHandler {
         }
     }
 
-    protected void clearCurrentTableElements() {
+    protected void clearCurrentElements() {
+        _currentTable = null;
         _currentColumn = null;
         _currentFK = null;
         _currentIndex = null;

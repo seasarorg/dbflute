@@ -127,6 +127,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public static final String TABLE_COUNT_KEY = "tableCount";
     public static final String TABLE_DIFF_KEY = "tableDiff";
     public static final String SEQUENCE_DIFF_KEY = "sequenceDiff";
+    public static final String KEYWORD_H2_SYSTEM_SEQUENCE = "SYSTEM_SEQUENCE";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -632,7 +633,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 }
                 final boolean bothValid = next != null && previous != null;
                 if (bothValid && isDatabaseH2()) {
-                    if (Srl.hasKeywordAllIgnoreCase("SYSTEM_SEQUENCE", next, previous)) {
+                    if (Srl.hasKeywordAllIgnoreCase(KEYWORD_H2_SYSTEM_SEQUENCE, next, previous)) {
                         return true;
                     }
                 }
@@ -937,6 +938,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected void processAddedSequence() {
         final List<Sequence> sequenceList = _nextDb.getSequenceList();
         for (Sequence sequence : sequenceList) {
+            if (isSystemSequence(sequence.getSequenceName())) {
+                continue;
+            }
             final Sequence found = findPreviousSequence(sequence);
             if (found == null || !isSameSequenceName(sequence, found)) { // added
                 addSequenceDiff(DfSequenceDiff.createAdded(sequence.getUniqueName()));
@@ -957,8 +961,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
             // found
             final DfSequenceDiff sequenceDiff = DfSequenceDiff.createChanged(next.getUniqueName());
 
+            // sequence needs schema to be unique so comparing schema is non-sense here
+            //processUnifiedSchema(next, previous, sequenceDiff);
+
             // direct attributes
-            processUnifiedSchema(next, previous, sequenceDiff);
             processMinimumValue(next, previous, sequenceDiff);
             processMaximumValue(next, previous, sequenceDiff);
             processIncrementSize(next, previous, sequenceDiff);
@@ -968,21 +974,6 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 addSequenceDiff(sequenceDiff);
             }
         }
-    }
-
-    protected void processUnifiedSchema(Sequence next, Sequence previous, DfSequenceDiff sequenceDiff) {
-        if (_suppressUnifiedSchema) {
-            return;
-        }
-        diffNextPrevious(next, previous, sequenceDiff, new StringNextPreviousDiffer<Sequence, DfSequenceDiff>() {
-            public String provide(Sequence obj) {
-                return obj.getUnifiedSchema().getCatalogSchema();
-            }
-
-            public void diff(DfSequenceDiff diff, DfNextPreviousDiff nextPreviousDiff) {
-                diff.setUnifiedSchemaDiff(nextPreviousDiff);
-            }
-        });
     }
 
     protected void processMinimumValue(Sequence next, Sequence previous, DfSequenceDiff sequenceDiff) {
@@ -1053,6 +1044,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected void processDeletedSequence() {
         final List<Sequence> sequenceList = _previousDb.getSequenceList();
         for (Sequence sequence : sequenceList) {
+            if (isSystemSequence(sequence.getSequenceName())) {
+                continue;
+            }
             final Sequence found = findNextSequence(sequence);
             if (found == null || !isSameSequenceName(sequence, found)) { // deleted
                 addSequenceDiff(DfSequenceDiff.createDeleted(sequence.getUniqueName()));
@@ -1061,10 +1055,17 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     // -----------------------------------------------------
-    //                                           Same Helper
-    //                                           -----------
+    //                                         Assist Helper
+    //                                         -------------
+    protected boolean isSystemSequence(String sequenceName) {
+        if (isDatabaseH2()) {
+            return Srl.hasKeywordAllIgnoreCase(KEYWORD_H2_SYSTEM_SEQUENCE, sequenceName);
+        }
+        return false;
+    }
+
     protected boolean isSameSequenceName(Sequence next, Sequence previous) {
-        return isSame(next.getSequenceName(), previous.getSequenceName()); // not unique name
+        return isSame(next.getUniqueName(), previous.getUniqueName());
     }
 
     // ===================================================================================
