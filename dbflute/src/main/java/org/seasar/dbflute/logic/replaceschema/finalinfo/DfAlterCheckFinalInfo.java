@@ -26,6 +26,10 @@ public class DfAlterCheckFinalInfo extends DfAbstractSchemaTaskFinalInfo {
     protected DfAlterCheckReplaceSchemaFailureException _replaceSchemaFailureEx;
     protected DfAlterCheckDifferenceFoundException _diffFoundEx;
 
+    public boolean hasAlterCheckDiff() {
+        return _diffFoundEx != null;
+    }
+
     public void throwAlterCheckExceptionIfExists() {
         if (_breakCause != null) {
             throw _breakCause;

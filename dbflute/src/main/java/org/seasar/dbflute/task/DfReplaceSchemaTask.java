@@ -10,10 +10,14 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.AppData;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.context.Context;
 import org.seasar.dbflute.exception.DfCreateSchemaFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyFailureException;
 import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAbstractSchemaTaskFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfAlterCheckFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
@@ -30,6 +34,7 @@ import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
+import org.seasar.dbflute.task.bs.assistant.DfDocumentSelector;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -56,6 +61,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     protected String _areYouReadyAnswer; // from environment variable
     protected boolean _cancelled;
     protected String _varyingArg;
+    protected final DfDocumentSelector _selector = new DfDocumentSelector(); // e.g. AlterCheck
 
     // ===================================================================================
     //                                                                           Beginning
@@ -133,6 +139,17 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         }
     }
 
+    // -----------------------------------------------------
+    //                          Arrange before ReplaceSchema
+    //                          ----------------------------
+    protected void arrangeBeforeReps() {
+        final DfArrangeBeforeRepsProcess process = new DfArrangeBeforeRepsProcess();
+        process.arrangeBeforeReps();
+    }
+
+    // -----------------------------------------------------
+    //                                            AlterCheck
+    //                                            ----------
     protected boolean isAlterProcess() {
         return isAlterCheck() || isSavePrevious();
     }
@@ -157,6 +174,9 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
                     process.useDraftSpace();
                 }
                 _alterCheckFinalInfo = process.checkAlter();
+                if (_alterCheckFinalInfo.hasAlterCheckDiff()) {
+                    outputAlterCheckDiffHtml();
+                }
             } else if (isSavePrevious()) {
                 _alterCheckFinalInfo = process.savePrevious();
             }
@@ -180,6 +200,14 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         });
     }
 
+    protected void outputAlterCheckDiffHtml() {
+        _selector.selectAlterCheckDiffHtml();
+        fireVelocityProcess();
+    }
+
+    // -----------------------------------------------------
+    //                                          Main Process
+    //                                          ------------
     protected void processMain() {
         executeCoreProcess(getPlaySqlDir(), false);
     }
@@ -319,14 +347,6 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     // ===================================================================================
-    //                                                        Arrange before ReplaceSchema
-    //                                                        ============================
-    protected void arrangeBeforeReps() {
-        final DfArrangeBeforeRepsProcess process = new DfArrangeBeforeRepsProcess();
-        process.arrangeBeforeReps();
-    }
-
-    // ===================================================================================
     //                                                                          Final Info
     //                                                                          ==========
     @Override
@@ -434,6 +454,22 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
         for (String detailMessage : detailMessageList) {
             sb.append(ln()).append("  ").append(detailMessage);
         }
+    }
+
+    // ===================================================================================
+    //                                                                  Prepare Generation
+    //                                                                  ==================
+    @Override
+    public Context initControlContext() throws Exception {
+        _log.info("");
+        _log.info("...Preparing generation of alter check");
+        return createVelocityContext();
+    }
+
+    protected VelocityContext createVelocityContext() {
+        final DfVelocityContextFactory factory = createVelocityContextFactory();
+        final AppData appData = AppData.createAsEmpty();
+        return factory.createAsCore(appData, _selector);
     }
 
     // ===================================================================================

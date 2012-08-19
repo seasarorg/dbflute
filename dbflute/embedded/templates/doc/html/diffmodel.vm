@@ -109,7 +109,7 @@ ${database.historyHtmlJavaScriptEmbedded}
 <body>
 <h1>History for ${database.projectName} (${database.databaseName})</h1>
 
-#foreach ($schemaDiff in $database.schemaDiffList)
+#foreach ($schemaDiff in $selector.schemaDiffList)
 <div class="section">
 	<h2><span class="dt">Diff Date: </span>${schemaDiff.diffDate}</h2>
 #if ($schemaDiff.hasComment())
@@ -124,7 +124,7 @@ ${database.historyHtmlJavaScriptEmbedded}
 	<ul class="table-content">
 #foreach ($tableDiff in $schemaDiff.addedTableDiffList)
 #if ($schemaDiff.isLatest())
-		<li><a href="./${database.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></li>
+		<li><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></li>
 #else
 		<li>${tableDiff.tableDispName}</li>
 #end 
@@ -136,7 +136,7 @@ ${database.historyHtmlJavaScriptEmbedded}
 	<div class="table-content">
 #foreach ($tableDiff in $schemaDiff.changedTableDiffList)
 #if ($schemaDiff.isLatest())
-		<h4><a href="./${database.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></h4>
+		<h4><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></h4>
 #else
 		<h4>${tableDiff.tableDispName}</h4>
 #end

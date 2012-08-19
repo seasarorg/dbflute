@@ -44,8 +44,8 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     }
 
     // ===================================================================================
-    //                                                                 Initialize Override
-    //                                                                 ===================
+    //                                                                  Prepare Generation
+    //                                                                  ==================
     @Override
     public Context initControlContext() throws Exception {
         initializeSchemaData();
@@ -60,10 +60,6 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
 
     protected abstract DfSchemaXmlReader createSchemaXmlReader();
 
-    protected void initializeVelocityContext() {
-        _context = createVelocityContext(_schemaData);
-    }
-
     protected DfSchemaXmlReader createSchemaXmlReaderAsCoreToGenerate() {
         return DfSchemaXmlReader.createAsCoreToGenerate();
     }
@@ -72,12 +68,12 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
         return DfSchemaXmlReader.createAsCoreToManage();
     }
 
-    protected VelocityContext createVelocityContext(final AppData appData) {
-        final DfVelocityContextFactory factory = createVelocityContextFactory();
-        return factory.create(appData);
+    protected void initializeVelocityContext() {
+        _context = createVelocityContext(_schemaData);
     }
 
-    protected DfVelocityContextFactory createVelocityContextFactory() {
-        return new DfVelocityContextFactory();
+    protected VelocityContext createVelocityContext(final AppData appData) {
+        final DfVelocityContextFactory factory = createVelocityContextFactory();
+        return factory.createAsCore(appData, _selector);
     }
 }

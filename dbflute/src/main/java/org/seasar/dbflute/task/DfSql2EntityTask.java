@@ -949,8 +949,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                         Assist Helper
     //                                         -------------
     protected VelocityContext createVelocityContext(final AppData appData) {
-        final DfVelocityContextFactory factory = new DfVelocityContextFactory();
-        return factory.create(appData);
+        final DfVelocityContextFactory factory = createVelocityContextFactory();
+        return factory.createAsCore(appData, _selector);
     }
 
     protected boolean needsConvertToJavaName(String columnName) {

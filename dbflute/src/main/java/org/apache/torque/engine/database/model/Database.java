@@ -81,14 +81,12 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
-import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.seasar.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
-import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlCollector;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
@@ -160,11 +158,6 @@ public class Database {
     //                                         -------------
     /** The meta data of parameter bean. */
     protected Map<String, DfPmbMetaData> _pmbMetaDataMap; // when sql2entity only
-
-    // -----------------------------------------------------
-    //                                        Schema History
-    //                                        --------------
-    protected DfSchemaHistory _schemaHistory; // when doc only
 
     // -----------------------------------------------------
     //                                                 Other
@@ -945,11 +938,34 @@ public class Database {
     }
 
     public void enableDocumentOutputDirectory() {
+        doEnableDocumentOutputDirectory(true);
+    }
+
+    public void backToDocumentOutputDirectory() {
+        doEnableDocumentOutputDirectory(false);
+    }
+
+    protected void doEnableDocumentOutputDirectory(boolean logging) {
         final String outputDirectory = getProperties().getDocumentProperties().getDocumentOutputDirectory();
-        _log.info("...Setting up documentOutputDirectory: " + outputDirectory);
+        if (logging) {
+            _log.info("...Setting up documentOutputDirectory: " + outputDirectory);
+        }
         final File dir = new File(outputDirectory);
         if (!dir.exists()) {
-            _log.info("...Making directories for documentOutputDirectory: " + dir);
+            if (logging) {
+                _log.info("...Making directories for documentOutputDirectory: " + dir);
+            }
+            dir.mkdirs(); // because this directory is NOT user setting basically 
+        }
+        getGeneratorInstance().setOutputPath(outputDirectory);
+    }
+
+    public void enableMigrationOutputDirectory() {
+        final String outputDirectory = getProperties().getReplaceSchemaProperties().getMigrationSchemaDirectory();
+        _log.info("...Setting up migrationOutputDirectory: " + outputDirectory);
+        final File dir = new File(outputDirectory);
+        if (!dir.exists()) {
+            _log.info("...Making directories for migrationOutputDirectory: " + dir);
             dir.mkdirs(); // because this directory is NOT user setting basically 
         }
         getGeneratorInstance().setOutputPath(outputDirectory);
@@ -1929,11 +1945,6 @@ public class Database {
     // -----------------------------------------------------
     //                                            SchemaHTML
     //                                            ----------
-    public String getSchemaHtmlFileName() {
-        final String projectName = getProjectName();
-        return getProperties().getDocumentProperties().getSchemaHtmlFileName(projectName);
-    }
-
     public boolean isSchemaHtmlOutsideSqlValid() {
         if (getProperties().getDocumentProperties().isSuppressSchemaHtmlOutsideSql()) {
             return false;
@@ -1976,11 +1987,6 @@ public class Database {
     // -----------------------------------------------------
     //                                           HistoryHTML
     //                                           -----------
-    public String getHistoryHtmlFileName() {
-        final String projectName = getProjectName();
-        return getProperties().getDocumentProperties().getHistoryHtmlFileName(projectName);
-    }
-
     public boolean isHistoryHtmlStyleSheetEmbedded() {
         return getProperties().getDocumentProperties().isHistoryHtmlStyleSheetEmbedded();
     }
@@ -2011,34 +2017,6 @@ public class Database {
 
     public String getHistoryHtmlJavaScriptLink() {
         return getProperties().getDocumentProperties().getHistoryHtmlJavaScriptLink();
-    }
-
-    public String getSchemaSyncCheckDiffMapFile() {
-        return getProperties().getDocumentProperties().getSchemaSyncCheckDiffMapFile();
-    }
-
-    public String getSchemaSyncCheckDiffHtmlFileName() {
-        return getProperties().getDocumentProperties().getSchemaSyncCheckDiffHtmlFileName();
-    }
-
-    // -----------------------------------------------------
-    //                                            Compatible
-    //                                            ----------
-    public void deleteOldSchemaHtmlFile() {
-        final String currentFileName = getSchemaHtmlFileName();
-        final String outputDirectory = getProperties().getDocumentProperties().getDocumentOutputDirectory();
-        final String oldFileName = outputDirectory + "/project-schema-" + getProjectName() + ".html";
-        if (currentFileName.equalsIgnoreCase(oldFileName)) {
-            return; // if current is same as old
-        }
-        final File file = new File(oldFileName);
-        if (file.exists()) {
-            try {
-                file.delete();
-            } catch (RuntimeException continued) {
-                _log.info("*Failed to delete old schemaHtml: " + file, continued);
-            }
-        }
     }
 
     // ===================================================================================
@@ -2467,36 +2445,6 @@ public class Database {
         final DataSource dataSource = getDataSource();
         _procedureMetaInfoList = handler.getAvailableProcedureList(dataSource);
         return _procedureMetaInfoList;
-    }
-
-    // ===================================================================================
-    //                                                                      Schema History
-    //                                                                      ==============
-    public void loadSchemaHistoryAsCore() { // for HistoryHtml
-        doLoadSchemaHistory(DfSchemaHistory.createAsCore());
-    }
-
-    public void loadSchemaHistoryAsSchemaSyncCheck() { // for SchemaSyncCheck
-        doLoadSchemaHistory(DfSchemaHistory.createAsPlain(getSchemaSyncCheckDiffMapFile()));
-    }
-
-    protected void doLoadSchemaHistory(DfSchemaHistory schemaHistory) {
-        _log.info("...Loading schema history");
-        _schemaHistory = schemaHistory;
-        _schemaHistory.loadHistory();
-        if (existsSchemaHistory()) {
-            _log.info(" -> found history: count=" + getSchemaDiffList().size());
-        } else {
-            _log.info(" -> no history");
-        }
-    }
-
-    public boolean existsSchemaHistory() {
-        return _schemaHistory.existsHistory();
-    }
-
-    public List<DfSchemaDiff> getSchemaDiffList() {
-        return _schemaHistory.getSchemaDiffList();
     }
 
     // ===================================================================================

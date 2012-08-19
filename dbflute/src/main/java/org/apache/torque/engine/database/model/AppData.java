@@ -55,6 +55,9 @@ package org.apache.torque.engine.database.model;
  */
 
 import org.apache.torque.engine.database.transform.DTDResolver;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
@@ -97,6 +100,17 @@ public class AppData {
      */
     public AppData(String databaseType) {
         this._databaseType = databaseType;
+    }
+
+    public static AppData createAsEmpty() { // e.g. ReplaceSchema's generation
+        final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
+        final DfDatabaseTypeFacadeProp facadeProp = basicProp.getDatabaseTypeFacadeProp();
+        final String databaseType = facadeProp.getTargetDatabase();
+        final AppData appData = new AppData(databaseType);
+        final Database database = new Database();
+        database.setAppData(appData);
+        appData.addDatabase(database);
+        return appData;
     }
 
     // ===================================================================================

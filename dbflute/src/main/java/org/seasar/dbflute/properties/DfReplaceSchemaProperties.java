@@ -1009,24 +1009,27 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // -----------------------------------------------------
     //                                       Schema Resource
     //                                       ---------------
+    public String getMigrationSchemaDirectory() {
+        return getMigrationDir() + "schema";
+    }
+
     public String getMigrationAlterCheckPreviousSchemaXml() {
-        final String baseDirectory = getMigrationDir();
-        return baseDirectory + "/schema/migration-previous-schema.xml";
+        final String baseDirectory = getMigrationSchemaDirectory();
+        return baseDirectory + "/migration-previous-schema.xml";
     }
 
     public String getMigrationAlterCheckNextSchemaXml() {
-        final String baseDirectory = getMigrationDir();
-        return baseDirectory + "/schema/migration-next-schema.xml";
+        final String baseDirectory = getMigrationSchemaDirectory();
+        return baseDirectory + "/migration-next-schema.xml";
     }
 
     public String getMigrationAlterCheckResultDiff() {
-        final String baseDirectory = getMigrationDir();
-        return baseDirectory + "/schema/alter-check-result.diffmap";
+        final String baseDirectory = getMigrationSchemaDirectory();
+        return baseDirectory + "/project-alter-check.diffmap";
     }
 
-    public String getMigrationChangeOutputResultDiff() {
-        final String baseDirectory = getMigrationDir();
-        return baseDirectory + "/schema/change-output-result.diffmap";
+    public String getMigrationAlterCheckDiffHtmlFileName() {
+        return "alter-check-diff.html";
     }
 
     // -----------------------------------------------------

@@ -18,31 +18,41 @@ $database.initializeClassificationDeployment()
 ## - - - - - -
 ## *the argument 'dataModel' might be unused on DBFlute
 #if ($selector.isSchemaHtml())
-#set ($outFile = "${database.schemaHtmlFileName}")
+#set ($outFile = "${selector.schemaHtmlFileName}")
   $generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
 #end
-
-## for migration of renaming
-$database.deleteOldSchemaHtmlFile()
 
 ## - - - - - - -
 ## History HTML
 ## - - - - - - -
 #if ($selector.isHistoryHtml())
-$database.loadSchemaHistoryAsCore()
-#if ($database.existsSchemaHistory())
-#set ($outFile = "${database.historyHtmlFileName}")
+$selector.loadSchemaHistoryAsCore()
+#if ($selector.existsSchemaHistory())
+#set ($outFile = "${selector.historyHtmlFileName}")
 $generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
 #end
 #end
 
-## - - - - - - - - - - -
-## SchemaSyncCheck HTML
-## - - - - - - - - - - -
+## - - - - - - - - - -
+## SyncCheckDiff HTML
+## - - - - - - - - - -
 #if ($selector.isSyncCheckDiffHtml())
-$database.loadSchemaHistoryAsSchemaSyncCheck()
-#if ($database.existsSchemaHistory())
-#set ($outFile = "${database.schemaSyncCheckDiffHtmlFileName}")
+$selector.loadSchemaHistoryAsSchemaSyncCheck()
+#if ($selector.existsSchemaHistory())
+#set ($outFile = "${selector.schemaSyncCheckDiffHtmlFileName}")
 $generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
 #end
+#end
+
+## - - - - - - - - - -
+## AlterCheckDiff HTML
+## - - - - - - - - - -
+#if ($selector.isAlterCheckDiffHtml())
+$database.enableMigrationOutputDirectory()
+$selector.loadSchemaHistoryAsAlterCheck()
+#if ($selector.existsSchemaHistory())
+#set ($outFile = "${selector.alterCheckDiffHtmlFileName}")
+$generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
+#end
+$database.backToDocumentOutputDirectory()
 #end

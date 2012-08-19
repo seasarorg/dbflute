@@ -43,6 +43,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.friends.velocity.DfFlutistLog4JLogSystem;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
+import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
@@ -53,6 +54,7 @@ import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
+import org.seasar.dbflute.task.bs.assistant.DfDocumentSelector;
 import org.seasar.dbflute.task.bs.assistant.DfTaskBasicController;
 import org.seasar.dbflute.task.bs.assistant.DfTaskControlCallback;
 import org.seasar.dbflute.task.bs.assistant.DfTaskControlLogic;
@@ -81,6 +83,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     /** The logic of task control. (NotNull) */
     protected final DfTaskControlLogic _controlLogic = createTaskControlLogic(_databaseResource);
+
+    /** The selector of documents for velocity context. (NotNull) */
+    protected final DfDocumentSelector _selector = new DfDocumentSelector();
 
     // ===================================================================================
     //                                                                     Task Controller
@@ -418,6 +423,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             }
         }
         return contents;
+    }
+
+    protected DfVelocityContextFactory createVelocityContextFactory() {
+        return new DfVelocityContextFactory();
     }
 
     // ===================================================================================

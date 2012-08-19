@@ -113,6 +113,9 @@
   <target name="replace-schema" description="ReplaceSchema task">
     <df-replace-schema
         contextProperties="${torque.contextProperties}"
+        controlTemplate="${torque.template.doc}"
+        templatePath="${torque.templatePath}"
+        useClasspath="${torque.useClasspath}"
         environmentType="${dfenv}"
         areYouReadyAnswer="${dfans}"
         varyingArg="${dfvarg}">

@@ -24,7 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.properties.DfFreeGenProperties;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenManager;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
@@ -120,10 +122,9 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     }
 
     protected VelocityContext createVelocityContext() {
-        final VelocityContext context = new VelocityContext();
-        context.put("manager", getFreeGenProperties().getFreeGenManager());
-        context.put("requestList", _freeGenRequestList);
-        return context;
+        final DfVelocityContextFactory factory = createVelocityContextFactory();
+        final DfFreeGenManager freeGenManager = getFreeGenProperties().getFreeGenManager();
+        return factory.createAsFreeGen(freeGenManager, _freeGenRequestList);
     }
 
     // ===================================================================================
