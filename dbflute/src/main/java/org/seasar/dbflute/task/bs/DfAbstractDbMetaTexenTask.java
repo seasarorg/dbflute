@@ -73,15 +73,11 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     }
 
     protected VelocityContext createVelocityContext(final AppData appData) {
-        final DfVelocityContextFactory factory = new DfVelocityContextFactory();
+        final DfVelocityContextFactory factory = createVelocityContextFactory();
         return factory.create(appData);
     }
 
-    // ===================================================================================
-    //                                                                    Execute Override
-    //                                                                    ================
-    @Override
-    protected void doExecute() {
-        fireVelocityProcess();
+    protected DfVelocityContextFactory createVelocityContextFactory() {
+        return new DfVelocityContextFactory();
     }
 }

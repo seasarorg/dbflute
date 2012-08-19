@@ -30,9 +30,6 @@ public class DfSchemaSyncChecker {
     /** Log instance. */
     private static Log _log = LogFactory.getLog(DfSchemaSyncChecker.class);
 
-    protected static final String SCHEMA_XML = "./schema/sync-check-schema.xml";
-    protected static final String HISTORY_FILE = "./schema/sync-check-result.diffmap";
-
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -64,18 +61,18 @@ public class DfSchemaSyncChecker {
     }
 
     protected void clearPreviousResource() {
-        final File schemaXml = new File(SCHEMA_XML);
+        final File schemaXml = new File(getSchemaXml());
         if (schemaXml.exists()) {
             schemaXml.delete();
         }
-        final File historyFile = new File(HISTORY_FILE);
+        final File historyFile = new File(getDiffMapFile());
         if (historyFile.exists()) {
             historyFile.delete();
         }
     }
 
     protected void clearTemporaryResource() {
-        final File schemaXml = new File(SCHEMA_XML);
+        final File schemaXml = new File(getSchemaXml());
         if (schemaXml.exists()) {
             schemaXml.delete();
         }
@@ -114,7 +111,7 @@ public class DfSchemaSyncChecker {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The schema was not synchronized with another schema.");
         br.addItem("Advice");
-        br.addElement("You can confirm the result at '" + HISTORY_FILE + "'.");
+        br.addElement("You can confirm the result at 'output/doc/" + getDiffHtmlFileName() + "'.");
         br.addElement("'Previous' means the main schema, defined at databaseInfoMap.dfprop.");
         br.addElement("'Next' means the sync-check target schema, defined at schemaSyncCheckMap property.");
         final String msg = br.buildExceptionMessage();
@@ -126,12 +123,12 @@ public class DfSchemaSyncChecker {
     //                                                                          ==========
     protected DfSchemaXmlSerializer createMainSerializer() {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return DfSchemaXmlSerializer.createAsManage(_mainDs, mainSchema, SCHEMA_XML, HISTORY_FILE);
+        return DfSchemaXmlSerializer.createAsManage(_mainDs, mainSchema, getSchemaXml(), getDiffMapFile());
     }
 
     protected DfSchemaXmlSerializer createTargetSerializer(DataSource targetDs) {
         final UnifiedSchema schema = getDocumentProperties().getSchemaSyncCheckDatabaseSchema();
-        return DfSchemaXmlSerializer.createAsManage(targetDs, schema, SCHEMA_XML, HISTORY_FILE);
+        return DfSchemaXmlSerializer.createAsManage(targetDs, schema, getSchemaXml(), getDiffMapFile());
     }
 
     // ===================================================================================
@@ -147,5 +144,17 @@ public class DfSchemaSyncChecker {
 
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
+    }
+
+    protected String getSchemaXml() {
+        return getDocumentProperties().getSchemaSyncCheckSchemaXml();
+    }
+
+    protected String getDiffMapFile() {
+        return getDocumentProperties().getSchemaSyncCheckDiffMapFile();
+    }
+
+    protected String getDiffHtmlFileName() {
+        return getDocumentProperties().getSchemaSyncCheckDiffHtmlFileName();
     }
 }

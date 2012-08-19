@@ -112,7 +112,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     @Override
     protected void doExecute() {
         setupControlTemplate();
-        super.doExecute();
+        fireVelocityProcess();
         setupBehaviorQueryPath();
         showSkippedFileInformation();
         refreshResources();

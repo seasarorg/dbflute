@@ -17,8 +17,10 @@ $database.initializeClassificationDeployment()
 ## Schema HTML
 ## - - - - - -
 ## *the argument 'dataModel' might be unused on DBFlute
+#if ($selector.isSchemaHtml())
 #set ($outFile = "${database.schemaHtmlFileName}")
-$generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
+  $generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
+#end
 
 ## for migration of renaming
 $database.deleteOldSchemaHtmlFile()
@@ -26,8 +28,21 @@ $database.deleteOldSchemaHtmlFile()
 ## - - - - - - -
 ## History HTML
 ## - - - - - - -
-$database.loadSchemaHistory()
+#if ($selector.isHistoryHtml())
+$database.loadSchemaHistoryAsCore()
 #if ($database.existsSchemaHistory())
 #set ($outFile = "${database.historyHtmlFileName}")
 $generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
+#end
+#end
+
+## - - - - - - - - - - -
+## SchemaSyncCheck HTML
+## - - - - - - - - - - -
+#if ($selector.isSyncCheckDiffHtml())
+$database.loadSchemaHistoryAsSchemaSyncCheck()
+#if ($database.existsSchemaHistory())
+#set ($outFile = "${database.schemaSyncCheckDiffHtmlFileName}")
+$generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
+#end
 #end

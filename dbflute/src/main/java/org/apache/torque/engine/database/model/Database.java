@@ -2013,6 +2013,14 @@ public class Database {
         return getProperties().getDocumentProperties().getHistoryHtmlJavaScriptLink();
     }
 
+    public String getSchemaSyncCheckDiffMapFile() {
+        return getProperties().getDocumentProperties().getSchemaSyncCheckDiffMapFile();
+    }
+
+    public String getSchemaSyncCheckDiffHtmlFileName() {
+        return getProperties().getDocumentProperties().getSchemaSyncCheckDiffHtmlFileName();
+    }
+
     // -----------------------------------------------------
     //                                            Compatible
     //                                            ----------
@@ -2464,9 +2472,17 @@ public class Database {
     // ===================================================================================
     //                                                                      Schema History
     //                                                                      ==============
-    public void loadSchemaHistory() { // for HiostoryHtml
+    public void loadSchemaHistoryAsCore() { // for HistoryHtml
+        doLoadSchemaHistory(DfSchemaHistory.createAsCore());
+    }
+
+    public void loadSchemaHistoryAsSchemaSyncCheck() { // for SchemaSyncCheck
+        doLoadSchemaHistory(DfSchemaHistory.createAsPlain(getSchemaSyncCheckDiffMapFile()));
+    }
+
+    protected void doLoadSchemaHistory(DfSchemaHistory schemaHistory) {
         _log.info("...Loading schema history");
-        _schemaHistory = DfSchemaHistory.createAsCore();
+        _schemaHistory = schemaHistory;
         _schemaHistory.loadHistory();
         if (existsSchemaHistory()) {
             _log.info(" -> found history: count=" + getSchemaDiffList().size());

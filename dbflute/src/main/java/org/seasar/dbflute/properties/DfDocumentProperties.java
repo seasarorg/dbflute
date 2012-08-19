@@ -31,6 +31,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     protected static final String STYLE_SHEET_EMBEDDED_MARK = "$";
     protected static final String JAVA_SCRIPT_EMBEDDED_MARK = "$";
 
+    protected static final String SCHEMA_SYNC_CHECK_SCHEMA_XML = "./schema/project-sync-check-schema.xml";
+    protected static final String SCHEMA_SYNC_CHECK_DIFF_MAP_FILE = "./schema/project-sync-check-result.diffmap";
+    protected static final String SCHEMA_SYNC_CHECK_DIFF_HTML_FILE_NAME = "sync-check-result.html";
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -576,6 +580,18 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
         final String password = schemaSyncCheckMap.get("password");
         return password != null ? password : "";
+    }
+
+    public String getSchemaSyncCheckSchemaXml() {
+        return SCHEMA_SYNC_CHECK_SCHEMA_XML;
+    }
+
+    public String getSchemaSyncCheckDiffMapFile() {
+        return SCHEMA_SYNC_CHECK_DIFF_MAP_FILE;
+    }
+
+    public String getSchemaSyncCheckDiffHtmlFileName() {
+        return SCHEMA_SYNC_CHECK_DIFF_HTML_FILE_NAME;
     }
 
     // ===================================================================================

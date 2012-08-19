@@ -87,6 +87,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final DocumentSelector _selector = new DocumentSelector();
     protected String _varyingArg;
 
     // ===================================================================================
@@ -169,7 +170,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*    Schema HTML    *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        super.doExecute();
+        _selector.selectSchemaHtml().selectHistoryHtml();
+        fireVelocityProcess();
     }
 
     protected void processLoadDataReverse() {
@@ -240,7 +242,13 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
         final DfSchemaSyncChecker checker = new DfSchemaSyncChecker(getDataSource());
-        checker.checkSync();
+        try {
+            checker.checkSync();
+        } catch (DfSchemaSyncCheckTragedyResultException e) {
+            _selector.selectSyncCheckDiffHtml();
+            fireVelocityProcess();
+            throw e;
+        }
     }
 
     protected void throwSchemaSyncCheckPropertyNotFoundException() {
@@ -324,7 +332,41 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     public Context initControlContext() throws Exception {
         super.initControlContext();
         _context.put("escape", new Escape());
+        _context.put("selector", _selector);
         return _context;
+    }
+
+    public static class DocumentSelector {
+        protected boolean _schemaHtml;
+        protected boolean _historyHtml;
+        protected boolean _syncCheckDiffHtml;
+
+        public boolean isSchemaHtml() {
+            return _schemaHtml;
+        }
+
+        public DocumentSelector selectSchemaHtml() {
+            _schemaHtml = true;
+            return this;
+        }
+
+        public boolean isHistoryHtml() {
+            return _historyHtml;
+        }
+
+        public DocumentSelector selectHistoryHtml() {
+            _historyHtml = true;
+            return this;
+        }
+
+        public boolean isSyncCheckDiffHtml() {
+            return _syncCheckDiffHtml;
+        }
+
+        public DocumentSelector selectSyncCheckDiffHtml() {
+            _syncCheckDiffHtml = true;
+            return this;
+        }
     }
 
     // ===================================================================================
