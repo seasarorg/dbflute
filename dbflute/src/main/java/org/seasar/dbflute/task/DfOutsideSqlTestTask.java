@@ -78,7 +78,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     //                                                                       =============
     @Override
     protected List<File> getTargetSqlFileList() {
-        final DfOutsideSqlPack outsideSqlPack = collectSqlFileList();
+        final DfOutsideSqlPack outsideSqlPack = collectOutsideSql();
         final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
         if (specifiedSqlFile != null) {
             final List<File> filteredList = new ArrayList<File>();

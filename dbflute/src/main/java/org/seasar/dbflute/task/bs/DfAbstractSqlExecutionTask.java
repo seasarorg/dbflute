@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006 the Seasar Foundation and the Others.
+ * Copyright 2004-2012 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,10 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
 
     protected DfRunnerInformation createRunnerInformation() {
         final DfRunnerInformation runInfo = new DfRunnerInformation();
-        runInfo.setDriver(_driver);
-        runInfo.setUrl(_url);
-        runInfo.setUser(_user);
-        runInfo.setPassword(_password);
+        runInfo.setDriver(getDriver());
+        runInfo.setUrl(getUrl());
+        runInfo.setUser(getUser());
+        runInfo.setPassword(getPassword());
         runInfo.setBreakCauseThrow(isBreakCauseThrow());
         runInfo.setErrorContinue(isErrorContinue());
         runInfo.setAutoCommit(isAutoCommit());

@@ -73,7 +73,7 @@ import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * The DBFlute task generating documentations, SchemaHTML, HistoryHTML and DataXlsTemplate.
+ * The DBFlute task generating documentations, SchemaHTML, HistoryHTML and so on.
  * @author Modified by jflute
  */
 public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {

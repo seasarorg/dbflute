@@ -88,6 +88,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                          DataSource
     //                                                                          ==========
+    @Override
     protected boolean isUseDataSource() {
         return true;
     }
@@ -97,7 +98,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                             =======
     @Override
     protected void doExecute() {
-        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsCore(getDataSource(), _mainSchema);
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsCore(getDataSource(), getMainSchema());
         serializer.serialize();
     }
 }

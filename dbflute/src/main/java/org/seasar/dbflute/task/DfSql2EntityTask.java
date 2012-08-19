@@ -123,10 +123,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         setupSchemaInformation();
 
         final DfRunnerInformation runInfo = new DfRunnerInformation();
-        runInfo.setDriver(_driver);
-        runInfo.setUrl(_url);
-        runInfo.setUser(_userId);
-        runInfo.setPassword(_password);
+        runInfo.setDriver(getDriver());
+        runInfo.setUrl(getUrl());
+        runInfo.setUser(getUser());
+        runInfo.setPassword(getPassword());
 
         // Sql2Entity task immediately breaks the process by error
         runInfo.setBreakCauseThrow(true);
@@ -304,6 +304,21 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected void setupExtendedClassDescription() {
         final DfPmbCommentSetupper reflector = new DfPmbCommentSetupper(_database.getPmbMetaDataList());
         reflector.setupExtendedClassDescription();
+    }
+
+    // ===================================================================================
+    //                                                                SQL File Information
+    //                                                                ====================
+    protected void showTargetSqlFileInformation(DfOutsideSqlPack outsideSqlPack) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
+        sb.append(ln()).append("Target SQL files: ").append(outsideSqlPack.size());
+        sb.append(ln());
+        for (DfOutsideSqlFile sqlFile : outsideSqlPack.getOutsideSqlFileList()) {
+            sb.append(ln()).append("  ").append(sqlFile.getPhysicalFile().getName());
+        }
+        sb.append(ln()).append("- - - - - - - - - -/");
+        _log.info(sb);
     }
 
     // ===================================================================================

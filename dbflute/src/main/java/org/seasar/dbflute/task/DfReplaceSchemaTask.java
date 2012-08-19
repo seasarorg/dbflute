@@ -29,14 +29,14 @@ import org.seasar.dbflute.logic.replaceschema.process.DfLoadDataProcess;
 import org.seasar.dbflute.logic.replaceschema.process.DfTakeFinallyProcess;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
-import org.seasar.dbflute.task.bs.DfAbstractTask;
+import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  * @since 0.9.8.3 (2011/04/29 Friday)
  */
-public class DfReplaceSchemaTask extends DfAbstractTask {
+public class DfReplaceSchemaTask extends DfAbstractTexenTask {
 
     // ===================================================================================
     //                                                                          Definition

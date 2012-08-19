@@ -24,6 +24,7 @@ import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.DfTraceViewUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -104,6 +105,10 @@ public class DfRefreshTask extends DfAbstractTask {
             sb.append(" *Abort");
         }
         DfDBFluteTaskUtil.logFinalMessage(sb.toString());
+    }
+
+    protected String getPerformanceView(long mil) {
+        return DfTraceViewUtil.convertToPerformanceView(mil);
     }
 
     // ===================================================================================

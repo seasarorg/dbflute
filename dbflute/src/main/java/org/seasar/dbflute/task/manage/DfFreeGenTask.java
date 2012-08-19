@@ -116,8 +116,7 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
         for (DfFreeGenRequest request : _freeGenRequestList) {
             _log.info("  " + request.toString());
         }
-        final VelocityContext context = createVelocityContext();
-        return context;
+        return createVelocityContext();
     }
 
     protected VelocityContext createVelocityContext() {
