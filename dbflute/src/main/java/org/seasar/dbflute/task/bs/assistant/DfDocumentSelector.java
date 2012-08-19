@@ -42,8 +42,8 @@ public class DfDocumentSelector {
     //                                                                           =========
     protected boolean _schemaHtml;
     protected boolean _historyHtml;
-    protected boolean _syncCheckDiffHtml;
-    protected boolean _alterCheckDiffHtml;
+    protected boolean _schemaSyncCheckResultHtml;
+    protected boolean _alterCheckResultHtml;
     protected DfSchemaHistory _schemaHistory;
 
     // ===================================================================================
@@ -153,21 +153,21 @@ public class DfDocumentSelector {
         return this;
     }
 
-    public boolean isSyncCheckDiffHtml() {
-        return _syncCheckDiffHtml;
+    public boolean isSchemaSyncCheckResultHtml() {
+        return _schemaSyncCheckResultHtml;
     }
 
-    public DfDocumentSelector selectSyncCheckDiffHtml() {
-        _syncCheckDiffHtml = true;
+    public DfDocumentSelector selectSchemaSyncCheckResultHtml() {
+        _schemaSyncCheckResultHtml = true;
         return this;
     }
 
-    public boolean isAlterCheckDiffHtml() {
-        return _alterCheckDiffHtml;
+    public boolean isAlterCheckResultHtml() {
+        return _alterCheckResultHtml;
     }
 
-    public DfDocumentSelector selectAlterCheckDiffHtml() {
-        _alterCheckDiffHtml = true;
+    public DfDocumentSelector selectAlterCheckResultHtml() {
+        _alterCheckResultHtml = true;
         return this;
     }
 }

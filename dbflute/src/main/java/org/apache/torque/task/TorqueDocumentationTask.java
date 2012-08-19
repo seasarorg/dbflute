@@ -244,7 +244,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         try {
             checker.checkSync();
         } catch (DfSchemaSyncCheckTragedyResultException e) {
-            _selector.selectSyncCheckDiffHtml();
+            _selector.selectSchemaSyncCheckResultHtml();
             fireVelocityProcess();
             throw e;
         }

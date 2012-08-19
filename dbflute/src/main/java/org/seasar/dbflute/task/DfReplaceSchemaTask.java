@@ -204,7 +204,7 @@ public class DfReplaceSchemaTask extends DfAbstractTexenTask {
     }
 
     protected void outputAlterCheckResultHtml() {
-        _selector.selectAlterCheckDiffHtml();
+        _selector.selectAlterCheckResultHtml();
         fireVelocityProcess();
     }
 

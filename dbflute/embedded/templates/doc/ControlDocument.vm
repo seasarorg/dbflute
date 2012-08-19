@@ -36,7 +36,7 @@ $generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
 ## - - - - - - - - - - - - - -
 ## SchemaSyncCheck Result HTML
 ## - - - - - - - - - - - - - -
-#if ($selector.isSyncCheckDiffHtml())
+#if ($selector.isSchemaSyncCheckResultHtml())
 $selector.loadSchemaHistoryAsSchemaSyncCheck()
 #if ($selector.existsSchemaHistory())
 #set ($outFile = "${selector.schemaSyncCheckResultFileName}")
@@ -47,7 +47,7 @@ $generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
 ## - - - - - - - - - - - -
 ## AlterCheck Result HTML
 ## - - - - - - - - - - - -
-#if ($selector.isAlterCheckDiffHtml())
+#if ($selector.isAlterCheckResultHtml())
 $database.enableMigrationOutputDirectory()
 $selector.loadSchemaHistoryAsAlterCheck()
 #if ($selector.existsSchemaHistory())
