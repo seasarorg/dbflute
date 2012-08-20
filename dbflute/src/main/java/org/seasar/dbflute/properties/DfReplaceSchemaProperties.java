@@ -1010,7 +1010,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                       Schema Resource
     //                                       ---------------
     public String getMigrationSchemaDirectory() {
-        return getMigrationDir() + "schema";
+        return getMigrationDir() + "/schema";
     }
 
     public String getMigrationAlterCheckPreviousSchemaXml() {

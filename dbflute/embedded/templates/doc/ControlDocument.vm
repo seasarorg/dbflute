@@ -8,24 +8,28 @@ $database.enableDocumentOutputDirectory()
 ## Initialize properties.
 ## - - - - - - - - - - - -
 $database.initializeVersion(90)
+#if ($selector.needsInitializeProperties())
 $database.initializeAdditionalPrimaryKey()
 $database.initializeAdditionalUniqueKey()
 $database.initializeAdditionalForeignKey()
 $database.initializeClassificationDeployment()
+#end
 
 ## - - - - - -
 ## Schema HTML
 ## - - - - - -
 ## *the argument 'dataModel' might be unused on DBFlute
 #if ($selector.isSchemaHtml())
+$selector.markSchemaHtml()
 #set ($outFile = "${selector.schemaHtmlFileName}")
-  $generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
+$generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
 #end
 
 ## - - - - - - -
 ## History HTML
 ## - - - - - - -
 #if ($selector.isHistoryHtml())
+$selector.markHistoryHtml()
 $selector.loadSchemaHistoryAsCore()
 #if ($selector.existsSchemaHistory())
 #set ($outFile = "${selector.historyHtmlFileName}")
@@ -37,6 +41,7 @@ $generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
 ## SchemaSyncCheck Result HTML
 ## - - - - - - - - - - - - - -
 #if ($selector.isSchemaSyncCheckResultHtml())
+$selector.markSchemaSyncCheckResultHtml()
 $selector.loadSchemaHistoryAsSchemaSyncCheck()
 #if ($selector.existsSchemaHistory())
 #set ($outFile = "${selector.schemaSyncCheckResultFileName}")
@@ -49,6 +54,7 @@ $generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
 ## - - - - - - - - - - - -
 #if ($selector.isAlterCheckResultHtml())
 $database.enableMigrationOutputDirectory()
+$selector.markAlterCheckResultHtml()
 $selector.loadSchemaHistoryAsAlterCheck()
 #if ($selector.existsSchemaHistory())
 #set ($outFile = "${selector.alterCheckResultFileName}")

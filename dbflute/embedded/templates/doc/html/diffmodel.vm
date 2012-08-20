@@ -123,7 +123,7 @@ ${database.historyHtmlJavaScriptEmbedded}
 	<h3>Add Table</h3>
 	<ul class="table-content">
 #foreach ($tableDiff in $schemaDiff.addedTableDiffList)
-#if ($schemaDiff.isLatest())
+#if ($selector.isCurrentHistoryHtml() && $schemaDiff.isLatest())
 		<li><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></li>
 #else
 		<li>${tableDiff.tableDispName}</li>
@@ -135,7 +135,7 @@ ${database.historyHtmlJavaScriptEmbedded}
 	<h3>Change Table</h3>
 	<div class="table-content">
 #foreach ($tableDiff in $schemaDiff.changedTableDiffList)
-#if ($schemaDiff.isLatest())
+#if ($selector.isCurrentHistoryHtml() && $schemaDiff.isLatest())
 		<h4><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></h4>
 #else
 		<h4>${tableDiff.tableDispName}</h4>

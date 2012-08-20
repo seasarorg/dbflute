@@ -44,7 +44,42 @@ public class DfDocumentSelector {
     protected boolean _historyHtml;
     protected boolean _schemaSyncCheckResultHtml;
     protected boolean _alterCheckResultHtml;
+    protected DocumentType _currentDocumentType;
     protected DfSchemaHistory _schemaHistory;
+
+    // ===================================================================================
+    //                                                               Derived Determination
+    //                                                               =====================
+    public boolean needsInitializeProperties() {
+        return _schemaHtml || _historyHtml;
+    }
+
+    // ===================================================================================
+    //                                                                    Current Document
+    //                                                                    ================
+    public boolean isCurrentHistoryHtml() {
+        return _currentDocumentType != null && _currentDocumentType.equals(DocumentType.HistoryHtml);
+    }
+
+    public void markSchemaHtml() {
+        _currentDocumentType = DocumentType.SchemaHtml;
+    }
+
+    public void markHistoryHtml() {
+        _currentDocumentType = DocumentType.HistoryHtml;
+    }
+
+    public void markSchemaSyncCheckResultHtml() {
+        _currentDocumentType = DocumentType.SchemaSyncCheckResultHtml;
+    }
+
+    public void markAlterCheckResultHtml() {
+        _currentDocumentType = DocumentType.AlterCheckResultHtml;
+    }
+
+    public enum DocumentType {
+        SchemaHtml, HistoryHtml, SchemaSyncCheckResultHtml, AlterCheckResultHtml
+    }
 
     // ===================================================================================
     //                                                                      Schema History
