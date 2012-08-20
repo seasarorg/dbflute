@@ -3095,13 +3095,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================
-    //                                                                   LikeSearch Escape
-    //                                                                   =================
+    //                                                               LikeSearch Adjustment
+    //                                                               =====================
     public void adjustLikeSearchDBWay(LikeSearchOption option) {
         final DBWay dbway = dbway();
         option.acceptOriginalWildCardList(dbway.getOriginalWildCardList());
         option.acceptStringConnector(dbway.getStringConnector());
-        option.acceptGearedCipherManager(getGearedCipherManager());
+        option.acceptGearedCipherManager(getGearedCipherManager()); // come together!
     }
 
     // ===================================================================================

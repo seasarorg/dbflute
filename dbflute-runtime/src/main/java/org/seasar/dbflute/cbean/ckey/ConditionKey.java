@@ -299,9 +299,7 @@ public abstract class ConditionKey implements Serializable {
                 final String plainColumnExp = columnRealName.toString();
                 final String decryptExp = cipher.decrypt(plainColumnExp);
                 final boolean nonInvertible = plainColumnExp.equals(decryptExp);
-                final boolean forcedEncrypt = isForcedEncryptConditionKey();
-                final boolean columnCollaboration = hasColumnCollaboration(columnRealName, option);
-                if (nonInvertible || (forcedEncrypt && !columnCollaboration)) { // needs to encrypt
+                if (isBindEncryptAllowed(columnRealName, option, nonInvertible)) {
                     bindExp = cipher.encrypt(basicBindExp);
                     columnExp = columnRealName;
                 } else { // needs to decrypt (invertible)
@@ -317,6 +315,19 @@ public abstract class ConditionKey implements Serializable {
         return createBindClauseResult(resolvedColumn, bindExp, option);
     }
 
+    protected boolean isBindEncryptAllowed(ColumnRealName columnRealName, ConditionOption option, boolean nonInvertible) {
+        if (isOutOfBindEncryptConditionKey()) { // e.g. LikeSearch
+            return false; // regardless of invertible
+        }
+        if (nonInvertible) { // means it cannot decrypt
+            return true;
+        }
+        // invertible here
+        // basically decrypt but encrypt if it can be, for better performance
+        final boolean possible = isPossibleBindEncryptConditionKey(); // e.g. Equal, NotEqual
+        return possible && !hasColumnCollaboration(columnRealName, option); // means simple condition
+    }
+
     protected String buildBindVariableExp(String location, ConditionOption option) {
         return "/*pmb." + location + "*/" + getBindVariableDummyValue();
     }
@@ -325,7 +336,11 @@ public abstract class ConditionKey implements Serializable {
         return null; // as default
     }
 
-    protected boolean isForcedEncryptConditionKey() { // to override
+    protected boolean isOutOfBindEncryptConditionKey() { // to override
+        return false; // as default
+    }
+
+    protected boolean isPossibleBindEncryptConditionKey() { // to override
         return false; // as default
     }
 

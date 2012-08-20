@@ -86,6 +86,11 @@ public class ConditionKeyLikeSearch extends ConditionKey {
     }
 
     @Override
+    protected boolean isOutOfBindEncryptConditionKey() { // to override
+        return true; // because wild cards are embedded in condition value for likeSearch
+    }
+
+    @Override
     protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
         cvalue.setupLikeSearch((String) value, (LikeSearchOption) option, location);
     }

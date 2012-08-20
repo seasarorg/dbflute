@@ -72,7 +72,7 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
     }
 
     @Override
-    protected boolean isForcedEncryptConditionKey() {
+    protected boolean isPossibleBindEncryptConditionKey() {
         return true;
     }
 

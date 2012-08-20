@@ -1038,8 +1038,8 @@ public interface SqlClause {
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================
-    //                                                                   LikeSearch Escape
-    //                                                                   =================
+    //                                                               LikeSearch Adjustment
+    //                                                               =====================
     void adjustLikeSearchDBWay(LikeSearchOption option);
 
     // [DBFlute-0.9.8.4]
