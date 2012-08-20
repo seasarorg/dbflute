@@ -38,9 +38,6 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
     protected ConditionKeyNotEqual() {
         _conditionKey = "notEqual";
         _operand = defineOperand();
@@ -51,9 +48,6 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         if (value == null) {
@@ -71,38 +65,19 @@ public abstract class ConditionKeyNotEqual extends ConditionKey {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher) {
-        conditionList.add(buildBindClause(columnRealName, value.getNotEqualLatestLocation(), cipher));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
-        throw new UnsupportedOperationException();
+        conditionList.add(buildBindClause(columnRealName, value.getNotEqualLatestLocation(), cipher, option));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setupNotEqual(value, location);
+    protected boolean isForcedEncryptConditionKey() {
+        return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
-            ConditionOption option) {
-        throw new UnsupportedOperationException();
+    protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
+        cvalue.setupNotEqual(value, location);
     }
 }

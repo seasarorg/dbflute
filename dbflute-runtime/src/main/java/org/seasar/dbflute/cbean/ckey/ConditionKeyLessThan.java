@@ -38,9 +38,6 @@ public class ConditionKeyLessThan extends ConditionKey {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
     protected ConditionKeyLessThan() {
         initializeConditionKey();
         initializeOperand();
@@ -57,9 +54,6 @@ public class ConditionKeyLessThan extends ConditionKey {
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         if (value == null) {
@@ -77,38 +71,14 @@ public class ConditionKeyLessThan extends ConditionKey {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher) {
-        conditionList.add(buildBindClause(columnRealName, value.getLessThanLatestLocation(), cipher));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
-        throw new UnsupportedOperationException();
+        conditionList.add(buildBindClause(columnRealName, value.getLessThanLatestLocation(), cipher, option));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setupLessThan(value, location);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
-            ConditionOption option) {
-        throw new UnsupportedOperationException();
+    protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
+        cvalue.setupLessThan(value, location);
     }
 }

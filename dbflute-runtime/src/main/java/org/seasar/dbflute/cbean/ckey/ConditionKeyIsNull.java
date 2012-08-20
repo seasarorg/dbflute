@@ -38,9 +38,6 @@ public class ConditionKeyIsNull extends ConditionKey {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
     protected ConditionKeyIsNull() {
         initializeConditionKey();
         initializeOperand();
@@ -57,9 +54,6 @@ public class ConditionKeyIsNull extends ConditionKey {
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         if (cvalue.isFixedQuery() && cvalue.hasIsNull()) {
@@ -69,38 +63,14 @@ public class ConditionKeyIsNull extends ConditionKey {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher) {
-        conditionList.add(buildClauseWithoutValue(columnRealName));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
-        throw new UnsupportedOperationException();
+        conditionList.add(buildClauseWithoutValue(columnRealName));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setIsNull(DUMMY_OBJECT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
-            ConditionOption option) {
-        throw new UnsupportedOperationException();
+    protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
+        cvalue.setIsNull(DUMMY_OBJECT);
     }
 }

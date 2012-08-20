@@ -38,9 +38,6 @@ public class ConditionKeyEqual extends ConditionKey {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
     protected ConditionKeyEqual() {
         _conditionKey = "equal";
         _operand = "=";
@@ -49,9 +46,6 @@ public class ConditionKeyEqual extends ConditionKey {
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean doIsValidRegistration(ConditionValue cvalue, Object value, ColumnRealName callerName) {
         if (value == null) {
@@ -69,38 +63,19 @@ public class ConditionKeyEqual extends ConditionKey {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher) {
-        conditionList.add(buildBindClause(columnRealName, value.getEqualLatestLocation(), cipher));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option) {
-        throw new UnsupportedOperationException();
+        conditionList.add(buildBindClause(columnRealName, value.getEqualLatestLocation(), cipher, option));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setupEqual(value, location);
+    protected boolean isForcedEncryptConditionKey() {
+        return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
-            ConditionOption option) {
-        throw new UnsupportedOperationException();
+    protected void doSetupConditionValue(ConditionValue cvalue, Object value, String location, ConditionOption option) {
+        cvalue.setupEqual(value, location);
     }
 }

@@ -344,10 +344,12 @@ public class LikeSearchOption extends SimpleStringOption {
         }
     }
 
+    @Override
     public boolean hasCompoundColumn() {
         return _compoundColumnList != null && !_compoundColumnList.isEmpty();
     }
 
+    @Override
     public List<HpSpecifiedColumn> getCompoundColumnList() {
         return _compoundColumnList;
     }
@@ -502,6 +504,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * Get the operand for extension.
      * @return The operand for extension. (NullAllowed: If the value is null, it means no extension)
      */
+    @Override
     public ExtensionOperand getExtensionOperand() { // for application extension
         return null; // as default
     }
@@ -513,6 +516,7 @@ public class LikeSearchOption extends SimpleStringOption {
      * Get the arranger of where clause.
      * @return The arranger of where clause. (NullAllowed: If the value is null, it means no arrangement)
      */
+    @Override
     public QueryClauseArranger getWhereClauseArranger() { // for application extension
         return null; // as default
     }

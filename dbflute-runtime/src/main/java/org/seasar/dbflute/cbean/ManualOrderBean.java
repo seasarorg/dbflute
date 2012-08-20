@@ -679,15 +679,6 @@ public class ManualOrderBean implements HpCalculator {
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
-    // -----------------------------------------------------
-    //                                         Assert Object
-    //                                         -------------
-    /**
-     * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
-     */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
             String msg = "The value should not be null: variableName=null value=" + value;

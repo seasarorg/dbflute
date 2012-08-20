@@ -1586,12 +1586,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     //                                ----------------------
     public void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName // SQL name of column
             , ConditionKey key, ConditionValue value // basic resources
-            , ColumnFunctionCipher cipher) { // optional resources
-        registerBaseTableInlineWhereClause(columnSqlName, key, value, cipher, null);
-    }
-
-    public void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName // SQL name of column
-            , ConditionKey key, ConditionValue value // basic resources
             , ColumnFunctionCipher cipher, ConditionOption option) { // optional resources
         final List<QueryClause> clauseList = getBaseTableInlineWhereClauseList4Register();
         final String inlineBaseAlias = getInlineViewBasePointAlias();
@@ -1632,11 +1626,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                In-line for Outer Join
     //                                ----------------------
-    public void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName,
-            ConditionKey key, ConditionValue value, ColumnFunctionCipher cipher, boolean onClause) {
-        registerOuterJoinInlineWhereClause(foreignAliasName, columnSqlName, key, value, cipher, null, onClause);
-    }
-
     public void registerOuterJoinInlineWhereClause(String foreignAliasName // foreign alias of column 
             , ColumnSqlName columnSqlName // SQL name of column
             , ConditionKey key, ConditionValue value // basic resources

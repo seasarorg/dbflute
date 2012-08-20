@@ -16,18 +16,28 @@
 package org.seasar.dbflute.cbean.ckey;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
+import org.seasar.dbflute.cbean.coption.RangeOfOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.CallbackProcessor;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.dbway.ExtensionOperand;
+import org.seasar.dbflute.dbway.StringConnector;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
  * The abstract class of condition-key.
@@ -156,22 +166,18 @@ public abstract class ConditionKey implements Serializable {
     /**
      * Add where clause.
      * @param provider The provider of query mode. (NotNull)
-     * @param conditionList Condition list. (NotNull)
+     * @param conditionList The list of condition. (NotNull)
      * @param columnRealName The real name of column. (NotNull)
-     * @param cvalue Condition value. (NotNull)
+     * @param cvalue The object of condition value. (NotNull)
      * @param cipher The cipher of column by function. (NullAllowed)
-     * @param option Condition option. (NullAllowed)
+     * @param option The option of condition. (NullAllowed)
      */
     public void addWhereClause(final QueryModeProvider provider, final List<QueryClause> conditionList,
             final ColumnRealName columnRealName, final ConditionValue cvalue, // basic resources
             final ColumnFunctionCipher cipher, final ConditionOption option) { // optional resources
         cvalue.process(new CallbackProcessor<Void>() {
             public Void process() {
-                if (option != null) {
-                    doAddWhereClause(conditionList, columnRealName, cvalue, cipher, option);
-                } else {
-                    doAddWhereClause(conditionList, columnRealName, cvalue, cipher);
-                }
+                doAddWhereClause(conditionList, columnRealName, cvalue, cipher, option);
                 return null;
             }
 
@@ -182,25 +188,15 @@ public abstract class ConditionKey implements Serializable {
     }
 
     /**
-     * Do add where clause.
-     * @param conditionList Condition list. (NotNull)
+     * Do adding where clause.
+     * @param conditionList The list of condition. (NotNull)
      * @param columnRealName The real name of column. (NotNull)
-     * @param value Condition value. (NotNull)
+     * @param cvalue The object of condition value. (NotNull)
      * @param cipher The cipher of column by function. (NullAllowed)
+     * @param option The option of condition. (NullAllowed)
      */
     protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher);
-
-    /**
-     * Do add where clause.
-     * @param conditionList Condition list. (NotNull)
-     * @param columnRealName The real name of column. (NotNull)
-     * @param value Condition value. (NotNull)
-     * @param cipher The cipher of column by function. (NullAllowed)
-     * @param option Condition option. (NotNull)
-     */
-    protected abstract void doAddWhereClause(List<QueryClause> conditionList, ColumnRealName columnRealName,
-            ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option);
+            ConditionValue cvalue, ColumnFunctionCipher cipher, ConditionOption option);
 
     // ===================================================================================
     //                                                                     Condition Value
@@ -208,32 +204,16 @@ public abstract class ConditionKey implements Serializable {
     /**
      * Setup condition value.
      * @param provider The provider of query mode. (NotNull)
-     * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (NullAllowed)
-     * @param location Location. (NullAllowed)
-     */
-    public void setupConditionValue(QueryModeProvider provider, ConditionValue conditionValue, Object value,
-            String location) {
-        setupConditionValue(provider, conditionValue, value, location, null);
-    }
-
-    /**
-     * Setup condition value.
-     * @param provider The provider of query mode. (NotNull)
-     * @param cvalue Condition value. (NotNull)
-     * @param value Value. (NullAllowed)
-     * @param location Location. (NullAllowed)
+     * @param cvalue The object of condition value. (NotNull)
+     * @param value The native value of condition. (NullAllowed)
+     * @param location The location on parameter comment. (NotNull)
      * @param option Condition option. (NullAllowed)
      */
     public void setupConditionValue(final QueryModeProvider provider, final ConditionValue cvalue, final Object value,
             final String location, final ConditionOption option) {
         cvalue.process(new CallbackProcessor<Void>() {
             public Void process() {
-                if (option != null) {
-                    doSetupConditionValue(cvalue, value, location, option);
-                } else {
-                    doSetupConditionValue(cvalue, value, location);
-                }
+                doSetupConditionValue(cvalue, value, location, option);
                 return null;
             }
 
@@ -244,101 +224,255 @@ public abstract class ConditionKey implements Serializable {
     }
 
     /**
-     * Do setup condition value.
-     * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (NotNull)
-     * @param location Location. (NotNull)
+     * Do setting up condition value.
+     * @param cvalue The object of condition value. (NotNull)
+     * @param value The native value of condition. (NullAllowed)
+     * @param location The location on parameter comment. (NotNull)
+     * @param option The option of condition. (NullAllowed)
      */
-    protected abstract void doSetupConditionValue(ConditionValue conditionValue, Object value, String location);
-
-    /**
-     * Do setup condition value.
-     * @param conditionValue Condition value. (NotNull)
-     * @param value Value. (NotNull)
-     * @param location Location. (NotNull)
-     * @param option Condition option. (NotNull)
-     */
-    protected abstract void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
+    protected abstract void doSetupConditionValue(ConditionValue cvalue, Object value, String location,
             ConditionOption option);
 
     // ===================================================================================
     //                                                                         Bind Clause
     //                                                                         ===========
+    // -----------------------------------------------------
+    //                                           Entry Point
+    //                                           -----------
     /**
      * Build bind clause.
      * @param columnRealName The real name of column. (NotNull)
-     * @param location Location. (NotNull)
-     * @return Bind clause. (NotNull)
+     * @param location The location on parameter comment. (NotNull)
      * @param cipher The cipher of column by function. (NullAllowed)
+     * @param option The option of condition. (NullAllowed)
+     * @return The query clause as bind clause. (NotNull)
      */
-    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher) {
-        return new StringQueryClause(doBuildBindMainQuery(columnRealName, location, cipher));
+    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
+            ConditionOption option) {
+        return new StringQueryClause(doBuildBindClause(columnRealName, location, cipher, option));
     }
 
-    protected QueryClause doBuildBindClauseOrIsNull(ColumnRealName columnRealName, String location,
-            ColumnFunctionCipher cipher) {
-        final String mainQuery = doBuildBindMainQuery(columnRealName, location, cipher);
+    /**
+     * Build bind clause with orIsNull condition.
+     * @param columnRealName The real name of column. (NotNull)
+     * @param location The location on parameter comment. (NotNull)
+     * @param cipher The cipher of column by function. (NullAllowed)
+     * @param option The option of condition. (NullAllowed)
+     * @return The query clause as bind clause. (NotNull)
+     */
+    protected QueryClause buildBindClauseOrIsNull(ColumnRealName columnRealName, String location,
+            ColumnFunctionCipher cipher, ConditionOption option) {
+        final String mainQuery = doBuildBindClause(columnRealName, location, cipher, option);
         final String clause = "(" + mainQuery + " or " + columnRealName + " is null)";
         return new StringQueryClause(clause);
     }
 
-    protected String doBuildBindMainQuery(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher) {
-        final String bindExpression = buildBindExpression(location, null, cipher);
-        return columnRealName + " " + getOperand() + " " + bindExpression;
+    protected String doBuildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
+            ConditionOption option) {
+        final BindClauseResult result = resolveBindClause(columnRealName, location, cipher, option);
+        return result.toBindClause();
     }
 
     /**
-     * Build bind clause. (basically for like-search)
+     * Build clause without value. (basically for isNull, isNotNull)
      * @param columnRealName The real name of column. (NotNull)
-     * @param operand Operand. (NotNull)
-     * @param location Location. (NotNull)
-     * @param rearOption Rear option. (NotNull)
-     * @param cipher The cipher of column by function. (NullAllowed)
-     * @return Bind clause. (NotNull)
-     */
-    protected QueryClause buildBindClause(ColumnRealName columnRealName, String operand, String location,
-            String rearOption, ColumnFunctionCipher cipher) {
-        final String bindExpression = buildBindExpression(location, null, cipher);
-        final String clause = columnRealName + " " + operand + " " + bindExpression + rearOption;
-        return new StringQueryClause(clause);
-    }
-
-    /**
-     * Build bind clause.
-     * @param columnRealName The real name of column. (NotNull)
-     * @param location Location. (NotNull)
-     * @param dummyValue Dummy value. (NotNull)
-     * @param cipher The cipher of column by function. (NullAllowed)  
-     * @return Bind clause. (NotNull)
-     */
-    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, String dummyValue,
-            ColumnFunctionCipher cipher) {
-        final String bindExpression = buildBindExpression(location, dummyValue, cipher);
-        final String clause = columnRealName + " " + getOperand() + " " + bindExpression;
-        return new StringQueryClause(clause);
-    }
-
-    /**
-     * Build clause without value.
-     * @param columnRealName The real name of column. (NotNull)
-     * @return Clause without value. (NotNull)
+     * @return The query clause as bind clause. (NotNull)
      */
     protected QueryClause buildClauseWithoutValue(ColumnRealName columnRealName) {
-        final String clause = columnRealName + " " + getOperand();
+        final String clause = columnRealName + " " + getOperand(); // no need to resolve cipher
         return new StringQueryClause(clause);
     }
 
-    protected String buildBindExpression(String location, String dummyValue, ColumnFunctionCipher cipher) {
-        final String bindExpression = "/*pmb." + location + "*/" + dummyValue;
-        return cipher != null ? cipher.encrypt(bindExpression) : bindExpression;
+    // -----------------------------------------------------
+    //                                       Clause Resolver
+    //                                       ---------------
+    protected BindClauseResult resolveBindClause(ColumnRealName columnRealName, String location,
+            ColumnFunctionCipher cipher, ConditionOption option) {
+        final String basicBindExp = buildBindVariableExp(location, option);
+        final String bindExp;
+        final ColumnRealName resolvedColumn;
+        final boolean decryptColumn;
+        {
+            final ColumnRealName columnExp;
+            if (cipher != null) {
+                final String plainColumnExp = columnRealName.toString();
+                final String decryptExp = cipher.decrypt(plainColumnExp);
+                final boolean nonInvertible = plainColumnExp.equals(decryptExp);
+                final boolean forcedEncrypt = isForcedEncryptConditionKey();
+                final boolean calculationColumn = hasCalculationColumn(columnRealName, option);
+                if (nonInvertible || (forcedEncrypt && !calculationColumn)) { // needs to encrypt
+                    bindExp = cipher.encrypt(basicBindExp);
+                    columnExp = columnRealName;
+                    decryptColumn = false;
+                } else { // needs to decrypt (invertible)
+                    bindExp = basicBindExp;
+                    columnExp = toColumnRealName(decryptExp);
+                    decryptColumn = true;
+                }
+            } else { // mainly here
+                bindExp = basicBindExp;
+                columnExp = columnRealName;
+                decryptColumn = false;
+            }
+            resolvedColumn = resolveOptionalColumn(columnExp, cipher, decryptColumn, option);
+        }
+        return createBindClauseResult(resolvedColumn, bindExp, option);
     }
 
-    /**
-     * Get wild-card.
-     * @return Wild-card.
-     */
-    protected String getWildCard() {
-        return "%";
+    protected String buildBindVariableExp(String location, ConditionOption option) {
+        return "/*pmb." + location + "*/" + getBindVariableDummyValue();
+    }
+
+    protected String getBindVariableDummyValue() { // to override
+        return null; // as default
+    }
+
+    protected boolean isForcedEncryptConditionKey() { // to override
+        return false; // as default
+    }
+
+    protected ColumnRealName toColumnRealName(String columnSqlName) {
+        return ColumnRealName.create(null, new ColumnSqlName(columnSqlName));
+    }
+
+    protected BindClauseResult createBindClauseResult(ColumnRealName columnExp, String bindExp, ConditionOption option) {
+        final String operand = resolveOperand(option);
+        final String rearOption = resolveRearOption(option);
+        final BindClauseResult result = new BindClauseResult(columnExp, operand, bindExp, rearOption);
+        result.setArranger(resolveWhereClauseArranger(option));
+        return result;
+    }
+
+    protected String resolveOperand(ConditionOption option) {
+        final String operand = extractExtOperand(option);
+        return operand != null ? operand : getOperand();
+    }
+
+    protected String extractExtOperand(ConditionOption option) {
+        final ExtensionOperand extOperand = option != null ? option.getExtensionOperand() : null;
+        return extOperand != null ? extOperand.operand() : null;
+    }
+
+    protected String resolveRearOption(ConditionOption option) {
+        return option != null ? option.getRearOption() : "";
+    }
+
+    protected QueryClauseArranger resolveWhereClauseArranger(ConditionOption option) {
+        return option != null ? option.getWhereClauseArranger() : null;
+    }
+
+    // -----------------------------------------------------
+    //                                       Optional Column
+    //                                       ---------------
+    protected ColumnRealName resolveOptionalColumn(ColumnRealName columnExp, ColumnFunctionCipher cipher,
+            boolean decryptColumn, ConditionOption option) {
+        return resolveCalculationColumn(resolveCompoundColumn(columnExp, cipher, decryptColumn, option), option);
+    }
+
+    protected boolean hasCalculationColumn(ColumnRealName columnRealName, ConditionOption option) {
+        return option != null && option instanceof RangeOfOption && ((RangeOfOption) option).hasCalculationRange();
+    }
+
+    protected ColumnRealName resolveCalculationColumn(ColumnRealName columnRealName, ConditionOption option) {
+        if (option == null) {
+            return columnRealName;
+        }
+        if (option instanceof RangeOfOption) {
+            final RangeOfOption rangeOfOption = (RangeOfOption) option;
+            if (rangeOfOption.hasCalculationRange()) {
+                final HpCalcSpecification<ConditionBean> calculationRange = rangeOfOption.getCalculationRange();
+                final String calculated = calculationRange.buildStatementToSpecifidName(columnRealName.toString());
+                return toColumnRealName(calculated);
+            }
+        }
+        return columnRealName;
+    }
+
+    protected boolean hasCompoundColumn(ColumnRealName columnRealName, ConditionOption option) {
+        return option != null && !option.hasCompoundColumn();
+    }
+
+    protected ColumnRealName resolveCompoundColumn(ColumnRealName baseRealName, ColumnFunctionCipher cipher,
+            boolean decryptColumn, ConditionOption option) {
+        if (option == null || !option.hasCompoundColumn()) {
+            return baseRealName;
+        }
+        final ColumnRealName realRealName;
+        if (!option.hasStringConnector()) { // basically no way
+            String msg = "The option should have string connector when compound column is specified: " + option;
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+        final List<HpSpecifiedColumn> compoundColumnList = option.getCompoundColumnList();
+        final List<ColumnRealName> realNameList = new ArrayList<ColumnRealName>();
+        realNameList.add(baseRealName); // already cipher
+        for (HpSpecifiedColumn specifiedColumn : compoundColumnList) {
+            final ColumnRealName realName;
+            {
+                final ColumnRealName specifiedName = specifiedColumn.toColumnRealName();
+                if (cipher != null && decryptColumn) {
+                    realName = toColumnRealName(cipher.decrypt(specifiedName.toString()));
+                } else {
+                    realName = specifiedName;
+                }
+            }
+            realNameList.add(realName);
+        }
+        final StringConnector stringConnector = option.getStringConnector();
+        final String connected = stringConnector.connect(realNameList.toArray());
+        realRealName = ColumnRealName.create(null, new ColumnSqlName(connected));
+        return realRealName;
+    }
+
+    // -----------------------------------------------------
+    //                                         Result Object
+    //                                         -------------
+    public static class BindClauseResult {
+        protected final ColumnRealName _columnExp;
+        protected final String _operand;
+        protected final String _bindExp;
+        protected final String _rearOption;
+        protected QueryClauseArranger _arranger;
+
+        public BindClauseResult(ColumnRealName columnExp, String operand, String bindExp, String rearOption) {
+            _columnExp = columnExp;
+            _operand = operand;
+            _bindExp = bindExp;
+            _rearOption = rearOption;
+        }
+
+        public String toBindClause() {
+            final String clause;
+            if (_arranger != null) {
+                clause = _arranger.arrange(_columnExp, _operand, _bindExp, _rearOption);
+            } else {
+                clause = _columnExp + " " + _operand + " " + _bindExp + _rearOption;
+            }
+            return clause;
+        }
+
+        public ColumnRealName getColumnExp() {
+            return _columnExp;
+        }
+
+        public String getOperand() {
+            return _operand;
+        }
+
+        public String getBindExp() {
+            return _bindExp;
+        }
+
+        public String getRearOption() {
+            return _rearOption;
+        }
+
+        public QueryClauseArranger getArranger() {
+            return _arranger;
+        }
+
+        public void setArranger(QueryClauseArranger arranger) {
+            this._arranger = arranger;
+        }
     }
 
     // ===================================================================================

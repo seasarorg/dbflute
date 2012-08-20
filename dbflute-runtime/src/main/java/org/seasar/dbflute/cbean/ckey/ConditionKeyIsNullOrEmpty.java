@@ -34,9 +34,6 @@ public class ConditionKeyIsNullOrEmpty extends ConditionKeyIsNull {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor.
-     */
     protected ConditionKeyIsNullOrEmpty() {
     }
 

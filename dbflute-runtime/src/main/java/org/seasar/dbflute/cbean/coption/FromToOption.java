@@ -17,8 +17,14 @@ package org.seasar.dbflute.cbean.coption;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
+import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
+import org.seasar.dbflute.dbway.ExtensionOperand;
+import org.seasar.dbflute.dbway.StringConnector;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -106,14 +112,6 @@ public class FromToOption implements ConditionOption {
     protected Integer _moveToScope;
     protected boolean _usePattern;
     protected boolean _orIsNull;
-
-    // ===================================================================================
-    //                                                            Interface Implementation
-    //                                                            ========================
-    public String getRearOption() {
-        String msg = "Thie option does not use getRearOption().";
-        throw new UnsupportedOperationException(msg);
-    }
 
     // ===================================================================================
     //                                                                  Comparison Pattern
@@ -1255,6 +1253,37 @@ public class FromToOption implements ConditionOption {
         if (_moveToScope != null) {
             DfTypeUtil.addCalendarQuarterOfYear(cal, _moveToScope);
         }
+    }
+
+    // ===================================================================================
+    //                                                            Interface Implementation
+    //                                                            ========================
+    public String getRearOption() {
+        return "";
+    }
+
+    public boolean hasCompoundColumn() {
+        return false;
+    }
+
+    public List<HpSpecifiedColumn> getCompoundColumnList() {
+        return DfCollectionUtil.emptyList();
+    }
+
+    public boolean hasStringConnector() {
+        return false;
+    }
+
+    public StringConnector getStringConnector() {
+        return null;
+    }
+
+    public ExtensionOperand getExtensionOperand() {
+        return null;
+    }
+
+    public QueryClauseArranger getWhereClauseArranger() {
+        return null;
     }
 
     // ===================================================================================

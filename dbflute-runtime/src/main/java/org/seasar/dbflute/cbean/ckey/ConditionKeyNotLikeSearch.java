@@ -18,7 +18,6 @@ package org.seasar.dbflute.cbean.ckey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
-import org.seasar.dbflute.dbway.ExtensionOperand;
 
 /**
  * The condition-key of notLikeSearch.
@@ -48,17 +47,15 @@ public class ConditionKeyNotLikeSearch extends ConditionKeyLikeSearch {
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-
     @Override
     protected String getLocation(ConditionValue value) {
         return value.getNotLikeSearchLatestLocation();
     }
 
     @Override
-    protected String getRealOperand(LikeSearchOption option) {
-        final ExtensionOperand extOperand = option.getExtensionOperand();
-        final String operand = extOperand != null ? extOperand.operand() : null;
-        return operand != null ? "not " + operand : getOperand();
+    protected String extractExtOperand(ConditionOption option) {
+        final String extOperand = super.extractExtOperand(option);
+        return extOperand != null ? "not " + extOperand : null;
     }
 
     @Override

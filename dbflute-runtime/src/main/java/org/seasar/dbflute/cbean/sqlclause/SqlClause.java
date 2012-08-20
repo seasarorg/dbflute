@@ -397,9 +397,6 @@ public interface SqlClause {
     //                                In-line for Base Table
     //                                ----------------------
     void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
-            ColumnFunctionCipher cipher);
-
-    void registerBaseTableInlineWhereClause(ColumnSqlName columnSqlName, ConditionKey key, ConditionValue value,
             ColumnFunctionCipher cipher, ConditionOption option);
 
     void registerBaseTableInlineWhereClause(String value);
@@ -411,9 +408,6 @@ public interface SqlClause {
     // -----------------------------------------------------
     //                                In-line for Outer Join
     //                                ----------------------
-    void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName, ConditionKey key,
-            ConditionValue value, ColumnFunctionCipher cipher, boolean onClause);
-
     void registerOuterJoinInlineWhereClause(String foreignAliasName, ColumnSqlName columnSqlName, ConditionKey key,
             ConditionValue value, ColumnFunctionCipher cipher, ConditionOption option, boolean onClause);
 

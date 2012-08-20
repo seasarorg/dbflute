@@ -731,6 +731,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void doRegisterLikeSearchQuerySplitBy(ConditionKey key, String value, ConditionValue cvalue,
             String columnDbName, LikeSearchOption option) {
+        assertObjectNotNull("option(LikeSearchOption)", option);
         // these values should be valid only (already filtered before)
         // and invalid values are ignored even at the check mode
         // but if all elements are invalid, it is an exception
@@ -814,6 +815,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          FromTo Query
     //                                          ------------
     protected void regFTQ(Date fromDate, Date toDate, ConditionValue cvalue, String columnDbName, FromToOption option) {
+        assertObjectNotNull("option(FromToOption)", option);
         final Date filteredFromDate = option.filterFromDate(fromDate);
         final ConditionKey fromKey = option.getFromDateConditionKey();
         final boolean fromValidQuery = isValidQueryNoCheck(fromKey, filteredFromDate, cvalue, columnDbName);
@@ -851,6 +853,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         -------------
     protected void regROO(Number minNumber, Number maxNumber, ConditionValue cvalue, String columnDbName,
             RangeOfOption option) {
+        assertObjectNotNull("option(RangeOfOption)", option);
+        if (option.hasCalculationRange()) {
+            final ConditionBean dreamCruiseCB = _baseCB.xcreateDreamCruiseCB();
+            //dreamCruiseCB.x
+            //dreamCruiseCB.overTheWaves(xcreateManualOrderSpecifiedColumn(dreamCruiseCB));
+            option.xinitCalculationRange(_baseCB, dreamCruiseCB);
+        }
         final ConditionKey minKey = option.getMinNumberConditionKey();
         final boolean minValidQuery = isValidQueryNoCheck(minKey, minNumber, cvalue, columnDbName);
 
@@ -863,10 +872,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         try {
             if (minValidQuery) {
-                setupConditionValueAndRegisterWhereClause(minKey, minNumber, cvalue, columnDbName);
+                setupConditionValueAndRegisterWhereClause(minKey, minNumber, cvalue, columnDbName, option);
             }
             if (maxValidQuery) {
-                setupConditionValueAndRegisterWhereClause(maxKey, maxNumber, cvalue, columnDbName);
+                setupConditionValueAndRegisterWhereClause(maxKey, maxNumber, cvalue, columnDbName, option);
             } else {
                 if (!minValidQuery) { // means both queries are invalid
                     final List<ConditionKey> keyList = newArrayList(minKey, maxKey);
@@ -939,27 +948,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Inline Query
     //                                          ------------
     protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName) {
-        if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
-            return;
-        }
-        final DBMeta dbmeta = xgetDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
-        final String propertyName = columnInfo.getPropertyName();
-        final String uncapPropName = initUncap(propertyName);
-        // If Java, it is necessary to use uncapPropName!
-        key.setupConditionValue(xcreateQueryModeProvider(), cvalue, value, xgetLocation(uncapPropName));
-        final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
-        final ColumnFunctionCipher cipher = xgetSqlClause().findColumnFunctionCipher(columnInfo);
-        if (isBaseQuery()) {
-            xgetSqlClause().registerBaseTableInlineWhereClause(columnSqlName, key, cvalue, cipher);
-        } else {
-            final String aliasName = xgetAliasName();
-            xgetSqlClause()
-                    .registerOuterJoinInlineWhereClause(aliasName, columnSqlName, key, cvalue, cipher, _onClause);
-        }
+        doRegIQ(key, value, cvalue, columnDbName, null);
     }
 
-    protected void regIQ(final ConditionKey key, final Object value, final ConditionValue cvalue,
+    protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String columnDbName,
+            ConditionOption option) {
+        doRegIQ(key, value, cvalue, columnDbName, option);
+    }
+
+    protected void doRegIQ(final ConditionKey key, final Object value, final ConditionValue cvalue,
             final String columnDbName, final ConditionOption option) {
         if (!isValidQueryChecked(key, value, cvalue, columnDbName)) {
             return;
@@ -1379,8 +1376,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, null);
     }
 
-    protected void setupConditionValueAndRegisterWhereClause(final ConditionKey key, final Object value,
-            final ConditionValue cvalue, final String columnDbName, final ConditionOption option) {
+    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
+            String columnDbName, ConditionOption option) {
         final DBMeta dbmeta = xgetLocalDBMeta();
         final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnDbName);
         final String propertyName = columnInfo.getPropertyName();
@@ -1580,8 +1577,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         });
         if (manualOrderBean.hasCalculationOrder()) {
-            // cipher adjustment is unsupported at order-by
-            // so it does not use column info here
             final ConditionBean dreamCruiseCB = _baseCB.xcreateDreamCruiseCB();
             dreamCruiseCB.overTheWaves(xcreateManualOrderSpecifiedColumn(dreamCruiseCB));
             manualOrderBean.xinitCalculationOrder(_baseCB, dreamCruiseCB);

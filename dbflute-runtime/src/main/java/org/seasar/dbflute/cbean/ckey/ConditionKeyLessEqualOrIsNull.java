@@ -16,6 +16,7 @@
 package org.seasar.dbflute.cbean.ckey;
 
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 
@@ -44,7 +45,8 @@ public class ConditionKeyLessEqualOrIsNull extends ConditionKeyLessEqual {
     //                                                                      Implementation
     //                                                                      ==============
     @Override
-    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher) {
-        return doBuildBindClauseOrIsNull(columnRealName, location, cipher);
+    protected QueryClause buildBindClause(ColumnRealName columnRealName, String location, ColumnFunctionCipher cipher,
+            ConditionOption option) {
+        return buildBindClauseOrIsNull(columnRealName, location, cipher, option);
     }
 }
