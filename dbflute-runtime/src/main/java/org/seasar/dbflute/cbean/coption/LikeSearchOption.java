@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.StringConnector;
@@ -54,6 +55,7 @@ public class LikeSearchOption extends SimpleStringOption {
     protected List<HpSpecifiedColumn> _compoundColumnList;
     protected List<Integer> _compoundColumnSizeList;
     protected StringConnector _stringConnector;
+    protected GearedCipherManager _cipherManager;;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -519,6 +521,22 @@ public class LikeSearchOption extends SimpleStringOption {
     @Override
     public QueryClauseArranger getWhereClauseArranger() { // for application extension
         return null; // as default
+    }
+
+    // ===================================================================================
+    //                                                                       Geared Cipher
+    //                                                                       =============
+    /**
+     * Accept the manager of geared cipher. (basically for compound columns)
+     * @param cipherManager The manager of geared cipher. (NullAllowed)
+     */
+    public void acceptGearedCipherManager(GearedCipherManager cipherManager) {
+        _cipherManager = cipherManager;
+    }
+
+    @Override
+    public GearedCipherManager getGearedCipherManager() {
+        return _cipherManager;
     }
 
     // ===================================================================================

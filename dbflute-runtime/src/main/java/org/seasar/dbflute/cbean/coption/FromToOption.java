@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
@@ -1283,6 +1284,10 @@ public class FromToOption implements ConditionOption {
     }
 
     public QueryClauseArranger getWhereClauseArranger() {
+        return null;
+    }
+
+    public GearedCipherManager getGearedCipherManager() {
         return null;
     }
 

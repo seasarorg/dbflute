@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean.coption;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.dbway.StringConnector;
@@ -69,4 +70,10 @@ public interface ConditionOption {
      * @return The object of the arranger. (NullAllowed)
      */
     QueryClauseArranger getWhereClauseArranger();
+
+    /**
+     * Get the manager of geared cipher. (basically for compound columns)
+     * @return The manager of geared cipher. (NullAllowed)
+     */
+    GearedCipherManager getGearedCipherManager();
 }

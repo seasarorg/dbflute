@@ -25,6 +25,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.RangeOfOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -33,6 +34,7 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbway.ExtensionOperand;
@@ -291,7 +293,6 @@ public abstract class ConditionKey implements Serializable {
         final String basicBindExp = buildBindVariableExp(location, option);
         final String bindExp;
         final ColumnRealName resolvedColumn;
-        final boolean decryptColumn;
         {
             final ColumnRealName columnExp;
             if (cipher != null) {
@@ -299,22 +300,19 @@ public abstract class ConditionKey implements Serializable {
                 final String decryptExp = cipher.decrypt(plainColumnExp);
                 final boolean nonInvertible = plainColumnExp.equals(decryptExp);
                 final boolean forcedEncrypt = isForcedEncryptConditionKey();
-                final boolean calculationColumn = hasCalculationColumn(columnRealName, option);
-                if (nonInvertible || (forcedEncrypt && !calculationColumn)) { // needs to encrypt
+                final boolean columnCollaboration = hasColumnCollaboration(columnRealName, option);
+                if (nonInvertible || (forcedEncrypt && !columnCollaboration)) { // needs to encrypt
                     bindExp = cipher.encrypt(basicBindExp);
                     columnExp = columnRealName;
-                    decryptColumn = false;
                 } else { // needs to decrypt (invertible)
                     bindExp = basicBindExp;
                     columnExp = toColumnRealName(decryptExp);
-                    decryptColumn = true;
                 }
             } else { // mainly here
                 bindExp = basicBindExp;
                 columnExp = columnRealName;
-                decryptColumn = false;
             }
-            resolvedColumn = resolveOptionalColumn(columnExp, cipher, decryptColumn, option);
+            resolvedColumn = resolveOptionalColumn(columnExp, option);
         }
         return createBindClauseResult(resolvedColumn, bindExp, option);
     }
@@ -364,9 +362,12 @@ public abstract class ConditionKey implements Serializable {
     // -----------------------------------------------------
     //                                       Optional Column
     //                                       ---------------
-    protected ColumnRealName resolveOptionalColumn(ColumnRealName columnExp, ColumnFunctionCipher cipher,
-            boolean decryptColumn, ConditionOption option) {
-        return resolveCalculationColumn(resolveCompoundColumn(columnExp, cipher, decryptColumn, option), option);
+    protected ColumnRealName resolveOptionalColumn(ColumnRealName columnExp, ConditionOption option) {
+        return resolveCalculationColumn(resolveCompoundColumn(columnExp, option), option);
+    }
+
+    protected boolean hasColumnCollaboration(ColumnRealName columnRealName, ConditionOption option) {
+        return hasCalculationColumn(columnRealName, option) || hasCompoundColumn(columnRealName, option);
     }
 
     protected boolean hasCalculationColumn(ColumnRealName columnRealName, ConditionOption option) {
@@ -392,12 +393,10 @@ public abstract class ConditionKey implements Serializable {
         return option != null && !option.hasCompoundColumn();
     }
 
-    protected ColumnRealName resolveCompoundColumn(ColumnRealName baseRealName, ColumnFunctionCipher cipher,
-            boolean decryptColumn, ConditionOption option) {
+    protected ColumnRealName resolveCompoundColumn(ColumnRealName baseRealName, ConditionOption option) {
         if (option == null || !option.hasCompoundColumn()) {
             return baseRealName;
         }
-        final ColumnRealName realRealName;
         if (!option.hasStringConnector()) { // basically no way
             String msg = "The option should have string connector when compound column is specified: " + option;
             throw new IllegalConditionBeanOperationException(msg);
@@ -406,21 +405,27 @@ public abstract class ConditionKey implements Serializable {
         final List<ColumnRealName> realNameList = new ArrayList<ColumnRealName>();
         realNameList.add(baseRealName); // already cipher
         for (HpSpecifiedColumn specifiedColumn : compoundColumnList) {
-            final ColumnRealName realName;
-            {
-                final ColumnRealName specifiedName = specifiedColumn.toColumnRealName();
-                if (cipher != null && decryptColumn) {
-                    realName = toColumnRealName(cipher.decrypt(specifiedName.toString()));
-                } else {
-                    realName = specifiedName;
-                }
-            }
-            realNameList.add(realName);
+            realNameList.add(doResolveCompoundColumn(option, specifiedColumn));
         }
         final StringConnector stringConnector = option.getStringConnector();
         final String connected = stringConnector.connect(realNameList.toArray());
-        realRealName = ColumnRealName.create(null, new ColumnSqlName(connected));
-        return realRealName;
+        return ColumnRealName.create(null, new ColumnSqlName(connected));
+    }
+
+    protected ColumnRealName doResolveCompoundColumn(ConditionOption option, HpSpecifiedColumn specifiedColumn) {
+        final GearedCipherManager cipherManager = option.getGearedCipherManager();
+        final ColumnRealName specifiedName = specifiedColumn.toColumnRealName();
+        if (cipherManager != null && !specifiedColumn.isDerived()) {
+            final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
+            final ColumnFunctionCipher cipher = cipherManager.findColumnFunctionCipher(columnInfo);
+            if (cipher != null) {
+                return toColumnRealName(cipher.decrypt(specifiedName.toString()));
+            } else {
+                return specifiedName;
+            }
+        } else {
+            return specifiedName;
+        }
     }
 
     // -----------------------------------------------------

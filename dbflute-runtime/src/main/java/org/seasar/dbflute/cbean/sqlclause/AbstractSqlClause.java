@@ -3101,6 +3101,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final DBWay dbway = dbway();
         option.acceptOriginalWildCardList(dbway.getOriginalWildCardList());
         option.acceptStringConnector(dbway.getStringConnector());
+        option.acceptGearedCipherManager(getGearedCipherManager());
     }
 
     // ===================================================================================

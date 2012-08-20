@@ -1373,7 +1373,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          ------------
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
             String columnDbName) {
-        setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, null);
+        final ConditionOption embeddedOption = createEmbeddedOption(key, value, cvalue, columnDbName);
+        setupConditionValueAndRegisterWhereClause(key, value, cvalue, columnDbName, embeddedOption);
+    }
+
+    protected ConditionOption createEmbeddedOption(ConditionKey key, Object value, ConditionValue cvalue,
+            String columnDbName) { // to override (closet option)
+        return null;
     }
 
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,

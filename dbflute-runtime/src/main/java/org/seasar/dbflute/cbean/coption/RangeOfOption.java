@@ -22,6 +22,7 @@ import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -290,6 +291,10 @@ public class RangeOfOption implements ConditionOption, HpCalculator {
     }
 
     public QueryClauseArranger getWhereClauseArranger() {
+        return null;
+    }
+
+    public GearedCipherManager getGearedCipherManager() {
         return null;
     }
 
