@@ -369,7 +369,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                         if (!lineComment && Srl.containsAnyIgnoreCase(lineText, packageBodyMarkAry)) {
                             final String rear = Srl.substringFirstRearIgnoreCase(lineText, packageBodyMarkAry);
                             packageBodyName = Srl.substringFirstFront(rear, "(", " ").trim();
-                            line = 0; // begin here (increment later)
+                            line = 0; // begin package body here
                         } else { // e.g. package definition part or empty line
                             continue;
                         }
@@ -379,14 +379,14 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 }
                 currentName = packageBodyName != null ? (plainName + "." + packageBodyName) : plainName;
             }
-            ++line;
             if (previousName != null && !previousName.equals(currentName)) { // switch
                 if (packageBodyName == null) { // if not null, cannot find the end point of the package body
                     setupProcedureSourceInfo(resultMap, previousName, sb.toString(), line);
                 }
-                line = 1; // already first line for the next procedure
+                line = 0; // begin next here
                 sb = new StringBuilder();
             }
+            ++line;
             if (sb.length() > 0) {
                 sb.append("\n");
             }
