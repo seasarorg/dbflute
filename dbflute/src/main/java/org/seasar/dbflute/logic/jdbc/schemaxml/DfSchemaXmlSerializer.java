@@ -580,6 +580,7 @@ public class DfSchemaXmlSerializer {
     //                                              Sequence
     //                                              --------
     protected void processSequence(Connection conn, DatabaseMetaData metaData) throws SQLException {
+        _log.info("...Getting sequences");
         final Map<String, DfSequenceMeta> sequenceMap = extractSequenceMap();
         if (sequenceMap == null) {
             return;
@@ -647,6 +648,7 @@ public class DfSchemaXmlSerializer {
     }
 
     protected void processProcedure(Connection conn, DatabaseMetaData metaData) throws SQLException {
+        _log.info("...Extracting procedures");
         final Map<String, DfProcedureMeta> procedureMap = extractProcedureMap();
         if (procedureMap == null) {
             return;
@@ -692,15 +694,15 @@ public class DfSchemaXmlSerializer {
             procedureElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
         }
         // -1 means no data for the future (2012/08/20)
-        final String sourceLine = "-1";
+        final String sourceLine = DfSchemaDiff.NULL_META_MARK;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceLine)) {
             procedureElement.setAttribute("sourceLine", sourceLine);
         }
-        final String sourceSize = "-1";
+        final String sourceSize = DfSchemaDiff.NULL_META_MARK;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceSize)) {
             procedureElement.setAttribute("sourceSize", sourceSize);
         }
-        final String sourceHash = "-1";
+        final String sourceHash = DfSchemaDiff.NULL_META_MARK;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceHash)) {
             procedureElement.setAttribute("sourceHash", sourceHash);
         }

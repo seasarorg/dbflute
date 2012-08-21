@@ -140,6 +140,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public static final String SEQUENCE_DIFF_KEY = "sequenceDiff";
     public static final String KEYWORD_H2_SYSTEM_SEQUENCE = "SYSTEM_SEQUENCE";
     public static final String PROCEDURE_DIFF_KEY = "procedureDiff";
+    public static final String NULL_META_MARK = "df:nullMeta";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -1155,7 +1156,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processSourceLine(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
-        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+        diffNextPrevious(next, previous, procedureDiff, new ProcedureSourceNextPreviousDiffer() {
             public String provide(Procedure obj) {
                 return DfTypeUtil.toString(obj.getSourceLine());
             }
@@ -1167,7 +1168,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processSourceSize(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
-        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+        diffNextPrevious(next, previous, procedureDiff, new ProcedureSourceNextPreviousDiffer() {
             public String provide(Procedure obj) {
                 return DfTypeUtil.toString(obj.getSourceSize());
             }
@@ -1179,15 +1180,34 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processSourceHash(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
-        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+        diffNextPrevious(next, previous, procedureDiff, new ProcedureSourceNextPreviousDiffer() {
             public String provide(Procedure obj) {
                 return DfTypeUtil.toString(obj.getSourceHash());
+            }
+
+            @Override
+            public boolean isMatch(String next, String previous) {
+                if (previous != null && previous.equals("-1")) { // for migration
+                    return true;
+                }
+                return super.isMatch(next, previous);
             }
 
             public void diff(DfProcedureDiff diff, DfNextPreviousDiff nextPreviousDiff) {
                 diff.setSourceHashDiff(nextPreviousDiff);
             }
         });
+    }
+
+    protected abstract class ProcedureSourceNextPreviousDiffer extends
+            StringNextPreviousDiffer<Procedure, DfProcedureDiff> {
+        @Override
+        public boolean isMatch(String next, String previous) {
+            if (previous != null && previous.equals(NULL_META_MARK)) { // for migration
+                return true;
+            }
+            return super.isMatch(next, previous);
+        }
     }
 
     protected void processProcedureComment(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {

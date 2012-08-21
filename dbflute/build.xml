@@ -6,7 +6,7 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.9.7F"/>
-	<property name="build.version" value="${version}"/>
+	<property name="build.version" value="${version}-RC3"/>
 	<property name="pre.version" value="0.9.9.7C"/>
 	<property name="runtime.version" value="0.9.9.7F"/>
 	<property name="runtime.build.version" value="${runtime.version}"/>
