@@ -48,10 +48,38 @@ public class DfDocumentSelector {
     protected DfSchemaHistory _schemaHistory;
 
     // ===================================================================================
-    //                                                               Derived Determination
-    //                                                               =====================
+    //                                                                         Coin Method
+    //                                                                         ===========
     public boolean needsInitializeProperties() {
         return _schemaHtml || _historyHtml;
+    }
+
+    public String getDiffModelBigTitle() {
+        final String title;
+        if (isCurrentHistoryHtml()) {
+            title = "History";
+        } else if (isCurrentSchemaSyncCheckResultHtml()) {
+            title = "SyncCheck";
+        } else if (isCurrentAlterCheckResultHtml()) {
+            title = "AlterCheck";
+        } else { // no way
+            title = "Unknown";
+        }
+        return title;
+    }
+
+    public String getDiffModelSmallTitle() {
+        final String title;
+        if (isCurrentHistoryHtml()) {
+            title = "history";
+        } else if (isCurrentSchemaSyncCheckResultHtml()) {
+            title = "sync check";
+        } else if (isCurrentAlterCheckResultHtml()) {
+            title = "alter check";
+        } else { // no way
+            title = "unknown";
+        }
+        return title;
     }
 
     // ===================================================================================
@@ -59,6 +87,14 @@ public class DfDocumentSelector {
     //                                                                    ================
     public boolean isCurrentHistoryHtml() {
         return _currentDocumentType != null && _currentDocumentType.equals(DocumentType.HistoryHtml);
+    }
+
+    public boolean isCurrentSchemaSyncCheckResultHtml() {
+        return _currentDocumentType != null && _currentDocumentType.equals(DocumentType.SchemaSyncCheckResultHtml);
+    }
+
+    public boolean isCurrentAlterCheckResultHtml() {
+        return _currentDocumentType != null && _currentDocumentType.equals(DocumentType.AlterCheckResultHtml);
     }
 
     public void markSchemaHtml() {

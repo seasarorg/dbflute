@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8" />
-	<title>${database.projectName} history</title>
+	<title>${database.projectName} ${selector.diffModelSmallTitle}</title>
 #if ($database.isHistoryHtmlStyleSheetEmbedded())
 	<style type="text/css">
 ${database.historyHtmlStyleSheetEmbedded}
@@ -107,7 +107,7 @@ ${database.historyHtmlJavaScriptEmbedded}
 </head>
 
 <body>
-<h1>History for ${database.projectName} (${database.databaseName})</h1>
+<h1>${selector.diffModelBigTitle} for ${database.projectName} (${database.databaseName})</h1>
 
 #foreach ($schemaDiff in $selector.schemaDiffList)
 <div class="section">
