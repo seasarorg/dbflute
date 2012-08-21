@@ -104,7 +104,7 @@ public class Procedure {
             }
         }
         _sourceHash = attrib.getValue("sourceHash");
-        _procedureComment = attrib.getValue("procedureComment");
+        _procedureComment = attrib.getValue("comment");
         return true;
     }
 
