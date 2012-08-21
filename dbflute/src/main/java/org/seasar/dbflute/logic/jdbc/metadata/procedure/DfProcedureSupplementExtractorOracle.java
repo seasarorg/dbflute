@@ -353,35 +353,53 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         }
         final Map<String, DfProcedureSourceInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
         final List<Map<String, String>> sourceList = selectProcedureSourceList(unifiedSchema);
+        final String[] packageBodyMarkAry = new String[] { "procedure ", "function " };
+        String packageBodyName = null;
         StringBuilder sb = new StringBuilder();
-        String preName = null;
         int line = 0;
+        String previousName = null;
         for (Map<String, String> sourceMap : sourceList) {
+            final String lineText = sourceMap.get("TEXT");
+            final boolean lineComment = Srl.startsWith(lineText.trim(), "--");
+            final String currentName;
+            {
+                final String plainName = sourceMap.get("NAME");
+                if (isSourcePackageBody(sourceMap)) {
+                    if (packageBodyName == null) {
+                        if (!lineComment && Srl.containsAnyIgnoreCase(lineText, packageBodyMarkAry)) {
+                            final String rear = Srl.substringFirstRearIgnoreCase(lineText, packageBodyMarkAry);
+                            packageBodyName = Srl.substringFirstFront(rear, "(", " ").trim();
+                            line = 1; // begin here
+                        } else { // e.g. package definition part or empty line
+                            continue;
+                        }
+                    }
+                } else {
+                    packageBodyName = null;
+                }
+                currentName = packageBodyName != null ? (plainName + "." + packageBodyName) : plainName;
+            }
             ++line;
-            final String procedureName = sourceMap.get("NAME");
-            if (preName != null && !preName.equals(procedureName)) { // switch
-                setupProcedureSourceInfo(resultMap, procedureName, sb.toString(), line);
+            if (previousName != null && !previousName.equals(currentName)) { // switch
+                setupProcedureSourceInfo(resultMap, previousName, sb.toString(), line);
                 line = 1;
                 sb = new StringBuilder();
             }
-            final String text = sourceMap.get("TEXT");
-            sb.append(text).append("\n");
-            preName = procedureName;
+            if (sb.length() > 0) {
+                sb.append("\n").append(lineText);
+            }
+            previousName = currentName;
+            if (isSourcePackageBody(sourceMap) && packageBodyName != null) { // in package body
+                if (!lineComment && Srl.containsIgnoreCase(lineText, "end " + packageBodyName)) { // means end
+                    packageBodyName = null;
+                }
+            }
         }
-        if (preName != null) {
-            setupProcedureSourceInfo(resultMap, preName, sb.toString(), line);
+        if (previousName != null) { // the latest element
+            setupProcedureSourceInfo(resultMap, previousName, sb.toString(), line);
         }
         _procedureSourceMapMap.put(unifiedSchema, resultMap);
         return _procedureSourceMapMap.get(unifiedSchema);
-    }
-
-    protected void setupProcedureSourceInfo(Map<String, DfProcedureSourceInfo> resultMap, String procedureName,
-            String sourceCode, int line) {
-        final DfProcedureSourceInfo sourceInfo = new DfProcedureSourceInfo();
-        sourceInfo.setSourceCode(sourceCode);
-        sourceInfo.setSourceLine(line);
-        sourceInfo.setSourceSize(sourceCode.length());
-        resultMap.put(procedureName, sourceInfo);
     }
 
     protected List<Map<String, String>> selectProcedureSourceList(UnifiedSchema unifiedSchema) {
@@ -406,6 +424,20 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             return DfCollectionUtil.emptyList();
         }
         return resultList;
+    }
+
+    protected void setupProcedureSourceInfo(Map<String, DfProcedureSourceInfo> resultMap, String procedureName,
+            String sourceCode, int line) {
+        final DfProcedureSourceInfo sourceInfo = new DfProcedureSourceInfo();
+        sourceInfo.setSourceCode(sourceCode.trim());
+        sourceInfo.setSourceLine(line);
+        sourceInfo.setSourceSize(sourceCode.length());
+        resultMap.put(procedureName, sourceInfo);
+    }
+
+    protected boolean isSourcePackageBody(Map<String, String> sourceMap) {
+        final String type = sourceMap.get("TYPE");
+        return type != null && type.equals("PACKAGE BODY");
     }
 
     // ===================================================================================
