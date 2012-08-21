@@ -686,6 +686,7 @@ public class DfSchemaXmlSerializer {
         if (_suppressAdditionalSchema) {
             extractor.suppressAdditionalSchema();
         }
+        extractor.suppressGenerationRestriction();
         return extractor;
     }
 
@@ -916,9 +917,9 @@ public class DfSchemaXmlSerializer {
     protected void helpSynonymColumnComments(DfTableMeta tableInfo, List<DfColumnMeta> columnList) {
         for (DfColumnMeta column : columnList) {
             if (canHandleSynonym(tableInfo) && !column.hasColumnComment()) {
-                DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
+                final DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
                 if (synonym != null && synonym.hasColumnCommentMap()) {
-                    UserColComments userColComments = synonym.getColumnCommentMap().get(column.getColumnName());
+                    final UserColComments userColComments = synonym.getColumnCommentMap().get(column.getColumnName());
                     if (userColComments != null && userColComments.hasComments()) {
                         column.setColumnComment(userColComments.getComments());
                     }

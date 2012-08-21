@@ -78,6 +78,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                           =========
     protected boolean _suppressAdditionalSchema;
     protected boolean _suppressFilterByProperty;
+    protected boolean _suppressGenerationRestriction;
     protected boolean _suppressLogging;
     protected DataSource _procedureSynonymDataSource;
     protected DataSource _procedureToDBLinkDataSource;
@@ -107,8 +108,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * @throws SQLException
      */
     public Map<String, DfProcedureMeta> getAvailableProcedureMap(DataSource dataSource) throws SQLException {
-        final DfOutsideSqlProperties outsideSqlProperties = getOutsideSqlProperties();
-        if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
+        if (isQuitByGenerateProp()) {
             return newLinkedHashMap();
         }
         final List<DfProcedureMeta> procedureList = setupAvailableProcedureList(dataSource);
@@ -118,6 +118,14 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
 
         // arrange order (additional schema after main schema)
         return arrangeProcedureOrder(procedureHandilngMap);
+    }
+
+    protected boolean isQuitByGenerateProp() {
+        if (_suppressGenerationRestriction) {
+            return false;
+        }
+        final DfOutsideSqlProperties prop = getOutsideSqlProperties();
+        return !prop.isGenerateProcedureParameterBean();
     }
 
     protected List<DfProcedureMeta> setupAvailableProcedureList(DataSource dataSource) throws SQLException {
@@ -1027,6 +1035,10 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
 
     public void suppressFilterByProperty() {
         _suppressFilterByProperty = true;
+    }
+
+    public void suppressGenerationRestriction() {
+        _suppressGenerationRestriction = true;
     }
 
     public void suppressLogging() {
