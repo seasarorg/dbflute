@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
+import org.apache.torque.engine.database.model.Procedure;
 import org.apache.torque.engine.database.model.Sequence;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -116,6 +117,16 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //            ; sequenceComment = map:{ next = [comment] ; previous = [comment] }
     //        }
     //    }
+    //    ; procedureDiff = map:{
+    //        ; [procedure-name] = map:{
+    //            ; diffType = [ADD or CHANGE or DELETE]
+    //            ; unifiedSchemaDiff = map:{ next = [schema] ; previous = [schema] }
+    //            ; sourceLine = map:{ next = [value] ; previous = [value] }
+    //            ; sourceSize = map:{ next = [value] ; previous = [value] }
+    //            ; sourceHash = map:{ next = [value] ; previous = [value] }
+    //            ; procedureComment = map:{ next = [comment] ; previous = [comment] }
+    //        }
+    //    }
     //}
 
     // ===================================================================================
@@ -128,6 +139,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public static final String TABLE_DIFF_KEY = "tableDiff";
     public static final String SEQUENCE_DIFF_KEY = "sequenceDiff";
     public static final String KEYWORD_H2_SYSTEM_SEQUENCE = "SYSTEM_SEQUENCE";
+    public static final String PROCEDURE_DIFF_KEY = "procedureDiff";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -165,6 +177,22 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected final List<DfTableDiff> _changedTableDiffList = DfCollectionUtil.newArrayList();
     protected final List<DfTableDiff> _deletedTableDiffList = DfCollectionUtil.newArrayList();
 
+    // -----------------------------------------------------
+    //                                         Sequence Diff
+    //                                         -------------
+    protected final List<DfSequenceDiff> _sequenceDiffAllList = DfCollectionUtil.newArrayList();
+    protected final List<DfSequenceDiff> _addedSequenceDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfSequenceDiff> _changedSequenceDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfSequenceDiff> _deletedSequenceDiffList = DfCollectionUtil.newArrayList();
+
+    // -----------------------------------------------------
+    //                                         Procedure Diff
+    //                                         -------------
+    protected final List<DfProcedureDiff> _procedureDiffAllList = DfCollectionUtil.newArrayList();
+    protected final List<DfProcedureDiff> _addedProcedureDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfProcedureDiff> _changedProcedureDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfProcedureDiff> _deletedProcedureDiffList = DfCollectionUtil.newArrayList();
+
     protected List<NestDiffSetupper> _nestDiffList = DfCollectionUtil.newArrayList();
     {
         _nestDiffList.add(new NestDiffSetupper() {
@@ -193,15 +221,20 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 addSequenceDiff(createSequenceDiff(diff));
             }
         });
-    }
+        _nestDiffList.add(new NestDiffSetupper() {
+            public String propertyName() {
+                return PROCEDURE_DIFF_KEY;
+            }
 
-    // -----------------------------------------------------
-    //                                         Sequence Diff
-    //                                         -------------
-    protected final List<DfSequenceDiff> _sequenceDiffAllList = DfCollectionUtil.newArrayList();
-    protected final List<DfSequenceDiff> _addedSequenceDiffList = DfCollectionUtil.newArrayList();
-    protected final List<DfSequenceDiff> _changedSequenceDiffList = DfCollectionUtil.newArrayList();
-    protected final List<DfSequenceDiff> _deletedSequenceDiffList = DfCollectionUtil.newArrayList();
+            public List<? extends DfNestDiff> provide() {
+                return _procedureDiffAllList;
+            }
+
+            public void setup(Map<String, Object> diff) {
+                addProcedureDiff(createProcedureDiff(diff));
+            }
+        });
+    }
 
     // -----------------------------------------------------
     //                                             Meta Info
@@ -299,6 +332,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public void analyzeDiff() {
         processTable();
         processSequence();
+        processProcedure();
     }
 
     // ===================================================================================
@@ -1069,6 +1103,140 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     // ===================================================================================
+    //                                                                   Procedure Process
+    //                                                                   =================
+    protected void processProcedure() {
+        if (_previousDb.hasProcedureGroup() && _nextDb.hasProcedureGroup()) {
+            processAddedProcedure();
+            processChangedProcedure();
+            processDeletedProcedure();
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                 Added
+    //                                                 -----
+    protected void processAddedProcedure() {
+        final List<Procedure> procedureList = _nextDb.getProcedureList();
+        for (Procedure procedure : procedureList) {
+            final Procedure found = findPreviousProcedure(procedure);
+            if (found == null || !isSameProcedureName(procedure, found)) { // added
+                addProcedureDiff(DfProcedureDiff.createAdded(procedure.getUniqueName()));
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                               Changed
+    //                                               -------
+    protected void processChangedProcedure() {
+        final List<Procedure> procedureList = _nextDb.getProcedureList();
+        for (Procedure next : procedureList) {
+            final Procedure previous = findPreviousProcedure(next);
+            if (previous == null || !isSameProcedureName(next, previous)) {
+                continue;
+            }
+            // found
+            final DfProcedureDiff procedureDiff = DfProcedureDiff.createChanged(next.getUniqueName());
+
+            // procedure needs schema to be unique so comparing schema is non-sense here
+            //processUnifiedSchema(next, previous, procedureDiff);
+
+            // direct attributes
+            processSourceLine(next, previous, procedureDiff);
+            processSourceSize(next, previous, procedureDiff);
+            processSourceHash(next, previous, procedureDiff);
+            processProcedureComment(next, previous, procedureDiff);
+
+            if (procedureDiff.hasDiff()) { // changed
+                addProcedureDiff(procedureDiff);
+            }
+        }
+    }
+
+    protected void processSourceLine(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
+        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+            public String provide(Procedure obj) {
+                return DfTypeUtil.toString(obj.getSourceLine());
+            }
+
+            public void diff(DfProcedureDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setSourceLineDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processSourceSize(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
+        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+            public String provide(Procedure obj) {
+                return DfTypeUtil.toString(obj.getSourceSize());
+            }
+
+            public void diff(DfProcedureDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setSourceSizeDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processSourceHash(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
+        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+            public String provide(Procedure obj) {
+                return DfTypeUtil.toString(obj.getSourceHash());
+            }
+
+            public void diff(DfProcedureDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setSourceHashDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected void processProcedureComment(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
+        if (!_checkDbComment) {
+            return;
+        }
+        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+            public String provide(Procedure obj) {
+                return DfTypeUtil.toString(obj.getProcedureComment());
+            }
+
+            public void diff(DfProcedureDiff diff, DfNextPreviousDiff nextPreviousDiff) {
+                diff.setProcedureCommentDiff(nextPreviousDiff);
+            }
+        });
+    }
+
+    protected <TYPE> void diffNextPrevious(Procedure next, Procedure previous, DfProcedureDiff diff,
+            NextPreviousDiffer<Procedure, DfProcedureDiff, TYPE> differ) {
+        final TYPE nextValue = differ.provide(next);
+        final TYPE previousValue = differ.provide(previous);
+        if (!differ.isMatch(nextValue, previousValue)) {
+            final String nextDisp = differ.disp(nextValue, true);
+            final String previousDisp = differ.disp(previousValue, false);
+            differ.diff(diff, createNextPreviousDiff(nextDisp, previousDisp));
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                               Deleted
+    //                                               -------
+    protected void processDeletedProcedure() {
+        final List<Procedure> procedureList = _previousDb.getProcedureList();
+        for (Procedure procedure : procedureList) {
+            final Procedure found = findNextProcedure(procedure);
+            if (found == null || !isSameProcedureName(procedure, found)) { // deleted
+                addProcedureDiff(DfProcedureDiff.createDeleted(procedure.getUniqueName()));
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
+    protected boolean isSameProcedureName(Procedure next, Procedure previous) {
+        return isSame(next.getUniqueName(), previous.getUniqueName());
+    }
+
+    // ===================================================================================
     //                                                                         Find Object
     //                                                                         ===========
     protected Table findNextTable(Table table) {
@@ -1085,6 +1253,14 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     protected Sequence findPreviousSequence(Sequence sequence) {
         return _previousDb.getSequence(sequence.getUniqueName());
+    }
+
+    protected Procedure findNextProcedure(Procedure procedure) {
+        return _nextDb.getProcedure(procedure.getUniqueName());
+    }
+
+    protected Procedure findPreviousProcedure(Procedure procedure) {
+        return _previousDb.getProcedure(procedure.getUniqueName());
     }
 
     // ===================================================================================
@@ -1299,7 +1475,42 @@ public class DfSchemaDiff extends DfAbstractDiff {
         } else {
             String msg = "Unknown diff-type of sequence: ";
             msg = msg + " diffType=" + sequenceDiff.getDiffType();
-            msg = msg + " tableDiff=" + sequenceDiff;
+            msg = msg + " sequenceDiff=" + sequenceDiff;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                         Procedure Diff
+    //                                         -------------
+    public List<DfProcedureDiff> getProcedureDiffAllList() {
+        return _procedureDiffAllList;
+    }
+
+    public List<DfProcedureDiff> getAddedProcedureDiffList() {
+        return _addedProcedureDiffList;
+    }
+
+    public List<DfProcedureDiff> getChangedProcedureDiffList() {
+        return _changedProcedureDiffList;
+    }
+
+    public List<DfProcedureDiff> getDeletedProcedureDiffList() {
+        return _deletedProcedureDiffList;
+    }
+
+    public void addProcedureDiff(DfProcedureDiff procedureDiff) {
+        _procedureDiffAllList.add(procedureDiff);
+        if (procedureDiff.isAdded()) {
+            _addedProcedureDiffList.add(procedureDiff);
+        } else if (procedureDiff.isChanged()) {
+            _changedProcedureDiffList.add(procedureDiff);
+        } else if (procedureDiff.isDeleted()) {
+            _deletedProcedureDiffList.add(procedureDiff);
+        } else {
+            String msg = "Unknown diff-type of procedure: ";
+            msg = msg + " diffType=" + procedureDiff.getDiffType();
+            msg = msg + " procedureDiff=" + procedureDiff;
             throw new IllegalStateException(msg);
         }
     }

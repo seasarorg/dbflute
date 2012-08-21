@@ -159,14 +159,14 @@ public class Column {
     // -----------------------------------------------------
     //                                         Load from XML
     //                                         -------------
-    public boolean loadFromXML(Attributes attrib, XmlReadingFilter columnFilter) {
+    public boolean loadFromXML(Attributes attrib, XmlReadingFilter readingFilter) {
         // name
         _name = attrib.getValue("name"); // column name
         _javaName = attrib.getValue("javaName");
 
         final UnifiedSchema unifiedSchema = getTable().getUnifiedSchema();
         final String tableName = getTable().getName();
-        if (columnFilter != null && columnFilter.isColumnExcept(unifiedSchema, tableName, _name)) {
+        if (readingFilter != null && readingFilter.isColumnExcept(unifiedSchema, tableName, _name)) {
             return false;
         }
 

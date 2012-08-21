@@ -189,7 +189,7 @@ public class Table {
     /**
      * Load the table object from an XML tag.
      * @param attrib XML attributes. (NotNull)
-     * @param readingFilter The filter of table by name when reading XML. (NullAllowed)
+     * @param readingFilter The filter of object by name when reading XML. (NullAllowed)
      * @return Should be the table excepted?
      */
     public boolean loadFromXML(Attributes attrib, XmlReadingFilter readingFilter) {
@@ -496,13 +496,13 @@ public class Table {
     /**
      * A utility function to create a new column from attrib and add it to this table.
      * @param attrib xml attributes for the column to add
-     * @param columnFilter The filter of column. (NullAllowed)
+     * @param readingFilter The filter of column. (NullAllowed)
      * @return the added column (NullAllowed: if null, means the column was filtered)
      */
-    public Column addColumn(Attributes attrib, XmlReadingFilter columnFilter) {
+    public Column addColumn(Attributes attrib, XmlReadingFilter readingFilter) {
         Column col = new Column();
         col.setTable(this);
-        if (!col.loadFromXML(attrib, columnFilter)) {
+        if (!col.loadFromXML(attrib, readingFilter)) {
             return null;
         }
         addColumn(col);
@@ -2408,7 +2408,7 @@ public class Table {
     public boolean isUseIdentity() {
         final DfBasicProperties basicProperties = getBasicProperties();
 
-        // because serial type is treated as sequence 
+        // because serial type is treated as sequence
         if (basicProperties.isDatabasePostgreSQL()) {
             return false;
         }

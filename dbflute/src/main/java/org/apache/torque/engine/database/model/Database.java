@@ -154,6 +154,14 @@ public class Database {
     protected boolean _sequenceGroupMarked;
 
     // -----------------------------------------------------
+    //                                             Procedure
+    //                                             ---------
+    // same reason as table's reason
+    protected final List<Procedure> _procedureList = new ArrayList<Procedure>(100);
+    protected final StringKeyMap<Procedure> _procedureMap = StringKeyMap.createAsFlexible(); // for key-map
+    protected boolean _procedureGroupMarked;
+
+    // -----------------------------------------------------
     //                                         ParameterBean
     //                                         -------------
     /** The meta data of parameter bean. */
@@ -220,13 +228,13 @@ public class Database {
     /**
      * Add table from attributes of SchemaXML.
      * @param attrib The attributes of SchemaXML. (NotNull)
-     * @param tableFilter The filter of table. (NullAllowed)
-     * @return The instance of added table. (NullAllowed: if null, means the table was filtered) 
+     * @param readingFilter The filter of object. (NullAllowed)
+     * @return The instance of added table. (NullAllowed: if null, means the table was filtered)
      */
-    public Table addTable(Attributes attrib, XmlReadingFilter tableFilter) {
+    public Table addTable(Attributes attrib, XmlReadingFilter readingFilter) {
         final Table tbl = new Table();
         tbl.setDatabase(this);
-        if (!tbl.loadFromXML(attrib, tableFilter)) {
+        if (!tbl.loadFromXML(attrib, readingFilter)) {
             return null;
         }
         addTable(tbl);
@@ -327,7 +335,7 @@ public class Database {
     // -----------------------------------------------------
     //                                         Determination
     //                                         -------------
-    public boolean hasTableComment() { // means resolved comment (not plain) 
+    public boolean hasTableComment() { // means resolved comment (not plain)
         for (Table table : getTableList()) {
             if (table.hasComment()) {
                 return true;
@@ -355,10 +363,10 @@ public class Database {
         return _sequenceMap.get(sequenceUniqueName);
     }
 
-    public Sequence addSequence(Attributes attrib, XmlReadingFilter tableFilter) {
+    public Sequence addSequence(Attributes attrib, XmlReadingFilter readingFilter) {
         final Sequence seq = new Sequence();
         seq.setDatabase(this);
-        if (!seq.loadFromXML(attrib, tableFilter)) {
+        if (!seq.loadFromXML(attrib, readingFilter)) {
             return null;
         }
         addSequence(seq);
@@ -493,6 +501,38 @@ public class Database {
     // -----------------------------------------------------
     //                                             Procedure
     //                                             ---------
+    public void markProcedureGroup() {
+        _procedureGroupMarked = true;
+    }
+
+    public boolean hasProcedureGroup() {
+        return _procedureGroupMarked;
+    }
+
+    public List<Procedure> getProcedureList() {
+        return _procedureList;
+    }
+
+    public Procedure getProcedure(String procedureUniqueName) {
+        return _procedureMap.get(procedureUniqueName);
+    }
+
+    public Procedure addProcedure(Attributes attrib, XmlReadingFilter readingFilter) {
+        final Procedure procedure = new Procedure();
+        procedure.setDatabase(this);
+        if (!procedure.loadFromXML(attrib, readingFilter)) {
+            return null;
+        }
+        addProcedure(procedure);
+        return procedure;
+    }
+
+    public void addProcedure(Procedure procedure) {
+        procedure.setDatabase(this);
+        _procedureList.add(procedure);
+        _procedureMap.put(procedure.getUniqueName(), procedure);
+    }
+
     public boolean isPmbMetaDataForProcedure(String className) {
         return getPmbBasicHandler().isForProcedure(className);
     }
@@ -955,7 +995,7 @@ public class Database {
             if (logging) {
                 _log.info("...Making directories for documentOutputDirectory: " + dir);
             }
-            dir.mkdirs(); // because this directory is NOT user setting basically 
+            dir.mkdirs(); // because this directory is NOT user setting basically
         }
         getGeneratorInstance().setOutputPath(outputDirectory);
     }
@@ -966,7 +1006,7 @@ public class Database {
         final File dir = new File(outputDirectory);
         if (!dir.exists()) {
             _log.info("...Making directories for migrationOutputDirectory: " + dir);
-            dir.mkdirs(); // because this directory is NOT user setting basically 
+            dir.mkdirs(); // because this directory is NOT user setting basically
         }
         getGeneratorInstance().setOutputPath(outputDirectory);
     }
@@ -1022,7 +1062,7 @@ public class Database {
 
     // /- - - - - - - - - - - - - - - - - - - - - - - -
     // basically return types of property methods are
-    // String or boolean or List (not Number and Date) 
+    // String or boolean or List (not Number and Date)
     // because Velocity templates use them.
     // - - - - - - - - - -/
 
@@ -2193,7 +2233,7 @@ public class Database {
     // -----------------------------------------------------
     //                                   AllCommon Component
     //                                   -------------------
-    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     // These methods for all-common components are used when it needs to identity their components.
     // For example when the DI container is Seasar, These methods are not used
     // because S2Container has name-space in the DI architecture.

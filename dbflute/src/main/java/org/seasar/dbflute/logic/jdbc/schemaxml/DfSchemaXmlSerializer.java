@@ -39,6 +39,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfForeignKeyExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfIndexExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfUniqueKeyExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor;
@@ -50,6 +51,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.identity.factory.DfIdentityExtract
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
@@ -126,7 +128,8 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
-    protected boolean _suppressAdditionalSchema;
+    protected boolean _suppressExceptTarget; // already reflected to regular handlers
+    protected boolean _suppressAdditionalSchema; // to check in processes related to additional schema
 
     // ===================================================================================
     //                                                                         Constructor
@@ -176,17 +179,20 @@ public class DfSchemaXmlSerializer {
      */
     public static DfSchemaXmlSerializer createAsManage(DataSource dataSource, UnifiedSchema mainSchema,
             String schemaXml, String historyFile) {
-        DfSchemaXmlSerializer serializer = new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
+        final DfSchemaXmlSerializer serializer = new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml,
+                historyFile);
         return serializer.suppressExceptTarget().suppressAdditionalSchema();
     }
 
     protected DfSchemaXmlSerializer suppressExceptTarget() {
+        // contains non-generated tables and procedures
         _tableExtractor.suppressExceptTarget();
         _columnExtractor.suppressExceptTarget();
         _uniqueKeyExtractor.suppressExceptTarget();
         _indexExtractor.suppressExceptTarget();
         _foreignKeyExtractor.suppressExceptTarget();
         _autoIncrementExtractor.suppressExceptTarget();
+        _suppressExceptTarget = true;
         return this;
     }
 
@@ -313,6 +319,10 @@ public class DfSchemaXmlSerializer {
         }
 
         processSequence(conn, metaData);
+
+        if (isProcedureMetaEnabled()) {
+            processProcedure(conn, metaData);
+        }
 
         _doc.appendChild(_databaseNode);
     }
@@ -585,9 +595,6 @@ public class DfSchemaXmlSerializer {
 
     protected Map<String, DfSequenceMeta> extractSequenceMap() {
         final DfSequenceExtractorFactory factory = createSequenceExtractorFactory(_dataSource);
-        if (_suppressAdditionalSchema) {
-            factory.suppressAdditionalSchema();
-        }
         final DfSequenceExtractor sequenceExtractor = factory.createSequenceExtractor();
         Map<String, DfSequenceMeta> sequenceMap = null;
         if (sequenceExtractor != null) {
@@ -602,7 +609,12 @@ public class DfSchemaXmlSerializer {
 
     protected DfSequenceExtractorFactory createSequenceExtractorFactory(DataSource dataSource) {
         final DfDatabaseTypeFacadeProp facadeProp = getProperties().getBasicProperties().getDatabaseTypeFacadeProp();
-        return new DfSequenceExtractorFactory(dataSource, facadeProp, getDatabaseProperties());
+        final DfDatabaseProperties databaseProp = getDatabaseProperties();
+        final DfSequenceExtractorFactory factory = new DfSequenceExtractorFactory(dataSource, facadeProp, databaseProp);
+        if (_suppressAdditionalSchema) {
+            factory.suppressAdditionalSchema();
+        }
+        return factory;
     }
 
     protected void doProcessSequence(Element sequenceGroupElement, final DfSequenceMeta sequenceMeta) {
@@ -625,6 +637,78 @@ public class DfSchemaXmlSerializer {
         if (number != null) {
             tableElement.setAttribute(key, DfTypeUtil.toString(number));
         }
+    }
+
+    // -----------------------------------------------------
+    //                                             Procedure
+    //                                             ---------
+    protected boolean isProcedureMetaEnabled() {
+        return getDocumentProperties().isCheckProcedureDiff();
+    }
+
+    protected void processProcedure(Connection conn, DatabaseMetaData metaData) throws SQLException {
+        final Map<String, DfProcedureMeta> procedureMap = extractProcedureMap();
+        if (procedureMap == null) {
+            return;
+        }
+        _log.info("...Processing procedures: " + procedureMap.size());
+        final Element procedureGroupElement = _doc.createElement("procedureGroup");
+        for (Entry<String, DfProcedureMeta> entry : procedureMap.entrySet()) {
+            final DfProcedureMeta procedureMeta = entry.getValue();
+            doProcessProcedure(procedureGroupElement, procedureMeta);
+        }
+        _databaseNode.appendChild(procedureGroupElement);
+    }
+
+    protected Map<String, DfProcedureMeta> extractProcedureMap() {
+        final DfProcedureExtractor procedureExtractor = createProcedureExtractor();
+        Map<String, DfProcedureMeta> procedureMap = null;
+        try {
+            procedureMap = procedureExtractor.getAvailableProcedureMap(_dataSource);
+        } catch (SQLException continued) { // because of supplement
+            _log.info("*Failed to get procedure map: " + continued.getMessage());
+        } catch (RuntimeException continued) { // because of supplement
+            _log.info("*Failed to get procedure map: " + continued.getMessage());
+        }
+        return procedureMap;
+    }
+
+    protected DfProcedureExtractor createProcedureExtractor() {
+        final DfProcedureExtractor extractor = new DfProcedureExtractor();
+        if (_suppressExceptTarget) {
+            extractor.suppressFilterByProperty();
+        }
+        if (_suppressAdditionalSchema) {
+            extractor.suppressAdditionalSchema();
+        }
+        return extractor;
+    }
+
+    protected void doProcessProcedure(Element procedureGroupElement, final DfProcedureMeta procedureMeta) {
+        final Element procedureElement = _doc.createElement("procedure");
+        procedureElement.setAttribute("name", procedureMeta.getProcedureName());
+        final UnifiedSchema unifiedSchema = procedureMeta.getProcedureSchema();
+        if (unifiedSchema.hasSchema()) {
+            procedureElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
+        }
+        // -1 means no data for the future (2012/08/20)
+        final String sourceLine = "-1";
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceLine)) {
+            procedureElement.setAttribute("sourceLine", sourceLine);
+        }
+        final String sourceSize = "-1";
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceSize)) {
+            procedureElement.setAttribute("sourceSize", sourceSize);
+        }
+        final String sourceHash = "-1";
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceHash)) {
+            procedureElement.setAttribute("sourceHash", sourceHash);
+        }
+        final String procedureComment = procedureMeta.getProcedureComment();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureComment)) {
+            procedureElement.setAttribute("procedureComment", procedureComment);
+        }
+        procedureGroupElement.appendChild(procedureElement);
     }
 
     // ===================================================================================
@@ -792,7 +876,7 @@ public class DfSchemaXmlSerializer {
             //  B: FOO table, BAR synonym to A's FOO table
             // BAR synonym's columns are from both A and B's FOO table.
             // (means that BAR synonym has other table's columns)
-            // Why? my friend, the Oracle JDBC Driver! 
+            // Why? my friend, the Oracle JDBC Driver!
             // - - - - - - - - - -/
             final StringSet columnSet = StringSet.createAsCaseInsensitive();
             for (DfColumnMeta columnMeta : metaInfoList) {

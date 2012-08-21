@@ -122,7 +122,7 @@ public class XmlToAppData extends DefaultHandler {
     /**
      * Creates a new instance for the specified database type.
      * @param databaseType The type of database for the application.
-     * @param readingFilter The filter of table by name when reading XML. (NullAllowed)
+     * @param readingFilter The filter of object by name when reading XML. (NullAllowed)
      */
     public XmlToAppData(String databaseType, XmlReadingFilter readingFilter) {
         _appData = new AppData(databaseType);
@@ -136,6 +136,8 @@ public class XmlToAppData extends DefaultHandler {
         boolean isColumnExcept(UnifiedSchema unifiedSchema, String tableName, String columnName);
 
         boolean isSequenceExcept(UnifiedSchema unifiedSchema, String sequenceName);
+
+        boolean isProcedureExcept(UnifiedSchema unifiedSchema, String procedureName);
     }
 
     // ===================================================================================
@@ -243,6 +245,12 @@ public class XmlToAppData extends DefaultHandler {
             } else if (rawName.equals("sequence")) { // may contain additional schema's sequences
                 clearCurrentElements();
                 _currentDB.addSequence(attributes, _readingFilter);
+            } else if (rawName.equals("procedureGroup")) {
+                clearCurrentElements();
+                _currentDB.markProcedureGroup();
+            } else if (rawName.equals("procedure")) { // may contain additional schema's procedures
+                clearCurrentElements();
+                _currentDB.addProcedure(attributes, _readingFilter);
             }
             if (_currentTable != null) { // check because the table may be filtered
                 // handle table elements

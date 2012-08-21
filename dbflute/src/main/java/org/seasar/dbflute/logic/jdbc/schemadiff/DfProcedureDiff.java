@@ -6,10 +6,11 @@ import java.util.Map;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
+ * @author awaawa
  * @author jflute
  * @since 0.9.9.7F (2012/08/20 Monday)
  */
-public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
+public class DfProcedureDiff extends DfAbstractDiff implements DfNestDiff {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -17,17 +18,17 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
-    protected final String _sequenceUniqueName;
+    protected final String _procedureUniqueName;
     protected final DfDiffType _diffType;
 
     // -----------------------------------------------------
     //                                             Diff Item
     //                                             ---------
     protected DfNextPreviousDiff _unifiedSchemaDiff;
-    protected DfNextPreviousDiff _minimumValueDiff;
-    protected DfNextPreviousDiff _maximumValueDiff;
-    protected DfNextPreviousDiff _incrementSizeDiff;
-    protected DfNextPreviousDiff _sequenceCommentDiff;
+    protected DfNextPreviousDiff _sourceLineDiff;
+    protected DfNextPreviousDiff _sourceSizeDiff;
+    protected DfNextPreviousDiff _sourceHashDiff;
+    protected DfNextPreviousDiff _procedureCommentDiff;
 
     protected List<NextPreviousHandler> _nextPreviousItemList = DfCollectionUtil.newArrayList();
     {
@@ -44,59 +45,77 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
                 return _unifiedSchemaDiff;
             }
 
-            public void restore(Map<String, Object> sequenceDiffMap) {
-                _unifiedSchemaDiff = restoreNextPreviousDiff(sequenceDiffMap, propertyName());
+            public void restore(Map<String, Object> procedureDiffMap) {
+                _unifiedSchemaDiff = restoreNextPreviousDiff(procedureDiffMap, propertyName());
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
-                return "Minimum Value";
+                return "SourceLine";
             }
 
             public String propertyName() {
-                return "minimumValueDiff";
+                return "sourceLineDiff";
             }
 
             public DfNextPreviousDiff provide() {
-                return _minimumValueDiff;
+                return _sourceLineDiff;
             }
 
-            public void restore(Map<String, Object> sequenceDiffMap) {
-                _minimumValueDiff = restoreNextPreviousDiff(sequenceDiffMap, propertyName());
+            @Override
+            protected Map<String, String> createSavedNextPreviousDiffMap() {
+                return provide().createNextPreviousDiffQuotedMap();
+            }
+
+            public void restore(Map<String, Object> procedureDiffMap) {
+                _sourceLineDiff = restoreNextPreviousDiffUnquote(procedureDiffMap, propertyName());
+                quoteDispIfNeeds();
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
-                return "Maximum Value";
+                return "SourceSize";
             }
 
             public String propertyName() {
-                return "maximumValueDiff";
+                return "sourceSizeDiff";
             }
 
             public DfNextPreviousDiff provide() {
-                return _maximumValueDiff;
+                return _sourceSizeDiff;
             }
 
-            public void restore(Map<String, Object> sequenceDiffMap) {
-                _maximumValueDiff = restoreNextPreviousDiff(sequenceDiffMap, propertyName());
+            @Override
+            protected Map<String, String> createSavedNextPreviousDiffMap() {
+                return provide().createNextPreviousDiffQuotedMap();
+            }
+
+            public void restore(Map<String, Object> procedureDiffMap) {
+                _sourceSizeDiff = restoreNextPreviousDiffUnquote(procedureDiffMap, propertyName());
+                quoteDispIfNeeds();
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandlerBase() {
             public String titleName() {
-                return "Increment Size";
+                return "SourceHash";
             }
 
             public String propertyName() {
-                return "incrementSizeDiff";
+                return "sourceHashDiff";
             }
 
             public DfNextPreviousDiff provide() {
-                return _incrementSizeDiff;
+                return _sourceHashDiff;
             }
 
-            public void restore(Map<String, Object> sequenceDiffMap) {
-                _incrementSizeDiff = restoreNextPreviousDiff(sequenceDiffMap, propertyName());
+            @Override
+            protected Map<String, String> createSavedNextPreviousDiffMap() {
+                return provide().createNextPreviousDiffQuotedMap();
+            }
+
+            public void restore(Map<String, Object> procedureDiffMap) {
+                _sourceHashDiff = restoreNextPreviousDiffUnquote(procedureDiffMap, propertyName());
+                quoteDispIfNeeds();
             }
         });
         _nextPreviousItemList.add(new NextPreviousHandlerBase() {
@@ -105,11 +124,11 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
             }
 
             public String propertyName() {
-                return "sequenceCommentDiff";
+                return "procedureCommentDiff";
             }
 
             public DfNextPreviousDiff provide() {
-                return _sequenceCommentDiff;
+                return _procedureCommentDiff;
             }
 
             @Override
@@ -117,8 +136,8 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
                 return provide().createNextPreviousDiffQuotedMap();
             }
 
-            public void restore(Map<String, Object> sequenceDiffMap) {
-                _sequenceCommentDiff = restoreNextPreviousDiffUnquote(sequenceDiffMap, propertyName());
+            public void restore(Map<String, Object> procedureDiffMap) {
+                _procedureCommentDiff = restoreNextPreviousDiffUnquote(procedureDiffMap, propertyName());
                 quoteDispIfNeeds();
             }
         });
@@ -127,50 +146,50 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfSequenceDiff(String sequenceUniqueName, DfDiffType diffType) {
-        _sequenceUniqueName = sequenceUniqueName;
+    protected DfProcedureDiff(String procedureUniqueName, DfDiffType diffType) {
+        _procedureUniqueName = procedureUniqueName;
         _diffType = diffType;
     }
 
-    protected DfSequenceDiff(Map<String, Object> sequenceDiffMap) {
-        _sequenceUniqueName = (String) sequenceDiffMap.get("sequenceName"); // it's a unique name
-        assertSequenceNameExists(_sequenceUniqueName, sequenceDiffMap);
-        _diffType = DfDiffType.valueOf((String) sequenceDiffMap.get("diffType"));
-        assertDiffTypeExists(_sequenceUniqueName, sequenceDiffMap, _diffType);
-        acceptDiffMap(sequenceDiffMap);
+    protected DfProcedureDiff(Map<String, Object> procedureDiffMap) {
+        _procedureUniqueName = (String) procedureDiffMap.get("procedureName"); // it's a unique name
+        assertProcedureNameExists(_procedureUniqueName, procedureDiffMap);
+        _diffType = DfDiffType.valueOf((String) procedureDiffMap.get("diffType"));
+        assertDiffTypeExists(_procedureUniqueName, procedureDiffMap, _diffType);
+        acceptDiffMap(procedureDiffMap);
     }
 
-    protected void assertSequenceNameExists(String sequenceUniqueName, Map<String, Object> sequenceDiffMap) {
-        if (sequenceUniqueName == null) { // basically no way
-            String msg = "The sequenceUniqueName is required in sequence diff-map:";
-            msg = msg + " sequenceDiffMap=" + sequenceDiffMap;
+    protected void assertProcedureNameExists(String procedureUniqueName, Map<String, Object> procedureDiffMap) {
+        if (procedureUniqueName == null) { // basically no way
+            String msg = "The procedureUniqueName is required in procedure diff-map:";
+            msg = msg + " procedureDiffMap=" + procedureDiffMap;
             throw new IllegalStateException(msg);
         }
     }
 
-    protected void assertDiffTypeExists(String sequenceUniqueName, Map<String, Object> sequenceDiffMap,
+    protected void assertDiffTypeExists(String procedureUniqueName, Map<String, Object> procedureDiffMap,
             DfDiffType diffType) {
         if (diffType == null) { // basically no way
-            String msg = "The diffType is required in sequence diff-map:";
-            msg = msg + " sequence=" + sequenceUniqueName + " sequenceDiffMap=" + sequenceDiffMap;
+            String msg = "The diffType is required in procedure diff-map:";
+            msg = msg + " procedure=" + procedureUniqueName + " procedureDiffMap=" + procedureDiffMap;
             throw new IllegalStateException(msg);
         }
     }
 
-    public static DfSequenceDiff createAdded(String sequenceName) {
-        return new DfSequenceDiff(sequenceName, DfDiffType.ADD);
+    public static DfProcedureDiff createAdded(String procedureName) {
+        return new DfProcedureDiff(procedureName, DfDiffType.ADD);
     }
 
-    public static DfSequenceDiff createChanged(String sequenceName) {
-        return new DfSequenceDiff(sequenceName, DfDiffType.CHANGE);
+    public static DfProcedureDiff createChanged(String procedureName) {
+        return new DfProcedureDiff(procedureName, DfDiffType.CHANGE);
     }
 
-    public static DfSequenceDiff createDeleted(String sequenceName) {
-        return new DfSequenceDiff(sequenceName, DfDiffType.DELETE);
+    public static DfProcedureDiff createDeleted(String procedureName) {
+        return new DfProcedureDiff(procedureName, DfDiffType.DELETE);
     }
 
-    public static DfSequenceDiff createFromDiffMap(Map<String, Object> sequenceDiffMap) {
-        return new DfSequenceDiff(sequenceDiffMap);
+    public static DfProcedureDiff createFromDiffMap(Map<String, Object> procedureDiffMap) {
+        return new DfProcedureDiff(procedureDiffMap);
     }
 
     // ===================================================================================
@@ -178,7 +197,7 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
     //                                                                            ========
     public Map<String, Object> createDiffMap() {
         final Map<String, Object> diffMap = DfCollectionUtil.newLinkedHashMap();
-        diffMap.put("sequenceName", _sequenceUniqueName);
+        diffMap.put("procedureName", _procedureUniqueName);
         diffMap.put("diffType", _diffType.toString());
         final List<NextPreviousHandler> nextPreviousItemList = _nextPreviousItemList;
         for (NextPreviousHandler handler : nextPreviousItemList) {
@@ -217,20 +236,20 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
     //                                                 Basic
     //                                                 -----
     public String getKeyName() {
-        return _sequenceUniqueName;
+        return _procedureUniqueName;
     }
 
-    public String getSequenceName() {
-        return _sequenceUniqueName != null ? _sequenceUniqueName : "";
+    public String getProcedureName() {
+        return _procedureUniqueName != null ? _procedureUniqueName : "";
     }
 
-    public String getLowerSequenceName() {
-        return getSequenceName().toLowerCase();
+    public String getLowerProcedureName() {
+        return getProcedureName().toLowerCase();
     }
 
-    public String getSequenceDispName() {
-        // no filter about upper case because no property for sequence
-        return getSequenceName();
+    public String getProcedureDispName() {
+        // no filter about upper case because no property for procedure
+        return getProcedureName();
     }
 
     public DfDiffType getDiffType() {
@@ -276,51 +295,51 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
         _unifiedSchemaDiff = unifiedSchemaDiff;
     }
 
-    public boolean hasMinimumValueDiff() {
-        return _minimumValueDiff != null;
+    public boolean hasSourceLineDiff() {
+        return _sourceLineDiff != null;
     }
 
-    public DfNextPreviousDiff getMinimumValueDiff() {
-        return _minimumValueDiff;
+    public DfNextPreviousDiff getSourceLineDiff() {
+        return _sourceLineDiff;
     }
 
-    public void setMinimumValueDiff(DfNextPreviousDiff minimumValueDiff) {
-        _minimumValueDiff = minimumValueDiff;
+    public void setSourceLineDiff(DfNextPreviousDiff sourceLineDiff) {
+        _sourceLineDiff = sourceLineDiff;
     }
 
-    public boolean hasMaximumValueDiff() {
-        return _maximumValueDiff != null;
+    public boolean hasSourceSizeDiff() {
+        return _sourceSizeDiff != null;
     }
 
-    public DfNextPreviousDiff getMaximumValueDiff() {
-        return _maximumValueDiff;
+    public DfNextPreviousDiff getSourceSizeDiff() {
+        return _sourceSizeDiff;
     }
 
-    public void setMaximumValueDiff(DfNextPreviousDiff maximumValueDiff) {
-        _maximumValueDiff = maximumValueDiff;
+    public void setSourceSizeDiff(DfNextPreviousDiff sourceSizeDiff) {
+        _sourceSizeDiff = sourceSizeDiff;
     }
 
-    public boolean hasIncrementSizeDiff() {
-        return _incrementSizeDiff != null;
+    public boolean hasSourceHashDiff() {
+        return _sourceHashDiff != null;
     }
 
-    public DfNextPreviousDiff getIncrementSizeDiff() {
-        return _incrementSizeDiff;
+    public DfNextPreviousDiff getSourceHashDiff() {
+        return _sourceHashDiff;
     }
 
-    public void setIncrementSizeDiff(DfNextPreviousDiff incrementSizeDiff) {
-        _incrementSizeDiff = incrementSizeDiff;
+    public void setSourceHashDiff(DfNextPreviousDiff sourceHashDiff) {
+        _sourceHashDiff = sourceHashDiff;
     }
 
-    public boolean hasSequenceCommentDiff() {
-        return _sequenceCommentDiff != null;
+    public boolean hasProcedureCommentDiff() {
+        return _procedureCommentDiff != null;
     }
 
-    public DfNextPreviousDiff getSequenceCommentDiff() {
-        return _sequenceCommentDiff;
+    public DfNextPreviousDiff getProcedureCommentDiff() {
+        return _procedureCommentDiff;
     }
 
-    public void setSequenceCommentDiff(DfNextPreviousDiff sequenceCommentDiff) {
-        _sequenceCommentDiff = sequenceCommentDiff;
+    public void setProcedureCommentDiff(DfNextPreviousDiff procedureCommentDiff) {
+        _procedureCommentDiff = procedureCommentDiff;
     }
 }

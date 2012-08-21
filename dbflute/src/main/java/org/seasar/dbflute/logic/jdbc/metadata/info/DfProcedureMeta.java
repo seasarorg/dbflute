@@ -7,6 +7,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -38,9 +39,14 @@ public class DfProcedureMeta {
     // ===================================================================================
     //                                                                          Expression
     //                                                                          ==========
+    public String getProcedureDisplayName() {
+        return buildProcedureSqlName();
+    }
+
     public String getProcedureDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(buildProcedureSqlName());
+        sb.append(getProcedureDisplayName());
+
         final String typeDisp = _procedureType.alias() + (_procedureSynonym ? ", Synonym" : "");
         sb.append(" <span class=\"type\">(").append(typeDisp).append(")</span>");
         return sb.toString();
@@ -51,7 +57,7 @@ public class DfProcedureMeta {
     }
 
     public String getProcedureCommentForSchemaHtml() {
-        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        final DfDocumentProperties prop = getDocumentProperties();
         String comment = _procedureComment;
         comment = prop.resolvePreTextForSchemaHtml(comment);
         return comment;
@@ -76,7 +82,7 @@ public class DfProcedureMeta {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_procedureSqlName)) {
             return _procedureSqlName;
         }
-        final DfBasicProperties prop = DfBuildProperties.getInstance().getBasicProperties();
+        final DfBasicProperties prop = getBasicProperties();
         final String sqlName = getProcedureSchema().buildSqlName(getProcedureName());
         if (prop.isDatabaseDB2() && !sqlName.contains(".")) { // patch
             // DB2 needs schema prefix for calling procedures
@@ -166,7 +172,15 @@ public class DfProcedureMeta {
     }
 
     protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
+        return getProperties().getBasicProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

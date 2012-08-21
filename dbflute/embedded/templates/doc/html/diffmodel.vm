@@ -127,7 +127,7 @@ ${database.historyHtmlJavaScriptEmbedded}
 		<li><a href="./${selector.schemaHtmlFileName}#${tableDiff.lowerTableName}">${tableDiff.tableDispName}</a></li>
 #else
 		<li>${tableDiff.tableDispName}</li>
-#end 
+#end
 #end
 	</ul>
 #end
@@ -203,6 +203,36 @@ ${database.historyHtmlJavaScriptEmbedded}
 	<ul class="table-content">
 #foreach ($sequenceDiff in $schemaDiff.deletedSequenceDiffList)
 		<li>${sequenceDiff.sequenceDispName}</li>
+#end
+	</ul>
+#end
+#if (!$schemaDiff.addedProcedureDiffList.isEmpty())
+	<h3>Add Procedure</h3>
+	<ul class="table-content">
+#foreach ($procedureDiff in $schemaDiff.addedProcedureDiffList)
+		<li>${procedureDiff.procedureDispName}</li>
+#end
+	</ul>
+#end
+#if (!$schemaDiff.changedProcedureDiffList.isEmpty())
+	<h3>Change Procedure</h3>
+	<div class="table-content">
+#foreach ($procedureDiff in $schemaDiff.changedProcedureDiffList)
+		<h4>${procedureDiff.procedureDispName}</h4>
+		<div class="change-table-content">
+#foreach ($handler in $procedureDiff.nextPreviousDiffList)
+			<h5>$handler.titleName()</h5>
+			<div class="column-content">$handler.provide().displayForHtml</div>
+#end
+		</div>
+#end
+	</div>
+#end
+#if (!$schemaDiff.deletedProcedureDiffList.isEmpty())
+	<h3>Delete Procedure</h3>
+	<ul class="table-content">
+#foreach ($procedureDiff in $schemaDiff.deletedProcedureDiffList)
+		<li>${procedureDiff.procedureDispName}</li>
 #end
 	</ul>
 #end

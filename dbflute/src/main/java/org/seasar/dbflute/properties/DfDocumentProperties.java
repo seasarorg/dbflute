@@ -383,6 +383,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isCheckDbCommentDiff", false, getDocumentDefinitionMap());
     }
 
+    public boolean isCheckProcedureDiff() {
+        return isProperty("isCheckProcedureDiff", false, getDocumentDefinitionMap());
+    }
+
     // -----------------------------------------------------
     //                                           Style Sheet
     //                                           -----------

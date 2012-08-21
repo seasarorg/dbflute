@@ -353,6 +353,7 @@ public class DfTableDiff extends DfAbstractDiff implements DfNestDiff {
         // An implementation for the display name option is so easy here.
         // The best way is to save display names on a DiffMap file,
         // but DiffMap files are looked directly by human at AlterCheck and so on.
+        // (now, AlterCheck has HTML for its result but no action about this)
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         return prop.filterTableDispNameIfNeeds(getTableName());
     }

@@ -28,7 +28,7 @@ public class DfSchemaXmlReader {
     //                                                                           =========
     protected final String _schemaXml;
     protected final String _databaseType;
-    protected final XmlReadingFilter _tableFilter;
+    protected final XmlReadingFilter _readingFilter;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -36,12 +36,12 @@ public class DfSchemaXmlReader {
     /**
      * @param schemaXml The path of SchemaXML file relative to DBFlute client. (NotNull)
      * @param databaseType The type of database for the application.
-     * @param tableFilter The filter of table by name when reading XML. (NullAllowed)
+     * @param readingFilter The filter of object by name when reading XML. (NullAllowed)
      */
-    protected DfSchemaXmlReader(String schemaXml, String databaseType, XmlReadingFilter tableFilter) {
+    protected DfSchemaXmlReader(String schemaXml, String databaseType, XmlReadingFilter readingFilter) {
         _schemaXml = schemaXml;
         _databaseType = databaseType;
-        _tableFilter = tableFilter;
+        _readingFilter = readingFilter;
     }
 
     public static DfSchemaXmlReader createAsCoreToGenerate() {
@@ -53,22 +53,22 @@ public class DfSchemaXmlReader {
         return doCreateAsCoreTo(null);
     }
 
-    public static DfSchemaXmlReader doCreateAsCoreTo(DfGenetateXmlReadingFilter tableFilter) {
+    public static DfSchemaXmlReader doCreateAsCoreTo(DfGenetateXmlReadingFilter readingFilter) {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
         final String schemaXml = facadeProp.getProejctSchemaXMLFile();
-        return doCreateAs(schemaXml, tableFilter);
+        return doCreateAs(schemaXml, readingFilter);
     }
 
     public static DfSchemaXmlReader createAsFlexibleToManage(String schemaXml) {
         return doCreateAs(schemaXml, null);
     }
 
-    public static DfSchemaXmlReader doCreateAs(String schemaXml, DfGenetateXmlReadingFilter tableFilter) {
+    public static DfSchemaXmlReader doCreateAs(String schemaXml, DfGenetateXmlReadingFilter readingFilter) {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfDatabaseTypeFacadeProp facadeProp = basicProp.getDatabaseTypeFacadeProp();
         final String databaseType = facadeProp.getTargetDatabase();
-        return new DfSchemaXmlReader(schemaXml, databaseType, tableFilter);
+        return new DfSchemaXmlReader(schemaXml, databaseType, readingFilter);
     }
 
     protected static class DfGenetateXmlReadingFilter implements XmlReadingFilter {
@@ -114,16 +114,20 @@ public class DfSchemaXmlReader {
         public boolean isSequenceExcept(UnifiedSchema unifiedSchema, String sequenceName) {
             return false; // fixed (for the future)
         }
+
+        public boolean isProcedureExcept(UnifiedSchema unifiedSchema, String procedureName) {
+            return false; // fixed (for the future)
+        }
     }
 
     /**
      * @param schemaXml The path of SchemaXML file relative to DBFlute client. (NotNull)
      * @param databaseType The type of database for the application.
-     * @param tableFilter The filter of table by name when reading XML. (NullAllowed)
+     * @param readingFilter The filter of object by name when reading XML. (NullAllowed)
      * @return The instance of this. (NotNull)
      */
-    public static DfSchemaXmlReader createAsPlain(String schemaXml, String databaseType, XmlReadingFilter tableFilter) {
-        return new DfSchemaXmlReader(schemaXml, databaseType, tableFilter);
+    public static DfSchemaXmlReader createAsPlain(String schemaXml, String databaseType, XmlReadingFilter readingFilter) {
+        return new DfSchemaXmlReader(schemaXml, databaseType, readingFilter);
     }
 
     // ===================================================================================
@@ -168,7 +172,7 @@ public class DfSchemaXmlReader {
     }
 
     protected XmlToAppData createXmlToAppData() {
-        return new XmlToAppData(_databaseType, _tableFilter);
+        return new XmlToAppData(_databaseType, _readingFilter);
     }
 
     // ===================================================================================

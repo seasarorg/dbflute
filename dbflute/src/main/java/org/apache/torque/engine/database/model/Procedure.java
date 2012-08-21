@@ -60,10 +60,11 @@ import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter
 import org.xml.sax.Attributes;
 
 /**
+ * @author awaawa
  * @author jflute
  * @since 0.9.9.7F (2012/08/20 Monday)
  */
-public class Sequence {
+public class Procedure {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -71,10 +72,10 @@ public class Sequence {
     protected Database _database;
     protected String _name;
     protected UnifiedSchema _unifiedSchema;
-    protected BigDecimal _minimumValue;
-    protected BigDecimal _maximumValue;
-    protected Integer _incrementSize;
-    protected String _sequenceComment; // for the future (2012/08/18)
+    protected BigDecimal _sourceLine;
+    protected BigDecimal _sourceSize;
+    protected BigDecimal _sourceHash;
+    protected String _procedureComment;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -83,32 +84,33 @@ public class Sequence {
     //                                         Load from XML
     //                                         -------------
     public boolean loadFromXML(Attributes attrib, XmlReadingFilter readingFilter) {
-        _name = attrib.getValue("name"); // sequence name
+        _name = attrib.getValue("name"); // procedure name
         _unifiedSchema = UnifiedSchema.createAsDynamicSchema(attrib.getValue("schema"));
-        if (readingFilter != null && readingFilter.isSequenceExcept(_unifiedSchema, _name)) {
+        if (readingFilter != null && readingFilter.isProcedureExcept(_unifiedSchema, _name)) {
             return false;
         }
-        final String minimumValue = attrib.getValue("minimumValue");
-        if (minimumValue != null) {
+        final String sourceLine = attrib.getValue("sourceLine");
+        if (sourceLine != null) {
             try {
-                _minimumValue = new BigDecimal(minimumValue);
+                _sourceLine = new BigDecimal(sourceLine);
             } catch (NumberFormatException ignored) { // just in case
             }
         }
-        final String maximumValue = attrib.getValue("maximumValue");
-        if (maximumValue != null) {
+        final String sourceSize = attrib.getValue("sourceSize");
+        if (sourceSize != null) {
             try {
-                _maximumValue = new BigDecimal(maximumValue);
+                _sourceSize = new BigDecimal(sourceSize);
             } catch (NumberFormatException ignored) { // just in case
             }
         }
-        final String incrementSize = attrib.getValue("incrementSize");
-        if (incrementSize != null) {
+        final String sourceHash = attrib.getValue("sourceHash");
+        if (sourceHash != null) {
             try {
-                _incrementSize = Integer.parseInt(incrementSize);
+                _sourceHash = new BigDecimal(sourceHash);
             } catch (NumberFormatException ignored) { // just in case
             }
         }
+        _procedureComment = attrib.getValue("procedureComment");
         return true;
     }
 
@@ -124,8 +126,7 @@ public class Sequence {
     //                                                                      ==============
     @Override
     public String toString() {
-        return _unifiedSchema + "." + _name + ":{" + _minimumValue + " to " + _maximumValue + ", increment "
-                + _incrementSize + "}";
+        return _unifiedSchema + "." + _name;
     }
 
     // ===================================================================================
@@ -139,12 +140,12 @@ public class Sequence {
         this._database = database;
     }
 
-    public String getSequenceName() {
+    public String getProcedureName() {
         return _name;
     }
 
-    public void setSequenceName(String sequenceName) {
-        this._name = sequenceName;
+    public void setProcedureName(String procedureName) {
+        this._name = procedureName;
     }
 
     public UnifiedSchema getUnifiedSchema() {
@@ -155,35 +156,35 @@ public class Sequence {
         this._unifiedSchema = _unifiedSchema;
     }
 
-    public BigDecimal getMinimumValue() {
-        return _minimumValue;
+    public BigDecimal getSourceLine() {
+        return _sourceLine;
     }
 
-    public void setMinimumValue(BigDecimal minimumValue) {
-        this._minimumValue = minimumValue;
+    public void setSourceLine(BigDecimal sourceLine) {
+        this._sourceLine = sourceLine;
     }
 
-    public BigDecimal getMaximumValue() {
-        return _maximumValue;
+    public BigDecimal getSourceSize() {
+        return _sourceSize;
     }
 
-    public void setMaximumValue(BigDecimal maximumValue) {
-        this._maximumValue = maximumValue;
+    public void setSourceSize(BigDecimal sourceSize) {
+        this._sourceSize = sourceSize;
     }
 
-    public Integer getIncrementSize() {
-        return _incrementSize;
+    public BigDecimal getSourceHash() {
+        return _sourceHash;
     }
 
-    public void setIncrementSize(Integer incrementSize) {
-        this._incrementSize = incrementSize;
+    public void setSourceHash(BigDecimal sourceHash) {
+        this._sourceHash = sourceHash;
     }
 
-    public String getSequenceComment() {
-        return _sequenceComment;
+    public String getProcedureComment() {
+        return _procedureComment;
     }
 
-    public void setSequenceComment(String sequenceComment) {
-        this._sequenceComment = sequenceComment;
+    public void setProcedureComment(String procedureComment) {
+        this._procedureComment = procedureComment;
     }
 }
