@@ -630,6 +630,8 @@ public class DfSchemaXmlSerializer {
         setupSequenceAttributeNumber(sequenceMeta, sequenceElement, "minimumValue", sequenceMeta.getMinimumValue());
         setupSequenceAttributeNumber(sequenceMeta, sequenceElement, "maximumValue", sequenceMeta.getMaximumValue());
         setupSequenceAttributeNumber(sequenceMeta, sequenceElement, "incrementSize", sequenceMeta.getIncrementSize());
+        sequenceElement.setAttribute("comment", DfSchemaDiff.NO_META_MARK);
+
         sequenceGroupElement.appendChild(sequenceElement);
     }
 
@@ -694,21 +696,21 @@ public class DfSchemaXmlSerializer {
             procedureElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
         }
         // -1 means no data for the future (2012/08/20)
-        final String sourceLine = DfSchemaDiff.NULL_META_MARK;
+        final String sourceLine = DfSchemaDiff.NO_META_MARK;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceLine)) {
             procedureElement.setAttribute("sourceLine", sourceLine);
         }
-        final String sourceSize = DfSchemaDiff.NULL_META_MARK;
+        final String sourceSize = DfSchemaDiff.NO_META_MARK;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceSize)) {
             procedureElement.setAttribute("sourceSize", sourceSize);
         }
-        final String sourceHash = DfSchemaDiff.NULL_META_MARK;
+        final String sourceHash = DfSchemaDiff.NO_META_MARK;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceHash)) {
             procedureElement.setAttribute("sourceHash", sourceHash);
         }
         final String procedureComment = procedureMeta.getProcedureComment();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureComment)) {
-            procedureElement.setAttribute("procedureComment", procedureComment);
+            procedureElement.setAttribute("comment", procedureComment);
         }
         procedureGroupElement.appendChild(procedureElement);
     }

@@ -99,7 +99,20 @@ public abstract class DfAbstractDiff {
 
     protected abstract class StringNextPreviousDiffer<OBJECT, DIFF> implements NextPreviousDiffer<OBJECT, DIFF, String> {
         public boolean isMatch(String next, String previous) {
+            if (isNullMeta(next, previous)) { // for migration
+                return true;
+            }
             return isSame(next, previous);
+        }
+
+        protected boolean isNullMeta(String next, String previous) {
+            if (next != null && next.equals(DfSchemaDiff.NO_META_MARK)) {
+                return true;
+            }
+            if (previous != null && previous.equals(DfSchemaDiff.NO_META_MARK)) {
+                return true;
+            }
+            return false;
         }
 
         public String disp(String obj, boolean next) {

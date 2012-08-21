@@ -148,10 +148,10 @@ Java class or method name.
 <!ATTLIST sequence
   name CDATA #REQUIRED
   schema CDATA #IMPLIED
-  comment CDATA #IMPLIED
   minimumValue CDATA #IMPLIED
   maximumValue CDATA #IMPLIED
   incrementSize CDATA #IMPLIED
+  comment CDATA #IMPLIED
 >
 
 <!ELEMENT procedureGroup (procedure+)>

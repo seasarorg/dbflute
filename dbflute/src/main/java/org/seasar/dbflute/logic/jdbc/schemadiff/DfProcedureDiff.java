@@ -176,16 +176,16 @@ public class DfProcedureDiff extends DfAbstractDiff implements DfNestDiff {
         }
     }
 
-    public static DfProcedureDiff createAdded(String procedureName) {
-        return new DfProcedureDiff(procedureName, DfDiffType.ADD);
+    public static DfProcedureDiff createAdded(String procedureUniqueName) {
+        return new DfProcedureDiff(procedureUniqueName, DfDiffType.ADD);
     }
 
-    public static DfProcedureDiff createChanged(String procedureName) {
-        return new DfProcedureDiff(procedureName, DfDiffType.CHANGE);
+    public static DfProcedureDiff createChanged(String procedureUniqueName) {
+        return new DfProcedureDiff(procedureUniqueName, DfDiffType.CHANGE);
     }
 
-    public static DfProcedureDiff createDeleted(String procedureName) {
-        return new DfProcedureDiff(procedureName, DfDiffType.DELETE);
+    public static DfProcedureDiff createDeleted(String procedureUniqueName) {
+        return new DfProcedureDiff(procedureUniqueName, DfDiffType.DELETE);
     }
 
     public static DfProcedureDiff createFromDiffMap(Map<String, Object> procedureDiffMap) {
