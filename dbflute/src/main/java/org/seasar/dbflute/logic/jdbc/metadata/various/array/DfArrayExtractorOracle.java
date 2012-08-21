@@ -27,9 +27,9 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureArgumentInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle.ProcedureArgumentInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -126,9 +126,9 @@ public class DfArrayExtractorOracle {
     //                                                                   =================
     protected StringKeyMap<DfTypeArrayInfo> doExtractFlatArrayInfoSecondMap(UnifiedSchema unifiedSchema) {
         final StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
-        final List<ProcedureArgumentInfo> argInfoList = extractProcedureArgumentInfoList(unifiedSchema);
+        final List<DfProcedureArgumentInfo> argInfoList = extractProcedureArgumentInfoList(unifiedSchema);
         for (int i = 0; i < argInfoList.size(); i++) {
-            final ProcedureArgumentInfo argInfo = argInfoList.get(i);
+            final DfProcedureArgumentInfo argInfo = argInfoList.get(i);
             final String argumentName = argInfo.getArgumentName();
             if (Srl.is_Null_or_TrimmedEmpty(argumentName)) {
                 continue;
@@ -155,7 +155,7 @@ public class DfArrayExtractorOracle {
     }
 
     protected void setupFlatArrayInfo(StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap,
-            List<ProcedureArgumentInfo> argInfoList, ProcedureArgumentInfo argInfo, int index) {
+            List<DfProcedureArgumentInfo> argInfoList, DfProcedureArgumentInfo argInfo, int index) {
         final UnifiedSchema owner = UnifiedSchema.createAsDynamicSchema(null, argInfo.getTypeOwner());
         final String realTypeName = buildArrayTypeName(argInfo);
         final DfTypeArrayInfo arrayInfo = new DfTypeArrayInfo(owner, realTypeName);
@@ -163,16 +163,17 @@ public class DfArrayExtractorOracle {
         flatArrayInfoMap.put(realTypeName, arrayInfo);
         if (nestedArray) {
             final int nextIndex = (index + 1);
-            final ProcedureArgumentInfo nextArgInfo = argInfoList.get(nextIndex);
+            final DfProcedureArgumentInfo nextArgInfo = argInfoList.get(nextIndex);
             setupFlatArrayInfo(flatArrayInfoMap, argInfoList, nextArgInfo, nextIndex); // recursive call
         }
     }
 
-    protected boolean reflectArrayElementType(List<ProcedureArgumentInfo> argInfoList, int i, DfTypeArrayInfo arrayInfo) {
+    protected boolean reflectArrayElementType(List<DfProcedureArgumentInfo> argInfoList, int i,
+            DfTypeArrayInfo arrayInfo) {
         boolean nestedArray = false;
         final int nextIndex = (i + 1);
         if (argInfoList.size() > nextIndex) { // element type is in data type of next record
-            final ProcedureArgumentInfo nextInfo = argInfoList.get(nextIndex);
+            final DfProcedureArgumentInfo nextInfo = argInfoList.get(nextIndex);
             if (Srl.is_Null_or_TrimmedEmpty(nextInfo.getArgumentName())) { // element record's argument is null
                 final String typeName = nextInfo.getTypeName();
                 final String dataType = nextInfo.getDataType();
@@ -202,14 +203,14 @@ public class DfArrayExtractorOracle {
         return Srl.equalsIgnoreCase(dataType, "OBJECT");
     }
 
-    protected String buildArrayTypeName(ProcedureArgumentInfo argInfo) {
+    protected String buildArrayTypeName(DfProcedureArgumentInfo argInfo) {
         return argInfo.buildArrayTypeName();
     }
 
     // ===================================================================================
     //                                                                       Argument Info
     //                                                                       =============
-    protected List<ProcedureArgumentInfo> extractProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
+    protected List<DfProcedureArgumentInfo> extractProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
         final DfProcedureParameterNativeExtractorOracle extractor = createProcedureParameterExtractorOracle();
         return extractor.extractProcedureArgumentInfoList(unifiedSchema);
     }

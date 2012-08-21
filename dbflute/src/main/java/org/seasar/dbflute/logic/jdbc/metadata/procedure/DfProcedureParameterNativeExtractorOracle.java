@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureArgumentInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -58,18 +59,18 @@ public class DfProcedureParameterNativeExtractorOracle {
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
-    public List<ProcedureArgumentInfo> extractProcedureArgumentInfoList(UnifiedSchema unifiedSchema) { // Oracle dependency
+    public List<DfProcedureArgumentInfo> extractProcedureArgumentInfoList(UnifiedSchema unifiedSchema) { // Oracle dependency
         return selectProcedureArgumentInfoList(unifiedSchema);
     }
 
-    public List<ProcedureArgumentInfo> extractProcedureArgumentInfoToDBLinkList(String dbLinkName) { // Oracle dependency
+    public List<DfProcedureArgumentInfo> extractProcedureArgumentInfoToDBLinkList(String dbLinkName) { // Oracle dependency
         return selectProcedureArgumentInfoToDBLinkList(dbLinkName);
     }
 
     // ===================================================================================
     //                                                                       Argument Info
     //                                                                       =============
-    protected List<ProcedureArgumentInfo> selectProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
+    protected List<DfProcedureArgumentInfo> selectProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
         final String sql = buildProcedureArgumentSql(unifiedSchema);
         return filterParameterArgumentInfoList(doSelectProcedureArgumentInfoList(sql));
     }
@@ -84,7 +85,7 @@ public class DfProcedureParameterNativeExtractorOracle {
         return sb.toString();
     }
 
-    protected List<ProcedureArgumentInfo> selectProcedureArgumentInfoToDBLinkList(String dbLinkName) {
+    protected List<DfProcedureArgumentInfo> selectProcedureArgumentInfoToDBLinkList(String dbLinkName) {
         final String sql = buildProcedureArgumentToDBLinkSql(dbLinkName);
         return filterParameterArgumentInfoList(doSelectProcedureArgumentInfoList(sql));
     }
@@ -98,7 +99,7 @@ public class DfProcedureParameterNativeExtractorOracle {
         return sb.toString();
     }
 
-    protected List<ProcedureArgumentInfo> doSelectProcedureArgumentInfoList(String sql) {
+    protected List<DfProcedureArgumentInfo> doSelectProcedureArgumentInfoList(String sql) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("PACKAGE_NAME");
@@ -123,9 +124,9 @@ public class DfProcedureParameterNativeExtractorOracle {
             log("Failed to select procedure argument info: " + continued.getMessage());
             return DfCollectionUtil.emptyList();
         }
-        final List<ProcedureArgumentInfo> infoList = DfCollectionUtil.newArrayList();
+        final List<DfProcedureArgumentInfo> infoList = DfCollectionUtil.newArrayList();
         for (Map<String, String> map : resultList) {
-            final ProcedureArgumentInfo info = new ProcedureArgumentInfo();
+            final DfProcedureArgumentInfo info = new DfProcedureArgumentInfo();
             info.setPackageName(map.get("PACKAGE_NAME"));
             info.setObjectName(map.get("OBJECT_NAME"));
             info.setOverload(map.get("OVERLOAD"));
@@ -148,13 +149,13 @@ public class DfProcedureParameterNativeExtractorOracle {
         return infoList;
     }
 
-    protected List<ProcedureArgumentInfo> filterParameterArgumentInfoList(List<ProcedureArgumentInfo> infoList) {
-        final StringKeyMap<ProcedureArgumentInfo> infoMap = StringKeyMap.createAsFlexibleOrdered();
+    protected List<DfProcedureArgumentInfo> filterParameterArgumentInfoList(List<DfProcedureArgumentInfo> infoList) {
+        final StringKeyMap<DfProcedureArgumentInfo> infoMap = StringKeyMap.createAsFlexibleOrdered();
         for (int i = 0; i < infoList.size(); i++) {
-            final ProcedureArgumentInfo info = infoList.get(i);
+            final DfProcedureArgumentInfo info = infoList.get(i);
             final String argumentName = info.getArgumentName();
             final String key = generateParameterInfoMapKey(info.getPackageName(), info.getObjectName(), argumentName);
-            final ProcedureArgumentInfo alreadyRegistered = infoMap.get(key);
+            final DfProcedureArgumentInfo alreadyRegistered = infoMap.get(key);
             if (alreadyRegistered != null) { // means overload argument
                 continue; // overload should be ordered by ascend
             }
@@ -172,139 +173,6 @@ public class DfProcedureParameterNativeExtractorOracle {
         }
         keySb.append(procedureName).append(".").append(parameterName);
         return keySb.toString();
-    }
-
-    public static class ProcedureArgumentInfo {
-        protected String _packageName;
-        protected String _objectName;
-        protected String _overload;
-        protected String _sequence;
-        protected String _argumentName;
-        protected String _inOut;
-        protected String _dataType;
-        protected String _dataLength;
-        protected String _dataPrecision;
-        protected String _dataScale;
-        protected String _typeOwner;
-        protected String _typeName;
-        protected String _typeSubName;
-
-        public String buildArrayTypeName() {
-            final String typeName = getTypeName();
-            final String typeSubName = getTypeSubName();
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(typeSubName)) {
-                // *typeOwner handling is under review
-                //final String typeOwner = argInfo.getTypeOwner();
-                return typeName + "." + typeSubName;
-            } else {
-                // *it may need to add typeOwner if additional schema at the future
-                return typeName;
-            }
-        }
-
-        public String getPackageName() {
-            return _packageName;
-        }
-
-        public void setPackageName(String packageName) {
-            this._packageName = packageName;
-        }
-
-        public String getObjectName() {
-            return _objectName;
-        }
-
-        public void setObjectName(String objectName) {
-            this._objectName = objectName;
-        }
-
-        public String getOverload() {
-            return _overload;
-        }
-
-        public void setOverload(String overload) {
-            this._overload = overload;
-        }
-
-        public String getSequence() {
-            return _sequence;
-        }
-
-        public void setSequence(String sequence) {
-            this._sequence = sequence;
-        }
-
-        public String getArgumentName() {
-            return _argumentName;
-        }
-
-        public void setArgumentName(String argumentName) {
-            this._argumentName = argumentName;
-        }
-
-        public String getInOut() {
-            return _inOut;
-        }
-
-        public void setInOut(String inOut) {
-            this._inOut = inOut;
-        }
-
-        public String getDataType() {
-            return _dataType;
-        }
-
-        public void setDataType(String dataType) {
-            this._dataType = dataType;
-        }
-
-        public String getDataLength() {
-            return _dataLength;
-        }
-
-        public void setDataLength(String dataLength) {
-            this._dataLength = dataLength;
-        }
-
-        public String getDataPrecision() {
-            return _dataPrecision;
-        }
-
-        public void setDataPrecision(String dataPrecision) {
-            this._dataPrecision = dataPrecision;
-        }
-
-        public String getDataScale() {
-            return _dataScale;
-        }
-
-        public void setDataScale(String dataScale) {
-            this._dataScale = dataScale;
-        }
-
-        public String getTypeName() {
-            return _typeName;
-        }
-
-        public void setTypeName(String typeName) {
-            this._typeName = typeName;
-        }
-
-        public String getTypeOwner() {
-            return _typeOwner;
-        }
-
-        public void setTypeOwner(String typeOwner) {
-            this._typeOwner = typeOwner;
-        }
-
-        public String getTypeSubName() {
-            return _typeSubName;
-        }
-
-        public void setTypeSubName(String typeSubName) {
-            this._typeSubName = typeSubName;
-        }
     }
 
     // ===================================================================================

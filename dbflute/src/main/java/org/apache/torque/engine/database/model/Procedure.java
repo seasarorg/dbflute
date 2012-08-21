@@ -74,7 +74,7 @@ public class Procedure {
     protected UnifiedSchema _unifiedSchema;
     protected BigDecimal _sourceLine;
     protected BigDecimal _sourceSize;
-    protected BigDecimal _sourceHash;
+    protected String _sourceHash;
     protected String _procedureComment;
 
     // ===================================================================================
@@ -103,13 +103,7 @@ public class Procedure {
             } catch (NumberFormatException ignored) { // just in case
             }
         }
-        final String sourceHash = attrib.getValue("sourceHash");
-        if (sourceHash != null) {
-            try {
-                _sourceHash = new BigDecimal(sourceHash);
-            } catch (NumberFormatException ignored) { // just in case
-            }
-        }
+        _sourceHash = attrib.getValue("sourceHash");
         _procedureComment = attrib.getValue("procedureComment");
         return true;
     }
@@ -172,11 +166,11 @@ public class Procedure {
         this._sourceSize = sourceSize;
     }
 
-    public BigDecimal getSourceHash() {
+    public String getSourceHash() {
         return _sourceHash;
     }
 
-    public void setSourceHash(BigDecimal sourceHash) {
+    public void setSourceHash(String sourceHash) {
         this._sourceHash = sourceHash;
     }
 

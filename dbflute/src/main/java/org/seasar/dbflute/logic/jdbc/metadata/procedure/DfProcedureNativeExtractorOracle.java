@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle.ProcedureArgumentInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureArgumentInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -73,9 +73,9 @@ public class DfProcedureNativeExtractorOracle {
     protected Map<String, ProcedureNativeInfo> selectProcedureNativeInfoMap(UnifiedSchema unifiedSchema) {
         final String sql = buildProcedureNativeSql(unifiedSchema);
         final Map<String, ProcedureNativeInfo> nativeInfoMap = doSelectProcedureNativeInfoMap(sql);
-        final Map<String, List<ProcedureArgumentInfo>> argInfoMap = selectProcedureArgumentInfoMap(unifiedSchema);
+        final Map<String, List<DfProcedureArgumentInfo>> argInfoMap = selectProcedureArgumentInfoMap(unifiedSchema);
         for (Entry<String, ProcedureNativeInfo> entry : nativeInfoMap.entrySet()) {
-            final List<ProcedureArgumentInfo> argInfoList = argInfoMap.get(entry.getKey());
+            final List<DfProcedureArgumentInfo> argInfoList = argInfoMap.get(entry.getKey());
             if (argInfoList != null) { // found (means the procedure has parameters)
                 entry.getValue().acceptArgInfoList(argInfoList);
             }
@@ -95,9 +95,9 @@ public class DfProcedureNativeExtractorOracle {
     protected Map<String, ProcedureNativeInfo> selectDBLinkProcedureNativeInfoMap(String dbLinkName) {
         final String sql = buildDBLinkProcedureNativeSql(dbLinkName);
         final Map<String, ProcedureNativeInfo> nativeInfoMap = doSelectProcedureNativeInfoMap(sql);
-        final Map<String, List<ProcedureArgumentInfo>> argInfoMap = selectDBLinkProcedureArgumentInfoMap(dbLinkName);
+        final Map<String, List<DfProcedureArgumentInfo>> argInfoMap = selectDBLinkProcedureArgumentInfoMap(dbLinkName);
         for (Entry<String, ProcedureNativeInfo> entry : nativeInfoMap.entrySet()) {
-            final List<ProcedureArgumentInfo> argInfoList = argInfoMap.get(entry.getKey());
+            final List<DfProcedureArgumentInfo> argInfoList = argInfoMap.get(entry.getKey());
             if (argInfoList != null) { // found (means the procedure has parameters)
                 entry.getValue().acceptArgInfoList(argInfoList);
             }
@@ -162,10 +162,10 @@ public class DfProcedureNativeExtractorOracle {
     public static class ProcedureNativeInfo {
         protected String _packageName;
         protected String _procedureName;
-        protected final List<ProcedureArgumentInfo> _argInfoList = DfCollectionUtil.newArrayList();
+        protected final List<DfProcedureArgumentInfo> _argInfoList = DfCollectionUtil.newArrayList();
 
-        public void acceptArgInfoList(List<ProcedureArgumentInfo> argInfoList) {
-            for (ProcedureArgumentInfo argInfo : argInfoList) {
+        public void acceptArgInfoList(List<DfProcedureArgumentInfo> argInfoList) {
+            for (DfProcedureArgumentInfo argInfo : argInfoList) {
                 addArgInfo(argInfo);
             }
         }
@@ -186,11 +186,11 @@ public class DfProcedureNativeExtractorOracle {
             this._procedureName = procedureName;
         }
 
-        public List<ProcedureArgumentInfo> getArgInfoList() {
+        public List<DfProcedureArgumentInfo> getArgInfoList() {
             return _argInfoList;
         }
 
-        public void addArgInfo(ProcedureArgumentInfo argInfo) {
+        public void addArgInfo(DfProcedureArgumentInfo argInfo) {
             this._argInfoList.add(argInfo);
         }
     }
@@ -198,30 +198,30 @@ public class DfProcedureNativeExtractorOracle {
     // ===================================================================================
     //                                                                       Argument Info
     //                                                                       =============
-    protected Map<String, List<ProcedureArgumentInfo>> selectProcedureArgumentInfoMap(UnifiedSchema unifiedSchema) {
+    protected Map<String, List<DfProcedureArgumentInfo>> selectProcedureArgumentInfoMap(UnifiedSchema unifiedSchema) {
         final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(
                 _dataSource, _suppressLogging);
-        final List<ProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
+        final List<DfProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoList(unifiedSchema);
         return arrangeProcedureArgumentInfoMap(allArgList);
     }
 
-    protected Map<String, List<ProcedureArgumentInfo>> selectDBLinkProcedureArgumentInfoMap(String dbLinkName) {
+    protected Map<String, List<DfProcedureArgumentInfo>> selectDBLinkProcedureArgumentInfoMap(String dbLinkName) {
         final DfProcedureParameterNativeExtractorOracle extractor = new DfProcedureParameterNativeExtractorOracle(
                 _dataSource, _suppressLogging);
-        final List<ProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoToDBLinkList(dbLinkName);
+        final List<DfProcedureArgumentInfo> allArgList = extractor.extractProcedureArgumentInfoToDBLinkList(dbLinkName);
         return arrangeProcedureArgumentInfoMap(allArgList);
     }
 
-    protected Map<String, List<ProcedureArgumentInfo>> arrangeProcedureArgumentInfoMap(
-            List<ProcedureArgumentInfo> allArgList) {
-        final Map<String, List<ProcedureArgumentInfo>> map = DfCollectionUtil.newLinkedHashMap();
-        for (ProcedureArgumentInfo currentArgInfo : allArgList) {
+    protected Map<String, List<DfProcedureArgumentInfo>> arrangeProcedureArgumentInfoMap(
+            List<DfProcedureArgumentInfo> allArgList) {
+        final Map<String, List<DfProcedureArgumentInfo>> map = DfCollectionUtil.newLinkedHashMap();
+        for (DfProcedureArgumentInfo currentArgInfo : allArgList) {
             final String packageName = currentArgInfo.getPackageName();
             final String procedureName = currentArgInfo.getObjectName();
             // DBFlute treats overload methods as one method
             //final String overload = currentArgInfo.getOverload();
             final String key = generateNativeInfoMapKey(packageName, procedureName);
-            List<ProcedureArgumentInfo> argList = map.get(key);
+            List<DfProcedureArgumentInfo> argList = map.get(key);
             if (argList == null) {
                 argList = DfCollectionUtil.newArrayList();
                 map.put(key, argList);

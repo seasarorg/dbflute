@@ -1182,7 +1182,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected void processSourceHash(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
         diffNextPrevious(next, previous, procedureDiff, new ProcedureSourceNextPreviousDiffer() {
             public String provide(Procedure obj) {
-                return DfTypeUtil.toString(obj.getSourceHash());
+                return obj.getSourceHash();
             }
 
             public void diff(DfProcedureDiff diff, DfNextPreviousDiff nextPreviousDiff) {

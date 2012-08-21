@@ -138,6 +138,25 @@ public class DfProcedureColumnMeta {
     }
 
     // ===================================================================================
+    //                                                                 Definition Identity
+    //                                                                 ===================
+    public String getColumnDefinitionIndentity() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(_columnName);
+        sb.append(" ");
+        sb.append(_dbTypeName);
+        if (DfColumnExtractor.isColumnSizeValid(_columnSize)) {
+            sb.append("(").append(_columnSize);
+            if (DfColumnExtractor.isDecimalDigitsValid(_decimalDigits)) {
+                sb.append(", ").append(_decimalDigits);
+            }
+            sb.append(")");
+        }
+        sb.append(" as ").append(_procedureColumnType.alias());
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                             Parameter Determination
     //                                                             =======================
     public boolean isBindParameter() {

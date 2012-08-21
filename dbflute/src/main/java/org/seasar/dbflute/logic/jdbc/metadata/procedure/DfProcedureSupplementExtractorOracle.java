@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +29,12 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureArgumentInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle.ProcedureArgumentInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.various.array.DfArrayExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.various.struct.DfStructExtractorOracle;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -92,10 +95,10 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     //                                         Argument Info
     //                                         -------------
     /** The info map of procedure argument for cache. */
-    protected final Map<UnifiedSchema, List<ProcedureArgumentInfo>> _argumentInfoListMap = newHashMap();
+    protected final Map<UnifiedSchema, List<DfProcedureArgumentInfo>> _argumentInfoListMap = newHashMap();
 
     /** The info map of procedure argument to DB link for cache. */
-    protected final Map<String, List<ProcedureArgumentInfo>> _argumentInfoListToDBLinkMap = newHashMap();
+    protected final Map<String, List<DfProcedureArgumentInfo>> _argumentInfoListToDBLinkMap = newHashMap();
 
     // -----------------------------------------------------
     //                                       ResultMap Cache
@@ -158,10 +161,10 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         return doFindParameterOverloadInfoMap(findProcedureArgumentInfoToDBLinkList(dbLinkName));
     }
 
-    protected StringKeyMap<Integer> doFindParameterOverloadInfoMap(List<ProcedureArgumentInfo> infoList) {
+    protected StringKeyMap<Integer> doFindParameterOverloadInfoMap(List<DfProcedureArgumentInfo> infoList) {
         final StringKeyMap<Integer> infoMap = StringKeyMap.createAsFlexibleOrdered();
         for (int i = 0; i < infoList.size(); i++) {
-            final ProcedureArgumentInfo info = infoList.get(i);
+            final DfProcedureArgumentInfo info = infoList.get(i);
             final String argumentName = info.getArgumentName();
             final String overload = info.getOverload();
             if (Srl.is_Null_or_TrimmedEmpty(argumentName) || Srl.is_Null_or_TrimmedEmpty(overload)) {
@@ -194,11 +197,11 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (parameterArrayInfoMap != null) {
             return parameterArrayInfoMap;
         }
-        final List<ProcedureArgumentInfo> argInfoList = findProcedureArgumentInfoList(unifiedSchema);
+        final List<DfProcedureArgumentInfo> argInfoList = findProcedureArgumentInfoList(unifiedSchema);
         parameterArrayInfoMap = StringKeyMap.createAsFlexibleOrdered();
         final StringKeyMap<DfTypeArrayInfo> flatArrayInfoMap = findFlatArrayInfoMap(unifiedSchema);
         for (int i = 0; i < argInfoList.size(); i++) {
-            final ProcedureArgumentInfo argInfo = argInfoList.get(i);
+            final DfProcedureArgumentInfo argInfo = argInfoList.get(i);
             final String argumentName = argInfo.getArgumentName();
             if (Srl.is_Null_or_TrimmedEmpty(argumentName)) {
                 continue;
@@ -246,7 +249,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         }
     }
 
-    protected String buildArrayTypeName(ProcedureArgumentInfo argInfo) {
+    protected String buildArrayTypeName(DfProcedureArgumentInfo argInfo) {
         return argInfo.buildArrayTypeName();
     }
 
@@ -337,6 +340,42 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     }
 
     // ===================================================================================
+    //                                                                         Source Info
+    //                                                                         ===========
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, DfProcedureSourceInfo> extractProcedureSourceInfo(UnifiedSchema unifiedSchema) {
+        // not implemented yet
+        return DfCollectionUtil.emptyMap();
+    }
+
+    protected List<Map<String, String>> selectProcedureSourceList(UnifiedSchema unifiedSchema) {
+        // mysql.proc can be accessed only by root so it uses information schema
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        StringBuilder sb = new StringBuilder();
+        sb.append("select * from ALL_SOURCE");
+        sb.append(" where OWNER = '").append(unifiedSchema.getPureSchema()).append("'");
+        sb.append(" order by NAME, LINE");
+        String sql = sb.toString();
+        final List<String> columnList = new ArrayList<String>();
+        columnList.add("NAME");
+        columnList.add("TYPE");
+        columnList.add("LINE");
+        columnList.add("TEXT");
+        final List<Map<String, String>> resultList;
+        try {
+            log(sql);
+            resultList = facade.selectStringList(sql, columnList);
+        } catch (Exception continued) {
+            // because it's basically assist info
+            log("Failed to select procedure source info: " + continued.getMessage());
+            return DfCollectionUtil.emptyList();
+        }
+        return resultList;
+    }
+
+    // ===================================================================================
     //                                                                       Key Generator
     //                                                                       =============
     public String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName) {
@@ -361,8 +400,8 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     // ===================================================================================
     //                                                                       Argument Info
     //                                                                       =============
-    protected List<ProcedureArgumentInfo> findProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
-        List<ProcedureArgumentInfo> argInfoList = _argumentInfoListMap.get(unifiedSchema);
+    protected List<DfProcedureArgumentInfo> findProcedureArgumentInfoList(UnifiedSchema unifiedSchema) {
+        List<DfProcedureArgumentInfo> argInfoList = _argumentInfoListMap.get(unifiedSchema);
         if (argInfoList != null) {
             return argInfoList;
         }
@@ -372,8 +411,8 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         return _argumentInfoListMap.get(unifiedSchema);
     }
 
-    protected List<ProcedureArgumentInfo> findProcedureArgumentInfoToDBLinkList(String dbLinkName) {
-        List<ProcedureArgumentInfo> argInfoList = _argumentInfoListToDBLinkMap.get(dbLinkName);
+    protected List<DfProcedureArgumentInfo> findProcedureArgumentInfoToDBLinkList(String dbLinkName) {
+        List<DfProcedureArgumentInfo> argInfoList = _argumentInfoListToDBLinkMap.get(dbLinkName);
         if (argInfoList != null) {
             return argInfoList;
         }

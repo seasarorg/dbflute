@@ -18,7 +18,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 
@@ -50,7 +50,7 @@ public interface DfProcedureSupplementExtractor {
      * @param unifiedSchema The unified schema to extract. (NotNull)
      * @return The map of array info. (NotNull)
      */
-    StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema);
+    Map<String, DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema);
 
     /**
      * @param catalog The catalog for procedure. (NullAllowed)
@@ -59,4 +59,10 @@ public interface DfProcedureSupplementExtractor {
      * @return The map key for parameter info. (NotNull)
      */
     String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName);
+
+    /**
+     * @param unifiedSchema The unified schema to extract. (NotNull)
+     * @return The map for source info. (NotNull)
+     */
+    Map<String, DfProcedureSourceInfo> extractProcedureSourceInfo(UnifiedSchema unifiedSchema);
 }

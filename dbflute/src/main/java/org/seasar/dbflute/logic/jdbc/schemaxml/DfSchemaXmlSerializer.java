@@ -52,6 +52,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
@@ -695,23 +696,27 @@ public class DfSchemaXmlSerializer {
         if (unifiedSchema.hasSchema()) {
             procedureElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
         }
-        // -1 means no data for the future (2012/08/20)
-        final String sourceLine = DfSchemaDiff.PROCEDURE_SOURCE_NO_META_MARK;
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceLine)) {
-            procedureElement.setAttribute("sourceLine", sourceLine);
+
+        final String noMetaMark = DfSchemaDiff.PROCEDURE_SOURCE_NO_META_MARK;
+        final DfProcedureSourceInfo sourceInfo = procedureMeta.getProcedureSourceInfo();
+        {
+            final Integer sourceLine = sourceInfo != null ? sourceInfo.getSourceLine() : null;
+            procedureElement.setAttribute("sourceLine", sourceLine != null ? sourceLine.toString() : noMetaMark);
         }
-        final String sourceSize = DfSchemaDiff.PROCEDURE_SOURCE_NO_META_MARK;
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceSize)) {
-            procedureElement.setAttribute("sourceSize", sourceSize);
+        {
+            final Integer sourceSize = sourceInfo != null ? sourceInfo.getSourceSize() : null;
+            procedureElement.setAttribute("sourceSize", sourceSize != null ? sourceSize.toString() : noMetaMark);
         }
-        final String sourceHash = DfSchemaDiff.PROCEDURE_SOURCE_NO_META_MARK;
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceHash)) {
-            procedureElement.setAttribute("sourceHash", sourceHash);
+        {
+            final String sourceHash = sourceInfo != null ? sourceInfo.toSourceHash() : null;
+            procedureElement.setAttribute("sourceHash", sourceHash != null ? sourceHash : noMetaMark);
         }
+
         final String procedureComment = procedureMeta.getProcedureComment();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureComment)) {
             procedureElement.setAttribute("comment", procedureComment);
         }
+
         procedureGroupElement.appendChild(procedureElement);
     }
 

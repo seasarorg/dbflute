@@ -1,6 +1,5 @@
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
@@ -8,6 +7,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -30,11 +30,9 @@ public class DfProcedureMeta {
     protected boolean _procedureSynonym;
     protected boolean _includedProcedureToDBLink;
 
-    // procedure parameters
-    protected final List<DfProcedureColumnMeta> _procedureColumnList = new ArrayList<DfProcedureColumnMeta>();
-
-    // by execution meta
-    protected final List<DfProcedureNotParamResultMeta> _notParamResultList = new ArrayList<DfProcedureNotParamResultMeta>();
+    protected final List<DfProcedureColumnMeta> _procedureColumnList = DfCollectionUtil.newArrayList(); // procedure parameters
+    protected final List<DfProcedureNotParamResultMeta> _notParamResultList = DfCollectionUtil.newArrayList(); // by execution meta
+    protected DfProcedureSourceInfo _procedureSourceInfo; // assist info (basically for schema diff)
 
     // ===================================================================================
     //                                                                          Expression
@@ -123,6 +121,19 @@ public class DfProcedureMeta {
             }
         }
         return count;
+    }
+
+    public String getColumnDefinitionIndentity() {
+        final StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (DfProcedureColumnMeta columnMeta : _procedureColumnList) {
+            if (index > 0) {
+                sb.append(", ");
+            }
+            sb.append(columnMeta.getColumnDefinitionIndentity());
+            ++index;
+        }
+        return sb.toString();
     }
 
     // ===================================================================================
@@ -309,5 +320,13 @@ public class DfProcedureMeta {
 
     public void addNotParamResult(DfProcedureNotParamResultMeta notParamResult) {
         this._notParamResultList.add(notParamResult);
+    }
+
+    public DfProcedureSourceInfo getProcedureSourceInfo() {
+        return _procedureSourceInfo;
+    }
+
+    public void setProcedureSourceInfo(DfProcedureSourceInfo procedureSourceInfo) {
+        this._procedureSourceInfo = procedureSourceInfo;
     }
 }

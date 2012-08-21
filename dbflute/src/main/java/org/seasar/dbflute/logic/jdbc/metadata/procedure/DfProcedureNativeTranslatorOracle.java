@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2011 the Seasar Foundation and the Others.
+ * Copyright 2004-2012 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureArgumentInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeExtractorOracle.ProcedureNativeInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureParameterNativeExtractorOracle.ProcedureArgumentInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfDBLinkNativeExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfDBLinkNativeExtractorOracle.DBLinkNativeInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymNativeExtractorOracle;
@@ -96,8 +96,8 @@ public class DfProcedureNativeTranslatorOracle {
     protected DfProcedureMeta createDBLinkProcedureMeta(ProcedureNativeInfo nativeInfo, String dbLinkName) {
         final DfProcedureMeta procedureMeta = new DfProcedureMeta();
         setupProcedureName(nativeInfo, procedureMeta, dbLinkName);
-        final List<ProcedureArgumentInfo> argInfoList = nativeInfo.getArgInfoList();
-        for (ProcedureArgumentInfo argInfo : argInfoList) {
+        final List<DfProcedureArgumentInfo> argInfoList = nativeInfo.getArgInfoList();
+        for (DfProcedureArgumentInfo argInfo : argInfoList) {
             final DfProcedureColumnMeta columnMeta = new DfProcedureColumnMeta();
             columnMeta.setColumnName(argInfo.getArgumentName());
             setupProcedureColumnDataType(argInfo, columnMeta);
@@ -135,7 +135,7 @@ public class DfProcedureNativeTranslatorOracle {
         procedureMeta.setProcedureType(DfProcedureType.procedureResultUnknown);
     }
 
-    protected void setupProcedureColumnDataType(ProcedureArgumentInfo argInfo, DfProcedureColumnMeta columnMeta) {
+    protected void setupProcedureColumnDataType(DfProcedureArgumentInfo argInfo, DfProcedureColumnMeta columnMeta) {
         final String dataType = argInfo.getDataType();
         columnMeta.setDbTypeName(dataType);
         final String jdbcType = _columnExtractor.getColumnJdbcType(Types.OTHER, dataType);
@@ -147,7 +147,7 @@ public class DfProcedureNativeTranslatorOracle {
         }
     }
 
-    protected void setupProcedureColumnInOutType(ProcedureArgumentInfo argInfo, DfProcedureColumnMeta columnMeta) {
+    protected void setupProcedureColumnInOutType(DfProcedureArgumentInfo argInfo, DfProcedureColumnMeta columnMeta) {
         final String inOut = argInfo.getInOut();
         if ("in".equalsIgnoreCase(inOut)) {
             columnMeta.setProcedureColumnType(DfProcedureColumnType.procedureColumnIn);
@@ -161,7 +161,7 @@ public class DfProcedureNativeTranslatorOracle {
         }
     }
 
-    protected void setupProcedureColumnSize(ProcedureArgumentInfo argInfo, DfProcedureColumnMeta columnMeta) {
+    protected void setupProcedureColumnSize(DfProcedureArgumentInfo argInfo, DfProcedureColumnMeta columnMeta) {
         final String dataLength = argInfo.getDataLength();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(dataLength)) {
             columnMeta.setColumnSize(Integer.valueOf(dataLength));
