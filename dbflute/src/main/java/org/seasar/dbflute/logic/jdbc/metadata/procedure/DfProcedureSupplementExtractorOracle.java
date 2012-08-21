@@ -386,8 +386,9 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 sb = new StringBuilder();
             }
             if (sb.length() > 0) {
-                sb.append("\n").append(lineText);
+                sb.append("\n");
             }
+            sb.append(lineText);
             previousName = currentName;
             if (isSourcePackageBody(sourceMap) && packageBodyName != null) { // in package body
                 if (!lineComment && Srl.containsIgnoreCase(lineText, "end " + packageBodyName)) { // means end
