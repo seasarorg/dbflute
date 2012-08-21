@@ -355,36 +355,41 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         final List<Map<String, String>> sourceList = selectProcedureSourceList(unifiedSchema);
         StringBuilder sb = new StringBuilder();
         String preName = null;
+        int line = 0;
         for (Map<String, String> sourceMap : sourceList) {
+            ++line;
             final String procedureName = sourceMap.get("NAME");
             if (preName != null && !preName.equals(procedureName)) { // switch
-                setupProcedureSourceInfo(resultMap, procedureName, sb.toString());
+                setupProcedureSourceInfo(resultMap, procedureName, sb.toString(), line);
+                line = 1;
                 sb = new StringBuilder();
             }
             final String text = sourceMap.get("TEXT");
             sb.append(text).append("\n");
             preName = procedureName;
         }
+        if (preName != null) {
+            setupProcedureSourceInfo(resultMap, preName, sb.toString(), line);
+        }
         _procedureSourceMapMap.put(unifiedSchema, resultMap);
         return _procedureSourceMapMap.get(unifiedSchema);
     }
 
     protected void setupProcedureSourceInfo(Map<String, DfProcedureSourceInfo> resultMap, String procedureName,
-            String sourceCode) {
+            String sourceCode, int line) {
         final DfProcedureSourceInfo sourceInfo = new DfProcedureSourceInfo();
         sourceInfo.setSourceCode(sourceCode);
-        sourceInfo.setSourceLine(Srl.count(sourceCode, "\n"));
+        sourceInfo.setSourceLine(line);
         sourceInfo.setSourceSize(sourceCode.length());
         resultMap.put(procedureName, sourceInfo);
     }
 
     protected List<Map<String, String>> selectProcedureSourceList(UnifiedSchema unifiedSchema) {
-        // mysql.proc can be accessed only by root so it uses information schema
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         StringBuilder sb = new StringBuilder();
         sb.append("select * from ALL_SOURCE");
         sb.append(" where OWNER = '").append(unifiedSchema.getPureSchema()).append("'");
-        sb.append(" order by NAME, LINE");
+        sb.append(" order by NAME, TYPE, LINE");
         String sql = sb.toString();
         final List<String> columnList = new ArrayList<String>();
         columnList.add("NAME");

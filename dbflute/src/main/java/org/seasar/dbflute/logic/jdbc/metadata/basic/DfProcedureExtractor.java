@@ -939,22 +939,24 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                           -----------
     protected void doSetupSourceInfo(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
             DfProcedureSupplementExtractor extractor, UnifiedSchema unifiedSchema, boolean reflectParamsToHash) {
-        final Map<String, DfProcedureSourceInfo> mainInfo = extractor.extractProcedureSourceInfo(unifiedSchema);
-        if (mainInfo == null) {
+        final Map<String, DfProcedureSourceInfo> sourceInfoMap = extractor.extractProcedureSourceInfo(unifiedSchema);
+        if (sourceInfoMap == null) {
             return;
         }
+        log("...Reflecting source info to procedure meta: schema=" + unifiedSchema.getCatalogSchema());
         for (DfProcedureMeta procedureMeta : metaInfoList) {
             final UnifiedSchema procedureSchema = procedureMeta.getProcedureSchema();
             if (!unifiedSchema.equals(procedureSchema)) {
                 continue;
             }
-            final DfProcedureSourceInfo sourceInfo = mainInfo.get(procedureMeta.getProcedureName());
+            final DfProcedureSourceInfo sourceInfo = sourceInfoMap.get(procedureMeta.getProcedureName());
             if (sourceInfo == null) {
                 continue;
             }
             if (reflectParamsToHash) {
                 sourceInfo.setSupplementCode(procedureMeta.getColumnDefinitionIndentity());
             }
+            log("  " + procedureMeta.getProcedureDisplayName() + ":" + sourceInfo);
             procedureMeta.setProcedureSourceInfo(sourceInfo);
         }
     }

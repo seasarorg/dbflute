@@ -47,10 +47,9 @@ public class DfSchemaSyncChecker {
     //                                                                          ==========
     public void checkSync() {
         clearOutputResource();
-        serializeMainSchema();
-        final DfSchemaXmlSerializer targetSerializer = serializeTargetSchema();
+        final DfSchemaXmlSerializer serializer = diffSchema();
         _log.info("...Checking the schema synchronized");
-        final DfSchemaDiff schemaDiff = targetSerializer.getSchemaDiff();
+        final DfSchemaDiff schemaDiff = serializer.getSchemaDiff();
         if (schemaDiff.hasDiff()) {
             _log.info(" -> the schema has differences");
             throwSchemaSyncCheckTragedyResultException();
@@ -75,15 +74,22 @@ public class DfSchemaSyncChecker {
         }
     }
 
-    protected void serializeMainSchema() {
+    protected DfSchemaXmlSerializer diffSchema() {
+        serializeTargetSchema(); // previous
+        return serializeMainSchema(); // next
+    }
+
+    protected DfSchemaXmlSerializer serializeMainSchema() {
         final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
+        mainSerializer.suppressUnifiedSchema(); // because of comparison with other schema
         mainSerializer.serialize();
+        return mainSerializer;
     }
 
     protected DfSchemaXmlSerializer serializeTargetSchema() {
         final DataSource targetDs = prepareTargetDataSource();
         final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
-        targetSerializer.suppressUnifiedSchema(); // because of comparison with other schema
+        targetSerializer.suppressUnifiedSchema(); // same reason as main schema
         targetSerializer.serialize();
         return targetSerializer;
     }
@@ -108,9 +114,10 @@ public class DfSchemaSyncChecker {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The schema was not synchronized with another schema.");
         br.addItem("Advice");
-        br.addElement("You can confirm the result at '" + getResultFilePath() + "'.");
-        br.addElement("'Previous' means the main schema, defined at databaseInfoMap.dfprop.");
-        br.addElement("'Next' means the sync-check target schema, defined at schemaSyncCheckMap property.");
+        br.addElement("You can see the details at");
+        br.addElement(" '" + getResultFilePath() + "'.");
+        br.addElement("'Previous' means the sync-check schema, defined at schemaSyncCheckMap property.");
+        br.addElement("'Next' means the main schema, defined at databaseInfoMap.dfprop.");
         final String msg = br.buildExceptionMessage();
         throw new DfSchemaSyncCheckTragedyResultException(msg);
     }

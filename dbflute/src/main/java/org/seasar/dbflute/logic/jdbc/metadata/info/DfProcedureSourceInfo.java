@@ -31,6 +31,11 @@ public class DfProcedureSourceInfo {
         return Integer.toHexString(resource.hashCode());
     }
 
+    @Override
+    public String toString() {
+        return "{" + _sourceLine + ", " + _sourceSize + ", " + toSourceHash() + "}";
+    }
+
     public String getSourceCode() {
         return _sourceCode;
     }
