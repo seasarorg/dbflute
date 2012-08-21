@@ -11,6 +11,7 @@
 # o historyHtmlFileName (NotRequired - Default 'history-[project-name].html')
 # o isCheckColumnDefOrderDiff (NotRequired - Default false)
 # o isCheckDbCommentDiff (NotRequired - Default false)
+# o isCheckProcedureDiff (NotRequired - Default false)
 # o loadDataReverseMap (NotRequired - Default map:{})
 # o schemaSyncCheckMap (NotRequired - Default map:{})
 #
@@ -26,6 +27,7 @@
 #     ; historyHtmlFileName = xxx.html
 #     ; isCheckColumnDefOrderDiff = true
 #     ; isCheckDbCommentDiff = true
+#     ; isCheckProcedureDiff = true
 #     ; loadDataReverseMap = map:{
 #         ; recordLimit = -1
 #         ; isContainsCommonColumn = true
@@ -123,9 +125,16 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isCheckDbCommentDiff (NotRequired - Default false)
-    #  Does it check differences of table or column comment?
+    #  Does it check differences of table or column or others comment?
     #
     #; isCheckDbCommentDiff = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isCheckProcedureDiff (NotRequired - Default false)
+    #  Does it check differences of procedures?
+    #
+    #; isCheckProcedureDiff = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
