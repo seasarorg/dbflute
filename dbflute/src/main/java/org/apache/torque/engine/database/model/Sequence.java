@@ -115,7 +115,7 @@ public class Sequence {
     // ===================================================================================
     //                                                                    Derived Property
     //                                                                    ================
-    public String getUniqueName() {
+    public String getFormalUniqueName() {
         return _unifiedSchema.getCatalogSchema() + "." + _name;
     }
 
@@ -151,8 +151,8 @@ public class Sequence {
         return _unifiedSchema;
     }
 
-    public void setUnifiedSchema(UnifiedSchema _unifiedSchema) {
-        this._unifiedSchema = _unifiedSchema;
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
+        this._unifiedSchema = unifiedSchema;
     }
 
     public BigDecimal getMinimumValue() {

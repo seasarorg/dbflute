@@ -117,7 +117,7 @@ public class Procedure {
     // ===================================================================================
     //                                                                    Derived Property
     //                                                                    ================
-    public String getUniqueName() {
+    public String getFormalUniqueName() {
         return _unifiedSchema.getCatalogSchema() + "." + _name;
     }
 

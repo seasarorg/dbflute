@@ -157,16 +157,16 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
         }
     }
 
-    public static DfSequenceDiff createAdded(String sequenceName) {
-        return new DfSequenceDiff(sequenceName, DfDiffType.ADD);
+    public static DfSequenceDiff createAdded(String sequenceUniqueName) {
+        return new DfSequenceDiff(sequenceUniqueName, DfDiffType.ADD);
     }
 
-    public static DfSequenceDiff createChanged(String sequenceName) {
-        return new DfSequenceDiff(sequenceName, DfDiffType.CHANGE);
+    public static DfSequenceDiff createChanged(String sequenceUniqueName) {
+        return new DfSequenceDiff(sequenceUniqueName, DfDiffType.CHANGE);
     }
 
-    public static DfSequenceDiff createDeleted(String sequenceName) {
-        return new DfSequenceDiff(sequenceName, DfDiffType.DELETE);
+    public static DfSequenceDiff createDeleted(String sequenceUniqueName) {
+        return new DfSequenceDiff(sequenceUniqueName, DfDiffType.DELETE);
     }
 
     public static DfSequenceDiff createFromDiffMap(Map<String, Object> sequenceDiffMap) {

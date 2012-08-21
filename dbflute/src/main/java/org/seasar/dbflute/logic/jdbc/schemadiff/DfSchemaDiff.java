@@ -140,7 +140,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public static final String SEQUENCE_DIFF_KEY = "sequenceDiff";
     public static final String KEYWORD_H2_SYSTEM_SEQUENCE = "SYSTEM_SEQUENCE";
     public static final String PROCEDURE_DIFF_KEY = "procedureDiff";
-    public static final String NO_META_MARK = "df:noMeta";
+    public static final String PROCEDURE_SOURCE_NO_META_MARK = "-1";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -978,7 +978,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             final Sequence found = findPreviousSequence(sequence);
             if (found == null || !isSameSequenceName(sequence, found)) { // added
-                addSequenceDiff(DfSequenceDiff.createAdded(sequence.getUniqueName()));
+                addSequenceDiff(DfSequenceDiff.createAdded(sequence.getFormalUniqueName()));
             }
         }
     }
@@ -994,7 +994,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 continue;
             }
             // found
-            final DfSequenceDiff sequenceDiff = DfSequenceDiff.createChanged(next.getUniqueName());
+            final DfSequenceDiff sequenceDiff = DfSequenceDiff.createChanged(next.getFormalUniqueName());
 
             // sequence needs schema to be unique so comparing schema is non-sense here
             //processUnifiedSchema(next, previous, sequenceDiff);
@@ -1084,7 +1084,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
             final Sequence found = findNextSequence(sequence);
             if (found == null || !isSameSequenceName(sequence, found)) { // deleted
-                addSequenceDiff(DfSequenceDiff.createDeleted(sequence.getUniqueName()));
+                addSequenceDiff(DfSequenceDiff.createDeleted(sequence.getFormalUniqueName()));
             }
         }
     }
@@ -1100,7 +1100,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected boolean isSameSequenceName(Sequence next, Sequence previous) {
-        return isSame(next.getUniqueName(), previous.getUniqueName());
+        return isSame(next.getFormalUniqueName(), previous.getFormalUniqueName());
     }
 
     // ===================================================================================
@@ -1122,7 +1122,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         for (Procedure procedure : procedureList) {
             final Procedure found = findPreviousProcedure(procedure);
             if (found == null || !isSameProcedureName(procedure, found)) { // added
-                addProcedureDiff(DfProcedureDiff.createAdded(procedure.getUniqueName()));
+                addProcedureDiff(DfProcedureDiff.createAdded(procedure.getFormalUniqueName()));
             }
         }
     }
@@ -1138,7 +1138,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 continue;
             }
             // found
-            final DfProcedureDiff procedureDiff = DfProcedureDiff.createChanged(next.getUniqueName());
+            final DfProcedureDiff procedureDiff = DfProcedureDiff.createChanged(next.getFormalUniqueName());
 
             // procedure needs schema to be unique so comparing schema is non-sense here
             //processUnifiedSchema(next, previous, procedureDiff);
@@ -1156,7 +1156,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processSourceLine(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
-        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+        diffNextPrevious(next, previous, procedureDiff, new ProcedureSourceNextPreviousDiffer() {
             public String provide(Procedure obj) {
                 return DfTypeUtil.toString(obj.getSourceLine());
             }
@@ -1168,7 +1168,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processSourceSize(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
-        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+        diffNextPrevious(next, previous, procedureDiff, new ProcedureSourceNextPreviousDiffer() {
             public String provide(Procedure obj) {
                 return DfTypeUtil.toString(obj.getSourceSize());
             }
@@ -1180,7 +1180,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processSourceHash(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
-        diffNextPrevious(next, previous, procedureDiff, new StringNextPreviousDiffer<Procedure, DfProcedureDiff>() {
+        diffNextPrevious(next, previous, procedureDiff, new ProcedureSourceNextPreviousDiffer() {
             public String provide(Procedure obj) {
                 return DfTypeUtil.toString(obj.getSourceHash());
             }
@@ -1189,6 +1189,27 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 diff.setSourceHashDiff(nextPreviousDiff);
             }
         });
+    }
+
+    protected abstract class ProcedureSourceNextPreviousDiffer extends
+            StringNextPreviousDiffer<Procedure, DfProcedureDiff> {
+        @Override
+        public boolean isMatch(String next, String previous) {
+            if (isNullMeta(next, previous)) {
+                return true;
+            }
+            return super.isMatch(next, previous);
+        }
+
+        protected boolean isNullMeta(String next, String previous) {
+            if (next != null && next.equals(PROCEDURE_SOURCE_NO_META_MARK)) {
+                return true;
+            }
+            if (previous != null && previous.equals(PROCEDURE_SOURCE_NO_META_MARK)) {
+                return true;
+            }
+            return false;
+        }
     }
 
     protected void processProcedureComment(Procedure next, Procedure previous, DfProcedureDiff procedureDiff) {
@@ -1225,7 +1246,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         for (Procedure procedure : procedureList) {
             final Procedure found = findNextProcedure(procedure);
             if (found == null || !isSameProcedureName(procedure, found)) { // deleted
-                addProcedureDiff(DfProcedureDiff.createDeleted(procedure.getUniqueName()));
+                addProcedureDiff(DfProcedureDiff.createDeleted(procedure.getFormalUniqueName()));
             }
         }
     }
@@ -1234,7 +1255,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                         Assist Helper
     //                                         -------------
     protected boolean isSameProcedureName(Procedure next, Procedure previous) {
-        return isSame(next.getUniqueName(), previous.getUniqueName());
+        return isSame(next.getFormalUniqueName(), previous.getFormalUniqueName());
     }
 
     // ===================================================================================
@@ -1249,19 +1270,19 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected Sequence findNextSequence(Sequence sequence) {
-        return _nextDb.getSequence(sequence.getUniqueName());
+        return _nextDb.getSequence(sequence.getFormalUniqueName());
     }
 
     protected Sequence findPreviousSequence(Sequence sequence) {
-        return _previousDb.getSequence(sequence.getUniqueName());
+        return _previousDb.getSequence(sequence.getFormalUniqueName());
     }
 
     protected Procedure findNextProcedure(Procedure procedure) {
-        return _nextDb.getProcedure(procedure.getUniqueName());
+        return _nextDb.getProcedure(procedure.getFormalUniqueName());
     }
 
     protected Procedure findPreviousProcedure(Procedure procedure) {
-        return _previousDb.getProcedure(procedure.getUniqueName());
+        return _previousDb.getProcedure(procedure.getFormalUniqueName());
     }
 
     // ===================================================================================

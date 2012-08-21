@@ -630,8 +630,8 @@ public class DfSchemaXmlSerializer {
         setupSequenceAttributeNumber(sequenceMeta, sequenceElement, "minimumValue", sequenceMeta.getMinimumValue());
         setupSequenceAttributeNumber(sequenceMeta, sequenceElement, "maximumValue", sequenceMeta.getMaximumValue());
         setupSequenceAttributeNumber(sequenceMeta, sequenceElement, "incrementSize", sequenceMeta.getIncrementSize());
-        sequenceElement.setAttribute("comment", DfSchemaDiff.NO_META_MARK);
-
+        // no sequence meta now (2012/08/21)
+        //sequenceElement.setAttribute("comment", null);
         sequenceGroupElement.appendChild(sequenceElement);
     }
 
@@ -696,15 +696,15 @@ public class DfSchemaXmlSerializer {
             procedureElement.setAttribute("schema", unifiedSchema.getIdentifiedSchema());
         }
         // -1 means no data for the future (2012/08/20)
-        final String sourceLine = DfSchemaDiff.NO_META_MARK;
+        final String sourceLine = DfSchemaDiff.PROCEDURE_SOURCE_NO_META_MARK;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceLine)) {
             procedureElement.setAttribute("sourceLine", sourceLine);
         }
-        final String sourceSize = DfSchemaDiff.NO_META_MARK;
+        final String sourceSize = DfSchemaDiff.PROCEDURE_SOURCE_NO_META_MARK;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceSize)) {
             procedureElement.setAttribute("sourceSize", sourceSize);
         }
-        final String sourceHash = DfSchemaDiff.NO_META_MARK;
+        final String sourceHash = DfSchemaDiff.PROCEDURE_SOURCE_NO_META_MARK;
         if (Srl.is_NotNull_and_NotTrimmedEmpty(sourceHash)) {
             procedureElement.setAttribute("sourceHash", sourceHash);
         }

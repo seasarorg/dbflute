@@ -376,7 +376,7 @@ public class Database {
     public void addSequence(Sequence seq) {
         seq.setDatabase(this);
         _sequenceList.add(seq);
-        _sequenceMap.put(seq.getUniqueName(), seq);
+        _sequenceMap.put(seq.getFormalUniqueName(), seq);
     }
 
     // ===================================================================================
@@ -530,7 +530,7 @@ public class Database {
     public void addProcedure(Procedure procedure) {
         procedure.setDatabase(this);
         _procedureList.add(procedure);
-        _procedureMap.put(procedure.getUniqueName(), procedure);
+        _procedureMap.put(procedure.getFormalUniqueName(), procedure);
     }
 
     public boolean isPmbMetaDataForProcedure(String className) {
