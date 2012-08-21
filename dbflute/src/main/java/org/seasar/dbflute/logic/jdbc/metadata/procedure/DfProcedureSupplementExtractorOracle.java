@@ -359,11 +359,19 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         int line = 0;
         String previousName = null;
         for (Map<String, String> sourceMap : sourceList) {
-            final String lineText = sourceMap.get("TEXT");
+            final String lineText;
+            {
+                final String plainText = sourceMap.get("TEXT"); // null-allowed column
+                if (plainText != null) {
+                    lineText = plainText;
+                } else {
+                    lineText = ""; // Oracle treats null as empty string
+                }
+            }
             final boolean lineComment = Srl.startsWith(lineText.trim(), "--");
             final String currentName;
             {
-                final String plainName = sourceMap.get("NAME");
+                final String plainName = sourceMap.get("NAME"); // not-null column
                 if (isSourcePackageBody(sourceMap)) {
                     // overload procedure is unsupported here
                     if (packageBodyName == null) {
@@ -384,7 +392,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 line = 0; // begin next here
                 sb = new StringBuilder();
             }
-            ++line;
+            ++line; // count self (not use LINE column because of merge logic)
             if (sb.length() > 0) {
                 sb.append("\n");
             }
@@ -453,8 +461,8 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     }
 
     protected boolean isSourcePackageBody(Map<String, String> sourceMap) {
-        final String type = sourceMap.get("TYPE");
-        return type != null && type.equals("PACKAGE BODY");
+        final String type = sourceMap.get("TYPE"); // null-allowed column
+        return type != null && type.equalsIgnoreCase("PACKAGE BODY");
     }
 
     // ===================================================================================
