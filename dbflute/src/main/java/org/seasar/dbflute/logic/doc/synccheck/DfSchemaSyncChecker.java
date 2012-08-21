@@ -116,8 +116,12 @@ public class DfSchemaSyncChecker {
         br.addItem("Advice");
         br.addElement("You can see the details at");
         br.addElement(" '" + getResultFilePath() + "'.");
+        br.addElement("");
         br.addElement("'Previous' means the sync-check schema, defined at schemaSyncCheckMap property.");
         br.addElement("'Next' means the main schema, defined at databaseInfoMap.dfprop.");
+        br.addElement("");
+        br.addElement("e.g. Add Table: FOO_TABLE");
+        br.addElement("create the table on the sync-check schema to synchronize with main schema.");
         final String msg = br.buildExceptionMessage();
         throw new DfSchemaSyncCheckTragedyResultException(msg);
     }
