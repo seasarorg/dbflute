@@ -444,7 +444,19 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         sourceInfo.setSourceCode(sourceCode.trim());
         sourceInfo.setSourceLine(line);
         sourceInfo.setSourceSize(sourceCode.length());
-        resultMap.put(procedureName, sourceInfo);
+        final DfProcedureSourceInfo existingInfo = resultMap.get(procedureName);
+        if (existingInfo != null) { // means e.g. split overload
+            mergeExistingSourceInfo(sourceInfo, existingInfo);
+        } else { // basically here
+            resultMap.put(procedureName, sourceInfo);
+        }
+    }
+
+    protected void mergeExistingSourceInfo(DfProcedureSourceInfo currentInfo, DfProcedureSourceInfo existingInfo) {
+        final String mergedSourceCode = currentInfo.getSourceCode() + "\n" + existingInfo.getSourceCode();
+        existingInfo.setSourceCode(mergedSourceCode);
+        existingInfo.setSourceLine(currentInfo.getSourceLine() + existingInfo.getSourceLine());
+        existingInfo.setSourceSize(mergedSourceCode.length()); // re-calculate
     }
 
     protected boolean isSourcePackageBody(Map<String, String> sourceMap) {
