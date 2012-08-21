@@ -365,11 +365,16 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             {
                 final String plainName = sourceMap.get("NAME");
                 if (isSourcePackageBody(sourceMap)) {
+                    // overload procedure is unsupported here
                     if (packageBodyName == null) {
                         if (!lineComment && Srl.containsAnyIgnoreCase(lineText, packageBodyMarkAry)) {
                             final String rear = Srl.substringFirstRearIgnoreCase(lineText, packageBodyMarkAry);
                             packageBodyName = Srl.substringFirstFront(rear, "(", " ").trim();
-                            line = 0; // begin package body here
+                            final String keyName = buildPackageBodyKeyName(plainName, packageBodyName);
+                            final boolean overloadContinued = previousName != null && previousName.equals(keyName);
+                            if (!overloadContinued) {
+                                line = 0; // begin package body here
+                            }
                         } else { // e.g. package definition part or empty line
                             continue;
                         }
@@ -377,7 +382,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
                 } else {
                     packageBodyName = null;
                 }
-                currentName = packageBodyName != null ? (plainName + "." + packageBodyName) : plainName;
+                currentName = packageBodyName != null ? buildPackageBodyKeyName(plainName, packageBodyName) : plainName;
             }
             if (previousName != null && !previousName.equals(currentName)) { // switch
                 if (packageBodyName == null) { // if not null, cannot find the end point of the package body
@@ -427,6 +432,10 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
             return DfCollectionUtil.emptyList();
         }
         return resultList;
+    }
+
+    protected String buildPackageBodyKeyName(String plainName, String packageBodyName) {
+        return plainName + "." + packageBodyName;
     }
 
     protected void setupProcedureSourceInfo(Map<String, DfProcedureSourceInfo> resultMap, String procedureName,
