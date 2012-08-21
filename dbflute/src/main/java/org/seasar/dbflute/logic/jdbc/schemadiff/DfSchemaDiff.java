@@ -1291,7 +1291,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public Map<String, Object> createSchemaDiffMap() {
         final Map<String, Object> schemaDiffMap = DfCollectionUtil.newLinkedHashMap();
         schemaDiffMap.put(DIFF_DATE_KEY, DfTypeUtil.toString(_diffDate, DIFF_DATE_PATTERN));
-        schemaDiffMap.put(TABLE_COUNT_KEY, _tableCountDiff.createNextPreviousDiffMap());
+        if (_tableCountDiff.hasDiff()) {
+            schemaDiffMap.put(TABLE_COUNT_KEY, _tableCountDiff.createNextPreviousDiffMap());
+        }
 
         final List<NestDiffSetupper> nestDiffList = _nestDiffList;
         for (NestDiffSetupper setupper : nestDiffList) {
