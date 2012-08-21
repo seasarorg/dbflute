@@ -102,7 +102,7 @@ public class DfProcedureSupplementExtractorMySQL implements DfProcedureSupplemen
             return cachedMap;
         }
         final List<Map<String, String>> sourceList = selectProcedureSourceList(unifiedSchema);
-        final Map<String, DfProcedureSourceInfo> resultMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, DfProcedureSourceInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
         for (Map<String, String> sourceMap : sourceList) {
             final String name = sourceMap.get("ROUTINE_NAME");
             if (name == null) { // just in case

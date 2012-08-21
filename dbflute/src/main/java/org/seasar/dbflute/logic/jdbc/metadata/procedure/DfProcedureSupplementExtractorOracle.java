@@ -107,6 +107,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     protected final Map<String, StringKeyMap<Integer>> _parameterOverloadToDBLinkResultMapMap = newHashMap();
     protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _parameterArrayResultMapMap = newHashMap();
     protected final Map<UnifiedSchema, StringKeyMap<DfTypeStructInfo>> _structResultMapMap = newHashMap();
+    protected final Map<UnifiedSchema, Map<String, DfProcedureSourceInfo>> _procedureSourceMapMap = newHashMap();
 
     // DBLink procedure's GreatWalls are unsupported yet
     //protected final Map<String, StringKeyMap<DfTypeArrayInfo>> _parameterArrayInfoToDBLinkResultMapMap = newHashMap();
@@ -346,8 +347,35 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
      * {@inheritDoc}
      */
     public Map<String, DfProcedureSourceInfo> extractProcedureSourceInfo(UnifiedSchema unifiedSchema) {
-        // not implemented yet
-        return DfCollectionUtil.emptyMap();
+        final Map<String, DfProcedureSourceInfo> cachedMap = _procedureSourceMapMap.get(unifiedSchema);
+        if (cachedMap != null) {
+            return cachedMap;
+        }
+        final Map<String, DfProcedureSourceInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        final List<Map<String, String>> sourceList = selectProcedureSourceList(unifiedSchema);
+        StringBuilder sb = new StringBuilder();
+        String preName = null;
+        for (Map<String, String> sourceMap : sourceList) {
+            final String procedureName = sourceMap.get("NAME");
+            if (preName != null && !preName.equals(procedureName)) { // switch
+                setupProcedureSourceInfo(resultMap, procedureName, sb.toString());
+                sb = new StringBuilder();
+            }
+            final String text = sourceMap.get("TEXT");
+            sb.append(text).append("\n");
+            preName = procedureName;
+        }
+        _procedureSourceMapMap.put(unifiedSchema, resultMap);
+        return _procedureSourceMapMap.get(unifiedSchema);
+    }
+
+    protected void setupProcedureSourceInfo(Map<String, DfProcedureSourceInfo> resultMap, String procedureName,
+            String sourceCode) {
+        final DfProcedureSourceInfo sourceInfo = new DfProcedureSourceInfo();
+        sourceInfo.setSourceCode(sourceCode);
+        sourceInfo.setSourceLine(Srl.count(sourceCode, "\n"));
+        sourceInfo.setSourceSize(sourceCode.length());
+        resultMap.put(procedureName, sourceInfo);
     }
 
     protected List<Map<String, String>> selectProcedureSourceList(UnifiedSchema unifiedSchema) {

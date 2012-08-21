@@ -27,7 +27,7 @@ public class DfProcedureSourceInfo {
 
     public String toSourceHash() {
         final String resource = (_sourceCode != null ? _sourceCode : "")
-                + (_supplementCode != null ? _supplementCode : "");
+                + (_supplementCode != null ? "\n" + _supplementCode : "");
         return Integer.toHexString(resource.hashCode());
     }
 

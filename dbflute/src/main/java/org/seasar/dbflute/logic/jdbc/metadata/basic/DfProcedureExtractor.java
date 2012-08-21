@@ -82,7 +82,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     protected DataSource _procedureSynonymDataSource;
     protected DataSource _procedureToDBLinkDataSource;
 
-    // it needs to refactor but no time
+    // key is data source because it may be schema diff
     protected final Map<Integer, DfProcedureSupplementExtractorMySQL> _supplementExtractorMySQLMap = newHashMap();
     protected final Map<Integer, DfProcedureSupplementExtractorOracle> _supplementExtractorOracleMap = newHashMap();
 
