@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.util.Srl;
@@ -51,6 +52,10 @@ public abstract class DfAbstractMetaDataExtractor {
         return DfBuildProperties.getInstance();
     }
 
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
     protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
         return DfBuildProperties.getInstance().getBasicProperties().getDatabaseTypeFacadeProp();
     }
@@ -73,6 +78,10 @@ public abstract class DfAbstractMetaDataExtractor {
 
     protected boolean isDatabaseSQLServer() {
         return getDatabaseTypeFacadeProp().isDatabaseSQLServer();
+    }
+
+    protected boolean isDatabaseH2() {
+        return getDatabaseTypeFacadeProp().isDatabaseH2();
     }
 
     protected boolean isDatabaseSQLite() {

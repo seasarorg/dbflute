@@ -62,7 +62,12 @@ public interface DfProcedureSupplementExtractor {
 
     /**
      * @param unifiedSchema The unified schema to extract. (NotNull)
-     * @return The map for source info. (NotNull)
+     * @return The map for source info. The key is pure procedure name. e.g. SP_FOO (NotNull)
      */
     Map<String, DfProcedureSourceInfo> extractProcedureSourceInfo(UnifiedSchema unifiedSchema);
+
+    /**
+     * Suppress logging, e.g. SQL log
+     */
+    void suppressLogging();
 }

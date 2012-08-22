@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.util.Srl;
 
@@ -58,5 +59,23 @@ public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
             logReplaceSql(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);
         }
+    }
+
+    // ===================================================================================
+    //                                                                      Drop Procedure
+    //                                                                      ==============
+    @Override
+    protected DfDropProcedureByJdbcCallback createDropProcedureByJdbcCallback() {
+        return new DfDropProcedureByJdbcDefaultCallback() {
+            @Override
+            public String buildDropFunctionSql(DfProcedureMeta procedureMeta) {
+                return "drop alias " + buildProcedureSqlName(procedureMeta);
+            }
+        };
+    }
+
+    @Override
+    protected boolean isDropFunctionFirst() {
+        return true;
     }
 }

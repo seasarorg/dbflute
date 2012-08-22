@@ -703,6 +703,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                         Super Debug
+    //                                                                         ===========
+    public boolean isSuperDebug() { // closet (very internal)
+        return isProperty("isSuperDebug", false);
+    }
+
+    // ===================================================================================
     //                                                                             Friends
     //                                                                             =======
     public boolean isFriendsHibernate() {

@@ -27,14 +27,14 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 
 /**
  * @author jflute
- * @since 0.9.9.7F (2012/08/21 Tuesday)
+ * @since 0.9.9.7F (2012/08/22 Wednesday)
  */
-public class DfProcedureSupplementExtractorMySQL extends DfProcedureSupplementExtractorBase {
+public class DfProcedureSupplementExtractorPostgreSQL extends DfProcedureSupplementExtractorBase {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfProcedureSupplementExtractorMySQL(DataSource dataSource) {
+    public DfProcedureSupplementExtractorPostgreSQL(DataSource dataSource) {
         super(dataSource);
     }
 
@@ -46,14 +46,15 @@ public class DfProcedureSupplementExtractorMySQL extends DfProcedureSupplementEx
         final List<Map<String, String>> sourceList = selectProcedureSourceList(unifiedSchema);
         final Map<String, DfProcedureSourceInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
         for (Map<String, String> sourceMap : sourceList) {
-            final String name = sourceMap.get("ROUTINE_NAME");
+            final String name = sourceMap.get("routine_name");
             if (name == null) { // just in case
                 continue;
             }
             final DfProcedureSourceInfo sourceInfo = new DfProcedureSourceInfo();
 
-            // ROUTINES does not have parameter list
-            final String body = sourceMap.get("ROUTINE_DEFINITION");
+            // 'routine_definition' has body part only
+            // it uses same way as MySQL about parameter info for simple
+            final String body = sourceMap.get("routine_definition");
             if (body == null) {
                 continue;
             }
@@ -69,16 +70,17 @@ public class DfProcedureSupplementExtractorMySQL extends DfProcedureSupplementEx
     }
 
     protected List<Map<String, String>> selectProcedureSourceList(UnifiedSchema unifiedSchema) {
-        // mysql.proc can be accessed only by root so it uses information schema
         StringBuilder sb = new StringBuilder();
-        sb.append("select * from INFORMATION_SCHEMA.ROUTINES");
-        sb.append(" where ROUTINE_SCHEMA = '").append(unifiedSchema.getPureCatalog()).append("'");
-        sb.append(" order by ROUTINE_NAME");
+        sb.append("select * from information_schema.routines");
+        sb.append(" where routine_catalog = '").append(unifiedSchema.getPureCatalog()).append("'");
+        sb.append(" and routine_schema = '").append(unifiedSchema.getPureSchema()).append("'");
+        sb.append(" order by routine_name");
         String sql = sb.toString();
         final List<String> columnList = new ArrayList<String>();
-        columnList.add("ROUTINE_SCHEMA");
-        columnList.add("ROUTINE_NAME");
-        columnList.add("ROUTINE_DEFINITION"); // body only (no parameter info)
+        columnList.add("routine_catalog");
+        columnList.add("routine_schema");
+        columnList.add("routine_name");
+        columnList.add("routine_definition"); // body only (no parameter info)
         return selectStringList(sql, columnList);
     }
 }

@@ -25,5 +25,8 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
  */
 public interface DfSequenceExtractor {
 
-    Map<String, DfSequenceMeta> getSequenceMap();
+    /**
+     * @return The map of sequence meta. The key is sequence full name: e.g. EXAMPLEDB.SP_FOO
+     */
+    Map<String, DfSequenceMeta> extractSequenceMap();
 }

@@ -26,7 +26,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 
 /**
@@ -61,19 +60,17 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
     }
 
     protected void setupPureSequence(Map<String, DfSequenceMeta> resultMap, StringBuilder logSb) {
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildMetaSelectSql();
         if (sql == null) {
             return;
         }
-        _log.info(sql);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SEQUENCE_OWNER");
         columnList.add("SEQUENCE_NAME");
         columnList.add("MIN_VALUE");
         columnList.add("MAX_VALUE");
         columnList.add("INCREMENT_BY");
-        final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
+        final List<Map<String, String>> resultList = selectStringList(sql, columnList);
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
             final DfSequenceMeta info = new DfSequenceMeta();
@@ -111,7 +108,6 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
     }
 
     protected void setupSequenceSynonym(Map<String, DfSequenceMeta> resultMap, StringBuilder logSb) {
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SYNONYM_OWNER");
         columnList.add("SYNONYM_NAME");
@@ -124,8 +120,7 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
         if (sql == null) {
             return;
         }
-        _log.info(sql);
-        final List<Map<String, String>> synonymList = facade.selectStringList(sql, columnList);
+        final List<Map<String, String>> synonymList = selectStringList(sql, columnList);
         for (Map<String, String> recordMap : synonymList) {
             final DfSequenceMeta info = new DfSequenceMeta();
             final String sequenceSchema = recordMap.get("SYNONYM_OWNER");

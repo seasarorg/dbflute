@@ -26,7 +26,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
@@ -54,19 +53,17 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
     protected Map<String, DfSequenceMeta> doGetSequenceMap() {
         _log.info("...Loading sequence informations");
         final Map<String, DfSequenceMeta> resultMap = StringKeyMap.createAsFlexibleOrdered();
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildMetaSelectSql();
         if (sql == null) {
             return DfCollectionUtil.emptyMap();
         }
-        _log.info(sql);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SEQSCHEMA");
         columnList.add("SEQNAME");
         columnList.add("MINVALUE");
         columnList.add("MAXVALUE");
         columnList.add("INCREMENT");
-        final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
+        final List<Map<String, String>> resultList = selectStringList(sql, columnList);
         final StringBuilder logSb = new StringBuilder();
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
@@ -110,7 +107,7 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
         } else {
             return null;
         }
-        // the table 'sequences' on DB2 does not have catalog of sequence
+        // the table 'SEQUENCES' on DB2 does not have catalog of sequence
         return "select * from SYSCAT.SEQUENCES where SEQSCHEMA in (" + schemaCondition + ")";
     }
 }

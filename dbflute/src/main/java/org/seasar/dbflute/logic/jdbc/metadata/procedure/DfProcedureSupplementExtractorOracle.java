@@ -16,20 +16,15 @@
 package org.seasar.dbflute.logic.jdbc.metadata.procedure;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureArgumentInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
@@ -37,8 +32,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.various.array.DfArrayExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.various.struct.DfStructExtractorOracle;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -46,21 +39,11 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.7.6 (2010/11/18 Thursday)
  */
-public class DfProcedureSupplementExtractorOracle implements DfProcedureSupplementExtractor {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfProcedureSupplementExtractorOracle.class);
+public class DfProcedureSupplementExtractorOracle extends DfProcedureSupplementExtractorBase {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    // -----------------------------------------------------
-    //                                                 Basic
-    //                                                 -----
-    protected final DataSource _dataSource;
-
     // -----------------------------------------------------
     //                                       Basic GreatWall
     //                                       ---------------
@@ -107,22 +90,16 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     protected final Map<String, StringKeyMap<Integer>> _parameterOverloadToDBLinkResultMapMap = newHashMap();
     protected final Map<UnifiedSchema, StringKeyMap<DfTypeArrayInfo>> _parameterArrayResultMapMap = newHashMap();
     protected final Map<UnifiedSchema, StringKeyMap<DfTypeStructInfo>> _structResultMapMap = newHashMap();
-    protected final Map<UnifiedSchema, Map<String, DfProcedureSourceInfo>> _procedureSourceMapMap = newHashMap();
 
     // DBLink procedure's GreatWalls are unsupported yet
     //protected final Map<String, StringKeyMap<DfTypeArrayInfo>> _parameterArrayInfoToDBLinkResultMapMap = newHashMap();
     //protected final Map<String, StringKeyMap<DfTypeStructInfo>> _structInfoToDBLinkResultMapMap = newHashMap();
 
-    // -----------------------------------------------------
-    //                                                Option
-    //                                                ------
-    protected boolean _suppressLogging;
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfProcedureSupplementExtractorOracle(DataSource dataSource) {
-        _dataSource = dataSource;
+        super(dataSource);
     }
 
     // ===================================================================================
@@ -131,6 +108,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringKeyMap<Integer> extractParameterOverloadInfoMap(UnifiedSchema unifiedSchema) {
         final StringKeyMap<Integer> overloadInfoToDBLinkMap = _parameterOverloadResultMapMap.get(unifiedSchema);
         if (overloadInfoToDBLinkMap == null) {
@@ -185,6 +163,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringKeyMap<DfTypeArrayInfo> extractParameterArrayInfoMap(UnifiedSchema unifiedSchema) {
         final StringKeyMap<DfTypeArrayInfo> overloadInfoToDBLinkMap = _parameterArrayResultMapMap.get(unifiedSchema);
         if (overloadInfoToDBLinkMap == null) {
@@ -260,6 +239,7 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringKeyMap<DfTypeStructInfo> extractStructInfoMap(UnifiedSchema unifiedSchema) {
         final StringKeyMap<DfTypeStructInfo> structInfoToDBLinkMap = _structResultMapMap.get(unifiedSchema);
         if (structInfoToDBLinkMap == null) {
@@ -341,16 +321,19 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     }
 
     // ===================================================================================
+    //                                                                       Key Generator
+    //                                                                       =============
+    @Override
+    public String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName) {
+        return DfProcedureParameterNativeExtractorOracle.generateParameterInfoMapKey(catalog, procedureName,
+                parameterName);
+    }
+
+    // ===================================================================================
     //                                                                         Source Info
     //                                                                         ===========
-    /**
-     * {@inheritDoc}
-     */
-    public Map<String, DfProcedureSourceInfo> extractProcedureSourceInfo(UnifiedSchema unifiedSchema) {
-        final Map<String, DfProcedureSourceInfo> cachedMap = _procedureSourceMapMap.get(unifiedSchema);
-        if (cachedMap != null) {
-            return cachedMap;
-        }
+    @Override
+    protected Map<String, DfProcedureSourceInfo> doExtractProcedureSourceInfo(UnifiedSchema unifiedSchema) {
         final Map<String, DfProcedureSourceInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
         final List<Map<String, String>> sourceList = selectProcedureSourceList(unifiedSchema);
         final String[] packageBodyMarkAry = new String[] { "procedure ", "function " };
@@ -407,32 +390,23 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
         if (previousName != null && packageBodyName == null) { // the latest element
             setupProcedureSourceInfo(resultMap, previousName, sb.toString(), line);
         }
-        _procedureSourceMapMap.put(unifiedSchema, resultMap);
-        return _procedureSourceMapMap.get(unifiedSchema);
+        return resultMap;
     }
 
     protected List<Map<String, String>> selectProcedureSourceList(UnifiedSchema unifiedSchema) {
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         StringBuilder sb = new StringBuilder();
         sb.append("select * from ALL_SOURCE");
         sb.append(" where OWNER = '").append(unifiedSchema.getPureSchema()).append("'");
         sb.append(" order by NAME, TYPE, LINE");
         String sql = sb.toString();
         final List<String> columnList = new ArrayList<String>();
-        columnList.add("NAME");
-        columnList.add("TYPE");
+        columnList.add("NAME"); // procedure name
+        columnList.add("TYPE"); // PROCEDURE, FUNCTION, PACKAGE BODY, ...
+
+        // contains parameter definition
         columnList.add("LINE");
         columnList.add("TEXT");
-        final List<Map<String, String>> resultList;
-        try {
-            log(sql);
-            resultList = facade.selectStringList(sql, columnList);
-        } catch (Exception continued) {
-            // because it's basically assist info
-            log("Failed to select procedure source info: " + continued.getMessage());
-            return DfCollectionUtil.emptyList();
-        }
-        return resultList;
+        return selectStringList(sql, columnList);
     }
 
     protected String buildPackageBodyKeyName(String plainName, String packageBodyName) {
@@ -463,14 +437,6 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
     protected boolean isSourcePackageBody(Map<String, String> sourceMap) {
         final String type = sourceMap.get("TYPE"); // null-allowed column
         return type != null && type.equalsIgnoreCase("PACKAGE BODY");
-    }
-
-    // ===================================================================================
-    //                                                                       Key Generator
-    //                                                                       =============
-    public String generateParameterInfoMapKey(String catalog, String procedureName, String parameterName) {
-        return DfProcedureParameterNativeExtractorOracle.generateParameterInfoMapKey(catalog, procedureName,
-                parameterName);
     }
 
     // ===================================================================================
@@ -514,41 +480,5 @@ public class DfProcedureSupplementExtractorOracle implements DfProcedureSuppleme
 
     protected DfProcedureParameterNativeExtractorOracle createProcedureParameterExtractorOracle() {
         return new DfProcedureParameterNativeExtractorOracle(_dataSource, _suppressLogging);
-    }
-
-    // ===================================================================================
-    //                                                                          Properties
-    //                                                                          ==========
-    protected UnifiedSchema getMainSchema() {
-        return getDatabaseProperties().getDatabaseSchema();
-    }
-
-    protected List<UnifiedSchema> getAdditionalSchemaList() {
-        return getDatabaseProperties().getAdditionalSchemaList();
-    }
-
-    protected DfDatabaseProperties getDatabaseProperties() {
-        return DfBuildProperties.getInstance().getDatabaseProperties();
-    }
-
-    // ===================================================================================
-    //                                                                             Logging
-    //                                                                             =======
-    protected void log(String msg) {
-        if (_suppressLogging) {
-            return;
-        }
-        _log.info(msg);
-    }
-
-    public void suppressLogging() {
-        _suppressLogging = true;
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
-        return DfCollectionUtil.newHashMap();
     }
 }

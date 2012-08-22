@@ -27,14 +27,14 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 
 /**
  * @author jflute
- * @since 0.9.9.7F (2012/08/21 Tuesday)
+ * @since 0.9.9.7F (2012/08/22 Wednesday)
  */
-public class DfProcedureSupplementExtractorMySQL extends DfProcedureSupplementExtractorBase {
+public class DfProcedureSupplementExtractorH2 extends DfProcedureSupplementExtractorBase {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfProcedureSupplementExtractorMySQL(DataSource dataSource) {
+    public DfProcedureSupplementExtractorH2(DataSource dataSource) {
         super(dataSource);
     }
 
@@ -46,20 +46,17 @@ public class DfProcedureSupplementExtractorMySQL extends DfProcedureSupplementEx
         final List<Map<String, String>> sourceList = selectProcedureSourceList(unifiedSchema);
         final Map<String, DfProcedureSourceInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
         for (Map<String, String> sourceMap : sourceList) {
-            final String name = sourceMap.get("ROUTINE_NAME");
+            final String name = sourceMap.get("ALIAS_NAME");
             if (name == null) { // just in case
                 continue;
             }
             final DfProcedureSourceInfo sourceInfo = new DfProcedureSourceInfo();
 
-            // ROUTINES does not have parameter list
-            final String body = sourceMap.get("ROUTINE_DEFINITION");
+            final String body = sourceMap.get("SOURCE"); // full text
             if (body == null) {
                 continue;
             }
             sourceInfo.setSourceCode(body);
-
-            // body part only
             sourceInfo.setSourceLine(calculateSourceLine(body));
             sourceInfo.setSourceSize(calculateSourceSize(body));
 
@@ -69,16 +66,17 @@ public class DfProcedureSupplementExtractorMySQL extends DfProcedureSupplementEx
     }
 
     protected List<Map<String, String>> selectProcedureSourceList(UnifiedSchema unifiedSchema) {
-        // mysql.proc can be accessed only by root so it uses information schema
         StringBuilder sb = new StringBuilder();
-        sb.append("select * from INFORMATION_SCHEMA.ROUTINES");
-        sb.append(" where ROUTINE_SCHEMA = '").append(unifiedSchema.getPureCatalog()).append("'");
-        sb.append(" order by ROUTINE_NAME");
+        sb.append("select * from INFORMATION_SCHEMA.FUNCTION_ALIASES");
+        sb.append(" where ALIAS_CATALOG = '").append(unifiedSchema.getPureCatalog()).append("'");
+        sb.append(" and ALIAS_SCHEMA = '").append(unifiedSchema.getPureSchema()).append("'");
+        sb.append(" order by ALIAS_NAME");
         String sql = sb.toString();
         final List<String> columnList = new ArrayList<String>();
-        columnList.add("ROUTINE_SCHEMA");
-        columnList.add("ROUTINE_NAME");
-        columnList.add("ROUTINE_DEFINITION"); // body only (no parameter info)
+        columnList.add("ALIAS_CATALOG");
+        columnList.add("ALIAS_SCHEMA");
+        columnList.add("ALIAS_NAME");
+        columnList.add("SOURCE"); // full text (contains parameter definition)
         return selectStringList(sql, columnList);
     }
 }

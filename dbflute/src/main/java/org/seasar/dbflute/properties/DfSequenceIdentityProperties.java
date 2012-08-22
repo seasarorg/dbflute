@@ -11,8 +11,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
@@ -30,11 +28,6 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public final class DfSequenceIdentityProperties extends DfAbstractHelperProperties {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSequenceIdentityProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -233,11 +226,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         final DfSequenceExtractor sequenceExtractor = factory.createSequenceExtractor();
         Map<String, DfSequenceMeta> sequenceMap = null;
         if (sequenceExtractor != null) {
-            try {
-                sequenceMap = sequenceExtractor.getSequenceMap();
-            } catch (RuntimeException continued) { // because of supplement
-                _log.info("*Failed to get sequence map: " + continued.getMessage());
-            }
+            sequenceMap = sequenceExtractor.extractSequenceMap();
         }
         if (sequenceMap != null) {
             _sequenceMap = sequenceMap;

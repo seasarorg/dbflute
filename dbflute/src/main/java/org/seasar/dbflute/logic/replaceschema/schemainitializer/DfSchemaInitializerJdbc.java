@@ -384,19 +384,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected DfDropProcedureByJdbcCallback createDropProcedureByJdbcCallback() {
-        return new DfDropProcedureByJdbcCallback() {
-            public String buildDropProcedureSql(DfProcedureMeta procedureMeta) {
-                return "drop procedure " + buildProcedureSqlName(procedureMeta);
-            }
+        return new DfDropProcedureByJdbcDefaultCallback();
+    }
 
-            public String buildDropFunctionSql(DfProcedureMeta procedureMeta) {
-                return "drop function " + buildProcedureSqlName(procedureMeta);
-            }
+    protected class DfDropProcedureByJdbcDefaultCallback implements DfDropProcedureByJdbcCallback {
+        public String buildDropProcedureSql(DfProcedureMeta procedureMeta) {
+            return "drop procedure " + buildProcedureSqlName(procedureMeta);
+        }
 
-            public String buildDropPackageSql(DfProcedureMeta procedureMeta) {
-                return "drop package " + procedureMeta.getProcedurePackage();
-            }
-        };
+        public String buildDropFunctionSql(DfProcedureMeta procedureMeta) {
+            return "drop function " + buildProcedureSqlName(procedureMeta);
+        }
+
+        public String buildDropPackageSql(DfProcedureMeta procedureMeta) {
+            return "drop package " + procedureMeta.getProcedurePackage();
+        }
     }
 
     protected String buildProcedureSqlName(DfProcedureMeta metaInfo) {

@@ -600,11 +600,7 @@ public class DfSchemaXmlSerializer {
         final DfSequenceExtractor sequenceExtractor = factory.createSequenceExtractor();
         Map<String, DfSequenceMeta> sequenceMap = null;
         if (sequenceExtractor != null) {
-            try {
-                sequenceMap = sequenceExtractor.getSequenceMap();
-            } catch (RuntimeException continued) { // because of supplement
-                _log.info("*Failed to get sequence map: " + continued.getMessage());
-            }
+            sequenceMap = sequenceExtractor.extractSequenceMap();
         }
         return sequenceMap;
     }

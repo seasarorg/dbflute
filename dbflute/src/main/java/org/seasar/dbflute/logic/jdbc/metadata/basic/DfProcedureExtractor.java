@@ -51,8 +51,11 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureNativeTranslatorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractorDB2;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractorH2;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractorMySQL;
 import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractorOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.procedure.DfProcedureSupplementExtractorPostgreSQL;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.factory.DfProcedureSynonymExtractorFactory;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -84,6 +87,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     protected DataSource _procedureToDBLinkDataSource;
 
     // key is data source because it may be schema diff
+    protected final Map<Integer, Map<String, DfProcedureSupplementExtractor>> _supplementExtractorMap = newHashMap();
+    protected final Map<Integer, DfProcedureSupplementExtractorPostgreSQL> _supplementExtractorPostgreSQLMap = newHashMap();
     protected final Map<Integer, DfProcedureSupplementExtractorMySQL> _supplementExtractorMySQLMap = newHashMap();
     protected final Map<Integer, DfProcedureSupplementExtractorOracle> _supplementExtractorOracleMap = newHashMap();
 
@@ -763,8 +768,14 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     protected void resolveAssistInfo(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
         if (isDatabaseMySQL()) {
             doResolveAssistInfoMySQL(dataSource, metaInfoList);
+        } else if (isDatabasePostgreSQL()) {
+            doResolveAssistInfoPostgreSQL(dataSource, metaInfoList);
         } else if (isDatabaseOracle()) {
             doResolveAssistInfoOracle(dataSource, metaInfoList);
+        } else if (isDatabaseDB2()) {
+            doResolveAssistInfoDB2(dataSource, metaInfoList);
+        } else if (isDatabaseH2()) {
+            doResolveAssistInfoH2(dataSource, metaInfoList);
         }
     }
 
@@ -775,7 +786,24 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         // available schema
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
-        final DfProcedureSupplementExtractorMySQL extractor = getSupplementExtractorMySQL(dataSource);
+        final DfProcedureSupplementExtractor extractor = getSupplementExtractorMySQL(dataSource);
+
+        // source info
+        final boolean reflectParamsToHash = true; // cannot get parameter info from MySQL
+        doSetupSourceInfo(dataSource, metaInfoList, extractor, mainSchema, reflectParamsToHash);
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            doSetupSourceInfo(dataSource, metaInfoList, extractor, additionalSchema, reflectParamsToHash);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            PostgreSQL
+    //                                            ----------
+    protected void doResolveAssistInfoPostgreSQL(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
+        // available schema
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
+        final DfProcedureSupplementExtractor extractor = getSupplementExtractorPostgreSQL(dataSource);
 
         // source info
         final boolean reflectParamsToHash = true; // cannot get parameter info from MySQL
@@ -849,8 +877,42 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     // -----------------------------------------------------
-    //                                                DBLink
-    //                                                ------
+    //                                                   DB2
+    //                                                   ---
+    protected void doResolveAssistInfoDB2(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
+        // available schema
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
+        final DfProcedureSupplementExtractor extractor = getSupplementExtractorDB2(dataSource);
+
+        // source info
+        final boolean reflectParamsToHash = false; // can get parameter definition code from DB2
+        doSetupSourceInfo(dataSource, metaInfoList, extractor, mainSchema, reflectParamsToHash);
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            doSetupSourceInfo(dataSource, metaInfoList, extractor, additionalSchema, reflectParamsToHash);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                           H2 Database
+    //                                           -----------
+    protected void doResolveAssistInfoH2(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
+        // available schema
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
+        final DfProcedureSupplementExtractor extractor = getSupplementExtractorH2(dataSource);
+
+        // source info
+        final boolean reflectParamsToHash = false; // can get parameter definition code from H2
+        doSetupSourceInfo(dataSource, metaInfoList, extractor, mainSchema, reflectParamsToHash);
+        for (UnifiedSchema additionalSchema : additionalSchemaList) {
+            doSetupSourceInfo(dataSource, metaInfoList, extractor, additionalSchema, reflectParamsToHash);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                             DB Link
+    //                                                                             =======
     protected void resolveAssistInfoToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
             String dbLinkName) {
         if (isDatabaseOracle()) {
@@ -896,9 +958,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    // -----------------------------------------------------
-    //                                            Great Wall
-    //                                            ----------
+    // ===================================================================================
+    //                                                                          Great Wall
+    //                                                                          ==========
     protected void doSetupGreatWallOracle(StringKeyMap<DfTypeArrayInfo> parameterArrayInfoMap,
             StringKeyMap<DfTypeStructInfo> structInfoMap, List<DfProcedureMeta> metaInfoList,
             DfProcedureSupplementExtractorOracle extractor) {
@@ -942,9 +1004,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         }
     }
 
-    // -----------------------------------------------------
-    //                                           Source Info
-    //                                           -----------
+    // ===================================================================================
+    //                                                                         Source Info
+    //                                                                         ===========
     protected void doSetupSourceInfo(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
             DfProcedureSupplementExtractor extractor, UnifiedSchema unifiedSchema, boolean reflectParamsToHash) {
         final Map<String, DfProcedureSourceInfo> sourceInfoMap = extractor.extractProcedureSourceInfo(unifiedSchema);
@@ -964,38 +1026,96 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             if (reflectParamsToHash) {
                 sourceInfo.setSupplementCode(procedureMeta.getColumnDefinitionIndentity());
             }
-            log("  " + procedureMeta.getProcedureDisplayName() + ":" + sourceInfo);
+            showReflectedSourceInfo(procedureMeta, sourceInfo);
             procedureMeta.setProcedureSourceInfo(sourceInfo);
         }
     }
 
-    // -----------------------------------------------------
-    //                                    (Cached) Extractor
-    //                                    ------------------
+    protected void showReflectedSourceInfo(DfProcedureMeta procedureMeta, DfProcedureSourceInfo sourceInfo) {
+        final String procedureDisplayName = procedureMeta.getProcedureDisplayName();
+        if (getBasicProperties().isSuperDebug()) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("[").append(procedureDisplayName).append("]: ").append(sourceInfo);
+            sb.append(ln()).append("<source code>");
+            sb.append(ln()).append(sourceInfo.getSourceCode());
+            final String supplementCode = sourceInfo.getSupplementCode();
+            if (supplementCode != null) {
+                sb.append(ln()).append("<supplement code>");
+                sb.append(ln()).append(supplementCode);
+            }
+            log(sb.toString());
+        } else {
+            log("  " + procedureDisplayName + ":" + sourceInfo);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                  (Cached) Extractor
+    //                                                                  ==================
     protected DfProcedureSupplementExtractorMySQL getSupplementExtractorMySQL(DataSource dataSource) {
-        final int key = dataSource.hashCode();
-        DfProcedureSupplementExtractorMySQL extractorMySQL = _supplementExtractorMySQLMap.get(key);
-        if (extractorMySQL == null) {
-            _supplementExtractorMySQLMap.put(key, new DfProcedureSupplementExtractorMySQL(dataSource));
-        }
-        extractorMySQL = _supplementExtractorMySQLMap.get(key);
-        if (_suppressLogging) {
-            extractorMySQL.suppressLogging();
-        }
-        return extractorMySQL;
+        return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
+            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+                return new DfProcedureSupplementExtractorMySQL(dataSource);
+            }
+        });
+    }
+
+    protected DfProcedureSupplementExtractorPostgreSQL getSupplementExtractorPostgreSQL(DataSource dataSource) {
+        return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
+            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+                return new DfProcedureSupplementExtractorPostgreSQL(dataSource);
+            }
+        });
     }
 
     protected DfProcedureSupplementExtractorOracle getSupplementExtractorOracle(DataSource dataSource) {
-        final int key = dataSource.hashCode();
-        DfProcedureSupplementExtractorOracle extractorOracle = _supplementExtractorOracleMap.get(key);
-        if (extractorOracle == null) {
-            _supplementExtractorOracleMap.put(key, new DfProcedureSupplementExtractorOracle(dataSource));
+        return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
+            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+                return new DfProcedureSupplementExtractorOracle(dataSource);
+            }
+        });
+    }
+
+    protected DfProcedureSupplementExtractorDB2 getSupplementExtractorDB2(DataSource dataSource) {
+        return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
+            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+                return new DfProcedureSupplementExtractorDB2(dataSource);
+            }
+        });
+    }
+
+    protected DfProcedureSupplementExtractorH2 getSupplementExtractorH2(DataSource dataSource) {
+        return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
+            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+                return new DfProcedureSupplementExtractorH2(dataSource);
+            }
+        });
+    }
+
+    protected <EXTRACTOR extends DfProcedureSupplementExtractor> EXTRACTOR doGetSupplementExtractor(
+            DataSource dataSource, DfProcedureSupplementExtractorCreator creator) {
+        final int dataSourceKey = dataSource.hashCode();
+        Map<String, DfProcedureSupplementExtractor> cacheMap = _supplementExtractorMap.get(dataSourceKey);
+        if (cacheMap == null) {
+            cacheMap = newHashMap();
+            _supplementExtractorMap.put(dataSourceKey, cacheMap);
         }
-        extractorOracle = _supplementExtractorOracleMap.get(key);
+        final String databaseKey = getBasicProperties().getTargetDatabase();
+        DfProcedureSupplementExtractor extractor = cacheMap.get(databaseKey);
+        if (extractor == null) {
+            extractor = creator.create(dataSource);
+            cacheMap.put(databaseKey, extractor);
+        }
         if (_suppressLogging) {
-            extractorOracle.suppressLogging();
+            extractor.suppressLogging();
         }
-        return extractorOracle;
+        @SuppressWarnings("unchecked")
+        final EXTRACTOR castExtractor = (EXTRACTOR) extractor;
+        return castExtractor;
+    }
+
+    protected static interface DfProcedureSupplementExtractorCreator {
+        DfProcedureSupplementExtractor create(DataSource dataSource);
     }
 
     // ===================================================================================

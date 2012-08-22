@@ -26,7 +26,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 
 /**
@@ -53,9 +52,7 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
     protected Map<String, DfSequenceMeta> doGetSequenceMap() {
         _log.info("...Loading sequence informations");
         final Map<String, DfSequenceMeta> resultMap = StringKeyMap.createAsFlexibleOrdered();
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String sql = buildMetaSelectSql();
-        _log.info(sql);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("sequence_catalog");
         columnList.add("sequence_schema");
@@ -63,7 +60,7 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
         columnList.add("minimum_value");
         columnList.add("maximum_value");
         columnList.add("increment");
-        final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
+        final List<Map<String, String>> resultList = selectStringList(sql, columnList);
         final StringBuilder logSb = new StringBuilder();
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
@@ -79,19 +76,19 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
 
             String minValue = recordMap.get("minimum_value");
             if (minValue == null || minValue.trim().length() == 0) {
-                minValue = selectMinimumValue(facade, unifiedSchema, sequenceName);
+                minValue = selectMinimumValue(unifiedSchema, sequenceName);
             }
             info.setMinimumValue(minValue != null ? new BigDecimal(minValue) : null);
 
             String maxValue = recordMap.get("maximum_value");
             if (maxValue == null || maxValue.trim().length() == 0) {
-                maxValue = selectMaximumValue(facade, unifiedSchema, sequenceName);
+                maxValue = selectMaximumValue(unifiedSchema, sequenceName);
             }
             info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
 
             String incrementSize = recordMap.get("increment");
             if (incrementSize == null || incrementSize.trim().length() == 0) {
-                incrementSize = selectIncrementSize(facade, unifiedSchema, sequenceName);
+                incrementSize = selectIncrementSize(unifiedSchema, sequenceName);
             }
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
 
@@ -117,28 +114,28 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
         } else {
             schemaCondition = "'public'";
         }
-        // it allowed to exist unused sequences so it does not use catalog condition 
+        // it allowed to exist unused sequences so it does not use catalog condition
+        // and sequences cannot show only connected catalog, maybe...
         return "select * from information_schema.sequences where sequence_schema in (" + schemaCondition + ")";
     }
 
-    protected String selectMinimumValue(DfJdbcFacade facade, UnifiedSchema unifiedSchema, String sequenceName) {
-        return selectElementValue(facade, unifiedSchema, sequenceName, "min_value");
+    protected String selectMinimumValue(UnifiedSchema unifiedSchema, String sequenceName) {
+        return selectElementValue(unifiedSchema, sequenceName, "min_value");
     }
 
-    protected String selectMaximumValue(DfJdbcFacade facade, UnifiedSchema unifiedSchema, String sequenceName) {
-        return selectElementValue(facade, unifiedSchema, sequenceName, "max_value");
+    protected String selectMaximumValue(UnifiedSchema unifiedSchema, String sequenceName) {
+        return selectElementValue(unifiedSchema, sequenceName, "max_value");
     }
 
-    protected String selectIncrementSize(DfJdbcFacade facade, UnifiedSchema unifiedSchema, String sequenceName) {
-        return selectElementValue(facade, unifiedSchema, sequenceName, "increment_by");
+    protected String selectIncrementSize(UnifiedSchema unifiedSchema, String sequenceName) {
+        return selectElementValue(unifiedSchema, sequenceName, "increment_by");
     }
 
-    protected String selectElementValue(DfJdbcFacade facade, UnifiedSchema unifiedSchema, String sequenceName,
-            String elementName) {
+    protected String selectElementValue(UnifiedSchema unifiedSchema, String sequenceName, String elementName) {
         String sql = buildElementValueSql(unifiedSchema.buildSqlName(sequenceName), elementName);
         final List<String> columnList = new ArrayList<String>();
         columnList.add(elementName);
-        final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
+        final List<Map<String, String>> resultList = selectStringList(sql, columnList);
         if (!resultList.isEmpty()) {
             return resultList.get(0).get(elementName); // only one record exists
         }
