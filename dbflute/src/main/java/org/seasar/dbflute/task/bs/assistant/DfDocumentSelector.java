@@ -173,6 +173,44 @@ public class DfDocumentSelector {
     }
 
     // ===================================================================================
+    //                                                                              Design
+    //                                                                              ======
+    // -----------------------------------------------------
+    //                                           HistoryHTML
+    //                                           -----------
+    public boolean isHistoryHtmlStyleSheetEmbedded() {
+        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlStyleSheetEmbedded();
+    }
+
+    public boolean isHistoryHtmlStyleSheetLink() {
+        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlStyleSheetLink();
+    }
+
+    public String getHistoryHtmlStyleSheetEmbedded() {
+        return getDocumentProperties().getHistoryHtmlStyleSheetEmbedded();
+    }
+
+    public String getHistoryHtmlStyleSheetLink() {
+        return getDocumentProperties().getHistoryHtmlStyleSheetLink();
+    }
+
+    public boolean isHistoryHtmlJavaScriptEmbedded() {
+        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlJavaScriptEmbedded();
+    }
+
+    public boolean isHistoryHtmlJavaScriptLink() {
+        return isCurrentHistoryHtml() && getDocumentProperties().isHistoryHtmlJavaScriptLink();
+    }
+
+    public String getHistoryHtmlJavaScriptEmbedded() {
+        return getDocumentProperties().getHistoryHtmlJavaScriptEmbedded();
+    }
+
+    public String getHistoryHtmlJavaScriptLink() {
+        return getDocumentProperties().getHistoryHtmlJavaScriptLink();
+    }
+
+    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {

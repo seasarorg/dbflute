@@ -3,12 +3,12 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>${database.projectName} ${selector.diffModelSmallTitle}</title>
-#if ($database.isHistoryHtmlStyleSheetEmbedded())
+#if ($selector.isHistoryHtmlStyleSheetEmbedded())
 	<style type="text/css">
-${database.historyHtmlStyleSheetEmbedded}
+${selector.historyHtmlStyleSheetEmbedded}
 	</style>
-#elseif ($database.isHistoryHtmlStyleSheetLink())
-	${database.historyHtmlStyleSheetLink}
+#elseif ($selector.isHistoryHtmlStyleSheetLink())
+	${selector.historyHtmlStyleSheetLink}
 #else
 	<style type="text/css">
 * {
@@ -97,12 +97,12 @@ p.tablecount {
 }
 	</style>
 #end
-#if ($database.isHistoryHtmlJavaScriptEmbedded())
+#if ($selector.isHistoryHtmlJavaScriptEmbedded())
 	<script type="text/javascript">
-${database.historyHtmlJavaScriptEmbedded}
+${selector.historyHtmlJavaScriptEmbedded}
 	</script>
-#elseif ($database.isHistoryHtmlJavaScriptLink())
-	${database.historyHtmlJavaScriptLink}
+#elseif ($selector.isHistoryHtmlJavaScriptLink())
+	${selector.historyHtmlJavaScriptLink}
 #end
 </head>
 
