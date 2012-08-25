@@ -419,14 +419,6 @@
 		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-sqlap" depends="prepare-reflection" description="==> reflect to sqlap example">
-		<delete dir="${extraction.dir}"/>
-	</target>
-
-	<target name="reflect-to-bhvap" depends="prepare-reflection" description="==> reflect to bhvap all examples">
-		<delete dir="${extraction.dir}"/>
-	</target>
-
 	<target name="reflect-to-javatest" depends="prepare-reflection" description="==> reflect to java test">
 		<copy file="${dist}/${runtime.jar}" tofile="${javatest.dir}/lib/${runtime.nonversion.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${javatest.dir}/lib/sources/${runtime.sources.nonversion.jar}" overwrite="true"/>
@@ -458,8 +450,6 @@
 	  	<antcall target="reflect-to-flex" />
 	  	<antcall target="reflect-to-ymir" />
 	  	<antcall target="reflect-to-sastruts" />
-	  	<antcall target="reflect-to-sqlap" />
-	  	<antcall target="reflect-to-bhvap" />
 	  	<antcall target="reflect-to-javatest" />
 	</target>
 
