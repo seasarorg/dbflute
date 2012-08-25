@@ -56,6 +56,14 @@ rm ./log/*.log
 . sql2entity.sh
 . outside-sql-test.sh
 
+cd ../../dbflute-db2-example/dbflute_exampledb
+rm ./log/*.log
+. jdbc.sh
+. doc.sh
+. generate.sh
+. sql2entity.sh
+. outside-sql-test.sh
+
 cd ../../dbflute-multipledb-seasar-example/dbflute_librarydb
 rm ./log/*.log
 . jdbc.sh
