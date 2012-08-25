@@ -452,6 +452,7 @@
 	  	<antcall target="reflect-to-cdi" />
 	  	<antcall target="reflect-to-mysql" />
 	  	<antcall target="reflect-to-postgresql" />
+	  	<antcall target="reflect-to-db2" />
 	  	<antcall target="reflect-to-sqlite" />
 	  	<antcall target="reflect-to-multipledb" />
 	  	<antcall target="reflect-to-flex" />
@@ -468,7 +469,6 @@
 
 	<target name="reflect-to-all-for-win" depends="prepare-reflection" description="==> reflect to all examples">
 	  	<antcall target="reflect-to-oracle" />
-	  	<antcall target="reflect-to-db2" />
 	  	<antcall target="reflect-to-sqlserver" />
 	  	<antcall target="reflect-to-msaccess" />
 	  	<antcall target="reflect-to-buri" />
