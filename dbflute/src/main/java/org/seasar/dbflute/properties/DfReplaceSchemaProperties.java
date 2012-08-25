@@ -1,11 +1,8 @@
 package org.seasar.dbflute.properties;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +19,6 @@ import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.process.SystemScript;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
@@ -511,104 +507,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return createConnection(driver, url, unifiedSchema, user, password);
     }
 
-    protected String resolvePasswordVariable(String additonalUser, String password) {
-        if (Srl.is_Null_or_TrimmedEmpty(password)) {
-            return password;
-        }
-        final DfAdditionalUserPasswordInfo pwdInfo = analyzePasswordVariable(password);
-        if (pwdInfo == null) {
-            return password;
-        }
-        final File pwdFile = pwdInfo.getPwdFile();
-        final String defaultPwd = pwdInfo.getDefaultPwd();
-        if (!pwdFile.exists()) {
-            if (defaultPwd == null) {
-                throwAdditionalUserPasswordFileNotFoundException(additonalUser, password, pwdFile);
-            }
-            return defaultPwd; // no password file
-        }
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(pwdFile), "UTF-8"));
-            final String line = br.readLine();
-            return line; // first line in the password file is password
-        } catch (Exception continued) {
-            _log.info("Failed to read the password file: " + pwdFile);
-            return defaultPwd; // no password
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
-
-    protected DfAdditionalUserPasswordInfo analyzePasswordVariable(String password) {
-        final String prefix = "df:dfprop/";
-        if (!password.startsWith(prefix)) {
-            return null;
-        }
-        final String fileName;
-        final String defaultPwd;
-        {
-            final String content = Srl.substringFirstRear(password, prefix);
-            if (content.contains("|")) {
-                fileName = Srl.substringFirstFront(content, "|");
-                defaultPwd = Srl.substringFirstRear(content, "|");
-            } else {
-                fileName = content;
-                defaultPwd = null;
-            }
-        }
-        final File pwdFile = new File("./dfprop/" + fileName);
-        final DfAdditionalUserPasswordInfo pwdInfo = new DfAdditionalUserPasswordInfo();
-        pwdInfo.setPwdFile(pwdFile);
-        pwdInfo.setDefaultPwd(defaultPwd);
-        return pwdInfo;
-    }
-
-    protected static class DfAdditionalUserPasswordInfo {
-        protected File _pwdFile;
-        protected String _defaultPwd;
-
-        public File getPwdFile() {
-            return _pwdFile;
-        }
-
-        public void setPwdFile(File pwdFile) {
-            this._pwdFile = pwdFile;
-        }
-
-        public String getDefaultPwd() {
-            return _defaultPwd;
-        }
-
-        public void setDefaultPwd(String defaultPwd) {
-            this._defaultPwd = defaultPwd;
-        }
-    }
-
-    protected void throwAdditionalUserPasswordFileNotFoundException(String additonalUser, String password, File pwdFile) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The password file for additional user was not found.");
-        br.addItem("Advice");
-        br.addElement("Check your password file existing.");
-        br.addElement("And check the setting in DBFlute property.");
-        br.addElement("If you need to set a default password,");
-        br.addElement("Set a password as follows: (default = defpwd)");
-        br.addElement("  password = df:dfprop/system-password.txt|defpwd");
-        br.addItem("AdditionalUser");
-        br.addElement(additonalUser);
-        br.addItem("Password Setting");
-        br.addElement(password);
-        br.addItem("Password File");
-        br.addElement(pwdFile);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
-    }
-
     protected final Map<String, Boolean> _additionalUserSkipIfNotFoundPasswordFileAndDefaultMap = newLinkedHashMap();
 
     public boolean isAdditionalUserSkipIfNotFoundPasswordFileAndDefault(String additonalUser) {
@@ -622,7 +520,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (propertyMap != null && isProperty(key, false, propertyMap)) {
             final String password = propertyMap.get("password");
             if (Srl.is_NotNull_and_NotTrimmedEmpty(password)) {
-                final DfAdditionalUserPasswordInfo pwdInfo = analyzePasswordVariable(password);
+                final DfDatabaseUserPasswordInfo pwdInfo = analyzePasswordVariable(password);
                 if (!pwdInfo.getPwdFile().exists() && pwdInfo.getDefaultPwd() == null) { // both not found
                     result = true;
                 }

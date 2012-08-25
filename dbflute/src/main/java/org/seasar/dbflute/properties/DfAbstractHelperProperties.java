@@ -1,5 +1,10 @@
 package org.seasar.dbflute.properties;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -10,10 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfJDBCException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
@@ -29,11 +37,17 @@ import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
 public abstract class DfAbstractHelperProperties {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
 
     // ===============================================================================
     //                                                                      Definition
@@ -461,6 +475,107 @@ public abstract class DfAbstractHelperProperties {
     }
 
     // ===============================================================================
+    //                                                               Password Variable
+    //                                                               =================
+    protected String resolvePasswordVariable(String user, String password) {
+        if (Srl.is_Null_or_TrimmedEmpty(password)) {
+            return password;
+        }
+        final DfDatabaseUserPasswordInfo pwdInfo = analyzePasswordVariable(password);
+        if (pwdInfo == null) {
+            return password;
+        }
+        final File pwdFile = pwdInfo.getPwdFile();
+        final String defaultPwd = pwdInfo.getDefaultPwd();
+        if (!pwdFile.exists()) {
+            if (defaultPwd == null) {
+                throwDatabaseUserPasswordFileNotFoundException(user, password, pwdFile);
+            }
+            return defaultPwd; // no password file
+        }
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(pwdFile), "UTF-8"));
+            final String line = br.readLine();
+            return line; // first line in the password file is password
+        } catch (Exception continued) {
+            _log.info("Failed to read the password file: " + pwdFile);
+            return defaultPwd; // no password
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    protected DfDatabaseUserPasswordInfo analyzePasswordVariable(String password) {
+        final String prefix = "df:dfprop/";
+        if (!password.startsWith(prefix)) {
+            return null;
+        }
+        final String fileName;
+        final String defaultPwd;
+        {
+            final String content = Srl.substringFirstRear(password, prefix);
+            if (content.contains("|")) {
+                fileName = Srl.substringFirstFront(content, "|");
+                defaultPwd = Srl.substringFirstRear(content, "|");
+            } else {
+                fileName = content;
+                defaultPwd = null;
+            }
+        }
+        final File pwdFile = new File("./dfprop/" + fileName);
+        final DfDatabaseUserPasswordInfo pwdInfo = new DfDatabaseUserPasswordInfo();
+        pwdInfo.setPwdFile(pwdFile);
+        pwdInfo.setDefaultPwd(defaultPwd);
+        return pwdInfo;
+    }
+
+    protected static class DfDatabaseUserPasswordInfo {
+        protected File _pwdFile;
+        protected String _defaultPwd;
+
+        public File getPwdFile() {
+            return _pwdFile;
+        }
+
+        public void setPwdFile(File pwdFile) {
+            this._pwdFile = pwdFile;
+        }
+
+        public String getDefaultPwd() {
+            return _defaultPwd;
+        }
+
+        public void setDefaultPwd(String defaultPwd) {
+            this._defaultPwd = defaultPwd;
+        }
+    }
+
+    protected void throwDatabaseUserPasswordFileNotFoundException(String additonalUser, String password, File pwdFile) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The password file for user was not found.");
+        br.addItem("Advice");
+        br.addElement("Check your password file existing.");
+        br.addElement("And check the setting in DBFlute property.");
+        br.addElement("If you need to set a default password,");
+        br.addElement("Set a password as follows: (default = defpwd)");
+        br.addElement("  password = df:dfprop/system-password.txt|defpwd");
+        br.addItem("Database User");
+        br.addElement(additonalUser);
+        br.addItem("Password Setting");
+        br.addElement(password);
+        br.addItem("Password File");
+        br.addElement(pwdFile);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    // ===============================================================================
     //                                                            Other Property Entry
     //                                                            ====================
     public DfPropertiesHandler handler() {
@@ -496,8 +611,8 @@ public abstract class DfAbstractHelperProperties {
     }
 
     // ===============================================================================
-    //                                                                   Assist Helper
-    //                                                                   =============
+    //                                                                  Target by Hint 
+    //                                                                  ==============
     protected boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
     }
@@ -506,6 +621,9 @@ public abstract class DfAbstractHelperProperties {
         return DfNameHintUtil.isHitByTheHint(name, hint);
     }
 
+    // ===============================================================================
+    //                                                                Environment Type
+    //                                                                ================
     protected final boolean isSpecifiedEnvironmentType() {
         return DfEnvironmentType.getInstance().isSpecifiedType();
     }
@@ -514,11 +632,17 @@ public abstract class DfAbstractHelperProperties {
         return DfEnvironmentType.getInstance().getEnvironmentType();
     }
 
+    // ===============================================================================
+    //                                                                     Task Status
+    //                                                                     ===========
     protected boolean isDocOnlyTask() {
         final DfDBFluteTaskStatus instance = DfDBFluteTaskStatus.getInstance();
         return instance.isDocTask() || instance.isReplaceSchema();
     }
 
+    // ===============================================================================
+    //                                                               Connection Helper
+    //                                                               =================
     protected Connection createConnection(String driver, String url, UnifiedSchema unifiedSchema, Properties info) {
         setupConnectionDriver(driver);
         try {
@@ -572,6 +696,9 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
+    // ===============================================================================
+    //                                                                     Cast Helper
+    //                                                                     ===========
     protected String castToString(Object obj, String property) {
         if (!(obj instanceof String)) {
             String msg = "The type of the property '" + property + "' should be String:";

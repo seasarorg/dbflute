@@ -38,7 +38,16 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DatabaseInfo _databaseInfo = new DatabaseInfo();
+    protected final DatabaseInfo _databaseInfo = new DatabaseInfo();
+
+    // cache
+    protected String _cacheDriver;
+    protected String _cacheUrl;
+    protected String _cacheMainCatalog;
+    protected boolean _catalogCacheDone;
+    protected UnifiedSchema _cacheMainSchema;
+    protected String _cacheUser;
+    protected String _cachePassword;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -54,27 +63,37 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                     Connection Info
     //                                                                     ===============
-
+    // -----------------------------------------------------
+    //                                          Driver & URL
+    //                                          ------------
     public String getDatabaseDriver() {
-        return _databaseInfo.getDatabaseDriver();
+        if (_cacheDriver != null) {
+            return _cacheDriver;
+        }
+        _cacheDriver = _databaseInfo.getDatabaseDriver();
+        return _cacheDriver;
     }
 
     public String getDatabaseUrl() {
-        return _databaseInfo.getDatabaseUrl();
+        if (_cacheUrl != null) {
+            return _cacheUrl;
+        }
+        _cacheUrl = _databaseInfo.getDatabaseUrl();
+        return _cacheUrl;
     }
 
-    protected String _mainCatalog = null;
-    protected boolean _catalogDone = false;
-
+    // -----------------------------------------------------
+    //                                               Catalog
+    //                                               -------
     public String getDatabaseCatalog() { // as main catalog
-        if (_catalogDone) {
-            return _mainCatalog;
+        if (_catalogCacheDone) {
+            return _cacheMainCatalog;
         }
-        _catalogDone = true;
+        _catalogCacheDone = true;
 
         final String catalog = _databaseInfo.getDatabaseCatalog(); // It's closet!
-        _mainCatalog = prepareMainCatalog(catalog, getDatabaseUrl());
-        return _mainCatalog;
+        _cacheMainCatalog = prepareMainCatalog(catalog, getDatabaseUrl());
+        return _cacheMainCatalog;
     }
 
     public String prepareMainCatalog(String catalog, String url) {
@@ -100,18 +119,19 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return catalog;
     }
 
-    protected UnifiedSchema _mainSchema = null;
-
+    // -----------------------------------------------------
+    //                                                Schema
+    //                                                ------
     /**
      * @return The unified schema. (NotNull)
      */
     public UnifiedSchema getDatabaseSchema() { // as main schema
-        if (_mainSchema != null) {
-            return _mainSchema;
+        if (_cacheMainSchema != null) {
+            return _cacheMainSchema;
         }
         final String schema = _databaseInfo.getDatabaseSchema();
-        _mainSchema = prepareMainUnifiedSchema(getDatabaseCatalog(), schema);
-        return _mainSchema;
+        _cacheMainSchema = prepareMainUnifiedSchema(getDatabaseCatalog(), schema);
+        return _cacheMainSchema;
     }
 
     public UnifiedSchema prepareMainUnifiedSchema(String catalog, String schema) {
@@ -148,14 +168,6 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return UnifiedSchema.createAsMainSchema(catalog, schema);
     }
 
-    public String getDatabaseUser() {
-        return _databaseInfo.getDatabaseUser();
-    }
-
-    public String getDatabasePassword() {
-        return _databaseInfo.getDatabasePassword();
-    }
-
     public boolean isDifferentUserSchema() {
         final String databaseUser = getDatabaseUser();
         final UnifiedSchema databaseSchema = getDatabaseSchema();
@@ -168,6 +180,25 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         targetSchemaList.add(mainSchema);
         targetSchemaList.addAll(getAdditionalSchemaList());
         return targetSchemaList;
+    }
+
+    // -----------------------------------------------------
+    //                                       User & Password
+    //                                       ---------------
+    public String getDatabaseUser() {
+        if (_cacheUser != null) {
+            return _cacheUser;
+        }
+        _cacheUser = _databaseInfo.getDatabaseUser();
+        return _cacheUser;
+    }
+
+    public String getDatabasePassword() {
+        if (_cachePassword != null) {
+            return _cachePassword;
+        }
+        _cachePassword = resolvePasswordVariable(getDatabaseUser(), _databaseInfo.getDatabasePassword());
+        return _cachePassword;
     }
 
     // ===================================================================================
@@ -668,6 +699,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             return stringProp("torque.database.schema", "");
         }
 
+        /**
+         * @return The string of user. (NotNull)
+         */
         public String getDatabaseUser() {
             initializeDatabaseInfoMap();
             final String key = KEY_USER;
@@ -678,6 +712,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             return stringProp("torque.database.user");
         }
 
+        /**
+         * @return The string of password. (NotNull)
+         */
         public String getDatabasePassword() {
             initializeDatabaseInfoMap();
             final String key = KEY_PASSWORD;
