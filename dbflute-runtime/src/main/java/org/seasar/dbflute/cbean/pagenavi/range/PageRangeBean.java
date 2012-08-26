@@ -230,8 +230,19 @@ public class PageRangeBean implements Serializable {
         this._allPageCount = allPageCount;
     }
 
+    public PageRangeOption getPageRangeOption() {
+        return _pageRangeOption;
+    }
+
     public void setPageRangeOption(PageRangeOption pageRangeOption) {
         this._pageRangeOption = pageRangeOption;
+    }
+
+    public void setPageRangeSize(int pageRangeSize) {
+        if (_pageRangeOption == null) {
+            _pageRangeOption = new PageRangeOption();
+        }
+        _pageRangeOption.setPageRangeSize(pageRangeSize);
     }
 
     // -----------------------------------------------------
