@@ -178,6 +178,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @return The value of pageGroupBean. (NotNull)
      */
     public PageGroupBean pageGroup() {
+        assertPageGroupValid();
         if (_pageGroupBean == null) {
             _pageGroupBean = new PageGroupBean();
             _pageGroupBean.setPageGroupOption(_pageGroupOption);
@@ -185,6 +186,23 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
             _pageGroupBean.setAllPageCount(getAllPageCount());
         }
         return _pageGroupBean;
+    }
+
+    protected void assertPageGroupValid() {
+        if (_pageGroupOption == null) {
+            String msg = "The pageGroupOption should not be null. Please call setPageGroupOption().";
+            throw new IllegalStateException(msg);
+        }
+        if (_pageGroupOption.getPageGroupSize() == 0) {
+            String msg = "The pageGroupSize should be greater than 1. But the value is zero.";
+            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+            throw new IllegalStateException(msg);
+        }
+        if (_pageGroupOption.getPageGroupSize() == 1) {
+            String msg = "The pageGroupSize should be greater than 1. But the value is one.";
+            msg = msg + " pageGroupSize=" + _pageGroupOption.getPageGroupSize();
+            throw new IllegalStateException(msg);
+        }
     }
 
     // -----------------------------------------------------
@@ -261,6 +279,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
      * @return The value of pageRangeBean. (NotNull)
      */
     public PageRangeBean pageRange() {
+        assertPageRangeValid();
         if (_pageRangeBean == null) {
             _pageRangeBean = new PageRangeBean();
             _pageRangeBean.setPageRangeOption(_pageRangeOption);
@@ -268,6 +287,18 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
             _pageRangeBean.setAllPageCount(getAllPageCount());
         }
         return _pageRangeBean;
+    }
+
+    protected void assertPageRangeValid() {
+        if (_pageRangeOption == null) {
+            String msg = "The pageRangeOption should not be null. Please call setPageRangeOption().";
+            throw new IllegalStateException(msg);
+        }
+        final int pageRangeSize = _pageRangeOption.getPageRangeSize();
+        if (pageRangeSize == 0) {
+            String msg = "The pageRangeSize should be greater than 1. But the value is zero.";
+            throw new IllegalStateException(msg);
+        }
     }
 
     // ===================================================================================

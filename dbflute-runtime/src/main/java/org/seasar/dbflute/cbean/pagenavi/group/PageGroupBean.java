@@ -240,19 +240,8 @@ public class PageGroupBean implements Serializable {
         this._allPageCount = allPageCount;
     }
 
-    public PageGroupOption getPageGroupOption() {
-        return _pageGroupOption;
-    }
-
     public void setPageGroupOption(PageGroupOption pageGroupOption) {
         this._pageGroupOption = pageGroupOption;
-    }
-
-    public void setPageGroupSize(int pageGroupSize) {
-        if (_pageGroupOption == null) {
-            _pageGroupOption = new PageGroupOption();
-        }
-        _pageGroupOption.setPageGroupSize(pageGroupSize);
     }
 
     // -----------------------------------------------------
