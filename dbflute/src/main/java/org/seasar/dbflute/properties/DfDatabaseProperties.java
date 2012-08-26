@@ -78,7 +78,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         if (_cacheUrl != null) {
             return _cacheUrl;
         }
-        _cacheUrl = _databaseInfo.getDatabaseUrl();
+        final String propTitle = "databaseInfoMap#url";
+        _cacheUrl = resolveDispatchVariable(propTitle, _databaseInfo.getDatabaseUrl());
         return _cacheUrl;
     }
 
@@ -189,7 +190,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         if (_cacheUser != null) {
             return _cacheUser;
         }
-        _cacheUser = _databaseInfo.getDatabaseUser();
+        final String propTitle = "databaseInfoMap#user";
+        _cacheUser = resolveDispatchVariable(propTitle, _databaseInfo.getDatabaseUser());
         return _cacheUser;
     }
 
@@ -197,7 +199,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         if (_cachePassword != null) {
             return _cachePassword;
         }
-        _cachePassword = resolvePasswordVariable(getDatabaseUser(), _databaseInfo.getDatabasePassword());
+        final String propTitle = "databaseInfoMap#password";
+        final String user = getDatabaseUser();
+        _cachePassword = resolvePasswordVariable(propTitle, user, _databaseInfo.getDatabasePassword());
         return _cachePassword;
     }
 

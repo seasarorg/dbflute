@@ -486,10 +486,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (propertyMap == null) {
             return null;
         }
+        final String title = "replaceSchemaDefinitionMap#additionalUserMap$";
         final String driver = getDatabaseProperties().getDatabaseDriver();
         final String url;
         {
-            String property = propertyMap.get("url");
+            String property = resolveDispatchVariable(title + "url", propertyMap.get("url"));
             if (property != null && property.trim().length() > 0) {
                 url = property;
             } else {
@@ -501,8 +502,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final String catalog = analyzer.extractCatalog();
         final String schema = propertyMap.get("schema");
         final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema);
-        final String user = propertyMap.get("user");
-        final String password = resolvePasswordVariable(additonalUser, propertyMap.get("password"));
+        final String user = resolveDispatchVariable(title + "user", propertyMap.get("user"));
+        final String password = resolvePasswordVariable(title + "password", additonalUser, propertyMap.get("password"));
         _log.info("...Creating a connection for additional user");
         return createConnection(driver, url, unifiedSchema, user, password);
     }
@@ -520,8 +521,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (propertyMap != null && isProperty(key, false, propertyMap)) {
             final String password = propertyMap.get("password");
             if (Srl.is_NotNull_and_NotTrimmedEmpty(password)) {
-                final DfDatabaseUserPasswordInfo pwdInfo = analyzePasswordVariable(password);
-                if (!pwdInfo.getPwdFile().exists() && pwdInfo.getDefaultPwd() == null) { // both not found
+                final DfDispatchVariableInfo pwdInfo = analyzeDispatchVariable(password);
+                if (!pwdInfo.getDispatchFile().exists() && pwdInfo.getDefaultValue() == null) { // both not found
                     result = true;
                 }
             }

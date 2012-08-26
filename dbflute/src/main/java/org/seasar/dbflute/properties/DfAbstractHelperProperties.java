@@ -475,32 +475,83 @@ public abstract class DfAbstractHelperProperties {
     }
 
     // ===============================================================================
-    //                                                               Password Variable
+    //                                                               Dispatch Variable
     //                                                               =================
-    protected String resolvePasswordVariable(String user, String password) {
-        if (Srl.is_Null_or_TrimmedEmpty(password)) {
-            return password;
-        }
-        final DfDatabaseUserPasswordInfo pwdInfo = analyzePasswordVariable(password);
-        if (pwdInfo == null) {
-            return password;
-        }
-        final File pwdFile = pwdInfo.getPwdFile();
-        final String defaultPwd = pwdInfo.getDefaultPwd();
-        if (!pwdFile.exists()) {
-            if (defaultPwd == null) {
-                throwDatabaseUserPasswordFileNotFoundException(user, password, pwdFile);
+    protected String resolveDispatchVariable(final String propTitle, String plainValue) {
+        return doResolveDispatchVariable(plainValue, new DfDispatchVariableCallback() {
+            public void throwNotFoundException(String plainValue, File dispatchFile) {
+                throwDispatchFileNotFoundException(propTitle, plainValue, dispatchFile);
             }
-            return defaultPwd; // no password file
+        });
+    }
+
+    protected void throwDispatchFileNotFoundException(String propTitle, String plainValue, File dispatchFile) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The dispatch file was not found.");
+        br.addItem("Advice");
+        br.addElement("Check your dispatch file existing.");
+        br.addElement("And check the setting in DBFlute property.");
+        br.addItem("Property");
+        br.addElement(propTitle);
+        br.addItem("Dispatch Setting");
+        br.addElement(plainValue);
+        br.addItem("Dispatch File");
+        br.addElement(dispatchFile);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    protected String resolvePasswordVariable(final String propTitle, final String user, String password) {
+        return doResolveDispatchVariable(password, new DfDispatchVariableCallback() {
+            public void throwNotFoundException(String plainValue, File dispatchFile) {
+                throwDatabaseUserPasswordFileNotFoundException(propTitle, user, plainValue, dispatchFile);
+            }
+        });
+    }
+
+    protected void throwDatabaseUserPasswordFileNotFoundException(String propTitle, String user, String password,
+            File pwdFile) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The password file for the user was not found.");
+        br.addItem("Advice");
+        br.addElement("Check your password file existing.");
+        br.addElement("And check the setting in DBFlute property.");
+        br.addItem("Property");
+        br.addElement(propTitle);
+        br.addItem("Database User");
+        br.addElement(user);
+        br.addItem("Password Setting");
+        br.addElement(password);
+        br.addItem("Password File");
+        br.addElement(pwdFile);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    protected String doResolveDispatchVariable(String plainValue, DfDispatchVariableCallback callback) {
+        if (Srl.is_Null_or_TrimmedEmpty(plainValue)) {
+            return plainValue;
+        }
+        final DfDispatchVariableInfo variableInfo = analyzeDispatchVariable(plainValue);
+        if (variableInfo == null) {
+            return plainValue;
+        }
+        final File dispatchFile = variableInfo.getDispatchFile();
+        final String defaultValue = variableInfo.getDefaultValue();
+        if (!dispatchFile.exists()) {
+            if (defaultValue == null) {
+                callback.throwNotFoundException(plainValue, dispatchFile);
+            }
+            return defaultValue; // no dispatch file
         }
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(pwdFile), "UTF-8"));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(dispatchFile), "UTF-8"));
             final String line = br.readLine();
-            return line; // first line in the password file is password
+            return line; // first line in the dispatch file is value
         } catch (Exception continued) {
-            _log.info("Failed to read the password file: " + pwdFile);
-            return defaultPwd; // no password
+            _log.info("Failed to read the dispatch file: " + dispatchFile);
+            return defaultValue; // no password
         } finally {
             if (br != null) {
                 try {
@@ -511,68 +562,53 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
-    protected DfDatabaseUserPasswordInfo analyzePasswordVariable(String password) {
+    protected static interface DfDispatchVariableCallback {
+        void throwNotFoundException(String plainValue, File dispatchFile);
+    }
+
+    protected DfDispatchVariableInfo analyzeDispatchVariable(String password) {
         final String prefix = "df:dfprop/";
         if (!password.startsWith(prefix)) {
             return null;
         }
         final String fileName;
-        final String defaultPwd;
+        final String defaultValue;
         {
             final String content = Srl.substringFirstRear(password, prefix);
             if (content.contains("|")) {
                 fileName = Srl.substringFirstFront(content, "|");
-                defaultPwd = Srl.substringFirstRear(content, "|");
+                defaultValue = Srl.substringFirstRear(content, "|");
             } else {
                 fileName = content;
-                defaultPwd = null;
+                defaultValue = null;
             }
         }
-        final File pwdFile = new File("./dfprop/" + fileName);
-        final DfDatabaseUserPasswordInfo pwdInfo = new DfDatabaseUserPasswordInfo();
-        pwdInfo.setPwdFile(pwdFile);
-        pwdInfo.setDefaultPwd(defaultPwd);
-        return pwdInfo;
+        final File dispatchFile = new File("./dfprop/" + fileName);
+        final DfDispatchVariableInfo variableInfo = new DfDispatchVariableInfo();
+        variableInfo.setDispatchFile(dispatchFile);
+        variableInfo.setDefaultValue(defaultValue);
+        return variableInfo;
     }
 
-    protected static class DfDatabaseUserPasswordInfo {
-        protected File _pwdFile;
-        protected String _defaultPwd;
+    protected static class DfDispatchVariableInfo {
+        protected File _dispatchFile;
+        protected String _defaultValue;
 
-        public File getPwdFile() {
-            return _pwdFile;
+        public File getDispatchFile() {
+            return _dispatchFile;
         }
 
-        public void setPwdFile(File pwdFile) {
-            this._pwdFile = pwdFile;
+        public void setDispatchFile(File dispatchFile) {
+            this._dispatchFile = dispatchFile;
         }
 
-        public String getDefaultPwd() {
-            return _defaultPwd;
+        public String getDefaultValue() {
+            return _defaultValue;
         }
 
-        public void setDefaultPwd(String defaultPwd) {
-            this._defaultPwd = defaultPwd;
+        public void setDefaultValue(String defaultValue) {
+            this._defaultValue = defaultValue;
         }
-    }
-
-    protected void throwDatabaseUserPasswordFileNotFoundException(String additonalUser, String password, File pwdFile) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The password file for user was not found.");
-        br.addItem("Advice");
-        br.addElement("Check your password file existing.");
-        br.addElement("And check the setting in DBFlute property.");
-        br.addElement("If you need to set a default password,");
-        br.addElement("Set a password as follows: (default = defpwd)");
-        br.addElement("  password = df:dfprop/system-password.txt|defpwd");
-        br.addItem("Database User");
-        br.addElement(additonalUser);
-        br.addItem("Password Setting");
-        br.addElement(password);
-        br.addItem("Password File");
-        br.addElement(pwdFile);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
     }
 
     // ===============================================================================
