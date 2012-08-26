@@ -37,14 +37,20 @@ public class DfJFadResultSetWrapper {
     }
 
     public String getString(String columnName) throws SQLException {
-        final Object value = getObject(columnName);
+        final Object value;
+        final ValueType valueType = _columnValueTypeMap.get(columnName);
+        if (valueType != null) {
+            value = valueType.getValue(_rs, columnName);
+        } else {
+            value = _rs.getString(columnName);
+        }
         if (value == null) {
             return null;
         }
         if (_stringConverter != null) {
             return _stringConverter.convert(value);
         } else {
-            return value != null ? value.toString() : null;
+            return value.toString();
         }
     }
 }
