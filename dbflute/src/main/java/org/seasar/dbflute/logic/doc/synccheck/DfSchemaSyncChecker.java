@@ -162,10 +162,6 @@ public class DfSchemaSyncChecker {
         return getDocumentProperties().getSchemaSyncCheckDiffMapFile();
     }
 
-    protected String getResultFileName() {
-        return getDocumentProperties().getSchemaSyncCheckResultFileName();
-    }
-
     protected String getResultFilePath() {
         return getDocumentProperties().getSchemaSyncCheckResultFilePath();
     }

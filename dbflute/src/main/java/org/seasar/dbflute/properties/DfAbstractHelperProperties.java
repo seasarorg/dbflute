@@ -502,11 +502,12 @@ public abstract class DfAbstractHelperProperties {
     }
 
     protected String resolvePasswordVariable(final String propTitle, final String user, String password) {
-        return doResolveDispatchVariable(password, new DfDispatchVariableCallback() {
+        final String resolved = doResolveDispatchVariable(password, new DfDispatchVariableCallback() {
             public void throwNotFoundException(String plainValue, File dispatchFile) {
                 throwDatabaseUserPasswordFileNotFoundException(propTitle, user, plainValue, dispatchFile);
             }
         });
+        return resolved != null ? resolved : ""; // password not allowed to be null
     }
 
     protected void throwDatabaseUserPasswordFileNotFoundException(String propTitle, String user, String password,

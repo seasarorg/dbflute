@@ -558,7 +558,12 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     public String getSchemaSyncCheckDatabaseUrl() {
         final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
         final String url = schemaSyncCheckMap.get("url");
-        return Srl.is_NotNull_and_NotTrimmedEmpty(url) ? url : getDatabaseProperties().getDatabaseUrl();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(url)) {
+            final String propTitle = "documentDefinitionMap#schemaSyncCheckMap$url";
+            return resolveDispatchVariable(propTitle, url);
+        } else {
+            return getDatabaseProperties().getDatabaseUrl();
+        }
     }
 
     public String getSchemaSyncCheckDatabaseCatalog() {
@@ -577,13 +582,15 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public String getSchemaSyncCheckDatabaseUser() {
         final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
-        return schemaSyncCheckMap.get("user");
+        final String propTitle = "documentDefinitionMap#schemaSyncCheckMap$url";
+        return resolveDispatchVariable(propTitle, schemaSyncCheckMap.get("user"));
     }
 
     public String getSchemaSyncCheckDatabasePassword() {
         final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
-        final String password = schemaSyncCheckMap.get("password");
-        return password != null ? password : "";
+        final String propTitle = "documentDefinitionMap#schemaSyncCheckMap$password";
+        final String user = getSchemaSyncCheckDatabaseUser();
+        return resolvePasswordVariable(propTitle, user, schemaSyncCheckMap.get("password"));
     }
 
     public String getSchemaSyncCheckSchemaXml() {
@@ -595,6 +602,11 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String getSchemaSyncCheckResultFileName() {
+        final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
+        final String fileName = schemaSyncCheckMap.get("resultHtmlFileName");
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(fileName)) {
+            return fileName;
+        }
         return SCHEMA_SYNC_CHECK_RESULT_FILE_NAME;
     }
 
