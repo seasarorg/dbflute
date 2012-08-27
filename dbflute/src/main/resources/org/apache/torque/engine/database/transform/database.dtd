@@ -1,6 +1,5 @@
 <!--
     Torque XML database schema DTD
-    $Id: database.dtd,v 1.1 2003/02/10 13:22:37 mpoeschl Exp $
 -->
 
 <!--
@@ -31,7 +30,7 @@ Java class or method name.
               to lowercase.
 -->
 
-<!ELEMENT database (external-schema*, table+, sequenceGroup, procedureGroup)>
+<!ELEMENT database (external-schema*, table+, sequenceGroup?, procedureGroup?)>
 <!ATTLIST database
   name CDATA #IMPLIED
   defaultIdMethod (idbroker|native|autoincrement|sequence|none) "none"
@@ -140,7 +139,7 @@ Java class or method name.
   position CDATA #REQUIRED
 >
 
-<!ELEMENT sequenceGroup (sequence+)>
+<!ELEMENT sequenceGroup (sequence*)>
 <!ATTLIST sequenceGroup
 >
 
@@ -154,7 +153,7 @@ Java class or method name.
   comment CDATA #IMPLIED
 >
 
-<!ELEMENT procedureGroup (procedure+)>
+<!ELEMENT procedureGroup (procedure*)>
 <!ATTLIST procedureGroup
 >
 

@@ -583,7 +583,7 @@ public class DfSchemaXmlSerializer {
     protected void processSequence(Connection conn, DatabaseMetaData metaData) throws SQLException {
         _log.info("...Getting sequences");
         final Map<String, DfSequenceMeta> sequenceMap = extractSequenceMap();
-        if (sequenceMap == null) {
+        if (sequenceMap == null) { // means sequence-not-supported DBMS
             return;
         }
         _log.info("...Processing sequences: " + sequenceMap.size());
