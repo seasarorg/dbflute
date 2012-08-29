@@ -259,8 +259,16 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
                 return isDatabaseOracle();
             }
 
+            public boolean isDbmsDB2() {
+                return isDatabaseDB2();
+            }
+
             public boolean isDbmsSQLServer() {
                 return isDatabaseSQLServer();
+            }
+
+            public boolean isDbmsDerby() {
+                return isDbmsDerby();
             }
 
             @Override
@@ -277,6 +285,10 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                          ------------
     public boolean isConceptTypeUUID(final String dbTypeName) {
         return getJdbcTypeMapper().isConceptTypeUUID(dbTypeName);
+    }
+
+    public boolean isConceptTypePlainClob(final String dbTypeName) {
+        return getJdbcTypeMapper().isConceptTypePlainClob(dbTypeName);
     }
 
     public boolean isConceptTypeStringClob(final String dbTypeName) {

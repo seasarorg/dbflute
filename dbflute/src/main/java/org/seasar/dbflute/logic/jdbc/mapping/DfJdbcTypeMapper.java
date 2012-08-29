@@ -47,7 +47,11 @@ public class DfJdbcTypeMapper {
 
         boolean isDbmsOracle();
 
+        boolean isDbmsDB2();
+
         boolean isDbmsSQLServer();
+
+        boolean isDbmsDerby();
     }
 
     // ===================================================================================
@@ -181,9 +185,26 @@ public class DfJdbcTypeMapper {
         return false;
     }
 
-    public boolean isConceptTypeStringClob(final String dbTypeName) {
-        // basically types needs to be handled as stream on JDBC
-        // now only Oracle's CLOB
+    /**
+     * Is the type 'PlainClob' as concept type? </br >
+     * This type is not related to a way of JDBC handling,
+     * whether the type can be purely called 'CLOB type' or not. <br />
+     * But 'text' type is not contained to it.
+     * @param dbTypeName The name of DB type. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isConceptTypePlainClob(final String dbTypeName) { // all CLOB type
+        return isOracleClob(dbTypeName) || isDB2Clob(dbTypeName) || isDerbyClob(dbTypeName);
+    }
+
+    /**
+     * Is the type 'StringClob' as concept type? </br >
+     * It means the type needs to be handled as stream on JDBC.
+     * @param dbTypeName The name of DB type. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isConceptTypeStringClob(final String dbTypeName) { // needs stream
+        // only Oracle's CLOB (it can get all text by getString() on DB2)
         return isOracleClob(dbTypeName);
     }
 
@@ -267,8 +288,16 @@ public class DfJdbcTypeMapper {
         return _resource.isDbmsOracle() && containsIgnoreCase(dbTypeName, "varray");
     }
 
+    public boolean isDB2Clob(final String dbTypeName) {
+        return _resource.isDbmsDB2() && containsIgnoreCase(dbTypeName, "clob");
+    }
+
     public boolean isSQLServerUniqueIdentifier(final String dbTypeName) {
         return _resource.isDbmsSQLServer() && matchIgnoreCase(dbTypeName, "uniqueidentifier");
+    }
+
+    public boolean isDerbyClob(final String dbTypeName) {
+        return _resource.isDbmsDerby() && containsIgnoreCase(dbTypeName, "clob");
     }
 
     // -----------------------------------------------------

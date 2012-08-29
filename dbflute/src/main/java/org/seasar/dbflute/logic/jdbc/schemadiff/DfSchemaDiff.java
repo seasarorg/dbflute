@@ -138,6 +138,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public static final String TABLE_COUNT_KEY = "tableCount";
     public static final String TABLE_DIFF_KEY = "tableDiff";
     public static final String SEQUENCE_DIFF_KEY = "sequenceDiff";
+    public static final String KEYWORD_DB2_SYSTEM_SEQUENCE = "SQL";
     public static final String KEYWORD_H2_SYSTEM_SEQUENCE = "SYSTEM_SEQUENCE";
     public static final String PROCEDURE_DIFF_KEY = "procedureDiff";
     public static final String PROCEDURE_SOURCE_NO_META_MARK = "-1";
@@ -667,10 +668,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
                     return true;
                 }
                 final boolean bothValid = next != null && previous != null;
-                if (bothValid && isDatabaseH2()) {
-                    if (Srl.hasKeywordAllIgnoreCase(KEYWORD_H2_SYSTEM_SEQUENCE, next, previous)) {
-                        return true;
-                    }
+                if (bothValid && isSystemSequence(next) && isSystemSequence(previous)) {
+                    return true;
                 }
                 return false;
             }
@@ -1093,8 +1092,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                         Assist Helper
     //                                         -------------
     protected boolean isSystemSequence(String sequenceName) {
-        if (isDatabaseH2()) {
-            return Srl.hasKeywordAllIgnoreCase(KEYWORD_H2_SYSTEM_SEQUENCE, sequenceName);
+        if (isDatabaseDB2()) {
+            return Srl.hasPrefixAllIgnoreCase(KEYWORD_DB2_SYSTEM_SEQUENCE, sequenceName);
+        } else if (isDatabaseH2()) {
+            return Srl.hasPrefixAllIgnoreCase(KEYWORD_H2_SYSTEM_SEQUENCE, sequenceName);
         }
         return false;
     }

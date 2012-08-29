@@ -165,5 +165,13 @@ public class DfJdbcTypeMapperTest {
         public boolean isDbmsSQLServer() {
             return _databaseSQLServer;
         }
+
+        public boolean isDbmsDB2() {
+            return false;
+        }
+
+        public boolean isDbmsDerby() {
+            return false;
+        }
     }
 }

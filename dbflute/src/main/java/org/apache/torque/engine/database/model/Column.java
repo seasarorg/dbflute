@@ -374,6 +374,10 @@ public class Column {
         return hasDbType() && (_dbType.startsWith("nchar") || _dbType.startsWith("nvarchar"));
     }
 
+    public boolean isDbTypePlainClob() { // as pinpoint
+        return hasDbType() && _columnHandler.isConceptTypePlainClob(_dbType);
+    }
+
     public boolean isDbTypeStringClob() { // as pinpoint
         return hasDbType() && _columnHandler.isConceptTypeStringClob(_dbType);
     }
@@ -482,7 +486,10 @@ public class Column {
         if (isNotNull() || isPrimaryKey()) {
             return false;
         }
-        return isJavaNativeStringObject() && !isDbTypeChar() && !isDbTypeStringClob();
+        // o String type only
+        // o off course, not char type
+        // o basically CLOB cannot accept equal condition
+        return isJavaNativeStringObject() && !isDbTypeChar() && !isDbTypePlainClob();
     }
 
     // -----------------------------------------------------
