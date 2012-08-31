@@ -268,7 +268,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
             }
 
             public boolean isDbmsDerby() {
-                return isDbmsDerby();
+                return isDatabaseDerby();
             }
 
             @Override

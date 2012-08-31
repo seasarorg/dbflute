@@ -84,6 +84,10 @@ public abstract class DfAbstractMetaDataExtractor {
         return getDatabaseTypeFacadeProp().isDatabaseH2();
     }
 
+    protected boolean isDatabaseDerby() {
+        return getDatabaseTypeFacadeProp().isDatabaseDerby();
+    }
+
     protected boolean isDatabaseSQLite() {
         return getDatabaseTypeFacadeProp().isDatabaseSQLite();
     }
