@@ -1092,10 +1092,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                         Assist Helper
     //                                         -------------
     protected boolean isSystemSequence(String sequenceName) {
+        final String pureName = Srl.substringLastRear(sequenceName, ".");
         if (isDatabaseDB2()) {
-            return Srl.hasPrefixAllIgnoreCase(KEYWORD_DB2_SYSTEM_SEQUENCE, sequenceName);
+            return Srl.hasPrefixAllIgnoreCase(KEYWORD_DB2_SYSTEM_SEQUENCE, pureName);
         } else if (isDatabaseH2()) {
-            return Srl.hasPrefixAllIgnoreCase(KEYWORD_H2_SYSTEM_SEQUENCE, sequenceName);
+            return Srl.hasPrefixAllIgnoreCase(KEYWORD_H2_SYSTEM_SEQUENCE, pureName);
         }
         return false;
     }
