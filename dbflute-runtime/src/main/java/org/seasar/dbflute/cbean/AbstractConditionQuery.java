@@ -1587,6 +1587,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             dreamCruiseCB.overTheWaves(xcreateManualOrderSpecifiedColumn(dreamCruiseCB));
             manualOrderBean.xinitCalculationOrder(_baseCB, dreamCruiseCB);
         }
+        manualOrderBean.validate();
         xgetSqlClause().addManualOrderToPreviousOrderByElement(manualOrderBean);
     }
 

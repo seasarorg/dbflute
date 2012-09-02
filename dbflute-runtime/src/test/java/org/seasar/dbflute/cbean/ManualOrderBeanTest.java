@@ -3,8 +3,9 @@ package org.seasar.dbflute.cbean;
 import java.util.Date;
 import java.util.List;
 
-import org.seasar.dbflute.cbean.ManualOrderBean.CaseWhenElement;
 import org.seasar.dbflute.cbean.ManualOrderBean.FreeParameterManualOrderThemeListHandler;
+import org.seasar.dbflute.cbean.chelper.HpMobCaseWhenElement;
+import org.seasar.dbflute.cbean.chelper.HpMobConnectionMode;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -25,15 +26,15 @@ public class ManualOrderBeanTest extends PlainTestCase {
         mob.when_DateFromTo(fromDate, toDate);
 
         // ## Assert ##
-        List<CaseWhenElement> caseWhenAcceptedList = mob.getCaseWhenAcceptedList();
+        List<HpMobCaseWhenElement> caseWhenAcceptedList = mob.getCaseWhenAcceptedList();
         {
             assertEquals(1, caseWhenAcceptedList.size());
-            final CaseWhenElement fromElement = caseWhenAcceptedList.get(0);
+            final HpMobCaseWhenElement fromElement = caseWhenAcceptedList.get(0);
             assertEquals(ConditionKey.CK_GREATER_EQUAL, fromElement.getConditionKey());
             assertNull(fromElement.getConnectionMode());
-            CaseWhenElement toElement = fromElement.getConnectedElementList().get(0);
+            HpMobCaseWhenElement toElement = fromElement.getConnectedElementList().get(0);
             assertEquals(ConditionKey.CK_LESS_THAN, toElement.getConditionKey());
-            assertEquals(ManualOrderBean.ConnectionMode.AND, toElement.getConnectionMode());
+            assertEquals(HpMobConnectionMode.AND, toElement.getConnectionMode());
             assertEquals(0, mob.getCaseWhenBoundList().size());
 
             String fromExp = DfTypeUtil.toString(fromElement.getOrderValue(), "yyyy/MM/dd");
@@ -53,16 +54,16 @@ public class ManualOrderBeanTest extends PlainTestCase {
         });
 
         // ## Assert ##
-        List<CaseWhenElement> caseWhenBoundList = mob.getCaseWhenBoundList();
+        List<HpMobCaseWhenElement> caseWhenBoundList = mob.getCaseWhenBoundList();
         {
             assertNotSame(0, caseWhenBoundList.size());
             assertEquals(1, caseWhenBoundList.size());
-            final CaseWhenElement fromElement = caseWhenBoundList.get(0);
+            final HpMobCaseWhenElement fromElement = caseWhenBoundList.get(0);
             assertEquals(ConditionKey.CK_GREATER_EQUAL, fromElement.getConditionKey());
             assertNull(fromElement.getConnectionMode());
-            CaseWhenElement toElement = fromElement.getConnectedElementList().get(0);
+            HpMobCaseWhenElement toElement = fromElement.getConnectedElementList().get(0);
             assertEquals(ConditionKey.CK_LESS_THAN, toElement.getConditionKey());
-            assertEquals(ManualOrderBean.ConnectionMode.AND, toElement.getConnectionMode());
+            assertEquals(HpMobConnectionMode.AND, toElement.getConnectionMode());
         }
     }
 }

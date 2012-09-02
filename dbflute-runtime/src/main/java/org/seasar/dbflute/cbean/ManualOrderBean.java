@@ -16,12 +16,14 @@
 package org.seasar.dbflute.cbean;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.chelper.HpMobCaseWhenElement;
+import org.seasar.dbflute.cbean.chelper.HpMobConnectedBean;
+import org.seasar.dbflute.cbean.chelper.HpMobConnectionMode;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ColumnConversionOption;
@@ -49,10 +51,14 @@ public class ManualOrderBean implements HpCalculator {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final List<CaseWhenElement> _caseWhenAcceptedList = new ArrayList<CaseWhenElement>();
-    protected final List<CaseWhenElement> _caseWhenBoundList = new ArrayList<CaseWhenElement>();
+    protected final List<HpMobCaseWhenElement> _caseWhenAcceptedList = new ArrayList<HpMobCaseWhenElement>();
+    protected final List<HpMobCaseWhenElement> _caseWhenBoundList = new ArrayList<HpMobCaseWhenElement>();
     protected HpCalcSpecification<ConditionBean> _calcSpecification;
-    protected ConnectionMode _connectionMode; // null means no connection
+    protected HpMobConnectionMode _connectionMode; // null means no connection
+
+    // basically for switch order
+    protected Object _elseAcceptedValue;
+    protected Object _elseBoundValue;
 
     // ===================================================================================
     //                                                                           Case When
@@ -65,7 +71,7 @@ public class ManualOrderBean implements HpCalculator {
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_Equal(Object orderValue) {
+    public HpMobConnectedBean when_Equal(Object orderValue) {
         return doWhen(ConditionKey.CK_EQUAL, orderValue);
     }
 
@@ -74,7 +80,7 @@ public class ManualOrderBean implements HpCalculator {
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_NotEqual(Object orderValue) {
+    public HpMobConnectedBean when_NotEqual(Object orderValue) {
         return doWhen(ConditionKey.CK_NOT_EQUAL_STANDARD, orderValue);
     }
 
@@ -83,7 +89,7 @@ public class ManualOrderBean implements HpCalculator {
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_GreaterThan(Object orderValue) {
+    public HpMobConnectedBean when_GreaterThan(Object orderValue) {
         return doWhen(ConditionKey.CK_GREATER_THAN, orderValue);
     }
 
@@ -92,7 +98,7 @@ public class ManualOrderBean implements HpCalculator {
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_LessThan(Object orderValue) {
+    public HpMobConnectedBean when_LessThan(Object orderValue) {
         return doWhen(ConditionKey.CK_LESS_THAN, orderValue);
     }
 
@@ -101,7 +107,7 @@ public class ManualOrderBean implements HpCalculator {
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_GreaterEqual(Object orderValue) {
+    public HpMobConnectedBean when_GreaterEqual(Object orderValue) {
         return doWhen(ConditionKey.CK_GREATER_EQUAL, orderValue);
     }
 
@@ -110,7 +116,7 @@ public class ManualOrderBean implements HpCalculator {
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_LessEqual(Object orderValue) {
+    public HpMobConnectedBean when_LessEqual(Object orderValue) {
         return doWhen(ConditionKey.CK_LESS_EQUAL, orderValue);
     }
 
@@ -118,7 +124,7 @@ public class ManualOrderBean implements HpCalculator {
      * Add 'when' element for 'case' statement as IsNull.
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_IsNull() {
+    public HpMobConnectedBean when_IsNull() {
         return doWhen(ConditionKey.CK_IS_NULL, null);
     }
 
@@ -126,7 +132,7 @@ public class ManualOrderBean implements HpCalculator {
      * Add 'when' element for 'case' statement as IsNotNull.
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_IsNotNull() {
+    public HpMobConnectedBean when_IsNotNull() {
         return doWhen(ConditionKey.CK_IS_NOT_NULL, null);
     }
 
@@ -137,7 +143,7 @@ public class ManualOrderBean implements HpCalculator {
      * @param option The option of from-to. (NotNull)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_FromTo(Date fromDate, Date toDate, FromToOption option) {
+    public HpMobConnectedBean when_FromTo(Date fromDate, Date toDate, FromToOption option) {
         return doWhen_FromTo(fromDate, toDate, option);
     }
 
@@ -147,13 +153,29 @@ public class ManualOrderBean implements HpCalculator {
      * @param toDate The to-date for ordering. (NullAllowed: if null, means invalid to-condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
-    public ConnectedOrderBean when_DateFromTo(Date fromDate, Date toDate) {
+    public HpMobConnectedBean when_DateFromTo(Date fromDate, Date toDate) {
         return doWhen_FromTo(fromDate, toDate, new DateFromToOption());
+    }
+
+    protected HpMobConnectedBean doWhen_FromTo(Date fromDate, Date toDate, FromToOption option) {
+        if (option == null) {
+            String msg = "The argument 'option' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        final ConditionKey fromDateConditionKey = option.getFromDateConditionKey();
+        final ConditionKey toDateConditionKey = option.getToDateConditionKey();
+        final Date filteredFromDate = option.filterFromDate(fromDate);
+        final Date filteredToDate = option.filterToDate(toDate);
+        return doWhen(fromDateConditionKey, filteredFromDate).doAnd(toDateConditionKey, filteredToDate);
     }
 
     // -----------------------------------------------------
     //                                           Order Value
     //                                           -----------
+    /**
+     * Accept the list of order value as equal condition.
+     * @param orderValueList The list of order value. (NotNull)
+     */
     public void acceptOrderValueList(List<? extends Object> orderValueList) {
         if (orderValueList == null) {
             String msg = "The argument 'orderValueList' should not be null.";
@@ -167,37 +189,23 @@ public class ManualOrderBean implements HpCalculator {
     // -----------------------------------------------------
     //                                         Assist Helper
     //                                         -------------
-    protected ConnectedOrderBean doWhen_FromTo(Date fromDate, Date toDate, FromToOption option) {
-        if (option == null) {
-            String msg = "The argument 'option' should not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        final ConditionKey fromDateConditionKey = option.getFromDateConditionKey();
-        final ConditionKey toDateConditionKey = option.getToDateConditionKey();
-        final Date filteredFromDate = option.filterFromDate(fromDate);
-        final Date filteredToDate = option.filterToDate(toDate);
-        return doWhen(fromDateConditionKey, filteredFromDate).doAnd(toDateConditionKey, filteredToDate);
-    }
-
-    protected ConnectedOrderBean doWhen(ConditionKey conditionKey, Object orderValue) {
-        final ConnectedOrderBean resultBean = new ConnectedOrderBean(this);
+    protected HpMobConnectedBean doWhen(ConditionKey conditionKey, Object orderValue) {
         if (orderValue == null && !isManualOrderConditionKeyNullHandling(conditionKey)) {
             String msg = "The argument 'orderValue' should not be null: conditionKey=" + conditionKey;
             throw new IllegalArgumentException(msg);
         }
-        final CaseWhenElement addedElement = createElement(conditionKey, orderValue);
+        final HpMobCaseWhenElement addedElement = createElement(conditionKey, orderValue);
         if (_connectionMode != null) {
             if (_caseWhenAcceptedList.isEmpty()) {
-                String msg = "The connected mode should exist only when previous conditions exist:";
-                msg = msg + " conditionKey=" + conditionKey + " orderValue=" + orderValue;
-                throw new IllegalStateException(msg);
+                throwManualOrderPreviousConditionNotFoundException(_connectionMode, conditionKey, orderValue);
             }
             addedElement.setConnectionMode(_connectionMode);
-            final CaseWhenElement lastElement = _caseWhenAcceptedList.get(_caseWhenAcceptedList.size() - 1);
-            final List<CaseWhenElement> connectedElementList = lastElement.getConnectedElementList();
+            final HpMobCaseWhenElement lastElement = getAcceptedLastElement();
+            final List<HpMobCaseWhenElement> connectedElementList = lastElement.getConnectedElementList();
             if (!connectedElementList.isEmpty()) { // check same connectors
-                final CaseWhenElement previousConnected = connectedElementList.get(connectedElementList.size() - 1);
-                final ConnectionMode previousMode = previousConnected.getConnectionMode();
+                final HpMobCaseWhenElement previousConnected = connectedElementList
+                        .get(connectedElementList.size() - 1);
+                final HpMobConnectionMode previousMode = previousConnected.getConnectionMode();
                 if (previousMode != null && !previousMode.equals(addedElement.getConnectionMode())) {
                     throwManualOrderTwoConnectorUnsupportedException(conditionKey, orderValue, lastElement);
                 }
@@ -206,15 +214,39 @@ public class ManualOrderBean implements HpCalculator {
         } else {
             _caseWhenAcceptedList.add(addedElement);
         }
-        return resultBean;
+        return createConnectedBean();
     }
 
     protected boolean isManualOrderConditionKeyNullHandling(ConditionKey conditionKey) {
         return conditionKey.equals(ConditionKey.CK_IS_NULL) || conditionKey.equals(ConditionKey.CK_IS_NOT_NULL);
     }
 
+    protected HpMobCaseWhenElement getAcceptedLastElement() {
+        return _caseWhenAcceptedList.get(_caseWhenAcceptedList.size() - 1);
+    }
+
+    protected HpMobConnectedBean createConnectedBean() {
+        return new HpMobConnectedBean(this);
+    }
+
+    protected void throwManualOrderPreviousConditionNotFoundException(HpMobConnectionMode mode,
+            ConditionKey conditionKey, Object orderValue) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found previous condition of 'case when' for connecting next condition.");
+        br.addItem("Advice");
+        br.addElement("You should set first condition before setting next condition.");
+        br.addItem("Connection Mode");
+        br.addElement(mode);
+        br.addItem("Added ConnectionKey");
+        br.addElement(conditionKey);
+        br.addItem("Added OrderValue");
+        br.addElement(orderValue);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
     protected void throwManualOrderTwoConnectorUnsupportedException(ConditionKey conditionKey, Object orderValue,
-            CaseWhenElement lastElement) {
+            HpMobCaseWhenElement lastElement) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("both two connectors and/or were set.");
         br.addItem("Advice");
@@ -229,6 +261,67 @@ public class ManualOrderBean implements HpCalculator {
         br.addElement(orderValue);
         br.addItem("Fixed ConnectionMode");
         br.addElement(lastElement.getConnectionMode());
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                           Then/Else
+    //                                                                           =========
+    public void xregisterThenValueToLastElement(Object thenValue) {
+        if (thenValue == null) {
+            String msg = "The argument 'thenValue' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (_caseWhenAcceptedList.isEmpty()) {
+            throwManualOrderThenValueCaseWhenElementNotFoundException(thenValue);
+        }
+        final HpMobCaseWhenElement lastElement = getAcceptedLastElement();
+        lastElement.setThenValue(thenValue);
+    }
+
+    protected void throwManualOrderThenValueCaseWhenElementNotFoundException(Object thenValue) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found 'case when' element for 'then' value.");
+        br.addItem("Advice");
+        br.addElement("You should set 'case when' element before setting 'then' value.");
+        br.addItem("Added ThenValue");
+        br.addElement(thenValue);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    /**
+     * Add 'else' value. (Basically for SwitchOrder) <br />
+     * You should set 'then' values before calling this.
+     * @param elseValue The value for 'else', String, Integer, Date, DreamCruiseTicket... (NotNull)
+     */
+    public void elseEnd(Object elseValue) { // cannot be 'else()' for reservation word
+        if (elseValue == null) {
+            String msg = "The argument 'elseValue' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (_caseWhenAcceptedList.isEmpty()) {
+            throwManualOrderElseValueCaseWhenElementNotFoundException(elseValue);
+        }
+        _elseAcceptedValue = elseValue;
+    }
+
+    protected void throwManualOrderElseValueCaseWhenElementNotFoundException(Object elseValue) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found 'case when' element for 'else' value.");
+        br.addItem("Advice");
+        br.addElement("You should set 'case when' element before setting 'else' value.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.elseEnd(0); // *NG");
+        br.addElement("  (o):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_Equal(...); // *Don't forget here");
+        br.addElement("    mob.elseEnd(0); // OK");
+        br.addItem("Added ThenValue");
+        br.addElement(elseValue);
         final String msg = br.buildExceptionMessage();
         throw new IllegalConditionBeanOperationException(msg);
     }
@@ -387,255 +480,71 @@ public class ManualOrderBean implements HpCalculator {
     //                                                                     Connected Order
     //                                                                     ===============
     public void toBeConnectionModeAsAnd() {
-        _connectionMode = ConnectionMode.AND;
+        _connectionMode = HpMobConnectionMode.AND;
     }
 
     public void toBeConnectionModeAsOr() {
-        _connectionMode = ConnectionMode.OR;
+        _connectionMode = HpMobConnectionMode.OR;
     }
 
     public void clearConnectionMode() {
         _connectionMode = null;
     }
 
-    protected enum ConnectionMode {
-        AND("and"), OR("or");
-        private String _connector;
-
-        private ConnectionMode(String connector) {
-            _connector = connector;
-        }
-
-        @Override
-        public String toString() {
-            return _connector;
-        }
-    }
-
-    public static class ConnectedOrderBean {
-        protected final ManualOrderBean _parentBean;
-
-        public ConnectedOrderBean(ManualOrderBean parentBean) {
-            _parentBean = parentBean;
-        }
-
-        public ConnectedOrderBean and_Equal(Object orderValue) {
-            return doAnd(ConditionKey.CK_EQUAL, orderValue);
-        }
-
-        public ConnectedOrderBean and_NotEqual(Object orderValue) {
-            return doAnd(ConditionKey.CK_NOT_EQUAL_STANDARD, orderValue);
-        }
-
-        public ConnectedOrderBean and_GreaterThan(Object orderValue) {
-            return doAnd(ConditionKey.CK_GREATER_THAN, orderValue);
-        }
-
-        public ConnectedOrderBean and_LessThan(Object orderValue) {
-            return doAnd(ConditionKey.CK_LESS_THAN, orderValue);
-        }
-
-        public ConnectedOrderBean and_GreaterEqual(Object orderValue) {
-            return doAnd(ConditionKey.CK_GREATER_EQUAL, orderValue);
-        }
-
-        public ConnectedOrderBean and_LessEqual(Object orderValue) {
-            return doAnd(ConditionKey.CK_LESS_EQUAL, orderValue);
-        }
-
-        public ConnectedOrderBean and_IsNull() {
-            return doAnd(ConditionKey.CK_IS_NULL, null);
-        }
-
-        public ConnectedOrderBean and_IsNotNull() {
-            return doAnd(ConditionKey.CK_IS_NOT_NULL, null);
-        }
-
-        public ConnectedOrderBean doAnd(ConditionKey conditionKey, Object orderValue) {
-            toBeConnectionModeAsAnd();
-            try {
-                return delegate(conditionKey, orderValue);
-            } finally {
-                clearConnectionMode();
-            }
-        }
-
-        public ConnectedOrderBean or_Equal(Object orderValue) {
-            return doOr(ConditionKey.CK_EQUAL, orderValue);
-        }
-
-        public ConnectedOrderBean or_NotEqual(Object orderValue) {
-            return doOr(ConditionKey.CK_NOT_EQUAL_STANDARD, orderValue);
-        }
-
-        public ConnectedOrderBean or_GreaterThan(Object orderValue) {
-            return doOr(ConditionKey.CK_GREATER_THAN, orderValue);
-        }
-
-        public ConnectedOrderBean or_LessThan(Object orderValue) {
-            return doOr(ConditionKey.CK_LESS_THAN, orderValue);
-        }
-
-        public ConnectedOrderBean or_GreaterEqual(Object orderValue) {
-            return doOr(ConditionKey.CK_GREATER_EQUAL, orderValue);
-        }
-
-        public ConnectedOrderBean or_LessEqual(Object orderValue) {
-            return doOr(ConditionKey.CK_LESS_EQUAL, orderValue);
-        }
-
-        public ConnectedOrderBean or_IsNull() {
-            return doOr(ConditionKey.CK_IS_NULL, null);
-        }
-
-        public ConnectedOrderBean or_IsNotNull() {
-            return doOr(ConditionKey.CK_IS_NOT_NULL, null);
-        }
-
-        public ConnectedOrderBean doOr(ConditionKey conditionKey, Object orderValue) {
-            toBeConnectionModeAsOr();
-            try {
-                return delegate(conditionKey, orderValue);
-            } finally {
-                clearConnectionMode();
-            }
-        }
-
-        protected ConnectedOrderBean delegate(ConditionKey conditionKey, Object orderValue) {
-            if (ConditionKey.CK_EQUAL.equals(conditionKey)) {
-                _parentBean.when_Equal(orderValue);
-            } else if (ConditionKey.CK_NOT_EQUAL_STANDARD.equals(conditionKey)) {
-                _parentBean.when_NotEqual(orderValue);
-            } else if (ConditionKey.CK_GREATER_THAN.equals(conditionKey)) {
-                _parentBean.when_GreaterThan(orderValue);
-            } else if (ConditionKey.CK_LESS_THAN.equals(conditionKey)) {
-                _parentBean.when_LessThan(orderValue);
-            } else if (ConditionKey.CK_GREATER_EQUAL.equals(conditionKey)) {
-                _parentBean.when_GreaterEqual(orderValue);
-            } else if (ConditionKey.CK_LESS_EQUAL.equals(conditionKey)) {
-                _parentBean.when_LessEqual(orderValue);
-            } else if (ConditionKey.CK_IS_NULL.equals(conditionKey)) {
-                _parentBean.when_IsNull();
-            } else if (ConditionKey.CK_IS_NOT_NULL.equals(conditionKey)) {
-                _parentBean.when_IsNotNull();
-            } else {
-                String msg = "Unknown conditionKey: " + conditionKey;
-                throw new IllegalStateException(msg);
-            }
-            return this;
-        }
-
-        protected void toBeConnectionModeAsAnd() {
-            _parentBean.toBeConnectionModeAsAnd();
-        }
-
-        protected void toBeConnectionModeAsOr() {
-            _parentBean.toBeConnectionModeAsOr();
-        }
-
-        protected void clearConnectionMode() {
-            _parentBean.clearConnectionMode();
-        }
-    }
-
     // ===================================================================================
     //                                                                    CaseWhen Element 
     //                                                                    ================
-    protected CaseWhenElement createElement(ConditionKey conditionKey, Object orderValue) {
-        return new CaseWhenElement(conditionKey, orderValue);
-    }
-
-    public static class CaseWhenElement {
-        protected ConditionKey _conditionKey;
-        protected Object _orderValue;
-        protected List<CaseWhenElement> _connectedElementList; // top element only
-        protected ConnectionMode _connectionMode; // connected elements only
-
-        public CaseWhenElement(ConditionKey conditionKey, Object orderValue) {
-            _conditionKey = conditionKey;
-            _orderValue = orderValue;
-        }
-
-        public void toBeConnectionModeAsAnd() {
-            _connectionMode = ConnectionMode.AND;
-        }
-
-        public void toBeConnectionModeAsOr() {
-            _connectionMode = ConnectionMode.OR;
-        }
-
-        public String toConnector() {
-            return _connectionMode != null ? _connectionMode.toString() : null;
-        }
-
-        @Override
-        public String toString() {
-            return DfTypeUtil.toClassTitle(this) + ":{" + _conditionKey + ", " + _orderValue + ", "
-                    + _connectedElementList + ", " + _connectionMode + "}";
-        }
-
-        public ConditionKey getConditionKey() {
-            return _conditionKey;
-        }
-
-        public Object getOrderValue() {
-            return _orderValue;
-        }
-
-        @SuppressWarnings("unchecked")
-        public List<CaseWhenElement> getConnectedElementList() {
-            return _connectedElementList != null ? _connectedElementList : Collections.EMPTY_LIST;
-        }
-
-        public void addConnectedElement(CaseWhenElement connectedElement) {
-            if (_connectedElementList == null) {
-                _connectedElementList = new ArrayList<CaseWhenElement>();
-            }
-            _connectedElementList.add(connectedElement);
-        }
-
-        public ConnectionMode getConnectionMode() {
-            return _connectionMode;
-        }
-
-        public void setConnectionMode(ConnectionMode connectionMode) {
-            _connectionMode = connectionMode;
-        }
+    protected HpMobCaseWhenElement createElement(ConditionKey conditionKey, Object orderValue) {
+        return new HpMobCaseWhenElement(conditionKey, orderValue);
     }
 
     // ===================================================================================
     //                                                                     Binding Process
     //                                                                     ===============
-    public void bind(FreeParameterManualOrderThemeListHandler handler) {
+    /**
+     * Bind parameters for manual order. <br />
+     * It is called from DBFlute runtime internally.
+     * @param handler The handler for free parameters. (NotNull)
+     */
+    public void bind(FreeParameterManualOrderThemeListHandler handler) { // called when set to query
         if (!hasManualOrder()) {
             return;
         }
-        for (CaseWhenElement topElement : _caseWhenAcceptedList) {
-            final CaseWhenElement boundTopElement = doBind(handler, topElement);
-            final List<CaseWhenElement> connectedList = topElement.getConnectedElementList();
-            for (CaseWhenElement connectedElement : connectedList) {
-                final CaseWhenElement boundConnectedElement = doBind(handler, connectedElement);
+        for (HpMobCaseWhenElement topElement : _caseWhenAcceptedList) {
+            final HpMobCaseWhenElement boundTopElement = doBind(handler, topElement);
+            final List<HpMobCaseWhenElement> connectedList = topElement.getConnectedElementList();
+            for (HpMobCaseWhenElement connectedElement : connectedList) {
+                final HpMobCaseWhenElement boundConnectedElement = doBind(handler, connectedElement);
                 boundTopElement.addConnectedElement(boundConnectedElement);
             }
             _caseWhenBoundList.add(boundTopElement);
         }
+        if (_elseAcceptedValue != null) {
+            _elseBoundValue = handler.register(THEME_KEY, _elseAcceptedValue);
+        }
     }
 
-    protected CaseWhenElement doBind(FreeParameterManualOrderThemeListHandler handler, CaseWhenElement element) {
-        final Object orderValue = getResolvedOrderValue(element);
-        final String bindExp = handler.register(THEME_KEY, orderValue);
-        final CaseWhenElement boundElement = createElement(element.getConditionKey(), bindExp);
+    protected HpMobCaseWhenElement doBind(FreeParameterManualOrderThemeListHandler handler, HpMobCaseWhenElement element) {
+        final ConditionKey conditionKey = element.getConditionKey();
+        final Object orderValue = resolveBoundValue(handler, element.getOrderValue());
+        final HpMobCaseWhenElement boundElement = createElement(conditionKey, orderValue);
         boundElement.setConnectionMode(element.getConnectionMode());
+        boundElement.setThenValue(resolveBoundValue(handler, element.getThenValue()));
         return boundElement;
     }
 
-    protected Object getResolvedOrderValue(CaseWhenElement element) {
-        Object orderValue = element.getOrderValue();
-        if (orderValue instanceof Classification) {
-            final Classification cls = (Classification) orderValue;
-            orderValue = handleClassificationOrderValue(cls);
+    protected Object resolveBoundValue(FreeParameterManualOrderThemeListHandler handler, Object plainValue) {
+        if (plainValue == null) {
+            return null;
         }
-        return orderValue;
+        if (plainValue instanceof HpSpecifiedColumn) {
+            return ((HpSpecifiedColumn) plainValue).toColumnRealName().toString();
+        }
+        if (plainValue instanceof Classification) {
+            final Classification cls = (Classification) plainValue;
+            plainValue = handleClassificationOrderValue(cls);
+        }
+        return handler.register(THEME_KEY, plainValue);
     }
 
     protected Object handleClassificationOrderValue(Classification cls) {
@@ -665,8 +574,146 @@ public class ManualOrderBean implements HpCalculator {
         return DfTypeUtil.toBoolean(plainCode);
     }
 
+    /**
+     * The handler of theme list of free parameter for manual order. 
+     */
     public static interface FreeParameterManualOrderThemeListHandler {
+
+        /**
+         * @param themeKey The theme key of free parameter. (NotNull)
+         * @param orderValue The registered order value. (NotNull)
+         * @return The bound expression for registered order value. (NotNull)
+         */
         String register(String themeKey, Object orderValue);
+    }
+
+    // ===================================================================================
+    //                                                                          Validation
+    //                                                                          ==========
+    /**
+     * Validate case-when constraints. <br />
+     * It is called from DBFlute runtime internally.
+     */
+    public void validate() { // called when set to query
+        doValidateCaseWhenConstraint();
+    }
+
+    protected void doValidateCaseWhenConstraint() {
+        if (_caseWhenAcceptedList.isEmpty()) {
+            return;
+        }
+        final HpMobCaseWhenElement first = _caseWhenAcceptedList.get(0);
+        final boolean firstThenExists = first.getThenValue() != null;
+        for (HpMobCaseWhenElement current : _caseWhenAcceptedList) {
+            final boolean currentThenExists = current.getThenValue() != null;
+            if (firstThenExists && !currentThenExists) {
+                throwManualOrderRequiredThenNotFoundException(current);
+            } else if (!firstThenExists && currentThenExists) {
+                throwManualOrderUnnecessaryThenFoundException(current);
+            }
+        }
+        final boolean elseExists = _elseAcceptedValue != null;
+        if (firstThenExists && !elseExists) { // e.g. SwitchOrder
+            throwManualOrderRequiredElseNotFoundException();
+        } else if (!firstThenExists && elseExists) { // e.g. PriorityOrder
+            String msg = "Found unnecessary 'else', it doesn't need it if PriorityOrder: " + toString();
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+    }
+
+    protected void throwManualOrderRequiredThenNotFoundException(HpMobCaseWhenElement current) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found 'then', all elements need it (if SwitchOrder).");
+        br.addItem("Advice");
+        br.addElement("You should set 'then' value to all case-when elements");
+        br.addElement("if you want to use SwitchOrder.");
+        br.addElement("(settings for 'then' value means SwitchOrder)");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_GreaterThan(7).then(...);");
+        br.addElement("    mob.when_LessThan(3); // *NG");
+        br.addElement("  (o):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_GreaterThan(7).then(...);");
+        br.addElement("    mob.when_LessThan(3).then(...); // OK");
+        br.addItem("Target Element");
+        br.addElement(current);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void throwManualOrderUnnecessaryThenFoundException(HpMobCaseWhenElement current) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found unnecessary 'then', all elements doesn't need it (if PriorityOrder).");
+        br.addItem("Advice");
+        br.addElement("You should NOT set 'then' value to all case-when elements");
+        br.addElement("if you want to use PriorityOrder.");
+        br.addElement("(No 'then' value means PriorityOrder)");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_GreaterThan(7);");
+        br.addElement("    mob.when_LessThan(3).then(...); // *NG");
+        br.addElement("  (o):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_GreaterThan(7);");
+        br.addElement("    mob.when_LessThan(3); // OK");
+        br.addItem("Target Element");
+        br.addElement(current);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void throwManualOrderRequiredElseNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found 'else', it needs it (if SwitchOrder).");
+        br.addItem("Advice");
+        br.addElement("You should set 'else' value if you want to use SwitchOrder.");
+        br.addElement("(settings for 'then' value means SwitchOrder)");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_GreaterThan(7).then(...);");
+        br.addElement("    mob.when_LessThan(3).then(...);");
+        br.addElement("    cb.query().addOrderBy_...().withManualOrder(mob); // *NG");
+        br.addElement("  (o):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_GreaterThan(7).then(...);");
+        br.addElement("    mob.when_LessThan(3).then(...);");
+        br.addElement("    mob.elseEnd(3); // OK");
+        br.addElement("    cb.query().addOrderBy_...().withManualOrder(mob);");
+        br.addItem("CaseWhen Element");
+        for (HpMobCaseWhenElement element : _caseWhenAcceptedList) {
+            br.addElement(element);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void throwManualOrderUnnecessaryElseNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found unnecessary 'else', it doesn't need it (if PriorityOrder).");
+        br.addItem("Advice");
+        br.addElement("You should NOT set 'else' value if you want to use PriorityOrder.");
+        br.addElement("(No 'then' value means PriorityOrder)");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_GreaterThan(7);");
+        br.addElement("    mob.when_LessThan(3);");
+        br.addElement("    mob.elseEnd(3); // *NG");
+        br.addElement("  (o):");
+        br.addElement("    ManualOrderBean mob = new ManualOrderBean();");
+        br.addElement("    mob.when_GreaterThan(7);");
+        br.addElement("    mob.when_LessThan(3);");
+        br.addElement("    cb.query().addOrderBy_...().withManualOrder(mob); // OK");
+        br.addItem("CaseWhen Element");
+        for (HpMobCaseWhenElement element : _caseWhenAcceptedList) {
+            br.addElement(element);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
     }
 
     // ===================================================================================
@@ -719,11 +766,20 @@ public class ManualOrderBean implements HpCalculator {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public List<CaseWhenElement> getCaseWhenAcceptedList() {
+    public List<HpMobCaseWhenElement> getCaseWhenAcceptedList() {
         return _caseWhenAcceptedList;
     }
 
-    public List<CaseWhenElement> getCaseWhenBoundList() {
+    public List<HpMobCaseWhenElement> getCaseWhenBoundList() {
         return _caseWhenBoundList;
+    }
+
+    /**
+     * Get the 'else' value, which is bound. <br />
+     * It returns null if you set only 'else' value but not binding.
+     * @return The value for 'else'. (NullAllowed)
+     */
+    public Object getElseValue() {
+        return _elseBoundValue;
     }
 }

@@ -21,8 +21,8 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ManualOrderBean;
-import org.seasar.dbflute.cbean.ManualOrderBean.CaseWhenElement;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
+import org.seasar.dbflute.cbean.chelper.HpMobCaseWhenElement;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
@@ -125,36 +125,8 @@ public class OrderByElement implements Serializable {
     }
 
     // ===================================================================================
-    //                                                                 Order-By Expression
-    //                                                                 ===================
-    public boolean isAsc() {
-        if (_ascDesc == null) {
-            String msg = "The attribute[ascDesc] should not be null.";
-            throw new IllegalStateException(msg);
-        }
-        if (_ascDesc.equals("asc")) {
-            return true;
-        } else if (_ascDesc.equals("desc")) {
-            return false;
-        } else {
-            String msg = "The attribute[ascDesc] should be asc or desc: but ascDesc=" + _ascDesc;
-            throw new IllegalStateException(msg);
-        }
-    }
-
-    public String getColumnFullName() {
-        final StringBuilder sb = new StringBuilder();
-        if (_aliasName != null) {
-            sb.append(_aliasName).append(".");
-        }
-        if (_columnName == null) {
-            String msg = "The attribute[columnName] should not be null.";
-            throw new IllegalStateException(msg);
-        }
-        sb.append(_columnName);
-        return sb.toString();
-    }
-
+    //                                                                     Order-By Clause 
+    //                                                                     ===============
     public String getElementClause() { // needs cipher
         if (_ascDesc == null) {
             String msg = "The attribute[ascDesc] should not be null.";
@@ -221,28 +193,42 @@ public class OrderByElement implements Serializable {
                 realAlias = decryptIfNeeds(_columnInfo, columnAlias);
             }
         }
-        final List<CaseWhenElement> caseWhenList = _manualOrderBean.getCaseWhenBoundList();
+        final List<HpMobCaseWhenElement> caseWhenList = _manualOrderBean.getCaseWhenBoundList();
         if (!caseWhenList.isEmpty()) {
             sb.append(ln()).append("   case").append(ln());
             int index = 0;
-            for (CaseWhenElement element : caseWhenList) {
+            for (HpMobCaseWhenElement element : caseWhenList) {
                 sb.append("     when ");
                 doSetupManualOrderClause(sb, realAlias, element);
-                final List<CaseWhenElement> connectedElementList = element.getConnectedElementList();
-                for (CaseWhenElement connectedElement : connectedElementList) {
+                final List<HpMobCaseWhenElement> connectedElementList = element.getConnectedElementList();
+                for (HpMobCaseWhenElement connectedElement : connectedElementList) {
                     doSetupManualOrderClause(sb, realAlias, connectedElement);
                 }
-                sb.append(" then ").append(index).append(ln());
+                final Object thenValue = element.getThenValue();
+                final String thenExp;
+                if (thenValue != null) {
+                    thenExp = thenValue.toString();
+                } else {
+                    thenExp = String.valueOf(index);
+                }
+                sb.append(" then ").append(thenExp).append(ln());
                 ++index;
             }
-            sb.append("     else ").append(index).append(ln());
+            final Object elseValue = _manualOrderBean.getElseValue();
+            final String elseExp;
+            if (elseValue != null) {
+                elseExp = elseValue.toString();
+            } else {
+                elseExp = String.valueOf(index);
+            }
+            sb.append("     else ").append(elseExp).append(ln());
             sb.append("   end ").append(_ascDesc);
         } else {
             sb.append(realAlias);
         }
     }
 
-    protected void doSetupManualOrderClause(StringBuilder sb, String columnAlias, CaseWhenElement element) {
+    protected void doSetupManualOrderClause(StringBuilder sb, String columnAlias, HpMobCaseWhenElement element) {
         final ConditionKey conditionKey = element.getConditionKey();
         final String keyExp = conditionKey.getOperand();
         final String connector = element.toConnector();
@@ -305,6 +291,37 @@ public class OrderByElement implements Serializable {
 
     protected String ln() {
         return DBFluteSystem.getBasicLn();
+    }
+
+    // ===================================================================================
+    //                                                                       Order-By Info
+    //                                                                       =============
+    public boolean isAsc() {
+        if (_ascDesc == null) {
+            String msg = "The attribute[ascDesc] should not be null.";
+            throw new IllegalStateException(msg);
+        }
+        if (_ascDesc.equals("asc")) {
+            return true;
+        } else if (_ascDesc.equals("desc")) {
+            return false;
+        } else {
+            String msg = "The attribute[ascDesc] should be asc or desc: but ascDesc=" + _ascDesc;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    public String getColumnFullName() {
+        final StringBuilder sb = new StringBuilder();
+        if (_aliasName != null) {
+            sb.append(_aliasName).append(".");
+        }
+        if (_columnName == null) {
+            String msg = "The attribute[columnName] should not be null.";
+            throw new IllegalStateException(msg);
+        }
+        sb.append(_columnName);
+        return sb.toString();
     }
 
     // ===================================================================================
