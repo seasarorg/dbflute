@@ -140,10 +140,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
                 columnMetaInfo.setDecimalDigits(decimalDigits);
                 columnMetaInfo.setRequired(nullType == 0);
                 columnMetaInfo.setColumnComment(columnComment);
-
-                // default value as meta data may have illegal characters
-                //  e.g. Oracle, MySQL
-                columnMetaInfo.setDefaultValue(defaultValue != null ? defaultValue.trim() : null);
+                columnMetaInfo.setDefaultValue(filterDefaultValue(defaultValue));
 
                 columnList.add(columnMetaInfo);
             }
@@ -183,6 +180,41 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
                 throw e;
             }
         }
+    }
+
+    protected String filterDefaultValue(String defaultValue) {
+        if (defaultValue == null) {
+            return null;
+        }
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // default value as meta data may have illegal characters
+        // - - - - - - - - - -/
+
+        // default value may have line separator e.g. Oracle, MySQL
+        defaultValue = defaultValue.trim();
+
+        if (isDatabaseOracle()) {
+            // Oracle provides null value as null string after removing default value
+            // (null string with quoted means valid default value as 'null') 
+            if ("null".equalsIgnoreCase(defaultValue)) {
+                return null;
+            }
+        }
+
+        defaultValue = removeDefaultValueQuotation(defaultValue);
+        return defaultValue;
+    }
+
+    protected String removeDefaultValueQuotation(String defaultValue) {
+        // trim out parens & quotes out of default value.
+        // makes sense for MSSQL. not sure about others.
+        if (defaultValue.startsWith("(") && defaultValue.endsWith(")")) {
+            defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
+        }
+        if (defaultValue.startsWith("'") && defaultValue.endsWith("'")) {
+            defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
+        }
+        return defaultValue;
     }
 
     public Map<String, DfColumnMeta> getColumnMap(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {

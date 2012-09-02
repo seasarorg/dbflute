@@ -463,18 +463,8 @@ public class DfSchemaXmlSerializer {
     }
 
     protected void processDefaultValue(DfColumnMeta columnMeta, Element columnElement) {
-        String defaultValue = columnMeta.getDefaultValue();
+        final String defaultValue = columnMeta.getDefaultValue();
         if (defaultValue != null) {
-            // trim out parens & quotes out of default value.
-            // makes sense for MSSQL. not sure about others.
-            if (defaultValue.startsWith("(") && defaultValue.endsWith(")")) {
-                defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
-            }
-
-            if (defaultValue.startsWith("'") && defaultValue.endsWith("'")) {
-                defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
-            }
-
             columnElement.setAttribute("default", defaultValue);
         }
     }
