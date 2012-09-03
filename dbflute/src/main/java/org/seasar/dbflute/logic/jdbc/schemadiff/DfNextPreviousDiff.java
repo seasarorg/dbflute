@@ -36,20 +36,16 @@ public class DfNextPreviousDiff extends DfAbstractDiff {
     protected DfNextPreviousDiff(Map<String, Object> nextPreviousDiffMap, boolean unquote) {
         final String next = (String) nextPreviousDiffMap.get("next");
         final String previous = (String) nextPreviousDiffMap.get("previous");
-        final boolean bothQuoted = isBothQuoted(next, previous);
-        _next = unquoteIfNeeds(next, unquote, bothQuoted);
-        _previous = unquoteIfNeeds(previous, unquote, bothQuoted);
+        _next = !isNullMark(next) ? unquoteIfNeeds(next, unquote) : null;
+        _previous = !isNullMark(previous) ? unquoteIfNeeds(previous, unquote) : null;
     }
 
-    protected boolean isBothQuoted(String next, String previous) {
-        if (next != null && previous != null) {
-            return Srl.isQuotedDouble(next) && Srl.isQuotedDouble(previous);
-        }
-        return false;
+    protected boolean isNullMark(String value) {
+        return "null".equals(value);
     }
 
-    protected String unquoteIfNeeds(String value, boolean unquote, boolean bothQuoted) {
-        return (value != null && unquote && bothQuoted) ? Srl.unquoteDouble(value) : value;
+    protected String unquoteIfNeeds(String value, boolean unquote) {
+        return value != null && unquote ? Srl.unquoteDouble(value) : value;
     }
 
     public static DfNextPreviousDiff create(String nextValue, String previousValue) {
@@ -74,10 +70,10 @@ public class DfNextPreviousDiff extends DfAbstractDiff {
         return map;
     }
 
-    public Map<String, String> createNextPreviousDiffQuotedMap() {
+    public Map<String, String> createNextPreviousDiffQuotedMap() { // values are quoted if not null
         final Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
-        map.put("next", "\"" + _next + "\"");
-        map.put("previous", "\"" + _previous + "\"");
+        map.put("next", _next != null ? "\"" + _next + "\"" : null);
+        map.put("previous", _previous != null ? "\"" + _previous + "\"" : null);
         return map;
     }
 
