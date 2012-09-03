@@ -89,15 +89,29 @@ public class DfNextPreviousDiff extends DfAbstractDiff {
     //                                                                          ==========
     public String getDisplayForHtml() {
         final StringBuilder sb = new StringBuilder();
-        final boolean quote = _quoteDispIfNeeds && (canBeTrimmed(_next) || canBeTrimmed(_previous));
-        sb.append(quote ? "\"" : "").append(_previous).append(quote ? "\"" : "");
-        sb.append(" -> ");
-        sb.append(quote ? "\"" : "").append(_next).append(quote ? "\"" : "");
+        final boolean quote = _quoteDispIfNeeds && (canBeTrimmed() || canBeNullMark());
+        sb.append(quoteIfNeeds(_previous, quote)).append(" -> ").append(quoteIfNeeds(_next, quote));
         return escape(sb.toString());
     }
 
-    protected boolean canBeTrimmed(String value) {
+    protected boolean canBeTrimmed() {
+        return doCanBeTrimmed(_next) || doCanBeTrimmed(_previous);
+    }
+
+    protected boolean doCanBeTrimmed(String value) {
         return value != null && value.trim().length() != value.length();
+    }
+
+    protected boolean canBeNullMark() {
+        return doCanBeNullMark(_next) || doCanBeNullMark(_previous);
+    }
+
+    protected boolean doCanBeNullMark(String value) {
+        return "null".equals(value);
+    }
+
+    protected String quoteIfNeeds(String value, boolean quote) {
+        return value != null && quote ? Srl.quoteDouble(value) : value;
     }
 
     public void quoteDispIfNeeds() {

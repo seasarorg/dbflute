@@ -380,7 +380,9 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
             if (countSkipped > 0) {
                 sb.append(ln()).append("   v: Skipped exists (").append(countSkipped).append(")");
             }
-            sb.append(ln()).append("   x: Failure exists (").append(countFailure).append(")");
+            if (countFailure > 0) {
+                sb.append(ln()).append("   x: Failure exists (").append(countFailure).append(")");
+            }
         }
         return sb.toString();
     }
