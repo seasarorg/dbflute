@@ -16,20 +16,30 @@
 package org.seasar.dbflute.task;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
+import org.seasar.dbflute.exception.DfOutsideSqlTestFailureFoundException;
+import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
 import org.seasar.dbflute.logic.outsidesqltest.DfOutsideSqlChecker;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
-import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
+import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
@@ -37,7 +47,7 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
 /**
  * @author jflute
  */
-public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
+public class DfOutsideSqlTestTask extends DfAbstractTask {
 
     // ===================================================================================
     //                                                                          Definition
@@ -48,8 +58,11 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The count of non-target SQL. */
-    protected int _nonTargetSqlCount;
+    /** The set of non-target SQL file. */
+    protected final Set<File> _nonTargetSqlFileSet = new HashSet<File>();
+
+    /** The result of SqlFile fire. (NotNull after fire) */
+    protected DfSqlFileFireResult _fireResult;
 
     // ===================================================================================
     //                                                                           Beginning
@@ -66,17 +79,50 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     }
 
     // ===================================================================================
+    //                                                                          DataSource
+    //                                                                          ==========
+    @Override
+    protected boolean isUseDataSource() {
+        return true;
+    }
+
+    // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
     @Override
     protected void doExecute() {
-        super.doExecute();
+        final DfRunnerInformation runInfo = createRunnerInformation();
+        final DfSqlFileFireMan fireMan = createSqlFileFireMan();
+        final List<File> sqlFileList = getTargetSqlFileList();
+        _fireResult = fireMan.fire(getSqlFileRunner(runInfo), sqlFileList);
+        handleSqlFileFailure(_fireResult, sqlFileList);
+    }
+
+    // ===================================================================================
+    //                                                                        SqlFile Fire
+    //                                                                        ============
+    protected DfSqlFileFireMan createSqlFileFireMan() {
+        return new DfSqlFileFireMan();
+    }
+
+    protected DfRunnerInformation createRunnerInformation() {
+        final DfRunnerInformation runInfo = new DfRunnerInformation();
+        runInfo.setDriver(getDriver());
+        runInfo.setUrl(getUrl());
+        runInfo.setUser(getUser());
+        runInfo.setPassword(getPassword());
+        runInfo.setBreakCauseThrow(isBreakCauseThrow());
+        runInfo.setErrorContinue(isErrorContinue());
+        runInfo.setAutoCommit(isAutoCommit());
+        runInfo.setRollbackOnly(isRollbackOnly());
+        runInfo.setIgnoreTxError(isIgnoreTxError());
+        customizeRunnerInformation(runInfo);
+        return runInfo;
     }
 
     // ===================================================================================
     //                                                                       Main Override
     //                                                                       =============
-    @Override
     protected List<File> getTargetSqlFileList() {
         final DfOutsideSqlPack outsideSqlPack = collectOutsideSql();
         final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
@@ -94,8 +140,8 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         }
     }
 
-    @Override
     protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
+        final String nonTargetMark = "df:x";
         final DBDef currentDBDef = getDatabaseTypeFacadeProp().getCurrentDBDef();
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
             @Override
@@ -127,8 +173,9 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
             @Override
             protected boolean isTargetSql(String sql) {
                 final String entityName = getEntityName(sql);
-                if (entityName != null && "df:x".equalsIgnoreCase(entityName)) { // Non target SQL!
-                    ++_nonTargetSqlCount;
+                if (entityName != null && nonTargetMark.equalsIgnoreCase(entityName)) { // non-target SQL
+                    _nonTargetSqlFileSet.add(_sqlFile);
+                    _log.info("...Skipping the SQL by non-target mark '" + nonTargetMark + "'");
                     return false;
                 }
                 return super.isTargetSql(sql);
@@ -167,7 +214,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
                 if (!betweenBeginEndMarkList.isEmpty()) {
                     return betweenBeginEndMarkList;
                 } else {
-                    // for MySQL. 
+                    // basically for MySQL 
                     return getListBetweenBeginEndMark(sql, "-- " + mark, mark);
                 }
             }
@@ -205,27 +252,22 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         checker.check(sqlFile.getName(), sql);
     }
 
-    @Override
     protected boolean isAutoCommit() {
         return false;
     }
 
-    @Override
     protected boolean isBreakCauseThrow() {
-        return true; // OutsideSqlTest task immediately breaks the process by error
-    }
-
-    @Override
-    protected boolean isErrorContinue() {
         return false;
     }
 
-    @Override
+    protected boolean isErrorContinue() {
+        return true;
+    }
+
     protected boolean isRollbackOnly() {
         return true; // this task does not commit 
     }
 
-    @Override
     protected boolean isIgnoreTxError() {
         if (getBasicProperties().isDatabaseSQLite()) {
             // SQLite may throw an exception when roll-back
@@ -236,29 +278,116 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         }
     }
 
-    @Override
     protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
         runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
     }
 
+    // ===================================================================================
+    //                                                                  Exception Handling
+    //                                                                  ==================
+    protected void handleSqlFileFailure(DfSqlFileFireResult fireResult, List<File> sqlFileList) {
+        final SQLFailureException topCause = fireResult.getBreakCause();
+        if (topCause != null) {
+            throw topCause;
+        }
+        final List<DfSqlFileRunnerResult> resultList = fireResult.getRunnerResultList();
+        for (DfSqlFileRunnerResult runnerResult : resultList) {
+            final SQLFailureException elementCause = runnerResult.getBreakCause();
+            if (elementCause != null) {
+                throw elementCause;
+            }
+            final List<ErrorContinuedSql> continuedSqlList = runnerResult.getErrorContinuedSqlList();
+            if (!continuedSqlList.isEmpty()) {
+                throwOutsideSqlTestFailureFoundException();
+            }
+        }
+    }
+
+    protected void throwOutsideSqlTestFailureFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found the failure SQL by the OutsideSqlTest.");
+        br.addItem("Advice");
+        br.addElement("You can see the exception info");
+        br.addElement("after each SQL logging like this:");
+        br.addElement("");
+        br.addElement("  ...Firing [SQL-file]");
+        br.addElement("  SQL: [SQL-string]");
+        br.addElement("  *Failure: [SQLException-class]");
+        br.addElement("  /nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn...");
+        br.addElement("  [SQLException-message]");
+        br.addElement("  [SQLState-info]");
+        br.addElement("  nnnnnnnnnn/");
+        br.addElement("");
+        final String msg = br.buildExceptionMessage();
+        throw new DfOutsideSqlTestFailureFoundException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                          Final Info
+    //                                                                          ==========
     @Override
-    protected void showTargetSqlFileInformation(List<File> sqlFileList) {
-        super.showTargetSqlFileInformation(sqlFileList);
-        if (_nonTargetSqlCount > 0) {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            sb.append(ln()).append("Non-target SQL count: ").append(_nonTargetSqlCount);
-            sb.append(ln()).append("- - - - - - - - - -/");
-            _log.info(sb.toString());
+    protected String getFinalInformation() {
+        return buildFinalMessage();
+    }
+
+    protected String buildFinalMessage() {
+        if (_fireResult == null) {
+            return null;
         }
-        final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
-        if (specifiedSqlFile != null) {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(ln()).append("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            sb.append(ln()).append("Specified SQL file: ").append(specifiedSqlFile);
-            sb.append(ln()).append("- - - - - - - - - -/");
-            _log.info(sb.toString());
+        final DfSqlFileFireResult fireResult = _fireResult;
+        int countOK = 0;
+        int countSkipped = 0;
+        int countFailure = 0;
+        final StringBuilder sb = new StringBuilder();
+        sb.append(" {Checked SQL}");
+        final List<DfSqlFileRunnerResult> runnerResultList = fireResult.getRunnerResultList();
+        for (DfSqlFileRunnerResult runnerResult : runnerResultList) {
+            final File sqlFile = runnerResult.getSqlFile();
+            final List<ErrorContinuedSql> continuedSqlList = runnerResult.getErrorContinuedSqlList();
+            sb.append(ln());
+            if (continuedSqlList.isEmpty()) {
+                if (_nonTargetSqlFileSet.contains(sqlFile)) {
+                    // accurately 'v' means the SQL file may have skipped SQLs
+                    // however SQL file for OutsideSqlTest has only one SQL normally
+                    sb.append("  v ");
+                    ++countSkipped;
+                } else {
+                    sb.append("  o ");
+                    ++countOK;
+                }
+            } else {
+                // you can say same as 'v'
+                // (anyway, look at the log for detail)
+                sb.append("  x ");
+                ++countFailure;
+            }
+            sb.append(sqlFile.getName());
+            for (ErrorContinuedSql errorContinuedSql : continuedSqlList) {
+                final SQLException sqlEx = errorContinuedSql.getSqlEx();
+                String sqlMsg = sqlEx.getMessage();
+                if (sqlMsg != null) {
+                    sqlMsg = sqlMsg.trim();
+                    if (sqlMsg.contains(ln())) {
+                        sqlMsg = Srl.substringFirstFront(sqlMsg, ln()).trim() + "...";
+                    }
+                }
+                sb.append(ln()).append("   -> ").append(sqlMsg);
+            }
         }
+        if (!runnerResultList.isEmpty()) {
+            sb.append(ln());
+            sb.append(ln()).append("   o: OK (").append(countOK).append(")");
+            if (countSkipped > 0) {
+                sb.append(ln()).append("   v: Skipped exists (").append(countSkipped).append(")");
+            }
+            sb.append(ln()).append("   x: Failure exists (").append(countFailure).append(")");
+            sb.append(ln());
+            sb.append(ln()).append("  *Look at the log for the detail");
+            sb.append(ln()).append("    * * * * * * * * * *");
+            sb.append(ln()).append("    * SQLTest Failure *");
+            sb.append(ln()).append("    * * * * * * * * * *");
+        }
+        return sb.toString();
     }
 
     // ===================================================================================

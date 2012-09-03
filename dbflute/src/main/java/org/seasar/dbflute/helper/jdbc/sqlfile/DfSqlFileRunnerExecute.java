@@ -72,7 +72,9 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             }
         } catch (SQLException e) {
             if (!lazyConnectFailed && _runInfo.isErrorContinue()) { // when continue option
-                showContinueWarnLog(sql, e);
+                if (isContinueWarnLogEnabled()) {
+                    showContinueWarnLog(sql, e);
+                }
                 _result.addErrorContinuedSql(sql, e);
             } else { // main root @since 0.9.9.2F
                 throwSQLFailureException(sql, e);
@@ -100,7 +102,15 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         // override if it needs
     }
 
+    protected boolean isContinueWarnLogEnabled() {
+        return true;
+    }
+
     protected void showContinueWarnLog(String sql, SQLException e) {
+        _log.warn(buildContinueWarnLog(e));
+    }
+
+    protected String buildContinueWarnLog(SQLException e) {
         final StringBuilder sb = new StringBuilder();
         sb.append("*Failure: ").append(e.getClass().getName()).append(ln());
         sb.append("/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
@@ -120,7 +130,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             }
         }
         sb.append("nnnnnnnnnnnnnnnnnnnn/");
-        _log.warn(sb.toString());
+        return sb.toString();
     }
 
     @Override

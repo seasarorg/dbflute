@@ -153,7 +153,7 @@ public class DfTakeAssertTask extends DfAbstractTask {
     //                                                                          Final Info
     //                                                                          ==========
     @Override
-    public String getFinalInformation() {
+    protected String getFinalInformation() {
         return buildFinalMessage();
     }
 

@@ -45,23 +45,26 @@ public class DfSqlFileRunnerResult {
     }
 
     public static class ErrorContinuedSql {
-        protected String _sql;
-        protected SQLException _sqlEx;
+        protected final File _sqlFile;
+        protected final String _sql;
+        protected final SQLException _sqlEx;
+
+        public ErrorContinuedSql(File sqlFile, String sql, SQLException sqlEx) {
+            _sqlFile = sqlFile;
+            _sql = sql;
+            _sqlEx = sqlEx;
+        }
+
+        public File getSqlFile() {
+            return _sqlFile;
+        }
 
         public String getSql() {
             return _sql;
         }
 
-        public void setSql(String sql) {
-            this._sql = sql;
-        }
-
         public SQLException getSqlEx() {
             return _sqlEx;
-        }
-
-        public void setSqlEx(SQLException ex) {
-            _sqlEx = ex;
         }
     }
 
@@ -77,10 +80,7 @@ public class DfSqlFileRunnerResult {
     }
 
     public void addErrorContinuedSql(String sql, SQLException sqlEx) {
-        final ErrorContinuedSql errorContinuedSql = new ErrorContinuedSql();
-        errorContinuedSql.setSql(sql);
-        errorContinuedSql.setSqlEx(sqlEx);
-        _errorContinuedSqlList.add(errorContinuedSql);
+        _errorContinuedSqlList.add(new ErrorContinuedSql(_sqlFile, sql, sqlEx));
     }
 
     public int getGoodSqlCount() {
