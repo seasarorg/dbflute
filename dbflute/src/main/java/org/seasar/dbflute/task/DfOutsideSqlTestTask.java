@@ -191,11 +191,6 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
                 _log.info(" -> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount) + ln());
             }
 
-            @Override
-            protected boolean isSqlTrimAndRemoveLineSeparator() {
-                return false;
-            }
-
             protected String getEntityName(final String sql) {
                 return getTargetString(sql, "#");
             }

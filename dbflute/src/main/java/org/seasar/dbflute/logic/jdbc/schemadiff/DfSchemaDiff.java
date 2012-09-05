@@ -1,3 +1,18 @@
+/*
+ * Copyright 2004-2012 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.logic.jdbc.schemadiff;
 
 import java.util.Date;
@@ -188,13 +203,22 @@ public class DfSchemaDiff extends DfAbstractDiff {
     protected final List<DfSequenceDiff> _deletedSequenceDiffList = DfCollectionUtil.newArrayList();
 
     // -----------------------------------------------------
-    //                                         Procedure Diff
-    //                                         -------------
+    //                                        Procedure Diff
+    //                                        --------------
     protected final List<DfProcedureDiff> _procedureDiffAllList = DfCollectionUtil.newArrayList();
     protected final List<DfProcedureDiff> _addedProcedureDiffList = DfCollectionUtil.newArrayList();
     protected final List<DfProcedureDiff> _changedProcedureDiffList = DfCollectionUtil.newArrayList();
     protected final List<DfProcedureDiff> _deletedProcedureDiffList = DfCollectionUtil.newArrayList();
 
+    // -----------------------------------------------------
+    //                                            Craft Diff
+    //                                            ----------
+    protected final DfCraftDiffProcess _craftDiffProcess = new DfCraftDiffProcess();
+    protected String _craftDiffMetaDirPath;
+
+    // -----------------------------------------------------
+    //                                             Nest Diff
+    //                                             ---------
     protected List<NestDiffSetupper> _nestDiffList = DfCollectionUtil.newArrayList();
     {
         _nestDiffList.add(new NestDiffSetupper() {
@@ -1261,6 +1285,20 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     // ===================================================================================
+    //                                                                       Craft Process
+    //                                                                       =============
+    protected void processCraftDiff() {
+        if (_craftDiffMetaDirPath == null) {
+            return;
+        }
+        _craftDiffProcess.craftDiff(_craftDiffMetaDirPath);
+    }
+
+    protected void loadPreviousCraftMeta() {
+        // TODO jflute
+    }
+
+    // ===================================================================================
     //                                                                         Find Object
     //                                                                         ===========
     protected Table findNextTable(Table table) {
@@ -1414,6 +1452,10 @@ public class DfSchemaDiff extends DfAbstractDiff {
         _suppressUnifiedSchema = true;
     }
 
+    public void enableCraftDiff(String craftDiffMetaDirPath) {
+        this._craftDiffMetaDirPath = craftDiffMetaDirPath;
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -1455,7 +1497,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         return _deletedTableDiffList;
     }
 
-    public void addTableDiff(DfTableDiff tableDiff) {
+    protected void addTableDiff(DfTableDiff tableDiff) {
         _tableDiffAllList.add(tableDiff);
         if (tableDiff.isAdded()) {
             _addedTableDiffList.add(tableDiff);
@@ -1463,10 +1505,9 @@ public class DfSchemaDiff extends DfAbstractDiff {
             _changedTableDiffList.add(tableDiff);
         } else if (tableDiff.isDeleted()) {
             _deletedTableDiffList.add(tableDiff);
-        } else {
+        } else { // no way
             String msg = "Unknown diff-type of table: ";
-            msg = msg + " diffType=" + tableDiff.getDiffType();
-            msg = msg + " tableDiff=" + tableDiff;
+            msg = msg + " diffType=" + tableDiff.getDiffType() + " tableDiff=" + tableDiff;
             throw new IllegalStateException(msg);
         }
     }
@@ -1490,7 +1531,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         return _deletedSequenceDiffList;
     }
 
-    public void addSequenceDiff(DfSequenceDiff sequenceDiff) {
+    protected void addSequenceDiff(DfSequenceDiff sequenceDiff) {
         _sequenceDiffAllList.add(sequenceDiff);
         if (sequenceDiff.isAdded()) {
             _addedSequenceDiffList.add(sequenceDiff);
@@ -1498,17 +1539,16 @@ public class DfSchemaDiff extends DfAbstractDiff {
             _changedSequenceDiffList.add(sequenceDiff);
         } else if (sequenceDiff.isDeleted()) {
             _deletedSequenceDiffList.add(sequenceDiff);
-        } else {
+        } else { // no way
             String msg = "Unknown diff-type of sequence: ";
-            msg = msg + " diffType=" + sequenceDiff.getDiffType();
-            msg = msg + " sequenceDiff=" + sequenceDiff;
+            msg = msg + " diffType=" + sequenceDiff.getDiffType() + " sequenceDiff=" + sequenceDiff;
             throw new IllegalStateException(msg);
         }
     }
 
     // -----------------------------------------------------
-    //                                         Procedure Diff
-    //                                         -------------
+    //                                        Procedure Diff
+    //                                        --------------
     public List<DfProcedureDiff> getProcedureDiffAllList() {
         return _procedureDiffAllList;
     }
@@ -1525,7 +1565,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         return _deletedProcedureDiffList;
     }
 
-    public void addProcedureDiff(DfProcedureDiff procedureDiff) {
+    protected void addProcedureDiff(DfProcedureDiff procedureDiff) {
         _procedureDiffAllList.add(procedureDiff);
         if (procedureDiff.isAdded()) {
             _addedProcedureDiffList.add(procedureDiff);
@@ -1533,12 +1573,34 @@ public class DfSchemaDiff extends DfAbstractDiff {
             _changedProcedureDiffList.add(procedureDiff);
         } else if (procedureDiff.isDeleted()) {
             _deletedProcedureDiffList.add(procedureDiff);
-        } else {
+        } else { // no way
             String msg = "Unknown diff-type of procedure: ";
-            msg = msg + " diffType=" + procedureDiff.getDiffType();
-            msg = msg + " procedureDiff=" + procedureDiff;
+            msg = msg + " diffType=" + procedureDiff.getDiffType() + " procedureDiff=" + procedureDiff;
             throw new IllegalStateException(msg);
         }
+    }
+
+    // -----------------------------------------------------
+    //                                            Craft Diff
+    //                                            ----------
+    public List<String> getCraftTitleList() {
+        return _craftDiffProcess.getCraftTitleList();
+    }
+
+    public List<DfCraftDiff> getCraftDiffAllList(String craftTitle) {
+        return _craftDiffProcess.getCraftDiffAllList(craftTitle);
+    }
+
+    public List<DfCraftDiff> getAddedCraftDiffList(String craftTitle) {
+        return _craftDiffProcess.getAddedCraftDiffList(craftTitle);
+    }
+
+    public List<DfCraftDiff> getChangedCraftDiffList(String craftTitle) {
+        return _craftDiffProcess.getChangedCraftDiffList(craftTitle);
+    }
+
+    public List<DfCraftDiff> getDeletedCraftDiffList(String craftTitle) {
+        return _craftDiffProcess.getDeletedCraftDiffList(craftTitle);
     }
 
     // -----------------------------------------------------

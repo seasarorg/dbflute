@@ -150,6 +150,7 @@ public class DfSchemaXmlSerializer {
         _schemaDiff = DfSchemaDiff.createAsFlexible(schemaXml);
 
         // all diff processes are depends on the DBFlute property
+        // (CraftDiff settings are set later)
         if (getDocumentProperties().isCheckColumnDefOrderDiff()) {
             _schemaDiff.checkColumnDefOrder();
         }
@@ -159,19 +160,26 @@ public class DfSchemaXmlSerializer {
     }
 
     /**
+     * Create instance as core process. 
      * @param dataSource The data source of the database. (NotNull)
      * @param mainSchema The main schema as unified schema. (NotNull)
      * @return The new instance. (NotNull)
      */
     public static DfSchemaXmlSerializer createAsCore(DataSource dataSource, UnifiedSchema mainSchema) {
-        final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
+        final DfBuildProperties buildProp = DfBuildProperties.getInstance();
+        final DfBasicProperties basicProp = buildProp.getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
         final String schemaXml = facadeProp.getProejctSchemaXMLFile();
         final String historyFile = facadeProp.getProjectSchemaHistoryFile();
-        return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
+        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, mainSchema, schemaXml, historyFile);
+        final DfDocumentProperties docProp = buildProp.getDocumentProperties();
+        serializer.enableCraftDiff(docProp.getCoreCraftDiffMetaDir());
+        return serializer;
     }
 
     /**
+     * Create instance as manage process. <br />
+     * CraftDiff settings are not set here. 
      * @param dataSource The data source of the database. (NotNull)
      * @param mainSchema The main schema as unified schema. (NotNull)
      * @param schemaXml The XML file to output meta info of the schema. (NotNull)
@@ -180,9 +188,13 @@ public class DfSchemaXmlSerializer {
      */
     public static DfSchemaXmlSerializer createAsManage(DataSource dataSource, UnifiedSchema mainSchema,
             String schemaXml, String historyFile) {
-        final DfSchemaXmlSerializer serializer = new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml,
-                historyFile);
+        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, mainSchema, schemaXml, historyFile);
         return serializer.suppressExceptTarget().suppressAdditionalSchema();
+    }
+
+    protected static DfSchemaXmlSerializer newSerializer(DataSource dataSource, UnifiedSchema mainSchema,
+            String schemaXml, String historyFile) {
+        return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
     }
 
     protected DfSchemaXmlSerializer suppressExceptTarget() {
@@ -1240,6 +1252,10 @@ public class DfSchemaXmlSerializer {
     //                                                                         ===========
     public void suppressUnifiedSchema() {
         _schemaDiff.suppressUnifiedSchema();
+    }
+
+    public void enableCraftDiff(String craftMetaDir) {
+        _schemaDiff.enableCraftDiff(craftMetaDir);
     }
 
     // ===================================================================================

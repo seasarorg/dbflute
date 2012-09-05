@@ -131,12 +131,19 @@ public class DfSchemaSyncChecker {
     //                                                                          ==========
     protected DfSchemaXmlSerializer createMainSerializer() {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return DfSchemaXmlSerializer.createAsManage(_mainDs, mainSchema, getSchemaXml(), getDiffMapFile());
+        return doCreateSerializer(_mainDs, mainSchema);
     }
 
     protected DfSchemaXmlSerializer createTargetSerializer(DataSource targetDs) {
-        final UnifiedSchema schema = getDocumentProperties().getSchemaSyncCheckDatabaseSchema();
-        return DfSchemaXmlSerializer.createAsManage(targetDs, schema, getSchemaXml(), getDiffMapFile());
+        final UnifiedSchema targetSchema = getDocumentProperties().getSchemaSyncCheckDatabaseSchema();
+        return doCreateSerializer(targetDs, targetSchema);
+    }
+
+    protected DfSchemaXmlSerializer doCreateSerializer(DataSource dataSource, UnifiedSchema unifiedSchema) {
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, unifiedSchema,
+                getSchemaXml(), getDiffMapFile());
+        serializer.enableCraftDiff(getSchemaSyncCheckCraftMetaDir());
+        return serializer;
     }
 
     // ===================================================================================
@@ -164,5 +171,9 @@ public class DfSchemaSyncChecker {
 
     protected String getResultFilePath() {
         return getDocumentProperties().getSchemaSyncCheckResultFilePath();
+    }
+
+    protected String getSchemaSyncCheckCraftMetaDir() {
+        return getDocumentProperties().getSchemaSyncCheckCraftMetaDir();
     }
 }

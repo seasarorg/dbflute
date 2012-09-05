@@ -60,8 +60,8 @@ public class DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().isSuppressLoggingReplaceSql();
     }
 
-    protected String resolveTerminater4Tool() {
-        return getDatabaseTypeFacadeProp().isDatabaseOracle() ? "/" : null;
+    protected String resolveTerminator4Tool() {
+        return getReplaceSchemaProperties().resolveTerminator4Tool();
     }
 
     protected boolean isDbCommentLineForIrregularPattern(String line) {

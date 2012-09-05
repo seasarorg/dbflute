@@ -807,7 +807,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml) {
         final String historyFile = null; // no use history here (use SchemaDiff directly later)
-        return DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema, schemaXml, historyFile);
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema,
+                schemaXml, historyFile);
+        serializer.enableCraftDiff(getMigrationAlterCheckCraftMetaDir());
+        return serializer;
     }
 
     // ===================================================================================
@@ -1306,6 +1309,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected String getMigrationAlterCheckNextSchemaXml() {
         return getReplaceSchemaProperties().getMigrationAlterCheckNextSchemaXml();
+    }
+
+    protected String getMigrationAlterCheckCraftMetaDir() {
+        return getReplaceSchemaProperties().getMigrationAlterCheckCraftMetaDir();
     }
 
     // -----------------------------------------------------

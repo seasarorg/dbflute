@@ -323,11 +323,6 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
         }
     }
 
-    @Override
-    protected boolean isSqlTrimAndRemoveLineSeparator() {
-        return false;
-    }
-
     // ===================================================================================
     //                                                                   Assert Definition
     //                                                                   =================

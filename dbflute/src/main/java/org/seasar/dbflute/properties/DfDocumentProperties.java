@@ -35,6 +35,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     protected static final String SCHEMA_SYNC_CHECK_DIFF_MAP_FILE = "./schema/project-sync-check.diffmap";
     protected static final String SCHEMA_SYNC_CHECK_RESULT_FILE_NAME = "sync-check-result.html";
 
+    protected static final String BASIC_CRAFT_SQL_DIR = "./playsql/craftsql";
+    protected static final String CORE_CRAFT_META_DIR = "./schema/craftmeta";
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -387,6 +390,18 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isCheckProcedureDiff", false, getDocumentDefinitionMap());
     }
 
+    public boolean isCheckCraftDiff() { // closet
+        return isProperty("isCheckCraftDiff", true, getDocumentDefinitionMap());
+    }
+
+    public String getCoreCraftDiffMetaDir() {
+        return isCheckCraftDiff() ? CORE_CRAFT_META_DIR : null;
+    }
+
+    public String getBasicCraftSqlDir() {
+        return isCheckCraftDiff() ? BASIC_CRAFT_SQL_DIR : null;
+    }
+
     // -----------------------------------------------------
     //                                           Style Sheet
     //                                           -----------
@@ -613,6 +628,19 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     public String getSchemaSyncCheckResultFilePath() {
         final String outputDirectory = getDocumentOutputDirectory();
         return outputDirectory + "/" + getSchemaSyncCheckResultFileName();
+    }
+
+    public String getSchemaSyncCheckCraftMetaDir() {
+        if (!isCheckCraftDiff()) {
+            return null;
+        }
+        final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
+        final String craftMetaDirPath = schemaSyncCheckMap.get("craftMetaDirPath");
+        final String outputDirectory = getDocumentOutputDirectory();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(craftMetaDirPath)) {
+            return outputDirectory + "/" + craftMetaDirPath;
+        }
+        return outputDirectory + "/craftmeta";
     }
 
     // ===================================================================================

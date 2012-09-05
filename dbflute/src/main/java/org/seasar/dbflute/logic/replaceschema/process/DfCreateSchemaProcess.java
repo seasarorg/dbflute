@@ -319,11 +319,6 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         }
 
         @Override
-        protected boolean isSqlTrimAndRemoveLineSeparator() {
-            return false; // for looks
-        }
-
-        @Override
         protected boolean isHandlingCommentOnLineSeparator() {
             return true;
         }
@@ -339,8 +334,8 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         }
 
         @Override
-        protected String getTerminater4Tool() {
-            return resolveTerminater4Tool();
+        protected String getTerminator4Tool() {
+            return resolveTerminator4Tool();
         }
 
         @Override

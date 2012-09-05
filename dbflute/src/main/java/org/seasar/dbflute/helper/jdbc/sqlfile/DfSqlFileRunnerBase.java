@@ -487,7 +487,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     protected String removeTerminater4ToolIfNeeds(String sql) {
-        String terminater = getTerminater4Tool();
+        String terminater = getTerminator4Tool();
         if (terminater == null || terminater.trim().length() == 0) {
             return sql;
         }
@@ -500,7 +500,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         return sql;
     }
 
-    protected String getTerminater4Tool() {// for override.
+    protected String getTerminator4Tool() { // for override.
         return null;
     }
 
@@ -603,14 +603,14 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
      * @return The determination, true or false.
      */
     protected boolean isSqlTrimAndRemoveLineSeparator() {
-        return false; // as Default
+        return false; // as default (keep plain for looks)
     }
 
     /**
      * @return The determination, true or false.
      */
     protected boolean isHandlingCommentOnLineSeparator() {
-        return false; // as Default
+        return false; // as default (no handling about comment-on line separator)
     }
 
     // ===================================================================================

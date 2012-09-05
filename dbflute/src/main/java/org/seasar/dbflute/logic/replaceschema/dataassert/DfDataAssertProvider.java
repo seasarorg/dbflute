@@ -1,3 +1,18 @@
+/*
+ * Copyright 2004-2012 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.logic.replaceschema.dataassert;
 
 import java.io.File;
@@ -21,6 +36,7 @@ import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureListNotZeroExce
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionInvalidMarkException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -60,13 +76,13 @@ public class DfDataAssertProvider {
             }
         });
     }
-    protected String _loadType;
+    protected final String _envType;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataAssertProvider(String loadType) {
-        _loadType = loadType;
+    public DfDataAssertProvider(String envType) {
+        _envType = envType;
     }
 
     // ===================================================================================
@@ -84,7 +100,7 @@ public class DfDataAssertProvider {
         final String terminator = "#";
         final String typeAtMark = "@";
 
-        // Resolve comment spaces.
+        // resolve comment spaces
         sql = DfStringUtil.replace(sql, "-- #", "--#");
 
         final Set<Entry<String, DfDataAssertHandler>> entrySet = _assertHandlerMap.entrySet();
@@ -92,19 +108,19 @@ public class DfDataAssertProvider {
         for (Entry<String, DfDataAssertHandler> entry : entrySet) {
             final String key = entry.getKey();
 
-            // Find plain mark.
+            // find plain mark
             final String firstMark = "--" + starter + key + terminator;
             if (sql.contains(firstMark)) {
                 return entry.getValue();
             }
 
-            // Find with data loading type.
-            final String secondMark = "--" + starter + key + typeAtMark + _loadType + terminator;
+            // find with envType
+            final String secondMark = "--" + starter + key + typeAtMark + _envType + terminator;
             if (sql.contains(secondMark)) {
                 return entry.getValue();
             }
 
-            // Set up default handler with check.
+            // not found but set up default handler with check
             final String thirdMark = "--" + starter + key;
             final int keyIndex = sql.indexOf(thirdMark);
             if (keyIndex < 0) {
@@ -120,19 +136,23 @@ public class DfDataAssertProvider {
             }
             final String option = rearString.substring(0, rearString.indexOf(terminator));
             if (option.startsWith(typeAtMark)) {
-                defaultHandler = new DfDataAssertHandler() {
-                    public void handle(File sqlFile, Statement st, String sql) throws SQLException {
-                        String msg = "...Skipping for the different dataLoadingType:";
-                        msg = msg + " " + thirdMark + option + terminator;
-                        _log.info(msg);
-                    }
-                };
+                final String envType = Srl.substringFirstRear(option, typeAtMark);
+                defaultHandler = createDefaultHandler(key, envType);
             } else {
                 String msg = "Unknown option '" + option + "':" + ln() + sql;
                 throw new DfTakeFinallyAssertionInvalidMarkException(msg);
             }
         }
         return defaultHandler; // when not found
+    }
+
+    protected DfDataAssertHandler createDefaultHandler(String key, String envType) {
+        final String msg = "...Skipping for the different envType: " + key + "@" + envType + "/" + _envType;
+        return new DfDataAssertHandler() {
+            public void handle(File sqlFile, Statement st, String sql) throws SQLException {
+                _log.info(msg);
+            }
+        };
     }
 
     // ===================================================================================
@@ -155,7 +175,7 @@ public class DfDataAssertProvider {
         try {
             rs = st.executeQuery(sql);
             int count = 0;
-            while (rs.next()) {// One loop only!
+            while (rs.next()) { // one loop only!
                 count = rs.getInt(1);
                 break;
             }
@@ -198,7 +218,7 @@ public class DfDataAssertProvider {
             final int columnCount = metaData.getColumnCount();
             final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
             int count = 0;
-            while (rs.next()) { // One loop only!
+            while (rs.next()) {
                 Map<String, String> recordMap = new LinkedHashMap<String, String>();
                 for (int i = 1; i <= columnCount; i++) {
                     recordMap.put(metaData.getColumnName(i), rs.getString(i));

@@ -121,15 +121,18 @@ public class DfDocumentSelector {
     //                                                                      Schema History
     //                                                                      ==============
     public void loadSchemaHistoryAsCore() { // for HistoryHtml
-        doLoadSchemaHistory(DfSchemaHistory.createAsCore());
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsCore();
+        doLoadSchemaHistory(schemaHistory);
     }
 
     public void loadSchemaHistoryAsSchemaSyncCheck() { // for SchemaSyncCheck
-        doLoadSchemaHistory(DfSchemaHistory.createAsPlain(getSchemaSyncCheckDiffMapFile()));
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getSchemaSyncCheckDiffMapFile());
+        doLoadSchemaHistory(schemaHistory);
     }
 
     public void loadSchemaHistoryAsAlterCheck() { // for AlterCheck
-        doLoadSchemaHistory(DfSchemaHistory.createAsPlain(getAlterCheckDiffMapFile()));
+        final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(getAlterCheckDiffMapFile());
+        doLoadSchemaHistory(schemaHistory);
     }
 
     protected void doLoadSchemaHistory(DfSchemaHistory schemaHistory) {

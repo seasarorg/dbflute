@@ -36,7 +36,7 @@ public class DfSchemaHistory {
     //                                          Load History
     //                                          ------------
     protected final List<DfSchemaDiff> _schemaDiffList = DfCollectionUtil.newArrayList();
-    protected boolean _existsSchemaDiff;
+    protected boolean _existsSchemaDiff; // status
 
     // ===================================================================================
     //                                                                         Constructor
@@ -45,13 +45,13 @@ public class DfSchemaHistory {
         _historyFile = historyFile;
     }
 
-    public static DfSchemaHistory createAsCore() {
+    public static DfSchemaHistory createAsCore() { // pure HistoryHTML
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
         return new DfSchemaHistory(facadeProp.getProjectSchemaHistoryFile());
     }
 
-    public static DfSchemaHistory createAsPlain(String historyFile) {
+    public static DfSchemaHistory createAsPlain(String historyFile) { // e.g. SchemaSyncCheck, AlterCheck
         return new DfSchemaHistory(historyFile);
     }
 

@@ -936,6 +936,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return baseDirectory + "/" + getMigrationAlterCheckResultFileName();
     }
 
+    public String getMigrationAlterCheckCraftMetaDir() {
+        if (!getDocumentProperties().isCheckCraftDiff()) {
+            return null;
+        }
+        final String baseDirectory = getMigrationSchemaDirectory();
+        return baseDirectory + "/craftmeta";
+    }
+
     // -----------------------------------------------------
     //                                         Mark Resource
     //                                         -------------
@@ -1023,6 +1031,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         @SuppressWarnings("unchecked")
         final List<String> strList = (List<String>) obj;
         return strList;
+    }
+
+    // ===================================================================================
+    //                                                                     Tool Terminator
+    //                                                                     ===============
+    public String resolveTerminator4Tool() {
+        return getBasicProperties().isDatabaseOracle() ? "/" : null;
     }
 
     // ===================================================================================
