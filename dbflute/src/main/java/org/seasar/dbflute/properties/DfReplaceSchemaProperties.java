@@ -15,7 +15,6 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
@@ -24,7 +23,7 @@ import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
-import org.seasar.dbflute.properties.assistant.DfReplaceSchemaResourceFinder;
+import org.seasar.dbflute.properties.assistant.DfSchemaResourceFinder;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
@@ -94,7 +93,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return doGetSchemaSqlFileMap(getReplaceSchemaSqlFileList(sqlRootDir));
     }
 
-    public Map<String, File> doGetSchemaSqlFileMap(List<File> sqlFileList) {
+    protected Map<String, File> doGetSchemaSqlFileMap(List<File> sqlFileList) {
         final Map<String, File> resultMap = new LinkedHashMap<String, File>();
         for (File sqlFile : sqlFileList) {
             // Schema SQL files are located in the same directory
@@ -105,16 +104,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     protected List<File> doGetSchemaSqlFileList(String targetDir, String title) {
-        return doGetResourceFileList(targetDir, title, ".sql");
-    }
-
-    protected List<File> doGetResourceFileList(String targetDir, String prefix, String... suffixes) {
-        final DfReplaceSchemaResourceFinder finder = new DfReplaceSchemaResourceFinder();
-        finder.addPrefix(prefix);
-        for (String suffix : suffixes) {
-            finder.addSuffix(suffix);
-        }
-        return finder.findResourceFileList(targetDir);
+        return findSchemaResourceFileList(targetDir, title, ".sql");
     }
 
     // -----------------------------------------------------
@@ -172,7 +162,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     protected List<File> doGetDataFileList(String targetDir, String suffix, boolean oneLevelNested) {
-        final DfReplaceSchemaResourceFinder finder = new DfReplaceSchemaResourceFinder();
+        final DfSchemaResourceFinder finder = new DfSchemaResourceFinder();
         finder.addSuffix(suffix);
         finder.addSuffix(".dataprop"); // contains data-prop
         if (oneLevelNested) {
@@ -252,9 +242,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         final String propString = (String) getReplaceSchemaDefinitionMap().get("repsEnvType");
         if (propString == null) {
-            final DfEnvironmentType environmentType = DfEnvironmentType.getInstance();
-            if (environmentType.isSpecifiedType()) {
-                return DfEnvironmentType.getInstance().getEnvironmentType();
+            if (isSpecifiedEnvironmentType()) {
+                return getEnvironmentType();
             } else {
                 return "ut"; // final default
             }
@@ -266,18 +255,28 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return (String) getReplaceSchemaDefinitionMap().get("dataLoadingType");
     }
 
-    public boolean isTargetRepsFile(String sql) {
-        final String repsEnvExp = analyzeRepsEnvType(sql);
-        if (Srl.is_Null_or_TrimmedEmpty(repsEnvExp)) {
-            return true;
-        }
-        final List<String> envList = Srl.splitListTrimmed(repsEnvExp, ",");
-        final String repsEnvType = getRepsEnvType();
-        _log.info("...Checking repsEnvType: " + repsEnvType + " in " + envList);
-        return envList.contains(repsEnvType);
+    public boolean isTargetRepsFile(String sql) { // for ReplaceSchema
+        return checkTargetEnvType(sql, getRepsEnvType());
     }
 
-    protected String analyzeRepsEnvType(String sql) {
+    public boolean isTargetEnvTypeFile(String sql) { // for general purpose
+        return checkTargetEnvType(sql, getEnvironmentType());
+    }
+
+    protected boolean checkTargetEnvType(String sql, String envType) {
+        final String envExp = analyzeCheckEnvType(sql);
+        if (Srl.is_Null_or_TrimmedEmpty(envExp)) {
+            return true; // no check means target
+        }
+        if (envType == null) {
+            return false;
+        }
+        final List<String> envList = Srl.splitListTrimmed(envExp, ",");
+        _log.info("...Checking envType: " + envType + " in " + envList);
+        return envList.contains(envType);
+    }
+
+    protected String analyzeCheckEnvType(String sql) {
         final String beginMark = "#df:checkEnv(";
         final int markIndex = sql.indexOf(beginMark);
         if (markIndex < 0) {
@@ -802,7 +801,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final List<String> suffixList = new ArrayList<String>();
         suffixList.add(".sql");
         suffixList.addAll(SystemScript.getSupportedExtList());
-        return doGetResourceFileList(targetDir, sqlTitle, suffixList.toArray(new String[] {}));
+        return findSchemaResourceFileList(targetDir, sqlTitle, suffixList.toArray(new String[] {}));
     }
 
     public String getMigrationAlterSchemaSqlTitle() {
@@ -838,8 +837,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         suffixList.add(".sql");
         suffixList.addAll(SystemScript.getSupportedExtList());
         final String[] suffixes = suffixList.toArray(new String[] {});
-        final List<File> fileList = doGetResourceFileList(targetDir, sqlTitle, suffixes);
-        fileList.addAll(doGetResourceFileList(targetDir, "draft-" + sqlTitle, suffixes));
+        final List<File> fileList = findSchemaResourceFileList(targetDir, sqlTitle, suffixes);
+        fileList.addAll(findSchemaResourceFileList(targetDir, "draft-" + sqlTitle, suffixes));
         return fileList;
     }
 
@@ -849,8 +848,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final List<String> suffixList = new ArrayList<String>();
         suffixList.add(".sql");
         final String[] suffixes = suffixList.toArray(new String[] {});
-        final List<File> fileList = doGetResourceFileList(targetDir, sqlTitle, suffixes);
-        fileList.addAll(doGetResourceFileList(targetDir, "draft-" + sqlTitle, suffixes));
+        final List<File> fileList = findSchemaResourceFileList(targetDir, sqlTitle, suffixes);
+        fileList.addAll(findSchemaResourceFileList(targetDir, "draft-" + sqlTitle, suffixes));
         return fileList;
     }
 

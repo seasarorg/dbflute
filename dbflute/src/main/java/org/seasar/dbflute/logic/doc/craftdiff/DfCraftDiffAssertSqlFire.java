@@ -18,13 +18,10 @@ package org.seasar.dbflute.logic.doc.craftdiff;
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCraftDiffNonAssertionSqlFoundException;
@@ -36,25 +33,15 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
-import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
-import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
-import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 0.9.9.8 (2012/09/04 Tuesday)
  */
-public class DfCraftDiffSqlFire {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfCraftDiffSqlFire.class);
+public class DfCraftDiffAssertSqlFire {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -62,54 +49,31 @@ public class DfCraftDiffSqlFire {
     // -----------------------------------------------------
     //                                        Basic Resource
     //                                        --------------
-    protected final String _sqlRootDir;
     protected final DataSource _dataSource;
-    protected final UnifiedSchema _mainSchema;
+    protected final UnifiedSchema _unifiedSchema;
     protected final String _craftMetaDir;
-
-    // -----------------------------------------------------
-    //                                                Result
-    //                                                ------
-    protected final List<File> _executedSqlFileList = DfCollectionUtil.newArrayList();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCraftDiffSqlFire(String sqlRootDir, DataSource dataSource, UnifiedSchema mainSchema, String craftMetaDir) {
-        _sqlRootDir = sqlRootDir;
+    public DfCraftDiffAssertSqlFire(DataSource dataSource, UnifiedSchema unifiedSchema, String craftMetaDir) {
         _dataSource = dataSource;
-        _mainSchema = mainSchema;
+        _unifiedSchema = unifiedSchema;
         _craftMetaDir = craftMetaDir;
     }
 
-    public DfSqlFileFireResult fire(DfRunnerInformation runInfo) {
-        _log.info("");
-        _log.info("* * * * * * * **");
-        _log.info("*              *");
-        _log.info("*  Craft Diff  *");
-        _log.info("*              *");
-        _log.info("* * * * * * * **");
-        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan() {
-            @Override
-            protected DfSqlFileRunnerResult processSqlFile(DfSqlFileRunner runner, File sqlFile) {
-                _executedSqlFileList.add(sqlFile);
-                return super.processSqlFile(runner, sqlFile);
-            }
-        };
+    // ===================================================================================
+    //                                                                            SQL Fire
+    //                                                                            ========
+    public DfSqlFileFireResult fire() {
+        final DfRunnerInformation runInfo = createRunnerInformation();
+        final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Craft Diff");
         return fireMan.fire(getSqlFileRunner4CraftDiff(runInfo), getCraftDiffSqlFileList());
     }
 
     protected DfSqlFileRunner getSqlFileRunner4CraftDiff(final DfRunnerInformation runInfo) {
-        final DfReplaceSchemaProperties prop = getReplaceSchemaProperties();
         final DfSqlFileRunnerExecute runnerExecute = new DfSqlFileRunnerExecute(runInfo, _dataSource) {
-            @Override
-            protected String filterSql(String sql) {
-                sql = super.filterSql(sql);
-                sql = prop.resolveFilterVariablesIfNeeds(sql);
-                return sql;
-            }
-
             @Override
             protected String getTerminator4Tool() {
                 return resolveTerminator4Tool();
@@ -117,10 +81,10 @@ public class DfCraftDiffSqlFire {
 
             @Override
             protected boolean isTargetFile(String sql) {
-                return isTargetRepsFile(sql); // TODO jflute
+                return isTargetEnvTypeFile(sql);
             }
         };
-        final DfCraftDiffAssertProvider provider = new DfCraftDiffAssertProvider(getEnvType(), _craftMetaDir);
+        final DfCraftDiffAssertProvider provider = new DfCraftDiffAssertProvider(_craftMetaDir);
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
             public DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException {
                 final DfCraftDiffAssertHandler handler = provider.provideCraftDiffAssertHandler(sql);
@@ -148,16 +112,27 @@ public class DfCraftDiffSqlFire {
         throw new DfCraftDiffNonAssertionSqlFoundException(msg);
     }
 
-    protected List<File> getCraftDiffSqlFileList() {
-        final List<File> fileList = new ArrayList<File>();
-        // TODO jflute
-        fileList.addAll(getReplaceSchemaProperties().getTakeFinallySqlFileList(_sqlRootDir));
-        fileList.addAll(getReplaceSchemaProperties().getAppcalitionTakeFinallySqlFileList());
-        return fileList;
+    // ===================================================================================
+    //                                                                  Runner Information
+    //                                                                  ==================
+    protected DfRunnerInformation createRunnerInformation() {
+        final DfRunnerInformation runInfo = new DfRunnerInformation();
+        final DfDatabaseProperties prop = getDatabaseProperties();
+        runInfo.setDriver(prop.getDatabaseDriver());
+        runInfo.setUrl(prop.getDatabaseUrl());
+        runInfo.setUser(prop.getDatabaseUser());
+        runInfo.setPassword(prop.getDatabasePassword());
+        runInfo.setEncoding(getSqlFileEncoding());
+        runInfo.setBreakCauseThrow(true);
+        runInfo.setErrorContinue(false);
+        runInfo.setAutoCommit(false);
+        runInfo.setRollbackOnly(true);
+        runInfo.setSuppressLoggingSql(false);
+        return runInfo;
     }
 
-    protected String getEnvType() {
-        return null; // TODO jflute
+    protected String getSqlFileEncoding() {
+        return getReplaceSchemaProperties().getSqlFileEncoding(); // same as ReplaceSchema
     }
 
     // ===================================================================================
@@ -165,6 +140,18 @@ public class DfCraftDiffSqlFire {
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
+    }
+
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return getProperties().getDatabaseProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
+    protected List<File> getCraftDiffSqlFileList() {
+        return getDocumentProperties().getCraftSqlFileList();
     }
 
     protected DfReplaceSchemaProperties getReplaceSchemaProperties() {
@@ -175,23 +162,7 @@ public class DfCraftDiffSqlFire {
         return getReplaceSchemaProperties().resolveTerminator4Tool();
     }
 
-    protected boolean isTargetRepsFile(String sql) {
-        return getReplaceSchemaProperties().isTargetRepsFile(sql);
-    }
-
-    protected DfBasicProperties getBasicProperties() {
-        return getProperties().getBasicProperties();
-    }
-
-    protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
-        return getBasicProperties().getDatabaseTypeFacadeProp();
-    }
-
-    protected DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
-        return getBasicProperties().getLanguageTypeFacadeProp();
-    }
-
-    protected DfDatabaseProperties getDatabaseProperties() {
-        return getProperties().getDatabaseProperties();
+    protected boolean isTargetEnvTypeFile(String sql) {
+        return getReplaceSchemaProperties().isTargetEnvTypeFile(sql);
     }
 }

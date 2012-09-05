@@ -173,7 +173,7 @@ public class DfSchemaXmlSerializer {
         final String historyFile = facadeProp.getProjectSchemaHistoryFile();
         final DfSchemaXmlSerializer serializer = newSerializer(dataSource, mainSchema, schemaXml, historyFile);
         final DfDocumentProperties docProp = buildProp.getDocumentProperties();
-        serializer.enableCraftDiff(docProp.getCoreCraftDiffMetaDir());
+        serializer.enableCraftDiff(dataSource, mainSchema, docProp.getCoreCraftDiffMetaDir());
         return serializer;
     }
 
@@ -1254,8 +1254,8 @@ public class DfSchemaXmlSerializer {
         _schemaDiff.suppressUnifiedSchema();
     }
 
-    public void enableCraftDiff(String craftMetaDir) {
-        _schemaDiff.enableCraftDiff(craftMetaDir);
+    public void enableCraftDiff(DataSource dataSource, UnifiedSchema mainSchema, String craftMetaDir) {
+        _schemaDiff.enableCraftDiff(dataSource, mainSchema, craftMetaDir);
     }
 
     // ===================================================================================

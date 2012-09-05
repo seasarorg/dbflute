@@ -142,7 +142,7 @@ public class DfSchemaSyncChecker {
     protected DfSchemaXmlSerializer doCreateSerializer(DataSource dataSource, UnifiedSchema unifiedSchema) {
         final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, unifiedSchema,
                 getSchemaXml(), getDiffMapFile());
-        serializer.enableCraftDiff(getSchemaSyncCheckCraftMetaDir());
+        serializer.enableCraftDiff(dataSource, unifiedSchema, getSchemaSyncCheckCraftMetaDir());
         return serializer;
     }
 

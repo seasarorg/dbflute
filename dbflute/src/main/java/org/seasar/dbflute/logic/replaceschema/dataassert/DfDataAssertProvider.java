@@ -89,8 +89,8 @@ public class DfDataAssertProvider {
     //                                                                             Provide
     //                                                                             =======
     /**
-     * @param sql SQL string. (NotNull)
-     * @return The handle of data assert. (NullAllowed)
+     * @param sql The SQL string to assert. (NotNull)
+     * @return The handle of data assert. (NullAllowed: if null, means not found)
      */
     public DfDataAssertHandler provideDataAssertHandler(String sql) {
         if (!sql.contains("--")) {

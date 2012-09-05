@@ -30,13 +30,13 @@ public class DfEnvironmentType {
     /** Log instance. */
     public static final Log _log = LogFactory.getLog(DfEnvironmentType.class);
 
+    /** The singleton instance of this. */
     private static final DfEnvironmentType _instance = new DfEnvironmentType();
-    private static final String DEFAULT_TYPE = "df:default";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _environmentType = DEFAULT_TYPE;
+    protected String _environmentType;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -55,7 +55,7 @@ public class DfEnvironmentType {
     //                                                                    Environment Type
     //                                                                    ================
     public boolean isSpecifiedType() {
-        return _environmentType != null && !_environmentType.equalsIgnoreCase(DEFAULT_TYPE);
+        return _environmentType != null;
     }
 
     /**
@@ -65,7 +65,7 @@ public class DfEnvironmentType {
         return _environmentType;
     }
 
-    public void setEnvironmentType(String environmentType) {
+    public void setEnvironmentType(String environmentType) { // called by Ant
         if (environmentType == null || environmentType.trim().length() == 0) {
             return;
         }

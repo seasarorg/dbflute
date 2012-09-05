@@ -23,6 +23,7 @@ import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
+import org.seasar.dbflute.properties.assistant.DfSchemaResourceFinder;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
@@ -669,8 +670,23 @@ public abstract class DfAbstractHelperProperties {
         return DfEnvironmentType.getInstance().isSpecifiedType();
     }
 
+    /**
+     * @return The type of environment. (NullAllowed: if null, means non-specified type)
+     */
     protected final String getEnvironmentType() {
         return DfEnvironmentType.getInstance().getEnvironmentType();
+    }
+
+    // ===============================================================================
+    //                                                                 Schema Resource
+    //                                                                 ===============
+    protected List<File> findSchemaResourceFileList(String targetDir, String prefix, String... suffixes) {
+        final DfSchemaResourceFinder finder = new DfSchemaResourceFinder();
+        finder.addPrefix(prefix);
+        for (String suffix : suffixes) {
+            finder.addSuffix(suffix);
+        }
+        return finder.findResourceFileList(targetDir);
     }
 
     // ===============================================================================

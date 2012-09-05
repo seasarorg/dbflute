@@ -134,7 +134,7 @@ public class DfTaskControlLogic {
     //                                                                       =============
     public void showFinalMessage(long before, long after, boolean abort, String taskName, String finalInformation) {
         final String displayTaskName = getDisplayTaskName(taskName);
-        final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
+        final String envType = DfEnvironmentType.getInstance().getEnvironmentType();
         final StringBuilder sb = new StringBuilder();
         final String ln = ln();
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
@@ -153,7 +153,7 @@ public class DfTaskControlLogic {
         sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
         sb.append(ln).append("    package   = " + getBasicProperties().getPackageBase());
         sb.append(ln);
-        sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + environmentType + "}");
+        sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + (envType != null ? envType : "") + "}");
         final String driver = _databaseResource.getDriver();
         if (driver != null) { // basically true except cancelled
             sb.append(ln).append("    driver = " + driver);

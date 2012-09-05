@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -35,8 +36,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     protected static final String SCHEMA_SYNC_CHECK_DIFF_MAP_FILE = "./schema/project-sync-check.diffmap";
     protected static final String SCHEMA_SYNC_CHECK_RESULT_FILE_NAME = "sync-check-result.html";
 
-    protected static final String BASIC_CRAFT_SQL_DIR = "./playsql/craftsql";
-    protected static final String CORE_CRAFT_META_DIR = "./schema/craftmeta";
+    protected static final String BASIC_CRAFT_DIFF_DIR = "./schema/craftdiff";
+    protected static final String CORE_CRAFT_META_DIR = BASIC_CRAFT_DIFF_DIR;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -398,8 +399,16 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isCheckCraftDiff() ? CORE_CRAFT_META_DIR : null;
     }
 
-    public String getBasicCraftSqlDir() {
-        return isCheckCraftDiff() ? BASIC_CRAFT_SQL_DIR : null;
+    public List<File> getCraftSqlFileList() {
+        if (!isCheckCraftDiff()) {
+            return DfCollectionUtil.emptyList();
+        }
+        final String targetDir = getBasicCraftSqlDir();
+        return findSchemaResourceFileList(targetDir, "craft-diff", ".sql");
+    }
+
+    protected String getBasicCraftSqlDir() {
+        return isCheckCraftDiff() ? BASIC_CRAFT_DIFF_DIR : null;
     }
 
     // -----------------------------------------------------

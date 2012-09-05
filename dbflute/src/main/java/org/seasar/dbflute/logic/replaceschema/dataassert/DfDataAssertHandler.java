@@ -26,10 +26,10 @@ import java.sql.Statement;
 public interface DfDataAssertHandler {
 
     /**
-     * Handle asserting.
-     * @param sqlFile The SQL file that contains the SQL. (NotNull)
-     * @param st Statement. (NotNull)
-     * @param sql SQL string. (NotNull)
+     * Handle the assertion.
+     * @param sqlFile The SQL file that contains the assert SQL. (NotNull)
+     * @param st The statement for the SQL. (NotNull)
+     * @param sql The SQL string to assert. (NotNull)
      * @throws SQLException
      */
     void handle(File sqlFile, Statement st, String sql) throws SQLException;

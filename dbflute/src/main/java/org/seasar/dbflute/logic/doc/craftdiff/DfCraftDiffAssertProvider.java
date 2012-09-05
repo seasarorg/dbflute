@@ -15,13 +15,6 @@
  */
 package org.seasar.dbflute.logic.doc.craftdiff;
 
-import java.io.File;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -32,22 +25,14 @@ import org.seasar.dbflute.util.Srl;
 public class DfCraftDiffAssertProvider {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfCraftDiffAssertProvider.class);
-
-    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String _envType;
     protected final String _craftMetaDir;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCraftDiffAssertProvider(String envType, String craftMetaDir) {
-        _envType = envType;
+    public DfCraftDiffAssertProvider(String craftMetaDir) {
         _craftMetaDir = craftMetaDir;
     }
 
@@ -55,8 +40,8 @@ public class DfCraftDiffAssertProvider {
     //                                                                             Provide
     //                                                                             =======
     /**
-     * @param sql SQL string. (NotNull)
-     * @return The handle of craft-diff assert. (NullAllowed)
+     * @param sql The SQL string to assert. (NotNull)
+     * @return The handle of CraftDiff assert. (NullAllowed: if null, means not found)
      */
     public DfCraftDiffAssertHandler provideCraftDiffAssertHandler(String sql) {
         if (!sql.contains("--")) {
@@ -64,7 +49,6 @@ public class DfCraftDiffAssertProvider {
         }
         final String starter = "#df:";
         final String terminator = "#";
-        final String typeAtMark = "@";
 
         // resolve comment spaces
         sql = DfStringUtil.replace(sql, "-- #", "--#");
@@ -75,40 +59,16 @@ public class DfCraftDiffAssertProvider {
             return null;
         }
         final String rearOfKey = Srl.substringFirstRear(sql, keyPrefix);
-        if (!rearOfKey.contains(")")) {
+        final String keySuffix = ")" + terminator;
+        if (!rearOfKey.contains(keySuffix)) {
             return null;
         }
-        final String parameter = Srl.substringFirstFront(rearOfKey, ")");
-        final List<String> parameterList = Srl.splitListTrimmed(parameter, ",");
-        if (parameterList.size() >= 2) {
+        final String craftTitle = Srl.substringFirstFront(rearOfKey, keySuffix);
+        if (Srl.is_Null_or_TrimmedEmpty(craftTitle)) {
             // TODO jflute exception
             throw new IllegalStateException();
         }
-        final String craftTitle = parameterList.remove(0);
-        final String keyName = parameterList.remove(0);
-        // parameterList becomes diffItemList here TODO jflute necessary?
-        final String rearOfParameter = Srl.substringFirstRear(rearOfKey, ")");
-        final String option = Srl.substringFirstFront(rearOfParameter, terminator);
-        final String envType = option.startsWith(typeAtMark) ? Srl.substringFirstRear(option, typeAtMark) : null;
-        if (isDifferentEnvType(envType)) {
-            return createDefaultHandler(craftTitle, envType);
-        }
-        return new DfCraftDiffAssertHandlerImpl(_craftMetaDir, craftTitle, keyName, parameterList);
-    }
-
-    protected boolean isDifferentEnvType(final String envType) {
-        if (_envType == null && envType == null) {
-            return true;
-        }
-        return _envType != null && !_envType.equals(envType);
-    }
-
-    protected DfCraftDiffAssertHandler createDefaultHandler(String craftTitle, String envType) {
-        final String msg = "...Skipping for the different envType: " + craftTitle + "@" + envType + "/" + _envType;
-        return new DfCraftDiffAssertHandler() {
-            public void handle(File sqlFile, Statement st, String sql) throws SQLException {
-                _log.info(msg);
-            }
-        };
+        // *unsupported envType on assert definition
+        return new DfCraftDiffAssertHandler(_craftMetaDir, craftTitle);
     }
 }

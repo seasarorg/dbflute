@@ -809,7 +809,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final String historyFile = null; // no use history here (use SchemaDiff directly later)
         final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema,
                 schemaXml, historyFile);
-        serializer.enableCraftDiff(getMigrationAlterCheckCraftMetaDir());
+        serializer.enableCraftDiff(_dataSource, _mainSchema, getMigrationAlterCheckCraftMetaDir());
         return serializer;
     }
 

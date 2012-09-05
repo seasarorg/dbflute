@@ -14,7 +14,7 @@ import java.util.TreeSet;
  * @author jflute
  * @since 0.9.8.3 (2011/04/30 Saturday)
  */
-public class DfReplaceSchemaResourceFinder {
+public class DfSchemaResourceFinder {
 
     protected final Set<String> _prefixSet = new LinkedHashSet<String>();
     protected final Set<String> _suffixSet = new LinkedHashSet<String>();
