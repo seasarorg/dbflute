@@ -19,5 +19,11 @@ package org.seasar.dbflute.helper.token.file;
  * @author jflute
  */
 public interface FileTokenizingCallback {
-    public void handleRowResource(FileTokenizingRowResource fileTokenizingRowResource);
+
+    /**
+     * Handle the row resource per one record data. <br />
+     * You can get the data from row resources.
+     * @param rowResource The row resource of the file-tokenizing. (NotNull)
+     */
+    void handleRowResource(FileTokenizingRowResource rowResource);
 }

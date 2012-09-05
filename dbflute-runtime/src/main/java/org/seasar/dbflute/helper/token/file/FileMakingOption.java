@@ -25,20 +25,20 @@ public class FileMakingOption {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Encoding. (Required) */
+    /** The encoding for the file. (Required) */
     protected String _encoding;
 
-    /** Delimiter. (Required) */
+    /** The delimiter of data. (Required) */
     protected String _delimiter;
 
-    /** Line separator. (NotRequired) */
+    /** The line separator for the file. (NotRequired) */
     protected String _lineSeparator;
 
-    /** Quote minimally. (NotRequired) */
+    /** Does it quote values minimally? (NotRequired) */
     protected boolean _quoteMinimally;
 
-    /** File-making header information. (NotRequired) */
-    protected FileMakingHeaderInfo _fileMakingHeaderInfo;
+    /** The header info of file-making. (NotRequired) */
+    protected FileMakingHeaderInfo _headerInfo;
 
     // ===================================================================================
     //                                                                         Easy-to-Use
@@ -79,9 +79,9 @@ public class FileMakingOption {
     }
 
     public FileMakingOption headerInfo(List<String> columnNameList) {
-        final FileMakingHeaderInfo fileMakingHeaderInfo = new FileMakingHeaderInfo();
-        fileMakingHeaderInfo.setColumnNameList(columnNameList);
-        _fileMakingHeaderInfo = fileMakingHeaderInfo;
+        final FileMakingHeaderInfo headerInfo = new FileMakingHeaderInfo();
+        headerInfo.setColumnNameList(columnNameList);
+        _headerInfo = headerInfo;
         return this;
     }
 
@@ -117,10 +117,10 @@ public class FileMakingOption {
     }
 
     public FileMakingHeaderInfo getFileMakingHeaderInfo() {
-        return _fileMakingHeaderInfo;
+        return _headerInfo;
     }
 
-    public void setFileMakingHeaderInfo(FileMakingHeaderInfo fileMakingHeaderInfo) {
-        _fileMakingHeaderInfo = fileMakingHeaderInfo;
+    public void setFileMakingHeaderInfo(FileMakingHeaderInfo headerInfo) {
+        _headerInfo = headerInfo;
     }
 }

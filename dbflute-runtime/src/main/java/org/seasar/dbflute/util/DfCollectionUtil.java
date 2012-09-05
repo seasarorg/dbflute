@@ -259,6 +259,10 @@ public class DfCollectionUtil {
         return new HashMap<KEY, VALUE>();
     }
 
+    public static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap(Map<KEY, VALUE> map) {
+        return new HashMap<KEY, VALUE>(map);
+    }
+
     public static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap(KEY key, VALUE value) {
         final HashMap<KEY, VALUE> map = newHashMap();
         map.put(key, value);
@@ -276,6 +280,10 @@ public class DfCollectionUtil {
         return new LinkedHashMap<KEY, VALUE>();
     }
 
+    public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(Map<KEY, VALUE> map) {
+        return new LinkedHashMap<KEY, VALUE>(map);
+    }
+
     public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key, VALUE value) {
         final LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
         map.put(key, value);
@@ -291,6 +299,10 @@ public class DfCollectionUtil {
 
     public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
         return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
+    public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(Map<KEY, VALUE> map) {
+        return new ConcurrentHashMap<KEY, VALUE>(map);
     }
 
     public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key, VALUE value) {

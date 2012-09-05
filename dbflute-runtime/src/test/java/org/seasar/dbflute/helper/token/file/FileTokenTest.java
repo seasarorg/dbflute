@@ -22,11 +22,11 @@ public class FileTokenTest extends PlainTestCase {
         final String second = "\"a\",\"\",\"c\"\"c\",\"d\"\"\",\"e\"";
         final String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
         String all = first + ln() + second + ln() + third;
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(all.getBytes("UTF-8"));
+        ByteArrayInputStream ins = new ByteArrayInputStream(all.getBytes("UTF-8"));
 
         // ## Act ##
         final Set<String> markSet = new HashSet<String>();
-        impl.tokenize(inputStream, new FileTokenizingCallback() {
+        impl.tokenize(ins, new FileTokenizingCallback() {
             int index = 0;
 
             public void handleRowResource(FileTokenizingRowResource fileTokenizingRowResource) {
@@ -103,10 +103,10 @@ public class FileTokenTest extends PlainTestCase {
     public void test_make() throws Exception {
         // ## Arrange ##
         FileToken impl = new FileToken();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream ous = new ByteArrayOutputStream();
 
         // ## Act ##
-        impl.make(outputStream, new FileMakingCallback() {
+        impl.make(ous, new FileMakingCallback() {
             int index = 0;
 
             public FileMakingRowResource getRowResource() {
@@ -141,7 +141,7 @@ public class FileTokenTest extends PlainTestCase {
         }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf());
 
         // ## Assert ##
-        String actual = outputStream.toString();
+        String actual = ous.toString();
         log(actual);
         String[] split = actual.split("\n");
         assertEquals("\"a\",\"b\",\"cc\",\"d\",\"e\"", split[0]);

@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +25,7 @@ public class FileMakingHeaderInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected List<String> columnNameList = new ArrayList<String>();
+    protected List<String> columnNameList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -43,9 +42,5 @@ public class FileMakingHeaderInfo {
 
     public void setColumnNameList(List<String> columnNameList) {
         this.columnNameList = columnNameList;
-    }
-
-    public boolean isEmpty() {
-        return this.columnNameList.isEmpty();
     }
 }

@@ -21,10 +21,10 @@ package org.seasar.dbflute.helper.token.file;
 public interface FileMakingCallback {
 
     /**
-     * Get file-making header information. <br />
+     * Get the row resource of file-making. <br />
      * You should return your row resource for file-making.
      * It continues invoking until this method returns null.
-     * @return File-making header information. (NullAllowed)
+     * @return The row resource of file-making. (NullAllowed)
      */
-    public FileMakingRowResource getRowResource();
+    FileMakingRowResource getRowResource();
 }

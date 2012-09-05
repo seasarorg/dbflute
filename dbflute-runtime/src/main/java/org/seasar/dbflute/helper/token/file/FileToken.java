@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,8 +28,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.seasar.dbflute.helper.token.line.LineMakingOption;
 import org.seasar.dbflute.helper.token.line.LineToken;
@@ -37,6 +37,32 @@ import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.util.Srl;
 
 /**
+ * The handler of token file. <br />
+ * You can read/write the token file.
+ * <pre>
+ * e.g. Reading
+ *  File tsvFile = ...
+ *  FileToken fileToken = new FileToken();
+ *  fileToken.tokenize(new FileInputStream(tsvFile), new FileTokenizingCallback() {
+ *      public void handleRowResource(FileTokenizingRowResource rowResource) {
+ *          ... = rowResource.getFileTokenizingHeaderInfo();
+ *          ... = rowResource.getValueList();
+ *      }
+ *  }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8());
+ * 
+ * e.g. Writing
+ *  File tsvFile = ...
+ *  List&lt;String&gt; columnNameList = ...
+ *  FileToken fileToken = new FileToken();
+ *  final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
+ *  // or final Iterator&lt;LinkedHashMap&lt;String, String&gt;&gt; iterator = ...
+ *  fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
+ *      public FileMakingRowResource getRowResource() { // null or empty resource means end of data
+ *          return new FileMakingRowResource().acceptValueListIterator(iterator); // data only here
+ *          // or return new FileMakingRowResource().acceptNameValueMapIterator(iterator); // with header
+ *      }
+ *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+ * </pre>
  * @author jflute
  */
 public class FileToken {
@@ -44,28 +70,39 @@ public class FileToken {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Line-token for help. */
+    /** The handler of line token for help. */
     protected final LineToken _lineToken = new LineToken();
 
     // ===================================================================================
-    //                                                                            Tokenize
-    //                                                                            ========
+    //                                                                      Tokenize(Read)
+    //                                                                      ==============
     /**
-     * Tokenize token-file data of a specified file.
-     * @param filename File name. (NotNull)
-     * @param fileTokenizingCallback File-tokenizing callback. (NotNull)
-     * @param fileTokenizingOption File-tokenizing option. (NotNull and Required{encoding and delimiter})
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * Read the token data from the specified file. (file-tokenizing) <br />
+     * CR + LF is treated as LF.
+     * <pre>
+     * File tsvFile = ...
+     * FileToken fileToken = new FileToken();
+     * fileToken.tokenize(new FileInputStream(tsvFile), new FileTokenizingCallback() {
+     *     public void handleRowResource(FileTokenizingRowResource rowResource) {
+     *         ... = rowResource.getFileTokenizingHeaderInfo();
+     *         ... = rowResource.getValueList();
+     *     }
+     * }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
+     * </pre>
+     * @param filePath The path of file name to read. (NotNull)
+     * @param callback The callback for file-tokenizing. (NotNull)
+     * @param option The option for file-tokenizing. (NotNull, Required{delimiter, encoding})
+     * @throws java.io.FileNotFoundException When the file was not found.
+     * @throws java.io.IOException When the file reading failed.
      */
-    public void tokenize(String filename, FileTokenizingCallback fileTokenizingCallback,
-            FileTokenizingOption fileTokenizingOption) throws FileNotFoundException, IOException {
-        assertStringNotNullAndNotTrimmedEmpty("filename", filename);
+    public void tokenize(String filePath, FileTokenizingCallback callback, FileTokenizingOption option)
+            throws FileNotFoundException, IOException {
+        assertStringNotNullAndNotTrimmedEmpty("filePath", filePath);
 
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(filename);
-            tokenize(fis, fileTokenizingCallback, fileTokenizingOption);
+            fis = new FileInputStream(filePath);
+            tokenize(fis, callback, option);
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
@@ -73,7 +110,7 @@ public class FileToken {
         } finally {
             try {
                 if (fis != null) {
-                    fis.close();
+                    fis.close(); // just in case
                 }
             } catch (IOException ignored) {
             }
@@ -81,39 +118,34 @@ public class FileToken {
     }
 
     /**
-     * Tokenize token-file data of a specified file. <br />
-     * CR + LF is treated as LF.
-     * <pre>
-     * This method uses java.io.InputStreamReader and java.io.BufferedReader that wrap the argument[inputStream].
-     * These objects are closed. (Invoking close() at finally)
-     * </pre>
-     * @param inputStream Input target stream. (NotNull)
-     * @param fileTokenizingCallback File-tokenizing callback. (NotNull)
-     * @param fileTokenizingOption File-tokenizing option. (NotNull and Required{encoding and delimiter})
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * Write token data to specified file. (named file-tokenizing) <br />
+     * CR + LF is treated as LF. <br />
+     * This method uses {@link java.io.InputStreamReader} and {@link java.io.BufferedReader} that wrap the stream.
+     * And these objects are closed. (close() called finally)
+     * @param ins The input stream for writing. This stream is closed after writing automatically. (NotNull)
+     * @param callback The callback for file-tokenizing. (NotNull)
+     * @param option The option for file-tokenizing. (NotNull, Required{delimiter, encoding})
+     * @throws java.io.FileNotFoundException When the file was not found.
+     * @throws java.io.IOException When the file reading failed.
      */
-    public void tokenize(InputStream inputStream, FileTokenizingCallback fileTokenizingCallback,
-            FileTokenizingOption fileTokenizingOption) throws FileNotFoundException, IOException {
-        assertObjectNotNull("inputStream", inputStream);
-        assertObjectNotNull("fileTokenizingCallback", fileTokenizingCallback);
-        assertObjectNotNull("fileTokenizingOption", fileTokenizingOption);
-        final String delimiter = fileTokenizingOption.getDelimiter();
-        final String encoding = fileTokenizingOption.getEncoding();
-        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
+    public void tokenize(InputStream ins, FileTokenizingCallback callback, FileTokenizingOption option)
+            throws FileNotFoundException, IOException {
+        assertObjectNotNull("ins", ins);
+        assertObjectNotNull("callback", callback);
+        assertObjectNotNull("option", option);
+        final String delimiter = option.getDelimiter();
+        final String encoding = option.getEncoding();
         assertObjectNotNull("delimiter", delimiter);
-
-        InputStreamReader ir = null;
-        BufferedReader br = null;
+        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
 
         String lineString = null;
         String preContinueString = "";
         final List<String> temporaryValueList = new ArrayList<String>();
         final List<String> filteredValueList = new ArrayList<String>();
 
+        BufferedReader br = null;
         try {
-            ir = new InputStreamReader(inputStream, encoding);
-            br = new BufferedReader(ir);
+            br = new BufferedReader(new InputStreamReader(ins, encoding));
 
             final StringBuilder realRowStringSb = new StringBuilder();
             FileTokenizingHeaderInfo fileTokenizingHeaderInfo = null;
@@ -131,7 +163,7 @@ public class FileToken {
                     break;
                 }
                 if (count == 0) {
-                    if (fileTokenizingOption.isBeginFirstLine()) {
+                    if (option.isBeginFirstLine()) {
                         fileTokenizingHeaderInfo = new FileTokenizingHeaderInfo();// As empty
                     } else {
                         fileTokenizingHeaderInfo = analyzeHeaderInfo(delimiter, lineString);
@@ -160,7 +192,7 @@ public class FileToken {
                     final FileTokenizingRowResource fileTokenizingRowResource = new FileTokenizingRowResource();
                     fileTokenizingRowResource.setFirstLineInfo(fileTokenizingHeaderInfo);
 
-                    if (fileTokenizingOption.isHandleEmptyAsNull()) {
+                    if (option.isHandleEmptyAsNull()) {
                         for (final Iterator<String> ite = temporaryValueList.iterator(); ite.hasNext();) {
                             final String value = (String) ite.next();
                             if ("".equals(value)) {
@@ -179,7 +211,7 @@ public class FileToken {
                     fileTokenizingRowResource.setRowString(realRowString);
                     fileTokenizingRowResource.setRowNumber(rowNumber);
                     fileTokenizingRowResource.setLineNumber(lineNumber);
-                    fileTokenizingCallback.handleRowResource(fileTokenizingRowResource);
+                    callback.handleRowResource(fileTokenizingRowResource);
                 } finally {
                     ++rowNumber;
                     temporaryValueList.clear();
@@ -193,13 +225,10 @@ public class FileToken {
             throw e;
         } finally {
             try {
-                if (ir != null) {
-                    ir.close();
-                }
                 if (br != null) {
                     br.close();
                 }
-            } catch (java.io.IOException ignored) {
+            } catch (IOException ignored) {
             }
         }
     }
@@ -359,46 +388,45 @@ public class FileToken {
     }
 
     public static class ValueLineInfo {
-        protected java.util.List<String> valueList;
+        protected List<String> _valueList;
+        protected boolean _continueNextLine;
 
-        protected boolean continueNextLine;
-
-        public java.util.List<String> getValueList() {
-            return valueList;
+        public List<String> getValueList() {
+            return _valueList;
         }
 
         public void setValueList(List<String> valueList) {
-            this.valueList = valueList;
+            this._valueList = valueList;
         }
 
         public boolean isContinueNextLine() {
-            return continueNextLine;
+            return _continueNextLine;
         }
 
         public void setContinueNextLine(boolean continueNextLine) {
-            this.continueNextLine = continueNextLine;
+            this._continueNextLine = continueNextLine;
         }
     }
 
     // ===================================================================================
-    //                                                                                Make
-    //                                                                                ====
+    //                                                                         Make(Write)
+    //                                                                         ===========
     /**
-     * Make token-file from specified row resources.
-     * @param filename File name. (NotNull)
-     * @param fileMakingCallback File-making callback. (NotNull)
-     * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * Make token file from specified row resources.
+     * @param filePath The path of token file to write. (NotNull)
+     * @param callback The callback for file-making. (NotNull)
+     * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
+     * @throws java.io.FileNotFoundException When the file was not found.
+     * @throws java.io.IOException When the file reading failed.
      */
-    public void make(String filename, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption)
+    public void make(String filePath, FileMakingCallback callback, FileMakingOption option)
             throws FileNotFoundException, IOException {
-        assertStringNotNullAndNotTrimmedEmpty("filename", filename);
+        assertStringNotNullAndNotTrimmedEmpty("filename", filePath);
 
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(filename);
-            make(fos, fileMakingCallback, fileMakingOption);
+            fos = new FileOutputStream(filePath);
+            make(fos, callback, option);
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
@@ -411,74 +439,82 @@ public class FileToken {
     }
 
     /**
-     * Make token-file from specified row resources.
+     * Make token-file from specified row resources. <br />
+     * This method uses {@link java.io.OutputStreamWriter} and {@link java.io.BufferedWriter} that wrap the stream.
+     * And these objects are closed. (close() called finally)
      * <pre>
-     * This method uses java.io.BufferedOutputStream and java.io.OutputStreamWriter that wrap the argument[outputStream].
-     * These objects are closed. (Invoking close() at finally)
+     * File tsvFile = ...
+     * List&lt;String&gt; columnNameList = ...
+     * FileToken fileToken = new FileToken();
+     * final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
+     * // or final Iterator&lt;LinkedHashMap&lt;String, String&gt;&gt; iterator = ...
+     * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
+     *     public FileMakingRowResource getRowResource() { // null or empty resource means end of data
+     *         return new FileMakingRowResource().acceptValueListIterator(iterator); // data only here
+     *         // or return new FileMakingRowResource().acceptNameValueMapIterator(iterator); // with header
+     *     }
+     * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
      * </pre>
-     * @param outputStream Output target stream. (NotNull)
-     * @param fileMakingCallback File-making callback. (NotNull)
-     * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * @param ous The output stream for writing. This stream is closed after writing automatically. (NotNull)
+     * @param callback The callback for file-making. (NotNull)
+     * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
+     * @throws java.io.FileNotFoundException When the file was not found.
+     * @throws java.io.IOException When the file reading failed.
      */
-    public void make(OutputStream outputStream, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption)
+    public void make(OutputStream ous, FileMakingCallback callback, FileMakingOption option)
             throws FileNotFoundException, IOException {
-        assertObjectNotNull("outputStream", outputStream);
-        assertObjectNotNull("fileMakingCallback", fileMakingCallback);
-        assertObjectNotNull("fileMakingOption", fileMakingOption);
-        final String encoding = fileMakingOption.getEncoding();
-        final String delimiter = fileMakingOption.getDelimiter();
-        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
+        assertObjectNotNull("ous", ous);
+        assertObjectNotNull("callback", callback);
+        assertObjectNotNull("option", option);
+        final String encoding = option.getEncoding();
+        final String delimiter = option.getDelimiter();
         assertObjectNotNull("delimiter", delimiter);
+        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
         final String lineSeparator;
-        if (fileMakingOption.getLineSeparator() != null && !fileMakingOption.getLineSeparator().equals("")) {
-            lineSeparator = fileMakingOption.getLineSeparator();
+        if (option.getLineSeparator() != null && !option.getLineSeparator().equals("")) {
+            lineSeparator = option.getLineSeparator();
         } else {
-            lineSeparator = "\n"; // Default!
+            lineSeparator = "\n"; // default
         }
 
-        BufferedOutputStream bos = null;
-        Writer writer = null;
+        Writer writer = null; // is interface not to use newLine() for fixed line separator
         try {
-            bos = new BufferedOutputStream(outputStream);
-            writer = new OutputStreamWriter(bos, encoding);
-
+            writer = new BufferedWriter(new OutputStreamWriter(ous, encoding));
             boolean headerDone = false;
 
-            // Make header.
-            final FileMakingHeaderInfo fileMakingHeaderInfo = fileMakingOption.getFileMakingHeaderInfo();
-            if (fileMakingHeaderInfo != null) {
-                final List<String> columnNameList = fileMakingHeaderInfo.getColumnNameList();
+            // make header
+            final FileMakingHeaderInfo headerInfo = option.getFileMakingHeaderInfo();
+            if (headerInfo != null) {
+                final List<String> columnNameList = headerInfo.getColumnNameList();
                 if (columnNameList != null && !columnNameList.isEmpty()) {
                     final LineMakingOption lineMakingOption = new LineMakingOption();
                     lineMakingOption.setDelimiter(delimiter);
                     lineMakingOption.trimSpace(); // trimming is header only
-                    reflectQuoteMinimally(fileMakingOption, lineMakingOption);
+                    reflectQuoteMinimally(option, lineMakingOption);
                     final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
                     writer.write(columnHeaderString + lineSeparator);
                     headerDone = true;
                 }
             }
 
-            // Make row.
+            // make row
             FileMakingRowResource rowResource = null;
             while (true) {
-                rowResource = fileMakingCallback.getRowResource();
-                if (rowResource == null) {
-                    break;// The End!
+                rowResource = callback.getRowResource();
+                if (rowResource == null || !rowResource.hasResource()) {
+                    break; // the end
                 }
                 final List<String> valueList;
                 if (rowResource.getValueList() != null) {
                     valueList = rowResource.getValueList();
                 } else {
-                    final LinkedHashMap<String, String> nameValueMap = rowResource.getNameValueMap();
+                    final Map<String, String> nameValueMap = rowResource.getNameValueMap(); // not null here
                     if (!headerDone) {
                         final List<String> columnNameList = new ArrayList<String>(nameValueMap.keySet());
                         final LineMakingOption lineMakingOption = new LineMakingOption();
                         lineMakingOption.setDelimiter(delimiter);
                         lineMakingOption.trimSpace(); // trimming is header only
-                        reflectQuoteMinimally(fileMakingOption, lineMakingOption);
+                        reflectQuoteMinimally(option, lineMakingOption);
                         final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
                         writer.write(columnHeaderString + lineSeparator);
                         headerDone = true;
@@ -487,7 +523,7 @@ public class FileToken {
                 }
                 final LineMakingOption lineMakingOption = new LineMakingOption();
                 lineMakingOption.setDelimiter(delimiter);
-                reflectQuoteMinimally(fileMakingOption, lineMakingOption);
+                reflectQuoteMinimally(option, lineMakingOption);
                 final String lineString = _lineToken.make(valueList, lineMakingOption);
                 writer.write(lineString + lineSeparator);
             }
@@ -497,9 +533,6 @@ public class FileToken {
         } catch (IOException e) {
             throw e;
         } finally {
-            if (bos != null) {
-                bos.close();
-            }
             if (writer != null) {
                 writer.close();
             }
@@ -510,20 +543,16 @@ public class FileToken {
         if (fileMakingOption.isQuoteMinimally()) {
             lineMakingOption.quoteMinimally();
         } else {
-            lineMakingOption.quoteAll();
+            lineMakingOption.quoteAll(); // default
         }
     }
 
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------
-    /**
-     * Assert that the object is not null.
-     * 
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
-     */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
             String msg = "The value should not be null: variableName=null value=" + value;
@@ -538,12 +567,6 @@ public class FileToken {
     // -----------------------------------------------------
     //                                         Assert String
     //                                         -------------
-    /**
-     * Assert that the entity is not null and not trimmed empty.
-     * 
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     */
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);
         assertObjectNotNull(variableName, value);

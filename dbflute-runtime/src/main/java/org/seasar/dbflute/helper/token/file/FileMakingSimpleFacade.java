@@ -21,51 +21,55 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * The simple facade for file-making. <br />
+ * For example, the facade has on-memory making methods. 
  * @author jflute
  */
 public class FileMakingSimpleFacade {
 
-    protected final FileToken _fileToken = new FileToken();
+    /** The handler of file token for help. */
+    protected final FileToken fileToken = new FileToken();
 
     /**
-     * Make token-file from row-list.
-     * @param filename Output target file name. (NotNull)
-     * @param rowList Row-list composed of value-list. (NotNull)
-     * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * Make token file from row list.
+     * @param filePath The path of token file to write. (NotNull)
+     * @param rowList The list of row (value-list). (NotNull)
+     * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
+     * @throws java.io.FileNotFoundException When the file was not found.
+     * @throws java.io.IOException When the file reading failed.
      */
-    public void makeFromRowList(final String filename, final List<List<String>> rowList,
-            final FileMakingOption fileMakingOption) throws FileNotFoundException, IOException {
+    public void makeFromRowList(final String filePath, final List<List<String>> rowList, final FileMakingOption option)
+            throws FileNotFoundException, IOException {
         final FileMakingCallback fileMakingCallback = new FileMakingCallback() {
-            protected int rowCount = 0;
+            protected int rowCount = 0; // old style here (you can use iterator)
 
             public FileMakingRowResource getRowResource() {
                 ++rowCount;
                 if (rowList.size() < rowCount) {
-                    return null;// The End!
+                    return null; // the end
                 }
                 final List<String> valueList = (List<String>) rowList.get(rowCount - 1);
-                final FileMakingRowResource fileMakingRowResource = new FileMakingRowResource();
-                fileMakingRowResource.setValueList(valueList);
-                return fileMakingRowResource;
+                final FileMakingRowResource rowResource = new FileMakingRowResource();
+                rowResource.setValueList(valueList);
+                return rowResource;
             }
         };
-        _fileToken.make(filename, fileMakingCallback, fileMakingOption);
+        final FileToken fileToken = new FileToken();
+        fileToken.make(filePath, fileMakingCallback, option);
     }
 
     /**
-     * Make bytes from row-list.
-     * @param rowList Row-list composed of value-list. (NotNull)
-     * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})
-     * @return Result byte array. (NotNull)
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * Make bytes from row list.
+     * @param rowList The list of row (value-list). (NotNull)
+     * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
+     * @return The array of byte of the row list. (NotNull)
+     * @throws java.io.FileNotFoundException When the file was not found. (no way here)
+     * @throws java.io.IOException When the file reading failed.
      */
-    public byte[] makeFromRowList(final List<List<String>> rowList, final FileMakingOption fileMakingOption)
+    public byte[] makeFromRowList(final List<List<String>> rowList, final FileMakingOption option)
             throws FileNotFoundException, IOException {
         final FileMakingCallback fileMakingCallback = new FileMakingCallback() {
-            protected int rowCount = 0;
+            protected int rowCount = 0; // old style here (you can use iterator)
 
             public FileMakingRowResource getRowResource() {
                 ++rowCount;
@@ -73,13 +77,14 @@ public class FileMakingSimpleFacade {
                     return null;// The End!
                 }
                 final List<String> valueList = (List<String>) rowList.get(rowCount - 1);
-                final FileMakingRowResource fileMakingRowResource = new FileMakingRowResource();
-                fileMakingRowResource.setValueList(valueList);
-                return fileMakingRowResource;
+                final FileMakingRowResource rowResource = new FileMakingRowResource();
+                rowResource.setValueList(valueList);
+                return rowResource;
             }
         };
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        _fileToken.make(baos, fileMakingCallback, fileMakingOption);
+        final FileToken fileToken = new FileToken();
+        fileToken.make(baos, fileMakingCallback, option);
         return baos.toByteArray();
     }
 }
