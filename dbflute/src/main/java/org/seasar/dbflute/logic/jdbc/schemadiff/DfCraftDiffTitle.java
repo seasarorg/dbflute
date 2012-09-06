@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author awaawa
@@ -150,8 +149,7 @@ public class DfCraftDiffTitle extends DfAbstractDiff implements DfNestDiff {
     }
 
     public String getCraftDispTitle() {
-        final String craftTitle = getCraftTitle();
-        return craftTitle.contains("_") ? Srl.initCap(Srl.camelize(craftTitle)) : craftTitle;
+        return getCraftTitle();
     }
 
     public DfDiffType getDiffType() { // basically unused

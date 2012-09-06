@@ -462,14 +462,16 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     protected String extractCraftResourceNameFromMetaFileName(File metaFile) {
+        // craft-meta-Trigger-next.tsv -> Trigger
         final String name = metaFile.getName();
         final String prefix = getCraftMetaFilePrefix();
         final String ext = getCraftMetaFileExt();
         final String resourceName = Srl.extractScopeWide(name, prefix, ext).getContent();
         if (!resourceName.contains("-")) {
             // TODO jflute
+            throw new IllegalStateException();
         }
-        return resourceName;
+        return resourceName.startsWith("-") ? Srl.substringFirstRear(resourceName, "-") : resourceName;
     }
 
     // -----------------------------------------------------

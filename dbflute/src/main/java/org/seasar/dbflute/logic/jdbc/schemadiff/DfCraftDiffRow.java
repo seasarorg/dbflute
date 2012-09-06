@@ -160,7 +160,7 @@ public class DfCraftDiffRow extends DfAbstractDiff implements DfNestDiff {
     //                                                 Basic
     //                                                 -----
     public String getKeyName() { // this 'key' means identity in the DBFlute process
-        return _craftKeyName;
+        return getCraftKeyName();
     }
 
     public String getCraftKeyName() {
