@@ -251,7 +251,7 @@ public class DfProcedureDiff extends DfAbstractDiff implements DfNestDiff {
     //                                                 Basic
     //                                                 -----
     public String getKeyName() {
-        return _procedureUniqueName;
+        return getProcedureName();
     }
 
     public String getProcedureName() {

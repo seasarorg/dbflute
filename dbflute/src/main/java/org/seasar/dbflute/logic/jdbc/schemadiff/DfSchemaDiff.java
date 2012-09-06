@@ -130,23 +130,36 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //        ; [sequence-name] = map:{
     //            ; diffType = [ADD or CHANGE or DELETE]
     //            ; unifiedSchemaDiff = map:{ next = [schema] ; previous = [schema] }
-    //            ; minimumValue = map:{ next = [value] ; previous = [value] }
-    //            ; maximumValue = map:{ next = [value] ; previous = [value] }
-    //            ; incrementSize = map:{ next = [value] ; previous = [value] }
-    //            ; sequenceComment = map:{ next = [comment] ; previous = [comment] }
+    //            ; minimumValueDiff = map:{ next = [value] ; previous = [value] }
+    //            ; maximumValueDiff = map:{ next = [value] ; previous = [value] }
+    //            ; incrementSizeDiff = map:{ next = [value] ; previous = [value] }
+    //            ; sequenceCommentDiff = map:{ next = [comment] ; previous = [comment] }
     //        }
     //    }
     //    ; procedureDiff = map:{
     //        ; [procedure-name] = map:{
     //            ; diffType = [ADD or CHANGE or DELETE]
     //            ; unifiedSchemaDiff = map:{ next = [schema] ; previous = [schema] }
-    //            ; sourceLine = map:{ next = [value] ; previous = [value] }
-    //            ; sourceSize = map:{ next = [value] ; previous = [value] }
-    //            ; sourceHash = map:{ next = [value] ; previous = [value] }
-    //            ; procedureComment = map:{ next = [comment] ; previous = [comment] }
+    //            ; sourceLineDiff = map:{ next = [value] ; previous = [value] }
+    //            ; sourceSizeDiff = map:{ next = [value] ; previous = [value] }
+    //            ; sourceHashDiff = map:{ next = [value] ; previous = [value] }
+    //            ; procedureCommentDiff = map:{ next = [comment] ; previous = [comment] }
+    //        }
+    //    }
+    //    ; craftDiff = map:{
+    //        ; [craft-title] = map:{
+    //            ; craftRowDiff = map:{
+    //                ; [craft-key] = map:{
+    //                    ; diffType = [ADD or CHANGE or DELETE]
+    //                    ; craftValueDiff = map:{ next = [value] ; previous = [value] } 
+    //                }
+    //            }
     //        }
     //    }
     //}
+    //
+    // sequenceDiff and procedureDiff have no-diff-suffix items, sourceLine, sourceSize and so on,
+    // because I forgot to add the suffix, however no longer fix...
 
     // ===================================================================================
     //                                                                          Definition
@@ -160,6 +173,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     public static final String KEYWORD_DB2_SYSTEM_SEQUENCE = "SQL";
     public static final String KEYWORD_H2_SYSTEM_SEQUENCE = "SYSTEM_SEQUENCE";
     public static final String PROCEDURE_DIFF_KEY = "procedureDiff";
+    public static final String CRAFT_DIFF_KEY = "craftDiff";
     public static final String PROCEDURE_SOURCE_NO_META_MARK = "-1";
 
     // ===================================================================================
@@ -217,14 +231,14 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                            Craft Diff
     //                                            ----------
-    protected final DfCraftDiffProcess _craftDiffProcess = new DfCraftDiffProcess();
+    protected final DfCraftDiff _craftDiff = new DfCraftDiff();
     protected String _craftMetaDir;
     protected DfCraftDiffAssertSqlFire _craftDiffAssertSqlFire;
 
     // -----------------------------------------------------
     //                                             Nest Diff
     //                                             ---------
-    protected List<NestDiffSetupper> _nestDiffList = DfCollectionUtil.newArrayList();
+    protected final List<NestDiffSetupper> _nestDiffList = DfCollectionUtil.newArrayList();
     {
         _nestDiffList.add(new NestDiffSetupper() {
             public String propertyName() {
@@ -263,6 +277,19 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
             public void setup(Map<String, Object> diff) {
                 addProcedureDiff(createProcedureDiff(diff));
+            }
+        });
+        _nestDiffList.add(new NestDiffSetupper() {
+            public String propertyName() {
+                return CRAFT_DIFF_KEY;
+            }
+
+            public List<? extends DfNestDiff> provide() {
+                return _craftDiff.getCraftDiffTitleList();
+            }
+
+            public void setup(Map<String, Object> diff) {
+                _craftDiff.addCraftDiffTitle(createCraftDiffTitle(diff));
             }
         });
     }
@@ -364,6 +391,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         processTable();
         processSequence();
         processProcedure();
+        processCraftDiff();
     }
 
     // ===================================================================================
@@ -1306,7 +1334,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
 
     protected void processCraftDiff() {
         if (_craftMetaDir != null) {
-            _craftDiffProcess.craftDiff(_craftMetaDir);
+            _craftDiff.analyzeDiff(_craftMetaDir);
         }
     }
 
@@ -1599,24 +1627,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                            Craft Diff
     //                                            ----------
-    public List<String> getCraftTitleList() {
-        return _craftDiffProcess.getCraftTitleList();
-    }
-
-    public List<DfCraftDiff> getCraftDiffAllList(String craftTitle) {
-        return _craftDiffProcess.getCraftDiffAllList(craftTitle);
-    }
-
-    public List<DfCraftDiff> getAddedCraftDiffList(String craftTitle) {
-        return _craftDiffProcess.getAddedCraftDiffList(craftTitle);
-    }
-
-    public List<DfCraftDiff> getChangedCraftDiffList(String craftTitle) {
-        return _craftDiffProcess.getChangedCraftDiffList(craftTitle);
-    }
-
-    public List<DfCraftDiff> getDeletedCraftDiffList(String craftTitle) {
-        return _craftDiffProcess.getDeletedCraftDiffList(craftTitle);
+    public List<DfCraftDiffTitle> getCraftDiffTitleAllList() {
+        return _craftDiff.getCraftDiffTitleList();
     }
 
     // -----------------------------------------------------

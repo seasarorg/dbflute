@@ -49,6 +49,14 @@ public abstract class DfAbstractDiff {
         return DfProcedureDiff.createFromDiffMap(procedureDiffMap);
     }
 
+    protected DfCraftDiffTitle createCraftDiffTitle(Map<String, Object> craftDiffTitleMap) {
+        return DfCraftDiffTitle.createFromDiffMap(craftDiffTitleMap);
+    }
+
+    protected DfCraftDiffRow createCraftRowDiff(Map<String, Object> craftDiffRowMap) {
+        return DfCraftDiffRow.createFromDiffMap(craftDiffRowMap);
+    }
+
     // ===================================================================================
     //                                                                  Next Previous Diff
     //                                                                  ==================

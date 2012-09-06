@@ -37,7 +37,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     protected static final String SCHEMA_SYNC_CHECK_RESULT_FILE_NAME = "sync-check-result.html";
 
     protected static final String BASIC_CRAFT_DIFF_DIR = "./schema/craftdiff";
-    protected static final String CORE_CRAFT_META_DIR = BASIC_CRAFT_DIFF_DIR;
+    protected static final String CORE_CRAFT_META_DIR = BASIC_CRAFT_DIFF_DIR; // same as basic
 
     // ===================================================================================
     //                                                                         Constructor
@@ -391,12 +391,11 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isCheckProcedureDiff", false, getDocumentDefinitionMap());
     }
 
+    // -----------------------------------------------------
+    //                                             CraftDiff
+    //                                             ---------
     public boolean isCheckCraftDiff() { // closet
         return isProperty("isCheckCraftDiff", true, getDocumentDefinitionMap());
-    }
-
-    public String getCoreCraftDiffMetaDir() {
-        return isCheckCraftDiff() ? CORE_CRAFT_META_DIR : null;
     }
 
     public List<File> getCraftSqlFileList() {
@@ -404,11 +403,73 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return DfCollectionUtil.emptyList();
         }
         final String targetDir = getBasicCraftSqlDir();
-        return findSchemaResourceFileList(targetDir, "craft-diff", ".sql");
+        return findSchemaResourceFileList(targetDir, "craft-schema", ".sql");
     }
 
-    protected String getBasicCraftSqlDir() {
-        return isCheckCraftDiff() ? BASIC_CRAFT_DIFF_DIR : null;
+    protected String getBasicCraftSqlDir() { // closet
+        if (!isCheckCraftDiff()) {
+            return null;
+        }
+        return getProperty("basicCraftSqlDir", BASIC_CRAFT_DIFF_DIR, getDocumentDefinitionMap());
+    }
+
+    public String getCoreCraftMetaDir() {
+        if (!isCheckCraftDiff()) {
+            return null;
+        }
+        return isCheckCraftDiff() ? CORE_CRAFT_META_DIR : null;
+    }
+
+    protected String getCraftMetaFilePrefix() {
+        return "craft-meta";
+    }
+
+    protected String getCraftMetaFileExt() {
+        return ".tsv";
+    }
+
+    public List<File> getCraftMetaFileList(String craftMetaDir) {
+        if (!isCheckCraftDiff()) {
+            return DfCollectionUtil.emptyList();
+        }
+        final String prefix = getCraftMetaFilePrefix();
+        final String ext = getCraftMetaFileExt();
+        return findSchemaResourceFileList(craftMetaDir, prefix, ext);
+    }
+
+    public String buildCraftMetaFileName(String craftTitle, boolean next) {
+        final String prefix = getCraftMetaFilePrefix();
+        final String ext = getCraftMetaFileExt();
+        return prefix + "-" + craftTitle + "-" + (next ? "next" : "previous") + ext;
+    }
+
+    public String extractCraftTitle(File metaFile) {
+        final String resourceName = extractCraftResourceNameFromMetaFileName(metaFile);
+        return Srl.substringLastFront(resourceName, "-");
+    }
+
+    public boolean isCraftDirectionNext(File metaFile) {
+        final String resourceName = extractCraftResourceNameFromMetaFileName(metaFile);
+        final String direction = Srl.substringLastRear(resourceName, "-");
+        if ("next".equals(direction)) {
+            return true;
+        } else if ("previous".equals(direction)) {
+            return false;
+        } else {
+            // TODO jflute
+            throw new IllegalStateException();
+        }
+    }
+
+    protected String extractCraftResourceNameFromMetaFileName(File metaFile) {
+        final String name = metaFile.getName();
+        final String prefix = getCraftMetaFilePrefix();
+        final String ext = getCraftMetaFileExt();
+        final String resourceName = Srl.extractScopeWide(name, prefix, ext).getContent();
+        if (!resourceName.contains("-")) {
+            // TODO jflute
+        }
+        return resourceName;
     }
 
     // -----------------------------------------------------
@@ -625,7 +686,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return SCHEMA_SYNC_CHECK_DIFF_MAP_FILE;
     }
 
-    public String getSchemaSyncCheckResultFileName() {
+    public String getSchemaSyncCheckResultFileName() { // closet
         final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
         final String fileName = schemaSyncCheckMap.get("resultHtmlFileName");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(fileName)) {
@@ -639,7 +700,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return outputDirectory + "/" + getSchemaSyncCheckResultFileName();
     }
 
-    public String getSchemaSyncCheckCraftMetaDir() {
+    public String getSchemaSyncCheckCraftMetaDir() { // closet
         if (!isCheckCraftDiff()) {
             return null;
         }
@@ -649,7 +710,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(craftMetaDirPath)) {
             return outputDirectory + "/" + craftMetaDirPath;
         }
-        return outputDirectory + "/craftmeta";
+        return outputDirectory + "/craftdiff";
     }
 
     // ===================================================================================

@@ -940,7 +940,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             return null;
         }
         final String baseDirectory = getMigrationSchemaDirectory();
-        return baseDirectory + "/craftmeta";
+        return baseDirectory + "/craftdiff";
     }
 
     // -----------------------------------------------------

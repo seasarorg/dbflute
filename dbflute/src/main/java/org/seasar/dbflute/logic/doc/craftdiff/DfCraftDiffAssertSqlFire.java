@@ -28,7 +28,6 @@ import org.seasar.dbflute.exception.DfCraftDiffNonAssertionSqlFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
@@ -65,11 +64,13 @@ public class DfCraftDiffAssertSqlFire {
     // ===================================================================================
     //                                                                            SQL Fire
     //                                                                            ========
-    public DfSqlFileFireResult fire() {
+    public void fire() {
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Craft Diff");
-        return fireMan.fire(getSqlFileRunner4CraftDiff(runInfo), getCraftDiffSqlFileList());
+
+        // result file is ignored because of break cause
+        fireMan.fire(getSqlFileRunner4CraftDiff(runInfo), getCraftSqlFileList());
     }
 
     protected DfSqlFileRunner getSqlFileRunner4CraftDiff(final DfRunnerInformation runInfo) {
@@ -150,7 +151,7 @@ public class DfCraftDiffAssertSqlFire {
         return getProperties().getDocumentProperties();
     }
 
-    protected List<File> getCraftDiffSqlFileList() {
+    protected List<File> getCraftSqlFileList() {
         return getDocumentProperties().getCraftSqlFileList();
     }
 

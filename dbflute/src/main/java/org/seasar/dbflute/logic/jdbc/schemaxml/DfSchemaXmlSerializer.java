@@ -174,7 +174,7 @@ public class DfSchemaXmlSerializer {
         final String historyFile = facadeProp.getProjectSchemaHistoryFile();
         final DfSchemaXmlSerializer serializer = newSerializer(dataSource, mainSchema, schemaXml, historyFile);
         final DfDocumentProperties docProp = buildProp.getDocumentProperties();
-        serializer.enableCraftDiff(dataSource, mainSchema, docProp.getCoreCraftDiffMetaDir());
+        serializer.enableCraftDiff(dataSource, mainSchema, docProp.getCoreCraftMetaDir());
         serializer.suppressCraftLoadingPrevious();
         return serializer;
     }
@@ -1215,7 +1215,7 @@ public class DfSchemaXmlSerializer {
     protected void doLoadPreviousSchema() {
         _log.info("...Loading previous schema (schema diff process)");
         _schemaDiff.loadPreviousSchema();
-        if (!_suppressCraftLoadingPrevious) {
+        if (!_suppressCraftLoadingPrevious) { // e.g. SchemaSyncCheck, AlterCheck
             _schemaDiff.loadPreviousCraftMeta();
         }
         if (_schemaDiff.isFirstTime()) {

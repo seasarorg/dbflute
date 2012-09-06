@@ -26,12 +26,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -72,17 +73,16 @@ public class DfCraftDiffAssertHandler {
     }
 
     protected String buildNextDataFile(File sqlFile) {
-        return doCreateNextDataFile(sqlFile, "next");
+        return doCreateNextDataFile(sqlFile, true);
     }
 
     protected String buildPreviousDataFile(File sqlFile) {
-        return doCreateNextDataFile(sqlFile, "previous");
+        return doCreateNextDataFile(sqlFile, false);
     }
 
-    protected String doCreateNextDataFile(File sqlFile, String name) {
-        final String pureFileName = sqlFile.getName();
-        final String pureTitleName = Srl.substringLastFront(pureFileName, ".");
-        return _craftMetaDir + "/" + pureTitleName + "-" + name + ".tsv";
+    protected String doCreateNextDataFile(File sqlFile, boolean next) {
+        final String fileName = buildCraftMetaFileName(_craftTitle, next);
+        return _craftMetaDir + "/" + fileName;
     }
 
     // ===================================================================================
@@ -143,5 +143,20 @@ public class DfCraftDiffAssertHandler {
         } catch (IOException e) {
             // TODO jflute
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
+    protected String buildCraftMetaFileName(String craftTitle, boolean next) {
+        return getDocumentProperties().buildCraftMetaFileName(craftTitle, next);
     }
 }

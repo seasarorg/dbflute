@@ -217,7 +217,7 @@ public class DfSequenceDiff extends DfAbstractDiff implements DfNestDiff {
     //                                                 Basic
     //                                                 -----
     public String getKeyName() {
-        return _sequenceUniqueName;
+        return getSequenceName();
     }
 
     public String getSequenceName() {
