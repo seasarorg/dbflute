@@ -1292,19 +1292,22 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                       Craft Process
     //                                                                       =============
-    protected void processCraftDiff() {
-        if (_craftMetaDir == null) {
-            return;
+    public void loadPreviousCraftMeta() {
+        if (_craftDiffAssertSqlFire != null) {
+            _craftDiffAssertSqlFire.fire();
         }
-        _craftDiffProcess.craftDiff(_craftMetaDir);
     }
 
-    protected void loadPreviousCraftMeta() {
-        if (_craftDiffAssertSqlFire == null) {
-            return;
+    public void loadNextCraftMeta() {
+        if (_craftDiffAssertSqlFire != null) {
+            _craftDiffAssertSqlFire.fire();
         }
-        // TODO jflute
-        _craftDiffAssertSqlFire.fire();
+    }
+
+    protected void processCraftDiff() {
+        if (_craftMetaDir != null) {
+            _craftDiffProcess.craftDiff(_craftMetaDir);
+        }
     }
 
     // ===================================================================================

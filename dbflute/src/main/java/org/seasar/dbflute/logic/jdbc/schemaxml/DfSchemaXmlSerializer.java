@@ -131,6 +131,7 @@ public class DfSchemaXmlSerializer {
     //                                                ------
     protected boolean _suppressExceptTarget; // already reflected to regular handlers
     protected boolean _suppressAdditionalSchema; // to check in processes related to additional schema
+    protected boolean _suppressCraftLoadingPrevious; // suppressing previous is basically for HistoryHTML
 
     // ===================================================================================
     //                                                                         Constructor
@@ -174,6 +175,7 @@ public class DfSchemaXmlSerializer {
         final DfSchemaXmlSerializer serializer = newSerializer(dataSource, mainSchema, schemaXml, historyFile);
         final DfDocumentProperties docProp = buildProp.getDocumentProperties();
         serializer.enableCraftDiff(dataSource, mainSchema, docProp.getCoreCraftDiffMetaDir());
+        serializer.suppressCraftLoadingPrevious();
         return serializer;
     }
 
@@ -211,6 +213,11 @@ public class DfSchemaXmlSerializer {
 
     protected DfSchemaXmlSerializer suppressAdditionalSchema() {
         _suppressAdditionalSchema = true;
+        return this;
+    }
+
+    public DfSchemaXmlSerializer suppressCraftLoadingPrevious() {
+        _suppressCraftLoadingPrevious = true;
         return this;
     }
 
@@ -1208,6 +1215,9 @@ public class DfSchemaXmlSerializer {
     protected void doLoadPreviousSchema() {
         _log.info("...Loading previous schema (schema diff process)");
         _schemaDiff.loadPreviousSchema();
+        if (!_suppressCraftLoadingPrevious) {
+            _schemaDiff.loadPreviousCraftMeta();
+        }
         if (_schemaDiff.isFirstTime()) {
             _log.info(" -> no previous (first time)");
         }
@@ -1230,6 +1240,7 @@ public class DfSchemaXmlSerializer {
         }
         _log.info("...Loading next schema (schema diff process)");
         _schemaDiff.loadNextSchema();
+        _schemaDiff.loadNextCraftMeta();
         _schemaDiff.analyzeDiff();
         if (_schemaDiff.hasDiff()) {
             try {

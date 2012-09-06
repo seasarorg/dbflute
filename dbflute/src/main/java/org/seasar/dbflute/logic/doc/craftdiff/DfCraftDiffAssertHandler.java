@@ -65,7 +65,6 @@ public class DfCraftDiffAssertHandler {
      */
     public void handle(File sqlFile, Statement st, String sql) throws SQLException {
         final List<Map<String, String>> diffDataList = selectDiffDataList(sqlFile, st, sql);
-        // TODO jflute
         final String nextDataFilePath = buildNextDataFile(sqlFile);
         final String previousDataFilePath = buildPreviousDataFile(sqlFile);
         rollingPreviousDataFile(nextDataFilePath, previousDataFilePath);
