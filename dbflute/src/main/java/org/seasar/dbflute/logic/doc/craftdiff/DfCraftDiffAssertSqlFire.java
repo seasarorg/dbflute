@@ -65,12 +65,16 @@ public class DfCraftDiffAssertSqlFire {
     //                                                                            SQL Fire
     //                                                                            ========
     public void fire() {
+        final List<File> craftSqlFileList = getCraftSqlFileList();
+        if (craftSqlFileList.isEmpty()) {
+            return;
+        }
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Craft Diff");
 
         // result file is ignored because of break cause
-        fireMan.fire(getSqlFileRunner4CraftDiff(runInfo), getCraftSqlFileList());
+        fireMan.fire(getSqlFileRunner4CraftDiff(runInfo), craftSqlFileList);
     }
 
     protected DfSqlFileRunner getSqlFileRunner4CraftDiff(final DfRunnerInformation runInfo) {

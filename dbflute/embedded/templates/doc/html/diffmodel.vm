@@ -279,8 +279,8 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
-</div>
 #end
+</div>
 #end
 
 </body>

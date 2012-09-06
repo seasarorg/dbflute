@@ -1627,7 +1627,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                            Craft Diff
     //                                            ----------
-    public List<DfCraftTitleDiff> getCraftDiffTitleList() {
+    public List<DfCraftTitleDiff> getCraftTitleDiffList() {
         return _craftDiff.getCraftTitleDiffList();
     }
 

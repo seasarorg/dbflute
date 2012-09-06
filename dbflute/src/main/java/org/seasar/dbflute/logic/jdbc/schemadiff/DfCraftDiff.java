@@ -253,22 +253,6 @@ public class DfCraftDiff extends DfAbstractDiff {
         doDiffNextPrevious(diff, differ, nextDiffValue, previousDiffValue);
     }
 
-    protected boolean needsToHash(String nextValue, String previousValue) {
-        return containsLineSeparator(nextValue) || containsLineSeparator(previousValue); // either contains
-    }
-
-    protected boolean containsLineSeparator(String value) {
-        return value != null && value.contains("\n");
-    }
-
-    protected String convertToHash(String value) {
-        final StringBuilder nextSb = new StringBuilder();
-        nextSb.append(Srl.count(value, "\n") + 1).append(":"); // line
-        nextSb.append(value.length()).append(":"); // length
-        nextSb.append(Integer.toHexString(value.hashCode())); // hash
-        return nextSb.toString();
-    }
-
     protected void doDiffNextPrevious(DfCraftRowDiff diff,
             StringNextPreviousDiffer<DfCraftValue, DfCraftRowDiff> differ, final String nextValue,
             final String previousValue) {
@@ -298,6 +282,39 @@ public class DfCraftDiff extends DfAbstractDiff {
     //                                         -------------
     protected boolean isSameCraftKeyName(DfCraftValue next, DfCraftValue previous) {
         return isSame(next.getCraftKeyName(), previous.getCraftKeyName());
+    }
+
+    // ===================================================================================
+    //                                                                          Hash Logic
+    //                                                                          ==========
+    protected boolean needsToHash(String nextValue, String previousValue) {
+        return containsLineSeparator(nextValue, previousValue) || isOverLength(nextValue, previousValue);
+    }
+
+    protected boolean containsLineSeparator(String... values) {
+        for (String value : values) {
+            if (value != null && value.contains("\n")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean isOverLength(String... values) {
+        for (String value : values) {
+            if (value != null && value.length() > 100) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected String convertToHash(String value) {
+        final StringBuilder nextSb = new StringBuilder();
+        nextSb.append(Srl.count(value, "\n") + 1).append(":"); // line
+        nextSb.append(value.length()).append(":"); // length
+        nextSb.append(Integer.toHexString(value.hashCode())); // hash
+        return nextSb.toString();
     }
 
     // ===================================================================================

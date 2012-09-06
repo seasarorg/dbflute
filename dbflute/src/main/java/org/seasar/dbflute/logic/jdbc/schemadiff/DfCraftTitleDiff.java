@@ -81,8 +81,8 @@ public class DfCraftTitleDiff extends DfAbstractDiff implements DfNestDiff {
         return new DfCraftTitleDiff(craftTitle);
     }
 
-    public static DfCraftTitleDiff createFromDiffMap(Map<String, Object> procedureDiffMap) {
-        return new DfCraftTitleDiff(procedureDiffMap);
+    public static DfCraftTitleDiff createFromDiffMap(Map<String, Object> craftDiffMap) {
+        return new DfCraftTitleDiff(craftDiffMap);
     }
 
     // ===================================================================================

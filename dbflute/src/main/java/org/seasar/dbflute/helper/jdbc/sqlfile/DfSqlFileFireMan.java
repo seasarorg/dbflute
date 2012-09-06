@@ -88,6 +88,7 @@ public class DfSqlFileFireMan {
 
         // Result Message
         buildResultMessage(sqlFileList, fireResult, goodSqlCount, totalSqlCount, title);
+        _log.info(fireResult.getResultMessage());
 
         // Detail Message
         fireResult.setDetailMessage(buildDetailMessage(fireResult));
@@ -104,7 +105,6 @@ public class DfSqlFileFireMan {
             resultSb.append(" failure=").append(totalSqlCount - goodSqlCount);
         }
         resultSb.append(" (in ").append(sqlFileList.size()).append(" files)");
-        _log.info(resultSb.toString());
         fireResult.setResultMessage(resultSb.toString());
     }
 
