@@ -25,7 +25,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 0.9.9.8 (2012/09/04 Tuesday)
  */
-public class DfCraftDiffTitle extends DfAbstractDiff implements DfNestDiff {
+public class DfCraftTitleDiff extends DfAbstractDiff implements DfNestDiff {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -34,10 +34,10 @@ public class DfCraftDiffTitle extends DfAbstractDiff implements DfNestDiff {
     //                                                 Basic
     //                                                 -----
     protected final String _craftTitle;
-    protected final List<DfCraftDiffRow> _craftDiffRowAllList = DfCollectionUtil.newArrayList();
-    protected final List<DfCraftDiffRow> _addedCraftDiffRowList = DfCollectionUtil.newArrayList();
-    protected final List<DfCraftDiffRow> _changedCraftDiffRowList = DfCollectionUtil.newArrayList();
-    protected final List<DfCraftDiffRow> _deletedCraftDiffRowList = DfCollectionUtil.newArrayList();
+    protected final List<DfCraftRowDiff> _craftRowDiffAllList = DfCollectionUtil.newArrayList();
+    protected final List<DfCraftRowDiff> _addedCraftRowDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfCraftRowDiff> _changedCraftRowDiffList = DfCollectionUtil.newArrayList();
+    protected final List<DfCraftRowDiff> _deletedCraftRowDiffList = DfCollectionUtil.newArrayList();
 
     protected List<NestDiffSetupper> _nestDiffList = DfCollectionUtil.newArrayList();
     {
@@ -47,11 +47,11 @@ public class DfCraftDiffTitle extends DfAbstractDiff implements DfNestDiff {
             }
 
             public List<? extends DfNestDiff> provide() {
-                return _craftDiffRowAllList;
+                return _craftRowDiffAllList;
             }
 
             public void setup(Map<String, Object> diff) {
-                addCraftDiffRow(createCraftRowDiff(diff));
+                addCraftRowDiff(createCraftRowDiff(diff));
             }
         });
     }
@@ -59,30 +59,30 @@ public class DfCraftDiffTitle extends DfAbstractDiff implements DfNestDiff {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfCraftDiffTitle(String craftTitle) {
+    protected DfCraftTitleDiff(String craftTitle) {
         _craftTitle = craftTitle;
     }
 
-    protected DfCraftDiffTitle(Map<String, Object> craftDiffMap) {
+    protected DfCraftTitleDiff(Map<String, Object> craftDiffMap) {
         _craftTitle = (String) craftDiffMap.get("craftTitle"); // it's a unique name
-        assertCraftKeyNameExists(_craftTitle, craftDiffMap);
+        assertCraftTitleExists(_craftTitle, craftDiffMap);
         acceptDiffMap(craftDiffMap);
     }
 
-    protected void assertCraftKeyNameExists(String craftKeyName, Map<String, Object> craftDiffMap) {
-        if (craftKeyName == null) { // basically no way
-            String msg = "The craftKeyName is required in craft diff-map:";
+    protected void assertCraftTitleExists(String craftTitle, Map<String, Object> craftDiffMap) {
+        if (craftTitle == null) { // basically no way
+            String msg = "The craftTitle is required in craft diff-map:";
             msg = msg + " craftDiffMap=" + craftDiffMap;
             throw new IllegalStateException(msg);
         }
     }
 
-    public static DfCraftDiffTitle create(String craftTitle) {
-        return new DfCraftDiffTitle(craftTitle);
+    public static DfCraftTitleDiff create(String craftTitle) {
+        return new DfCraftTitleDiff(craftTitle);
     }
 
-    public static DfCraftDiffTitle createFromDiffMap(Map<String, Object> procedureDiffMap) {
-        return new DfCraftDiffTitle(procedureDiffMap);
+    public static DfCraftTitleDiff createFromDiffMap(Map<String, Object> procedureDiffMap) {
+        return new DfCraftTitleDiff(procedureDiffMap);
     }
 
     // ===================================================================================
@@ -166,33 +166,33 @@ public class DfCraftDiffTitle extends DfAbstractDiff implements DfNestDiff {
     // -----------------------------------------------------
     //                                             CraftDiff
     //                                             ---------
-    public List<DfCraftDiffRow> getCraftDiffRowAllList() {
-        return _craftDiffRowAllList;
+    public List<DfCraftRowDiff> getCraftDiffRowAllList() {
+        return _craftRowDiffAllList;
     }
 
-    public List<DfCraftDiffRow> getAddedCraftRowDiffList() {
-        return _addedCraftDiffRowList;
+    public List<DfCraftRowDiff> getAddedCraftRowDiffList() {
+        return _addedCraftRowDiffList;
     }
 
-    public List<DfCraftDiffRow> getChangedCraftRowDiffList() {
-        return _changedCraftDiffRowList;
+    public List<DfCraftRowDiff> getChangedCraftRowDiffList() {
+        return _changedCraftRowDiffList;
     }
 
-    public List<DfCraftDiffRow> getDeletedCraftRowDiffList() {
-        return _deletedCraftDiffRowList;
+    public List<DfCraftRowDiff> getDeletedCraftRowDiffList() {
+        return _deletedCraftRowDiffList;
     }
 
-    public void addCraftDiffRow(DfCraftDiffRow craftDiffRow) {
-        _craftDiffRowAllList.add(craftDiffRow);
-        if (craftDiffRow.isAdded()) {
-            _addedCraftDiffRowList.add(craftDiffRow);
-        } else if (craftDiffRow.isChanged()) {
-            _changedCraftDiffRowList.add(craftDiffRow);
-        } else if (craftDiffRow.isDeleted()) {
-            _deletedCraftDiffRowList.add(craftDiffRow);
+    public void addCraftRowDiff(DfCraftRowDiff craftRowDiff) {
+        _craftRowDiffAllList.add(craftRowDiff);
+        if (craftRowDiff.isAdded()) {
+            _addedCraftRowDiffList.add(craftRowDiff);
+        } else if (craftRowDiff.isChanged()) {
+            _changedCraftRowDiffList.add(craftRowDiff);
+        } else if (craftRowDiff.isDeleted()) {
+            _deletedCraftRowDiffList.add(craftRowDiff);
         } else { // no way
             String msg = "Unknown diff-type of craft: ";
-            msg = msg + " diffType=" + craftDiffRow.getDiffType() + " craftDiffRow=" + craftDiffRow;
+            msg = msg + " diffType=" + craftRowDiff.getDiffType() + " craftRowDiff=" + craftRowDiff;
             throw new IllegalStateException(msg);
         }
     }

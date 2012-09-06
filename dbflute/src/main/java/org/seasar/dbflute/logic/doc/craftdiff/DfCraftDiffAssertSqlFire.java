@@ -88,7 +88,7 @@ public class DfCraftDiffAssertSqlFire {
         final DfCraftDiffAssertProvider provider = new DfCraftDiffAssertProvider(_craftMetaDir);
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
             public DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException {
-                final DfCraftDiffAssertHandler handler = provider.provideCraftDiffAssertHandler(sql);
+                final DfCraftDiffAssertHandler handler = provider.provideCraftDiffAssertHandler(sqlFile, sql);
                 if (handler == null) {
                     throwCraftDiffNonAssertionSqlFoundException(sqlFile, sql);
                 }

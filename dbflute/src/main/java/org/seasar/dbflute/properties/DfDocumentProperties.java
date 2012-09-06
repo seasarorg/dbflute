@@ -12,7 +12,9 @@ import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -444,34 +446,53 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String extractCraftTitle(File metaFile) {
-        final String resourceName = extractCraftResourceNameFromMetaFileName(metaFile);
+        final String resourceName = extractCraftResourceNameFromMetaFile(metaFile);
         return Srl.substringLastFront(resourceName, "-");
     }
 
     public boolean isCraftDirectionNext(File metaFile) {
-        final String resourceName = extractCraftResourceNameFromMetaFileName(metaFile);
+        final String resourceName = extractCraftResourceNameFromMetaFile(metaFile);
         final String direction = Srl.substringLastRear(resourceName, "-");
         if ("next".equals(direction)) {
             return true;
         } else if ("previous".equals(direction)) {
             return false;
         } else {
-            // TODO jflute
-            throw new IllegalStateException();
+            throwCraftDiffIllegalCraftMetaFileNameException(metaFile, "Craft Direction", direction);
+            return false; // unreachable
         }
     }
 
-    protected String extractCraftResourceNameFromMetaFileName(File metaFile) {
+    protected String extractCraftResourceNameFromMetaFile(File metaFile) {
         // craft-meta-Trigger-next.tsv -> Trigger
         final String name = metaFile.getName();
         final String prefix = getCraftMetaFilePrefix();
         final String ext = getCraftMetaFileExt();
         final String resourceName = Srl.extractScopeWide(name, prefix, ext).getContent();
         if (!resourceName.contains("-")) {
-            // TODO jflute
-            throw new IllegalStateException();
+            throwCraftDiffIllegalCraftMetaFileNameException(metaFile, "Resource Name", resourceName);
         }
         return resourceName.startsWith("-") ? Srl.substringFirstRear(resourceName, "-") : resourceName;
+    }
+
+    protected void throwCraftDiffIllegalCraftMetaFileNameException(File metaFile, String attrName, String attrValue) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Illegal craft direction was found in the file name.");
+        br.addItem("Advice");
+        br.addElement("The file name of craft meta should be named like this:");
+        br.addElement("  craft-meta-[craft-title]-[next-or-previous].tsv");
+        br.addElement("");
+        br.addElement("For example:");
+        br.addElement("  (o): craft-meta-Trigger-next.tsv");
+        br.addElement("  (o): craft-meta-Trigger-previous.tsv");
+        br.addElement("  (x): craft-meta-Trigger-foo.tsv");
+        br.addElement("  (x): craft-meta-Trigger.tsv");
+        br.addItem("Meta File");
+        br.addElement(metaFile.getPath());
+        br.addItem(attrName);
+        br.addElement(attrValue);
+        final String msg = br.buildExceptionMessage();
+        throw new DfCraftDiffCraftTitleNotFoundException(msg);
     }
 
     // -----------------------------------------------------

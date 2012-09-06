@@ -42,7 +42,7 @@ public class DfCraftDiff extends DfAbstractDiff {
     //                                                                           Attribute
     //                                                                           =========
     protected final Set<String> _craftTitleSet = DfCollectionUtil.newLinkedHashSet();
-    protected final List<DfCraftDiffTitle> _craftDiffTitleList = DfCollectionUtil.newArrayList();
+    protected final List<DfCraftTitleDiff> _craftTitleDiffList = DfCollectionUtil.newArrayList();
 
     // map:{craftTitle = map:{craftKey : craftMeta}}
     protected Map<String, Map<String, DfCraftValue>> _nextTitleCraftValueMap;
@@ -168,16 +168,16 @@ public class DfCraftDiff extends DfAbstractDiff {
     protected void processCraftDiff() {
         for (Entry<String, Map<String, DfCraftValue>> entry : _nextTitleCraftValueMap.entrySet()) {
             final String craftTitle = entry.getKey();
-            final DfCraftDiffTitle titleDiff = DfCraftDiffTitle.create(craftTitle);
+            final DfCraftTitleDiff titleDiff = DfCraftTitleDiff.create(craftTitle);
             if (!hasPreviousCraftValue(titleDiff)) { // means no meta at previous time
                 continue; // out of target
             }
-            addCraftDiffTitle(titleDiff);
+            addCraftTitleDiff(titleDiff);
             doProcessCraftDiff(titleDiff);
         }
     }
 
-    protected void doProcessCraftDiff(DfCraftDiffTitle titleDiff) {
+    protected void doProcessCraftDiff(DfCraftTitleDiff titleDiff) {
         processAddedCraft(titleDiff);
         processChangedCraft(titleDiff);
         processDeletedCraft(titleDiff);
@@ -186,18 +186,18 @@ public class DfCraftDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                                 Added
     //                                                 -----
-    protected void processAddedCraft(DfCraftDiffTitle titleDiff) {
+    protected void processAddedCraft(DfCraftTitleDiff titleDiff) {
         final Map<String, DfCraftValue> nextValueMap = findNextValueMap(titleDiff); // exists here
         for (Entry<String, DfCraftValue> entry : nextValueMap.entrySet()) {
             final DfCraftValue craftValue = entry.getValue();
             final DfCraftValue found = findPreviousCraftValue(titleDiff, craftValue);
             if (found == null || !isSameCraftKeyName(craftValue, found)) { // added
-                titleDiff.addCraftDiffRow(DfCraftDiffRow.createAdded(craftValue.getCraftKeyName()));
+                titleDiff.addCraftRowDiff(DfCraftRowDiff.createAdded(craftValue.getCraftKeyName()));
             }
         }
     }
 
-    protected Map<String, DfCraftValue> findNextValueMap(DfCraftDiffTitle titleDiff) {
+    protected Map<String, DfCraftValue> findNextValueMap(DfCraftTitleDiff titleDiff) {
         final String craftTitle = titleDiff.getKeyName();
         return _nextTitleCraftValueMap.get(craftTitle); // always exists here
     }
@@ -205,7 +205,7 @@ public class DfCraftDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                               Changed
     //                                               -------
-    protected void processChangedCraft(DfCraftDiffTitle titleDiff) {
+    protected void processChangedCraft(DfCraftTitleDiff titleDiff) {
         final Map<String, DfCraftValue> nextValueMap = findNextValueMap(titleDiff); // exists here
         for (Entry<String, DfCraftValue> entry : nextValueMap.entrySet()) {
             final DfCraftValue next = entry.getValue();
@@ -214,31 +214,31 @@ public class DfCraftDiff extends DfAbstractDiff {
                 continue;
             }
             // found
-            final DfCraftDiffRow craftDiff = DfCraftDiffRow.createChanged(next.getCraftKeyName());
+            final DfCraftRowDiff craftDiff = DfCraftRowDiff.createChanged(next.getCraftKeyName());
 
             // only one item
             processCraftValue(next, previous, craftDiff);
 
             if (craftDiff.hasDiff()) { // changed
-                titleDiff.addCraftDiffRow(craftDiff);
+                titleDiff.addCraftRowDiff(craftDiff);
             }
         }
     }
 
-    protected void processCraftValue(DfCraftValue next, DfCraftValue previous, DfCraftDiffRow craftDiff) {
-        diffNextPrevious(next, previous, craftDiff, new StringNextPreviousDiffer<DfCraftValue, DfCraftDiffRow>() {
+    protected void processCraftValue(DfCraftValue next, DfCraftValue previous, DfCraftRowDiff craftDiff) {
+        diffNextPrevious(next, previous, craftDiff, new StringNextPreviousDiffer<DfCraftValue, DfCraftRowDiff>() {
             public String provide(DfCraftValue obj) {
                 return obj.getCraftValue();
             }
 
-            public void diff(DfCraftDiffRow diff, DfNextPreviousDiff nextPreviousDiff) {
+            public void diff(DfCraftRowDiff diff, DfNextPreviousDiff nextPreviousDiff) {
                 diff.setCraftValueDiff(nextPreviousDiff);
             }
         });
     }
 
-    protected void diffNextPrevious(DfCraftValue next, DfCraftValue previous, DfCraftDiffRow diff,
-            StringNextPreviousDiffer<DfCraftValue, DfCraftDiffRow> differ) {
+    protected void diffNextPrevious(DfCraftValue next, DfCraftValue previous, DfCraftRowDiff diff,
+            StringNextPreviousDiffer<DfCraftValue, DfCraftRowDiff> differ) {
         final String nextValue = differ.provide(next);
         final String previousValue = differ.provide(previous);
         final String nextDiffValue;
@@ -269,8 +269,8 @@ public class DfCraftDiff extends DfAbstractDiff {
         return nextSb.toString();
     }
 
-    protected void doDiffNextPrevious(DfCraftDiffRow diff,
-            StringNextPreviousDiffer<DfCraftValue, DfCraftDiffRow> differ, final String nextValue,
+    protected void doDiffNextPrevious(DfCraftRowDiff diff,
+            StringNextPreviousDiffer<DfCraftValue, DfCraftRowDiff> differ, final String nextValue,
             final String previousValue) {
         if (!differ.isMatch(nextValue, previousValue)) {
             final String nextDisp = differ.disp(nextValue, true);
@@ -282,13 +282,13 @@ public class DfCraftDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                               Deleted
     //                                               -------
-    protected void processDeletedCraft(DfCraftDiffTitle titleDiff) {
+    protected void processDeletedCraft(DfCraftTitleDiff titleDiff) {
         final Map<String, DfCraftValue> previousValueMap = findPreviousCraftValueMap(titleDiff); // exists here
         for (Entry<String, DfCraftValue> entry : previousValueMap.entrySet()) {
             final DfCraftValue craftValue = entry.getValue();
             final DfCraftValue found = findNextCraftDiffData(titleDiff, craftValue);
             if (found == null || !isSameCraftKeyName(craftValue, found)) { // deleted
-                titleDiff.addCraftDiffRow(DfCraftDiffRow.createDeleted(craftValue.getCraftKeyName()));
+                titleDiff.addCraftRowDiff(DfCraftRowDiff.createDeleted(craftValue.getCraftKeyName()));
             }
         }
     }
@@ -306,32 +306,32 @@ public class DfCraftDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                                  Next
     //                                                  ----
-    protected boolean hasNextCraftValue(DfCraftDiffTitle titleDiff) {
+    protected boolean hasNextCraftValue(DfCraftTitleDiff titleDiff) {
         return findNextCraftValueMap(titleDiff) != null;
     }
 
-    protected DfCraftValue findNextCraftDiffData(DfCraftDiffTitle titleDiff, DfCraftValue craftValue) {
+    protected DfCraftValue findNextCraftDiffData(DfCraftTitleDiff titleDiff, DfCraftValue craftValue) {
         final Map<String, DfCraftValue> metaMap = _nextTitleCraftValueMap.get(titleDiff.getKeyName());
         return metaMap != null ? metaMap.get(craftValue.getCraftKeyName()) : null;
     }
 
-    protected Map<String, DfCraftValue> findNextCraftValueMap(DfCraftDiffTitle titleDiff) {
+    protected Map<String, DfCraftValue> findNextCraftValueMap(DfCraftTitleDiff titleDiff) {
         return _nextTitleCraftValueMap.get(titleDiff.getKeyName());
     }
 
     // -----------------------------------------------------
     //                                              Previous
     //                                              --------
-    protected boolean hasPreviousCraftValue(DfCraftDiffTitle titleDiff) {
+    protected boolean hasPreviousCraftValue(DfCraftTitleDiff titleDiff) {
         return findPreviousCraftValueMap(titleDiff) != null;
     }
 
-    protected DfCraftValue findPreviousCraftValue(DfCraftDiffTitle titleDiff, DfCraftValue craftValue) {
+    protected DfCraftValue findPreviousCraftValue(DfCraftTitleDiff titleDiff, DfCraftValue craftValue) {
         final Map<String, DfCraftValue> metaMap = _previousTitleCraftValueMap.get(titleDiff.getKeyName());
         return metaMap != null ? metaMap.get(craftValue.getCraftKeyName()) : null;
     }
 
-    protected Map<String, DfCraftValue> findPreviousCraftValueMap(DfCraftDiffTitle titleDiff) {
+    protected Map<String, DfCraftValue> findPreviousCraftValueMap(DfCraftTitleDiff titleDiff) {
         return _previousTitleCraftValueMap.get(titleDiff.getKeyName());
     }
 
@@ -361,11 +361,11 @@ public class DfCraftDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public List<DfCraftDiffTitle> getCraftDiffTitleList() {
-        return _craftDiffTitleList;
+    public List<DfCraftTitleDiff> getCraftTitleDiffList() {
+        return _craftTitleDiffList;
     }
 
-    public void addCraftDiffTitle(DfCraftDiffTitle craftDiffTitle) {
-        _craftDiffTitleList.add(craftDiffTitle);
+    public void addCraftTitleDiff(DfCraftTitleDiff craftTitleDiff) {
+        _craftTitleDiffList.add(craftTitleDiff);
     }
 }

@@ -285,11 +285,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
             }
 
             public List<? extends DfNestDiff> provide() {
-                return _craftDiff.getCraftDiffTitleList();
+                return _craftDiff.getCraftTitleDiffList();
             }
 
             public void setup(Map<String, Object> diff) {
-                _craftDiff.addCraftDiffTitle(createCraftDiffTitle(diff));
+                _craftDiff.addCraftTitleDiff(createCraftDiffTitle(diff));
             }
         });
     }
@@ -1627,8 +1627,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                            Craft Diff
     //                                            ----------
-    public List<DfCraftDiffTitle> getCraftDiffTitleList() {
-        return _craftDiff.getCraftDiffTitleList();
+    public List<DfCraftTitleDiff> getCraftDiffTitleList() {
+        return _craftDiff.getCraftTitleDiffList();
     }
 
     // -----------------------------------------------------

@@ -15,8 +15,13 @@
  */
 package org.seasar.dbflute.logic.doc.craftdiff;
 
+import java.io.File;
+
+import org.seasar.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
@@ -40,35 +45,47 @@ public class DfCraftDiffAssertProvider {
     //                                                                             Provide
     //                                                                             =======
     /**
+     * @param sqlFile The text file that has the specified SQL. (NotNull) 
      * @param sql The SQL string to assert. (NotNull)
      * @return The handle of CraftDiff assert. (NullAllowed: if null, means not found)
      */
-    public DfCraftDiffAssertHandler provideCraftDiffAssertHandler(String sql) {
+    public DfCraftDiffAssertHandler provideCraftDiffAssertHandler(File sqlFile, String sql) {
         if (!sql.contains("--")) {
             return null;
         }
-        final String starter = "#df:";
-        final String terminator = "#";
-
         // resolve comment spaces
-        sql = DfStringUtil.replace(sql, "-- #", "--#");
+        final String resolvedSql = DfStringUtil.replace(sql, "-- #", "--#");
 
-        final String methodName = "assertEquals"; // CraftDiff supports only equals
-        final String keyPrefix = "--" + starter + methodName + "(";
-        if (!sql.contains(keyPrefix)) {
-            return null;
+        // CraftDiff supports only equals
+        final String keyPrefix = "--#df:assertEquals(";
+        final String keySuffix = ")#";
+        final ScopeInfo scopeFirst = Srl.extractScopeFirst(resolvedSql, keyPrefix, keySuffix);
+        if (scopeFirst == null) {
+            return null; // not found
         }
-        final String rearOfKey = Srl.substringFirstRear(sql, keyPrefix);
-        final String keySuffix = ")" + terminator;
-        if (!rearOfKey.contains(keySuffix)) {
-            return null;
-        }
-        final String craftTitle = Srl.substringFirstFront(rearOfKey, keySuffix);
+        final String craftTitle = scopeFirst.getContent().trim();
         if (Srl.is_Null_or_TrimmedEmpty(craftTitle)) {
-            // TODO jflute exception
-            throw new IllegalStateException();
+            throwCraftDiffCraftTitleNotFoundException(sqlFile, sql);
         }
         // *unsupported envType on assert definition
         return new DfCraftDiffAssertHandler(_craftMetaDir, craftTitle);
+    }
+
+    protected void throwCraftDiffCraftTitleNotFoundException(File sqlFile, String sql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the craft title in the SQL.");
+        br.addItem("Advice");
+        br.addElement("The assertion should have its title like this:");
+        br.addElement("  -- #df:assertEquals([craft-title])#");
+        br.addElement("");
+        br.addElement("For example:");
+        br.addElement("  (o): -- #df:assertEquals(Trigger)#");
+        br.addElement("  (x): -- #df:assertEquals()#");
+        br.addItem("SQL File");
+        br.addElement(sqlFile.getPath());
+        br.addItem("Assertion SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
+        throw new DfCraftDiffCraftTitleNotFoundException(msg);
     }
 }

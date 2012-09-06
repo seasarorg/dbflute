@@ -49,12 +49,12 @@ public abstract class DfAbstractDiff {
         return DfProcedureDiff.createFromDiffMap(procedureDiffMap);
     }
 
-    protected DfCraftDiffTitle createCraftDiffTitle(Map<String, Object> craftDiffTitleMap) {
-        return DfCraftDiffTitle.createFromDiffMap(craftDiffTitleMap);
+    protected DfCraftTitleDiff createCraftDiffTitle(Map<String, Object> craftDiffTitleMap) {
+        return DfCraftTitleDiff.createFromDiffMap(craftDiffTitleMap);
     }
 
-    protected DfCraftDiffRow createCraftRowDiff(Map<String, Object> craftDiffRowMap) {
-        return DfCraftDiffRow.createFromDiffMap(craftDiffRowMap);
+    protected DfCraftRowDiff createCraftRowDiff(Map<String, Object> craftDiffRowMap) {
+        return DfCraftRowDiff.createFromDiffMap(craftDiffRowMap);
     }
 
     // ===================================================================================

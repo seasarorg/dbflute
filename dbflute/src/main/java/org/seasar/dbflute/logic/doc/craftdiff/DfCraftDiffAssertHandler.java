@@ -141,7 +141,8 @@ public class DfCraftDiffAssertHandler {
                 }
             }, new FileMakingOption().delimitateByTab().encodeAsUTF8());
         } catch (IOException e) {
-            // TODO jflute
+            String msg = "Failed to make file: " + nextDataFile.getPath();
+            throw new IllegalStateException(msg, e);
         }
     }
 

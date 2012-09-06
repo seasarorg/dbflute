@@ -248,7 +248,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 ## ======================================================================================= 
 ##                                                                               CraftDiff
 ##                                                                               =========
-#foreach ($titleDiff in $schemaDiff.craftDiffTitleList)
+#foreach ($titleDiff in $schemaDiff.craftTitleDiffList)
 #if (!$titleDiff.addedCraftRowDiffList.isEmpty())
 	<h3>Add ${titleDiff.craftDispTitle}</h3>
 	<ul class="table-content">

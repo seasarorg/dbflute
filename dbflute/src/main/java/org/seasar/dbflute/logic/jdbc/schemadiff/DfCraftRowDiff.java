@@ -25,7 +25,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  * @author jflute
  * @since 0.9.9.8 (2012/09/04 Tuesday)
  */
-public class DfCraftDiffRow extends DfAbstractDiff implements DfNestDiff {
+public class DfCraftRowDiff extends DfAbstractDiff implements DfNestDiff {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -71,12 +71,12 @@ public class DfCraftDiffRow extends DfAbstractDiff implements DfNestDiff {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfCraftDiffRow(String craftKeyName, DfDiffType diffType) {
+    protected DfCraftRowDiff(String craftKeyName, DfDiffType diffType) {
         _craftKeyName = craftKeyName;
         _diffType = diffType;
     }
 
-    protected DfCraftDiffRow(Map<String, Object> craftDiffMap) {
+    protected DfCraftRowDiff(Map<String, Object> craftDiffMap) {
         _craftKeyName = (String) craftDiffMap.get("craftKeyName"); // it's a unique name
         assertCraftKeyNameExists(_craftKeyName, craftDiffMap);
         _diffType = DfDiffType.valueOf((String) craftDiffMap.get("diffType"));
@@ -100,20 +100,20 @@ public class DfCraftDiffRow extends DfAbstractDiff implements DfNestDiff {
         }
     }
 
-    public static DfCraftDiffRow createAdded(String craftKeyName) {
-        return new DfCraftDiffRow(craftKeyName, DfDiffType.ADD);
+    public static DfCraftRowDiff createAdded(String craftKeyName) {
+        return new DfCraftRowDiff(craftKeyName, DfDiffType.ADD);
     }
 
-    public static DfCraftDiffRow createChanged(String craftKeyName) {
-        return new DfCraftDiffRow(craftKeyName, DfDiffType.CHANGE);
+    public static DfCraftRowDiff createChanged(String craftKeyName) {
+        return new DfCraftRowDiff(craftKeyName, DfDiffType.CHANGE);
     }
 
-    public static DfCraftDiffRow createDeleted(String craftKeyName) {
-        return new DfCraftDiffRow(craftKeyName, DfDiffType.DELETE);
+    public static DfCraftRowDiff createDeleted(String craftKeyName) {
+        return new DfCraftRowDiff(craftKeyName, DfDiffType.DELETE);
     }
 
-    public static DfCraftDiffRow createFromDiffMap(Map<String, Object> procedureDiffMap) {
-        return new DfCraftDiffRow(procedureDiffMap);
+    public static DfCraftRowDiff createFromDiffMap(Map<String, Object> procedureDiffMap) {
+        return new DfCraftRowDiff(procedureDiffMap);
     }
 
     // ===================================================================================
