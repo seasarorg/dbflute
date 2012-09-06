@@ -119,6 +119,9 @@ ${selector.historyHtmlJavaScriptEmbedded}
 	<p class="tablecount"><span class="dt">table count: </span>${schemaDiff.tableCount.displayForHtml}</p>
 #end
 
+## ======================================================================================= 
+##                                                                               TableDiff
+##                                                                               =========
 #if (!$schemaDiff.addedTableDiffList.isEmpty())
 	<h3>Add Table</h3>
 	<ul class="table-content">
@@ -176,6 +179,9 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
+## ======================================================================================= 
+##                                                                            SequenceDiff
+##                                                                            ============
 #if (!$schemaDiff.addedSequenceDiffList.isEmpty())
 	<h3>Add Sequence</h3>
 	<ul class="table-content">
@@ -206,6 +212,9 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
+## ======================================================================================= 
+##                                                                           ProcedureDiff
+##                                                                           =============
 #if (!$schemaDiff.addedProcedureDiffList.isEmpty())
 	<h3>Add Procedure</h3>
 	<ul class="table-content">
@@ -236,7 +245,42 @@ ${selector.historyHtmlJavaScriptEmbedded}
 #end
 	</ul>
 #end
+## ======================================================================================= 
+##                                                                               CraftDiff
+##                                                                               =========
+#foreach ($titleDiff in $schemaDiff.craftDiffTitleList)
+#if (!$titleDiff.addedCraftRowDiffList.isEmpty())
+	<h3>Add ${titleDiff.craftDispTitle}</h3>
+	<ul class="table-content">
+#foreach ($rowDiff in $titleDiff.addedCraftRowDiffList)
+		<li>${rowDiff.craftKeyDispName}</li>
+#end
+	</ul>
+#end
+#if (!$titleDiff.changedCraftRowDiffList.isEmpty())
+	<h3>Change ${titleDiff.craftDispTitle}</h3>
+	<div class="table-content">
+#foreach ($rowDiff in $titleDiff.changedCraftRowDiffList)
+		<h4>${rowDiff.craftKeyDispName}</h4>
+		<div class="change-table-content">
+#foreach ($handler in $rowDiff.nextPreviousDiffList)
+			<h5>$handler.titleName()</h5>
+			<div class="column-content">$handler.provide().displayForHtml</div>
+#end
+		</div>
+#end
+	</div>
+#end
+#if (!$titleDiff.deletedCraftRowDiffList.isEmpty())
+	<h3>Delete ${titleDiff.craftDispTitle}</h3>
+	<ul class="table-content">
+#foreach ($rowDiff in $titleDiff.deletedCraftRowDiffList)
+		<li>${rowDiff.craftKeyDispName}</li>
+#end
+	</ul>
+#end
 </div>
+#end
 #end
 
 </body>
