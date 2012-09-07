@@ -1205,11 +1205,7 @@ public class DfSchemaXmlSerializer {
         if (_historyFile == null) {
             return;
         }
-        try {
-            doLoadPreviousSchema();
-        } catch (RuntimeException continued) {
-            _log.warn("*Failed to load previous schema", continued);
-        }
+        doLoadPreviousSchema();
     }
 
     protected void doLoadPreviousSchema() {
@@ -1227,11 +1223,7 @@ public class DfSchemaXmlSerializer {
         if (_historyFile == null) {
             return;
         }
-        try {
-            doLoadNextSchema();
-        } catch (RuntimeException continued) {
-            _log.warn("*Failed to load next schema", continued);
-        }
+        doLoadNextSchema();
     }
 
     protected void doLoadNextSchema() {

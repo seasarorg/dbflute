@@ -25,8 +25,11 @@ import java.sql.Statement;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfCraftDiffIllegalCraftKeyNameException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
@@ -107,10 +110,17 @@ public class DfCraftDiffAssertHandler {
             rs = st.executeQuery(sql);
             final ResultSetMetaData metaData = rs.getMetaData();
             final int columnCount = metaData.getColumnCount();
+            final Set<String> craftKeyNameSet = DfCollectionUtil.newHashSet();
             while (rs.next()) {
                 final Map<String, String> recordMap = DfCollectionUtil.newLinkedHashMap();
-                for (int i = 1; i <= columnCount; i++) {
-                    recordMap.put(metaData.getColumnLabel(i), rs.getString(i));
+                final int firstIndex = 1; // 1 origin in JDBC
+                for (int i = firstIndex; i <= columnCount; i++) {
+                    final String value = rs.getString(i);
+                    if (i == firstIndex) { // first loop
+                        assertCraftKeyExists(value, sqlFile, sql);
+                        assertUniqueCraftKey(value, sqlFile, sql, craftKeyNameSet);
+                    }
+                    recordMap.put(metaData.getColumnLabel(i), value);
                 }
                 resultList.add(recordMap);
             }
@@ -120,6 +130,43 @@ public class DfCraftDiffAssertHandler {
                 rs.close();
             }
         }
+    }
+
+    protected void assertCraftKeyExists(String craftKeyName, File sqlFile, String sql) {
+        if (craftKeyName == null) {
+            throwCraftDiffCraftKeyNameHasNullException(sqlFile, sql);
+        }
+    }
+
+    protected void throwCraftDiffCraftKeyNameHasNullException(File sqlFile, String sql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The craft key name has null.");
+        br.addItem("SQL File");
+        br.addElement(sqlFile.getPath());
+        br.addItem("Craft SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
+        throw new DfCraftDiffIllegalCraftKeyNameException(msg);
+    }
+
+    protected void assertUniqueCraftKey(String craftKeyName, File sqlFile, String sql, Set<String> craftKeyNameSet) {
+        if (craftKeyNameSet.contains(craftKeyName)) {
+            throwCraftDiffCraftKeyNameDuplicateException(craftKeyName, sqlFile, sql);
+        }
+        craftKeyNameSet.add(craftKeyName);
+    }
+
+    protected void throwCraftDiffCraftKeyNameDuplicateException(String craftKeyName, File sqlFile, String sql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The craft key name has duplicate entry.");
+        br.addItem("Duplicate Key");
+        br.addElement(craftKeyName);
+        br.addItem("SQL File");
+        br.addElement(sqlFile.getPath());
+        br.addItem("Craft SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
+        throw new DfCraftDiffIllegalCraftKeyNameException(msg);
     }
 
     // ===================================================================================

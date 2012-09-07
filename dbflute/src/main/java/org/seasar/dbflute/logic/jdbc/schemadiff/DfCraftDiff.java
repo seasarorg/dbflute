@@ -204,6 +204,7 @@ public class DfCraftDiff extends DfAbstractDiff {
     //                                       ---------------
     protected void assertCraftKeyExists(String craftKeyName, File metaFile, FileTokenizingRowResource rowResource) {
         if (craftKeyName == null) {
+            // basically no way because already checked when dump but just in case
             throwCraftDiffCraftKeyNameHasNullException(metaFile, rowResource);
         }
     }
@@ -231,6 +232,7 @@ public class DfCraftDiff extends DfAbstractDiff {
     protected void assertUniqueCraftKey(String craftKeyName, File metaFile, FileTokenizingRowResource rowResource,
             Set<String> craftKeyNameSet) {
         if (craftKeyNameSet.contains(craftKeyName)) {
+            // basically no way because already checked when dump but just in case
             throwCraftDiffCraftKeyNameDuplicateException(craftKeyName, metaFile, rowResource);
         }
         craftKeyNameSet.add(craftKeyName);
