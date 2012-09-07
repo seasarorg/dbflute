@@ -23,29 +23,39 @@ import java.util.List;
  */
 public class FileTokenizingHeaderInfo {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
-    protected List<String> _columnNameList = new ArrayList<String>();
-
-    // =====================================================================================
-    //                                                                           Easy-to-Use
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final List<String> _columnNameList = new ArrayList<String>();
     protected String _columnNameRowString;
 
-    public boolean isEmpty() {
-        return this._columnNameList.isEmpty();
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    public void acceptColumnNameList(List<String> columnNameList) {
+        clear();
+        for (String columnName : columnNameList) {
+            addColumnName(columnName);
+        }
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    public boolean isEmpty() {
+        return _columnNameList.isEmpty();
+    }
+
+    public void clear() {
+        _columnNameList.clear();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public List<String> getColumnNameList() {
         return _columnNameList;
     }
 
-    public void setColumnNameList(List<String> columnNameList) {
-        this._columnNameList = columnNameList;
+    public void addColumnName(String columnName) {
+        _columnNameList.add(columnName);
     }
 
     public String getColumnNameRowString() {

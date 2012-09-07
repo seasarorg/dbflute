@@ -25,43 +25,45 @@ public class FileTokenizingRowResource {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected FileTokenizingHeaderInfo fileTokenizingHeaderInfo;
-
-    protected List<String> valueList;
-
-    protected String rowString;
-
-    /** The row number. */
+    protected FileTokenizingHeaderInfo _headerInfo;
+    protected List<String> _valueList;
+    protected String _rowString;
     protected int _rowNumber;
-
-    /** The line number. */
     protected int _lineNumber;
 
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
-    public FileTokenizingHeaderInfo getFileTokenizingHeaderInfo() {
-        return fileTokenizingHeaderInfo;
+    /**
+     * Get the header info of the token file.
+     * @return The header info of the token file. (NotNull in callback)
+     */
+    public FileTokenizingHeaderInfo getHeaderInfo() {
+        return _headerInfo;
     }
 
-    public void setFirstLineInfo(FileTokenizingHeaderInfo fileTokenizingHeaderInfo) {
-        this.fileTokenizingHeaderInfo = fileTokenizingHeaderInfo;
+    public void setHeaderInfo(FileTokenizingHeaderInfo headerInfo) {
+        _headerInfo = headerInfo;
     }
 
+    /**
+     * Get the list of value.
+     * @return The list of value. (NotNull, NotEmpty)
+     */
     public List<String> getValueList() {
-        return valueList;
+        return _valueList;
     }
 
     public void setValueList(List<String> valueList) {
-        this.valueList = valueList;
+        _valueList = valueList;
     }
 
     public String getRowString() {
-        return rowString;
+        return _rowString;
     }
 
     public void setRowString(String rowString) {
-        this.rowString = rowString;
+        _rowString = rowString;
     }
 
     public int getRowNumber() {
@@ -78,5 +80,15 @@ public class FileTokenizingRowResource {
 
     public void setLineNumber(int lineNumber) {
         _lineNumber = lineNumber;
+    }
+
+    @Deprecated
+    public FileTokenizingHeaderInfo getFileTokenizingHeaderInfo() {
+        return _headerInfo;
+    }
+
+    @Deprecated
+    public void setFirstLineInfo(FileTokenizingHeaderInfo headerInfo) {
+        _headerInfo = headerInfo;
     }
 }

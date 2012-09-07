@@ -79,8 +79,12 @@ public class FileMakingOption {
     }
 
     public FileMakingOption headerInfo(List<String> columnNameList) {
+        if (columnNameList == null) {
+            String msg = "The argument 'columnNameList' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
         final FileMakingHeaderInfo headerInfo = new FileMakingHeaderInfo();
-        headerInfo.setColumnNameList(columnNameList);
+        headerInfo.acceptColumnNameList(columnNameList);
         _headerInfo = headerInfo;
         return this;
     }

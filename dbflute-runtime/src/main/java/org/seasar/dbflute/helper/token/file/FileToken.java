@@ -148,7 +148,7 @@ public class FileToken {
             br = new BufferedReader(new InputStreamReader(ins, encoding));
 
             final StringBuilder realRowStringSb = new StringBuilder();
-            FileTokenizingHeaderInfo fileTokenizingHeaderInfo = null;
+            FileTokenizingHeaderInfo headerInfo = null;
             int count = -1;
             int rowNumber = 1;
             int lineNumber = 0;
@@ -164,9 +164,9 @@ public class FileToken {
                 }
                 if (count == 0) {
                     if (option.isBeginFirstLine()) {
-                        fileTokenizingHeaderInfo = new FileTokenizingHeaderInfo();// As empty
+                        headerInfo = new FileTokenizingHeaderInfo(); // as empty
                     } else {
-                        fileTokenizingHeaderInfo = analyzeHeaderInfo(delimiter, lineString);
+                        headerInfo = analyzeHeaderInfo(delimiter, lineString);
                         continue;
                     }
                 }
@@ -189,8 +189,8 @@ public class FileToken {
                 temporaryValueList.addAll(ls);
 
                 try {
-                    final FileTokenizingRowResource fileTokenizingRowResource = new FileTokenizingRowResource();
-                    fileTokenizingRowResource.setFirstLineInfo(fileTokenizingHeaderInfo);
+                    final FileTokenizingRowResource rowResource = new FileTokenizingRowResource();
+                    rowResource.setHeaderInfo(headerInfo);
 
                     if (option.isHandleEmptyAsNull()) {
                         for (final Iterator<String> ite = temporaryValueList.iterator(); ite.hasNext();) {
@@ -201,17 +201,17 @@ public class FileToken {
                                 filteredValueList.add(value);
                             }
                         }
-                        fileTokenizingRowResource.setValueList(filteredValueList);
+                        rowResource.setValueList(filteredValueList);
                     } else {
-                        fileTokenizingRowResource.setValueList(temporaryValueList);
+                        rowResource.setValueList(temporaryValueList);
                     }
 
                     final String realRowString = realRowStringSb.toString();
                     realRowStringSb.setLength(0);
-                    fileTokenizingRowResource.setRowString(realRowString);
-                    fileTokenizingRowResource.setRowNumber(rowNumber);
-                    fileTokenizingRowResource.setLineNumber(lineNumber);
-                    callback.handleRowResource(fileTokenizingRowResource);
+                    rowResource.setRowString(realRowString);
+                    rowResource.setRowNumber(rowNumber);
+                    rowResource.setLineNumber(lineNumber);
+                    callback.handleRowResource(rowResource);
                 } finally {
                     ++rowNumber;
                     temporaryValueList.clear();
@@ -371,20 +371,20 @@ public class FileToken {
     }
 
     protected FileTokenizingHeaderInfo analyzeHeaderInfo(String delimiter, final String lineString) {
-        final List<String> columnNameList = new ArrayList<String>();
+        final FileTokenizingHeaderInfo headerInfo = new FileTokenizingHeaderInfo();
         final String[] values = lineString.split(delimiter);
         for (int i = 0; i < values.length; i++) {
             final String value = values[i].trim();// Trimming is Header Only!;
+            final String columnName;
             if (value.startsWith("\"") && value.endsWith("\"")) {
-                columnNameList.add(value.substring(1, value.length() - 1));
+                columnName = value.substring(1, value.length() - 1);
             } else {
-                columnNameList.add(value);
+                columnName = value;
             }
+            headerInfo.addColumnName(columnName);
         }
-        final FileTokenizingHeaderInfo fileTokenizingHeaderInfo = new FileTokenizingHeaderInfo();
-        fileTokenizingHeaderInfo.setColumnNameList(columnNameList);
-        fileTokenizingHeaderInfo.setColumnNameRowString(lineString);
-        return fileTokenizingHeaderInfo;
+        headerInfo.setColumnNameRowString(lineString);
+        return headerInfo;
     }
 
     public static class ValueLineInfo {
