@@ -520,7 +520,7 @@ public class ManualOrderBean implements HpCalculator {
             _caseWhenBoundList.add(boundTopElement);
         }
         if (_elseAcceptedValue != null) {
-            _elseBoundValue = handler.register(THEME_KEY, _elseAcceptedValue);
+            _elseBoundValue = resolveBoundValue(handler, _elseAcceptedValue);
         }
     }
 
