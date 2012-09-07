@@ -231,6 +231,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                            Craft Diff
     //                                            ----------
+    // these are not null if craft enabled
     protected final DfCraftDiff _craftDiff = new DfCraftDiff();
     protected String _craftMetaDir;
     protected DfCraftDiffAssertSqlFire _craftDiffAssertSqlFire;

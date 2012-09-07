@@ -34,6 +34,7 @@ import org.seasar.dbflute.exception.DfTableDuplicateException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffDirection;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
@@ -131,7 +132,7 @@ public class DfSchemaXmlSerializer {
     //                                                ------
     protected boolean _suppressExceptTarget; // already reflected to regular handlers
     protected boolean _suppressAdditionalSchema; // to check in processes related to additional schema
-    protected boolean _suppressCraftLoadingPrevious; // suppressing previous is basically for HistoryHTML
+    protected DfCraftDiffDirection _craftDiffDirection; // not null means CraftDiff enabled
 
     // ===================================================================================
     //                                                                         Constructor
@@ -174,8 +175,9 @@ public class DfSchemaXmlSerializer {
         final String historyFile = facadeProp.getProjectSchemaHistoryFile();
         final DfSchemaXmlSerializer serializer = newSerializer(dataSource, mainSchema, schemaXml, historyFile);
         final DfDocumentProperties docProp = buildProp.getDocumentProperties();
-        serializer.enableCraftDiff(dataSource, mainSchema, docProp.getCoreCraftMetaDir());
-        serializer.suppressCraftLoadingPrevious();
+        final String craftMetaDir = docProp.getCoreCraftMetaDir();
+        final DfCraftDiffDirection craftDiffDirection = DfCraftDiffDirection.NEXT;
+        serializer.enableCraftDiff(dataSource, mainSchema, craftMetaDir, craftDiffDirection);
         return serializer;
     }
 
@@ -213,11 +215,6 @@ public class DfSchemaXmlSerializer {
 
     protected DfSchemaXmlSerializer suppressAdditionalSchema() {
         _suppressAdditionalSchema = true;
-        return this;
-    }
-
-    public DfSchemaXmlSerializer suppressCraftLoadingPrevious() {
-        _suppressCraftLoadingPrevious = true;
         return this;
     }
 
@@ -1208,10 +1205,14 @@ public class DfSchemaXmlSerializer {
         doLoadPreviousSchema();
     }
 
+    protected boolean isCraftDiffDirection(DfCraftDiffDirection direction) {
+        return _craftDiffDirection != null && _craftDiffDirection.equals(direction);
+    }
+
     protected void doLoadPreviousSchema() {
         _log.info("...Loading previous schema (schema diff process)");
         _schemaDiff.loadPreviousSchema();
-        if (!_suppressCraftLoadingPrevious) { // e.g. SchemaSyncCheck, AlterCheck
+        if (isCraftDiffDirection(DfCraftDiffDirection.PREVIOUS)) {
             _schemaDiff.loadPreviousCraftMeta();
         }
         if (_schemaDiff.isFirstTime()) {
@@ -1232,7 +1233,9 @@ public class DfSchemaXmlSerializer {
         }
         _log.info("...Loading next schema (schema diff process)");
         _schemaDiff.loadNextSchema();
-        _schemaDiff.loadNextCraftMeta();
+        if (isCraftDiffDirection(DfCraftDiffDirection.NEXT)) {
+            _schemaDiff.loadNextCraftMeta();
+        }
         _schemaDiff.analyzeDiff();
         if (_schemaDiff.hasDiff()) {
             try {
@@ -1257,7 +1260,16 @@ public class DfSchemaXmlSerializer {
         _schemaDiff.suppressUnifiedSchema();
     }
 
-    public void enableCraftDiff(DataSource dataSource, UnifiedSchema mainSchema, String craftMetaDir) {
+    public void enableCraftDiff(DataSource dataSource, UnifiedSchema mainSchema, String craftMetaDir,
+            DfCraftDiffDirection craftDiffDirection) {
+        if (craftMetaDir == null) {
+            return;
+        }
+        if (craftDiffDirection == null) {
+            String msg = "The argument 'craftDiffDirection' should not be null: craftMetaDir=" + craftMetaDir;
+            throw new IllegalArgumentException(msg);
+        }
+        _craftDiffDirection = craftDiffDirection;
         _schemaDiff.enableCraftDiff(dataSource, mainSchema, craftMetaDir);
     }
 

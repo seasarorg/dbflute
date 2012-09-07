@@ -44,6 +44,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDis
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
 import org.seasar.dbflute.helper.process.ProcessResult;
 import org.seasar.dbflute.helper.process.SystemScript;
+import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffDirection;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
@@ -795,21 +796,24 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                    ================
     protected void serializePreviousSchema() {
         final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
-        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(previousXml);
+        final DfCraftDiffDirection direction = DfCraftDiffDirection.PREVIOUS;
+        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(previousXml, direction);
         serializer.serialize();
     }
 
     protected void serializeNextSchema() {
         final String nextXml = getMigrationAlterCheckNextSchemaXml();
-        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(nextXml);
+        final DfCraftDiffDirection direction = DfCraftDiffDirection.NEXT;
+        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(nextXml, direction);
         serializer.serialize();
     }
 
-    protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml) {
+    protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml, DfCraftDiffDirection direction) {
         final String historyFile = null; // no use history here (use SchemaDiff directly later)
         final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema,
                 schemaXml, historyFile);
-        serializer.enableCraftDiff(_dataSource, _mainSchema, getMigrationAlterCheckCraftMetaDir());
+        final String craftMetaDir = getMigrationAlterCheckCraftMetaDir();
+        serializer.enableCraftDiff(_dataSource, _mainSchema, craftMetaDir, direction);
         return serializer;
     }
 

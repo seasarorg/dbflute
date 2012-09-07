@@ -1,6 +1,7 @@
 package org.seasar.dbflute.logic.doc.synccheck;
 
 import java.io.File;
+import java.util.Stack;
 
 import javax.sql.DataSource;
 
@@ -12,6 +13,7 @@ import org.seasar.dbflute.exception.DfSchemaSyncCheckTragedyResultException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSource;
+import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffDirection;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -75,20 +77,28 @@ public class DfSchemaSyncChecker {
     }
 
     protected DfSchemaXmlSerializer diffSchema() {
-        serializeTargetSchema(); // previous
-        return serializeMainSchema(); // next
+        final Stack<DfCraftDiffDirection> directionStack = createDirectionStack();
+        serializeTargetSchema(directionStack); // previous
+        return serializeMainSchema(directionStack); // next
     }
 
-    protected DfSchemaXmlSerializer serializeMainSchema() {
-        final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
+    protected Stack<DfCraftDiffDirection> createDirectionStack() {
+        final Stack<DfCraftDiffDirection> directionStack = new Stack<DfCraftDiffDirection>();
+        directionStack.push(DfCraftDiffDirection.NEXT);
+        directionStack.push(DfCraftDiffDirection.PREVIOUS);
+        return directionStack;
+    }
+
+    protected DfSchemaXmlSerializer serializeMainSchema(Stack<DfCraftDiffDirection> directionStack) {
+        final DfSchemaXmlSerializer mainSerializer = createMainSerializer(directionStack.pop());
         mainSerializer.suppressUnifiedSchema(); // because of comparison with other schema
         mainSerializer.serialize();
         return mainSerializer;
     }
 
-    protected DfSchemaXmlSerializer serializeTargetSchema() {
+    protected DfSchemaXmlSerializer serializeTargetSchema(Stack<DfCraftDiffDirection> directionStack) {
         final DataSource targetDs = prepareTargetDataSource();
-        final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
+        final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs, directionStack.pop());
         targetSerializer.suppressUnifiedSchema(); // same reason as main schema
         targetSerializer.serialize();
         return targetSerializer;
@@ -129,20 +139,21 @@ public class DfSchemaSyncChecker {
     // ===================================================================================
     //                                                                          Serializer
     //                                                                          ==========
-    protected DfSchemaXmlSerializer createMainSerializer() {
+    protected DfSchemaXmlSerializer createMainSerializer(DfCraftDiffDirection direction) {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return doCreateSerializer(_mainDs, mainSchema);
+        return doCreateSerializer(_mainDs, mainSchema, direction);
     }
 
-    protected DfSchemaXmlSerializer createTargetSerializer(DataSource targetDs) {
+    protected DfSchemaXmlSerializer createTargetSerializer(DataSource targetDs, DfCraftDiffDirection direction) {
         final UnifiedSchema targetSchema = getDocumentProperties().getSchemaSyncCheckDatabaseSchema();
-        return doCreateSerializer(targetDs, targetSchema);
+        return doCreateSerializer(targetDs, targetSchema, direction);
     }
 
-    protected DfSchemaXmlSerializer doCreateSerializer(DataSource dataSource, UnifiedSchema unifiedSchema) {
+    protected DfSchemaXmlSerializer doCreateSerializer(DataSource dataSource, UnifiedSchema unifiedSchema,
+            DfCraftDiffDirection direction) {
         final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, unifiedSchema,
                 getSchemaXml(), getDiffMapFile());
-        serializer.enableCraftDiff(dataSource, unifiedSchema, getSchemaSyncCheckCraftMetaDir());
+        serializer.enableCraftDiff(dataSource, unifiedSchema, getSchemaSyncCheckCraftMetaDir(), direction);
         return serializer;
     }
 
