@@ -1205,10 +1205,6 @@ public class DfSchemaXmlSerializer {
         doLoadPreviousSchema();
     }
 
-    protected boolean isCraftDiffDirection(DfCraftDiffDirection direction) {
-        return _craftDiffDirection != null && _craftDiffDirection.equals(direction);
-    }
-
     protected void doLoadPreviousSchema() {
         _log.info("...Loading previous schema (schema diff process)");
         _schemaDiff.loadPreviousSchema();
@@ -1251,6 +1247,10 @@ public class DfSchemaXmlSerializer {
         } else {
             _log.info(" -> same as previous (schema diff)");
         }
+    }
+
+    protected boolean isCraftDiffDirection(DfCraftDiffDirection direction) {
+        return _craftDiffDirection != null && _craftDiffDirection.equals(direction);
     }
 
     // ===================================================================================
