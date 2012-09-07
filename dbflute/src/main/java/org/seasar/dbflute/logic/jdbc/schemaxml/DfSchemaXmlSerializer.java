@@ -1244,7 +1244,7 @@ public class DfSchemaXmlSerializer {
         _schemaDiff.analyzeDiff();
         if (_schemaDiff.hasDiff()) {
             try {
-                _log.info(" -> different from previous");
+                _log.info(" -> different from previous (schema diff)");
                 final DfSchemaHistory schemaHistory = DfSchemaHistory.createAsPlain(_historyFile);
                 _log.info("...Serializing schema-diff:");
                 _log.info("  filePath = " + schemaHistory.getHistoryFile());
@@ -1254,7 +1254,7 @@ public class DfSchemaXmlSerializer {
                 throw new IllegalStateException(msg, e);
             }
         } else {
-            _log.info(" -> same as previous");
+            _log.info(" -> same as previous (schema diff)");
         }
     }
 

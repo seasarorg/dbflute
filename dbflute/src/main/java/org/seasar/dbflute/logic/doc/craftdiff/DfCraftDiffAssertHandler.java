@@ -65,11 +65,19 @@ public class DfCraftDiffAssertHandler {
      * @throws SQLException
      */
     public void handle(File sqlFile, Statement st, String sql) throws SQLException {
+        prepareCraftMetaDir();
         final List<Map<String, String>> diffDataList = selectDiffDataList(sqlFile, st, sql);
         final String nextDataFilePath = buildNextDataFile(sqlFile);
         final String previousDataFilePath = buildPreviousDataFile(sqlFile);
         rollingPreviousDataFile(nextDataFilePath, previousDataFilePath);
         dumpCraftMetaToDataFile(diffDataList, new File(nextDataFilePath));
+    }
+
+    protected void prepareCraftMetaDir() {
+        final File dir = new File(_craftMetaDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
     }
 
     protected String buildNextDataFile(File sqlFile) {

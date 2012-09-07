@@ -45,14 +45,11 @@ import org.seasar.dbflute.util.Srl;
  */
 public abstract class DfAbstractHelperProperties {
 
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
-
     // ===============================================================================
     //                                                                      Definition
     //                                                                      ==========
+    private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
+
     // -----------------------------------------------------
     //                                         Default Value
     //                                         -------------
@@ -675,6 +672,13 @@ public abstract class DfAbstractHelperProperties {
      */
     protected final String getEnvironmentType() {
         return DfEnvironmentType.getInstance().getEnvironmentType();
+    }
+
+    /**
+     * @return The type of environment. (NotNull: if no specified environment type, returns default control mark)
+     */
+    protected final String getEnvironmentTypeIfNullDefaultControl() {
+        return DfEnvironmentType.getInstance().getEnvironmentTypeIfNullDefaultControl();
     }
 
     // ===============================================================================

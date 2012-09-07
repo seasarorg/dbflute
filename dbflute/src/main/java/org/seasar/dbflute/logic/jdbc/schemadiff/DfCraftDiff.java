@@ -23,9 +23,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfCraftDiffIllegalCraftKeyNameException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.FileTokenizingCallback;
+import org.seasar.dbflute.helper.token.file.FileTokenizingHeaderInfo;
 import org.seasar.dbflute.helper.token.file.FileTokenizingOption;
 import org.seasar.dbflute.helper.token.file.FileTokenizingRowResource;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -37,6 +42,11 @@ import org.seasar.dbflute.util.Srl;
  * @since 0.9.9.8 (2012/09/04 Tuesday)
  */
 public class DfCraftDiff extends DfAbstractDiff {
+
+    // ===============================================================================
+    //                                                                      Definition
+    //                                                                      ==========
+    private static final Log _log = LogFactory.getLog(DfCraftDiff.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -99,32 +109,70 @@ public class DfCraftDiff extends DfAbstractDiff {
         if (metaFileList.isEmpty()) { // empty directory or no check
             return;
         }
+        _log.info("...Loading craft meta: " + craftMetaDir);
         for (final File metaFile : metaFileList) {
             final String craftTitle = extractCraftTitle(metaFile);
             _craftTitleSet.add(craftTitle);
             final boolean next = isCraftDirectionNext(metaFile);
             final FileToken fileToken = new FileToken();
-            final List<DfCraftValue> valueList = DfCollectionUtil.newArrayList();
+            final List<DfCraftValue> craftValueList = DfCollectionUtil.newArrayList();
             try {
                 fileToken.tokenize(new FileInputStream(metaFile), new FileTokenizingCallback() {
+                    private final Set<String> _craftKeyNameSet = DfCollectionUtil.newHashSet(); // for duplicate check
+
                     public void handleRowResource(FileTokenizingRowResource rowResource) {
-                        final List<String> craftValueList = DfCollectionUtil.newArrayList(rowResource.getValueList());
-                        final String craftKeyName = craftValueList.remove(0); // it's the first item fixedly
-                        valueList.add(new DfCraftValue(craftKeyName, buildCraftValue(craftValueList)));
+                        final List<String> columnValueList = DfCollectionUtil.newArrayList(rowResource.getValueList());
+                        final String craftKeyName = columnValueList.remove(0); // it's the first item fixedly
+                        assertCraftKeyExists(craftKeyName, metaFile, rowResource);
+                        assertUniqueCraftKey(craftKeyName, metaFile, rowResource, _craftKeyNameSet);
+                        craftValueList.add(createCraftValue(craftKeyName, columnValueList));
                     }
                 }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
             } catch (IOException e) {
                 String msg = "Failed to read the file: " + metaFile;
                 throw new IllegalStateException(msg, e);
             }
+            _log.info("  " + metaFile.getName() + ": rowCount=" + craftValueList.size());
             if (next) {
-                registerNextMeta(craftTitle, valueList);
+                registerNextMeta(craftTitle, craftValueList);
             } else {
-                registerPreviousMeta(craftTitle, valueList);
+                registerPreviousMeta(craftTitle, craftValueList);
             }
         }
     }
 
+    // -----------------------------------------------------
+    //                                           Craft Value
+    //                                           -----------
+    protected DfCraftValue createCraftValue(String craftKeyName, List<String> craftValueList) {
+        return new DfCraftValue(filterCraftKeyName(craftKeyName), buildCraftValue(craftValueList));
+    }
+
+    protected String filterCraftKeyName(String craftKeyName) {
+        if (craftKeyName.equalsIgnoreCase("null")) {
+            return Srl.quoteDouble(craftKeyName); // because map file treats 'null' as null
+        }
+        return craftKeyName;
+    }
+
+    protected String buildCraftValue(final List<String> craftValueList) {
+        final StringBuilder sb = new StringBuilder();
+        for (String craftValue : craftValueList) {
+            if (sb.length() > 0) {
+                sb.append("|");
+            }
+            if (craftValue != null && craftValue.equalsIgnoreCase("null")) {
+                sb.append(Srl.quoteDouble(craftValue)); // null string
+            } else {
+                sb.append(craftValue); // null or normal string
+            }
+        }
+        return sb.toString();
+    }
+
+    // -----------------------------------------------------
+    //                                         Register Meta
+    //                                         -------------
     protected void registerNextMeta(String craftTitle, List<DfCraftValue> valueList) {
         if (_nextTitleCraftValueMap == null) {
             _nextTitleCraftValueMap = DfCollectionUtil.newLinkedHashMap();
@@ -151,15 +199,58 @@ public class DfCraftDiff extends DfAbstractDiff {
         }
     }
 
-    protected String buildCraftValue(final List<String> craftValueList) {
-        final StringBuilder sb = new StringBuilder();
-        for (String craftValue : craftValueList) {
-            if (sb.length() > 0) {
-                sb.append("|");
-            }
-            sb.append(craftValue);
+    // -----------------------------------------------------
+    //                                       Assert CraftKey
+    //                                       ---------------
+    protected void assertCraftKeyExists(String craftKeyName, File metaFile, FileTokenizingRowResource rowResource) {
+        if (craftKeyName == null) {
+            throwCraftDiffCraftKeyNameHasNullException(metaFile, rowResource);
         }
-        return sb.toString();
+    }
+
+    protected void throwCraftDiffCraftKeyNameHasNullException(File metaFile, FileTokenizingRowResource rowResource) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The craft key name has null.");
+        final FileTokenizingHeaderInfo headerInfo = rowResource.getHeaderInfo();
+        if (!headerInfo.isEmpty()) {
+            br.addItem("CraftKey Column");
+            br.addElement(headerInfo.getColumnNameList().get(0));
+        }
+        br.addItem("Line Number");
+        br.addElement(rowResource.getLineNumber());
+        br.addItem("Row Number");
+        br.addElement(rowResource.getRowNumber());
+        br.addItem("Row String");
+        br.addElement(rowResource.getRowString());
+        br.addItem("Meta File");
+        br.addElement(metaFile.getPath());
+        final String msg = br.buildExceptionMessage();
+        throw new DfCraftDiffIllegalCraftKeyNameException(msg);
+    }
+
+    protected void assertUniqueCraftKey(String craftKeyName, File metaFile, FileTokenizingRowResource rowResource,
+            Set<String> craftKeyNameSet) {
+        if (craftKeyNameSet.contains(craftKeyName)) {
+            throwCraftDiffCraftKeyNameDuplicateException(craftKeyName, metaFile, rowResource);
+        }
+        craftKeyNameSet.add(craftKeyName);
+    }
+
+    protected void throwCraftDiffCraftKeyNameDuplicateException(String craftKeyName, File metaFile,
+            FileTokenizingRowResource rowResource) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The craft key name has duplicate entry.");
+        final FileTokenizingHeaderInfo headerInfo = rowResource.getHeaderInfo();
+        if (!headerInfo.isEmpty()) {
+            br.addItem("CraftKey Column");
+            br.addElement(headerInfo.getColumnNameList().get(0));
+        }
+        br.addItem("Duplicate Key");
+        br.addElement(craftKeyName);
+        br.addItem("Meta File");
+        br.addElement(metaFile.getPath());
+        final String msg = br.buildExceptionMessage();
+        throw new DfCraftDiffIllegalCraftKeyNameException(msg);
     }
 
     // ===================================================================================

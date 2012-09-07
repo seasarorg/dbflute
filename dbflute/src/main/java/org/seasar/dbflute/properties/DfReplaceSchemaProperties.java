@@ -235,7 +235,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                    Environment Type
     //                                                                    ================
-    public String getRepsEnvType() {
+    public String getRepsEnvType() { // not null
         final String dataLoadingType = getDataLoadingType();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(dataLoadingType)) {
             return dataLoadingType;
@@ -260,16 +260,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public boolean isTargetEnvTypeFile(String sql) { // for general purpose
-        return checkTargetEnvType(sql, getEnvironmentType());
+        return checkTargetEnvType(sql, getEnvironmentTypeIfNullDefaultControl());
     }
 
     protected boolean checkTargetEnvType(String sql, String envType) {
         final String envExp = analyzeCheckEnvType(sql);
         if (Srl.is_Null_or_TrimmedEmpty(envExp)) {
             return true; // no check means target
-        }
-        if (envType == null) {
-            return false;
         }
         final List<String> envList = Srl.splitListTrimmed(envExp, ",");
         _log.info("...Checking envType: " + envType + " in " + envList);
