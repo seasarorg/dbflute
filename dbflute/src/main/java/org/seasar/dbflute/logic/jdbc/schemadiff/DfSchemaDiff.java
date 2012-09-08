@@ -23,16 +23,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Procedure;
 import org.apache.torque.engine.database.model.Sequence;
 import org.apache.torque.engine.database.model.Table;
-import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertSqlFire;
 import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfConstraintKeyDiffer;
 import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfForeignKeyDiffer;
 import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfIndexDiffer;
@@ -234,7 +230,6 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // these are not null if craft enabled
     protected final DfCraftDiff _craftDiff = new DfCraftDiff();
     protected String _craftMetaDir;
-    protected DfCraftDiffAssertSqlFire _craftDiffAssertSqlFire;
 
     // -----------------------------------------------------
     //                                             Nest Diff
@@ -1321,18 +1316,6 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // ===================================================================================
     //                                                                       Craft Process
     //                                                                       =============
-    public void loadPreviousCraftMeta() {
-        if (_craftDiffAssertSqlFire != null) {
-            _craftDiffAssertSqlFire.fire();
-        }
-    }
-
-    public void loadNextCraftMeta() {
-        if (_craftDiffAssertSqlFire != null) {
-            _craftDiffAssertSqlFire.fire();
-        }
-    }
-
     protected void processCraftDiff() {
         if (_craftMetaDir != null) {
             _craftDiff.analyzeDiff(_craftMetaDir);
@@ -1493,12 +1476,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
         _suppressUnifiedSchema = true;
     }
 
-    public void enableCraftDiff(DataSource dataSource, UnifiedSchema mainSchema, String craftMetaDir) {
+    public void enableCraftDiff(String craftMetaDir) {
         if (craftMetaDir == null) {
             return;
         }
         _craftMetaDir = craftMetaDir;
-        _craftDiffAssertSqlFire = new DfCraftDiffAssertSqlFire(dataSource, mainSchema, craftMetaDir);
     }
 
     // ===================================================================================

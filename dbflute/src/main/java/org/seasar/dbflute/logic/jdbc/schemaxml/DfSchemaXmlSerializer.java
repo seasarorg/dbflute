@@ -34,7 +34,7 @@ import org.seasar.dbflute.exception.DfTableDuplicateException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffDirection;
+import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertSqlFire;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
@@ -132,7 +132,8 @@ public class DfSchemaXmlSerializer {
     //                                                ------
     protected boolean _suppressExceptTarget; // already reflected to regular handlers
     protected boolean _suppressAdditionalSchema; // to check in processes related to additional schema
-    protected DfCraftDiffDirection _craftDiffDirection; // not null means CraftDiff enabled
+    protected boolean _craftDiffEnabled; // not null means CraftDiff enabled
+    protected DfCraftDiffAssertSqlFire _craftDiffAssertSqlFire; // not null when CraftDiff enabled 
 
     // ===================================================================================
     //                                                                         Constructor
@@ -176,8 +177,7 @@ public class DfSchemaXmlSerializer {
         final DfSchemaXmlSerializer serializer = newSerializer(dataSource, mainSchema, schemaXml, historyFile);
         final DfDocumentProperties docProp = buildProp.getDocumentProperties();
         final String craftMetaDir = docProp.getCoreCraftMetaDir();
-        final DfCraftDiffDirection craftDiffDirection = DfCraftDiffDirection.NEXT;
-        serializer.enableCraftDiff(dataSource, mainSchema, craftMetaDir, craftDiffDirection);
+        serializer.enableCraftDiff(dataSource, mainSchema, craftMetaDir);
         return serializer;
     }
 
@@ -339,6 +339,10 @@ public class DfSchemaXmlSerializer {
 
         if (isProcedureMetaEnabled()) {
             processProcedure(conn, metaData);
+        }
+
+        if (isCraftMetaEnabled()) {
+            processCraftMeta();
         }
 
         _doc.appendChild(_databaseNode);
@@ -721,6 +725,27 @@ public class DfSchemaXmlSerializer {
         }
 
         procedureGroupElement.appendChild(procedureElement);
+    }
+
+    // -----------------------------------------------------
+    //                                            Craft Meta
+    //                                            ----------
+    protected boolean isCraftMetaEnabled() {
+        return _craftDiffEnabled;
+    }
+
+    protected void processCraftMeta() {
+        extractCraftMeta();
+    }
+
+    /**
+     * Extract craft meta to meta files by SQL firing. <br />
+     * This extracts them to next files after rolling existing next files to previous files.
+     */
+    protected void extractCraftMeta() {
+        if (_craftDiffAssertSqlFire != null) { // always not null when this called
+            _craftDiffAssertSqlFire.fire();
+        }
     }
 
     // ===================================================================================
@@ -1208,9 +1233,6 @@ public class DfSchemaXmlSerializer {
     protected void doLoadPreviousSchema() {
         _log.info("...Loading previous schema (schema diff process)");
         _schemaDiff.loadPreviousSchema();
-        if (isCraftDiffDirection(DfCraftDiffDirection.PREVIOUS)) {
-            _schemaDiff.loadPreviousCraftMeta();
-        }
         if (_schemaDiff.isFirstTime()) {
             _log.info(" -> no previous (first time)");
         }
@@ -1229,9 +1251,6 @@ public class DfSchemaXmlSerializer {
         }
         _log.info("...Loading next schema (schema diff process)");
         _schemaDiff.loadNextSchema();
-        if (isCraftDiffDirection(DfCraftDiffDirection.NEXT)) {
-            _schemaDiff.loadNextCraftMeta();
-        }
         _schemaDiff.analyzeDiff();
         if (_schemaDiff.hasDiff()) {
             try {
@@ -1249,10 +1268,6 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected boolean isCraftDiffDirection(DfCraftDiffDirection direction) {
-        return _craftDiffDirection != null && _craftDiffDirection.equals(direction);
-    }
-
     // ===================================================================================
     //                                                                         Diff Option
     //                                                                         ===========
@@ -1260,17 +1275,13 @@ public class DfSchemaXmlSerializer {
         _schemaDiff.suppressUnifiedSchema();
     }
 
-    public void enableCraftDiff(DataSource dataSource, UnifiedSchema mainSchema, String craftMetaDir,
-            DfCraftDiffDirection craftDiffDirection) {
+    public void enableCraftDiff(DataSource dataSource, UnifiedSchema mainSchema, String craftMetaDir) {
         if (craftMetaDir == null) {
             return;
         }
-        if (craftDiffDirection == null) {
-            String msg = "The argument 'craftDiffDirection' should not be null: craftMetaDir=" + craftMetaDir;
-            throw new IllegalArgumentException(msg);
-        }
-        _craftDiffDirection = craftDiffDirection;
-        _schemaDiff.enableCraftDiff(dataSource, mainSchema, craftMetaDir);
+        _craftDiffEnabled = true;
+        _craftDiffAssertSqlFire = new DfCraftDiffAssertSqlFire(dataSource, mainSchema, craftMetaDir);
+        _schemaDiff.enableCraftDiff(craftMetaDir);
     }
 
     // ===================================================================================
