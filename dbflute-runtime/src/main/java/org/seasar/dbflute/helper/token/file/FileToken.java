@@ -77,7 +77,7 @@ public class FileToken {
     //                                                                      Tokenize(Read)
     //                                                                      ==============
     /**
-     * Read the token data from the specified file. (file-tokenizing) <br />
+     * Tokenize (read) the token data from the specified file. (file-tokenizing) <br />
      * CR + LF is treated as LF.
      * <pre>
      * File tsvFile = ...
@@ -118,7 +118,7 @@ public class FileToken {
     }
 
     /**
-     * Write token data to specified file. (named file-tokenizing) <br />
+     * Tokenize (read) token data to specified file. (named file-tokenizing) <br />
      * CR + LF is treated as LF. <br />
      * This method uses {@link java.io.InputStreamReader} and {@link java.io.BufferedReader} that wrap the stream.
      * And these objects are closed. (close() called finally)
@@ -412,7 +412,7 @@ public class FileToken {
     //                                                                         Make(Write)
     //                                                                         ===========
     /**
-     * Make token file from specified row resources.
+     * Make (write) token file from specified row resources.
      * @param filePath The path of token file to write. (NotNull)
      * @param callback The callback for file-making. (NotNull)
      * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
@@ -439,7 +439,7 @@ public class FileToken {
     }
 
     /**
-     * Make token-file from specified row resources. <br />
+     * Make (write) token-file from specified row resources. <br />
      * This method uses {@link java.io.OutputStreamWriter} and {@link java.io.BufferedWriter} that wrap the stream.
      * And these objects are closed. (close() called finally)
      * <pre>

@@ -60,6 +60,10 @@ public class ManualOrderBean implements HpCalculator {
     protected Object _elseAcceptedValue;
     protected Object _elseBoundValue;
 
+    // for DBMS that doesn't support binding there
+    protected boolean _suppressThenBinding;
+    protected boolean _suppressElseBinding;
+
     // ===================================================================================
     //                                                                           Case When
     //                                                                           =========
@@ -511,40 +515,70 @@ public class ManualOrderBean implements HpCalculator {
             return;
         }
         for (HpMobCaseWhenElement topElement : _caseWhenAcceptedList) {
-            final HpMobCaseWhenElement boundTopElement = doBind(handler, topElement);
+            final HpMobCaseWhenElement boundTopElement = doBindCaseWhen(handler, topElement);
             final List<HpMobCaseWhenElement> connectedList = topElement.getConnectedElementList();
             for (HpMobCaseWhenElement connectedElement : connectedList) {
-                final HpMobCaseWhenElement boundConnectedElement = doBind(handler, connectedElement);
+                final HpMobCaseWhenElement boundConnectedElement = doBindCaseWhen(handler, connectedElement);
                 boundTopElement.addConnectedElement(boundConnectedElement);
             }
             _caseWhenBoundList.add(boundTopElement);
         }
-        if (_elseAcceptedValue != null) {
-            _elseBoundValue = resolveBoundValue(handler, _elseAcceptedValue);
-        }
+        doBindElseEnd(handler);
     }
 
-    protected HpMobCaseWhenElement doBind(FreeParameterManualOrderThemeListHandler handler, HpMobCaseWhenElement element) {
+    protected HpMobCaseWhenElement doBindCaseWhen(FreeParameterManualOrderThemeListHandler handler,
+            HpMobCaseWhenElement element) {
         final ConditionKey conditionKey = element.getConditionKey();
-        final Object orderValue = resolveBoundValue(handler, element.getOrderValue());
+        final Object orderValue = resolveBoundValue(handler, element.getOrderValue(), false);
         final HpMobCaseWhenElement boundElement = createElement(conditionKey, orderValue);
         boundElement.setConnectionMode(element.getConnectionMode());
-        boundElement.setThenValue(resolveBoundValue(handler, element.getThenValue()));
+        boundElement.setThenValue(resolveBoundValue(handler, element.getThenValue(), _suppressThenBinding));
         return boundElement;
     }
 
-    protected Object resolveBoundValue(FreeParameterManualOrderThemeListHandler handler, Object plainValue) {
+    protected void doBindElseEnd(FreeParameterManualOrderThemeListHandler handler) {
+        if (_elseAcceptedValue != null) {
+            _elseBoundValue = resolveBoundValue(handler, _elseAcceptedValue, _suppressElseBinding);
+        }
+    }
+
+    protected Object resolveBoundValue(FreeParameterManualOrderThemeListHandler handler, Object plainValue,
+            boolean suppressBinding) {
         if (plainValue == null) {
             return null;
         }
         if (plainValue instanceof HpSpecifiedColumn) {
             return ((HpSpecifiedColumn) plainValue).toColumnRealName().toString();
         }
+        ClassificationCodeType codeType = null;
         if (plainValue instanceof Classification) {
             final Classification cls = (Classification) plainValue;
             plainValue = handleClassificationOrderValue(cls);
+            codeType = cls.meta().codeType();
         }
-        return handler.register(THEME_KEY, plainValue);
+        final Object boundExp;
+        if (suppressBinding) {
+            if (plainValue instanceof String) {
+                if (canBeLiteralClassificationCodeType(codeType)) {
+                    boundExp = plainValue;
+                } else {
+                    String notice = "The binding of string value is unsupported on the DBMS.";
+                    throwUnsupportedTypeSpecifiedException(notice, plainValue);
+                    boundExp = null; // unreachable
+                }
+            } else if (plainValue instanceof Number) {
+                boundExp = buildLiteralNumberExpression(plainValue);
+            } else if (plainValue instanceof Date) {
+                boundExp = buildLiteralDateExpression(plainValue);
+            } else {
+                String notice = "The binding of the type is unsupported on the DBMS.";
+                throwUnsupportedTypeSpecifiedException(notice, plainValue);
+                boundExp = null; // unreachable
+            }
+        } else {
+            boundExp = handler.register(THEME_KEY, plainValue);
+        }
+        return boundExp;
     }
 
     protected Object handleClassificationOrderValue(Classification cls) {
@@ -574,6 +608,32 @@ public class ManualOrderBean implements HpCalculator {
         return DfTypeUtil.toBoolean(plainCode);
     }
 
+    protected boolean canBeLiteralClassificationCodeType(ClassificationCodeType codeType) {
+        return codeType != null && codeType.equals(ClassificationCodeType.Number)
+                && codeType.equals(ClassificationCodeType.Boolean);
+    }
+
+    protected String buildLiteralNumberExpression(Object plainValue) {
+        return plainValue.toString();
+    }
+
+    protected String buildLiteralDateExpression(Object plainValue) {
+        return "'" + DfTypeUtil.toString(plainValue, "yyyy-MM-dd HH:mm:ss.SSS") + "'";
+    }
+
+    protected void throwUnsupportedTypeSpecifiedException(String notice, Object plainValue) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Advice");
+        br.addElement("The binding for the part, 'when' or 'then' or 'else',");
+        br.addElement("is unsupported with the value type.");
+        br.addItem("Specified Value");
+        br.addElement(plainValue.getClass());
+        br.addElement(plainValue);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
     /**
      * The handler of theme list of free parameter for manual order. 
      */
@@ -585,6 +645,16 @@ public class ManualOrderBean implements HpCalculator {
          * @return The bound expression for registered order value. (NotNull)
          */
         String register(String themeKey, Object orderValue);
+    }
+
+    public ManualOrderBean suppressThenBinding() {
+        _suppressThenBinding = true;
+        return this;
+    }
+
+    public ManualOrderBean suppressElseBinding() {
+        _suppressElseBinding = true;
+        return this;
     }
 
     // ===================================================================================

@@ -16,7 +16,6 @@
 package org.seasar.dbflute.helper.token.line;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.seasar.dbflute.util.Srl;
@@ -69,9 +68,8 @@ public class LineToken {
 
     protected String createLineString(List<String> valueList, String delimiter, boolean quoteAll,
             boolean quoteMinimamlly, boolean trimSpace) {
-        final StringBuffer sb = new StringBuffer();
-        for (final Iterator<String> ite = valueList.iterator(); ite.hasNext();) {
-            String value = (String) ite.next();
+        final StringBuilder sb = new StringBuilder();
+        for (String value : valueList) {
             value = (value != null ? value : "");
             if (trimSpace) {
                 value = value.trim();
