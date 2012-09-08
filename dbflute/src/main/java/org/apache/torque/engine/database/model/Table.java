@@ -63,8 +63,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
@@ -73,6 +71,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
@@ -2227,7 +2226,7 @@ public class Table {
             return null;
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
-        final DataSource ds = getDatabase().getDataSource();
+        final DfSchemaSource ds = getDatabase().getDataSource();
         BigDecimal value = prop.getSequenceMinimumValueByTableName(ds, getUnifiedSchema(), getName());
         if (value == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
@@ -2248,7 +2247,7 @@ public class Table {
             return null;
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
-        final DataSource ds = getDatabase().getDataSource();
+        final DfSchemaSource ds = getDatabase().getDataSource();
         BigDecimal value = prop.getSequenceMaximumValueByTableName(ds, getUnifiedSchema(), getName());
         if (value == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
@@ -2269,7 +2268,7 @@ public class Table {
             return null;
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
-        final DataSource ds = getDatabase().getDataSource();
+        final DfSchemaSource ds = getDatabase().getDataSource();
         Integer size = prop.getSequenceIncrementSizeByTableName(ds, getUnifiedSchema(), getName());
         if (size == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
@@ -2290,7 +2289,7 @@ public class Table {
             return null;
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
-        final DataSource ds = getDatabase().getDataSource();
+        final DfSchemaSource ds = getDatabase().getDataSource();
         return prop.getSequenceCacheSize(ds, getUnifiedSchema(), getName());
     }
 

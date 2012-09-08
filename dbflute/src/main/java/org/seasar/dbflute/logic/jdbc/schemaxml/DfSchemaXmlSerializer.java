@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
@@ -34,6 +32,7 @@ import org.seasar.dbflute.exception.DfTableDuplicateException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertSqlFire;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfAutoIncrementExtractor;
@@ -86,8 +85,7 @@ public class DfSchemaXmlSerializer {
     // -----------------------------------------------------
     //                                        Basic Resource
     //                                        --------------
-    protected final DataSource _dataSource;
-    protected final UnifiedSchema _mainSchema;
+    protected final DfSchemaSource _dataSource;
     protected final String _schemaXml;
     protected final String _historyFile; // NullAllowed
     protected final DfSchemaDiff _schemaDiff;
@@ -140,14 +138,11 @@ public class DfSchemaXmlSerializer {
     //                                                                         ===========
     /**
      * @param dataSource The data source of the database. (NotNull)
-     * @param mainSchema The main schema as unified schema. (NotNull)
      * @param schemaXml The XML file to output meta info of the schema. (NotNull)
      * @param historyFile The history file of schema-diff. (NullAllowed: if null, no action for schema-diff)
      */
-    protected DfSchemaXmlSerializer(DataSource dataSource, UnifiedSchema mainSchema, String schemaXml,
-            String historyFile) {
+    protected DfSchemaXmlSerializer(DfSchemaSource dataSource, String schemaXml, String historyFile) {
         _dataSource = dataSource;
-        _mainSchema = mainSchema;
         _schemaXml = schemaXml;
         _historyFile = historyFile;
         _schemaDiff = DfSchemaDiff.createAsFlexible(schemaXml);
@@ -165,19 +160,18 @@ public class DfSchemaXmlSerializer {
     /**
      * Create instance as core process. 
      * @param dataSource The data source of the database. (NotNull)
-     * @param mainSchema The main schema as unified schema. (NotNull)
      * @return The new instance. (NotNull)
      */
-    public static DfSchemaXmlSerializer createAsCore(DataSource dataSource, UnifiedSchema mainSchema) {
+    public static DfSchemaXmlSerializer createAsCore(DfSchemaSource dataSource) {
         final DfBuildProperties buildProp = DfBuildProperties.getInstance();
         final DfBasicProperties basicProp = buildProp.getBasicProperties();
         final DfSchemaXmlFacadeProp facadeProp = basicProp.getSchemaXmlFacadeProp();
         final String schemaXml = facadeProp.getProejctSchemaXMLFile();
         final String historyFile = facadeProp.getProjectSchemaHistoryFile();
-        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, mainSchema, schemaXml, historyFile);
+        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml, historyFile);
         final DfDocumentProperties docProp = buildProp.getDocumentProperties();
         final String craftMetaDir = docProp.getCoreCraftMetaDir();
-        serializer.enableCraftDiff(dataSource, mainSchema, craftMetaDir);
+        serializer.enableCraftDiff(dataSource, craftMetaDir);
         return serializer;
     }
 
@@ -185,20 +179,17 @@ public class DfSchemaXmlSerializer {
      * Create instance as manage process. <br />
      * CraftDiff settings are not set here. 
      * @param dataSource The data source of the database. (NotNull)
-     * @param mainSchema The main schema as unified schema. (NotNull)
      * @param schemaXml The XML file to output meta info of the schema. (NotNull)
      * @param historyFile The history file of schema-diff. (NullAllowed: if null, no action for schema-diff)
      * @return The new instance. (NotNull)
      */
-    public static DfSchemaXmlSerializer createAsManage(DataSource dataSource, UnifiedSchema mainSchema,
-            String schemaXml, String historyFile) {
-        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, mainSchema, schemaXml, historyFile);
+    public static DfSchemaXmlSerializer createAsManage(DfSchemaSource dataSource, String schemaXml, String historyFile) {
+        final DfSchemaXmlSerializer serializer = newSerializer(dataSource, schemaXml, historyFile);
         return serializer.suppressExceptTarget().suppressAdditionalSchema();
     }
 
-    protected static DfSchemaXmlSerializer newSerializer(DataSource dataSource, UnifiedSchema mainSchema,
-            String schemaXml, String historyFile) {
-        return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
+    protected static DfSchemaXmlSerializer newSerializer(DfSchemaSource dataSource, String schemaXml, String historyFile) {
+        return new DfSchemaXmlSerializer(dataSource, schemaXml, historyFile);
     }
 
     protected DfSchemaXmlSerializer suppressExceptTarget() {
@@ -218,9 +209,8 @@ public class DfSchemaXmlSerializer {
         return this;
     }
 
-    public static DfSchemaXmlSerializer createAsPlain(DataSource dataSource, UnifiedSchema mainSchema,
-            String schemaXml, String historyFile) {
-        return new DfSchemaXmlSerializer(dataSource, mainSchema, schemaXml, historyFile);
+    public static DfSchemaXmlSerializer createAsPlain(DfSchemaSource dataSource, String schemaXml, String historyFile) {
+        return new DfSchemaXmlSerializer(dataSource, schemaXml, historyFile);
     }
 
     // ===================================================================================
@@ -327,7 +317,7 @@ public class DfSchemaXmlSerializer {
 
         // Create database node. (The beginning of schema XML!)
         _databaseNode = _doc.createElement("database");
-        _databaseNode.setAttribute("name", _mainSchema.getPureSchema()); // as main schema
+        _databaseNode.setAttribute("name", _dataSource.getSchema().getPureSchema()); // as main schema
 
         processTable(conn, metaData, tableList);
         final boolean additionalTableExists = setupAddtionalTableIfNeeds();
@@ -582,7 +572,7 @@ public class DfSchemaXmlSerializer {
         br.addElement("You can create easily by using replace-schema.");
         br.addElement("Set up ./playsql/replace-schema.sql and execute ReplaceSchema task");
         br.addItem("Connected Schema");
-        br.addElement("schema = " + _mainSchema);
+        br.addElement("schema = " + _dataSource.getSchema());
         final String msg = br.buildExceptionMessage();
         throw new DfSchemaEmptyException(msg);
     }
@@ -615,7 +605,7 @@ public class DfSchemaXmlSerializer {
         return sequenceMap;
     }
 
-    protected DfSequenceExtractorFactory createSequenceExtractorFactory(DataSource dataSource) {
+    protected DfSequenceExtractorFactory createSequenceExtractorFactory(DfSchemaSource dataSource) {
         final DfDatabaseTypeFacadeProp facadeProp = getProperties().getBasicProperties().getDatabaseTypeFacadeProp();
         final DfDatabaseProperties databaseProp = getDatabaseProperties();
         final DfSequenceExtractorFactory factory = new DfSequenceExtractorFactory(dataSource, facadeProp, databaseProp);
@@ -761,8 +751,9 @@ public class DfSchemaXmlSerializer {
      * @throws SQLException
      */
     public List<DfTableMeta> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
-        final List<DfTableMeta> tableList = _tableExtractor.getTableList(dbMeta, _mainSchema);
-        helpTableComments(tableList, _mainSchema);
+        final UnifiedSchema mainSchema = _dataSource.getSchema();
+        final List<DfTableMeta> tableList = _tableExtractor.getTableList(dbMeta, mainSchema);
+        helpTableComments(tableList, mainSchema);
         resolveAdditionalSchema(dbMeta, tableList);
         assertDuplicateTable(tableList);
         return tableList;
@@ -1271,16 +1262,16 @@ public class DfSchemaXmlSerializer {
     // ===================================================================================
     //                                                                         Diff Option
     //                                                                         ===========
-    public void suppressUnifiedSchema() {
-        _schemaDiff.suppressUnifiedSchema();
+    public void suppressSchemaDiff() {
+        _schemaDiff.suppressSchema();
     }
 
-    public void enableCraftDiff(DataSource dataSource, UnifiedSchema mainSchema, String craftMetaDir) {
+    public void enableCraftDiff(DfSchemaSource dataSource, String craftMetaDir) {
         if (craftMetaDir == null) {
             return;
         }
         _craftDiffEnabled = true;
-        _craftDiffAssertSqlFire = new DfCraftDiffAssertSqlFire(dataSource, mainSchema, craftMetaDir);
+        _craftDiffAssertSqlFire = new DfCraftDiffAssertSqlFire(dataSource, craftMetaDir);
         _schemaDiff.enableCraftDiff(craftMetaDir);
     }
 

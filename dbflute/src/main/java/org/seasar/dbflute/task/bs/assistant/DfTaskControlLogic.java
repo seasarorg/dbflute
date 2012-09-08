@@ -18,8 +18,6 @@ package org.seasar.dbflute.task.bs.assistant;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
@@ -27,6 +25,7 @@ import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.generate.refresh.DfRefreshResourceProcess;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
@@ -114,14 +113,19 @@ public class DfTaskControlLogic {
         }
     }
 
-    public DataSource getDataSource() {
-        return DfDataSourceContext.getDataSource();
+    public DfSchemaSource getDataSource() {
+        return getSchemaSource();
+    }
+
+    protected DfSchemaSource getSchemaSource() {
+        final UnifiedSchema mainSchema = _databaseResource.getMainSchema();
+        return new DfSchemaSource(DfDataSourceContext.getDataSource(), mainSchema);
     }
 
     public void connectSchema() throws SQLException {
         final UnifiedSchema mainSchema = _databaseResource.getMainSchema();
         final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(mainSchema, getDatabaseTypeFacadeProp());
-        connector.connectSchema(getDataSource());
+        connector.connectSchema(getSchemaSource());
     }
 
     public DfConnectionMetaInfo getConnectionMetaInfo() {
@@ -248,12 +252,12 @@ public class DfTaskControlLogic {
     //                                                                 SQL File Collecting
     //                                                                 ===================
     /**
-     * Collect outside-SQL containing its file info as pack.
+     * Collect outside-SQL containing its file info as pack with directory check.
      * @return The pack object for outside-SQL files. (NotNull)
      */
-    public DfOutsideSqlPack collectOutsideSql() {
+    public DfOutsideSqlPack collectOutsideSqlChecked() {
         final DfOutsideSqlCollector sqlFileCollector = new DfOutsideSqlCollector();
-        return sqlFileCollector.collectOutsideSql();
+        return sqlFileCollector.collectOutsideSql(); // not suppress check
     }
 
     // ===================================================================================

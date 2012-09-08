@@ -419,7 +419,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (!isCheckCraftDiff()) {
             return null;
         }
-        return isCheckCraftDiff() ? CORE_CRAFT_META_DIR : null;
+        final String defaultDir = CORE_CRAFT_META_DIR;
+        final String property = getProperty("coreCraftMetaDirPath", defaultDir, getDocumentDefinitionMap());
+        return Srl.replace(property, "${defaultDir}", defaultDir);
     }
 
     protected String getCraftMetaFilePrefix() {
@@ -727,13 +729,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (!isCheckCraftDiff()) {
             return null;
         }
-        final Map<String, String> schemaSyncCheckMap = getSchemaSyncCheckMap();
-        final String craftMetaDirPath = schemaSyncCheckMap.get("craftMetaDirPath");
-        final String outputDirectory = getDocumentOutputDirectory();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(craftMetaDirPath)) {
-            return outputDirectory + "/" + craftMetaDirPath;
-        }
-        return outputDirectory + "/craftdiff";
+        final String defaultDir = getDocumentOutputDirectory() + "/craftdiff";
+        final String property = getProperty("craftMetaDirPath", defaultDir, getSchemaSyncCheckMap());
+        return Srl.replace(property, "${defaultDir}", defaultDir);
     }
 
     // ===================================================================================

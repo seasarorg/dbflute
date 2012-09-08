@@ -2,13 +2,13 @@ package org.seasar.dbflute.logic.jdbc.metadata.synonym.factory;
 
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractorOracle;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -16,7 +16,7 @@ import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
  */
 public class DfProcedureSynonymExtractorFactory {
 
-    protected final DataSource _dataSource;
+    protected final DfSchemaSource _dataSource;
     protected final DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected final DfDatabaseProperties _databaseProperties;
 
@@ -25,8 +25,8 @@ public class DfProcedureSynonymExtractorFactory {
      * @param databaseTypeFacadeProp The facade properties for database type. (NotNull)
      * @param databaseProperties The database properties. (NotNull)
      */
-    public DfProcedureSynonymExtractorFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
-            DfDatabaseProperties databaseProperties) {
+    public DfProcedureSynonymExtractorFactory(DfSchemaSource dataSource,
+            DfDatabaseTypeFacadeProp databaseTypeFacadeProp, DfDatabaseProperties databaseProperties) {
         _dataSource = dataSource;
         _databaseTypeFacadeProp = databaseTypeFacadeProp;
         _databaseProperties = databaseProperties;
@@ -46,6 +46,8 @@ public class DfProcedureSynonymExtractorFactory {
     }
 
     protected List<UnifiedSchema> createTargetSchemaList() { // not only main schema but also additional schemas
-        return _databaseProperties.getTargetSchemaList();
+        final List<UnifiedSchema> schemaList = DfCollectionUtil.newArrayList(_dataSource.getSchema());
+        schemaList.addAll(_databaseProperties.getAdditionalSchemaList());
+        return schemaList;
     }
 }

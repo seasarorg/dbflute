@@ -70,7 +70,7 @@ public class Procedure {
     //                                                                           Attribute
     //                                                                           =========
     protected Database _database;
-    protected String _name;
+    protected String _procedureName;
     protected UnifiedSchema _unifiedSchema;
     protected BigDecimal _sourceLine;
     protected BigDecimal _sourceSize;
@@ -84,9 +84,9 @@ public class Procedure {
     //                                         Load from XML
     //                                         -------------
     public boolean loadFromXML(Attributes attrib, XmlReadingFilter readingFilter) {
-        _name = attrib.getValue("name"); // procedure name
+        _procedureName = attrib.getValue("name"); // procedure name
         _unifiedSchema = UnifiedSchema.createAsDynamicSchema(attrib.getValue("schema"));
-        if (readingFilter != null && readingFilter.isProcedureExcept(_unifiedSchema, _name)) {
+        if (readingFilter != null && readingFilter.isProcedureExcept(_unifiedSchema, _procedureName)) {
             return false;
         }
         final String sourceLine = attrib.getValue("sourceLine");
@@ -111,8 +111,8 @@ public class Procedure {
     // ===================================================================================
     //                                                                    Derived Property
     //                                                                    ================
-    public String getFormalUniqueName() {
-        return _unifiedSchema.getCatalogSchema() + "." + _name;
+    public String getProcedureUniqueName() {
+        return _unifiedSchema.getCatalogSchema() + "." + _procedureName;
     }
 
     // ===================================================================================
@@ -120,7 +120,7 @@ public class Procedure {
     //                                                                      ==============
     @Override
     public String toString() {
-        return _unifiedSchema + "." + _name;
+        return _unifiedSchema + "." + _procedureName;
     }
 
     // ===================================================================================
@@ -135,11 +135,11 @@ public class Procedure {
     }
 
     public String getProcedureName() {
-        return _name;
+        return _procedureName;
     }
 
     public void setProcedureName(String procedureName) {
-        this._name = procedureName;
+        this._procedureName = procedureName;
     }
 
     public UnifiedSchema getUnifiedSchema() {

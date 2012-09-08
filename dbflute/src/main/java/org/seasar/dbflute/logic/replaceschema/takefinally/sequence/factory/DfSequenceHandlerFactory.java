@@ -2,9 +2,8 @@ package org.seasar.dbflute.logic.replaceschema.takefinally.sequence.factory;
 
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandler;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerDB2;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerH2;
@@ -12,17 +11,18 @@ import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHan
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandlerPostgreSQL;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  */
 public class DfSequenceHandlerFactory {
 
-    protected DataSource _dataSource;
+    protected DfSchemaSource _dataSource;
     protected DfDatabaseTypeFacadeProp _databaseTypeFacadeProp;
     protected DfDatabaseProperties _databaseProperties;
 
-    public DfSequenceHandlerFactory(DataSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
+    public DfSequenceHandlerFactory(DfSchemaSource dataSource, DfDatabaseTypeFacadeProp databaseTypeFacadeProp,
             DfDatabaseProperties databaseProperties) {
         _dataSource = dataSource;
         _databaseTypeFacadeProp = databaseTypeFacadeProp;
@@ -44,6 +44,8 @@ public class DfSequenceHandlerFactory {
     }
 
     protected List<UnifiedSchema> createTargetSchemaList() { // not only main schema but also additional schemas
-        return _databaseProperties.getTargetSchemaList();
+        final List<UnifiedSchema> schemaList = DfCollectionUtil.newArrayList(_dataSource.getSchema());
+        schemaList.addAll(_databaseProperties.getAdditionalSchemaList());
+        return schemaList;
     }
 }

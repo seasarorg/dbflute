@@ -64,7 +64,7 @@ elif [ "$FIRST_ARG" = "regenerate" ];then
 
 elif [ "$FIRST_ARG" = "refresh" ];then
 
-  if [ "$SECOND_ARG" = "" ];then
+  if [ "$2" = "" ];then
     echo \(input on your console\)
     echo What is refresh project? \(name\):
     read SECOND_ARG

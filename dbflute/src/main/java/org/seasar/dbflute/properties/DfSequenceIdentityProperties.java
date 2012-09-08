@@ -9,13 +9,12 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
@@ -218,7 +217,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //                                                            ========================
     protected Map<String, DfSequenceMeta> _sequenceMap;
 
-    public Map<String, DfSequenceMeta> getSequenceMap(DataSource dataSource) {
+    public Map<String, DfSequenceMeta> getSequenceMap(DfSchemaSource dataSource) {
         if (_sequenceMap != null) {
             return _sequenceMap;
         }
@@ -236,7 +235,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return _sequenceMap;
     }
 
-    protected DfSequenceExtractorFactory createSequenceExtractorFactory(DataSource dataSource) {
+    protected DfSequenceExtractorFactory createSequenceExtractorFactory(DfSchemaSource dataSource) {
         final DfDatabaseTypeFacadeProp facadeProp = getBasicProperties().getDatabaseTypeFacadeProp();
         return new DfSequenceExtractorFactory(dataSource, facadeProp, getDatabaseProperties());
     }
@@ -264,7 +263,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Minimum Value
     //                                         -------------
-    public BigDecimal getSequenceMinimumValueByTableName(DataSource dataSource, UnifiedSchema unifiedSchema,
+    public BigDecimal getSequenceMinimumValueByTableName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
             String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
@@ -273,7 +272,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return getSequenceMinimumValueBySequenceName(dataSource, unifiedSchema, sequenceName);
     }
 
-    public BigDecimal getSequenceMinimumValueBySequenceName(DataSource dataSource, UnifiedSchema unifiedSchema,
+    public BigDecimal getSequenceMinimumValueBySequenceName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
             String sequenceName) {
         final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         return getSequenceMinimumValue(unifiedSchema, sequenceName, sequenceMap);
@@ -297,7 +296,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Maximum Value
     //                                         -------------
-    public BigDecimal getSequenceMaximumValueByTableName(DataSource dataSource, UnifiedSchema unifiedSchema,
+    public BigDecimal getSequenceMaximumValueByTableName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
             String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
@@ -306,7 +305,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return getSequenceMaximumValueBySequenceName(dataSource, unifiedSchema, sequenceName);
     }
 
-    public BigDecimal getSequenceMaximumValueBySequenceName(DataSource dataSource, UnifiedSchema unifiedSchema,
+    public BigDecimal getSequenceMaximumValueBySequenceName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
             String sequenceName) {
         final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         return getSequenceMaximumValue(unifiedSchema, sequenceName, sequenceMap);
@@ -330,7 +329,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                        Increment Size
     //                                        --------------
-    public Integer getSequenceIncrementSizeByTableName(DataSource dataSource, UnifiedSchema unifiedSchema,
+    public Integer getSequenceIncrementSizeByTableName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
             String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
@@ -339,7 +338,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return getSequenceIncrementSizeBySequenceName(dataSource, unifiedSchema, sequenceName);
     }
 
-    public Integer getSequenceIncrementSizeBySequenceName(DataSource dataSource, UnifiedSchema unifiedSchema,
+    public Integer getSequenceIncrementSizeBySequenceName(DfSchemaSource dataSource, UnifiedSchema unifiedSchema,
             String sequenceName) {
         final Map<String, DfSequenceMeta> sequenceMap = getSequenceMap(dataSource);
         return getSequenceIncrementSize(unifiedSchema, sequenceName, sequenceMap);
@@ -363,7 +362,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                  (DBFlute) Cache Size
     //                                  --------------------
-    public Integer getSequenceCacheSize(DataSource dataSource, UnifiedSchema unifiedSchema, String tableName) {
+    public Integer getSequenceCacheSize(DfSchemaSource dataSource, UnifiedSchema unifiedSchema, String tableName) {
         final String sequenceProp = getSequenceProp(tableName);
         if (sequenceProp == null) {
             return null;

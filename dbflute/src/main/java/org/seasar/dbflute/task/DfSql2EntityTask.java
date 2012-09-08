@@ -213,7 +213,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                   Executing Element
     //                                                                   =================
     protected DfOutsideSqlPack getTargetSqlFileList() {
-        final DfOutsideSqlPack sqlFileList = collectOutsideSql();
+        final DfOutsideSqlPack sqlFileList = collectOutsideSqlChecked();
         final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
         if (specifiedSqlFile != null) {
             final DfOutsideSqlPack filteredList = new DfOutsideSqlPack();
@@ -296,7 +296,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                 Behavior Query Path
     //                                                                 ===================
     protected void setupBehaviorQueryPath() {
-        final DfOutsideSqlPack sqlFileList = collectOutsideSql();
+        final DfOutsideSqlPack sqlFileList = collectOutsideSqlChecked();
         final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper();
         setupper.setupBehaviorQueryPath(sqlFileList);
     }

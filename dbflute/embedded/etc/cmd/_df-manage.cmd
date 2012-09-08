@@ -3,6 +3,7 @@ setlocal
 set NATIVE_PROPERTIES_PATH=%1
 set FIRST_ARG=%2
 set SECOND_ARG=%3
+set PURE_FIRST_ARG=%2
 
 :: The code for compatibility
 if "%FIRST_ARG%"=="""" (
@@ -11,6 +12,10 @@ if "%FIRST_ARG%"=="""" (
 :: The code for compatibility
 if "%SECOND_ARG%"=="""" (
   set SECOND_ARG=
+)
+:: The code for compatibility
+if "%PURE_FIRST_ARG%"=="""" (
+  set PURE_FIRST_ARG=
 )
 
 if "%FIRST_ARG%"=="" (
@@ -69,9 +74,9 @@ if "%FIRST_ARG%"=="renewal" (
 
 ) else if "%FIRST_ARG%"=="refresh" (
 
-  if "%SECOND_ARG%"=="" echo (input on your console^)
-  if "%SECOND_ARG%"=="" echo What is refresh project? (name^):
-  if "%SECOND_ARG%"=="" set /p SECOND_ARG=
+  if "%PURE_FIRST_ARG%"=="" echo (input on your console^)
+  if "%PURE_FIRST_ARG%"=="" echo What is refresh project? (name^):
+  if "%PURE_FIRST_ARG%"=="" set /p SECOND_ARG=
 
   echo /nnnnnnnnnnnnnnnnnnnnnnnnnn
   echo ...Calling the Refresh task

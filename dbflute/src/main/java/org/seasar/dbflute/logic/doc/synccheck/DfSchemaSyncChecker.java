@@ -1,6 +1,7 @@
 package org.seasar.dbflute.logic.doc.synccheck;
 
 import java.io.File;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -12,6 +13,7 @@ import org.seasar.dbflute.exception.DfSchemaSyncCheckTragedyResultException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSource;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -33,13 +35,13 @@ public class DfSchemaSyncChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DataSource _mainDs;
+    protected final DfSchemaSource _mainSource;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSchemaSyncChecker(DataSource mainDs) {
-        _mainDs = mainDs;
+    public DfSchemaSyncChecker(DfSchemaSource mainSource) {
+        _mainSource = mainSource;
     }
 
     // ===================================================================================
@@ -48,7 +50,13 @@ public class DfSchemaSyncChecker {
     public void checkSync() {
         clearOutputResource();
         final DfSchemaXmlSerializer serializer = diffSchema();
-        _log.info("...Checking the schema synchronized");
+
+        _log.info("");
+        _log.info("* * * * * * * * * * * * * * * * *");
+        _log.info("*                               *");
+        _log.info("*   Check Schema Synchronized   *");
+        _log.info("*                               *");
+        _log.info("* * * * * * * * * * * * * * * * *");
         final DfSchemaDiff schemaDiff = serializer.getSchemaDiff();
         if (schemaDiff.hasDiff()) {
             _log.info(" -> the schema has differences");
@@ -72,26 +80,46 @@ public class DfSchemaSyncChecker {
         if (resultFile.exists()) {
             resultFile.delete();
         }
+        final String craftMetaDir = getSchemaSyncCheckCraftMetaDir();
+        if (craftMetaDir != null) {
+            final List<File> metaFileList = getCraftMetaFileList(craftMetaDir);
+            for (File metaFile : metaFileList) {
+                metaFile.delete();
+            }
+        }
     }
 
     protected DfSchemaXmlSerializer diffSchema() {
-        serializeTargetSchema(); // previous
-        return serializeMainSchema(); // next
-    }
+        _log.info("");
+        _log.info("* * * * * * * * * * * * * * * * *");
+        _log.info("*                               *");
+        _log.info("*    Target Schema (previous)   *");
+        _log.info("*                               *");
+        _log.info("* * * * * * * * * * * * * * * * *");
+        serializeTargetSchema();
 
-    protected DfSchemaXmlSerializer serializeMainSchema() {
-        final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
-        mainSerializer.suppressUnifiedSchema(); // because of comparison with other schema
-        mainSerializer.serialize();
-        return mainSerializer;
+        _log.info("");
+        _log.info("* * * * * * * * * * * * * * * * *");
+        _log.info("*                               *");
+        _log.info("*       Main Schema (next)      *");
+        _log.info("*                               *");
+        _log.info("* * * * * * * * * * * * * * * * *");
+        return serializeMainSchema();
     }
 
     protected DfSchemaXmlSerializer serializeTargetSchema() {
         final DataSource targetDs = prepareTargetDataSource();
         final DfSchemaXmlSerializer targetSerializer = createTargetSerializer(targetDs);
-        targetSerializer.suppressUnifiedSchema(); // same reason as main schema
+        targetSerializer.suppressSchemaDiff(); // same reason as main schema
         targetSerializer.serialize();
         return targetSerializer;
+    }
+
+    protected DfSchemaXmlSerializer serializeMainSchema() {
+        final DfSchemaXmlSerializer mainSerializer = createMainSerializer();
+        mainSerializer.suppressSchemaDiff(); // because of comparison with other schema
+        mainSerializer.serialize();
+        return mainSerializer;
     }
 
     protected DataSource prepareTargetDataSource() {
@@ -129,20 +157,23 @@ public class DfSchemaSyncChecker {
     // ===================================================================================
     //                                                                          Serializer
     //                                                                          ==========
-    protected DfSchemaXmlSerializer createMainSerializer() {
-        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return doCreateSerializer(_mainDs, mainSchema);
-    }
-
     protected DfSchemaXmlSerializer createTargetSerializer(DataSource targetDs) {
         final UnifiedSchema targetSchema = getDocumentProperties().getSchemaSyncCheckDatabaseSchema();
-        return doCreateSerializer(targetDs, targetSchema);
+        _log.info("schema: " + targetSchema);
+        return doCreateSerializer(new DfSchemaSource(targetDs, targetSchema));
     }
 
-    protected DfSchemaXmlSerializer doCreateSerializer(DataSource dataSource, UnifiedSchema unifiedSchema) {
-        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, unifiedSchema,
-                getSchemaXml(), getDiffMapFile());
-        serializer.enableCraftDiff(dataSource, unifiedSchema, getSchemaSyncCheckCraftMetaDir());
+    protected DfSchemaXmlSerializer createMainSerializer() {
+        _log.info("schema: " + _mainSource.getSchema());
+        return doCreateSerializer(_mainSource);
+    }
+
+    protected DfSchemaXmlSerializer doCreateSerializer(DfSchemaSource dataSource) {
+        final String historyFile = getDiffMapFile();
+        final String schemaXml = getSchemaXml();
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(dataSource, schemaXml,
+                historyFile);
+        serializer.enableCraftDiff(dataSource, getSchemaSyncCheckCraftMetaDir());
         return serializer;
     }
 
@@ -175,5 +206,9 @@ public class DfSchemaSyncChecker {
 
     protected String getSchemaSyncCheckCraftMetaDir() {
         return getDocumentProperties().getSchemaSyncCheckCraftMetaDir();
+    }
+
+    protected List<File> getCraftMetaFileList(String craftMetaDir) {
+        return getDocumentProperties().getCraftMetaFileList(craftMetaDir);
     }
 }

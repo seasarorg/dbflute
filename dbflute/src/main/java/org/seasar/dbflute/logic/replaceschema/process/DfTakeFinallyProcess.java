@@ -31,6 +31,7 @@ import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.DfTakeFinallyNonAssertionSqlFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
@@ -43,8 +44,10 @@ import org.seasar.dbflute.logic.replaceschema.dataassert.DfDataAssertProvider;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfTakeFinallyFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.DfSequenceHandler;
 import org.seasar.dbflute.logic.replaceschema.takefinally.sequence.factory.DfSequenceHandlerFactory;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -68,8 +71,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     //                                        Basic Resource
     //                                        --------------
     protected final String _sqlRootDir;
-    protected final DataSource _dataSource;
-    protected final UnifiedSchema _mainSchema;
+    protected final DfSchemaSource _dataSource;
     protected final DfTakeFinallySqlFileProvider _sqlFileProvider; // NullAllowed: if null, use default
 
     // -----------------------------------------------------
@@ -93,8 +95,7 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
     protected DfTakeFinallyProcess(String sqlRootDir, DataSource dataSource, UnifiedSchema mainSchema,
             DfTakeFinallySqlFileProvider sqlFileProvider) {
         _sqlRootDir = sqlRootDir;
-        _dataSource = dataSource;
-        _mainSchema = mainSchema;
+        _dataSource = new DfSchemaSource(dataSource, mainSchema);
         _sqlFileProvider = sqlFileProvider;
     }
 
@@ -343,11 +344,12 @@ public class DfTakeFinallyProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("* * * * * * * * * * **");
         final DfSequenceIdentityProperties sequenceProp = getProperties().getSequenceIdentityProperties();
         final Map<String, String> tableSequenceMap = sequenceProp.getTableSequenceMap();
-        final DfSequenceHandlerFactory factory = new DfSequenceHandlerFactory(_dataSource, getDatabaseTypeFacadeProp(),
-                getDatabaseProperties());
+        final DfDatabaseTypeFacadeProp dbTypeProp = getDatabaseTypeFacadeProp();
+        final DfDatabaseProperties databaseProp = getDatabaseProperties();
+        final DfSequenceHandlerFactory factory = new DfSequenceHandlerFactory(_dataSource, dbTypeProp, databaseProp);
         final DfSequenceHandler sequenceHandler = factory.createSequenceHandler();
         if (sequenceHandler == null) {
-            String databaseType = getDatabaseTypeFacadeProp().getTargetDatabase();
+            String databaseType = dbTypeProp.getTargetDatabase();
             String msg = "Unsupported isIncrementSequenceToDataMax at " + databaseType;
             throw new UnsupportedOperationException(msg);
         }

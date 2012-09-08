@@ -203,7 +203,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     //                                                                 Behavior Query Path
     //                                                                 ===================
     protected void setupBehaviorQueryPath() {
-        final DfOutsideSqlPack outsideSqlPack = collectOutsideSql();
+        final DfOutsideSqlPack outsideSqlPack = collectOutsideSqlChecked();
         final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper();
         setupper.setupBehaviorQueryPath(outsideSqlPack);
     }

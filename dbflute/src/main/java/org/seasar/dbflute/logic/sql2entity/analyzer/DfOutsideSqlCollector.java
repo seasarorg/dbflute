@@ -27,7 +27,6 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.task.DfSql2EntityTask;
 
 /**
  * @author jflute
@@ -39,7 +38,7 @@ public class DfOutsideSqlCollector {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
+    private static final Log _log = LogFactory.getLog(DfOutsideSqlCollector.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -64,8 +63,7 @@ public class DfOutsideSqlCollector {
         final List<DfOutsideSqlLocation> sqlDirectoryList = getSqlDirectoryList();
         for (DfOutsideSqlLocation sqlLocation : sqlDirectoryList) {
             final String sqlDirectory = sqlLocation.getSqlDirectory();
-            final File dir = new File(sqlDirectory);
-            if (dir.exists()) {
+            if (existsSqlDir(sqlDirectory)) {
                 outsideSqlPack.addAll(collectSqlFile(sqlDirectory, sqlLocation));
                 final String srcMainResources = replaceSrcMainJavaToSrcMainResources(sqlDirectory);
                 if (!sqlDirectory.equals(srcMainResources)) {
@@ -79,11 +77,18 @@ public class DfOutsideSqlCollector {
                 if (containsSrcMainJava(sqlDirectory)) {
                     final String srcMainResources = replaceSrcMainJavaToSrcMainResources(sqlDirectory);
                     if (!sqlDirectory.equals(srcMainResources)) {
-                        outsideSqlPack.addAll(collectSqlFile(srcMainResources, sqlLocation));
+                        if (existsSqlDir(srcMainResources)) {
+                            outsideSqlPack.addAll(collectSqlFile(srcMainResources, sqlLocation));
+                        } else {
+                            if (!_suppressDirectoryCheck) {
+                                String msg = "The sqlDirectory does not exist: " + srcMainResources;
+                                throw new IllegalStateException(msg);
+                            }
+                        }
                     }
                 } else {
                     if (!_suppressDirectoryCheck) {
-                        String msg = "The sqlDirectory does not exist: " + dir;
+                        String msg = "The sqlDirectory does not exist: " + sqlDirectory;
                         throw new IllegalStateException(msg);
                     }
                 }
@@ -95,6 +100,10 @@ public class DfOutsideSqlCollector {
     protected List<DfOutsideSqlLocation> getSqlDirectoryList() {
         final DfOutsideSqlProperties prop = getOutsideSqlProperties();
         return prop.getSqlLocationList();
+    }
+
+    protected boolean existsSqlDir(String sqlDirPath) {
+        return new File(sqlDirPath).exists();
     }
 
     protected List<DfOutsideSqlFile> collectSqlFile(String realSqlDirectory, DfOutsideSqlLocation sqlLocation) {

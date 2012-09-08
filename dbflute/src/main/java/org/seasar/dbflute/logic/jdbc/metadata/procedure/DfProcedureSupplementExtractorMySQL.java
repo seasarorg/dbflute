@@ -19,10 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 
 /**
@@ -34,7 +33,7 @@ public class DfProcedureSupplementExtractorMySQL extends DfProcedureSupplementEx
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfProcedureSupplementExtractorMySQL(DataSource dataSource) {
+    public DfProcedureSupplementExtractorMySQL(DfSchemaSource dataSource) {
         super(dataSource);
     }
 

@@ -20,13 +20,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import javax.sql.DataSource;
-
-import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCraftDiffNonAssertionSqlFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
@@ -48,16 +46,14 @@ public class DfCraftDiffAssertSqlFire {
     // -----------------------------------------------------
     //                                        Basic Resource
     //                                        --------------
-    protected final DataSource _dataSource;
-    protected final UnifiedSchema _unifiedSchema;
+    protected final DfSchemaSource _dataSource;
     protected final String _craftMetaDir;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCraftDiffAssertSqlFire(DataSource dataSource, UnifiedSchema unifiedSchema, String craftMetaDir) {
+    public DfCraftDiffAssertSqlFire(DfSchemaSource dataSource, String craftMetaDir) {
         _dataSource = dataSource;
-        _unifiedSchema = unifiedSchema;
         _craftMetaDir = craftMetaDir;
     }
 

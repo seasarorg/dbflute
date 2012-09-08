@@ -46,6 +46,7 @@ import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.DfDBFluteTaskUtil;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -193,7 +194,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         _controlLogic.destroyDataSource();
     }
 
-    protected DataSource getDataSource() {
+    protected DfSchemaSource getDataSource() {
         return _controlLogic.getDataSource();
     }
 
@@ -225,11 +226,11 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                 SQL File Collecting
     //                                                                 ===================
     /**
-     * Collect outside-SQL containing its file info as pack.
+     * Collect outside-SQL containing its file info as pack with directory check.
      * @return The pack object for outside-SQL files. (NotNull)
      */
-    protected DfOutsideSqlPack collectOutsideSql() {
-        return _controlLogic.collectOutsideSql();
+    protected DfOutsideSqlPack collectOutsideSqlChecked() {
+        return _controlLogic.collectOutsideSqlChecked();
     }
 
     // ===================================================================================

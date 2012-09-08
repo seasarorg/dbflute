@@ -10,6 +10,7 @@ import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
@@ -113,16 +114,20 @@ public class DfAbstractReplaceSchemaProcess {
         return getProperties().getBasicProperties();
     }
 
+    protected static DfDatabaseProperties getDatabaseProperties() {
+        return getProperties().getDatabaseProperties();
+    }
+
     protected static DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
         return getBasicProperties().getDatabaseTypeFacadeProp();
     }
 
-    protected static DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
-        return getBasicProperties().getLanguageTypeFacadeProp();
+    protected static DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
     }
 
-    protected static DfDatabaseProperties getDatabaseProperties() {
-        return getProperties().getDatabaseProperties();
+    protected static DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
+        return getBasicProperties().getLanguageTypeFacadeProp();
     }
 
     // ===================================================================================

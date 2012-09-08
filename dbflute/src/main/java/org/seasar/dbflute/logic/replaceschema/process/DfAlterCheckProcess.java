@@ -17,12 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
-import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.seasar.dbflute.exception.DfAlterCheckAlterSqlNotFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
@@ -35,6 +32,7 @@ import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.io.compress.DfZipArchiver;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireResult;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
@@ -76,8 +74,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                        Basic Resource
     //                                        --------------
-    protected final DataSource _dataSource;
-    protected final UnifiedSchema _mainSchema;
+    protected final DfSchemaSource _dataSource;
     protected final CoreProcessPlayer _coreProcessPlayer;
 
     // -----------------------------------------------------
@@ -88,17 +85,21 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
-    protected boolean _useDraftSpace;
+    protected boolean _useDraftSpace; // old style so basically unused
+
+    // -----------------------------------------------------
+    //                                                Status
+    //                                                ------
+    protected boolean _createdEmptyAlterSqlFile;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DfAlterCheckProcess(DataSource dataSource, UnifiedSchema mainSchema, CoreProcessPlayer coreProcessPlayer) {
+    protected DfAlterCheckProcess(DfSchemaSource dataSource, CoreProcessPlayer coreProcessPlayer) {
         if (dataSource == null) { // for example, ReplaceSchema may have lazy connection
             throwAlterCheckDataSourceNotFoundException();
         }
         _dataSource = dataSource;
-        _mainSchema = mainSchema;
         _coreProcessPlayer = coreProcessPlayer;
     }
 
@@ -112,9 +113,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         throw new DfAlterCheckDataSourceNotFoundException(msg);
     }
 
-    public static DfAlterCheckProcess createAsMain(DataSource dataSource, CoreProcessPlayer coreProcessPlayer) {
-        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        return new DfAlterCheckProcess(dataSource, mainSchema, coreProcessPlayer);
+    public static DfAlterCheckProcess createAsMain(DfSchemaSource dataSource, CoreProcessPlayer coreProcessPlayer) {
+        return new DfAlterCheckProcess(dataSource, coreProcessPlayer);
     }
 
     public static interface CoreProcessPlayer {
@@ -132,7 +132,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     public DfAlterCheckFinalInfo checkAlter() {
         deleteAllNGMark();
-        deleteSchemaXml(); // if remains
+        deleteSchemaResource(); // if remains
 
         final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
 
@@ -162,7 +162,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         }
 
         deleteSubmittedDraftFile(finalInfo);
-        deleteSchemaXml(); // not finally because of trace when abort
+        deleteSchemaResource(); // not finally because of trace when abort
         return finalInfo;
     }
 
@@ -606,7 +606,12 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             restoreLatestCheckedAlterSql();
             alterSqlFileList = getMigrationAlterSqlFileList();
             if (alterSqlFileList.isEmpty()) {
-                throwAlterCheckAlterSqlNotFoundException();
+                createEmptyAlterSqlFileIfNotExists();
+                _createdEmptyAlterSqlFile = true;
+                alterSqlFileList = getMigrationAlterSqlFileList();
+                if (alterSqlFileList.isEmpty()) { // no way
+                    throwAlterCheckAlterSqlNotFoundException();
+                }
             }
         }
         final DfRunnerInformation runInfo = createRunnerInformation();
@@ -620,6 +625,27 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         } catch (DfTakeFinallyAssertionFailureException e) {
             handleTakeFinallyAssertionFailureException(finalInfo, e);
         }
+    }
+
+    protected File createEmptyAlterSqlFileIfNotExists() {
+        final String alterDirPath = getMigrationAlterDirectory();
+        {
+            final File alterDir = new File(alterDirPath);
+            if (!alterDir.exists()) {
+                alterDir.mkdirs();
+            }
+        }
+        final File alterSqlFile = getMigrationSimpleAlterSqlFile();
+        if (!alterSqlFile.exists()) {
+            try {
+                _log.info("...Creating the alter SQL file as empty to " + resolvePath(alterSqlFile));
+                alterSqlFile.createNewFile();
+            } catch (IOException e) {
+                String msg = "Failed to create new file: " + alterSqlFile;
+                throw new IllegalStateException(msg);
+            }
+        }
+        return alterSqlFile;
     }
 
     protected void throwAlterCheckAlterSqlNotFoundException() {
@@ -807,10 +833,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml) {
         final String historyFile = null; // no use history here (use SchemaDiff directly later)
-        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, _mainSchema,
-                schemaXml, historyFile);
+        final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml,
+                historyFile);
         final String craftMetaDir = getMigrationAlterCheckCraftMetaDir();
-        serializer.enableCraftDiff(_dataSource, _mainSchema, craftMetaDir);
+        serializer.enableCraftDiff(_dataSource, craftMetaDir);
         return serializer;
     }
 
@@ -915,9 +941,16 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("|   Success Story   |");
         _log.info("|                   |");
         _log.info("+-------------------+");
+        checkEmptyAlterSuccess();
         saveHistory(finalInfo);
         deleteAllNGMark();
         deleteDiffResult();
+    }
+
+    protected void checkEmptyAlterSuccess() {
+        if (_createdEmptyAlterSqlFile) {
+            throwAlterCheckAlterSqlNotFoundException();
+        }
     }
 
     protected void saveHistory(DfAlterCheckFinalInfo finalInfo) {
@@ -1129,15 +1162,18 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                             Closing
     //                                                                             =======
-    protected void processClosing() {
-        deleteSchemaXml();
-    }
-
-    protected void deleteSchemaXml() {
+    protected void deleteSchemaResource() {
         final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
         final String nextXml = getMigrationAlterCheckNextSchemaXml();
         deleteFile(new File(previousXml), "...Deleting the SchemaXml file for previous schema");
         deleteFile(new File(nextXml), "...Deleting the SchemaXml file for next schema");
+        final String craftMetaDir = getMigrationAlterCheckCraftMetaDir();
+        if (craftMetaDir != null) {
+            final List<File> metaFileList = getCraftMetaFileList(craftMetaDir);
+            for (File metaFile : metaFileList) {
+                deleteFile(metaFile, "...Deleting the craft meta");
+            }
+        }
     }
 
     // ===================================================================================
@@ -1259,6 +1295,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return getReplaceSchemaProperties().getMigrationAlterSqlFileList();
     }
 
+    protected File getMigrationSimpleAlterSqlFile() {
+        return getReplaceSchemaProperties().getMigrationSimpleAlterSqlFile();
+    }
+
     protected List<File> getMigrationDraftAlterSqlFileList() {
         return getReplaceSchemaProperties().getMigrationDraftAlterSqlFileList();
     }
@@ -1314,6 +1354,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected String getMigrationAlterCheckCraftMetaDir() {
         return getReplaceSchemaProperties().getMigrationAlterCheckCraftMetaDir();
+    }
+
+    protected List<File> getCraftMetaFileList(String craftMetaDir) {
+        return getDocumentProperties().getCraftMetaFileList(craftMetaDir);
     }
 
     // -----------------------------------------------------

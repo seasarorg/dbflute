@@ -809,6 +809,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return !getMigrationAlterSqlFileList().isEmpty();
     }
 
+    public File getMigrationSimpleAlterSqlFile() {
+        final String alterDirPath = getMigrationAlterDirectory();
+        final String sqlTitle = getMigrationAlterSchemaSqlTitle();
+        return new File(alterDirPath + "/" + sqlTitle + ".sql");
+    }
+
     // -----------------------------------------------------
     //                                     Alter TakeFinally
     //                                     -----------------

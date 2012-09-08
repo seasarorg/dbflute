@@ -67,8 +67,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
@@ -81,6 +79,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.seasar.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
@@ -150,7 +149,8 @@ public class Database {
     //                                              --------
     // same reason as table's reason
     protected final List<Sequence> _sequenceList = new ArrayList<Sequence>(100);
-    protected final StringKeyMap<Sequence> _sequenceMap = StringKeyMap.createAsFlexible(); // for key-map
+    protected final StringKeyMap<Sequence> _sequencePureNameMap = StringKeyMap.createAsFlexible(); // for key-map
+    protected final StringKeyMap<Sequence> _sequenceUniqueNameMap = StringKeyMap.createAsFlexible(); // for key-map
     protected boolean _sequenceGroupMarked;
 
     // -----------------------------------------------------
@@ -158,7 +158,8 @@ public class Database {
     //                                             ---------
     // same reason as table's reason
     protected final List<Procedure> _procedureList = new ArrayList<Procedure>(100);
-    protected final StringKeyMap<Procedure> _procedureMap = StringKeyMap.createAsFlexible(); // for key-map
+    protected final StringKeyMap<Procedure> _procedurePureNameMap = StringKeyMap.createAsFlexible(); // for key-map
+    protected final StringKeyMap<Procedure> _procedureUniqueNameMap = StringKeyMap.createAsFlexible(); // for key-map
     protected boolean _procedureGroupMarked;
 
     // -----------------------------------------------------
@@ -359,8 +360,12 @@ public class Database {
         return _sequenceList;
     }
 
-    public Sequence getSequence(String sequenceUniqueName) {
-        return _sequenceMap.get(sequenceUniqueName);
+    public Sequence getSequenceByPureName(Sequence sequence) {
+        return _sequencePureNameMap.get(sequence.getSequenceName());
+    }
+
+    public Sequence getSequenceByUniqueName(Sequence sequence) {
+        return _sequenceUniqueNameMap.get(sequence.getFormalUniqueName());
     }
 
     public Sequence addSequence(Attributes attrib, XmlReadingFilter readingFilter) {
@@ -376,7 +381,8 @@ public class Database {
     public void addSequence(Sequence seq) {
         seq.setDatabase(this);
         _sequenceList.add(seq);
-        _sequenceMap.put(seq.getFormalUniqueName(), seq);
+        _sequencePureNameMap.put(seq.getSequenceName(), seq);
+        _sequenceUniqueNameMap.put(seq.getFormalUniqueName(), seq);
     }
 
     // ===================================================================================
@@ -513,8 +519,12 @@ public class Database {
         return _procedureList;
     }
 
-    public Procedure getProcedure(String procedureUniqueName) {
-        return _procedureMap.get(procedureUniqueName);
+    public Procedure getProcedureByPureName(Procedure procedure) {
+        return _procedurePureNameMap.get(procedure.getProcedureName());
+    }
+
+    public Procedure getProcedureByUniqueName(Procedure procedure) {
+        return _procedureUniqueNameMap.get(procedure.getProcedureUniqueName());
     }
 
     public Procedure addProcedure(Attributes attrib, XmlReadingFilter readingFilter) {
@@ -530,7 +540,8 @@ public class Database {
     public void addProcedure(Procedure procedure) {
         procedure.setDatabase(this);
         _procedureList.add(procedure);
-        _procedureMap.put(procedure.getFormalUniqueName(), procedure);
+        _procedurePureNameMap.put(procedure.getProcedureName(), procedure);
+        _procedureUniqueNameMap.put(procedure.getProcedureUniqueName(), procedure);
     }
 
     public boolean isPmbMetaDataForProcedure(String className) {
@@ -2484,9 +2495,9 @@ public class Database {
         _log.info(" ");
         _log.info("...Setting up procedures for documents");
         final DfProcedureExtractor handler = new DfProcedureExtractor();
-        handler.includeProcedureSynonym(getDataSource());
-        handler.includeProcedureToDBLink(getDataSource());
-        final DataSource dataSource = getDataSource();
+        final DfSchemaSource dataSource = getDataSource();
+        handler.includeProcedureSynonym(dataSource);
+        handler.includeProcedureToDBLink(dataSource);
         _procedureMetaInfoList = handler.getAvailableProcedureList(dataSource);
         return _procedureMetaInfoList;
     }
@@ -2494,8 +2505,9 @@ public class Database {
     // ===================================================================================
     //                                                                          DataSource
     //                                                                          ==========
-    protected DataSource getDataSource() {
-        return DfDataSourceContext.getDataSource();
+    protected DfSchemaSource getDataSource() {
+        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+        return new DfSchemaSource(DfDataSourceContext.getDataSource(), mainSchema);
     }
 
     // ===================================================================================

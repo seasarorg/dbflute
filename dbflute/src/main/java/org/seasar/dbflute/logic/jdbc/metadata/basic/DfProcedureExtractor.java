@@ -40,6 +40,7 @@ import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfProcedureListGettingFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
@@ -83,8 +84,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     protected boolean _suppressFilterByProperty;
     protected boolean _suppressGenerationRestriction;
     protected boolean _suppressLogging;
-    protected DataSource _procedureSynonymDataSource;
-    protected DataSource _procedureToDBLinkDataSource;
+    protected DfSchemaSource _procedureSynonymDataSource;
+    protected DfSchemaSource _procedureToDBLinkDataSource;
 
     // key is data source because it may be schema diff
     protected final Map<Integer, Map<String, DfProcedureSupplementExtractor>> _supplementExtractorMap = newHashMap();
@@ -101,7 +102,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The list of available procedure meta informations. (NotNull)
      * @throws SQLException
      */
-    public List<DfProcedureMeta> getAvailableProcedureList(DataSource dataSource) throws SQLException {
+    public List<DfProcedureMeta> getAvailableProcedureList(DfSchemaSource dataSource) throws SQLException {
         return new ArrayList<DfProcedureMeta>(getAvailableProcedureMap(dataSource).values());
     }
 
@@ -112,7 +113,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
      * @return The map of available procedure meta informations. The key is full-qualified name. (NotNull)
      * @throws SQLException
      */
-    public Map<String, DfProcedureMeta> getAvailableProcedureMap(DataSource dataSource) throws SQLException {
+    public Map<String, DfProcedureMeta> getAvailableProcedureMap(DfSchemaSource dataSource) throws SQLException {
         if (isQuitByGenerateProp()) {
             return newLinkedHashMap();
         }
@@ -133,10 +134,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         return !prop.isGenerateProcedureParameterBean();
     }
 
-    protected List<DfProcedureMeta> setupAvailableProcedureList(DataSource dataSource) throws SQLException {
+    protected List<DfProcedureMeta> setupAvailableProcedureList(DfSchemaSource dataSource) throws SQLException {
         // main schema
-        final UnifiedSchema mainSchema = getProperties().getDatabaseProperties().getDatabaseSchema();
-        final List<DfProcedureMeta> procedureList = getPlainProcedureList(dataSource, mainSchema);
+        final List<DfProcedureMeta> procedureList = getPlainProcedureList(dataSource, dataSource.getSchema());
 
         // additional schema
         setupAdditionalSchemaProcedure(dataSource, procedureList);
@@ -156,10 +156,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
 
     protected Map<String, DfProcedureMeta> arrangeProcedureHandilng(List<DfProcedureMeta> procedureList) {
         final Map<String, DfProcedureMeta> procedureHandlingMap = newLinkedHashMap();
-        final UnifiedSchema mainSchema = getProperties().getDatabaseProperties().getDatabaseSchema();
         for (DfProcedureMeta metaInfo : procedureList) {
-            // handle duplicate
-            if (handleDuplicateProcedure(metaInfo, procedureHandlingMap, mainSchema)) {
+            if (handleDuplicateProcedure(metaInfo, procedureHandlingMap)) {
                 continue;
             }
             procedureHandlingMap.put(metaInfo.buildProcedureKeyName(), metaInfo);
@@ -187,7 +185,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                     Additional Schema
     //                                     -----------------
-    protected void setupAdditionalSchemaProcedure(DataSource dataSource, List<DfProcedureMeta> procedureList)
+    protected void setupAdditionalSchemaProcedure(DfSchemaSource dataSource, List<DfProcedureMeta> procedureList)
             throws SQLException {
         if (_suppressAdditionalSchema) {
             return;
@@ -385,11 +383,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     /**
      * @param second The second procedure being processed current loop. (NotNull)
      * @param procedureHandlingMap The handling map of procedure. (NotNull)
-     * @param mainSchema The unified schema for main. (NotNull)
      * @return Does it skip to register the second procedure?
      */
-    protected boolean handleDuplicateProcedure(DfProcedureMeta second,
-            Map<String, DfProcedureMeta> procedureHandlingMap, UnifiedSchema mainSchema) {
+    protected boolean handleDuplicateProcedure(DfProcedureMeta second, Map<String, DfProcedureMeta> procedureHandlingMap) {
         final String procedureKeyName = second.buildProcedureKeyName();
         final DfProcedureMeta first = procedureHandlingMap.get(procedureKeyName);
         if (first == null) {
@@ -765,7 +761,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                         Assist Info
     //                                                                         ===========
-    protected void resolveAssistInfo(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
+    protected void resolveAssistInfo(DfSchemaSource dataSource, List<DfProcedureMeta> metaInfoList) {
         if (isDatabaseMySQL()) {
             doResolveAssistInfoMySQL(dataSource, metaInfoList);
         } else if (isDatabasePostgreSQL()) {
@@ -782,15 +778,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                                 MySQL
     //                                                 -----
-    protected void doResolveAssistInfoMySQL(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
-        // available schema
-        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
+    protected void doResolveAssistInfoMySQL(DfSchemaSource dataSource, List<DfProcedureMeta> metaInfoList) {
         final DfProcedureSupplementExtractor extractor = getSupplementExtractorMySQL(dataSource);
 
         // source info
         final boolean reflectParamsToHash = true; // cannot get parameter info from MySQL
-        doSetupSourceInfo(dataSource, metaInfoList, extractor, mainSchema, reflectParamsToHash);
+        doSetupSourceInfo(dataSource, metaInfoList, extractor, dataSource.getSchema(), reflectParamsToHash);
+        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
         for (UnifiedSchema additionalSchema : additionalSchemaList) {
             doSetupSourceInfo(dataSource, metaInfoList, extractor, additionalSchema, reflectParamsToHash);
         }
@@ -799,15 +793,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                            PostgreSQL
     //                                            ----------
-    protected void doResolveAssistInfoPostgreSQL(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
-        // available schema
-        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
+    protected void doResolveAssistInfoPostgreSQL(DfSchemaSource dataSource, List<DfProcedureMeta> metaInfoList) {
         final DfProcedureSupplementExtractor extractor = getSupplementExtractorPostgreSQL(dataSource);
 
         // source info
         final boolean reflectParamsToHash = true; // cannot get parameter info from MySQL
-        doSetupSourceInfo(dataSource, metaInfoList, extractor, mainSchema, reflectParamsToHash);
+        doSetupSourceInfo(dataSource, metaInfoList, extractor, dataSource.getSchema(), reflectParamsToHash);
+        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
         for (UnifiedSchema additionalSchema : additionalSchemaList) {
             doSetupSourceInfo(dataSource, metaInfoList, extractor, additionalSchema, reflectParamsToHash);
         }
@@ -816,9 +808,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                                Oracle
     //                                                ------
-    protected void doResolveAssistInfoOracle(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
-        // available schema
-        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
+    protected void doResolveAssistInfoOracle(DfSchemaSource dataSource, List<DfProcedureMeta> metaInfoList) {
+        final UnifiedSchema mainSchema = dataSource.getSchema();
         final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
 
         // overload
@@ -879,15 +870,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                                   DB2
     //                                                   ---
-    protected void doResolveAssistInfoDB2(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
-        // available schema
-        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
+    protected void doResolveAssistInfoDB2(DfSchemaSource dataSource, List<DfProcedureMeta> metaInfoList) {
         final DfProcedureSupplementExtractor extractor = getSupplementExtractorDB2(dataSource);
 
         // source info
         final boolean reflectParamsToHash = false; // can get parameter definition code from DB2
-        doSetupSourceInfo(dataSource, metaInfoList, extractor, mainSchema, reflectParamsToHash);
+        doSetupSourceInfo(dataSource, metaInfoList, extractor, dataSource.getSchema(), reflectParamsToHash);
+        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
         for (UnifiedSchema additionalSchema : additionalSchemaList) {
             doSetupSourceInfo(dataSource, metaInfoList, extractor, additionalSchema, reflectParamsToHash);
         }
@@ -896,15 +885,13 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // -----------------------------------------------------
     //                                           H2 Database
     //                                           -----------
-    protected void doResolveAssistInfoH2(DataSource dataSource, List<DfProcedureMeta> metaInfoList) {
-        // available schema
-        final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
-        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
+    protected void doResolveAssistInfoH2(DfSchemaSource dataSource, List<DfProcedureMeta> metaInfoList) {
         final DfProcedureSupplementExtractor extractor = getSupplementExtractorH2(dataSource);
 
         // source info
         final boolean reflectParamsToHash = false; // can get parameter definition code from H2
-        doSetupSourceInfo(dataSource, metaInfoList, extractor, mainSchema, reflectParamsToHash);
+        doSetupSourceInfo(dataSource, metaInfoList, extractor, dataSource.getSchema(), reflectParamsToHash);
+        final List<UnifiedSchema> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
         for (UnifiedSchema additionalSchema : additionalSchemaList) {
             doSetupSourceInfo(dataSource, metaInfoList, extractor, additionalSchema, reflectParamsToHash);
         }
@@ -913,14 +900,14 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                             DB Link
     //                                                                             =======
-    protected void resolveAssistInfoToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
+    protected void resolveAssistInfoToDBLink(DfSchemaSource dataSource, List<DfProcedureMeta> metaInfoList,
             String dbLinkName) {
         if (isDatabaseOracle()) {
             doResolveAssistInfoOracleToDBLink(dataSource, metaInfoList, dbLinkName);
         }
     }
 
-    protected void doResolveAssistInfoOracleToDBLink(DataSource dataSource, List<DfProcedureMeta> metaInfoList,
+    protected void doResolveAssistInfoOracleToDBLink(DfSchemaSource dataSource, List<DfProcedureMeta> metaInfoList,
             String dbLinkName) {
         final DfProcedureSupplementExtractorOracle extractor = getSupplementExtractorOracle(dataSource);
 
@@ -1052,48 +1039,48 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     // ===================================================================================
     //                                                                  (Cached) Extractor
     //                                                                  ==================
-    protected DfProcedureSupplementExtractorMySQL getSupplementExtractorMySQL(DataSource dataSource) {
+    protected DfProcedureSupplementExtractorMySQL getSupplementExtractorMySQL(DfSchemaSource dataSource) {
         return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
-            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+            public DfProcedureSupplementExtractor create(DfSchemaSource dataSource) {
                 return new DfProcedureSupplementExtractorMySQL(dataSource);
             }
         });
     }
 
-    protected DfProcedureSupplementExtractorPostgreSQL getSupplementExtractorPostgreSQL(DataSource dataSource) {
+    protected DfProcedureSupplementExtractorPostgreSQL getSupplementExtractorPostgreSQL(DfSchemaSource dataSource) {
         return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
-            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+            public DfProcedureSupplementExtractor create(DfSchemaSource dataSource) {
                 return new DfProcedureSupplementExtractorPostgreSQL(dataSource);
             }
         });
     }
 
-    protected DfProcedureSupplementExtractorOracle getSupplementExtractorOracle(DataSource dataSource) {
+    protected DfProcedureSupplementExtractorOracle getSupplementExtractorOracle(DfSchemaSource dataSource) {
         return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
-            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+            public DfProcedureSupplementExtractor create(DfSchemaSource dataSource) {
                 return new DfProcedureSupplementExtractorOracle(dataSource);
             }
         });
     }
 
-    protected DfProcedureSupplementExtractorDB2 getSupplementExtractorDB2(DataSource dataSource) {
+    protected DfProcedureSupplementExtractorDB2 getSupplementExtractorDB2(DfSchemaSource dataSource) {
         return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
-            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+            public DfProcedureSupplementExtractor create(DfSchemaSource dataSource) {
                 return new DfProcedureSupplementExtractorDB2(dataSource);
             }
         });
     }
 
-    protected DfProcedureSupplementExtractorH2 getSupplementExtractorH2(DataSource dataSource) {
+    protected DfProcedureSupplementExtractorH2 getSupplementExtractorH2(DfSchemaSource dataSource) {
         return doGetSupplementExtractor(dataSource, new DfProcedureSupplementExtractorCreator() {
-            public DfProcedureSupplementExtractor create(DataSource dataSource) {
+            public DfProcedureSupplementExtractor create(DfSchemaSource dataSource) {
                 return new DfProcedureSupplementExtractorH2(dataSource);
             }
         });
     }
 
     protected <EXTRACTOR extends DfProcedureSupplementExtractor> EXTRACTOR doGetSupplementExtractor(
-            DataSource dataSource, DfProcedureSupplementExtractorCreator creator) {
+            DfSchemaSource dataSource, DfProcedureSupplementExtractorCreator creator) {
         final int dataSourceKey = dataSource.hashCode();
         Map<String, DfProcedureSupplementExtractor> cacheMap = _supplementExtractorMap.get(dataSourceKey);
         if (cacheMap == null) {
@@ -1115,7 +1102,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     protected static interface DfProcedureSupplementExtractorCreator {
-        DfProcedureSupplementExtractor create(DataSource dataSource);
+        DfProcedureSupplementExtractor create(DfSchemaSource dataSource);
     }
 
     // ===================================================================================
@@ -1165,11 +1152,11 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
         _suppressLogging = true;
     }
 
-    public void includeProcedureSynonym(DataSource dataSource) {
+    public void includeProcedureSynonym(DfSchemaSource dataSource) {
         _procedureSynonymDataSource = dataSource;
     }
 
-    public void includeProcedureToDBLink(DataSource dataSource) {
+    public void includeProcedureToDBLink(DfSchemaSource dataSource) {
         _procedureToDBLinkDataSource = dataSource;
     }
 }

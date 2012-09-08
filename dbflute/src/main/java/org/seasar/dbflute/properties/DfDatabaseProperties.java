@@ -175,14 +175,6 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return !databaseUser.equalsIgnoreCase(databaseSchema.getPureSchema());
     }
 
-    public List<UnifiedSchema> getTargetSchemaList() {
-        final List<UnifiedSchema> targetSchemaList = new ArrayList<UnifiedSchema>();
-        final UnifiedSchema mainSchema = getDatabaseSchema();
-        targetSchemaList.add(mainSchema);
-        targetSchemaList.addAll(getAdditionalSchemaList());
-        return targetSchemaList;
-    }
-
     // -----------------------------------------------------
     //                                       User & Password
     //                                       ---------------

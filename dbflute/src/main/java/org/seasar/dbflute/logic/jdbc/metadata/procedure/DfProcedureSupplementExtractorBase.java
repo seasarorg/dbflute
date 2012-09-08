@@ -24,12 +24,10 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSourceInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeArrayInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -112,21 +110,6 @@ public abstract class DfProcedureSupplementExtractorBase implements DfProcedureS
 
     protected Integer calculateSourceSize(String sourceCode) {
         return sourceCode != null ? sourceCode.length() : 0;
-    }
-
-    // ===================================================================================
-    //                                                                          Properties
-    //                                                                          ==========
-    protected UnifiedSchema getMainSchema() {
-        return getDatabaseProperties().getDatabaseSchema();
-    }
-
-    protected List<UnifiedSchema> getAdditionalSchemaList() {
-        return getDatabaseProperties().getAdditionalSchemaList();
-    }
-
-    protected DfDatabaseProperties getDatabaseProperties() {
-        return DfBuildProperties.getInstance().getDatabaseProperties();
     }
 
     // ===================================================================================

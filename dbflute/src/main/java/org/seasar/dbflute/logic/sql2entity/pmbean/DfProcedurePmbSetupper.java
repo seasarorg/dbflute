@@ -20,14 +20,13 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
@@ -42,6 +41,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTypeStructInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfProcedureExecutionMetaExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -61,7 +61,7 @@ public class DfProcedurePmbSetupper {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DataSource _dataSource;
+    protected final DfSchemaSource _dataSource;
     protected final Map<String, DfCustomizeEntityInfo> _entityInfoMap;
     protected final Map<String, DfPmbMetaData> _pmbMetaDataMap;
     protected final Database _database;
@@ -72,7 +72,7 @@ public class DfProcedurePmbSetupper {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfProcedurePmbSetupper(DataSource dataSource, Map<String, DfCustomizeEntityInfo> entityInfoMap,
+    public DfProcedurePmbSetupper(DfSchemaSource dataSource, Map<String, DfCustomizeEntityInfo> entityInfoMap,
             Map<String, DfPmbMetaData> pmbMetaDataMap, Database database) {
         _dataSource = dataSource;
         _entityInfoMap = entityInfoMap;
@@ -509,16 +509,24 @@ public class DfProcedurePmbSetupper {
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
     protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
+        return getProperties().getBasicProperties();
+    }
+
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return getProperties().getDatabaseProperties();
     }
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
-        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     protected DfOutsideSqlProperties getOutsideSqlProperties() {
-        return DfBuildProperties.getInstance().getOutsideSqlProperties();
+        return getProperties().getOutsideSqlProperties();
     }
 
     // ===================================================================================

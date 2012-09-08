@@ -198,7 +198,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     //                                                ------
     protected boolean _checkColumnDefOrder; // depends on DBFlute property
     protected boolean _checkDbComment; // depends on DBFlute property
-    protected boolean _suppressUnifiedSchema; // basically for SchemaSyncCheck
+    protected boolean _suppressSchema; // basically for SchemaSyncCheck
 
     // -----------------------------------------------------
     //                                            Table Diff
@@ -445,7 +445,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processUnifiedSchema(Table next, Table previous, DfTableDiff tableDiff) {
-        if (_suppressUnifiedSchema) {
+        if (_suppressSchema) {
             return;
         }
         diffNextPrevious(next, previous, tableDiff, new StringNextPreviousDiffer<Table, DfTableDiff>() {
@@ -630,8 +630,16 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     // -----------------------------------------------------
-    //                                           Same Helper
-    //                                           -----------
+    //                                         Assist Helper
+    //                                         -------------
+    protected Table findNextTable(Table table) {
+        return _nextDb.getTable(table.getName());
+    }
+
+    protected Table findPreviousTable(Table table) {
+        return _previousDb.getTable(table.getName());
+    }
+
     protected boolean isSameTableName(Table next, Table previous) {
         return isSame(next.getName(), previous.getName());
     }
@@ -1144,6 +1152,18 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                         Assist Helper
     //                                         -------------
+    protected Sequence findNextSequence(Sequence sequence) {
+        return doFindSequence(_nextDb, sequence);
+    }
+
+    protected Sequence findPreviousSequence(Sequence sequence) {
+        return doFindSequence(_previousDb, sequence);
+    }
+
+    protected Sequence doFindSequence(Database db, Sequence sequence) {
+        return _suppressSchema ? db.getSequenceByPureName(sequence) : db.getSequenceByUniqueName(sequence);
+    }
+
     protected boolean isSystemSequence(String sequenceName) {
         final String pureName = Srl.substringLastRear(sequenceName, ".");
         if (isDatabaseDB2()) {
@@ -1155,7 +1175,11 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected boolean isSameSequenceName(Sequence next, Sequence previous) {
-        return isSame(next.getFormalUniqueName(), previous.getFormalUniqueName());
+        return isSame(getSequenceKeyName(next), getSequenceKeyName(previous));
+    }
+
+    protected String getSequenceKeyName(Sequence sequence) {
+        return _suppressSchema ? sequence.getSequenceName() : sequence.getFormalUniqueName();
     }
 
     // ===================================================================================
@@ -1177,7 +1201,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         for (Procedure procedure : procedureList) {
             final Procedure found = findPreviousProcedure(procedure);
             if (found == null || !isSameProcedureName(procedure, found)) { // added
-                addProcedureDiff(DfProcedureDiff.createAdded(procedure.getFormalUniqueName()));
+                addProcedureDiff(DfProcedureDiff.createAdded(procedure.getProcedureUniqueName()));
             }
         }
     }
@@ -1193,7 +1217,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 continue;
             }
             // found
-            final DfProcedureDiff procedureDiff = DfProcedureDiff.createChanged(next.getFormalUniqueName());
+            final DfProcedureDiff procedureDiff = DfProcedureDiff.createChanged(next.getProcedureUniqueName());
 
             // procedure needs schema to be unique so comparing schema is non-sense here
             //processUnifiedSchema(next, previous, procedureDiff);
@@ -1301,7 +1325,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         for (Procedure procedure : procedureList) {
             final Procedure found = findNextProcedure(procedure);
             if (found == null || !isSameProcedureName(procedure, found)) { // deleted
-                addProcedureDiff(DfProcedureDiff.createDeleted(procedure.getFormalUniqueName()));
+                addProcedureDiff(DfProcedureDiff.createDeleted(procedure.getProcedureUniqueName()));
             }
         }
     }
@@ -1309,8 +1333,25 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                         Assist Helper
     //                                         -------------
+    protected Procedure findNextProcedure(Procedure procedure) {
+        return doFindProcedure(_nextDb, procedure);
+    }
+
+    protected Procedure findPreviousProcedure(Procedure procedure) {
+        return doFindProcedure(_previousDb, procedure);
+    }
+
+    protected Procedure doFindProcedure(Database db, Procedure procedure) {
+        return _suppressSchema ? db.getProcedureByPureName(procedure) : db.getProcedureByUniqueName(procedure);
+    }
+
     protected boolean isSameProcedureName(Procedure next, Procedure previous) {
-        return isSame(next.getFormalUniqueName(), previous.getFormalUniqueName());
+        return isSame(getProcedureKeyName(next), getProcedureKeyName(previous));
+    }
+
+    protected String getProcedureKeyName(Procedure procedure) {
+        // the simple procedureName contains package name of Oracle
+        return _suppressSchema ? procedure.getProcedureName() : procedure.getProcedureUniqueName();
     }
 
     // ===================================================================================
@@ -1320,33 +1361,6 @@ public class DfSchemaDiff extends DfAbstractDiff {
         if (_craftMetaDir != null) {
             _craftDiff.analyzeDiff(_craftMetaDir);
         }
-    }
-
-    // ===================================================================================
-    //                                                                         Find Object
-    //                                                                         ===========
-    protected Table findNextTable(Table table) {
-        return _nextDb.getTable(table.getName());
-    }
-
-    protected Table findPreviousTable(Table table) {
-        return _previousDb.getTable(table.getName());
-    }
-
-    protected Sequence findNextSequence(Sequence sequence) {
-        return _nextDb.getSequence(sequence.getFormalUniqueName());
-    }
-
-    protected Sequence findPreviousSequence(Sequence sequence) {
-        return _previousDb.getSequence(sequence.getFormalUniqueName());
-    }
-
-    protected Procedure findNextProcedure(Procedure procedure) {
-        return _nextDb.getProcedure(procedure.getFormalUniqueName());
-    }
-
-    protected Procedure findPreviousProcedure(Procedure procedure) {
-        return _previousDb.getProcedure(procedure.getFormalUniqueName());
     }
 
     // ===================================================================================
@@ -1364,11 +1378,13 @@ public class DfSchemaDiff extends DfAbstractDiff {
             final List<? extends DfNestDiff> diffAllList = setupper.provide();
             if (!diffAllList.isEmpty()) {
                 final Map<String, Map<String, Object>> diffMap = DfCollectionUtil.newLinkedHashMap();
-                schemaDiffMap.put(setupper.propertyName(), diffMap);
                 for (DfNestDiff nestDiff : diffAllList) {
                     if (nestDiff.hasDiff()) {
                         diffMap.put(nestDiff.getKeyName(), nestDiff.createDiffMap());
                     }
+                }
+                if (!diffMap.isEmpty()) {
+                    schemaDiffMap.put(setupper.propertyName(), diffMap);
                 }
             }
         }
@@ -1472,8 +1488,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
         _checkDbComment = true;
     }
 
-    public void suppressUnifiedSchema() {
-        _suppressUnifiedSchema = true;
+    public void suppressSchema() {
+        _suppressSchema = true;
     }
 
     public void enableCraftDiff(String craftMetaDir) {

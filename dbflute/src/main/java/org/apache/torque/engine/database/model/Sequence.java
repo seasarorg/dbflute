@@ -69,7 +69,7 @@ public class Sequence {
     //                                                                           Attribute
     //                                                                           =========
     protected Database _database;
-    protected String _name;
+    protected String _sequenceName;
     protected UnifiedSchema _unifiedSchema;
     protected BigDecimal _minimumValue;
     protected BigDecimal _maximumValue;
@@ -83,9 +83,9 @@ public class Sequence {
     //                                         Load from XML
     //                                         -------------
     public boolean loadFromXML(Attributes attrib, XmlReadingFilter readingFilter) {
-        _name = attrib.getValue("name"); // sequence name
+        _sequenceName = attrib.getValue("name"); // sequence name
         _unifiedSchema = UnifiedSchema.createAsDynamicSchema(attrib.getValue("schema"));
-        if (readingFilter != null && readingFilter.isSequenceExcept(_unifiedSchema, _name)) {
+        if (readingFilter != null && readingFilter.isSequenceExcept(_unifiedSchema, _sequenceName)) {
             return false;
         }
         final String minimumValue = attrib.getValue("minimumValue");
@@ -116,7 +116,7 @@ public class Sequence {
     //                                                                    Derived Property
     //                                                                    ================
     public String getFormalUniqueName() {
-        return _unifiedSchema.getCatalogSchema() + "." + _name;
+        return _unifiedSchema.getCatalogSchema() + "." + _sequenceName;
     }
 
     // ===================================================================================
@@ -124,7 +124,7 @@ public class Sequence {
     //                                                                      ==============
     @Override
     public String toString() {
-        return _unifiedSchema + "." + _name + ":{" + _minimumValue + " to " + _maximumValue + ", increment "
+        return _unifiedSchema + "." + _sequenceName + ":{" + _minimumValue + " to " + _maximumValue + ", increment "
                 + _incrementSize + "}";
     }
 
@@ -140,11 +140,11 @@ public class Sequence {
     }
 
     public String getSequenceName() {
-        return _name;
+        return _sequenceName;
     }
 
     public void setSequenceName(String sequenceName) {
-        this._name = sequenceName;
+        this._sequenceName = sequenceName;
     }
 
     public UnifiedSchema getUnifiedSchema() {
