@@ -88,11 +88,6 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     //                                                ------
     protected boolean _useDraftSpace; // old style so basically unused
 
-    // -----------------------------------------------------
-    //                                                Status
-    //                                                ------
-    protected boolean _createdEmptyAlterSqlFile;
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -608,7 +603,6 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             alterSqlFileList = getMigrationAlterSqlFileList();
             if (alterSqlFileList.isEmpty()) {
                 createEmptyAlterSqlFileIfNotExists();
-                _createdEmptyAlterSqlFile = true;
                 alterSqlFileList = getMigrationAlterSqlFileList();
                 if (alterSqlFileList.isEmpty()) { // no way
                     throwAlterCheckAlterSqlNotFoundException();
@@ -747,6 +741,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         for (String detailMessage : detailMessageList) {
             finalInfo.addDetailMessage(detailMessage);
         }
+        finalInfo.setAlterSqlCount(fireResult.getTotalSqlCount());
         finalInfo.setBreakCause(fireResult.getBreakCause());
         finalInfo.setFailure(fireResult.isExistsError());
     }
@@ -942,15 +937,15 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("|   Success Story   |");
         _log.info("|                   |");
         _log.info("+-------------------+");
-        checkEmptyAlterSuccess();
+        checkEmptyAlterSuccess(finalInfo);
         saveHistory(finalInfo);
         deleteAllNGMark();
         deleteDiffResult();
     }
 
-    protected void checkEmptyAlterSuccess() {
-        if (_createdEmptyAlterSqlFile) {
-            throwAlterCheckAlterSqlNotFoundException();
+    protected void checkEmptyAlterSuccess(DfAlterCheckFinalInfo finalInfo) {
+        if (!finalInfo.hasAlterSqlExecution()) {
+            throwAlterCheckEmptyAlterSqlSuccessException();
         }
     }
 

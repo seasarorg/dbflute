@@ -122,7 +122,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 throw breakCause;
             } else {
                 _result.setGoodSqlCount(_goodSqlCount);
-                _result.setTotalSqlCount(-1);
+                _result.setTotalSqlCount(_totalSqlCount);
                 _result.setBreakCause(breakCause);
                 return _result;
             }

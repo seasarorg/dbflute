@@ -71,7 +71,6 @@ public class DfSqlFileFireMan {
                 goodSqlCount = goodSqlCount + runnerResult.getGoodSqlCount();
                 breakCause = runnerResult.getBreakCause();
                 if (breakCause != null) {
-                    totalSqlCount = -1;
                     break;
                 } else {
                     totalSqlCount = totalSqlCount + runnerResult.getTotalSqlCount();

@@ -31,6 +31,17 @@ public class DfSqlFileFireResult {
     protected boolean _existsError; // break or continue-error
     protected final List<DfSqlFileRunnerResult> _runnerResultList = new ArrayList<DfSqlFileRunnerResult>();
 
+    public int getTotalSqlCount() {
+        int totalSqlCount = 0;
+        for (DfSqlFileRunnerResult runnerResult : _runnerResultList) {
+            final int currentCount = runnerResult.getTotalSqlCount();
+            if (currentCount > 0) { // may be -1
+                totalSqlCount = totalSqlCount + currentCount;
+            }
+        }
+        return totalSqlCount;
+    }
+
     public String getResultMessage() {
         return _resultMessage;
     }
