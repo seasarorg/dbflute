@@ -421,7 +421,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         final String defaultDir = CORE_CRAFT_META_DIR;
         final String property = getProperty("coreCraftMetaDirPath", defaultDir, getDocumentDefinitionMap());
-        return Srl.replace(property, "${defaultDir}", defaultDir);
+        return Srl.replace(property, "$$DEFAULT$$", defaultDir);
     }
 
     protected String getCraftMetaFilePrefix() {
@@ -731,7 +731,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         final String defaultDir = getDocumentOutputDirectory() + "/craftdiff";
         final String property = getProperty("craftMetaDirPath", defaultDir, getSchemaSyncCheckMap());
-        return Srl.replace(property, "${defaultDir}", defaultDir);
+        return Srl.replace(property, "$$DEFAULT$$", defaultDir);
     }
 
     // ===================================================================================
