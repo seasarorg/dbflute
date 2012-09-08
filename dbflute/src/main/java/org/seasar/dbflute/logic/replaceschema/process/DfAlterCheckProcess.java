@@ -24,6 +24,7 @@ import org.seasar.dbflute.exception.DfAlterCheckAlterScriptSQLException;
 import org.seasar.dbflute.exception.DfAlterCheckAlterSqlNotFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckDataSourceNotFoundException;
 import org.seasar.dbflute.exception.DfAlterCheckDifferenceFoundException;
+import org.seasar.dbflute.exception.DfAlterCheckEmptyAlterSqlSuccessException;
 import org.seasar.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckRollbackSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckSavePreviousFailureException;
@@ -951,6 +952,15 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         if (_createdEmptyAlterSqlFile) {
             throwAlterCheckAlterSqlNotFoundException();
         }
+    }
+
+    protected void throwAlterCheckEmptyAlterSqlSuccessException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The AlterDDL was empty so unnecessary success.");
+        br.addItem("Advice");
+        br.addElement("You should check after changing schema.");
+        final String msg = br.buildExceptionMessage();
+        throw new DfAlterCheckEmptyAlterSqlSuccessException(msg);
     }
 
     protected void saveHistory(DfAlterCheckFinalInfo finalInfo) {
