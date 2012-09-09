@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.exception.DfSchemaSyncCheckTragedyResultException;
+import org.seasar.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSource;
@@ -167,7 +167,7 @@ public class DfSchemaSyncChecker {
         br.addElement("e.g. Add Table: FOO_TABLE");
         br.addElement("create the table on the sync-check schema to synchronize with main schema.");
         final String msg = br.buildExceptionMessage();
-        throw new DfSchemaSyncCheckTragedyResultException(msg);
+        throw new DfSchemaSyncCheckGhastlyTragedyException(msg);
     }
 
     // ===================================================================================

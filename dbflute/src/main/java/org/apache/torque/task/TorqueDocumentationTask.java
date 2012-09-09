@@ -60,7 +60,7 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
-import org.seasar.dbflute.exception.DfSchemaSyncCheckTragedyResultException;
+import org.seasar.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseOutputHandler;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseProcess;
@@ -88,6 +88,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                           Attribute
     //                                                                           =========
     protected String _varyingArg;
+    protected boolean _syncCheckGhastlyTragedy;
 
     // ===================================================================================
     //                                                                           Beginning
@@ -226,7 +227,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     protected void processSchemaSyncCheck() {
         try {
             doProcessSchemaSyncCheck();
-        } catch (DfSchemaSyncCheckTragedyResultException e) {
+        } catch (DfSchemaSyncCheckGhastlyTragedyException e) {
+            _syncCheckGhastlyTragedy = true;
             throw e;
         } finally {
             refreshResources();
@@ -248,7 +250,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final DfSchemaSyncChecker checker = new DfSchemaSyncChecker(getDataSource());
         try {
             checker.checkSync();
-        } catch (DfSchemaSyncCheckTragedyResultException e) {
+        } catch (DfSchemaSyncCheckGhastlyTragedyException e) {
             _selector.selectSchemaSyncCheckResultHtml();
             fireVelocityProcess();
             throw e;
@@ -269,6 +271,25 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         br.addElement("  }");
         final String msg = br.buildExceptionMessage();
         throw new DfRequiredPropertyNotFoundException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                          Final Info
+    //                                                                          ==========
+    @Override
+    public String getFinalInformation() {
+        return buildReplaceSchemaFinalMessage();
+    }
+
+    protected String buildReplaceSchemaFinalMessage() {
+        if (_syncCheckGhastlyTragedy) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("    * * * * * * * * * *").append(ln());
+            sb.append("    * Ghastly Tragedy *").append(ln());
+            sb.append("    * * * * * * * * * *");
+            return sb.toString();
+        }
+        return null;
     }
 
     // ===================================================================================
