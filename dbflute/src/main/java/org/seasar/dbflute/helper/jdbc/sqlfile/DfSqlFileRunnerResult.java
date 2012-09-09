@@ -35,6 +35,7 @@ public class DfSqlFileRunnerResult {
     protected final List<ErrorContinuedSql> _errorContinuedSqlList = new ArrayList<ErrorContinuedSql>(); // only when continued
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
+    protected boolean _skippedFile;
     protected SQLFailureException _breakCause; // only when break immediately by error
 
     // ===================================================================================
@@ -97,6 +98,14 @@ public class DfSqlFileRunnerResult {
 
     public void setTotalSqlCount(int totalSqlCount) {
         this._totalSqlCount = totalSqlCount;
+    }
+
+    public boolean isSkippedFile() {
+        return _skippedFile;
+    }
+
+    public void setSkippedFile(boolean skippedFile) {
+        this._skippedFile = skippedFile;
     }
 
     public SQLFailureException getBreakCause() {

@@ -110,10 +110,10 @@ public class DfSqlFileFireMan {
     protected String buildDetailMessage(DfSqlFileFireResult fireResult) {
         final StringBuilder sb = new StringBuilder();
         final List<DfSqlFileRunnerResult> runnerResultList = fireResult.getRunnerResultList();
-        for (DfSqlFileRunnerResult currentResult : runnerResultList) {
-            final List<ErrorContinuedSql> errorContinuedSqlList = currentResult.getErrorContinuedSqlList();
-            final String fileName = currentResult.getSqlFile().getName();
-            final SQLFailureException breakCause = currentResult.getBreakCause();
+        for (DfSqlFileRunnerResult runnerResult : runnerResultList) {
+            final List<ErrorContinuedSql> errorContinuedSqlList = runnerResult.getErrorContinuedSqlList();
+            final String fileName = runnerResult.getSqlFile().getName();
+            final SQLFailureException breakCause = runnerResult.getBreakCause();
             if (sb.length() > 0) {
                 sb.append(ln());
             }
@@ -121,37 +121,45 @@ public class DfSqlFileFireMan {
                 sb.append("x ").append(fileName);
                 sb.append(ln()).append(" >> (failed: Look at the exception message)");
             } else { // normal or error-continued
-                sb.append(errorContinuedSqlList.isEmpty() ? "o " : "x ").append(fileName);
-                for (ErrorContinuedSql errorContinuedSql : errorContinuedSqlList) {
-                    final String sql = errorContinuedSql.getSql();
-                    sb.append(ln()).append(sql);
-                    final SQLException sqlEx = errorContinuedSql.getSqlEx();
-                    String message = sqlEx.getMessage();
-                    if (sqlEx != null && message != null) {
-                        message = message.trim();
-                        final LineToken lineToken = new LineToken();
-                        final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
-                        lineTokenizingOption.setDelimiter(ln());
-                        final List<String> tokenizedList = lineToken.tokenize(message, lineTokenizingOption);
-                        int elementIndex = 0;
-                        for (String element : tokenizedList) {
-                            if (elementIndex == 0) {
-                                sb.append(ln()).append(" >> ").append(element);
-                            } else {
-                                sb.append(ln()).append("    ").append(element);
-                            }
-                            ++elementIndex;
-                        }
-                        if (isShowSQLState(sqlEx)) {
-                            sb.append(ln());
-                            sb.append("    (SQLState=").append(sqlEx.getSQLState());
-                            sb.append(" ErrorCode=").append(sqlEx.getErrorCode()).append(")");
-                        }
-                    }
+                if (errorContinuedSqlList.isEmpty()) { // OK or skipped
+                    sb.append(!runnerResult.isSkippedFile() ? "o " : "v ").append(fileName);
+                } else {
+                    sb.append("x ").append(fileName);
+                    doBuildErrorContinuedMessage(sb, errorContinuedSqlList);
                 }
             }
         }
         return sb.toString();
+    }
+
+    protected void doBuildErrorContinuedMessage(StringBuilder sb, List<ErrorContinuedSql> errorContinuedSqlList) {
+        for (ErrorContinuedSql errorContinuedSql : errorContinuedSqlList) {
+            final String sql = errorContinuedSql.getSql();
+            sb.append(ln()).append(sql);
+            final SQLException sqlEx = errorContinuedSql.getSqlEx();
+            String message = sqlEx.getMessage();
+            if (sqlEx != null && message != null) {
+                message = message.trim();
+                final LineToken lineToken = new LineToken();
+                final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
+                lineTokenizingOption.setDelimiter(ln());
+                final List<String> tokenizedList = lineToken.tokenize(message, lineTokenizingOption);
+                int elementIndex = 0;
+                for (String element : tokenizedList) {
+                    if (elementIndex == 0) {
+                        sb.append(ln()).append(" >> ").append(element);
+                    } else {
+                        sb.append(ln()).append("    ").append(element);
+                    }
+                    ++elementIndex;
+                }
+                if (isShowSQLState(sqlEx)) {
+                    sb.append(ln());
+                    sb.append("    (SQLState=").append(sqlEx.getSQLState());
+                    sb.append(" ErrorCode=").append(sqlEx.getErrorCode()).append(")");
+                }
+            }
+        }
     }
 
     /**

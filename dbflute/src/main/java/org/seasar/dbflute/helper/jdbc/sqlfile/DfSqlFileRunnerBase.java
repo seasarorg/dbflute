@@ -58,7 +58,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     protected DataSource _dataSource; // may be switched (e.g. LazyConnection)
 
     protected File _sqlFile;
-    protected DfSqlFileRunnerResult _result;
+    protected DfSqlFileRunnerResult _runnerResult;
 
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
@@ -78,7 +78,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
     public void prepare(File sqlFile) {
         _sqlFile = sqlFile;
-        _result = new DfSqlFileRunnerResult(sqlFile);
+        _runnerResult = new DfSqlFileRunnerResult(sqlFile);
     }
 
     // ===================================================================================
@@ -93,6 +93,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             throw new IllegalStateException(msg);
         }
 
+        boolean skippedFile = false;
         String currentSql = null;
         BufferedReader br = null;
         try {
@@ -101,15 +102,18 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
             setupConnection();
             setupStatement();
+            int sqlNumber = 0;
             for (String sql : sqlList) {
+                ++sqlNumber;
                 currentSql = sql;
-                if (!isTargetFile(sql)) {
+                if (sqlNumber == 1 && !isTargetFile(sql)) { // first SQL only 
+                    skippedFile = true;
                     break;
                 }
                 if (!isTargetSql(sql)) {
                     continue;
                 }
-                _totalSqlCount++;
+                ++_totalSqlCount;
                 final String realSql = filterSql(sql);
                 if (!_runInfo.isSuppressLoggingSql()) {
                     traceSql(realSql);
@@ -121,10 +125,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             if (_runInfo.isBreakCauseThrow()) {
                 throw breakCause;
             } else {
-                _result.setGoodSqlCount(_goodSqlCount);
-                _result.setTotalSqlCount(_totalSqlCount);
-                _result.setBreakCause(breakCause);
-                return _result;
+                _runnerResult.setGoodSqlCount(_goodSqlCount);
+                _runnerResult.setTotalSqlCount(_totalSqlCount);
+                _runnerResult.setBreakCause(breakCause);
+                return _runnerResult;
             }
         } catch (SQLException e) {
             // here is for the exception except executing SQL
@@ -143,9 +147,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         _totalSqlCount = _totalSqlCount - _skippedSqlCount;
 
         traceResult(_goodSqlCount, _totalSqlCount);
-        _result.setGoodSqlCount(_goodSqlCount);
-        _result.setTotalSqlCount(_totalSqlCount);
-        return _result;
+        _runnerResult.setGoodSqlCount(_goodSqlCount);
+        _runnerResult.setTotalSqlCount(_totalSqlCount);
+        _runnerResult.setSkippedFile(skippedFile);
+        return _runnerResult;
     }
 
     protected boolean isTargetFile(String sql) {
@@ -691,6 +696,6 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     //                                                                            Accessor
     //                                                                            ========
     public DfSqlFileRunnerResult getResult() {
-        return _result;
+        return _runnerResult;
     }
 }

@@ -75,7 +75,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 if (isContinueWarnLogEnabled()) {
                     showContinueWarnLog(sql, e);
                 }
-                _result.addErrorContinuedSql(sql, e);
+                _runnerResult.addErrorContinuedSql(sql, e);
             } else { // main root @since 0.9.9.2F
                 throwSQLFailureException(sql, e);
             }
