@@ -47,13 +47,15 @@ public class DfCraftDiffAssertHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected final String _craftMetaDir;
+    protected final DfCraftDiffAssertDirection _assertDirection;
     protected final String _craftTitle;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCraftDiffAssertHandler(String craftMetaDir, String craftTitle) {
+    public DfCraftDiffAssertHandler(String craftMetaDir, DfCraftDiffAssertDirection nextDirection, String craftTitle) {
         _craftMetaDir = craftMetaDir;
+        _assertDirection = nextDirection;
         _craftTitle = craftTitle;
     }
 
@@ -72,8 +74,19 @@ public class DfCraftDiffAssertHandler {
         final List<Map<String, String>> diffDataList = selectDiffDataList(sqlFile, st, sql);
         final String nextDataFilePath = buildNextDataFile(sqlFile);
         final String previousDataFilePath = buildPreviousDataFile(sqlFile);
-        rollingPreviousDataFile(nextDataFilePath, previousDataFilePath);
-        dumpCraftMetaToDataFile(diffDataList, new File(nextDataFilePath));
+        final String targetFilePath;
+        if (DfCraftDiffAssertDirection.ROLLING_NEXT.equals(_assertDirection)) {
+            rollingPreviousDataFile(nextDataFilePath, previousDataFilePath);
+            targetFilePath = nextDataFilePath;
+        } else if (DfCraftDiffAssertDirection.DIRECT_NEXT.equals(_assertDirection)) {
+            targetFilePath = nextDataFilePath;
+        } else if (DfCraftDiffAssertDirection.DIRECT_PREVIOUS.equals(_assertDirection)) {
+            targetFilePath = previousDataFilePath;
+        } else {
+            String msg = "Unknown assert direction: " + _assertDirection;
+            throw new IllegalStateException(msg);
+        }
+        dumpCraftMetaToDataFile(diffDataList, new File(targetFilePath));
     }
 
     protected void prepareCraftMetaDir() {

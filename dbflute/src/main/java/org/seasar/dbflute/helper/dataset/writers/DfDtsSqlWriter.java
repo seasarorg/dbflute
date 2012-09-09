@@ -15,19 +15,19 @@ public class DfDtsSqlWriter {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private DataSource dataSource;
+    protected DataSource _dataSource;
     protected UnifiedSchema _unifiedSchema;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfDtsSqlWriter(DataSource dataSource, UnifiedSchema unifiedSchema) {
-        this.dataSource = dataSource;
-        this._unifiedSchema = unifiedSchema;
+        _dataSource = dataSource;
+        _unifiedSchema = unifiedSchema;
     }
 
     public DataSource getDataSource() {
-        return dataSource;
+        return _dataSource;
     }
 
     public void write(DfDataSet dataSet) {

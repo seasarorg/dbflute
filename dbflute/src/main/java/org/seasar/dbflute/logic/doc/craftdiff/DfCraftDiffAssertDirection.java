@@ -13,20 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.logic.doc.craftdiff;
 
 /**
  * @author jflute
+ * @since 0.9.9.8 (2012/09/09 Sunday)
  */
-public class DfAlterCheckAlterSqlFailureException extends RuntimeException {
+public enum DfCraftDiffAssertDirection {
 
-    private static final long serialVersionUID = 1L;
-
-    public DfAlterCheckAlterSqlFailureException(String msg) {
-        super(msg);
-    }
-
-    public DfAlterCheckAlterSqlFailureException(String msg, SQLFailureException cause) {
-        super(msg, cause);
-    }
+    DIRECT_NEXT, DIRECT_PREVIOUS, ROLLING_NEXT;
 }

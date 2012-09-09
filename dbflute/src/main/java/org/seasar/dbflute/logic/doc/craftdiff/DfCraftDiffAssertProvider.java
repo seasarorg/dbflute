@@ -33,12 +33,14 @@ public class DfCraftDiffAssertProvider {
     //                                                                           Attribute
     //                                                                           =========
     protected final String _craftMetaDir;
+    protected final DfCraftDiffAssertDirection _nextDirection;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCraftDiffAssertProvider(String craftMetaDir) {
+    public DfCraftDiffAssertProvider(String craftMetaDir, DfCraftDiffAssertDirection nextDirection) {
         _craftMetaDir = craftMetaDir;
+        _nextDirection = nextDirection;
     }
 
     // ===================================================================================
@@ -68,7 +70,7 @@ public class DfCraftDiffAssertProvider {
             throwCraftDiffCraftTitleNotFoundException(sqlFile, sql);
         }
         // *unsupported envType on assert definition
-        return new DfCraftDiffAssertHandler(_craftMetaDir, craftTitle);
+        return new DfCraftDiffAssertHandler(_craftMetaDir, _nextDirection, craftTitle);
     }
 
     protected void throwCraftDiffCraftTitleNotFoundException(File sqlFile, String sql) {

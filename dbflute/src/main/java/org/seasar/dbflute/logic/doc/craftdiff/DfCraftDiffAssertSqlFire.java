@@ -48,13 +48,16 @@ public class DfCraftDiffAssertSqlFire {
     //                                        --------------
     protected final DfSchemaSource _dataSource;
     protected final String _craftMetaDir;
+    protected final DfCraftDiffAssertDirection _assertDirection;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCraftDiffAssertSqlFire(DfSchemaSource dataSource, String craftMetaDir) {
+    public DfCraftDiffAssertSqlFire(DfSchemaSource dataSource, String craftMetaDir,
+            DfCraftDiffAssertDirection assertDirection) {
         _dataSource = dataSource;
         _craftMetaDir = craftMetaDir;
+        _assertDirection = assertDirection;
     }
 
     // ===================================================================================
@@ -85,7 +88,7 @@ public class DfCraftDiffAssertSqlFire {
                 return isTargetEnvTypeFile(sql);
             }
         };
-        final DfCraftDiffAssertProvider provider = new DfCraftDiffAssertProvider(_craftMetaDir);
+        final DfCraftDiffAssertProvider provider = new DfCraftDiffAssertProvider(_craftMetaDir, _assertDirection);
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
             public DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException {
                 final DfCraftDiffAssertHandler handler = provider.provideCraftDiffAssertHandler(sqlFile, sql);

@@ -43,6 +43,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDis
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
 import org.seasar.dbflute.helper.process.ProcessResult;
 import org.seasar.dbflute.helper.process.SystemScript;
+import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertDirection;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
@@ -128,7 +129,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     public DfAlterCheckFinalInfo checkAlter() {
         deleteAllNGMark();
-        deleteSchemaResource(); // if remains
+        deleteSchemaXml();
+        deleteCraftMeta();
 
         final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
 
@@ -155,10 +157,11 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         } else {
             processSuccess(finalInfo);
             deleteAlterCheckMark();
+            deleteCraftMeta();
         }
 
         deleteSubmittedDraftFile(finalInfo);
-        deleteSchemaResource(); // not finally because of trace when abort
+        deleteSchemaXml(); // not finally because of trace when abort
         return finalInfo;
     }
 
@@ -815,24 +818,26 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                    Serialize Schema
     //                                                                    ================
-    protected void serializePreviousSchema() {
-        final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
-        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(previousXml);
-        serializer.serialize();
-    }
-
     protected void serializeNextSchema() {
         final String nextXml = getMigrationAlterCheckNextSchemaXml();
-        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(nextXml);
+        final DfCraftDiffAssertDirection direction = DfCraftDiffAssertDirection.DIRECT_NEXT;
+        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(nextXml, direction);
         serializer.serialize();
     }
 
-    protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml) {
+    protected void serializePreviousSchema() {
+        final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
+        final DfCraftDiffAssertDirection direction = DfCraftDiffAssertDirection.DIRECT_PREVIOUS;
+        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(previousXml, direction);
+        serializer.serialize();
+    }
+
+    protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml, DfCraftDiffAssertDirection direction) {
         final String historyFile = null; // no use history here (use SchemaDiff directly later)
         final DfSchemaXmlSerializer serializer = DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml,
                 historyFile);
         final String craftMetaDir = getMigrationAlterCheckCraftMetaDir();
-        serializer.enableCraftDiff(_dataSource, craftMetaDir);
+        serializer.enableCraftDiff(_dataSource, craftMetaDir, direction);
         return serializer;
     }
 
@@ -849,6 +854,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
         final String nextXml = getMigrationAlterCheckNextSchemaXml();
         final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsFlexible(previousXml, nextXml);
+        schemaDiff.enableCraftDiff(getMigrationAlterCheckCraftMetaDir());
         schemaDiff.loadPreviousSchema();
         schemaDiff.loadNextSchema();
         schemaDiff.analyzeDiff();
@@ -1167,11 +1173,14 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                             Closing
     //                                                                             =======
-    protected void deleteSchemaResource() {
+    protected void deleteSchemaXml() {
         final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
         final String nextXml = getMigrationAlterCheckNextSchemaXml();
         deleteFile(new File(previousXml), "...Deleting the SchemaXml file for previous schema");
         deleteFile(new File(nextXml), "...Deleting the SchemaXml file for next schema");
+    }
+
+    protected void deleteCraftMeta() {
         final String craftMetaDir = getMigrationAlterCheckCraftMetaDir();
         if (craftMetaDir != null) {
             final List<File> metaFileList = getCraftMetaFileList(craftMetaDir);

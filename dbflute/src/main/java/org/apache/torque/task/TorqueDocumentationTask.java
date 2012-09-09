@@ -177,12 +177,14 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         if (!isLoadDataReverseValid()) {
             return;
         }
-        _log.info("");
-        _log.info("* * * * * * * * * * *");
-        _log.info("*                   *");
-        _log.info("* Load Data Reverse *");
-        _log.info("*                   *");
-        _log.info("* * * * * * * * * * *");
+        // this process is executed separately, 
+        // so title logging is already existing at begin()
+        //_log.info("");
+        //_log.info("* * * * * * * * * * *");
+        //_log.info("*                   *");
+        //_log.info("* Load Data Reverse *");
+        //_log.info("*                   *");
+        //_log.info("* * * * * * * * * * *");
         final Database database = _schemaData.getDatabase();
         outputLoadDataReverse(database);
         refreshResources();
@@ -235,12 +237,14 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         if (!isSchemaSyncCheckValid()) {
             return;
         }
-        _log.info("");
-        _log.info("* * * * * * * * * * *");
-        _log.info("*                   *");
-        _log.info("* Schema Sync Check *");
-        _log.info("*                   *");
-        _log.info("* * * * * * * * * * *");
+        // this process is executed separately, 
+        // so title logging is already existing at begin()
+        //_log.info("");
+        //_log.info("* * * * * * * * * * *");
+        //_log.info("*                   *");
+        //_log.info("* Schema Sync Check *");
+        //_log.info("*                   *");
+        //_log.info("* * * * * * * * * * *");
         final DfSchemaSyncChecker checker = new DfSchemaSyncChecker(getDataSource());
         try {
             checker.checkSync();
