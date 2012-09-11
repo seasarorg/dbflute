@@ -1,0 +1,22 @@
+DBFlute
+Copyright 2004-2012 the Seasar Foundation and the Others.
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/)
+and other libraries:
+
+<Source Code>
+Apache Torque     : Apache License 2.0 (modified codes included)
+S2Dao             : Apache License 2.0 (modified codes included)
+
+<JAR file>
+Apache Velocity   : Apache License 2.0 (also modified codes included)
+Apache Commons    : Apache License 2.0
+MySQL Connector/J : GNU General Public License with MySQL FOSS License Exception
+PostgreSQL        : BSD License
+H2 Database       : MPL 1.1
+
+<Binary>
+Apache Ant        : Apache License 2.0 (package plainly redistributed)
+
+You can see their licenses at the './etc/license' directory.
