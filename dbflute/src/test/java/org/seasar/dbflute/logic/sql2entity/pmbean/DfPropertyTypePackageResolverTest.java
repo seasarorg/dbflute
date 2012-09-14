@@ -1,16 +1,27 @@
+/*
+ * Copyright 2004-2012 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.logic.sql2entity.pmbean;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute
  */
 public class DfPropertyTypePackageResolverTest extends PlainTestCase {
 
-    @Test
     public void test_doResolvePackageName_Java_Date_basic() throws Exception {
         // ## Arrange ##
         DfPropertyTypePackageResolver resolver = createJavaTarget();
@@ -20,7 +31,6 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
         assertEquals("Date", resolver.doResolvePackageName("Date", true));
     }
 
-    @Test
     public void test_doResolvePackageName_Java_List_basic() throws Exception {
         // ## Arrange ##
         DfPropertyTypePackageResolver resolver = createJavaTarget();
@@ -30,7 +40,6 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
         assertEquals("List<String>", resolver.doResolvePackageName("List<String>", true));
     }
 
-    @Test
     public void test_doResolvePackageName_Java_List_nest() throws Exception {
         // ## Arrange ##
         DfPropertyTypePackageResolver resolver = createJavaTarget();
@@ -42,7 +51,6 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
         assertEquals("java.util.List<java.util.List<java.util.Date>>", actual);
     }
 
-    @Test
     public void test_doResolvePackageName_Java_List_nest_Map() throws Exception {
         // ## Arrange ##
         DfPropertyTypePackageResolver resolver = createJavaTarget();
@@ -55,7 +63,6 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
         assertEquals("java.util.List<java.util.List<java.util.Map<Date, java.util.Date>>>", actual);
     }
 
-    @Test
     public void test_doResolvePackageName_Java_Map_basic() throws Exception {
         // ## Arrange ##
         DfPropertyTypePackageResolver resolver = createJavaTarget();
@@ -65,7 +72,6 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
         assertEquals("java.util.Map<String, java.util.Date>", resolver.doResolvePackageName("Map<String, Date>", false));
     }
 
-    @Test
     public void test_doResolvePackageName_Java_Map_nest() throws Exception {
         // ## Arrange ##
         DfPropertyTypePackageResolver resolver = createJavaTarget();
@@ -78,7 +84,6 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
         assertEquals("java.util.Map<Date, java.util.List<java.util.Map<Date, java.util.Date>>>", actual);
     }
 
-    @Test
     public void test_doResolvePackageName_CSharp_List_nest_Map() throws Exception {
         // ## Arrange ##
         DfPropertyTypePackageResolver resolver = createCSharpTarget();

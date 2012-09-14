@@ -20,8 +20,7 @@ import java.util.Arrays;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * Data Table. {Refer to S2Container}
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsBinaryType extends DfDtsObjectType {
@@ -31,6 +30,7 @@ public class DfDtsBinaryType extends DfDtsObjectType {
     public DfDtsBinaryType() {
     }
 
+    @Override
     public Object convert(Object value, String formatPattern) {
         if (value != null && value instanceof String) {
             return DfTypeUtil.toStringBytes((String) value, "UTF-8");
@@ -38,6 +38,7 @@ public class DfDtsBinaryType extends DfDtsObjectType {
         return value;
     }
 
+    @Override
     protected boolean doEquals(Object arg1, Object arg2) {
         if (arg1 instanceof byte[] && arg2 instanceof byte[]) {
             return Arrays.equals((byte[]) arg1, (byte[]) arg2);
@@ -45,6 +46,7 @@ public class DfDtsBinaryType extends DfDtsObjectType {
         return false;
     }
 
+    @Override
     public Class<?> getType() {
         return TYPE;
     }

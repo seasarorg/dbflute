@@ -24,8 +24,7 @@ import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDataRow {
@@ -65,11 +64,11 @@ public class DfDataRow {
     }
 
     // *unused on DBFlute
-    // public void setValue(int index, Object value) {
-    //     final DataColumn column = _table.getColumn(index);
-    //     _values.set(index, column.convert(value));
+    //public void setValue(int index, Object value) {
+    //    final DataColumn column = _table.getColumn(index);
+    //    _values.set(index, column.convert(value));
     //     modify();
-    // }
+    //}
 
     private void modify() {
         if (_state.equals(DfDtsRowStates.UNCHANGED)) {

@@ -48,7 +48,8 @@ import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 
 /**
- * The properties to build.
+ * The properties to build. <br />
+ * Actually this class is provider of various DBFlute properties.
  * @author jflute
  */
 public final class DfBuildProperties {

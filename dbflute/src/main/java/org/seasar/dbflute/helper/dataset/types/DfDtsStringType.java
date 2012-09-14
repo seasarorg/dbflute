@@ -18,8 +18,8 @@ package org.seasar.dbflute.helper.dataset.types;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * The string type for data set. {Refers to S2Container}
- * @author jflute
+ * The string type for data set.
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsStringType extends DfDtsObjectType {
@@ -34,6 +34,7 @@ public class DfDtsStringType extends DfDtsObjectType {
         this.trim = trim;
     }
 
+    @Override
     public Object convert(Object value, String formatPattern) {
         String s = DfTypeUtil.toString(value, formatPattern);
         if (s != null && trim) {
@@ -45,6 +46,7 @@ public class DfDtsStringType extends DfDtsObjectType {
         return s;
     }
 
+    @Override
     public Class<?> getType() {
         return String.class;
     }

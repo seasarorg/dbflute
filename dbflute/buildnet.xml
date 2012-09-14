@@ -153,6 +153,9 @@
 			<zipfileset prefix="ant" dir="${embedded}/ant"/>
 			<zipfileset prefix="" dir="${embedded}">
 				<include name="build-torque.xml"/>
+	          	<include name="LICENSE"/>
+	          	<include name="NOTICE"/>
+	          	<include name="README.txt"/>
 			</zipfileset>
 			<zipfileset prefix="" dir="${embedded}/mark">
 				<include name="product-is-dbflute.net-${version}"/>

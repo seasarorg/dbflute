@@ -20,8 +20,7 @@ import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDataColumn {

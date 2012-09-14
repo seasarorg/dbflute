@@ -18,8 +18,7 @@ package org.seasar.dbflute.helper.dataset.writers;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public interface DfDtsTableWriter {

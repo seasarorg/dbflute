@@ -12,13 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
- */
-package org.apache.torque.engine.database.model;
-
-/* ====================================================================
+ *
+ * And the following license definition is for Apache Torque.
+ * DBFlute modified this source code and redistribute as same license 'Apache'.
+ * /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *
+ * ====================================================================
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 2001-2003 The Apache Software Foundation.  All rights
+ * Copyright (c) 2002 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +69,10 @@ package org.apache.torque.engine.database.model;
  * individuals on behalf of the Apache Software Foundation.  For more
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
+ * 
+ * - - - - - - - - - -/
  */
+package org.apache.torque.engine.database.model;
 
 import org.apache.torque.engine.database.transform.DTDResolver;
 import org.seasar.dbflute.DfBuildProperties;
@@ -78,7 +83,7 @@ import org.xml.sax.Attributes;
 
 /**
  * The schema data for your application.
- * @author modified by jflute
+ * @author modified by jflute (originated in Apache Torque)
  */
 public class AppData {
 

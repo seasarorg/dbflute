@@ -23,8 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Data Table. {Refer to S2Container}
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsColumnTypes {
@@ -93,36 +92,36 @@ public class DfDtsColumnTypes {
     }
 
     // *unused on DBFlute
-    //    public static ValueType getValueType(int type) {
-    //        switch (type) {
-    //        case Types.TINYINT:
-    //        case Types.SMALLINT:
-    //        case Types.INTEGER:
-    //        case Types.BIGINT:
-    //        case Types.REAL:
-    //        case Types.FLOAT:
-    //        case Types.DOUBLE:
-    //        case Types.DECIMAL:
-    //        case Types.NUMERIC:
-    //            return ValueTypes.BIGDECIMAL;
-    //        case Types.BOOLEAN:
-    //            return ValueTypes.BOOLEAN;
-    //        case Types.DATE:
-    //        case Types.TIME:
-    //        case Types.TIMESTAMP:
-    //            return ValueTypes.TIMESTAMP;
-    //        case Types.BINARY:
-    //        case Types.VARBINARY:
-    //        case Types.LONGVARBINARY:
-    //            return ValueTypes.BINARY;
-    //        case Types.CHAR:
-    //        case Types.LONGVARCHAR:
-    //        case Types.VARCHAR:
-    //            return ValueTypes.STRING;
-    //        default:
-    //            return ValueTypes.OBJECT;
-    //        }
+    //public static ValueType getValueType(int type) {
+    //    switch (type) {
+    //    case Types.TINYINT:
+    //    case Types.SMALLINT:
+    //    case Types.INTEGER:
+    //    case Types.BIGINT:
+    //    case Types.REAL:
+    //    case Types.FLOAT:
+    //    case Types.DOUBLE:
+    //    case Types.DECIMAL:
+    //    case Types.NUMERIC:
+    //        return ValueTypes.BIGDECIMAL;
+    //    case Types.BOOLEAN:
+    //        return ValueTypes.BOOLEAN;
+    //    case Types.DATE:
+    //    case Types.TIME:
+    //    case Types.TIMESTAMP:
+    //        return ValueTypes.TIMESTAMP;
+    //    case Types.BINARY:
+    //    case Types.VARBINARY:
+    //    case Types.LONGVARBINARY:
+    //        return ValueTypes.BINARY;
+    //    case Types.CHAR:
+    //    case Types.LONGVARCHAR:
+    //    case Types.VARCHAR:
+    //        return ValueTypes.STRING;
+    //    default:
+    //        return ValueTypes.OBJECT;
     //    }
+    //}
 
     public static DfDtsColumnType getColumnType(int type) {
         DfDtsColumnType columnType = (DfDtsColumnType) typesBySqlType.get(new Integer(type));

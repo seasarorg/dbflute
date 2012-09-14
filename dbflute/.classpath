@@ -10,12 +10,12 @@
 	<classpathentry kind="lib" path="lib/commons-lang-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/dbflute-runtime.jar" sourcepath="lib/sources/dbflute-runtime-sources.jar"/>
-	<classpathentry kind="lib" path="lib/jdbc-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.13.jar"/>
 	<classpathentry kind="lib" path="lib/poi-3.2-FINAL-20081019.jar"/>
 	<classpathentry kind="lib" path="lib/velocity-1.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.8.1.jar" sourcepath="lib/sources/junit-4.8.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-compress-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/utflute-core-0.1.8.jar" sourcepath="lib/sources/utflute-core-0.1.8-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

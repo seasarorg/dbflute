@@ -35,6 +35,8 @@ public class DfDatabaseNameMapping {
     //                                                                       =========
     protected final String _databaseNameMappingString;
     {
+        // this code was written when jflute was very young
+        // (it remains without refactoring)
         final StringBuilder sb = new StringBuilder();
         sb.append("map:{");
         sb.append("    ; mysql      = map:{generateName = MySql      ; defName = mysql}");

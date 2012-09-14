@@ -1,10 +1,21 @@
+/*
+ * Copyright 2004-2012 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.logic.sql2entity.analyzer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import org.junit.Test;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute
@@ -12,7 +23,6 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class DfParameterBeanResolverTest extends PlainTestCase {
 
-    @Test
     public void test_doDerivePropertyTypeFromTestValue_String() throws Exception {
         // ## Arrange ##
         DfParameterBeanResolver target = createTarget();
@@ -26,7 +36,6 @@ public class DfParameterBeanResolverTest extends PlainTestCase {
         assertEquals(strType, target.doDerivePropertyTypeFromTestValue("'0'"));
     }
 
-    @Test
     public void test_doDerivePropertyTypeFromTestValue_Number() throws Exception {
         // ## Arrange ##
         DfParameterBeanResolver target = createTarget();
@@ -42,7 +51,6 @@ public class DfParameterBeanResolverTest extends PlainTestCase {
         assertEquals(bigDecimalType, target.doDerivePropertyTypeFromTestValue("123.45"));
     }
 
-    @Test
     public void test_doDerivePropertyTypeFromTestValue_Date() throws Exception {
         // ## Arrange ##
         DfParameterBeanResolver target = createTarget();
@@ -65,7 +73,6 @@ public class DfParameterBeanResolverTest extends PlainTestCase {
         assertEquals(timeType, target.doDerivePropertyTypeFromTestValue("'12:34:56'"));
     }
 
-    @Test
     public void test_doDerivePropertyTypeFromTestValue_List_Number() throws Exception {
         // ## Arrange ##
         DfParameterBeanResolver target = createTarget();
@@ -87,7 +94,6 @@ public class DfParameterBeanResolverTest extends PlainTestCase {
         assertEquals(bigDecimalType, target.doDerivePropertyTypeFromTestValue("(12.345, 123)"));
     }
 
-    @Test
     public void test_doDerivePropertyTypeFromTestValue_illegal() throws Exception {
         // ## Arrange ##
         DfParameterBeanResolver target = createTarget();
@@ -108,7 +114,6 @@ public class DfParameterBeanResolverTest extends PlainTestCase {
         assertEquals(strType, target.doDerivePropertyTypeFromTestValue("'20110128'"));
     }
 
-    @Test
     public void test_doSwitchPlainTypeNameIfCSharp() throws Exception {
         // ## Arrange ##
         DfParameterBeanResolver target = createTarget();
@@ -127,7 +132,6 @@ public class DfParameterBeanResolverTest extends PlainTestCase {
         assertEquals("IList<decimal?>", target.doSwitchPlainTypeNameIfCSharp("List<BigDecimal>"));
     }
 
-    @Test
     public void test_derivePropertyOptionFromTestValue() throws Exception {
         // ## Arrange ##
         DfParameterBeanResolver target = createTarget();

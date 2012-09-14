@@ -16,8 +16,8 @@
 package org.seasar.dbflute.helper.dataset.types;
 
 /**
- * The object type for data set. {Refers to S2Container}
- * @author jflute
+ * The object type for data set.
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsObjectType implements DfDtsColumnType {

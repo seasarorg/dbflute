@@ -39,6 +39,7 @@ public class DfEnvironmentType {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The type of environment. (NullAllowed: if null, means non-specified type) */
     protected String _environmentType;
 
     // ===================================================================================
@@ -55,8 +56,8 @@ public class DfEnvironmentType {
     }
 
     // ===================================================================================
-    //                                                                    Environment Type
-    //                                                                    ================
+    //                                                                            Accessor
+    //                                                                            ========
     public boolean isSpecifiedType() {
         return _environmentType != null;
     }

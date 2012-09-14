@@ -18,8 +18,7 @@ package org.seasar.dbflute.helper.dataset.types;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * Data Table. {Refer to S2Container}
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsBooleanType extends DfDtsObjectType {
@@ -27,10 +26,12 @@ public class DfDtsBooleanType extends DfDtsObjectType {
     public DfDtsBooleanType() {
     }
 
+    @Override
     public Object convert(Object value, String formatPattern) {
         return DfTypeUtil.toBoolean(value);
     }
 
+    @Override
     public Class<?> getType() {
         return Boolean.class;
     }

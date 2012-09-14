@@ -42,8 +42,8 @@ import org.seasar.dbflute.exception.DfTemplateParsingException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 
 /**
- * The generator for DBFlute, referring to the generator of Velocity.
- * @author modified by taktos
+ * The Velocity generator for DBFlute.
+ * @author modified by taktos (originated in Velocity)
  * @author modified by jflute
  * @since 0.7.6 (2008/07/01 Tuesday)
  */

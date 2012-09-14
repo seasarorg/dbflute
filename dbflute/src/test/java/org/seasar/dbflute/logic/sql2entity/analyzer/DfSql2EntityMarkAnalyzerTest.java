@@ -1,14 +1,25 @@
+/*
+ * Copyright 2004-2012 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.logic.sql2entity.analyzer;
-
-import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import org.junit.Test;
-import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
- * 
  * @author jflute
  * @since 0.9.6 (2009/10/26 Monday)
  */
@@ -17,7 +28,6 @@ public class DfSql2EntityMarkAnalyzerTest extends PlainTestCase {
     // ===================================================================================
     //                                                                   Title/Description
     //                                                                   =================
-    @Test
     public void test_getDescription_basic() {
         // ## Arrange ##
         DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
@@ -34,7 +44,6 @@ public class DfSql2EntityMarkAnalyzerTest extends PlainTestCase {
     // ===================================================================================
     //                                                                 SelectColumnComment
     //                                                                 ===================
-    @Test
     public void test_getSelectColumnCommentMap_basic() {
         // ## Arrange ##
         DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
@@ -53,7 +62,6 @@ public class DfSql2EntityMarkAnalyzerTest extends PlainTestCase {
         assertEquals("Comment3", commentMap.get("BAZ_DATE"));
     }
 
-    @Test
     public void test_getSelectColumnCommentMap_irregular() {
         // ## Arrange ##
         DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
@@ -78,7 +86,6 @@ public class DfSql2EntityMarkAnalyzerTest extends PlainTestCase {
         assertEquals("Comment6", commentMap.get("CORGE_DATE"));
     }
 
-    @Test
     public void test_getSelectColumnCommentMap_real() {
         // ## Arrange ##
         DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();

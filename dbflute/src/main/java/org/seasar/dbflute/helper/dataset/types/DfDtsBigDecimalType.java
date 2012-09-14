@@ -20,8 +20,7 @@ import java.math.BigDecimal;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * Data Table. {Refer to S2Container}
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsBigDecimalType extends DfDtsObjectType {
@@ -29,10 +28,12 @@ public class DfDtsBigDecimalType extends DfDtsObjectType {
     public DfDtsBigDecimalType() {
     }
 
+    @Override
     public Object convert(Object value, String formatPattern) {
         return DfTypeUtil.toBigDecimal(value, formatPattern);
     }
 
+    @Override
     public Class<?> getType() {
         return BigDecimal.class;
     }

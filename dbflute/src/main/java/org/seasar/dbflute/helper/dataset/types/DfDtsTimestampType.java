@@ -20,8 +20,8 @@ import java.sql.Timestamp;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * Data Table. {Refer to S2Container}
- * @author jflute
+ * The time-stamp type for data set.
+ * @author modified by jflute (originated in Seasar2)
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
 public class DfDtsTimestampType extends DfDtsObjectType {
@@ -29,10 +29,12 @@ public class DfDtsTimestampType extends DfDtsObjectType {
     public DfDtsTimestampType() {
     }
 
+    @Override
     public Object convert(Object value, String formatPattern) {
         return DfTypeUtil.toTimestamp(value, formatPattern);
     }
 
+    @Override
     public Class<?> getType() {
         return Timestamp.class;
     }
