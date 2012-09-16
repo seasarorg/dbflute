@@ -13,6 +13,7 @@ S2Dao             : Apache License 2.0 (modified codes included)
 <JAR file>
 Apache Velocity   : Apache License 2.0 (also modified codes included)
 Apache Commons    : Apache License 2.0
+Apache Poi        : Apache License 2.0
 MySQL Connector/J : GNU General Public License with MySQL FOSS License Exception
 PostgreSQL        : BSD License
 H2 Database       : MPL 1.1
