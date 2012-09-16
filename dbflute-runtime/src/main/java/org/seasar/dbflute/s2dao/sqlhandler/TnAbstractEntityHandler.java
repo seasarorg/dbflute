@@ -44,8 +44,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler {
 

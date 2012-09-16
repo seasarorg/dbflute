@@ -25,7 +25,7 @@ import java.sql.Types;
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  */
 public class ObjectType extends TnAbstractValueType {
 

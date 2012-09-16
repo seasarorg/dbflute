@@ -51,9 +51,8 @@ import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
 /**
  * The basic handler to execute SQL. <br />
  * All SQL executions of DBFlute are under this handler. <br />
- * This is always created when executing so it's non thread safe. <br />
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * This is always created when executing so it's non thread safe.
+ * @author modified by jflute (originated in S2Dao)
  */
 public abstract class TnAbstractBasicSqlHandler {
 

@@ -28,8 +28,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The value type of UUID as direct handling. <br />
- * This value type is available if the JDBC driver
- * allows UUID type, for example when binding.
+ * This value type is available if the JDBC driver allows UUID type, for example when binding.
  * @author jflute
  */
 public class UUIDAsDirectType extends TnAbstractValueType {

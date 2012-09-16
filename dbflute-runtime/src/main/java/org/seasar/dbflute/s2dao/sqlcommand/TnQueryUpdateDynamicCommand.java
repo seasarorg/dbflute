@@ -38,7 +38,6 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {

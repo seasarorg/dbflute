@@ -24,11 +24,11 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class TnScalarListResultSetHandler implements TnResultSetHandler {
 
-    private ValueType valueType;
+    private final ValueType valueType;
 
     public TnScalarListResultSetHandler(ValueType valueType) {
         this.valueType = valueType;

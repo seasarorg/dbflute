@@ -29,7 +29,7 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public abstract class TnAbstractMapResultSetHandler implements TnResultSetHandler {
 

@@ -18,7 +18,7 @@ package org.seasar.dbflute.twowaysql.context;
 import org.seasar.dbflute.twowaysql.context.impl.CommandContextImpl;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class CommandContextCreator {
 

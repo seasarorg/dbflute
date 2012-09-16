@@ -19,7 +19,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class SqlConnectorNode extends AbstractNode {
 

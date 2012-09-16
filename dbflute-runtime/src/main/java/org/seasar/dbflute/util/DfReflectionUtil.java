@@ -32,8 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  */
 public class DfReflectionUtil {
 

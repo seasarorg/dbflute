@@ -46,7 +46,7 @@ import org.seasar.dbflute.twowaysql.node.SqlPartsNode;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class SqlAnalyzer {
 

@@ -22,7 +22,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.ValueAndTypeSetupper.CommentType;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class BindVariableNode extends VariableNode {
 

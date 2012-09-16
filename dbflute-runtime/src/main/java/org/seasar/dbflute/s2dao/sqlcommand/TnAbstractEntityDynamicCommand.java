@@ -28,8 +28,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public abstract class TnAbstractEntityDynamicCommand extends TnAbstractBasicSqlCommand {
 

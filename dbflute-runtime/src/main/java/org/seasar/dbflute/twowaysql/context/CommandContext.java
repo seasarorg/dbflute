@@ -16,7 +16,7 @@
 package org.seasar.dbflute.twowaysql.context;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public interface CommandContext {
 

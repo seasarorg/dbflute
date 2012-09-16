@@ -26,7 +26,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * The value type for BigDecimal which uses setObject() when binding. <br />
  * Basically for NUMERIC of PostgreSQL's procedure parameter which needs setObject().
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  */
 public class ObjectBindingBigDecimalType extends BigDecimalType {
 

@@ -23,8 +23,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.jdbc.StatementFactory;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class TnBasicUpdateHandler extends TnBasicParameterHandler {
 

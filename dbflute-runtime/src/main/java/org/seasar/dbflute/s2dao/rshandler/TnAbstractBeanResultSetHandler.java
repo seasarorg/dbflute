@@ -30,17 +30,16 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandler {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private TnBeanMetaData beanMetaData;
-    protected TnRowCreator rowCreator;
-    protected TnRelationRowCreator relationRowCreator;
+    private final TnBeanMetaData beanMetaData;
+    protected final TnRowCreator rowCreator;
+    protected final TnRelationRowCreator relationRowCreator;
 
     // ===================================================================================
     //                                                                         Constructor

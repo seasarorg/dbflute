@@ -22,9 +22,8 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 
 /**
  * The basic command to execute SQL. <br />
- * This is basically reused on executing so it's thread safe. <br />
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * This is basically reused on executing so it's thread safe.
+ * @author modified by jflute (originated in S2Dao)
  */
 public abstract class TnAbstractBasicSqlCommand implements TnSqlCommand, SqlExecution {
 

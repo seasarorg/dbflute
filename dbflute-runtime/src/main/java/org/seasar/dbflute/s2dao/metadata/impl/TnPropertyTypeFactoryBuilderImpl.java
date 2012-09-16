@@ -20,8 +20,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactoryBuilder;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class TnPropertyTypeFactoryBuilderImpl implements TnPropertyTypeFactoryBuilder {
 

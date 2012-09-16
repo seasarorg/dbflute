@@ -20,7 +20,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class IfNode extends ScopeNode implements LoopAcceptable, SqlConnectorAdjustable {
 

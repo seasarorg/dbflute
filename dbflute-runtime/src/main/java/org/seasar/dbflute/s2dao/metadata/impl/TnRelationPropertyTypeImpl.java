@@ -20,15 +20,14 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements TnRelationPropertyType {
 
-    protected int _relationNo;
-    protected String[] _myKeys;
-    protected String[] _yourKeys;
-    protected TnBeanMetaData _beanMetaData;
+    protected final int _relationNo;
+    protected final String[] _myKeys;
+    protected final String[] _yourKeys;
+    protected final TnBeanMetaData _beanMetaData;
 
     public TnRelationPropertyTypeImpl(DfPropertyDesc propertyDesc, int relationNo, String[] myKeys, String[] yourKeys,
             TnBeanMetaData beanMetaData) {

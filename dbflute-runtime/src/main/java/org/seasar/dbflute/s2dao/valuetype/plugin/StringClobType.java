@@ -32,7 +32,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * The value type for CLOB type. <br />
  * This class's main target is Oracle.
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  */
 public class StringClobType extends TnAbstractValueType {
 

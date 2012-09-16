@@ -19,8 +19,7 @@ import java.sql.Types;
 
 /**
  * The value type of UUID as string handling. <br />
- * This value type is available if the JDBC driver
- * does NOT allow UUID type, for example when binding.
+ * This value type is available if the JDBC driver does NOT allow UUID type, for example when binding.
  * @author jflute
  */
 public class UUIDAsStringType extends UUIDAsDirectType {

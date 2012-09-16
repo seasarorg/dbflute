@@ -27,7 +27,7 @@ import java.sql.Types;
 
 /**
  * The value type of bytes OID. (basically for PostgreSQL)
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  */
 public class BytesOidType extends BytesType {
 

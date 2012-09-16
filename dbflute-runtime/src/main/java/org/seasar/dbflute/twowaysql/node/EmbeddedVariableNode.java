@@ -28,7 +28,7 @@ import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class EmbeddedVariableNode extends VariableNode {
 

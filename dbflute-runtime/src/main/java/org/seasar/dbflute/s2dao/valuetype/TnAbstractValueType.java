@@ -23,8 +23,7 @@ import java.sql.SQLException;
 import org.seasar.dbflute.jdbc.ValueType;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in Seasar2)
  */
 public abstract class TnAbstractValueType implements ValueType {
 

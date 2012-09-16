@@ -22,7 +22,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class CommandContextImpl implements CommandContext {
 

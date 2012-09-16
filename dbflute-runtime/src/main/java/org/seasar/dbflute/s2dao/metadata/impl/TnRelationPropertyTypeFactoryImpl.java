@@ -31,22 +31,16 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyTypeFactory {
 
-    protected Class<?> _beanClass;
-
-    protected TnBeanAnnotationReader _beanAnnotationReader;
-
-    protected TnBeanMetaDataFactory _beanMetaDataFactory;
-
-    protected DatabaseMetaData _databaseMetaData;
-
-    protected int _relationNestLevel;
-
-    protected boolean _stopRelationCreation;
+    protected final Class<?> _beanClass;
+    protected final TnBeanAnnotationReader _beanAnnotationReader;
+    protected final TnBeanMetaDataFactory _beanMetaDataFactory;
+    protected final DatabaseMetaData _databaseMetaData;
+    protected final int _relationNestLevel;
+    protected final boolean _stopRelationCreation;
 
     public TnRelationPropertyTypeFactoryImpl(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader,
             TnBeanMetaDataFactory beanMetaDataFactory, DatabaseMetaData databaseMetaData, int relationNestLevel,

@@ -32,7 +32,6 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
  * @author jflute
  */
 public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {

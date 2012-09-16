@@ -28,8 +28,7 @@ import org.seasar.dbflute.jdbc.PlainResultSetWrapper;
 import org.seasar.dbflute.resource.ResourceContext;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class TnFetchAssistResultSet extends PlainResultSetWrapper {
 

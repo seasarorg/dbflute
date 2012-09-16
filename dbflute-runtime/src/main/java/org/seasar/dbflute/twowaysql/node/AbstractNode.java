@@ -22,7 +22,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public abstract class AbstractNode implements Node {
 

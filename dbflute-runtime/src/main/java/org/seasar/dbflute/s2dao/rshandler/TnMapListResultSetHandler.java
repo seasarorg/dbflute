@@ -24,7 +24,7 @@ import java.util.Map;
 import org.seasar.dbflute.jdbc.ValueType;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class TnMapListResultSetHandler extends TnAbstractMapResultSetHandler {
 

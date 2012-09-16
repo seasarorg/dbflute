@@ -26,9 +26,8 @@ import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.node.Node;
 
 /**
- * The SQL execution of 2Way-SQL. <br />
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * The SQL execution of 2Way-SQL.
+ * @author modified by jflute (originated in S2Dao)
  * @since 0.9.7.9 (2010/12/26 Sunday)
  */
 public abstract class TnAbstractTwoWaySqlCommand extends TnAbstractBasicSqlCommand {

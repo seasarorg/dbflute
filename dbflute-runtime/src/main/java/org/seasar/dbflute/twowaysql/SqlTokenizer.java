@@ -20,7 +20,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class SqlTokenizer {
 

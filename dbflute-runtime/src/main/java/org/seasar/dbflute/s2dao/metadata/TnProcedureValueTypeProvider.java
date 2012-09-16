@@ -24,7 +24,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class TnProcedureValueTypeProvider {
 
