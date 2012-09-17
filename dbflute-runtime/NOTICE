@@ -1,9 +1,8 @@
 DBFlute
 Copyright 2004-2012 the Seasar Foundation and the Others.
 
-This product, DBFlute Module, includes software developed at
-The Apache Software Foundation (http://www.apache.org/)
-and other libraries:
+This product, DBFlute Runtime, includes softwares developed at
+The Apache Software Foundation (http://www.apache.org/):
 
 <Source Code>
 S2Dao             : Apache License 2.0 (modified codes included)

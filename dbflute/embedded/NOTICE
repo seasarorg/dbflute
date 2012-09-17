@@ -1,9 +1,8 @@
 DBFlute
 Copyright 2004-2012 the Seasar Foundation and the Others.
 
-This product, DBFlute Module, includes software developed at
-The Apache Software Foundation (http://www.apache.org/)
-and other libraries:
+This product, DBFlute Module, includes softwares developed at
+The Apache Software Foundation (http://www.apache.org/) and others:
 
 <Source Code>
 Apache Torque     : Apache License 2.0 (modified codes included)
