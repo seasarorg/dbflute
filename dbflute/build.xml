@@ -6,11 +6,11 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.9.9"/>
-	<property name="build.version" value="${version}-RC1"/>
+	<property name="build.version" value="${version}"/>
 	<property name="pre.version" value="0.9.9.8"/>
-	<property name="runtime.version" value="0.9.9.8"/>
+	<property name="runtime.version" value="0.9.9.9"/>
 	<property name="runtime.build.version" value="${runtime.version}"/>
-	<property name="runtime.pre.version" value="0.9.9.7F"/>
+	<property name="runtime.pre.version" value="0.9.9.8"/>
 
 	<!-- Resource Directories -->
 	<property name="workspace.base" value=".."/>
@@ -70,7 +70,6 @@
 	<property name="bhvap.spring.example.dir" value="${workspace.base}/dbflute-bhvap-spring-example"/>
 	<property name="bhvap.guice.example.dir" value="${workspace.base}/dbflute-bhvap-guice-example"/>
 	<property name="javatest.dir" value="${workspace.base}/javatest"/>
-	<property name="hands.on.dblib.dir" value="${workspace.base}/dfhands-on-dblib"/>
 
 	<!-- ============================================================================= -->
 	<!--                                                        C O M P I L E  T A S K -->
@@ -432,14 +431,6 @@
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${javatest.dir}/lib/sources/${runtime.sources.nonversion.jar}" overwrite="true"/>
 	</target>
 
-	<target name="reflect-to-hands-on" depends="prepare-reflection" description="==> reflect to hands-on example">
-	  	<copy todir="${hands.on.dblib.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
-		<replace file="${hands.on.dblib.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
-		<replace file="${hands.on.dblib.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
-		<delete dir="${hands.on.dblib.dir}/mydbflute/dbflute-${pre.version}"/>
-		<delete dir="${extraction.dir}"/>
-	</target>
-
 	<!-- = = = = = = = = = = -->
     <!-- Reflection for Mac  -->
 	<!-- = = = = = = = = = = -->
@@ -459,8 +450,8 @@
 	  	<antcall target="reflect-to-sqlite" />
 	  	<antcall target="reflect-to-multipledb" />
 	  	<antcall target="reflect-to-flex" />
-	  	<antcall target="reflect-to-ymir" />
 	  	<antcall target="reflect-to-sastruts" />
+	  	<antcall target="reflect-to-ymir" />
 	  	<antcall target="reflect-to-javatest" />
 	</target>
 </project>
