@@ -39,6 +39,12 @@ public class DfSchemaSource implements DataSource {
     //                                                                         Constructor
     //                                                                         ===========
     public DfSchemaSource(DataSource dataSource, UnifiedSchema schema) {
+        if (dataSource == null) {
+            throw new IllegalArgumentException("The argument 'dataSource' should not be null.");
+        }
+        if (schema == null) {
+            throw new IllegalArgumentException("The argument 'schema' should not be null.");
+        }
         _dataSource = dataSource;
         _schema = schema;
     }

@@ -188,7 +188,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     protected void setupConnection() {
-        if (_dataSource == null) {
+        if (_dataSource == null) { // means lazy connection (temporarily connect other users)
             return;
         }
         try {

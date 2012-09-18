@@ -18,6 +18,8 @@ package org.seasar.dbflute.task.bs.assistant;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
@@ -113,13 +115,29 @@ public class DfTaskControlLogic {
         }
     }
 
+    /**
+     * Get data source for main connection. <br />
+     * It returns valid data source after setupDataSource() success. <br />
+     * Basically not null but when data source does not exist on thread, it returns null.
+     * @return The data source with schema. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
+     */
     public DfSchemaSource getDataSource() {
         return getSchemaSource();
     }
 
+    /**
+     * Get schema source for main connection. <br />
+     * It returns valid data source after setupDataSource() success. <br />
+     * Basically not null but when data source does not exist on thread, it returns null.
+     * @return The schema source. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
+     */
     protected DfSchemaSource getSchemaSource() {
+        final DataSource dataSource = DfDataSourceContext.getDataSource();
+        if (dataSource == null) {
+            return null; // basically when lazy connection
+        }
         final UnifiedSchema mainSchema = _databaseResource.getMainSchema();
-        return new DfSchemaSource(DfDataSourceContext.getDataSource(), mainSchema);
+        return new DfSchemaSource(dataSource, mainSchema);
     }
 
     public void connectSchema() throws SQLException {

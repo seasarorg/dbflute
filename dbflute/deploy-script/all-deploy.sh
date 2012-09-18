@@ -1,5 +1,5 @@
 cd ..
-ant -f build.xml reflect-to-all-for-mac
+ant -f build.xml reflect-to-all-regulars
 
 cd ../dbflute-basic-example
 . sync-lib.sh

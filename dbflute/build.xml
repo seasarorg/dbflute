@@ -39,8 +39,9 @@
 	<!-- DI Container Examples -->
 	<property name="spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
 	<property name="guice.example.dir" value="${workspace.base}/dbflute-guice-example"/>
-	<property name="lucy.example.dir" value="${workspace.base}/dbflute-lucy-example"/>
 	<property name="cdi.example.dir" value="${workspace.base}/dbflute-cdi-example"/>
+	<property name="lucy.example.dir" value="${workspace.base}/dbflute-lucy-example"/>
+	<property name="slim3.example.dir" value="${workspace.base}/dbflute-slim3-example"/>
 
 	<!-- Database Examples -->
 	<property name="mysql.example.dir" value="${workspace.base}/dbflute-mysql-example"/>
@@ -261,23 +262,27 @@
 		<delete dir="${extraction.dir}"/>
 	</target>
 
+	<target name="reflect-to-cdi" depends="prepare-reflection" description="==> reflect to cdi example">
+	  	<copy todir="${cdi.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${cdi.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${cdi.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${cdi.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
+	</target>
+
 	<target name="reflect-to-lucy" depends="prepare-reflection" description="==> reflect to lucy example">
 	  	<copy todir="${lucy.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
-		<delete file="${lucy.example.dir}/lib/${runtime.pre.jar}"/>
-		<delete file="${lucy.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
-		<copy file="${dist}/${runtime.jar}" tofile="${lucy.example.dir}/lib/${runtime.jar}" overwrite="true"/>
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${lucy.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
 		<replace file="${lucy.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<replace file="${lucy.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${lucy.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-cdi" depends="prepare-reflection" description="==> reflect to cdi example">
-	  	<copy todir="${cdi.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
-		<replace file="${cdi.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
-		<replace file="${cdi.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
-		<delete dir="${cdi.example.dir}/mydbflute/dbflute-${pre.version}"/>
+	<target name="reflect-to-slim3" depends="prepare-reflection" description="==> reflect to slim3 example">
+	  	<copy todir="${slim3.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${slim3.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${slim3.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${slim3.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
@@ -439,7 +444,7 @@
     <!-- Reflection for Mac  -->
 	<!-- = = = = = = = = = = -->
 
-	<target name="reflect-to-all-for-mac" depends="prepare-reflection" description="==> reflect to all examples">
+	<target name="reflect-to-all-regulars" depends="prepare-reflection" description="==> reflect to all examples">
 	  	<antcall target="reflect-to-basic" />
 	  	<antcall target="reflect-to-spring" />
 	  	<antcall target="reflect-to-guice" />
@@ -447,24 +452,15 @@
 	  	<antcall target="reflect-to-cdi" />
 	  	<antcall target="reflect-to-mysql" />
 	  	<antcall target="reflect-to-postgresql" />
+	  	<antcall target="reflect-to-oracle" /> <!-- deploy only -->
 	  	<antcall target="reflect-to-db2" />
+	  	<antcall target="reflect-to-sqlserver" /> <!-- deploy only -->
+	  	<antcall target="reflect-to-msaccess" /> <!-- deploy only -->
 	  	<antcall target="reflect-to-sqlite" />
 	  	<antcall target="reflect-to-multipledb" />
 	  	<antcall target="reflect-to-flex" />
 	  	<antcall target="reflect-to-ymir" />
 	  	<antcall target="reflect-to-sastruts" />
 	  	<antcall target="reflect-to-javatest" />
-	</target>
-
-	<!-- = = = = = = = = = = = = -->
-    <!-- Reflection for Windows  -->
-	<!-- = = = = = = = = = = = = -->
-
-	<target name="reflect-to-all-for-win" depends="prepare-reflection" description="==> reflect to all examples">
-	  	<antcall target="reflect-to-oracle" />
-	  	<antcall target="reflect-to-sqlserver" />
-	  	<antcall target="reflect-to-msaccess" />
-	  	<antcall target="reflect-to-buri" />
-	  	<antcall target="reflect-to-doma" />
 	</target>
 </project>

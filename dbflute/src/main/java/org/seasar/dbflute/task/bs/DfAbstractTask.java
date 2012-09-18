@@ -172,6 +172,9 @@ public abstract class DfAbstractTask extends Task {
         _controlLogic.destroyDataSource();
     }
 
+    /**
+     * @return The data source with schema. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
+     */
     protected DfSchemaSource getDataSource() {
         return _controlLogic.getDataSource();
     }

@@ -98,15 +98,36 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     public static interface CreatingDataSourcePlayer {
+
+        /**
+         * Callback getting data source.
+         * It returns valid data source after setupDataSource() success. <br />
+         * Basically not null but when data source does not exist on thread, it returns null.
+         * @return The data source with schema. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
+         */
         DataSource callbackGetDataSource();
 
+        /**
+         * Callback setting up data source.
+         * @throws SQLException
+         */
         void callbackSetupDataSource() throws SQLException;
     }
 
+    /**
+     * Get data source. <br />
+     * It returns valid data source after setupDataSource() success. <br />
+     * Basically not null but when data source does not exist on thread, it returns null.
+     * @return The data source. (NullAllowed: when data source does not exist on thread, e.g. lazy connection)
+     */
     protected DataSource getDataSource() {
         return _dataSourcePlayer.callbackGetDataSource();
     }
 
+    /**
+     * Set up data source.
+     * @throws SQLException
+     */
     protected void setupDataSource() throws SQLException {
         _dataSourcePlayer.callbackSetupDataSource();
     }
@@ -407,8 +428,8 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         protected void lazyConnectIfNeeds() throws SQLException {
             if (_lazyConnection) {
                 _log.info("...Connecting by main user lazily");
-                setupDataSource();
-                _dataSource = getDataSource();
+                setupDataSource(); // setting up data source and set it to this thread 
+                _dataSource = getDataSource(); // not null because of after setting up data source
                 setupConnection();
                 setupStatement();
                 _lazyConnection = false;
