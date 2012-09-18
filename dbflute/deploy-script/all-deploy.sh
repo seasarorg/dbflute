@@ -112,7 +112,6 @@ rm ./log/*.log
 . sql2entity.sh
 
 cd ../../dbflute-ymir-example
-. sync-lib.sh
 cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
@@ -121,7 +120,6 @@ rm ./log/*.log
 . sql2entity.sh
 
 cd ../../dbflute-sastruts-example
-. sync-lib.sh
 cd dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
