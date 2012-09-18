@@ -326,6 +326,7 @@
 	<target name="reflect-to-sqlserver" depends="prepare-reflection" description="==> reflect to sqlserver example">
 	  	<copy todir="${sqlserver.example.dir}/mydbflute/dbflute-${version}" overwrite="true"><fileset dir="${extraction.dir}"/></copy>
 		<replace file="${sqlserver.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${sqlserver.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${sqlserver.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
