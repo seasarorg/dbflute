@@ -18,6 +18,11 @@ package org.apache.torque.engine.database.model;
 import java.math.BigDecimal;
 
 import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
@@ -73,7 +78,34 @@ public class Procedure {
     //                                                                    Derived Property
     //                                                                    ================
     public String getProcedureUniqueName() {
-        return _unifiedSchema.getCatalogSchema() + "." + _procedureName;
+        final DfBasicProperties prop = getBasicProperties();
+        final String filteredName;
+        if (prop.isDatabaseSQLServer()) {
+            // SQLServer returns 'sp_foo;1'
+            filteredName = Srl.substringLastFront(_procedureName, ";");
+        } else {
+            filteredName = _procedureName;
+        }
+        return _unifiedSchema.getCatalogSchema() + "." + filteredName;
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================
