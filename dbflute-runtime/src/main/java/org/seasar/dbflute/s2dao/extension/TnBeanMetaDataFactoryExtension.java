@@ -24,14 +24,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
+import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataFactoryImpl;
 import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
+import org.seasar.dbflute.s2dao.metadata.impl.TnDBMetaBeanAnnotationReader;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -51,6 +54,9 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     //                                                                           =========
     /** The map of bean meta data for cache. */
     protected final Map<Class<?>, TnBeanMetaData> _metaMap = newConcurrentHashMap();
+
+    /** Is internal debug enabled? */
+    protected boolean _internalDebug;
 
     // ===================================================================================
     //                                                                  Override for Cache
@@ -108,15 +114,13 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
         return null;
     }
 
-    // ===================================================================================
-    //                                                               BeanMetaData Creation
-    //                                                               =====================
     @Override
     protected TnBeanMetaDataImpl createBeanMetaDataImpl(Class<?> beanClass) {
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
         // for ConditionBean and insert() and update() and delete() and so on...
         // = = = = = = = = = =/
-        return new TnBeanMetaDataImpl(beanClass) {
+        final DBMeta dbmeta = provideDBMeta(beanClass);
+        return new TnBeanMetaDataImpl(beanClass, dbmeta) {
             /** The internal list of identifier generator. Elements of this list should be added when initializing. */
             protected final List<TnIdentifierGenerator> _internalIdentifierGeneratorList = new ArrayList<TnIdentifierGenerator>();
 
@@ -178,6 +182,16 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     // ===================================================================================
+    //                                                                   Annotation Reader
+    //                                                                   =================
+    @Override
+    protected TnBeanAnnotationReader createBeanAnnotationReader(Class<?> beanClass) {
+        // the DBMeta annotation reader also has field annotation reader's functions
+        // so fixedly creates and returns
+        return new TnDBMetaBeanAnnotationReader(beanClass);
+    }
+
+    // ===================================================================================
     //                                                                 Relation Next Level
     //                                                                 ===================
     /**
@@ -200,6 +214,10 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
         return Entity.class.isAssignableFrom(beanClass);
     }
 
+    protected DBMeta provideDBMeta(Class<?> entityType) {
+        return ResourceContext.provideDBMeta(entityType);
+    }
+
     protected TnBeanMetaData getMetaFromCache(Class<?> beanClass) {
         return _metaMap.get(beanClass);
     }
@@ -216,5 +234,12 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     //                                                                      ==============
     protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
         return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setInternalDebug(boolean internalDebug) {
+        _internalDebug = internalDebug;
     }
 }

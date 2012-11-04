@@ -16,19 +16,54 @@
 package org.seasar.dbflute.s2dao.metadata;
 
 /**
+ * The property type for relation. <br />
+ * This interface provides relation meta info.
  * @author modified by jflute (originated in S2Dao)
  */
 public interface TnRelationPropertyType extends TnPropertyType {
 
+    /**
+     * Get the relation No, which indicates number in the base table's relations. 
+     * @return The value of Integer. (NotMinus)
+     */
     int getRelationNo();
 
+    /**
+     * Get the size of key, which means how many relation keys exist.
+     * @return The value of Integer. (NotMinus, NotZero: no-key, no-relation)
+     */
     int getKeySize();
 
+    /**
+     * Get the my key, which is local column DB name as relation key, by the key index.
+     * @param index The index to find the corresponding relation key.
+     * @return The found DB name of local column. (NotNull)
+     */
     String getMyKey(int index);
 
+    /**
+     * Get the your key, which is foreign column DB name as relation key, by the key index. 
+     * @param index The index to find the corresponding relation key.
+     * @return The found DB name of foreign column. (NotNull)
+     */
     String getYourKey(int index);
 
+    /**
+     * Is the column in foreign columns?
+     * @param columnName The DB name of column. (NotNull)
+     * @return The determination, true or false.
+     */
     boolean isYourKey(String columnName);
 
-    TnBeanMetaData getBeanMetaData();
+    /**
+     * Get the my bean meta data, which is for base point of the relation (local entity).
+     * @return The instance of bean meta data. (NotNull)
+     */
+    TnBeanMetaData getMyBeanMetaData();
+
+    /**
+     * Get the your bean meta data, which is for the relation (foreign entity).
+     * @return The instance of bean meta data. (NotNull)
+     */
+    TnBeanMetaData getYourBeanMetaData();
 }

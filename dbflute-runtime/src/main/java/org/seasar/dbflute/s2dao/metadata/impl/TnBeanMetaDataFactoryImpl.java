@@ -29,6 +29,7 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
@@ -39,29 +40,41 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
 
 /**
+ * The implementation as S2Dao of factory of bean meta data. <br />
+ * This class has sub-class extended by DBFlute.
+ * <pre>
+ * {@link TnBeanMetaDataFactoryImpl} is close to S2Dao logic
+ * {@link TnBeanMetaDataFactoryExtension} has DBFlute logic
+ * </pre>
+ * DBFlute depended on S2Dao before 0.9.0. <br />
+ * It saves these structure to be easy to know what DBFlute extends it. <br />
+ * (However this class already has several DBFlute logic...)
  * @author modified by jflute (originated in S2Dao)
  */
 public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The property name of modified property. (S2Dao's specification) */
+    protected static final String MODIFIED_PROPERTY_PROPERTY_NAME = "modifiedPropertyNames";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
 
-    protected boolean _internalDebug;
-
     // ===================================================================================
     //                                                                            Creation
     //                                                                            ========
-    public TnBeanMetaData createBeanMetaData(final Class<?> daoInterface, final Class<?> beanClass) {
-        return createBeanMetaData(beanClass);
-    }
-
-    public TnBeanMetaData createBeanMetaData(final Class<?> beanClass) {
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = =
+    // these methods are overridden at the extension class 
+    // = = = = = = = = = =/
+    public TnBeanMetaData createBeanMetaData(Class<?> beanClass) {
         return createBeanMetaData(beanClass, 0);
     }
 
-    public TnBeanMetaData createBeanMetaData(final Class<?> beanClass, final int relationNestLevel) {
+    public TnBeanMetaData createBeanMetaData(Class<?> beanClass, int relationNestLevel) {
         if (beanClass == null) {
             throw new IllegalArgumentException("The argument 'beanClass' should not be null.");
         }
@@ -92,57 +105,67 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         return ResourceContext.createSQLExceptionHandler();
     }
 
-    public TnBeanMetaData createBeanMetaData(final DatabaseMetaData dbMetaData, final Class<?> beanClass,
-            final int relationNestLevel) {
+    public TnBeanMetaData createBeanMetaData(DatabaseMetaData dbMetaData, Class<?> beanClass, int relationNestLevel) {
+        if (dbMetaData == null) {
+            throw new IllegalArgumentException("The argument 'dbMetaData' should not be null.");
+        }
         if (beanClass == null) {
             throw new IllegalArgumentException("The argument 'beanClass' should not be null.");
         }
-        final boolean stopRelationCreation = isLimitRelationNestLevel(relationNestLevel);
-        final TnBeanAnnotationReader bar = createBeanAnnotationReader(beanClass);
-        final String versionNoPropertyName = getVersionNoPropertyName(bar);
-        final String timestampPropertyName = getTimestampPropertyName(bar);
-        final TnPropertyTypeFactory ptf = createPropertyTypeFactory(beanClass, bar, dbMetaData);
-        final TnRelationPropertyTypeFactory rptf = createRelationPropertyTypeFactory(beanClass, bar, dbMetaData,
-                relationNestLevel, stopRelationCreation);
-
         final TnBeanMetaDataImpl bmd = createBeanMetaDataImpl(beanClass);
-        bmd.setBeanAnnotationReader(bar);
+        final TnBeanAnnotationReader beanAnnotationReader = createBeanAnnotationReader(beanClass);
+        final String versionNoPropertyName = getVersionNoPropertyName(beanAnnotationReader);
+        final String timestampPropertyName = getTimestampPropertyName(beanAnnotationReader);
+        bmd.setBeanAnnotationReader(beanAnnotationReader);
         bmd.setVersionNoPropertyName(versionNoPropertyName);
         bmd.setTimestampPropertyName(timestampPropertyName);
-        bmd.setPropertyTypeFactory(ptf);
-        bmd.setRelationPropertyTypeFactory(rptf);
-        bmd.initialize();
+        bmd.setPropertyTypeFactory(createPropertyTypeFactory(beanClass, beanAnnotationReader, dbMetaData));
 
-        bmd.setModifiedPropertySupport(new TnModifiedPropertySupport() {
+        final boolean stopRelationCreation = isLimitRelationNestLevel(relationNestLevel);
+        bmd.setRelationPropertyTypeFactory(createRelationPropertyTypeFactory(beanClass, bmd, beanAnnotationReader,
+                dbMetaData, relationNestLevel, stopRelationCreation));
+
+        bmd.setModifiedPropertySupport(createModifiedPropertySupport());
+        bmd.initialize();
+        return bmd;
+    }
+
+    protected TnModifiedPropertySupport createModifiedPropertySupport() {
+        return new TnModifiedPropertySupport() {
             @SuppressWarnings("unchecked")
             public Set<String> getModifiedPropertyNames(Object bean) {
                 if (bean instanceof Entity) { // all entities of DBFlute are here
                     return ((Entity) bean).modifiedProperties();
-                } else {
+                } else { // basically no way on DBFlute (S2Dao's route)
                     final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(bean.getClass());
-                    final String propertyName = "modifiedPropertyNames"; // S2Dao's specification
+                    final String propertyName = MODIFIED_PROPERTY_PROPERTY_NAME;
                     if (!beanDesc.hasPropertyDesc(propertyName)) {
                         return Collections.EMPTY_SET;
                     } else {
                         final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
                         final Object value = propertyDesc.getValue(bean);
-                        final Set<String> names = (Set<String>) value;
-                        return names;
+                        return (Set<String>) value;
                     }
                 }
             }
-        });
+        };
+    }
 
-        return bmd;
+    protected TnBeanMetaDataImpl createBeanMetaDataImpl(Class<?> beanClass) {
+        // this is S2Dao's area so DBMeta is null
+        return new TnBeanMetaDataImpl(beanClass, null);
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                   Annotation Reader
+    //                                                                   =================
     protected TnBeanAnnotationReader createBeanAnnotationReader(Class<?> beanClass) {
-        return new TnDBMetaBeanAnnotationReader(beanClass);
+        return new TnFieldBeanAnnotationReader(beanClass);
     }
 
+    // ===================================================================================
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
     protected String getVersionNoPropertyName(TnBeanAnnotationReader beanAnnotationReader) {
         final String defaultName = "versionNo"; // VERSION_NO is special name
         final String name = beanAnnotationReader.getVersionNoPropertyName();
@@ -153,49 +176,49 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         return beanAnnotationReader.getTimestampPropertyName(); // has no default name
     }
 
-    protected TnPropertyTypeFactory createPropertyTypeFactory(Class<?> originalBeanClass,
+    // ===================================================================================
+    //                                                                       Property Type
+    //                                                                       =============
+    protected TnPropertyTypeFactory createPropertyTypeFactory(Class<?> beanClass,
             TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData databaseMetaData) {
-        return createPropertyTypeFactoryBuilder().build(originalBeanClass, beanAnnotationReader);
+        return createPropertyTypeFactoryBuilder().build(beanClass, beanAnnotationReader);
     }
 
     protected TnPropertyTypeFactoryBuilder createPropertyTypeFactoryBuilder() {
         return new TnPropertyTypeFactoryBuilderImpl();
     }
 
-    protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> originalBeanClass,
-            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData databaseMetaData, int relationNestLevel,
-            boolean isStopRelationCreation) {
-        return createRelationPropertyTypeFactoryBuilder().build(originalBeanClass, beanAnnotationReader,
-                databaseMetaData, relationNestLevel, isStopRelationCreation);
+    protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass,
+            TnBeanMetaDataImpl localBeanMetaData, TnBeanAnnotationReader beanAnnotationReader,
+            DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation) {
+        final TnRelationPropertyTypeFactoryBuilder builder = createRelationPropertyTypeFactoryBuilder();
+        return builder.build(beanClass, localBeanMetaData, beanAnnotationReader, dbMetaData, relationNestLevel,
+                stopRelationCreation);
     }
 
     protected TnRelationPropertyTypeFactoryBuilder createRelationPropertyTypeFactoryBuilder() {
-        TnRelationPropertyTypeFactoryBuilderImpl impl = new TnRelationPropertyTypeFactoryBuilderImpl();
+        final TnRelationPropertyTypeFactoryBuilderImpl impl = new TnRelationPropertyTypeFactoryBuilderImpl();
         impl.setBeanMetaDataFactory(this);
         return impl;
     }
 
-    protected TnBeanMetaDataImpl createBeanMetaDataImpl(Class<?> beanClass) {
-        return new TnBeanMetaDataImpl(beanClass);
-    }
-
-    protected boolean isLimitRelationNestLevel(final int relationNestLevel) {
+    // ===================================================================================
+    //                                                                 Relation Next Level
+    //                                                                 ===================
+    protected boolean isLimitRelationNestLevel(int relationNestLevel) {
         return relationNestLevel == getLimitRelationNestLevel();
     }
 
     protected int getLimitRelationNestLevel() {
-        // You can change relation creation range by changing this.
+        // you can change relation creation range by changing this
+        // (this comment is for S2Dao, DBFlute overrides this)
         return 1;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setDataSource(final DataSource dataSource) {
-        this._dataSource = dataSource;
-    }
-
-    public void setInternalDebug(final boolean internalDebug) {
-        this._internalDebug = internalDebug;
+    public void setDataSource(DataSource dataSource) {
+        _dataSource = dataSource;
     }
 }

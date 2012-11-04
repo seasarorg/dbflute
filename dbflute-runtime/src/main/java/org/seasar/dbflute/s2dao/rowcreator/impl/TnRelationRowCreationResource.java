@@ -101,7 +101,7 @@ public class TnRelationRowCreationResource {
     //                                  relationPropertyType
     //                                  --------------------
     public TnBeanMetaData getRelationBeanMetaData() {
-        return _relationPropertyType.getBeanMetaData();
+        return _relationPropertyType.getYourBeanMetaData();
     }
 
     public boolean hasNextRelationProperty() {

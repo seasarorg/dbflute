@@ -74,6 +74,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     private volatile StringKeyMap<String> _tablePropertyNameFlexibleMap;
     private volatile List<ColumnInfo> _columnInfoList;
     private volatile StringKeyMap<ColumnInfo> _columnInfoFlexibleMap;
+    private volatile UniqueInfo _primaryUniqueInfo;
     private volatile List<ForeignInfo> _foreignInfoList;
     private volatile StringKeyMap<ForeignInfo> _foreignInfoFlexibleMap;
     private volatile Map<Integer, ForeignInfo> _foreignInfoRelationNoKeyMap;
@@ -84,21 +85,26 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                             Resource Initialization
     //                                                             =======================
     protected void initializeInformationResource() { // for instance initializer of subclass.
-        // Initialize the flexible map of table DB name.
+        // initialize the flexible map of table DB name
         getTableDbNameFlexibleMap();
 
-        // Initialize the flexible map of table property name.
+        // initialize the flexible map of table property name
         getTablePropertyNameFlexibleMap();
 
-        // Initialize the list of column information.
+        // initialize the list of column information
         getColumnInfoList();
 
-        // Initialize the flexible map of column information. 
+        // initialize the flexible map of column information 
         getColumnInfoFlexibleMap();
 
-        // These should not be initialized here!
-        // because the problem 'cyclic reference' occurred! 
-        // So these are initialized as lazy.
+        // initialize the primary unique information
+        if (hasPrimaryKey()) {
+            getPrimaryUniqueInfo();
+        }
+
+        // these should not be initialized here
+        // because the problem 'cyclic reference' occurred 
+        // so these are initialized as lazy
         //getForeignInfoList();
         //getForeignInfoFlexibleMap();
         //getReferrerInfoList();
@@ -110,8 +116,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                    ================
     protected void setupEpg(Map<String, PropertyGateway> propertyGatewayMap, PropertyGateway gateway,
             String propertyName) {
-        // the map should be plain map for performance
-        propertyGatewayMap.put(propertyName, gateway);
+        propertyGatewayMap.put(propertyName, gateway); // the map should be plain map for performance
     }
 
     protected <ENTITY extends Entity> PropertyGateway doFindEpg(Map<String, PropertyGateway> propertyGatewayMap,
@@ -183,7 +188,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                          Table Info
     //                                                                          ==========
-    // These methods is expected to override if it needs.
+    // these methods is expected to override if it needs
     public String getTableAlias() {
         return null;
     }
@@ -315,13 +320,30 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                         Unique Info
     //                                                                         ===========
-    protected UniqueInfo cpui(ColumnInfo uniqueColumnInfo) { // createPrimaryUniqueInfo()
-        return cpui(Arrays.asList(uniqueColumnInfo));
+    /**
+     * {@inheritDoc}
+     */
+    public UniqueInfo getPrimaryUniqueInfo() {
+        if (_primaryUniqueInfo != null) {
+            return _primaryUniqueInfo;
+        }
+        synchronized (this) {
+            if (_primaryUniqueInfo != null) {
+                return _primaryUniqueInfo;
+            }
+            _primaryUniqueInfo = cpui();
+            return _primaryUniqueInfo;
+        }
     }
 
-    protected UniqueInfo cpui(List<ColumnInfo> uniqueColumnInfoList) { // createPrimaryUniqueInfo()
-        UniqueInfo uniqueInfo = new UniqueInfo(this, uniqueColumnInfoList, true);
-        return uniqueInfo;
+    protected abstract UniqueInfo cpui(); // createPrimaryUniqueInfo()
+
+    protected UniqueInfo hpcpui(ColumnInfo uniqueColumnInfo) { // helpCreatePrimaryUniqueInfo()
+        return hpcpui(Arrays.asList(uniqueColumnInfo));
+    }
+
+    protected UniqueInfo hpcpui(List<ColumnInfo> uniqueColumnInfoList) { // helpCreatePrimaryUniqueInfo()
+        return new UniqueInfo(this, uniqueColumnInfoList, true);
     }
 
     // ===================================================================================
@@ -332,8 +354,8 @@ public abstract class AbstractDBMeta implements DBMeta {
      */
     public RelationInfo findRelationInfo(String relationPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
-        return hasForeign(relationPropertyName) ? (RelationInfo) findForeignInfo(relationPropertyName)
-                : (RelationInfo) findReferrerInfo(relationPropertyName);
+        return hasForeign(relationPropertyName) ? findForeignInfo(relationPropertyName)
+                : findReferrerInfo(relationPropertyName);
     }
 
     // -----------------------------------------------------

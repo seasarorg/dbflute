@@ -24,20 +24,31 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
  */
 public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements TnRelationPropertyType {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final int _relationNo;
     protected final String[] _myKeys;
     protected final String[] _yourKeys;
-    protected final TnBeanMetaData _beanMetaData;
+    protected final TnBeanMetaData _myBeanMetaData;
+    protected final TnBeanMetaData _yourBeanMetaData;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public TnRelationPropertyTypeImpl(DfPropertyDesc propertyDesc, int relationNo, String[] myKeys, String[] yourKeys,
-            TnBeanMetaData beanMetaData) {
+            TnBeanMetaData myBeanMetaData, TnBeanMetaData yourBeanMetaData) {
         super(propertyDesc);
-        this._relationNo = relationNo;
-        this._myKeys = myKeys;
-        this._yourKeys = yourKeys;
-        this._beanMetaData = beanMetaData;
+        _relationNo = relationNo;
+        _myKeys = myKeys;
+        _yourKeys = yourKeys;
+        _myBeanMetaData = myBeanMetaData;
+        _yourBeanMetaData = yourBeanMetaData;
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public int getRelationNo() {
         return _relationNo;
     }
@@ -46,7 +57,7 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
         if (_myKeys.length > 0) {
             return _myKeys.length;
         } else {
-            return _beanMetaData.getPrimaryKeySize();
+            return _yourBeanMetaData.getPrimaryKeySize();
         }
 
     }
@@ -55,7 +66,7 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
         if (_myKeys.length > 0) {
             return _myKeys[index];
         } else {
-            return _beanMetaData.getPrimaryKeyDbName(index);
+            return _yourBeanMetaData.getPrimaryKeyDbName(index);
         }
     }
 
@@ -63,7 +74,7 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
         if (_yourKeys.length > 0) {
             return _yourKeys[index];
         } else {
-            return _beanMetaData.getPrimaryKeyDbName(index);
+            return _yourBeanMetaData.getPrimaryKeyDbName(index);
         }
     }
 
@@ -76,7 +87,11 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
         return false;
     }
 
-    public TnBeanMetaData getBeanMetaData() {
-        return _beanMetaData;
+    public TnBeanMetaData getMyBeanMetaData() {
+        return _myBeanMetaData;
+    }
+
+    public TnBeanMetaData getYourBeanMetaData() {
+        return _yourBeanMetaData;
     }
 }

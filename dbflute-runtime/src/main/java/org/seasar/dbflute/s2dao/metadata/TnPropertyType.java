@@ -22,6 +22,10 @@ import org.seasar.dbflute.helper.beans.DfPropertyDesc;
  */
 public interface TnPropertyType extends TnPropertyMapping {
 
+    /**
+     * Get the description object of the property.
+     * @return The instance of property description. (NotNull)
+     */
     DfPropertyDesc getPropertyDesc();
 
     boolean isPrimaryKey();

@@ -18,6 +18,7 @@ package org.seasar.dbflute.s2dao.metadata;
 import java.util.List;
 import java.util.Set;
 
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 
@@ -31,6 +32,12 @@ public interface TnBeanMetaData {
      * @return The type of bean. (NotNull) 
      */
     Class<?> getBeanClass();
+
+    /**
+     * Get the DB meta of bean.
+     * @return The instance of DB meta. (NullAllowed: but if it's DBFlute entity, NotNull)
+     */
+    DBMeta getDBMeta();
 
     /**
      * Get the list of property type.

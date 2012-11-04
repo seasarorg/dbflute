@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -46,7 +47,8 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Class<?> _beanClass;
+    protected final Class<?> _beanClass; // NotNull
+    protected final DBMeta _dbmeta; // NotNull if DBFlute entity
     protected final StringKeyMap<TnPropertyType> _propertyTypeMap = StringKeyMap.createAsCaseInsensitive();
     protected final List<TnPropertyType> _propertyTypeList = new ArrayList<TnPropertyType>();
     protected TnBeanAnnotationReader _beanAnnotationReader;
@@ -73,8 +75,9 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBeanMetaDataImpl(Class<?> beanClass) {
-        this._beanClass = beanClass;
+    public TnBeanMetaDataImpl(Class<?> beanClass, DBMeta dbmeta) {
+        _beanClass = beanClass;
+        _dbmeta = dbmeta;
     }
 
     // ===================================================================================
@@ -82,6 +85,10 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     //                                                                          ==========
     public Class<?> getBeanClass() {
         return _beanClass;
+    }
+
+    public DBMeta getDBMeta() {
+        return _dbmeta;
     }
 
     // ===================================================================================
@@ -175,7 +182,7 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     //                                                                      Implementation
     //                                                                      ==============
     /**
-     * @return The name of table. (NotNull: If it's not entity, this value is 'df:Unknown')
+     * @return The name of table. (NotNull: if not entity, returns 'df:Unknown')
      */
     public String getTableName() {
         return _tableName;
@@ -193,16 +200,8 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         return _versionNoPropertyName;
     }
 
-    public void setVersionNoPropertyName(String versionNoPropertyName) {
-        this._versionNoPropertyName = versionNoPropertyName;
-    }
-
     public String getTimestampPropertyName() {
         return _timestampPropertyName;
-    }
-
-    public void setTimestampPropertyName(String timestampPropertyName) {
-        this._timestampPropertyName = timestampPropertyName;
     }
 
     public TnPropertyType getPropertyTypeByColumnName(String columnName) {
@@ -227,13 +226,13 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         if (hasPropertyTypeByColumnName(alias)) {
             return getPropertyTypeByColumnName(alias);
         }
-        int index = alias.lastIndexOf('_');
+        final int index = alias.lastIndexOf('_');
         if (index < 0) {
             String msg = "The alias was not found in the table: table=" + _tableName + " alias=" + alias;
             throw new IllegalStateException(msg);
         }
-        String columnName = alias.substring(0, index);
-        String relnoStr = alias.substring(index + 1);
+        final String columnName = alias.substring(0, index);
+        final String relnoStr = alias.substring(index + 1);
         int relno = -1;
         try {
             relno = Integer.parseInt(relnoStr);
@@ -241,12 +240,12 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
             String msg = "The alias was not found in the table: table=" + _tableName + " alias=" + alias;
             throw new IllegalStateException(msg, t);
         }
-        TnRelationPropertyType rpt = getRelationPropertyType(relno);
-        if (!rpt.getBeanMetaData().hasPropertyTypeByColumnName(columnName)) {
+        final TnRelationPropertyType rpt = getRelationPropertyType(relno);
+        if (!rpt.getYourBeanMetaData().hasPropertyTypeByColumnName(columnName)) {
             String msg = "The alias was not found in the table: table=" + _tableName + " alias=" + alias;
             throw new IllegalStateException(msg);
         }
-        return rpt.getBeanMetaData().getPropertyTypeByColumnName(columnName);
+        return rpt.getYourBeanMetaData().getPropertyTypeByColumnName(columnName);
     }
 
     public boolean hasPropertyTypeByColumnName(String columnName) {
@@ -257,12 +256,12 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         if (hasPropertyTypeByColumnName(alias)) {
             return true;
         }
-        int index = alias.lastIndexOf('_');
+        final int index = alias.lastIndexOf('_');
         if (index < 0) {
             return false;
         }
-        String columnName = alias.substring(0, index);
-        String relnoStr = alias.substring(index + 1);
+        final String columnName = alias.substring(0, index);
+        final String relnoStr = alias.substring(index + 1);
         int relno = -1;
         try {
             relno = Integer.parseInt(relnoStr);
@@ -272,8 +271,8 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         if (relno >= getRelationPropertyTypeSize()) {
             return false;
         }
-        TnRelationPropertyType rpt = getRelationPropertyType(relno);
-        return rpt.getBeanMetaData().hasPropertyTypeByColumnName(columnName);
+        final TnRelationPropertyType rpt = getRelationPropertyType(relno);
+        return rpt.getYourBeanMetaData().hasPropertyTypeByColumnName(columnName);
     }
 
     public boolean hasVersionNoPropertyType() {
@@ -288,13 +287,13 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         if (hasPropertyTypeByColumnName(alias)) {
             return _tableName + "." + alias;
         }
-        int index = alias.lastIndexOf('_');
+        final int index = alias.lastIndexOf('_');
         if (index < 0) {
             String msg = "The alias was not found in the table: table=" + _tableName + " alias=" + alias;
             throw new IllegalStateException(msg);
         }
-        String columnName = alias.substring(0, index);
-        String relnoStr = alias.substring(index + 1);
+        final String columnName = alias.substring(0, index);
+        final String relnoStr = alias.substring(index + 1);
         int relno = -1;
         try {
             relno = Integer.parseInt(relnoStr);
@@ -302,8 +301,8 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
             String msg = "The alias was not found in the table: table=" + _tableName + " alias=" + alias;
             throw new IllegalStateException(msg, t);
         }
-        TnRelationPropertyType rpt = getRelationPropertyType(relno);
-        if (!rpt.getBeanMetaData().hasPropertyTypeByColumnName(columnName)) {
+        final TnRelationPropertyType rpt = getRelationPropertyType(relno);
+        if (!rpt.getYourBeanMetaData().hasPropertyTypeByColumnName(columnName)) {
             String msg = "The alias was not found in the table: table=" + _tableName + " alias=" + alias;
             throw new IllegalStateException(msg);
         }
@@ -320,7 +319,7 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
 
     public TnRelationPropertyType getRelationPropertyType(String propertyName) throws DfBeanPropertyNotFoundException {
         for (int i = 0; i < getRelationPropertyTypeSize(); i++) {
-            TnRelationPropertyType rpt = (TnRelationPropertyType) _relationPropertyTypes.get(i);
+            final TnRelationPropertyType rpt = (TnRelationPropertyType) _relationPropertyTypes.get(i);
             if (rpt != null && rpt.getPropertyName().equalsIgnoreCase(propertyName)) {
                 return rpt;
             }
@@ -345,37 +344,45 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     }
 
     public TnIdentifierGenerator getIdentifierGenerator(int index) {
-        return (TnIdentifierGenerator) _identifierGeneratorList.get(index);
+        return _identifierGeneratorList.get(index);
     }
 
     public TnIdentifierGenerator getIdentifierGenerator(String propertyName) {
-        return (TnIdentifierGenerator) _identifierGeneratorsByPropertyName.get(propertyName);
+        return _identifierGeneratorsByPropertyName.get(propertyName);
+    }
+
+    public Set<String> getModifiedPropertyNames(Object bean) {
+        return getModifiedPropertySupport().getModifiedPropertyNames(bean);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setVersionNoPropertyName(String versionNoPropertyName) {
+        _versionNoPropertyName = versionNoPropertyName;
+    }
+
+    public void setTimestampPropertyName(String timestampPropertyName) {
+        _timestampPropertyName = timestampPropertyName;
+    }
+
+    public void setBeanAnnotationReader(TnBeanAnnotationReader beanAnnotationReader) {
+        _beanAnnotationReader = beanAnnotationReader;
+    }
+
+    public void setPropertyTypeFactory(TnPropertyTypeFactory propertyTypeFactory) {
+        _propertyTypeFactory = propertyTypeFactory;
+    }
+
+    public void setRelationPropertyTypeFactory(TnRelationPropertyTypeFactory relationPropertyTypeFactory) {
+        _relationPropertyTypeFactory = relationPropertyTypeFactory;
     }
 
     public TnModifiedPropertySupport getModifiedPropertySupport() {
         return _modifiedPropertySupport;
     }
 
-    public void setModifiedPropertySupport(final TnModifiedPropertySupport propertyModifiedSupport) {
-        this._modifiedPropertySupport = propertyModifiedSupport;
-    }
-
-    public Set<String> getModifiedPropertyNames(final Object bean) {
-        return getModifiedPropertySupport().getModifiedPropertyNames(bean);
-    }
-
-    public void setRelationPropertyTypeFactory(TnRelationPropertyTypeFactory relationPropertyTypeFactory) {
-        this._relationPropertyTypeFactory = relationPropertyTypeFactory;
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setBeanAnnotationReader(TnBeanAnnotationReader beanAnnotationReader) {
-        this._beanAnnotationReader = beanAnnotationReader;
-    }
-
-    public void setPropertyTypeFactory(TnPropertyTypeFactory propertyTypeFactory) {
-        this._propertyTypeFactory = propertyTypeFactory;
+    public void setModifiedPropertySupport(TnModifiedPropertySupport propertyModifiedSupport) {
+        _modifiedPropertySupport = propertyModifiedSupport;
     }
 }

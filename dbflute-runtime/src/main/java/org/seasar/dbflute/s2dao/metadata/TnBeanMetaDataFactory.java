@@ -22,8 +22,6 @@ import java.sql.DatabaseMetaData;
  */
 public interface TnBeanMetaDataFactory {
 
-    TnBeanMetaData createBeanMetaData(Class<?> daoInterface, Class<?> beanClass);
-
     TnBeanMetaData createBeanMetaData(Class<?> beanClass);
 
     TnBeanMetaData createBeanMetaData(Class<?> beanClass, int relationNestLevel);

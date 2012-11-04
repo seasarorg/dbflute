@@ -73,7 +73,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
     protected void setupRelationKeyValue(TnRelationRowCreationResource res) {
         final TnRelationPropertyType rpt = res.getRelationPropertyType();
-        final TnBeanMetaData relBmd = rpt.getBeanMetaData();
+        final TnBeanMetaData relBmd = rpt.getYourBeanMetaData();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
 

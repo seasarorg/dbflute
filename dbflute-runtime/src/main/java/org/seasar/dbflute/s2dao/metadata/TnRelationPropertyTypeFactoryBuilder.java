@@ -22,6 +22,17 @@ import java.sql.DatabaseMetaData;
  */
 public interface TnRelationPropertyTypeFactoryBuilder {
 
-    TnRelationPropertyTypeFactory build(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader,
-            DatabaseMetaData databaseMetaData, int relationNestLevel, boolean isStopRelationCreation);
+    /**
+     * Build factory of relation property type.
+     * @param localBeanClass The bean type of local entity for the relation. (NotNull)
+     * @param localBeanMetaData The bean meta data of local entity for the relation. (NotNull)
+     * @param beanAnnotationReader The reader of bean annotation. (NotNull)
+     * @param dbMetaData The meta data of database. (NotNull)
+     * @param relationNestLevel The nest level of relation. (NotMinus) 
+     * @param stopRelationCreation Does it stop nest relation of the relation?
+     * @return The created factory. (NotNull)
+     */
+    TnRelationPropertyTypeFactory build(Class<?> localBeanClass, TnBeanMetaData localBeanMetaData,
+            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel,
+            boolean stopRelationCreation);
 }

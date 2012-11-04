@@ -93,6 +93,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             // they are unnecessary to do relation loop!
             skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
         }
+        final boolean canCache = hasCB && canRelationMappingCache();
         final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
 
         while (rs.next()) {
@@ -121,8 +122,8 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             if (relRowCache == null) {
                 relRowCache = createRelationRowCache(relSize);
             }
-            for (int i = 0; i < relSize; ++i) {
-                final TnRelationPropertyType rpt = getBeanMetaData().getRelationPropertyType(i);
+            for (int relno = 0; relno < relSize; ++relno) {
+                final TnRelationPropertyType rpt = getBeanMetaData().getRelationPropertyType(relno);
                 if (rpt == null) {
                     continue;
                 }
@@ -136,11 +137,11 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 final TnRelationKey relKey = createRelationKey(rs, rpt, selectColumnSet, relKeyValues, selectIndexMap);
                 Object relationRow = null;
                 if (relKey != null) {
-                    relationRow = relRowCache.getRelationRow(i, relKey);
+                    relationRow = getCachedRelationRow(relRowCache, relno, relKey, canCache);
                     if (relationRow == null) { // when no cache
                         relationRow = createRelationRow(rs, rpt, selectColumnSet, relKeyValues, relationPropertyCache);
                         if (relationRow != null) {
-                            relRowCache.addRelationRow(i, relKey, relationRow);
+                            addRelationRowCache(relRowCache, relno, relKey, relationRow, canCache);
                             postCreateRow(relationRow);
                         }
                     }
@@ -155,6 +156,9 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         }
     }
 
+    // ===================================================================================
+    //                                                                   RelationRow Cache
+    //                                                                   =================
     /**
      * Create the cache of relation row.
      * @param relSize The size of relation.
@@ -179,7 +183,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             throws SQLException {
         final List<Object> keyList = new ArrayList<Object>();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
-            final TnPropertyType pt = rpt.getBeanMetaData().getPropertyTypeByColumnName(rpt.getYourKey(i));
+            final TnPropertyType pt = rpt.getYourBeanMetaData().getPropertyTypeByColumnName(rpt.getYourKey(i));
             final String relationNoSuffix = buildRelationNoSuffix(rpt);
             final String columnName = pt.getColumnDbName() + relationNoSuffix;
             final ValueType valueType;
@@ -213,8 +217,19 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         }
     }
 
+    protected Object getCachedRelationRow(TnRelationRowCache cache, int relno, TnRelationKey relKey, boolean canCache) {
+        return canCache ? cache.getRelationRow(relno, relKey) : null;
+    }
+
+    protected void addRelationRowCache(TnRelationRowCache cache, int relno, TnRelationKey relKey, Object relationRow,
+            boolean canCache) {
+        if (canCache) {
+            cache.addRelationRow(relno, relKey, relationRow);
+        }
+    }
+
     // ===================================================================================
-    //                                                                       Assist Helper
+    //                                                                       ConditionBean
     //                                                                       =============
     protected boolean hasConditionBean() {
         return ConditionBeanContext.isExistConditionBeanOnThread();
@@ -248,6 +263,18 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         return "_" + rpt.getRelationNo();
     }
 
+    /**
+     * Can the relation mapping (entity instance) cache?
+     * @return The determination, true or false.
+     */
+    protected boolean canRelationMappingCache() {
+        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+        return cb.canRelationMappingCache();
+    }
+
+    // ===================================================================================
+    //                                                                          OutsideSql
+    //                                                                          ==========
     protected boolean hasOutsideSqlContext() {
         return OutsideSqlContext.isExistOutsideSqlContextOnThread();
     }

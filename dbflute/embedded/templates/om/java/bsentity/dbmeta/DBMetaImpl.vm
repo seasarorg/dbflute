@@ -149,18 +149,18 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                       ---------------
 #if ($table.hasPrimaryKey())
 #if ($table.hasSinglePrimaryKey())
-    public UniqueInfo getPrimaryUniqueInfo() { return cpui(column${table.primaryKeyAsOne.javaBeansRulePropertyNameInitCap}()); }
+    protected UniqueInfo cpui() { return hpcpui(column${table.primaryKeyAsOne.javaBeansRulePropertyNameInitCap}()); }
 #else
-    public UniqueInfo getPrimaryUniqueInfo() {
+    protected UniqueInfo cpui() {
         List<ColumnInfo> ls = newArrayList();
 #foreach ($col in $table.primaryKey)
         ls.add(column${col.javaBeansRulePropertyNameInitCap}());
 #end
-        return cpui(ls);
+        return hpcpui(ls);
     }
 #end
 #else
-    public UniqueInfo getPrimaryUniqueInfo() {
+    protected UniqueInfo cpui() {
         throw new UnsupportedOperationException("The table does not have primary key: " + getTableDbName());
     }
 #end

@@ -18,6 +18,7 @@ package org.seasar.dbflute.s2dao.metadata.impl;
 import java.sql.DatabaseMetaData;
 
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
+import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
@@ -27,15 +28,16 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
  */
 public class TnRelationPropertyTypeFactoryBuilderImpl implements TnRelationPropertyTypeFactoryBuilder {
 
-    protected TnBeanMetaDataFactory beanMetaDataFactory;
+    protected TnBeanMetaDataFactory _beanMetaDataFactory;
 
-    public void setBeanMetaDataFactory(TnBeanMetaDataFactory beanMetaDataFactory) {
-        this.beanMetaDataFactory = beanMetaDataFactory;
+    public TnRelationPropertyTypeFactory build(Class<?> localBeanClass, TnBeanMetaData localBeanMetaData,
+            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel,
+            boolean stopRelationCreation) {
+        return new TnRelationPropertyTypeFactoryImpl(localBeanClass, localBeanMetaData, beanAnnotationReader,
+                _beanMetaDataFactory, dbMetaData, relationNestLevel, stopRelationCreation);
     }
 
-    public TnRelationPropertyTypeFactory build(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader,
-            DatabaseMetaData databaseMetaData, int relationNestLevel, boolean isStopRelationCreation) {
-        return new TnRelationPropertyTypeFactoryImpl(beanClass, beanAnnotationReader, beanMetaDataFactory,
-                databaseMetaData, relationNestLevel, isStopRelationCreation);
+    public void setBeanMetaDataFactory(TnBeanMetaDataFactory beanMetaDataFactory) {
+        _beanMetaDataFactory = beanMetaDataFactory;
     }
 }

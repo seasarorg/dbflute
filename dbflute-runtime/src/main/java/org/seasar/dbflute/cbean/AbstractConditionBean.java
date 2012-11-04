@@ -75,19 +75,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // -----------------------------------------------------
-    //                                                Option
-    //                                                ------
-    /** Safety max result size. {Internal} */
-    private int _safetyMaxResultSize;
-
-    /** The configuration of statement. {Internal} (NullAllowed) */
-    private StatementConfig _statementConfig;
-
-    // -----------------------------------------------------
     //                                                Paging
     //                                                ------
     /** Is the count executed later? {Internal} */
-    private boolean _pagingCountLater; // the default value is on the DBFlute generator
+    private boolean _pagingCountLater; // the default value is on the DBFlute generator (true @since 0.9...)
 
     /** Can the paging re-select? {Internal} */
     private boolean _pagingReSelect = true;
@@ -110,9 +101,26 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // -----------------------------------------------------
     //                                          Dream Cruise
     //                                          ------------
+    /** The departure port (base point condition-bean) of dream cruise. (used when dream cruise) */
     protected ConditionBean _dreamCruiseDeparturePort;
+
+    /** The ticket (specified column) of dream cruise. (used when dream cruise) */
     protected HpSpecifiedColumn _dreamCruiseTicket;
+
+    /** The journey log book (relation path) of dream cruise. (used when dream cruise) */
     protected List<String> _dreamCruiseJourneyLogBook;
+
+    // -----------------------------------------------------
+    //                                        Various Option
+    //                                        --------------
+    /** Safety max result size. {Internal} */
+    private int _safetyMaxResultSize;
+
+    /** The configuration of statement. {Internal} (NullAllowed) */
+    private StatementConfig _statementConfig;
+
+    /** Does it cache of relation entity instance? {Internal} */
+    private boolean _relationMappingCache = true;
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -1018,6 +1026,23 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // ===================================================================================
+    //                                                                      Entity Mapping
+    //                                                                      ==============
+    /**
+     * {@inheritDoc}
+     */
+    public void disableRelationMappingCache() {
+        _relationMappingCache = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean canRelationMappingCache() {
+        return _relationMappingCache;
+    }
+
+    // ===================================================================================
     //                                                                     Embed Condition
     //                                                                     ===============
     /**
@@ -1032,7 +1057,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void embedCondition(Set<ColumnInfo> embeddedColumnInfoSet, boolean quote) {
         if (embeddedColumnInfoSet == null) {
-            String msg = "The argument[embedCondition] should not be null.";
+            String msg = "The argument 'embedCondition' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         if (quote) {

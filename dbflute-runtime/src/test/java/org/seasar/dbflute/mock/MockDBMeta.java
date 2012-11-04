@@ -124,6 +124,11 @@ public class MockDBMeta extends AbstractDBMeta {
         return null;
     }
 
+    @Override
+    protected UniqueInfo cpui() {
+        return null;
+    }
+
     public void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap) {
     }
 

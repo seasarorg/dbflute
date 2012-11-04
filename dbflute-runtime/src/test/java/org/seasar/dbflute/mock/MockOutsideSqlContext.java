@@ -30,7 +30,15 @@ public class MockOutsideSqlContext extends OutsideSqlContext {
                 return null;
             }
 
+            public DBMeta provideDBMeta(Class<?> entityType) {
+                return null;
+            }
+
             public DBMeta provideDBMetaChecked(String tableFlexibleName) {
+                return null;
+            }
+
+            public DBMeta provideDBMetaChecked(Class<?> entityType) {
                 return null;
             }
         }, null);

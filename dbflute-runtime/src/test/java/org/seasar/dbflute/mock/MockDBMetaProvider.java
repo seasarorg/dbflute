@@ -27,7 +27,15 @@ public class MockDBMetaProvider implements DBMetaProvider {
         return new MockDBMeta();
     }
 
+    public DBMeta provideDBMeta(Class<?> entityType) {
+        return new MockDBMeta();
+    }
+
     public DBMeta provideDBMetaChecked(String tableFlexibleName) {
+        return new MockDBMeta();
+    }
+
+    public DBMeta provideDBMetaChecked(Class<?> entityType) {
         return new MockDBMeta();
     }
 }

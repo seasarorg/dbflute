@@ -261,6 +261,21 @@ public interface ConditionBean extends PagingBean {
     StatementConfig getStatementConfig();
 
     // ===================================================================================
+    //                                                                      Entity Mapping
+    //                                                                      ==============
+    /**
+     * Disable (entity instance) cache of relation mapping. <br />
+     * Basically you don't need this. This is for accidents.
+     */
+    void disableRelationMappingCache();
+
+    /**
+     * Can the relation mapping (entity instance) cache?
+     * @return The determination, true or false.
+     */
+    boolean canRelationMappingCache();
+
+    // ===================================================================================
     //                                                                         Display SQL
     //                                                                         ===========
     /**

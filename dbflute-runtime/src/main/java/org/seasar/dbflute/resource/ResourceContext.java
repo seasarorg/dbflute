@@ -144,6 +144,18 @@ public class ResourceContext {
     }
 
     /**
+     * @param entityType The entity type of table. (NotNull)
+     * @return The instance of DB meta. (NullAllowed)
+     */
+    public static DBMeta provideDBMeta(Class<?> entityType) {
+        if (!isExistResourceContextOnThread()) {
+            return null;
+        }
+        final DBMetaProvider provider = getResourceContextOnThread().getDBMetaProvider();
+        return provider != null ? provider.provideDBMeta(entityType) : null;
+    }
+
+    /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (NotNull)
      */
@@ -157,6 +169,22 @@ public class ResourceContext {
             throw new IllegalStateException(msg);
         }
         return provider.provideDBMetaChecked(tableFlexibleName);
+    }
+
+    /**
+     * @param entityType The entity type of table. (NotNull)
+     * @return The instance of DB meta. (NotNull)
+     */
+    public static DBMeta provideDBMetaChecked(Class<?> entityType) {
+        assertResourceContextExists();
+        final ResourceContext context = getResourceContextOnThread();
+        final DBMetaProvider provider = context.getDBMetaProvider();
+        if (provider == null) {
+            String msg = "The provider of DB meta should exist:";
+            msg = msg + " entityType=" + entityType + " context=" + context;
+            throw new IllegalStateException(msg);
+        }
+        return provider.provideDBMetaChecked(entityType);
     }
 
     public static SqlAnalyzer createSqlAnalyzer(String sql, boolean blockNullParameter) {

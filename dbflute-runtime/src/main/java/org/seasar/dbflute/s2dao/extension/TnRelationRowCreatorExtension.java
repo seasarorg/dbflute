@@ -63,8 +63,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     @Override
     protected void setupRelationKeyValue(TnRelationRowCreationResource res) {
         final TnRelationPropertyType rpt = res.getRelationPropertyType();
-        final TnBeanMetaData bmd = rpt.getBeanMetaData();
-        final DBMeta dbmeta = findDBMeta(bmd.getBeanClass(), bmd.getTableName());
+        final TnBeanMetaData yourBmd = rpt.getYourBeanMetaData();
+        final DBMeta dbmeta = findDBMeta(yourBmd.getBeanClass(), yourBmd.getTableName());
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
 
@@ -92,7 +92,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
                 continue;
             }
 
-            final TnPropertyMapping mapping = bmd.getPropertyTypeByColumnName(rpt.getYourKey(i));
+            final TnPropertyMapping mapping = yourBmd.getPropertyTypeByColumnName(rpt.getYourKey(i));
             setValue(res, mapping, dbmeta, value);
         }
     }

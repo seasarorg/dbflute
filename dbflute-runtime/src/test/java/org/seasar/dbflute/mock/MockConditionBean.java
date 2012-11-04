@@ -274,6 +274,13 @@ public class MockConditionBean implements ConditionBean {
     public void disablePagingCountLeastJoin() {
     }
 
+    public void disableRelationMappingCache() {
+    }
+
+    public boolean canRelationMappingCache() {
+        return false;
+    }
+
     public boolean hasWhereClauseOnBaseQuery() {
         return false;
     }
