@@ -18,8 +18,6 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                       Attribute
         //                                                                       =========
         protected readonly ${glSqlClause} _sqlClause;
-        protected int _safetyMaxResultSize;
-        protected ${glStatementConfig} _statementConfig;
         protected bool _canPagingReSelect = true;
         private Map<String, Object> _freeParameterMap;
         private ${glUnionQuery}<${glConditionBean}> _unionQuerySynchronizer;
@@ -32,6 +30,10 @@ namespace ${glPackageBaseCommonCBean} {
         protected bool _forScalarSelect;
         protected bool _forScalarCondition;
         protected bool _forColumnQuery;
+
+        protected int _safetyMaxResultSize;
+        protected ${glStatementConfig} _statementConfig;
+        protected bool _relationMappingCache;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -262,6 +264,17 @@ namespace ${glPackageBaseCommonCBean} {
         public ${glStatementConfig} StatementConfig { get {
             return _statementConfig;
         }}
+
+        // ===============================================================================
+        //                                                                  Entity Mapping
+        //                                                                  ==============
+        public virtual void DisableRelationMappingCache() {
+            _relationMappingCache = false;
+        }
+
+        public virtual bool CanRelationMappingCache() {
+            return _relationMappingCache;
+        }
 
         // ===============================================================================
         //                                                                     Display SQL

@@ -60,6 +60,12 @@ namespace ${glPackageBaseCommonCBean} {
         ${glStatementConfig} StatementConfig { get; }
 
         // ===============================================================================
+        //                                                                  Entity Mapping
+        //                                                                  ==============
+        void DisableRelationMappingCache();
+        bool CanRelationMappingCache();
+
+        // ===============================================================================
         //                                                                     Display SQL
         //                                                                     ===========
     	String ToDisplaySql();

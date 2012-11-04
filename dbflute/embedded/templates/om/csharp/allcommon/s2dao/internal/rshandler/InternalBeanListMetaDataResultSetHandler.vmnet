@@ -52,6 +52,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                 // they are unnecessary to do relation loop!
                 skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
             }
+            bool canCache = hasCB && CanRelationMappingCache();
             Map<String, int?> selectIndexMap = GetSelectIndexMap();
 
             while (dataReader.Read()) {
@@ -91,11 +92,11 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
                     System.Collections.Hashtable relKeyValues = new System.Collections.Hashtable();
                     RelationKey relKey = CreateRelationKey(dataReader, rpt, columnNames, relKeyValues, selectIndexMap);
                     if (relKey != null) {
-                        relationRow = relRowCache.GetRelationRow(i, relKey);
+                        relationRow = GetCachedRelationRow(relRowCache, i, relKey, canCache);
                         if (relationRow == null) {
                             relationRow = CreateRelationRow(dataReader, rpt, columnNames, relKeyValues, relationPropertyCache);
                             if (relationRow != null) {
-                                relRowCache.AddRelationRow(i, relKey, relationRow);
+                                AddRelationRowCache(relRowCache, i, relKey, relationRow, canCache);
                                 PostCreateRow(relationRow, rpt.BeanMetaData);
                             }
                         }
@@ -149,6 +150,16 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             else return null;
         }
 
+        protected Object GetCachedRelationRow(RelationRowCache cache, int relno, RelationKey relKey, bool canCache) {
+            return canCache ? cache.GetRelationRow(relno, relKey) : null;
+        }
+
+        protected void AddRelationRowCache(RelationRowCache cache, int relno, RelationKey relKey, Object relationRow, bool canCache) {
+            if (canCache) {
+                cache.AddRelationRow(relno, relKey, relationRow);
+            }
+        }
+
         protected static String RemoveQuoteIfExists(String name) {
             if (name.StartsWith("\"") && name.EndsWith("\"")) {
                 name = name.Substring(1);
@@ -183,7 +194,7 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
         }
 
         // ===================================================================================
-        //                                                                       Assist Helper
+        //                                                                       ConditionBean
         //                                                                       =============
         protected bool HasConditionBean() {
             return ${glConditionBeanContext}.IsExistConditionBeanOnThread();
@@ -207,6 +218,15 @@ namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
             return "_" + rpt.RelationNo;
         }
 
+        // You should call HasConditionBean() before calling this!
+        protected bool CanRelationMappingCache() {
+            ${glConditionBean} cb = ${glConditionBeanContext}.GetConditionBeanOnThread();
+            return cb.CanRelationMappingCache();
+        }
+
+        // ===================================================================================
+        //                                                                          OutsideSql
+        //                                                                          ==========
         protected bool HasOutsideSqlContext() {
             return ${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread();
         }
