@@ -24,6 +24,8 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
+ * The reader of bean's field annotation. (S2Dao classic style) <br />
+ * DBFlute also partly uses this.
  * @author modified by jflute (originated in S2Dao)
  */
 public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {

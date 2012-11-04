@@ -18,13 +18,33 @@ package org.seasar.dbflute.s2dao.metadata;
 import java.sql.DatabaseMetaData;
 
 /**
+ * The factory of bean meta data.
  * @author modified by jflute (originated in S2Dao)
  */
 public interface TnBeanMetaDataFactory {
 
+    /**
+     * Create the bean meta data as relation nest level 0.
+     * @param beanClass The type of bean. (NotNull)
+     * @return The created bean meta data (or cached instance). (NotNull)
+     */
     TnBeanMetaData createBeanMetaData(Class<?> beanClass);
 
+    /**
+     * Create the bean meta data for relation.
+     * @param beanClass The type of bean. (NotNull)
+     * @param relationNestLevel The nest level of relation. (NotMinus)
+     * @return The created bean meta data (or cached instance). (NotNull)
+     */
     TnBeanMetaData createBeanMetaData(Class<?> beanClass, int relationNestLevel);
 
+    /**
+     * Create the bean meta data for relation with specified database meta data. <br />
+     * Other methods also use meta data but you can specify your own meta data by this.
+     * @param dbMetaData The meta data of database. (NotNull)
+     * @param beanClass The type of bean. (NotNull)
+     * @param relationNestLevel The nest level of relation. (NotMinus)
+     * @return The created bean meta data (or cached instance). (NotNull)
+     */
     TnBeanMetaData createBeanMetaData(DatabaseMetaData dbMetaData, Class<?> beanClass, int relationNestLevel);
 }

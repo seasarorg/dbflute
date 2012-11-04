@@ -41,8 +41,8 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
     //                                                                         Constructor
     //                                                                         ===========
     public TnAbstractPropertyTypeFactory(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader) {
-        this._beanClass = beanClass;
-        this._beanAnnotationReader = beanAnnotationReader;
+        _beanClass = beanClass;
+        _beanAnnotationReader = beanAnnotationReader;
     }
 
     // ===================================================================================

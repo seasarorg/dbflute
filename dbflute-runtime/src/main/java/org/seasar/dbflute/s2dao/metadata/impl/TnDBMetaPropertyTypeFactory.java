@@ -32,7 +32,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 /**
  * @author modified by jflute (originated in S2Dao)
  */
-public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
+public class TnDBMetaPropertyTypeFactory extends TnAbstractPropertyTypeFactory {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -42,7 +42,7 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnPropertyTypeFactoryImpl(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader) {
+    public TnDBMetaPropertyTypeFactory(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader) {
         super(beanClass, beanAnnotationReader);
         initializeResources();
     }

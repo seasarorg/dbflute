@@ -20,15 +20,24 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
+ * The implementation as S2Dao of creator of relation row. <br />
+ * This class has sub-class extended by DBFlute.
+ * <pre>
+ * {@link TnRelationRowCreatorImpl} is close to S2Dao logic
+ * {@link TnRelationRowCreatorExtension} has DBFlute logic
+ * </pre>
+ * DBFlute depended on S2Dao before 0.9.0. <br />
+ * It saves these structure to be easy to know what DBFlute extends it.
+ * However several S2Dao's logics are deleted as abstract methods.
  * @author modified by jflute (originated in S2Dao)
  */
 public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
@@ -45,14 +54,27 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
-        final TnRelationRowCreationResource res = createResourceForRow(rs, rpt, selectColumnMap, relKeyValues,
-                relationPropertyCache);
-        return createRelationRow(res);
+        return createRelationRow(createResourceForRow(rs, rpt, selectColumnMap, relKeyValues, relationPropertyCache));
     }
 
-    protected abstract TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
+    protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
             Map<String, String> selectColumnMap, Map<String, Object> relKeyValues,
-            Map<String, Map<String, TnPropertyMapping>> relationPropertyCache) throws SQLException;
+            Map<String, Map<String, TnPropertyMapping>> relationPropertyCache) throws SQLException {
+        // the resource class is already customized for DBFlute
+        final TnRelationRowCreationResource res = new TnRelationRowCreationResource();
+        res.setResultSet(rs);
+        res.setRelationPropertyType(rpt);
+        res.setSelectColumnMap(selectColumnMap);
+        res.setRelKeyValues(relKeyValues);
+        res.setRelationPropertyCache(relationPropertyCache);
+        res.setBaseSuffix(""); // as default
+        res.setRelationNoSuffix(buildRelationNoSuffix(rpt));
+        res.setLimitRelationNestLevel(getLimitRelationNestLevel());
+        res.setCurrentRelationNestLevel(1);// as Default
+        res.setCreateDeadLink(isCreateDeadLink());
+        res.setSelectIndexMap(ResourceContext.getSelectIndexMap());
+        return res;
+    }
 
     /**
      * @param res The resource of relation row creation. (NotNull)
@@ -71,32 +93,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         return res.getRow();
     }
 
-    protected void setupRelationKeyValue(TnRelationRowCreationResource res) {
-        final TnRelationPropertyType rpt = res.getRelationPropertyType();
-        final TnBeanMetaData relBmd = rpt.getYourBeanMetaData();
-        for (int i = 0; i < rpt.getKeySize(); ++i) {
-            final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
-
-            if (!res.containsSelectColumn(columnName)) {
-                continue;
-            }
-            if (!res.hasRowInstance()) {
-                res.setRow(newRelationRow(rpt));
-            }
-            if (!res.containsRelKeyValueIfExists(columnName)) {
-                continue;
-            }
-            final Object value = res.extractRelKeyValue(columnName);
-            if (value == null) {
-                continue;
-            }
-
-            final String yourKey = rpt.getYourKey(i);
-            final TnPropertyType pt = relBmd.getPropertyTypeByColumnName(yourKey);
-            final DfPropertyDesc pd = pt.getPropertyDesc();
-            pd.setValue(res.getRow(), value);
-        }
-    }
+    protected abstract void setupRelationKeyValue(TnRelationRowCreationResource res);
 
     protected abstract void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException;
 
@@ -109,65 +106,6 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
             return true;
         }
         return res.hasValidValueCount();
-    }
-
-    protected void setupRelationProperty(TnRelationRowCreationResource res) throws SQLException {
-        final String columnName = res.buildRelationColumnName();
-        if (!res.hasRowInstance()) {
-            res.setRow(newRelationRow(res));
-        }
-        registerRelationValue(res, columnName);
-    }
-
-    protected abstract void registerRelationValue(TnRelationRowCreationResource res, String columnName)
-            throws SQLException;
-
-    protected void registerRelationValidValue(TnRelationRowCreationResource res, TnPropertyType pt, Object value)
-            throws SQLException {
-        res.incrementValidValueCount();
-        final DfPropertyDesc pd = pt.getPropertyDesc();
-        pd.setValue(res.getRow(), value);
-    }
-
-    // -----------------------------------------------------
-    //                                         Next Relation
-    //                                         -------------
-    protected void setupNextRelationRow(TnRelationRowCreationResource res) throws SQLException {
-        final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
-        final Object row = res.getRow();
-        res.backupRelationPropertyType();
-        res.incrementCurrentRelationNestLevel();
-        try {
-            for (int i = 0; i < nextBmd.getRelationPropertyTypeSize(); ++i) {
-                final TnRelationPropertyType nextRpt = nextBmd.getRelationPropertyType(i);
-                setupNextRelationRowElement(res, row, nextRpt);
-            }
-        } finally {
-            res.setRow(row);
-            res.restoreRelationPropertyType();
-            res.decrementCurrentRelationNestLevel();
-        }
-    }
-
-    protected void setupNextRelationRowElement(TnRelationRowCreationResource res, Object row,
-            TnRelationPropertyType nextRpt) throws SQLException {
-        if (nextRpt == null) {
-            return;
-        }
-        res.clearRowInstance();
-        res.setRelationPropertyType(nextRpt);
-
-        final String baseSuffix = res.getRelationNoSuffix();
-        final String additionalRelationNoSuffix = buildRelationNoSuffix(nextRpt);
-        res.backupSuffixAndPrepare(baseSuffix, additionalRelationNoSuffix);
-        try {
-            final Object relationRow = createRelationRow(res);
-            if (relationRow != null) {
-                nextRpt.getPropertyDesc().setValue(row, relationRow);
-            }
-        } finally {
-            res.restoreSuffix();
-        }
     }
 
     // ===================================================================================
@@ -196,9 +134,25 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         return relationPropertyCache;
     }
 
-    protected abstract TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
+    protected Map<String, Map<String, TnPropertyMapping>> newRelationPropertyCache() {
+        return StringKeyMap.createAsCaseInsensitive();
+    }
+
+    protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
             Map<String, String> selectColumnMap, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache,
-            String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException;
+            String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException {
+        // the resource class is already customized for DBFlute
+        final TnRelationRowCreationResource res = new TnRelationRowCreationResource();
+        res.setRelationPropertyType(rpt);
+        res.setSelectColumnMap(selectColumnMap);
+        res.setRelationPropertyCache(relationPropertyCache);
+        res.setBaseSuffix(baseSuffix);
+        res.setRelationNoSuffix(relationNoSuffix);
+        res.setLimitRelationNestLevel(limitRelationNestLevel);
+        res.setCurrentRelationNestLevel(1); // as default
+        res.setSelectIndexMap(ResourceContext.getSelectIndexMap());
+        return res;
+    }
 
     protected abstract void setupPropertyCache(TnRelationRowCreationResource res) throws SQLException;
 
@@ -210,37 +164,6 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         res.savePropertyCacheElement();
     }
 
-    // -----------------------------------------------------
-    //                                         Next Relation
-    //                                         -------------
-    protected void setupNextPropertyCache(TnRelationRowCreationResource res, TnBeanMetaData nextBmd)
-            throws SQLException {
-        for (int i = 0; i < nextBmd.getRelationPropertyTypeSize(); ++i) {
-            final TnRelationPropertyType nextNextRpt = nextBmd.getRelationPropertyType(i);
-            res.setRelationPropertyType(nextNextRpt);
-            setupNextPropertyCacheElement(res, nextNextRpt);
-        }
-    }
-
-    protected void setupNextPropertyCacheElement(TnRelationRowCreationResource res, TnRelationPropertyType nextNextRpt)
-            throws SQLException {
-        final String baseSuffix = res.getRelationNoSuffix();
-        final String additionalRelationNoSuffix = buildRelationNoSuffix(nextNextRpt);
-        res.backupSuffixAndPrepare(baseSuffix, additionalRelationNoSuffix);
-        try {
-            setupPropertyCache(res);// Recursive call!
-        } finally {
-            res.restoreSuffix();
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                                Common
-    //                                                ------
-    protected Map<String, Map<String, TnPropertyMapping>> newRelationPropertyCache() {
-        return StringKeyMap.createAsCaseInsensitive();
-    }
-
     // ===================================================================================
     //                                                                        Common Logic
     //                                                                        ============
@@ -248,11 +171,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         return "_" + rpt.getRelationNo();
     }
 
-    protected Object newRelationRow(TnRelationRowCreationResource res) {
-        return newRelationRow(res.getRelationPropertyType());
-    }
-
-    protected Object newRelationRow(TnRelationPropertyType rpt) {
+    protected Object newRelationRow(TnRelationPropertyType rpt) { // for non DBFlute entity
         return DfReflectionUtil.newInstance(rpt.getPropertyDesc().getPropertyType());
     }
 

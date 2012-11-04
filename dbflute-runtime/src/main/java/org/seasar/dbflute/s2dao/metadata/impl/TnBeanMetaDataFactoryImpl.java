@@ -18,16 +18,10 @@ package org.seasar.dbflute.s2dao.metadata.impl;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
-import org.seasar.dbflute.helper.beans.DfBeanDesc;
-import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
@@ -48,10 +42,11 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
  * </pre>
  * DBFlute depended on S2Dao before 0.9.0. <br />
  * It saves these structure to be easy to know what DBFlute extends it. <br />
- * (However this class already has several DBFlute logic...)
+ * However several S2Dao's logics are deleted as abstract methods
+ * and this class already has several DBFlute logics...
  * @author modified by jflute (originated in S2Dao)
  */
-public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
+public abstract class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
 
     // ===================================================================================
     //                                                                          Definition
@@ -70,10 +65,12 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     // /= = = = = = = = = = = = = = = = = = = = = = = = = =
     // these methods are overridden at the extension class 
     // = = = = = = = = = =/
+    // this is overridden but called in sub-class
     public TnBeanMetaData createBeanMetaData(Class<?> beanClass) {
         return createBeanMetaData(beanClass, 0);
     }
 
+    // this is overridden but called in sub-class
     public TnBeanMetaData createBeanMetaData(Class<?> beanClass, int relationNestLevel) {
         if (beanClass == null) {
             throw new IllegalArgumentException("The argument 'beanClass' should not be null.");
@@ -105,6 +102,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         return ResourceContext.createSQLExceptionHandler();
     }
 
+    // this is overridden but called in sub-class
     public TnBeanMetaData createBeanMetaData(DatabaseMetaData dbMetaData, Class<?> beanClass, int relationNestLevel) {
         if (dbMetaData == null) {
             throw new IllegalArgumentException("The argument 'dbMetaData' should not be null.");
@@ -130,38 +128,14 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         return bmd;
     }
 
-    protected TnModifiedPropertySupport createModifiedPropertySupport() {
-        return new TnModifiedPropertySupport() {
-            @SuppressWarnings("unchecked")
-            public Set<String> getModifiedPropertyNames(Object bean) {
-                if (bean instanceof Entity) { // all entities of DBFlute are here
-                    return ((Entity) bean).modifiedProperties();
-                } else { // basically no way on DBFlute (S2Dao's route)
-                    final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(bean.getClass());
-                    final String propertyName = MODIFIED_PROPERTY_PROPERTY_NAME;
-                    if (!beanDesc.hasPropertyDesc(propertyName)) {
-                        return Collections.EMPTY_SET;
-                    } else {
-                        final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
-                        final Object value = propertyDesc.getValue(bean);
-                        return (Set<String>) value;
-                    }
-                }
-            }
-        };
-    }
+    protected abstract TnBeanMetaDataImpl createBeanMetaDataImpl(Class<?> beanClass);
 
-    protected TnBeanMetaDataImpl createBeanMetaDataImpl(Class<?> beanClass) {
-        // this is S2Dao's area so DBMeta is null
-        return new TnBeanMetaDataImpl(beanClass, null);
-    }
+    protected abstract TnModifiedPropertySupport createModifiedPropertySupport();
 
     // ===================================================================================
     //                                                                   Annotation Reader
     //                                                                   =================
-    protected TnBeanAnnotationReader createBeanAnnotationReader(Class<?> beanClass) {
-        return new TnFieldBeanAnnotationReader(beanClass);
-    }
+    protected abstract TnBeanAnnotationReader createBeanAnnotationReader(Class<?> beanClass);
 
     // ===================================================================================
     //                                                                     Optimistic Lock
@@ -185,21 +159,20 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     }
 
     protected TnPropertyTypeFactoryBuilder createPropertyTypeFactoryBuilder() {
-        return new TnPropertyTypeFactoryBuilderImpl();
+        return new TnPropertyTypeFactoryBuilderImpl(); // is already customized for DBFlute
     }
 
     protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass,
             TnBeanMetaDataImpl localBeanMetaData, TnBeanAnnotationReader beanAnnotationReader,
             DatabaseMetaData dbMetaData, int relationNestLevel, boolean stopRelationCreation) {
+        // DBFlute needs local BeanMetaData for relation property type
         final TnRelationPropertyTypeFactoryBuilder builder = createRelationPropertyTypeFactoryBuilder();
         return builder.build(beanClass, localBeanMetaData, beanAnnotationReader, dbMetaData, relationNestLevel,
                 stopRelationCreation);
     }
 
     protected TnRelationPropertyTypeFactoryBuilder createRelationPropertyTypeFactoryBuilder() {
-        final TnRelationPropertyTypeFactoryBuilderImpl impl = new TnRelationPropertyTypeFactoryBuilderImpl();
-        impl.setBeanMetaDataFactory(this);
-        return impl;
+        return new TnRelationPropertyTypeFactoryBuilderImpl(this); // is already customized for DBFlute
     }
 
     // ===================================================================================
@@ -209,11 +182,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         return relationNestLevel == getLimitRelationNestLevel();
     }
 
-    protected int getLimitRelationNestLevel() {
-        // you can change relation creation range by changing this
-        // (this comment is for S2Dao, DBFlute overrides this)
-        return 1;
-    }
+    protected abstract int getLimitRelationNestLevel(); // return 1 if S2Dao
 
     // ===================================================================================
     //                                                                            Accessor

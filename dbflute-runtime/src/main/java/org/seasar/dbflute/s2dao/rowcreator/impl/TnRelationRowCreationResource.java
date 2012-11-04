@@ -25,6 +25,8 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 
 /**
+ * The resource for relation row creation. <br />
+ * S2Dao logics are modified for DBFlute.
  * @author modified by jflute (originated in S2Dao)
  */
 public class TnRelationRowCreationResource {
@@ -71,8 +73,14 @@ public class TnRelationRowCreationResource {
     /** Does it create dead link? */
     protected boolean _createDeadLink;
 
-    /** The backup of relation property type. The element type is RelationPropertyType. */
+    // -----------------------------------------------------
+    //                                                Backup
+    //                                                ------
+    /** The backup of relation property type. The element type is {@link TnRelationPropertyType}. */
     protected Stack<TnRelationPropertyType> _relationPropertyTypeBackup;
+
+    /** The backup of relation key values. The element type is Map. */
+    protected Stack<Map<String, Object>> _relKeyValuesBackup;
 
     /** The backup of base suffix. The element type is String. */
     protected Stack<String> _baseSuffixBackup;
@@ -80,6 +88,9 @@ public class TnRelationRowCreationResource {
     /** The backup of base suffix. The element type is String. */
     protected Stack<String> _relationSuffixBackup;
 
+    // -----------------------------------------------------
+    //                                          Select Index
+    //                                          ------------
     /** The map of select index. (NullAllowed) */
     protected Map<String, Integer> _selectIndexMap;
 
@@ -109,14 +120,14 @@ public class TnRelationRowCreationResource {
     }
 
     public void backupRelationPropertyType() {
-        getOrCreateRelationPropertyTypeBackup().push(getRelationPropertyType());
+        getRelationPropertyTypeBackup().push(getRelationPropertyType());
     }
 
     public void restoreRelationPropertyType() {
-        setRelationPropertyType((TnRelationPropertyType) getOrCreateRelationPropertyTypeBackup().pop());
+        setRelationPropertyType(getRelationPropertyTypeBackup().pop());
     }
 
-    protected Stack<TnRelationPropertyType> getOrCreateRelationPropertyTypeBackup() {
+    protected Stack<TnRelationPropertyType> getRelationPropertyTypeBackup() {
         if (_relationPropertyTypeBackup == null) {
             _relationPropertyTypeBackup = new Stack<TnRelationPropertyType>();
         }
@@ -147,6 +158,21 @@ public class TnRelationRowCreationResource {
 
     public Object extractRelKeyValue(String key) {
         return _relKeyValues.get(key);
+    }
+
+    public void backupRelKeyValues() {
+        getRelKeyValuesBackup().push(getRelKeyValues());
+    }
+
+    public void restoreRelKeyValues() {
+        setRelKeyValues(getRelKeyValuesBackup().pop());
+    }
+
+    protected Stack<Map<String, Object>> getRelKeyValuesBackup() {
+        if (_relKeyValuesBackup == null) {
+            _relKeyValuesBackup = new Stack<Map<String, Object>>();
+        }
+        return _relKeyValuesBackup;
     }
 
     // -----------------------------------------------------
@@ -189,27 +215,15 @@ public class TnRelationRowCreationResource {
         _relationNoSuffix = _relationNoSuffix + additionalRelationNoSuffix;
     }
 
-    public void backupSuffixAndPrepare(String baseSuffix, String additionalRelationNoSuffix) {
-        backupBaseSuffix();
-        backupRelationNoSuffix();
-        this._baseSuffix = baseSuffix;
-        addRelationNoSuffix(additionalRelationNoSuffix);
-    }
-
-    public void restoreSuffix() {
-        restoreBaseSuffix();
-        restoreRelationNoSuffix();
-    }
-
     protected void backupBaseSuffix() {
-        getOrCreateBaseSuffixBackup().push(getBaseSuffix());
+        getBaseSuffixBackup().push(getBaseSuffix());
     }
 
     protected void restoreBaseSuffix() {
-        setBaseSuffix((String) getOrCreateBaseSuffixBackup().pop());
+        setBaseSuffix(getBaseSuffixBackup().pop());
     }
 
-    protected Stack<String> getOrCreateBaseSuffixBackup() {
+    protected Stack<String> getBaseSuffixBackup() {
         if (_baseSuffixBackup == null) {
             _baseSuffixBackup = new Stack<String>();
         }
@@ -217,14 +231,14 @@ public class TnRelationRowCreationResource {
     }
 
     protected void backupRelationNoSuffix() {
-        getOrCreateRelationNoSuffixBackup().push(getRelationNoSuffix());
+        getRelationNoSuffixBackup().push(getRelationNoSuffix());
     }
 
     protected void restoreRelationNoSuffix() {
-        setRelationNoSuffix((String) getOrCreateRelationNoSuffixBackup().pop());
+        setRelationNoSuffix(getRelationNoSuffixBackup().pop());
     }
 
-    protected Stack<String> getOrCreateRelationNoSuffixBackup() {
+    protected Stack<String> getRelationNoSuffixBackup() {
         if (_relationSuffixBackup == null) {
             _relationSuffixBackup = new Stack<String>();
         }
@@ -238,11 +252,11 @@ public class TnRelationRowCreationResource {
         return _currentRelationNestLevel < _limitRelationNestLevel;
     }
 
-    public void incrementCurrentRelationNestLevel() {
+    protected void incrementCurrentRelationNestLevel() {
         ++_currentRelationNestLevel;
     }
 
-    public void decrementCurrentRelationNestLevel() {
+    protected void decrementCurrentRelationNestLevel() {
         --_currentRelationNestLevel;
     }
 
@@ -259,6 +273,34 @@ public class TnRelationRowCreationResource {
 
     public boolean hasValidValueCount() {
         return _validValueCount > 0;
+    }
+
+    // ===================================================================================
+    //                                                                              Backup
+    //                                                                              ======
+    public void prepareNextRelationInfo() {
+        backupRelationPropertyType();
+        backupRelKeyValues();
+        incrementCurrentRelationNestLevel();
+    }
+
+    public void closeNextRelationInfo() {
+        restoreRelationPropertyType();
+        restoreRelKeyValues();
+        decrementCurrentRelationNestLevel();
+    }
+
+    public void prepareNextSuffix(String nextRelationNoSuffix) {
+        final String relationNoSuffix = getRelationNoSuffix();
+        backupBaseSuffix();
+        backupRelationNoSuffix();
+        setBaseSuffix(relationNoSuffix); // current relation to base
+        addRelationNoSuffix(nextRelationNoSuffix);
+    }
+
+    public void closeNextSuffix() {
+        restoreBaseSuffix();
+        restoreRelationNoSuffix();
     }
 
     // ===================================================================================

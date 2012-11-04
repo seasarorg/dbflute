@@ -15,13 +15,11 @@
  */
 package org.seasar.dbflute.s2dao.extension;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Stack;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
@@ -43,71 +41,43 @@ import org.seasar.dbflute.s2dao.rowcreator.impl.TnRelationRowCreatorImpl;
  */
 public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
+    // ===================================================================================
+    //                                                                      Factory Method
+    //                                                                      ==============
     public static TnRelationRowCreatorExtension createRelationRowCreator() {
         return new TnRelationRowCreatorExtension();
     }
 
-    @Override
-    protected Object createRelationRow(TnRelationRowCreationResource res) throws SQLException {
-        // - - - - - - - - - - - 
-        // Recursive Call Point!
-        // - - - - - - - - - - -
-        if (!res.hasPropertyCacheElement()) {
-            return null;
-        }
-        setupRelationKeyValue(res);
-        setupRelationAllValue(res);
-        return res.getRow();
-    }
-
+    // ===================================================================================
+    //                                                             Relation KeyValue Setup
+    //                                                             =======================
     @Override
     protected void setupRelationKeyValue(TnRelationRowCreationResource res) {
+        // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+        // setup of relation key is handled at all-value setup marked as '#RELKEY'
+        // so only entity instance creation exists in this method
+        // = = = = = = = = = =/
         final TnRelationPropertyType rpt = res.getRelationPropertyType();
         final TnBeanMetaData yourBmd = rpt.getYourBeanMetaData();
         final DBMeta dbmeta = findDBMeta(yourBmd.getBeanClass(), yourBmd.getTableName());
-        for (int i = 0; i < rpt.getKeySize(); ++i) {
-            final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
-
-            if (!res.containsSelectColumn(columnName)) {
-                continue;
+        if (!res.hasRowInstance()) {
+            final Object row;
+            if (dbmeta != null) {
+                row = dbmeta.newEntity();
+            } else {
+                row = newRelationRow(rpt);
             }
-            if (!res.hasRowInstance()) {
-                final Object row;
-                if (dbmeta != null) {
-                    row = dbmeta.newEntity();
-                } else {
-                    row = newRelationRow(rpt);
-                }
-                res.setRow(row);
-            }
-            if (!res.containsRelKeyValueIfExists(columnName)) {
-                continue;
-            }
-            final Object value = res.extractRelKeyValue(columnName);
-            if (value == null) {
-                // basically no way
-                // because this is not called if the referred value
-                // is null (then it must be no relation key)
-                // @see TnBeanListResultSetHandler
-                continue;
-            }
-
-            final TnPropertyMapping mapping = yourBmd.getPropertyTypeByColumnName(rpt.getYourKey(i));
-            setValue(res, mapping, dbmeta, value);
+            res.setRow(row);
         }
-    }
-
-    protected Object createRelationRowInstance(DBMeta dbmeta) {
-        if (dbmeta != null) {
-            return dbmeta.newEntity();
-        }
-        return null;
     }
 
     protected DBMeta findDBMeta(Class<?> rowType, String tableName) {
         return TnRowCreatorExtension.findCachedDBMeta(rowType, tableName);
     }
 
+    // ===================================================================================
+    //                                                             Relation AllValue Setup
+    //                                                             =======================
     @Override
     protected void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException {
         final Map<String, TnPropertyMapping> propertyCacheElement = res.extractPropertyCacheElement();
@@ -115,13 +85,13 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         for (Entry<String, TnPropertyMapping> entry : entrySet) {
             final TnPropertyMapping pt = entry.getValue();
             res.setCurrentPropertyType(pt);
-            if (!isValidRelationPerPropertyLoop(res)) {
+            if (!isValidRelationPerPropertyLoop(res)) { // always no way unless the method is overridden
                 res.clearRowInstance();
                 return;
             }
             setupRelationProperty(res);
         }
-        if (!isValidRelationAfterPropertyLoop(res)) {
+        if (!isValidRelationAfterPropertyLoop(res)) { // e.g. when all values are null
             res.clearRowInstance();
             return;
         }
@@ -131,11 +101,21 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         }
     }
 
-    @Override
+    protected void setupRelationProperty(TnRelationRowCreationResource res) throws SQLException {
+        final String columnName = res.buildRelationColumnName();
+        // already created here, this is S2Dao logic 
+        //if (!res.hasRowInstance()) {
+        //    res.setRow(newRelationRow(res));
+        //}
+        registerRelationValue(res, columnName);
+    }
+
     protected void registerRelationValue(TnRelationRowCreationResource res, String columnName) throws SQLException {
         final TnPropertyMapping mapping = res.getCurrentPropertyMapping();
         Object value = null;
-        if (res.containsRelKeyValueIfExists(columnName)) {
+        // TODO jflute
+        System.out.println("===> " + res.containsRelKeyValueIfExists(columnName) + ", " + columnName);
+        if (res.containsRelKeyValueIfExists(columnName)) { // #RELKEY
             // if this column is relation key, it gets the value from relation key values
             // for performance and avoiding twice getting same column value
             value = res.extractRelKeyValue(columnName);
@@ -174,6 +154,48 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         }
     }
 
+    // -----------------------------------------------------
+    //                                         Next Relation
+    //                                         -------------
+    protected void setupNextRelationRow(TnRelationRowCreationResource res) throws SQLException {
+        final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
+        final Object row = res.getRow();
+        res.prepareNextRelationInfo();
+        try {
+            for (int i = 0; i < nextBmd.getRelationPropertyTypeSize(); ++i) {
+                final TnRelationPropertyType nextRpt = nextBmd.getRelationPropertyType(i);
+                setupNextRelationRowElement(res, row, nextRpt);
+            }
+        } finally {
+            res.setRow(row);
+            res.closeNextRelationInfo();
+        }
+    }
+
+    protected void setupNextRelationRowElement(TnRelationRowCreationResource res, Object row,
+            TnRelationPropertyType nextRpt) throws SQLException {
+        if (nextRpt == null) {
+            return;
+        }
+        res.clearRowInstance();
+        res.setRelationPropertyType(nextRpt);
+        // TODO jflute relkeys here?
+
+        final String nextRelationNoSuffix = buildRelationNoSuffix(nextRpt);
+        res.prepareNextSuffix(nextRelationNoSuffix);
+        try {
+            final Object relationRow = createRelationRow(res);
+            if (relationRow != null) {
+                nextRpt.getPropertyDesc().setValue(row, relationRow);
+            }
+        } finally {
+            res.closeNextSuffix();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                Property Cache Setup
+    //                                                                ====================
     @Override
     protected void setupPropertyCache(TnRelationRowCreationResource res) throws SQLException {
         // - - - - - - - - - - - 
@@ -181,12 +203,12 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         // - - - - - - - - - - -
         res.initializePropertyCacheElement();
 
-        // Do only selected foreign property for performance if condition-bean exists.
+        // do only selected foreign property for performance if condition-bean exists
         if (hasConditionBean(res) && !hasSelectedForeignInfo(res)) {
             return;
         }
 
-        // Set up property cache about current beanMetaData.
+        // set up property cache about current bean meta data
         final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
         final List<TnPropertyType> ptList = nextBmd.getPropertyTypeList();
         for (TnPropertyType pt : ptList) { // already been filtered as target only
@@ -194,19 +216,43 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             setupPropertyCacheElement(res);
         }
 
-        // Set up next relation.
+        // set up next relation
         if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
-            res.backupRelationPropertyType();
-            res.incrementCurrentRelationNestLevel();
+            res.prepareNextRelationInfo();
             try {
                 setupNextPropertyCache(res, nextBmd);
             } finally {
-                res.restoreRelationPropertyType();
-                res.decrementCurrentRelationNestLevel();
+                res.closeNextRelationInfo();
             }
         }
     }
 
+    // -----------------------------------------------------
+    //                                         Next Relation
+    //                                         -------------
+    protected void setupNextPropertyCache(TnRelationRowCreationResource res, TnBeanMetaData nextBmd)
+            throws SQLException {
+        for (int i = 0; i < nextBmd.getRelationPropertyTypeSize(); ++i) {
+            final TnRelationPropertyType nextNextRpt = nextBmd.getRelationPropertyType(i);
+            res.setRelationPropertyType(nextNextRpt);
+            setupNextPropertyCacheElement(res, nextNextRpt);
+        }
+    }
+
+    protected void setupNextPropertyCacheElement(TnRelationRowCreationResource res, TnRelationPropertyType nextNextRpt)
+            throws SQLException {
+        final String nextRelationNoSuffix = buildRelationNoSuffix(nextNextRpt);
+        res.prepareNextSuffix(nextRelationNoSuffix);
+        try {
+            setupPropertyCache(res);// Recursive call!
+        } finally {
+            res.closeNextSuffix();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                     Option Override
+    //                                                                     ===============
     @Override
     protected boolean isCreateDeadLink() {
         return false;
@@ -215,46 +261,14 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     @Override
     protected int getLimitRelationNestLevel() {
         // basically unused on DBFlute because only ConditionBean uses relation row,
-        // and ConditionBean supports unlimited relation nest level.
-        // So this limit size is always used after hasConditionBean().
+        // and ConditionBean supports unlimited relation nest level
+        // so this limit size is always used after hasConditionBean()
         return 2; // for Compatible (old parameter)
     }
 
-    @Override
-    protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Object> relKeyValues,
-            Map<String, Map<String, TnPropertyMapping>> relationPropertyCache) throws SQLException {
-        final TnRelationRowCreationResource res = new TnRelationRowCreationResourceExtension();
-        res.setResultSet(rs);
-        res.setRelationPropertyType(rpt);
-        res.setSelectColumnMap(selectColumnMap);
-        res.setRelKeyValues(relKeyValues);
-        res.setRelationPropertyCache(relationPropertyCache);
-        res.setBaseSuffix("");// as Default
-        res.setRelationNoSuffix(buildRelationNoSuffix(rpt));
-        res.setLimitRelationNestLevel(getLimitRelationNestLevel());
-        res.setCurrentRelationNestLevel(1);// as Default
-        res.setCreateDeadLink(isCreateDeadLink());
-        res.setSelectIndexMap(ResourceContext.getSelectIndexMap());
-        return res;
-    }
-
-    @Override
-    protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache,
-            String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException {
-        final TnRelationRowCreationResource res = new TnRelationRowCreationResourceExtension();
-        res.setRelationPropertyType(rpt);
-        res.setSelectColumnMap(selectColumnMap);
-        res.setRelationPropertyCache(relationPropertyCache);
-        res.setBaseSuffix(baseSuffix);
-        res.setRelationNoSuffix(relationNoSuffix);
-        res.setLimitRelationNestLevel(limitRelationNestLevel);
-        res.setCurrentRelationNestLevel(1);// as Default
-        res.setSelectIndexMap(ResourceContext.getSelectIndexMap());
-        return res;
-    }
-
+    // ===================================================================================
+    //                                                                       ConditionBean 
+    //                                                                       =============
     protected boolean isConditionBeanSelectedRelation(TnRelationRowCreationResource res) {
         if (hasConditionBean(res)) {
             final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
@@ -275,51 +289,5 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             return true;
         }
         return false;
-    }
-
-    protected static class TnRelationRowCreationResourceExtension extends TnRelationRowCreationResource {
-        protected Stack<TnRelationPropertyType> backupRelationPropertyType = new Stack<TnRelationPropertyType>();
-        protected Stack<String> backupBaseSuffix = new Stack<String>();
-        protected Stack<String> backupRelationSuffix = new Stack<String>();
-
-        @Override
-        public void backupRelationPropertyType() {
-            backupRelationPropertyType.push(getRelationPropertyType());
-        }
-
-        @Override
-        public void restoreRelationPropertyType() {
-            setRelationPropertyType(backupRelationPropertyType.pop());
-        }
-
-        @Override
-        public void backupSuffixAndPrepare(String baseSuffix, String additionalRelationNoSuffix) {
-            backupBaseSuffixExtension();
-            backupRelationNoSuffixExtension();
-            setBaseSuffix(baseSuffix);
-            addRelationNoSuffix(additionalRelationNoSuffix);
-        }
-
-        @Override
-        public void restoreSuffix() {
-            restoreBaseSuffixExtension();
-            restoreRelationNoSuffixExtension();
-        }
-
-        protected void backupBaseSuffixExtension() {
-            backupBaseSuffix.push(getBaseSuffix());
-        }
-
-        protected void restoreBaseSuffixExtension() {
-            setBaseSuffix(backupBaseSuffix.pop());
-        }
-
-        protected void backupRelationNoSuffixExtension() {
-            backupRelationSuffix.push(getRelationNoSuffix());
-        }
-
-        protected void restoreRelationNoSuffixExtension() {
-            setRelationNoSuffix(backupRelationSuffix.pop());
-        }
     }
 }

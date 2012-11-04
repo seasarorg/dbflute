@@ -25,6 +25,6 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactoryBuilder;
 public class TnPropertyTypeFactoryBuilderImpl implements TnPropertyTypeFactoryBuilder {
 
     public TnPropertyTypeFactory build(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader) {
-        return new TnPropertyTypeFactoryImpl(beanClass, beanAnnotationReader);
+        return new TnDBMetaPropertyTypeFactory(beanClass, beanAnnotationReader);
     }
 }

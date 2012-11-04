@@ -133,7 +133,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                     continue;
                 }
 
-                final Map<String, Object> relKeyValues = new HashMap<String, Object>();
+                final Map<String, Object> relKeyValues = new HashMap<String, Object>(2);
                 final TnRelationKey relKey = createRelationKey(rs, rpt, selectColumnSet, relKeyValues, selectIndexMap);
                 Object relationRow = null;
                 if (relKey != null) {

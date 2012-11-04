@@ -17,20 +17,25 @@ package org.seasar.dbflute.s2dao.extension;
 
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnModifiedPropertySupport;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataFactoryImpl;
 import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
@@ -177,6 +182,31 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             @Override
             public TnIdentifierGenerator getIdentifierGenerator(String propertyName) {
                 return _internalIdentifierGeneratorsByPropertyName.get(propertyName);
+            }
+        };
+    }
+
+    // ===================================================================================
+    //                                                       Override for ModifiedProperty
+    //                                                       =============================
+    @Override
+    protected TnModifiedPropertySupport createModifiedPropertySupport() {
+        return new TnModifiedPropertySupport() {
+            @SuppressWarnings("unchecked")
+            public Set<String> getModifiedPropertyNames(Object bean) {
+                if (bean instanceof Entity) { // all entities of DBFlute are here
+                    return ((Entity) bean).modifiedProperties();
+                } else { // basically no way on DBFlute (S2Dao's route)
+                    final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(bean.getClass());
+                    final String propertyName = MODIFIED_PROPERTY_PROPERTY_NAME;
+                    if (!beanDesc.hasPropertyDesc(propertyName)) {
+                        return Collections.EMPTY_SET;
+                    } else {
+                        final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
+                        final Object value = propertyDesc.getValue(bean);
+                        return (Set<String>) value;
+                    }
+                }
             }
         };
     }

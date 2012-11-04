@@ -28,16 +28,16 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
  */
 public class TnRelationPropertyTypeFactoryBuilderImpl implements TnRelationPropertyTypeFactoryBuilder {
 
-    protected TnBeanMetaDataFactory _beanMetaDataFactory;
+    protected final TnBeanMetaDataFactory _beanMetaDataFactory;
+
+    public TnRelationPropertyTypeFactoryBuilderImpl(TnBeanMetaDataFactory beanMetaDataFactory) {
+        _beanMetaDataFactory = beanMetaDataFactory;
+    }
 
     public TnRelationPropertyTypeFactory build(Class<?> localBeanClass, TnBeanMetaData localBeanMetaData,
             TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData, int relationNestLevel,
             boolean stopRelationCreation) {
         return new TnRelationPropertyTypeFactoryImpl(localBeanClass, localBeanMetaData, beanAnnotationReader,
                 _beanMetaDataFactory, dbMetaData, relationNestLevel, stopRelationCreation);
-    }
-
-    public void setBeanMetaDataFactory(TnBeanMetaDataFactory beanMetaDataFactory) {
-        _beanMetaDataFactory = beanMetaDataFactory;
     }
 }
