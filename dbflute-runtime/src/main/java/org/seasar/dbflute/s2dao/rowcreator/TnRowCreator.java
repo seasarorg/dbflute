@@ -29,13 +29,14 @@ public interface TnRowCreator {
 
     /**
      * @param rs Result set. (NotNull)
+     * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
      * @param columnPropertyTypeMap The map of row property cache. The key is String(columnName) and the value is a PropertyMapping. (NotNull)
      * @param beanClass Bean class. (NotNull)
-     * @return Created row. (NotNull)
+     * @return The created row. (NotNull)
      * @throws SQLException
      */
-    Object createRow(ResultSet rs, Map<String, TnPropertyMapping> columnPropertyTypeMap, Class<?> beanClass)
-            throws SQLException;
+    Object createRow(ResultSet rs, Map<String, Integer> selectIndexMap,
+            Map<String, TnPropertyMapping> columnPropertyTypeMap, Class<?> beanClass) throws SQLException;
 
     /**
      * @param selectColumnMap The name map of select column. {flexible-name = column-DB-name} (NotNull)

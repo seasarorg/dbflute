@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +31,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -108,8 +108,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     /**
      * {@inheritDoc}
      */
-    public Object createRow(ResultSet rs, Map<String, TnPropertyMapping> propertyCache, Class<?> beanClass)
-            throws SQLException {
+    public Object createRow(ResultSet rs, Map<String, Integer> selectIndexMap,
+            Map<String, TnPropertyMapping> propertyCache, Class<?> beanClass) throws SQLException {
         if (propertyCache.isEmpty()) {
             String msg = "The propertyCache should not be empty: bean=" + beanClass.getName();
             throw new IllegalStateException(msg);
@@ -118,24 +118,22 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         TnPropertyMapping mapping = null;
         String propertyName = null;
         Object selectedValue = null;
-        final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
         final Object row;
         final DBMeta dbmeta;
         if (_fixedDBMeta != null) {
-            if (_creatableByDBMeta) {
+            if (_creatableByDBMeta) { // mainly here
                 row = _fixedDBMeta.newEntity();
-            } else {
+            } else { // e.g. manual-extended entity
                 row = newBean(beanClass);
             }
             dbmeta = _fixedDBMeta;
-        } else {
+        } else { // e.g. manual-created bean of outsideSql
             row = newBean(beanClass);
-            dbmeta = findCachedDBMeta(row);
+            dbmeta = findCachedDBMeta(row); // find just in case
         }
         try {
-            if (dbmeta != null) {
-                final Set<Entry<String, TnPropertyMapping>> entrySet = propertyCache.entrySet();
-                for (Entry<String, TnPropertyMapping> entry : entrySet) {
+            if (dbmeta != null) { // mainly here
+                for (Entry<String, TnPropertyMapping> entry : propertyCache.entrySet()) {
                     columnName = entry.getKey();
                     mapping = entry.getValue();
                     propertyName = mapping.getPropertyName();
@@ -147,9 +145,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                         mapping.getPropertyAccessor().setValue(row, selectedValue);
                     }
                 }
-            } else {
-                final Set<Entry<String, TnPropertyMapping>> entrySet = propertyCache.entrySet();
-                for (Entry<String, TnPropertyMapping> entry : entrySet) {
+            } else { // not DBFlute entity
+                for (Entry<String, TnPropertyMapping> entry : propertyCache.entrySet()) {
                     columnName = entry.getKey();
                     mapping = entry.getValue();
                     propertyName = mapping.getPropertyName();
@@ -218,8 +215,9 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                        DBMeta Cache
+    //                                                                        ============
+    // share with relation row
     /**
      * @param row The instance of row. (NotNull)
      * @return The interface of DBMeta. (NullAllowed: If it's null, it means NotFound.)
@@ -288,6 +286,25 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         @SuppressWarnings("unchecked")
         protected static Map<Class<?>, DBMeta> getDBMetaContextCacheMap() {
             return (Map<Class<?>, DBMeta>) InternalMapContext.getObject(DBMETA_CACHE_KEY);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                             Fix Row
+    //                                                                             =======
+    // share with relation row
+    /**
+     * Adjust created row. (clearing modified info, ...)
+     * @param row The row of result list. (NotNull)
+     * @param bmd The bean meta data of the row. (NotNull)
+     */
+    public static void adjustCreatedRow(final Object row, TnBeanMetaData bmd) {
+        if (row instanceof Entity) {
+            ((Entity) row).clearModifiedInfo();
+        } else { // not DBFlute entity
+            // actually any bean meta data can be accepted
+            // because only it gets modified properties
+            bmd.getModifiedPropertyNames(row).clear();
         }
     }
 

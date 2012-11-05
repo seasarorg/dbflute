@@ -29,6 +29,13 @@ public interface TnRelationPropertyType extends TnPropertyType {
     int getRelationNo();
 
     /**
+     * Get the suffix part of relation No for relation path that indicates unique location. <br /> 
+     * This suffix is added to selected column label.
+     * @return The suffix string. e.g. _0 (NotNull)
+     */
+    String getRelationNoSuffixPart();
+
+    /**
      * Get the size of key, which means how many relation keys exist.
      * @return The value of Integer. (NotMinus, NotZero: no-key, no-relation)
      */

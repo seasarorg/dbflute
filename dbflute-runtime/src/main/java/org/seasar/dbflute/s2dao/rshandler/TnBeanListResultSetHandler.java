@@ -18,19 +18,16 @@ package org.seasar.dbflute.s2dao.rshandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
-import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
@@ -74,13 +71,14 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     protected void mappingBean(ResultSet rs, BeanRowHandler handler) throws SQLException {
-        // Lazy initialization because if the result is zero, the resources are unused.
-        Map<String, String> selectColumnSet = null;
+        // lazy initialization because if the result is zero, the resources are unused
+        Map<String, String> selectColumnMap = null;
         Map<String, TnPropertyMapping> propertyCache = null;
-        Map<String, Map<String, TnPropertyMapping>> relationPropertyCache = null; // key is relationNoSuffix, columnName
+        Map<String, Map<String, TnPropertyMapping>> relPropCache = null; // key is relationNoSuffix, columnName
         TnRelationRowCache relRowCache = null;
 
-        final int relSize = getBeanMetaData().getRelationPropertyTypeSize();
+        final TnBeanMetaData basePointBmd = getBeanMetaData();
+        final int relSize = basePointBmd.getRelationPropertyTypeSize();
         final boolean hasCB = hasConditionBean();
         final boolean skipRelationLoop;
         {
@@ -93,139 +91,103 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             // they are unnecessary to do relation loop!
             skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
         }
-        final boolean canCache = hasCB && canRelationMappingCache();
+        final boolean canRowCache = hasCB && canRelationMappingCache();
         final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
 
         while (rs.next()) {
-            if (selectColumnSet == null) {
-                selectColumnSet = createSelectColumnMap(rs);
+            if (selectColumnMap == null) {
+                selectColumnMap = createSelectColumnMap(rs);
             }
             if (propertyCache == null) {
-                propertyCache = createPropertyCache(selectColumnSet);
+                propertyCache = createPropertyCache(selectColumnMap);
             }
 
-            // Create row instance of base table by row property cache.
-            final Object row = createRow(rs, propertyCache);
+            // create row instance of base table by row property cache
+            final Object row = createRow(rs, selectIndexMap, propertyCache);
 
-            // If it has condition-bean that has no relation to get
+            // if it has condition-bean that has no relation to get
             // or it has outside SQL context that is specified outside SQL,
-            // they are unnecessary to do relation loop!
+            // they are unnecessary to do relation loop
             if (skipRelationLoop) {
-                postCreateRow(row);
+                adjustCreatedRow(row, basePointBmd);
                 handler.handle(row);
                 continue;
             }
 
-            if (relationPropertyCache == null) {
-                relationPropertyCache = createRelationPropertyCache(selectColumnSet);
+            if (relPropCache == null) {
+                relPropCache = createRelationPropertyCache(selectColumnMap, selectIndexMap);
             }
             if (relRowCache == null) {
-                relRowCache = createRelationRowCache(relSize);
+                relRowCache = createRelationRowCache(relSize, canRowCache);
             }
-            for (int relno = 0; relno < relSize; ++relno) {
-                final TnRelationPropertyType rpt = getBeanMetaData().getRelationPropertyType(relno);
+            for (int i = 0; i < relSize; ++i) {
+                final TnRelationPropertyType rpt = basePointBmd.getRelationPropertyType(i);
                 if (rpt == null) {
                     continue;
                 }
-
-                // Do only selected foreign property for performance if condition-bean exists.
-                if (hasCB && !hasSelectedRelation(buildRelationNoSuffix(rpt))) {
+                // do only selected foreign property for performance if condition-bean exists
+                if (hasCB && !hasSelectedRelation(rpt.getRelationNoSuffixPart())) {
                     continue;
                 }
-
-                final Map<String, Object> relKeyValues = new HashMap<String, Object>(2);
-                final TnRelationKey relKey = createRelationKey(rs, rpt, selectColumnSet, relKeyValues, selectIndexMap);
-                Object relationRow = null;
-                if (relKey != null) {
-                    relationRow = getCachedRelationRow(relRowCache, relno, relKey, canCache);
-                    if (relationRow == null) { // when no cache
-                        relationRow = createRelationRow(rs, rpt, selectColumnSet, relKeyValues, relationPropertyCache);
-                        if (relationRow != null) {
-                            addRelationRowCache(relRowCache, relno, relKey, relationRow, canCache);
-                            postCreateRow(relationRow);
-                        }
-                    }
-                }
-                if (relationRow != null) {
-                    final DfPropertyDesc pd = rpt.getPropertyDesc();
-                    pd.setValue(row, relationRow);
-                }
+                mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache);
             }
-            postCreateRow(row);
+            adjustCreatedRow(row, basePointBmd);
             handler.handle(row);
         }
     }
 
-    // ===================================================================================
-    //                                                                   RelationRow Cache
-    //                                                                   =================
     /**
      * Create the cache of relation row.
+     * @param canRowCache Can the relation row cache?
      * @param relSize The size of relation.
      * @return The cache of relation row. (NotNull)
      */
-    protected TnRelationRowCache createRelationRowCache(int relSize) {
-        return new TnRelationRowCache(relSize);
+    protected TnRelationRowCache createRelationRowCache(int relSize, boolean canRowCache) {
+        return new TnRelationRowCache(relSize, canRowCache);
     }
 
     /**
-     * Create the key of relation.
-     * @param rs The result set. (NotNull)
-     * @param rpt The property type of relation. (NotNull)
-     * @param selectColumnMap The name map of select column. {flexible-name = column-DB-name} (NotNull)
-     * @param relKeyValues The values of relation keys. The key is relation column name. (NotNull)
-     * @param selectIndexMap The map of select index. (NullAllowed: If it's null, it doesn't use select index.)
-     * @return The key of relation. (NotNull)
+     * Do mapping first relation row. <br />
+     * This logic is similar to next relation mapping in {@link TnRelationRowCreatorExtension}. <br />
+     * So you should check it when this logic has modification.
+     * @param rs The result set of JDBC, connecting to database here. (NotNull)
+     * @param row The base point row. (NotNull)
+     * @param rpt The property type of the relation. (NotNull)
+     * @param selectColumnMap The map of select column. (NotNull)
+     * @param selectIndexMap The map of select index. (NullAllowed)
+     * @param relPropCache The map of relation property cache. (NotNull) 
+     * @param relRowCache The cache of relation row. (NotNull)
      * @throws SQLException
      */
-    protected TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Object> relKeyValues, Map<String, Integer> selectIndexMap)
+    protected void mappingFirstRelation(ResultSet rs, Object row, TnRelationPropertyType rpt,
+            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap,
+            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache)
             throws SQLException {
-        final List<Object> keyList = new ArrayList<Object>();
-        for (int i = 0; i < rpt.getKeySize(); ++i) {
-            final TnPropertyType pt = rpt.getYourBeanMetaData().getPropertyTypeByColumnName(rpt.getYourKey(i));
-            final String relationNoSuffix = buildRelationNoSuffix(rpt);
-            final String columnName = pt.getColumnDbName() + relationNoSuffix;
-            final ValueType valueType;
-            if (selectColumnMap.containsKey(columnName)) {
-                valueType = pt.getValueType();
-            } else {
-                // basically unreachable
-                // because the referred column (basically PK or FK) must exist
-                // if the relation's select clause is specified
-                return null;
-            }
-            final Object value;
-            if (selectIndexMap != null) {
-                value = ResourceContext.getValue(rs, columnName, valueType, selectIndexMap);
-            } else {
-                value = valueType.getValue(rs, columnName);
-            }
-            if (value == null) {
-                // reachable when the referred column data is null
-                // (treated as no relation data)
-                return null;
-            }
-            relKeyValues.put(columnName, value);
-            keyList.add(value);
+        final String relationNoSuffix = getFirstLevelRelationPath(rpt);
+        final TnRelationKey relKey = relRowCache.createRelationKey(rs, rpt // basic resource
+                , selectColumnMap, selectIndexMap // select resource
+                , relationNoSuffix); // indicates relation location
+        if (relKey == null) {
+            return; // treated as no data if the relation key has no data
         }
-        if (keyList.size() > 0) {
-            Object[] keys = keyList.toArray();
-            return new TnRelationKey(keys);
-        } else {
-            return null;
+        Object relationRow = relRowCache.getRelationRow(relationNoSuffix, relKey);
+        if (relationRow == null) { // when no cache
+            relationRow = createRelationRow(rs, rpt // basic resource
+                    , selectColumnMap, selectIndexMap // select resource
+                    , relKey.getRelKeyValues(), relPropCache, relRowCache); // relation resource
+            if (relationRow != null) { // is new created relation row
+                adjustCreatedRow(relationRow, rpt.getYourBeanMetaData());
+                relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
+            }
+        }
+        if (relationRow != null) {
+            rpt.getPropertyDesc().setValue(row, relationRow);
         }
     }
 
-    protected Object getCachedRelationRow(TnRelationRowCache cache, int relno, TnRelationKey relKey, boolean canCache) {
-        return canCache ? cache.getRelationRow(relno, relKey) : null;
-    }
-
-    protected void addRelationRowCache(TnRelationRowCache cache, int relno, TnRelationKey relKey, Object relationRow,
-            boolean canCache) {
-        if (canCache) {
-            cache.addRelationRow(relno, relKey, relationRow);
-        }
+    protected String getFirstLevelRelationPath(TnRelationPropertyType rpt) {
+        // here is on base so this suffix becomes relation path directly
+        return rpt.getRelationNoSuffixPart();
     }
 
     // ===================================================================================
@@ -252,15 +214,6 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     protected boolean hasSelectedRelation(String relationNoSuffix) {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
         return cb.getSqlClause().hasSelectedRelation(relationNoSuffix);
-    }
-
-    /**
-     * Build the string of relation No suffix.
-     * @param rpt The property type of relation. (NotNull)
-     * @return The string of relation No suffix. (NotNull)
-     */
-    protected String buildRelationNoSuffix(TnRelationPropertyType rpt) {
-        return "_" + rpt.getRelationNo();
     }
 
     /**

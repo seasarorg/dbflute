@@ -15,43 +15,59 @@
  */
 package org.seasar.dbflute.s2dao.rshandler;
 
+import java.util.Map;
+
 /**
  * @author modified by jflute (originated in S2Dao)
  */
 public final class TnRelationKey {
 
-    private Object[] values;
+    private final Object[] _plainValues; // to compare
+    private final Map<String, Object> _relKeyValues; // with column info
+    private final int _hashCode;
 
-    private int hashCode;
-
-    public TnRelationKey(Object[] values) {
-        this.values = values;
-        for (int i = 0; i < values.length; ++i) {
-            hashCode += values[i].hashCode();
+    public TnRelationKey(Object[] plainValues, Map<String, Object> relKeyValues) {
+        _plainValues = plainValues;
+        _relKeyValues = relKeyValues;
+        int calcHash = 0;
+        for (int i = 0; i < plainValues.length; ++i) {
+            calcHash += plainValues[i].hashCode();
         }
+        _hashCode = calcHash;
     }
 
-    public Object[] getValues() {
-        return values;
+    public Object[] getPlainValues() {
+        return _plainValues;
     }
 
+    public Map<String, Object> getRelKeyValues() {
+        return _relKeyValues;
+    }
+
+    @Override
     public int hashCode() {
-        return hashCode;
+        return _hashCode;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof TnRelationKey)) {
             return false;
         }
-        Object[] otherValues = ((TnRelationKey) o).values;
-        if (values.length != otherValues.length) {
+        final Object[] otherValues = ((TnRelationKey) o)._plainValues;
+        if (_plainValues.length != otherValues.length) {
             return false;
         }
-        for (int i = 0; i < values.length; ++i) {
-            if (!values[i].equals(otherValues[i])) {
+        for (int i = 0; i < _plainValues.length; ++i) {
+            if (!_plainValues[i].equals(otherValues[i])) {
                 return false;
             }
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return _relKeyValues.toString();
     }
 }

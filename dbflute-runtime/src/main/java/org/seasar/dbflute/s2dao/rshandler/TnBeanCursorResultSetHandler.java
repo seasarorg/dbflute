@@ -66,9 +66,8 @@ public class TnBeanCursorResultSetHandler extends TnBeanListResultSetHandler {
     }
 
     @Override
-    protected TnRelationRowCache createRelationRowCache(int relSize) {
-        // Override for non cache.
-        // Cursor select is for save memory so it should not cache instances.
+    protected TnRelationRowCache createRelationRowCache(int relSize, boolean canRowCache) {
+        // cursor select is for save memory so it should not cache instances
         return new TnRelationRowNonCache(relSize);
     }
 
@@ -80,9 +79,9 @@ public class TnBeanCursorResultSetHandler extends TnBeanListResultSetHandler {
     }
 
     protected EntityRowHandler<Entity> getEntityRowHandler() {
-        EntityRowHandler<? extends Entity> handlerOnThread = ConditionBeanContext.getEntityRowHandlerOnThread();
+        final EntityRowHandler<? extends Entity> handlerOnThread = ConditionBeanContext.getEntityRowHandlerOnThread();
         @SuppressWarnings("unchecked")
-        EntityRowHandler<Entity> entityRowHandler = (EntityRowHandler<Entity>) handlerOnThread;
+        final EntityRowHandler<Entity> entityRowHandler = (EntityRowHandler<Entity>) handlerOnThread;
         return entityRowHandler;
     }
 }

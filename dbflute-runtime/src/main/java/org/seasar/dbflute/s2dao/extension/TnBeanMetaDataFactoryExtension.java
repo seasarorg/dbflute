@@ -204,7 +204,11 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
                     } else {
                         final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
                         final Object value = propertyDesc.getValue(bean);
-                        return (Set<String>) value;
+                        if (value != null) {
+                            return (Set<String>) value;
+                        } else {
+                            return Collections.EMPTY_SET;
+                        }
                     }
                 }
             }

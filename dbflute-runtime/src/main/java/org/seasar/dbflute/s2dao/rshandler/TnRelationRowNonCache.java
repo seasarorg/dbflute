@@ -20,20 +20,7 @@ package org.seasar.dbflute.s2dao.rshandler;
  */
 public class TnRelationRowNonCache extends TnRelationRowCache {
 
-    /**
-     * @param size The size of relation.
-     */
     public TnRelationRowNonCache(int size) {
-        super(size);
-    }
-
-    @Override
-    public Object getRelationRow(int relno, TnRelationKey key) {
-        return null;
-    }
-
-    @Override
-    public void addRelationRow(int relno, TnRelationKey key, Object row) {
-        // Do nothing!
+        super(size, false); // no cache fixedly
     }
 }

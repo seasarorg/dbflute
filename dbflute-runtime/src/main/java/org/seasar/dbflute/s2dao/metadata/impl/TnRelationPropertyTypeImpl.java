@@ -28,6 +28,7 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
     //                                                                           Attribute
     //                                                                           =========
     protected final int _relationNo;
+    protected final String _relationNoSuffixPart;
     protected final String[] _myKeys;
     protected final String[] _yourKeys;
     protected final TnBeanMetaData _myBeanMetaData;
@@ -40,10 +41,15 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
             TnBeanMetaData myBeanMetaData, TnBeanMetaData yourBeanMetaData) {
         super(propertyDesc);
         _relationNo = relationNo;
+        _relationNoSuffixPart = buildRelationNoSuffixPart(relationNo);
         _myKeys = myKeys;
         _yourKeys = yourKeys;
         _myBeanMetaData = myBeanMetaData;
         _yourBeanMetaData = yourBeanMetaData;
+    }
+
+    protected String buildRelationNoSuffixPart(int relationNo) {
+        return "_" + relationNo;
     }
 
     // ===================================================================================
@@ -51,6 +57,10 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
     //                                                                            ========
     public int getRelationNo() {
         return _relationNo;
+    }
+
+    public String getRelationNoSuffixPart() {
+        return _relationNoSuffixPart;
     }
 
     public int getKeySize() {

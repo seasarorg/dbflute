@@ -18,10 +18,9 @@ package org.seasar.dbflute.s2dao.rshandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.Set;
 
-import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
@@ -37,9 +36,9 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private final TnBeanMetaData beanMetaData;
-    protected final TnRowCreator rowCreator;
-    protected final TnRelationRowCreator relationRowCreator;
+    private final TnBeanMetaData _beanMetaData;
+    protected final TnRowCreator _rowCreator;
+    protected final TnRelationRowCreator _relationRowCreator;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -51,15 +50,16 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
      */
     public TnAbstractBeanResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
             TnRelationRowCreator relationRowCreator) {
-        this.beanMetaData = beanMetaData;
-        this.rowCreator = rowCreator;
-        this.relationRowCreator = relationRowCreator;
+        _beanMetaData = beanMetaData;
+        _rowCreator = rowCreator;
+        _relationRowCreator = relationRowCreator;
     }
 
     // ===================================================================================
     //                                                                      Property Cache
     //                                                                      ==============
     /**
+     * Create property cache for base point row.
      * @param selectColumnSet The name set of select column. (NotNull)
      * @return The map of row property cache. Map{String(columnName), PropertyMapping} (NotNull)
      * @throws SQLException
@@ -69,62 +69,69 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
-        return rowCreator.createPropertyCache(selectColumnSet, beanMetaData);
+        return _rowCreator.createPropertyCache(selectColumnSet, _beanMetaData);
+    }
+
+    /**
+     * Create relation property cache.
+     * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
+     * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
+     * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
+     * @throws SQLException
+     */
+    protected Map<String, Map<String, TnPropertyMapping>> createRelationPropertyCache(
+            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap) throws SQLException {
+        return _relationRowCreator.createPropertyCache(selectColumnMap, selectIndexMap, _beanMetaData);
     }
 
     // ===================================================================================
     //                                                                          Create Row
     //                                                                          ==========
     /**
+     * Create base point row.
      * @param rs Result set. (NotNull)
+     * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
      * @param propertyCache The map of property cache. Map{String(columnName), PropertyMapping} (NotNull)
-     * @return Created row. (NotNull)
+     * @return The created row. (NotNull)
      * @throws SQLException
      */
-    protected Object createRow(ResultSet rs, Map<String, TnPropertyMapping> propertyCache) throws SQLException {
+    protected Object createRow(ResultSet rs, Map<String, Integer> selectIndexMap,
+            Map<String, TnPropertyMapping> propertyCache) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
-        final Class<?> beanClass = beanMetaData.getBeanClass();
-        return rowCreator.createRow(rs, propertyCache, beanClass);
+        final Class<?> beanClass = _beanMetaData.getBeanClass();
+        return _rowCreator.createRow(rs, selectIndexMap, propertyCache, beanClass);
     }
 
     /**
-     * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
-     * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
-     * @throws SQLException
-     */
-    protected Map<String, Map<String, TnPropertyMapping>> createRelationPropertyCache(
-            Map<String, String> selectColumnMap) throws SQLException {
-        return relationRowCreator.createPropertyCache(selectColumnMap, beanMetaData);
-    }
-
-    /**
+     * Create relation row.
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
      * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
+     * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
      * @param relKeyValues The map of relation key values. The key is relation column name. (NullAllowed)
-     * @param relationPropertyCache The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
+     * @param relPropCache The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
+     * @param relRowCache The cache of relation row. (NotNull)
      * @return Created relation row. (NullAllowed)
      * @throws SQLException
      */
     protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
-            Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache)
+            Map<String, Integer> selectIndexMap, Map<String, Object> relKeyValues,
+            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache)
             throws SQLException {
-        return relationRowCreator.createRelationRow(rs, rpt, selectColumnMap, relKeyValues, relationPropertyCache);
+        return _relationRowCreator.createRelationRow(rs, rpt // basic resource
+                , selectColumnMap, selectIndexMap // select resource
+                , relKeyValues, relPropCache, relRowCache); // relation resource
     }
 
     /**
+     * Adjust create row.
      * @param row The row of result list. (NotNull)
+     * @param bmd The bean meta data of the row. (NotNull)
      */
-    protected void postCreateRow(final Object row) {
-        if (row instanceof Entity) { // DBFlute target
-            ((Entity) row).clearModifiedInfo();
-        } else { // basically unreachable
-            final TnBeanMetaData bmd = getBeanMetaData();
-            final Set<String> names = bmd.getModifiedPropertyNames(row);
-            names.clear();
-        }
+    protected void adjustCreatedRow(final Object row, TnBeanMetaData bmd) {
+        TnRowCreatorExtension.adjustCreatedRow(row, bmd);
     }
 
     // ===================================================================================
@@ -138,6 +145,6 @@ public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandl
     //                                                                            Accessor
     //                                                                            ========
     public TnBeanMetaData getBeanMetaData() {
-        return beanMetaData;
+        return _beanMetaData;
     }
 }

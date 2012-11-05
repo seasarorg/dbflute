@@ -16,6 +16,7 @@
 package org.seasar.dbflute.s2dao.rowcreator.impl;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -23,6 +24,8 @@ import java.util.Stack;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
+import org.seasar.dbflute.s2dao.rshandler.TnRelationKey;
+import org.seasar.dbflute.s2dao.rshandler.TnRelationRowCache;
 
 /**
  * The resource for relation row creation. <br />
@@ -34,6 +37,9 @@ public class TnRelationRowCreationResource {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     /** Result set. */
     protected ResultSet _resultSet;
 
@@ -50,7 +56,10 @@ public class TnRelationRowCreationResource {
     protected Map<String, Object> _relKeyValues;
 
     /** The map of relation property cache. (keys are relationNoSuffix, columnName) */
-    protected Map<String, Map<String, TnPropertyMapping>> _relationPropertyCache;
+    protected Map<String, Map<String, TnPropertyMapping>> _relPropCache;
+
+    /** The cache of relation row. */
+    protected TnRelationRowCache _relRowCache;
 
     /** The suffix of base object. */
     protected String _baseSuffix;
@@ -176,11 +185,11 @@ public class TnRelationRowCreationResource {
     }
 
     // -----------------------------------------------------
-    //                                 relationPropertyCache
-    //                                 ---------------------
+    //                                          relPropCache
+    //                                          ------------
     // The type of relationPropertyCache is Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>.
     public void initializePropertyCacheElement() {
-        _relationPropertyCache.put(_relationNoSuffix, new HashMap<String, TnPropertyMapping>());
+        _relPropCache.put(_relationNoSuffix, new HashMap<String, TnPropertyMapping>());
     }
 
     public boolean hasPropertyCacheElement() {
@@ -189,7 +198,7 @@ public class TnRelationRowCreationResource {
     }
 
     public Map<String, TnPropertyMapping> extractPropertyCacheElement() {
-        return _relationPropertyCache.get(_relationNoSuffix);
+        return _relPropCache.get(_relationNoSuffix);
     }
 
     public void savePropertyCacheElement() {
@@ -202,6 +211,22 @@ public class TnRelationRowCreationResource {
             return;
         }
         propertyCacheElement.put(columnName, _currentPropertyMapping);
+    }
+
+    // -----------------------------------------------------
+    //                                           relRowCache
+    //                                           -----------
+    public TnRelationKey prepareRelationKey() throws SQLException {
+        final TnRelationKey relKey = doCreateRelationKey();
+        if (relKey != null) {
+            setRelKeyValues(relKey.getRelKeyValues());
+        }
+        return relKey;
+    }
+
+    protected TnRelationKey doCreateRelationKey() throws SQLException {
+        return _relRowCache.createRelationKey(_resultSet, _relationPropertyType, _selectColumnMap, _selectIndexMap,
+                _relationNoSuffix);
     }
 
     // -----------------------------------------------------
@@ -275,30 +300,31 @@ public class TnRelationRowCreationResource {
         return _validValueCount > 0;
     }
 
-    // ===================================================================================
-    //                                                                              Backup
-    //                                                                              ======
-    public void prepareNextRelationInfo() {
+    // -----------------------------------------------------
+    //                                                Backup
+    //                                                ------
+    public void prepareNextLevelMapping() {
         backupRelationPropertyType();
         backupRelKeyValues();
         incrementCurrentRelationNestLevel();
     }
 
-    public void closeNextRelationInfo() {
+    public void closeNextLevelMapping() {
         restoreRelationPropertyType();
         restoreRelKeyValues();
         decrementCurrentRelationNestLevel();
     }
 
-    public void prepareNextSuffix(String nextRelationNoSuffix) {
-        final String relationNoSuffix = getRelationNoSuffix();
+    public void prepareNextRelationProperty(TnRelationPropertyType nextRpt) {
         backupBaseSuffix();
         backupRelationNoSuffix();
-        setBaseSuffix(relationNoSuffix); // current relation to base
-        addRelationNoSuffix(nextRelationNoSuffix);
+        clearRowInstance();
+        setRelationPropertyType(nextRpt);
+        setBaseSuffix(getRelationNoSuffix()); // current relation to base
+        addRelationNoSuffix(nextRpt.getRelationNoSuffixPart());
     }
 
-    public void closeNextSuffix() {
+    public void closeNextRelationProperty() {
         restoreBaseSuffix();
         restoreRelationNoSuffix();
     }
@@ -312,22 +338,6 @@ public class TnRelationRowCreationResource {
 
     public void setResultSet(ResultSet resultSet) {
         this._resultSet = resultSet;
-    }
-
-    public Map<String, String> getSelectColumnMap() {
-        return _selectColumnMap;
-    }
-
-    public void setSelectColumnMap(Map<String, String> selectColumnMap) {
-        this._selectColumnMap = selectColumnMap;
-    }
-
-    public Map<String, Object> getRelKeyValues() {
-        return this._relKeyValues;
-    }
-
-    public void setRelKeyValues(Map<String, Object> relKeyValues) {
-        this._relKeyValues = relKeyValues;
     }
 
     public Object getRow() {
@@ -346,12 +356,44 @@ public class TnRelationRowCreationResource {
         this._relationPropertyType = rpt;
     }
 
-    public Map<String, Map<String, TnPropertyMapping>> getRelationPropertyCache() {
-        return _relationPropertyCache;
+    public Map<String, String> getSelectColumnMap() {
+        return _selectColumnMap;
     }
 
-    public void setRelationPropertyCache(Map<String, Map<String, TnPropertyMapping>> relationPropertyCache) {
-        this._relationPropertyCache = relationPropertyCache;
+    public void setSelectColumnMap(Map<String, String> selectColumnMap) {
+        this._selectColumnMap = selectColumnMap;
+    }
+
+    public Map<String, Integer> getSelectIndexMap() {
+        return _selectIndexMap;
+    }
+
+    public void setSelectIndexMap(Map<String, Integer> selectIndexMap) {
+        _selectIndexMap = selectIndexMap;
+    }
+
+    public Map<String, Object> getRelKeyValues() {
+        return this._relKeyValues;
+    }
+
+    public void setRelKeyValues(Map<String, Object> relKeyValues) {
+        this._relKeyValues = relKeyValues;
+    }
+
+    public Map<String, Map<String, TnPropertyMapping>> getRelPropCache() {
+        return _relPropCache;
+    }
+
+    public void setRelPropCache(Map<String, Map<String, TnPropertyMapping>> relPropCache) {
+        this._relPropCache = relPropCache;
+    }
+
+    public TnRelationRowCache getRelRowCache() {
+        return _relRowCache;
+    }
+
+    public void setRelRowCache(TnRelationRowCache relRowCache) {
+        this._relRowCache = relRowCache;
     }
 
     public String getBaseSuffix() {
@@ -400,13 +442,5 @@ public class TnRelationRowCreationResource {
 
     public void setCreateDeadLink(boolean createDeadLink) {
         this._createDeadLink = createDeadLink;
-    }
-
-    public Map<String, Integer> getSelectIndexMap() {
-        return _selectIndexMap;
-    }
-
-    public void setSelectIndexMap(Map<String, Integer> selectIndexMap) {
-        _selectIndexMap = selectIndexMap;
     }
 }
