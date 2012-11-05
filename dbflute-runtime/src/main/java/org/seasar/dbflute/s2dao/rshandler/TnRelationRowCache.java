@@ -17,12 +17,13 @@ package org.seasar.dbflute.s2dao.rshandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -93,41 +94,52 @@ public class TnRelationRowCache {
     public TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt,
             Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap, String relationNoSuffix)
             throws SQLException {
-        final int keySize = rpt.getKeySize();
-        final List<Object> keyList = new ArrayList<Object>(keySize);
-        final Map<String, Object> relKeyValues = new LinkedHashMap<String, Object>(keySize);
-        for (int i = 0; i < keySize; ++i) {
-            final TnPropertyType pt = rpt.getYourBeanMetaData().getPropertyTypeByColumnName(rpt.getYourKey(i));
-            final String columnName = pt.getColumnDbName() + relationNoSuffix;
-            final ValueType valueType;
-            if (selectColumnMap.containsKey(columnName)) {
-                valueType = pt.getValueType();
-            } else {
-                // basically unreachable
-                // because the referred column (basically PK or FK) must exist
-                // if the relation's select clause is specified
-                return null;
+        final DBMeta dbmeta = rpt.getYourBeanMetaData().getDBMeta();
+        final Map<String, Object> relKeyValues;
+        if (dbmeta != null && dbmeta.hasPrimaryKey()) {
+            final List<ColumnInfo> uniqueColumnList = dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
+            relKeyValues = new LinkedHashMap<String, Object>(uniqueColumnList.size());
+            for (ColumnInfo columnInfo : uniqueColumnList) {
+                final String keyColumn = columnInfo.getColumnDbName();
+                setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, relationNoSuffix, relKeyValues, keyColumn);
             }
-            final Object value;
-            if (selectIndexMap != null) {
-                value = ResourceContext.getValue(rs, columnName, valueType, selectIndexMap);
-            } else {
-                value = valueType.getValue(rs, columnName);
-            }
-            if (value == null) {
-                // reachable when the referred column data is null
-                // (treated as no relation data)
-                return null;
-            }
-            relKeyValues.put(columnName, value);
-            keyList.add(value);
-        }
-        if (keyList.size() > 0) {
-            Object[] keys = keyList.toArray();
-            return new TnRelationKey(keys, relKeyValues);
         } else {
-            return null;
+            final int keySize = rpt.getKeySize();
+            relKeyValues = new LinkedHashMap<String, Object>(keySize);
+            for (int i = 0; i < keySize; ++i) {
+                final String keyColumn = rpt.getYourKey(i);
+                setupKeyElement(rs, rpt, selectColumnMap, selectIndexMap, relationNoSuffix, relKeyValues, keyColumn);
+            }
         }
+        return !relKeyValues.isEmpty() ? new TnRelationKey(relKeyValues) : null;
+    }
+
+    protected void setupKeyElement(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
+            Map<String, Integer> selectIndexMap, String relationNoSuffix, final Map<String, Object> relKeyValues,
+            String keyColumn) throws SQLException {
+        final TnPropertyType pt = rpt.getYourBeanMetaData().getPropertyTypeByColumnName(keyColumn);
+        final String columnLabel = pt.getColumnDbName() + relationNoSuffix;
+        final ValueType valueType;
+        if (selectColumnMap.containsKey(columnLabel)) {
+            valueType = pt.getValueType();
+        } else {
+            // basically unreachable
+            // because the referred column (basically PK or FK) must exist
+            // if the relation's select clause is specified
+            return;
+        }
+        final Object value;
+        if (selectIndexMap != null) {
+            value = ResourceContext.getValue(rs, columnLabel, valueType, selectIndexMap);
+        } else {
+            value = valueType.getValue(rs, columnLabel);
+        }
+        if (value == null) {
+            // reachable when the referred column data is null
+            // (treated as no relation data)
+            return;
+        }
+        relKeyValues.put(columnLabel, value);
     }
 
     /**

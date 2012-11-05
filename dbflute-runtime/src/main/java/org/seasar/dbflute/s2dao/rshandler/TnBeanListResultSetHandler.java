@@ -86,9 +86,9 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             final boolean hasOSC = hasOutsideSqlContext();
             final boolean specifiedOutsideSql = isSpecifiedOutsideSql();
 
-            // If it has condition-bean that has no relation to get
+            // if it has condition-bean that has no relation to get
             // or it has outside SQL context that is specified-outside-sql,
-            // they are unnecessary to do relation loop!
+            // they are unnecessary to do relation loop
             skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
         }
         final boolean canRowCache = hasCB && canRelationMappingCache();
@@ -105,9 +105,6 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
             // create row instance of base table by row property cache
             final Object row = createRow(rs, selectIndexMap, propertyCache);
 
-            // if it has condition-bean that has no relation to get
-            // or it has outside SQL context that is specified outside SQL,
-            // they are unnecessary to do relation loop
             if (skipRelationLoop) {
                 adjustCreatedRow(row, basePointBmd);
                 handler.handle(row);

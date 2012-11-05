@@ -22,22 +22,18 @@ import java.util.Map;
  */
 public final class TnRelationKey {
 
+    private final Map<String, Object> _relKeyValues;
     private final Object[] _plainValues; // to compare
-    private final Map<String, Object> _relKeyValues; // with column info
     private final int _hashCode;
 
-    public TnRelationKey(Object[] plainValues, Map<String, Object> relKeyValues) {
-        _plainValues = plainValues;
+    public TnRelationKey(Map<String, Object> relKeyValues) {
         _relKeyValues = relKeyValues;
+        _plainValues = relKeyValues.values().toArray();
         int calcHash = 0;
-        for (int i = 0; i < plainValues.length; ++i) {
-            calcHash += plainValues[i].hashCode();
+        for (int i = 0; i < _plainValues.length; ++i) {
+            calcHash += _plainValues[i].hashCode();
         }
         _hashCode = calcHash;
-    }
-
-    public Object[] getPlainValues() {
-        return _plainValues;
     }
 
     public Map<String, Object> getRelKeyValues() {
