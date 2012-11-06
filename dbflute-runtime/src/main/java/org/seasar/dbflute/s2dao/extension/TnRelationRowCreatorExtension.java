@@ -185,9 +185,9 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         if (res.isStopCurrentRelationMapping()) {
             return;
         }
-        final TnRelationKey relKey = res.prepareRelationKey(); // also relKeyValues setup
-        if (relKey == null) {
-            return; // treated as no data if the relation key has no data
+        final TnRelationKey relKey = res.prepareRelationKey(); // also saves it in resource
+        if (relKey == null) { // the relation key has no data
+            return; // treated as no data
         }
         final TnRelationPropertyType nextRpt = res.getRelationPropertyType();
         final TnRelationRowCache relRowCache = res.getRelRowCache();

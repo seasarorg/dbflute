@@ -113,9 +113,9 @@ public class TnRelationRowCache {
      * @return The key of relation. (NullAllowed: null means no data of the relation)
      * @throws SQLException
      */
-    public TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap, String relationNoSuffix)
-            throws SQLException {
+    public TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt // basic resource
+            , Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap // select resource
+            , String relationNoSuffix) throws SQLException { // relation resource
         if (!_canCache) {
             return EMPTY_KEY;
         }

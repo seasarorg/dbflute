@@ -204,6 +204,12 @@ public class TnRelationRowCreationResource {
     // ===================================================================================
     //                                                                  Relation Row Cache
     //                                                                  ==================
+    /**
+     * Prepare the relation key of the current relation. <br />
+     * The created relation key is returned and saved in this resource if the key is created.
+     * @return The created relation key. (NullAllowed: null means the relation has no data)
+     * @throws SQLException
+     */
     public TnRelationKey prepareRelationKey() throws SQLException {
         final TnRelationKey relKey = doCreateRelationKey();
         if (relKey != null) {
@@ -213,8 +219,9 @@ public class TnRelationRowCreationResource {
     }
 
     protected TnRelationKey doCreateRelationKey() throws SQLException {
-        return _relRowCache.createRelationKey(_resultSet, _relationPropertyType, _selectColumnMap, _selectIndexMap,
-                _relationNoSuffix);
+        return _relRowCache.createRelationKey(_resultSet, _relationPropertyType // basic resource
+                , _selectColumnMap, _selectIndexMap // select resource
+                , _relationNoSuffix); // relation resource
     }
 
     // ===================================================================================
