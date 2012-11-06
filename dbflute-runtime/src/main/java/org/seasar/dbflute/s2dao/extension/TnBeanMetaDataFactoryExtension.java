@@ -43,7 +43,7 @@ import org.seasar.dbflute.s2dao.metadata.impl.TnDBMetaBeanAnnotationReader;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * The extension of the factory of bean meta data.
+ * The DBFlute extension of factory of bean meta data.
  * @author jflute
  */
 public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {

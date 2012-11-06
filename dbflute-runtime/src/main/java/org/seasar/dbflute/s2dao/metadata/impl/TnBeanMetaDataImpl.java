@@ -29,6 +29,7 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
@@ -40,6 +41,14 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 
 /**
+ * The implementation as S2Dao of bean meta data. <br />
+ * This class has sub-class extended by DBFlute.
+ * <pre>
+ * {@link TnBeanMetaDataImpl} is close to S2Dao logic
+ * The extension in {@link TnBeanMetaDataFactoryExtension} has DBFlute logic
+ * </pre>
+ * DBFlute depended on S2Dao before 0.9.0. <br />
+ * It saves these structure to be easy to know what DBFlute extends it.
  * @author modified by jflute (originated in S2Dao)
  */
 public class TnBeanMetaDataImpl implements TnBeanMetaData {

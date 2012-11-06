@@ -38,6 +38,7 @@ import org.seasar.dbflute.s2dao.rshandler.TnBeanListResultSetHandler;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
+ * The DBFlute extension of relation row creator.
  * @author jflute
  */
 public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
