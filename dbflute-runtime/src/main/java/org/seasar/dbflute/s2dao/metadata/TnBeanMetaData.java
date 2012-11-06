@@ -71,6 +71,16 @@ public interface TnBeanMetaData {
      */
     boolean hasPropertyType(String propertyName);
 
+    TnPropertyType getPropertyTypeByAliasName(String aliasName);
+
+    TnPropertyType getPropertyTypeByColumnName(String columnName);
+
+    boolean hasPropertyTypeByColumnName(String columnName);
+
+    boolean hasPropertyTypeByAliasName(String aliasName);
+
+    String convertFullColumnName(String alias);
+
     // ===================================================================================
     //                                                                     Optimistic Lock
     //                                                                     ===============
@@ -85,22 +95,6 @@ public interface TnBeanMetaData {
     String getTimestampPropertyName();
 
     boolean hasTimestampPropertyType();
-
-    // ===================================================================================
-    //                                                                    Column Converter
-    //                                                                    ================
-    String convertFullColumnName(String alias);
-
-    // ===================================================================================
-    //                                                               (Local) Property Type
-    //                                                               =====================
-    TnPropertyType getPropertyTypeByAliasName(String aliasName);
-
-    TnPropertyType getPropertyTypeByColumnName(String columnName);
-
-    boolean hasPropertyTypeByColumnName(String columnName);
-
-    boolean hasPropertyTypeByAliasName(String aliasName);
 
     // ===================================================================================
     //                                                              Relation Property Type

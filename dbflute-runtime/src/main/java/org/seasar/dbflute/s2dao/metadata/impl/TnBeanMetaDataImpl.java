@@ -186,25 +186,6 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         return _propertyTypeMap.get(propertyName) != null;
     }
 
-    // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
-    public TnPropertyType getVersionNoPropertyType() throws DfBeanPropertyNotFoundException {
-        return getPropertyType(getVersionNoPropertyName());
-    }
-
-    public TnPropertyType getTimestampPropertyType() throws DfBeanPropertyNotFoundException {
-        return getPropertyType(getTimestampPropertyName());
-    }
-
-    public String getVersionNoPropertyName() {
-        return _versionNoPropertyName;
-    }
-
-    public String getTimestampPropertyName() {
-        return _timestampPropertyName;
-    }
-
     public TnPropertyType getPropertyTypeByColumnName(String columnName) {
         final TnPropertyType propertyType = _columnPropertyTypeMap.get(columnName);
         if (propertyType == null) {
@@ -276,14 +257,6 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         return rpt.getYourBeanMetaData().hasPropertyTypeByColumnName(columnName);
     }
 
-    public boolean hasVersionNoPropertyType() {
-        return hasPropertyType(getVersionNoPropertyName());
-    }
-
-    public boolean hasTimestampPropertyType() {
-        return hasPropertyType(getTimestampPropertyName());
-    }
-
     public String convertFullColumnName(String alias) {
         if (hasPropertyTypeByColumnName(alias)) {
             return _tableName + "." + alias;
@@ -308,6 +281,33 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
             throw new IllegalStateException(msg);
         }
         return rpt.getPropertyName() + "." + columnName;
+    }
+
+    // ===================================================================================
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
+    public TnPropertyType getVersionNoPropertyType() throws DfBeanPropertyNotFoundException {
+        return getPropertyType(getVersionNoPropertyName());
+    }
+
+    public TnPropertyType getTimestampPropertyType() throws DfBeanPropertyNotFoundException {
+        return getPropertyType(getTimestampPropertyName());
+    }
+
+    public String getVersionNoPropertyName() {
+        return _versionNoPropertyName;
+    }
+
+    public String getTimestampPropertyName() {
+        return _timestampPropertyName;
+    }
+
+    public boolean hasVersionNoPropertyType() {
+        return hasPropertyType(getVersionNoPropertyName());
+    }
+
+    public boolean hasTimestampPropertyType() {
+        return hasPropertyType(getTimestampPropertyName());
     }
 
     // ===================================================================================
