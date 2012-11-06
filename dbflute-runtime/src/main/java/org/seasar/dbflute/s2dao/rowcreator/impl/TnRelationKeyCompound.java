@@ -13,31 +13,35 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.rshandler;
+package org.seasar.dbflute.s2dao.rowcreator.impl;
 
 import java.util.Map;
+
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationKey;
 
 /**
  * @author modified by jflute (originated in S2Dao)
  */
-public final class TnRelationKey {
+public final class TnRelationKeyCompound implements TnRelationKey {
 
     private final Map<String, Object> _relKeyValues;
-    private final Object[] _plainValues; // to compare
     private final int _hashCode;
 
-    public TnRelationKey(Map<String, Object> relKeyValues) {
+    public TnRelationKeyCompound(Map<String, Object> relKeyValues) {
         _relKeyValues = relKeyValues;
-        _plainValues = relKeyValues.values().toArray();
-        int calcHash = 0;
-        for (int i = 0; i < _plainValues.length; ++i) {
-            calcHash += _plainValues[i].hashCode();
-        }
-        _hashCode = calcHash;
+        _hashCode = relKeyValues.hashCode();
     }
 
     public Map<String, Object> getRelKeyValues() {
         return _relKeyValues;
+    }
+
+    public boolean containsColumn(String columnLabel) {
+        return _relKeyValues.containsKey(columnLabel);
+    }
+
+    public Object extractKeyValue(String columnLabel) {
+        return _relKeyValues.get(columnLabel);
     }
 
     @Override
@@ -47,19 +51,10 @@ public final class TnRelationKey {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TnRelationKey)) {
+        if (!(o instanceof TnRelationKeyCompound)) {
             return false;
         }
-        final Object[] otherValues = ((TnRelationKey) o)._plainValues;
-        if (_plainValues.length != otherValues.length) {
-            return false;
-        }
-        for (int i = 0; i < _plainValues.length; ++i) {
-            if (!_plainValues[i].equals(otherValues[i])) {
-                return false;
-            }
-        }
-        return true;
+        return _relKeyValues.equals(((TnRelationKeyCompound) o)._relKeyValues);
     }
 
     @Override

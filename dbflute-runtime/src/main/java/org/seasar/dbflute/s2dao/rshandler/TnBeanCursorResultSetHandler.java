@@ -22,6 +22,7 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCache;
 import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 
@@ -66,9 +67,9 @@ public class TnBeanCursorResultSetHandler extends TnBeanListResultSetHandler {
     }
 
     @Override
-    protected TnRelationRowCache createRelationRowCache(int relSize, boolean canRowCache) {
+    protected TnRelationRowCache createRelationRowCache(boolean hasCB) {
         // cursor select is for save memory so it should not cache instances
-        return new TnRelationRowNonCache(relSize);
+        return new TnRelationRowCache(-1, false);
     }
 
     // ===================================================================================

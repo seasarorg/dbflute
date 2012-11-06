@@ -65,7 +65,7 @@ public class GearedCipherManager {
             String msg = "You cannot set a primary key column for cipher: " + columnInfo;
             throw new IllegalArgumentException(msg);
         }
-        if (!columnInfo.getForeignInfoList().isEmpty()) {
+        if (columnInfo.isForeignKey()) {
             String msg = "You cannot set a foreign key column for cipher: " + columnInfo;
             throw new IllegalArgumentException(msg);
         }

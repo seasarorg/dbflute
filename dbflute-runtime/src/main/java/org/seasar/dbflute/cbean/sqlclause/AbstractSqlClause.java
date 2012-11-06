@@ -20,11 +20,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.seasar.dbflute.cbean.ManualOrderBean;
@@ -114,16 +116,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // The resources that are not frequently used to are lazy-loaded for performance.
     // - - - - - - - - - -/
-    /** The basic map of selected relation. map:{foreignRelationPath : foreignPropertyName} (NullAllowed: This is lazy-loaded) */
+    /** The basic map of selected relation. map:{foreignRelationPath : foreignPropertyName} (NullAllowed: lazy-loaded) */
     protected Map<String, String> _selectedRelationBasicMap;
 
-    /** The column map of selected relation. map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}} (NullAllowed: This is lazy-loaded) */
+    /** The column map of selected relation. map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}} (NullAllowed: lazy-loaded) */
     protected Map<String, Map<String, SelectedRelationColumn>> _selectedRelationColumnMap;
 
-    /** Specified select column map. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (NullAllowed: This is lazy-loaded) */
+    /** The set of relation connecting to selected next relation. (NulAllowed: lazy-loaded) */
+    protected Set<String> _selectedNextConnectingRelationSet;
+
+    /** Specified select column map. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (NullAllowed: lazy-loaded) */
     protected Map<String, Map<String, HpSpecifiedColumn>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
 
-    /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (NullAllowed: This is lazy-loaded) */
+    /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : specifiedInfo } } (NullAllowed: lazy-loaded) */
     protected Map<String, Map<String, HpSpecifiedColumn>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
     /** Specified derive sub-query map. A null key is acceptable. (NullAllowed: lazy-load) */
@@ -168,7 +173,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The clause of order-by. (NotNull) */
     protected OrderByClause _orderByClause;
 
-    /** The list of union clause. (NullAllowed: This is lazy-loaded) */
+    /** The list of union clause. (NullAllowed: lazy-loaded) */
     protected List<UnionQueryInfo> _unionQueryInfoList;
 
     /** Is order-by effective? Default value is false. True when registered. */
@@ -1162,24 +1167,22 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      */
     public void registerSelectedRelation(String foreignTableAliasName, String localTableDbName,
             String foreignPropertyName, String localRelationPath, String foreignRelationPath) {
+        assertObjectNotNull("foreignTableAliasName", foreignTableAliasName);
+        assertObjectNotNull("localTableDbName", localTableDbName);
+        assertObjectNotNull("foreignPropertyName", foreignPropertyName);
+        assertObjectNotNull("foreignRelationPath", foreignRelationPath);
         getSelectedRelationBasicMap().put(foreignRelationPath, foreignPropertyName);
         final Map<String, SelectedRelationColumn> columnMap = createSelectedSelectColumnInfo(foreignTableAliasName,
                 localTableDbName, foreignPropertyName, localRelationPath);
         getSelectedRelationColumnMap().put(foreignTableAliasName, columnMap);
+        analyzeSelectedNextConnectingRelation(foreignRelationPath);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isSelectedRelationEmpty() {
-        return _selectedRelationBasicMap == null || _selectedRelationBasicMap.isEmpty();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean hasSelectedRelation(String relationPath) {
-        return _selectedRelationBasicMap != null && _selectedRelationBasicMap.containsKey(relationPath);
+    protected Map<String, String> getSelectedRelationBasicMap() {
+        if (_selectedRelationBasicMap == null) {
+            _selectedRelationBasicMap = new LinkedHashMap<String, String>();
+        }
+        return _selectedRelationBasicMap;
     }
 
     protected Map<String, SelectedRelationColumn> createSelectedSelectColumnInfo(String foreignTableAliasName,
@@ -1187,7 +1190,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final DBMeta dbmeta = findDBMeta(localTableDbName);
         final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
         final int relationNo = foreignInfo.getRelationNo();
-        String nextRelationPath = "_" + relationNo;
+        String nextRelationPath = RELATION_PATH_DELIMITER + relationNo;
         if (localRelationPath != null) {
             nextRelationPath = localRelationPath + nextRelationPath;
         }
@@ -1205,18 +1208,64 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return resultMap;
     }
 
-    protected Map<String, String> getSelectedRelationBasicMap() {
-        if (_selectedRelationBasicMap == null) {
-            _selectedRelationBasicMap = new LinkedHashMap<String, String>();
+    protected void analyzeSelectedNextConnectingRelation(String foreignRelationPath) {
+        if (foreignRelationPath.length() <= 3) { // fast check e.g. _12, _3
+            return; // three characters cannot make two elements
         }
-        return _selectedRelationBasicMap;
+        final String delimiter = RELATION_PATH_DELIMITER;
+        final int delimiterCount = Srl.count(foreignRelationPath, delimiter);
+        if (delimiterCount < 2) { // has no previous relation
+            return;
+        }
+        final String previousPath = Srl.substringLastFront(foreignRelationPath, delimiter);
+        final Set<String> selectecNextConnectingRelationSet = getSelectedNextConnectingRelationSet();
+        selectecNextConnectingRelationSet.add(previousPath);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int getSelectedRelationCount() {
+        return _selectedRelationBasicMap != null ? _selectedRelationBasicMap.size() : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isSelectedRelationEmpty() {
+        return _selectedRelationBasicMap == null || _selectedRelationBasicMap.isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasSelectedRelation(String foreignRelationPath) {
+        return _selectedRelationBasicMap != null && _selectedRelationBasicMap.containsKey(foreignRelationPath);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public Map<String, Map<String, SelectedRelationColumn>> getSelectedRelationColumnMap() {
         if (_selectedRelationColumnMap == null) {
             _selectedRelationColumnMap = new LinkedHashMap<String, Map<String, SelectedRelationColumn>>();
         }
         return _selectedRelationColumnMap;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isSelectedNextConnectingRelation(String foreignRelationPath) {
+        return _selectedNextConnectingRelationSet != null
+                && _selectedNextConnectingRelationSet.contains(foreignRelationPath);
+    }
+
+    protected Set<String> getSelectedNextConnectingRelationSet() {
+        if (_selectedNextConnectingRelationSet == null) {
+            _selectedNextConnectingRelationSet = new HashSet<String>();
+        }
+        return _selectedNextConnectingRelationSet;
     }
 
     // ===================================================================================

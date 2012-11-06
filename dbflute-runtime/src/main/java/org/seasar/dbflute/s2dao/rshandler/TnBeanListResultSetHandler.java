@@ -29,7 +29,10 @@ import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationKey;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCache;
 import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationSelector;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 
 /**
@@ -76,22 +79,20 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         Map<String, TnPropertyMapping> propertyCache = null;
         Map<String, Map<String, TnPropertyMapping>> relPropCache = null; // key is relationNoSuffix, columnName
         TnRelationRowCache relRowCache = null;
+        TnRelationSelector relSelector = null;
 
         final TnBeanMetaData basePointBmd = getBeanMetaData();
-        final int relSize = basePointBmd.getRelationPropertyTypeSize();
         final boolean hasCB = hasConditionBean();
         final boolean skipRelationLoop;
         {
-            final boolean emptyRelation = isSelectedRelationEmpty();
-            final boolean hasOSC = hasOutsideSqlContext();
-            final boolean specifiedOutsideSql = isSpecifiedOutsideSql();
+            final boolean emptyRelationCB = hasCB && isSelectedRelationEmpty();
+            final boolean specifiedOutsideSql = hasOutsideSqlContext() && isSpecifiedOutsideSql();
 
             // if it has condition-bean that has no relation to get
             // or it has outside SQL context that is specified-outside-sql,
             // they are unnecessary to do relation loop
-            skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
+            skipRelationLoop = emptyRelationCB || specifiedOutsideSql;
         }
-        final boolean canRowCache = hasCB && canRelationMappingCache();
         final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
 
         while (rs.next()) {
@@ -111,22 +112,22 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
                 continue;
             }
 
+            if (relSelector == null) {
+                relSelector = createRelationSelector(hasCB);
+            }
             if (relPropCache == null) {
-                relPropCache = createRelationPropertyCache(selectColumnMap, selectIndexMap);
+                relPropCache = createRelationPropertyCache(selectColumnMap, selectIndexMap, relSelector);
             }
             if (relRowCache == null) {
-                relRowCache = createRelationRowCache(relSize, canRowCache);
+                relRowCache = createRelationRowCache(hasCB);
             }
-            for (int i = 0; i < relSize; ++i) {
-                final TnRelationPropertyType rpt = basePointBmd.getRelationPropertyType(i);
-                if (rpt == null) {
+            final List<TnRelationPropertyType> rptList = basePointBmd.getRelationPropertyTypeList();
+            for (TnRelationPropertyType rpt : rptList) {
+                if (relSelector.isNonSelectedRelation(rpt.getRelationNoSuffixPart())) {
                     continue;
                 }
-                // do only selected foreign property for performance if condition-bean exists
-                if (hasCB && !hasSelectedRelation(rpt.getRelationNoSuffixPart())) {
-                    continue;
-                }
-                mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache);
+                mappingFirstRelation(rs, row, rpt, selectColumnMap, selectIndexMap, relPropCache, relRowCache,
+                        relSelector);
             }
             adjustCreatedRow(row, basePointBmd);
             handler.handle(row);
@@ -134,12 +135,53 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     }
 
     /**
+     * Create the selector of relation.
+     * @param hasCB Does the select have condition-bean? 
+     * @return The created selector instance. (NotNull)
+     */
+    protected TnRelationSelector createRelationSelector(final boolean hasCB) {
+        final ConditionBean cb = hasCB ? ConditionBeanContext.getConditionBeanOnThread() : null;
+        return new TnRelationSelector() {
+            public boolean isNonLimitMapping() {
+                return hasCB;
+            }
+
+            public boolean isNonSelectedRelation(String relationNoSuffix) {
+                return cb != null && !cb.getSqlClause().hasSelectedRelation(relationNoSuffix);
+            }
+
+            public boolean isNonSelectedNextConnectingRelation(String relationNoSuffix) {
+                return cb != null && !cb.getSqlClause().isSelectedNextConnectingRelation(relationNoSuffix);
+            }
+        };
+    }
+
+    /**
      * Create the cache of relation row.
-     * @param canRowCache Can the relation row cache?
-     * @param relSize The size of relation.
+     * @param hasCB Does the select have condition-bean?
      * @return The cache of relation row. (NotNull)
      */
-    protected TnRelationRowCache createRelationRowCache(int relSize, boolean canRowCache) {
+    protected TnRelationRowCache createRelationRowCache(boolean hasCB) {
+        final int relSize;
+        {
+            final int defaultRelSize = 4; // as default
+            if (hasCB) { // mainly here
+                final int selectedRelationCount = getSelectedRelationCount();
+                if (selectedRelationCount > 0) {
+                    relSize = selectedRelationCount;
+                } else { // basically no way (if no count, cache is not created)
+                    relSize = defaultRelSize;
+                }
+            } else { // basically no way (only relation of DBFlute entity is supported)
+                relSize = defaultRelSize;
+            }
+        }
+        final boolean canRowCache;
+        if (hasCB) { // mainly here
+            canRowCache = canRelationMappingCache();
+        } else { // basically no way (only relation of DBFlute entity is supported)
+            canRowCache = true;
+        }
         return new TnRelationRowCache(relSize, canRowCache);
     }
 
@@ -154,12 +196,13 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
      * @param selectIndexMap The map of select index. (NullAllowed)
      * @param relPropCache The map of relation property cache. (NotNull) 
      * @param relRowCache The cache of relation row. (NotNull)
+     * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @throws SQLException
      */
     protected void mappingFirstRelation(ResultSet rs, Object row, TnRelationPropertyType rpt,
             Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache)
-            throws SQLException {
+            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
+            TnRelationSelector relSelector) throws SQLException {
         final String relationNoSuffix = getFirstLevelRelationPath(rpt);
         final TnRelationKey relKey = relRowCache.createRelationKey(rs, rpt // basic resource
                 , selectColumnMap, selectIndexMap // select resource
@@ -171,7 +214,7 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
         if (relationRow == null) { // when no cache
             relationRow = createRelationRow(rs, rpt // basic resource
                     , selectColumnMap, selectIndexMap // select resource
-                    , relKey.getRelKeyValues(), relPropCache, relRowCache); // relation resource
+                    , relKey, relPropCache, relRowCache, relSelector); // relation resource
             if (relationRow != null) { // is new created relation row
                 adjustCreatedRow(relationRow, rpt.getYourBeanMetaData());
                 relRowCache.addRelationRow(relationNoSuffix, relKey, relationRow);
@@ -190,27 +233,31 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     // ===================================================================================
     //                                                                       ConditionBean
     //                                                                       =============
+    /**
+     * Does the select have the condition-bean?
+     * @return The determination, true or false.
+     */
     protected boolean hasConditionBean() {
         return ConditionBeanContext.isExistConditionBeanOnThread();
     }
 
+    /**
+     * Is the selected relation empty?
+     * You should call {@link #hasConditionBean()} hasConditionBean() before calling this!
+     * @return The determination, true or false.
+     */
     protected boolean isSelectedRelationEmpty() {
-        if (!hasConditionBean()) {
-            return true;
-        }
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
         return cb.getSqlClause().isSelectedRelationEmpty();
     }
 
     /**
-     * Does it have the relation as selected?
-     * You should call hasConditionBean() before calling this!
-     * @param relationNoSuffix The suffix of relation NO. (NotNull)
-     * @return The determination, true or false.
+     * Get the count of selected relation.
+     * @return The integer of the count. (NotMinus)
      */
-    protected boolean hasSelectedRelation(String relationNoSuffix) {
+    protected int getSelectedRelationCount() {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        return cb.getSqlClause().hasSelectedRelation(relationNoSuffix);
+        return cb.getSqlClause().getSelectedRelationCount();
     }
 
     /**

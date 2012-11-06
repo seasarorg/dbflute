@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.rowcreator.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -24,8 +25,11 @@ import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationKey;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCache;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreationResource;
 import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
-import org.seasar.dbflute.s2dao.rshandler.TnRelationRowCache;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationSelector;
 
 /**
  * The implementation as S2Dao of creator of relation row. <br />
@@ -48,31 +52,32 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
      * {@inheritDoc}
      */
     public Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, Map<String, Object> relKeyValues,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache)
-            throws SQLException {
+            Map<String, Integer> selectIndexMap, TnRelationKey relKey,
+            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
+            TnRelationSelector relSelector) throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
         final TnRelationRowCreationResource res = createResourceForRow(rs, rpt // basic resource
                 , selectColumnMap, selectIndexMap // select resource
-                , relKeyValues, relPropCache, relRowCache); // relation resource
+                , relKey, relPropCache, relRowCache, relSelector); // relation resource
         return createRelationRow(res);
     }
 
     protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
-            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap, Map<String, Object> relKeyValues,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache)
-            throws SQLException {
+            Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap, TnRelationKey relKey,
+            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
+            TnRelationSelector relSelector) throws SQLException {
         // the resource class is already customized for DBFlute
         final TnRelationRowCreationResource res = new TnRelationRowCreationResource();
         res.setResultSet(rs);
         res.setRelationPropertyType(rpt);
         res.setSelectColumnMap(selectColumnMap);
         res.setSelectIndexMap(selectIndexMap);
-        res.setRelKeyValues(relKeyValues);
+        res.setRelationKey(relKey);
         res.setRelPropCache(relPropCache);
         res.setRelRowCache(relRowCache);
+        res.setRelationSelector(relSelector);
         res.setBaseSuffix(""); // as base point
         res.setRelationNoSuffix(rpt.getRelationNoSuffixPart()); // as first level relation
         res.setLimitRelationNestLevel(getLimitRelationNestLevel());
@@ -120,17 +125,19 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
      * {@inheritDoc}
      */
     public Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, TnBeanMetaData bmd) throws SQLException {
+            Map<String, Integer> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd)
+            throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
         final Map<String, Map<String, TnPropertyMapping>> relPropCache = newRelationPropertyCache();
-        for (int i = 0; i < bmd.getRelationPropertyTypeSize(); ++i) {
-            final TnRelationPropertyType rpt = bmd.getRelationPropertyType(i);
+        final List<TnRelationPropertyType> relationPropertyTypeList = baseBmd.getRelationPropertyTypeList();
+        for (TnRelationPropertyType rpt : relationPropertyTypeList) {
             final String baseSuffix = "";
             final String relationNoSuffix = rpt.getRelationNoSuffixPart();
             final TnRelationRowCreationResource res = createResourceForPropertyCache(rpt, selectColumnMap,
-                    selectIndexMap, relPropCache, baseSuffix, relationNoSuffix, getLimitRelationNestLevel());
+                    selectIndexMap, relPropCache, relSelector, baseSuffix, relationNoSuffix,
+                    getLimitRelationNestLevel());
             setupPropertyCache(res);
         }
         return relPropCache;
@@ -142,14 +149,15 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
     protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
             Map<String, String> selectColumnMap, Map<String, Integer> selectIndexMap,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, String baseSuffix, String relationNoSuffix,
-            int limitRelationNestLevel) throws SQLException {
+            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationSelector relSelector,
+            String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException {
         // the resource class is already customized for DBFlute
         final TnRelationRowCreationResource res = new TnRelationRowCreationResource();
         res.setRelationPropertyType(rpt);
         res.setSelectColumnMap(selectColumnMap);
         res.setSelectIndexMap(selectIndexMap);
         res.setRelPropCache(relPropCache);
+        res.setRelationSelector(relSelector);
         res.setBaseSuffix(baseSuffix);
         res.setRelationNoSuffix(relationNoSuffix);
         res.setLimitRelationNestLevel(limitRelationNestLevel);

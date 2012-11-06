@@ -25,8 +25,16 @@ import org.seasar.dbflute.jdbc.ValueType;
  */
 public interface TnPropertyMapping {
 
+    /**
+     * Get the accessor of the property. (basically by reflection)
+     * @return The accessor instance. (NotNull)
+     */
     DfPropertyAccessor getPropertyAccessor();
 
+    /**
+     * Get the value type.
+     * @return The value type instance. (NotNull)
+     */
     ValueType getValueType();
 
     /**

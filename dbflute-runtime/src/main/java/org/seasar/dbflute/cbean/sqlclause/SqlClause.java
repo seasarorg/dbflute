@@ -55,6 +55,11 @@ import org.seasar.dbflute.dbway.DBWay;
 public interface SqlClause {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String RELATION_PATH_DELIMITER = "_";
+
+    // ===================================================================================
     //                                                                      SubQuery Level
     //                                                                      ==============
     /**
@@ -191,14 +196,29 @@ public interface SqlClause {
      * @param localTableDbName The table DB name of local. (NotNull)
      * @param foreignPropertyName The property name of foreign table. (NotNull)
      * @param localRelationPath The path of local relation. (NullAllowed)
-     * @param foreignRelationPath The path of foreign relation. (NullAllowed)
+     * @param foreignRelationPath The path of foreign relation, same as relation No suffix. e.g. _3, _7_2 (NotNull)
      */
     void registerSelectedRelation(String foreignTableAliasName, String localTableDbName, String foreignPropertyName,
             String localRelationPath, String foreignRelationPath);
 
+    /**
+     * Get the count of selected relation.
+     * @return The integer of count. (NotMinus)
+     */
+    int getSelectedRelationCount();
+
+    /**
+     * Is the selected relation empty?
+     * @return The determination, true or false.
+     */
     boolean isSelectedRelationEmpty();
 
-    boolean hasSelectedRelation(String relationPath);
+    /**
+     * Is the relation selected?
+     * @param foreignRelationPath The path of foreign relation, same as relation No suffix. e.g. _3, _7_2 (NotNull)
+     * @return The determination, true or false.
+     */
+    boolean hasSelectedRelation(String foreignRelationPath);
 
     /**
      * Get the map of selected relation column. <br />
@@ -206,6 +226,13 @@ public interface SqlClause {
      * @return The map of selected relation column. map:{foreignTableAliasName : map:{columnName : selectedRelationColumn}} (NotNull)
      */
     Map<String, Map<String, SelectedRelationColumn>> getSelectedRelationColumnMap();
+
+    /**
+     * Does the relation connect to selected next relation?
+     * @param foreignRelationPath The path of foreign relation, same as relation No suffix. e.g. _3, _7_2 (NotNull)
+     * @return The determination, true or false.
+     */
+    boolean isSelectedNextConnectingRelation(String foreignRelationPath);
 
     // ===================================================================================
     //                                                                           OuterJoin

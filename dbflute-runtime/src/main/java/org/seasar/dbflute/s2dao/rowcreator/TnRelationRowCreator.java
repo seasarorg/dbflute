@@ -22,7 +22,6 @@ import java.util.Map;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
-import org.seasar.dbflute.s2dao.rshandler.TnRelationRowCache;
 
 /**
  * @author modified by jflute (originated in S2Dao)
@@ -35,25 +34,28 @@ public interface TnRelationRowCreator {
      * @param rpt The type of relation property. (NotNull)
      * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
      * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
-     * @param relKeyValues The map of relation key values. The key is relation column name. (NullAllowed)
+     * @param relKey The relation key, which has key values, of the relation. (NotNull)
      * @param relPropCache The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @param relRowCache The cache of relation row. (NotNull)
+     * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
      * @return The created row of the relation. (NullAllowed: if null, no data about the relation)
      * @throws SQLException
      */
     Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, Map<String, Object> relKeyValues,
-            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache)
-            throws SQLException;
+            Map<String, Integer> selectIndexMap, TnRelationKey relKey,
+            Map<String, Map<String, TnPropertyMapping>> relPropCache, TnRelationRowCache relRowCache,
+            TnRelationSelector relSelector) throws SQLException;
 
     /**
      * Create relation property cache.
      * @param selectColumnMap The name map of select column. map:{flexibleName = columnDbName} (NotNull)
      * @param selectIndexMap The map of select index. map:{selectColumnKeyName = selectIndex} (NullAllowed: null means select index is disabled)
-     * @param bmd Bean meta data of base object. (NotNull)
+     * @param relSelector The selector of relation, which can determines e.g. is it not-selected relation?. (NotNull)
+     * @param baseBmd Bean meta data of base object. (NotNull)
      * @return The map of relation property cache. map:{relationNoSuffix = map:{columnName = PropertyMapping}} (NotNull)
      * @throws SQLException
      */
     Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Map<String, String> selectColumnMap,
-            Map<String, Integer> selectIndexMap, TnBeanMetaData bmd) throws SQLException;
+            Map<String, Integer> selectIndexMap, TnRelationSelector relSelector, TnBeanMetaData baseBmd)
+            throws SQLException;
 }

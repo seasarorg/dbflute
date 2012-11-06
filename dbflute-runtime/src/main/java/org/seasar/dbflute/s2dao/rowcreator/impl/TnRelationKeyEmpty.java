@@ -13,14 +13,23 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.rshandler;
+package org.seasar.dbflute.s2dao.rowcreator.impl;
+
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationKey;
 
 /**
- * @author modified by jflute (originated in S2Dao)
+ * @author jflute
  */
-public class TnRelationRowNonCache extends TnRelationRowCache {
+public final class TnRelationKeyEmpty implements TnRelationKey {
 
-    public TnRelationRowNonCache(int size) {
-        super(size, false); // no cache fixedly
+    public TnRelationKeyEmpty() {
+    }
+
+    public boolean containsColumn(String columnLabel) {
+        return false;
+    }
+
+    public Object extractKeyValue(String columnLabel) {
+        return null;
     }
 }

@@ -16,11 +16,11 @@
 package org.seasar.dbflute.dbmeta.info;
 
 import java.lang.reflect.Method;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -61,14 +61,12 @@ public class ReferrerInfo implements RelationInfo {
         _referrerPropertyName = referrerPropertyName;
         _localDBMeta = localDBMeta;
         _referrerDBMeta = referrerDBMeta;
-        _localReferrerColumnInfoMap = localReferrerColumnInfoMap;
-        final Set<ColumnInfo> keySet = localReferrerColumnInfoMap.keySet();
-        _referrerLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
-        for (final Iterator<ColumnInfo> ite = keySet.iterator(); ite.hasNext();) {
-            final ColumnInfo key = ite.next();
-            final ColumnInfo value = localReferrerColumnInfoMap.get(key);
-            _referrerLocalColumnInfoMap.put(value, key);
+        _localReferrerColumnInfoMap = Collections.unmodifiableMap(localReferrerColumnInfoMap);
+        final Map<ColumnInfo, ColumnInfo> referrerLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
+        for (Entry<ColumnInfo, ColumnInfo> entry : localReferrerColumnInfoMap.entrySet()) {
+            referrerLocalColumnInfoMap.put(entry.getValue(), entry.getKey());
         }
+        _referrerLocalColumnInfoMap = Collections.unmodifiableMap(referrerLocalColumnInfoMap);
         _oneToOne = oneToOne;
         _reversePropertyName = reversePropertyName;
         _readMethod = findReadMethod();
@@ -321,19 +319,19 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     /**
-     * Get the snapshot map, key is a local column info, value is a referrer column info.
-     * @return The snapshot map. (NotNull)
+     * Get the read-only map, key is a local column info, value is a referrer column info.
+     * @return The read-only map. (NotNull)
      */
     public Map<ColumnInfo, ColumnInfo> getLocalReferrerColumnInfoMap() {
-        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_localReferrerColumnInfoMap); // as snapshot
+        return _localReferrerColumnInfoMap;
     }
 
     /**
-     * Get the snapshot map, key is a referrer column info, value is a column column info.
-     * @return The snapshot map. (NotNull)
+     * Get the read-only map, key is a referrer column info, value is a column column info.
+     * @return The read-only map. (NotNull)
      */
     public Map<ColumnInfo, ColumnInfo> getReferrerLocalColumnInfoMap() {
-        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_referrerLocalColumnInfoMap); // as snapshot
+        return _referrerLocalColumnInfoMap;
     }
 
     /**

@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
+import java.util.List;
+
 /**
  * The property type for relation. <br />
  * This interface provides relation meta info.
@@ -73,4 +75,13 @@ public interface TnRelationPropertyType extends TnPropertyType {
      * @return The instance of bean meta data. (NotNull)
      */
     TnBeanMetaData getYourBeanMetaData();
+
+    // TODO jflute
+    List<TnPropertyType> getUniquePropertyTypeList();
+
+    boolean hasSimpleUniqueKey();
+
+    boolean hasCompoundUniqueKey();
+
+    TnPropertyType getSimpleUniquePropertyType();
 }

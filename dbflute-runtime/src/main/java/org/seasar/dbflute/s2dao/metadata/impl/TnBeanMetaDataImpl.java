@@ -47,15 +47,19 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Class<?> _beanClass; // NotNull
-    protected final DBMeta _dbmeta; // NotNull if DBFlute entity
+    /** The type of bean. (NotNull) */
+    protected final Class<?> _beanClass;
+
+    /** The DB meta of the bean. (NotNull: if DBFlute entity) */
+    protected final DBMeta _dbmeta;
+
+    /** The name of table. (NotNull: after initialized, if it's not entity, this value is 'df:Unknown') */
+    protected String _tableName;
+
     protected final StringKeyMap<TnPropertyType> _propertyTypeMap = StringKeyMap.createAsCaseInsensitive();
     protected final List<TnPropertyType> _propertyTypeList = new ArrayList<TnPropertyType>();
     protected TnBeanAnnotationReader _beanAnnotationReader;
     protected TnPropertyTypeFactory _propertyTypeFactory;
-
-    /** The name of table. (NotNull: If it's not entity, this value is 'df:Unknown') */
-    protected String _tableName;
 
     /** The array of property type for primary key. */
     protected TnPropertyType[] _primaryKeys;
@@ -78,38 +82,6 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     public TnBeanMetaDataImpl(Class<?> beanClass, DBMeta dbmeta) {
         _beanClass = beanClass;
         _dbmeta = dbmeta;
-    }
-
-    // ===================================================================================
-    //                                                                          Bean Class
-    //                                                                          ==========
-    public Class<?> getBeanClass() {
-        return _beanClass;
-    }
-
-    public DBMeta getDBMeta() {
-        return _dbmeta;
-    }
-
-    // ===================================================================================
-    //                                                                       Property Type
-    //                                                                       =============
-    public List<TnPropertyType> getPropertyTypeList() {
-        return _propertyTypeList;
-    }
-
-    public TnPropertyType getPropertyType(String propertyName) {
-        final TnPropertyType propertyType = (TnPropertyType) _propertyTypeMap.get(propertyName);
-        if (propertyType == null) {
-            String msg = "The propertyName was not found in the map:";
-            msg = msg + " propertyName=" + propertyName + " propertyTypeMap=" + _propertyTypeMap;
-            throw new IllegalStateException(msg);
-        }
-        return propertyType;
-    }
-
-    public boolean hasPropertyType(String propertyName) {
-        return _propertyTypeMap.get(propertyName) != null;
     }
 
     // ===================================================================================
@@ -179,15 +151,44 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
     }
 
     // ===================================================================================
-    //                                                                      Implementation
-    //                                                                      ==============
-    /**
-     * @return The name of table. (NotNull: if not entity, returns 'df:Unknown')
-     */
+    //                                                                          Basic Info
+    //                                                                          ==========
+    public Class<?> getBeanClass() {
+        return _beanClass;
+    }
+
+    public DBMeta getDBMeta() {
+        return _dbmeta;
+    }
+
     public String getTableName() {
         return _tableName;
     }
 
+    // ===================================================================================
+    //                                                                       Property Type
+    //                                                                       =============
+    public List<TnPropertyType> getPropertyTypeList() {
+        return _propertyTypeList;
+    }
+
+    public TnPropertyType getPropertyType(String propertyName) {
+        final TnPropertyType propertyType = (TnPropertyType) _propertyTypeMap.get(propertyName);
+        if (propertyType == null) {
+            String msg = "The propertyName was not found in the map:";
+            msg = msg + " propertyName=" + propertyName + " propertyTypeMap=" + _propertyTypeMap;
+            throw new IllegalStateException(msg);
+        }
+        return propertyType;
+    }
+
+    public boolean hasPropertyType(String propertyName) {
+        return _propertyTypeMap.get(propertyName) != null;
+    }
+
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
     public TnPropertyType getVersionNoPropertyType() throws DfBeanPropertyNotFoundException {
         return getPropertyType(getVersionNoPropertyName());
     }
@@ -309,12 +310,19 @@ public class TnBeanMetaDataImpl implements TnBeanMetaData {
         return rpt.getPropertyName() + "." + columnName;
     }
 
+    // ===================================================================================
+    //                                                              Relation Property Type
+    //                                                              ======================
+    public List<TnRelationPropertyType> getRelationPropertyTypeList() {
+        return _relationPropertyTypes;
+    }
+
     public int getRelationPropertyTypeSize() {
         return _relationPropertyTypes.size();
     }
 
     public TnRelationPropertyType getRelationPropertyType(int index) {
-        return (TnRelationPropertyType) _relationPropertyTypes.get(index);
+        return _relationPropertyTypes.get(index);
     }
 
     public TnRelationPropertyType getRelationPropertyType(String propertyName) throws DfBeanPropertyNotFoundException {

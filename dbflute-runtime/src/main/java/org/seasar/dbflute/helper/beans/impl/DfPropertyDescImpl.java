@@ -28,8 +28,7 @@ import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * {Created with reference to S2Container's utility and extended for DBFlute}
- * @author jflute
+ * @author modified by jflute (originated in S2Dao)
  */
 public class DfPropertyDescImpl implements DfPropertyDesc {
 
@@ -70,20 +69,20 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
             String msg = "The argument 'propertyType' should not be null!";
             throw new IllegalArgumentException(msg);
         }
-        this._propertyName = propertyName;
-        this._propertyType = propertyType;
+        _propertyName = propertyName;
+        _propertyType = propertyType;
         setReadMethod(readMethod);
         setWriteMethod(writeMethod);
         setField(field);
-        this._beanDesc = beanDesc;
+        _beanDesc = beanDesc;
         setupStringConstructor();
         setupValueOfMethod();
     }
 
     private void setupStringConstructor() {
-        Constructor<?>[] cons = _propertyType.getConstructors();
+        final Constructor<?>[] cons = _propertyType.getConstructors();
         for (int i = 0; i < cons.length; ++i) {
-            Constructor<?> con = cons[i];
+            final Constructor<?> con = cons[i];
             if (con.getParameterTypes().length == 1 && con.getParameterTypes()[0].equals(String.class)) {
                 _stringConstructor = con;
                 break;
@@ -92,9 +91,9 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     }
 
     private void setupValueOfMethod() {
-        Method[] methods = _propertyType.getMethods();
+        final Method[] methods = _propertyType.getMethods();
         for (int i = 0; i < methods.length; ++i) {
-            Method method = methods[i];
+            final Method method = methods[i];
             if (DfReflectionUtil.isBridgeMethod(method) || DfReflectionUtil.isSyntheticMethod(method)) {
                 continue;
             }

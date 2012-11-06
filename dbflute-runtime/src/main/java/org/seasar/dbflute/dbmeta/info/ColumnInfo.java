@@ -71,6 +71,7 @@ public class ColumnInfo {
     protected final String _columnComment;
     protected final List<String> _foreignPropList;
     protected final List<String> _referrerPropList;
+    protected final boolean _foreignKey;
     protected final ClassificationMeta _classificationMeta;
     protected final PropertyGateway _gateway;
     protected final Method _readMethod;
@@ -108,6 +109,7 @@ public class ColumnInfo {
         _columnComment = columnComment;
         _foreignPropList = foreignPropList != null ? foreignPropList : EMPTY_LIST;
         _referrerPropList = referrerPropList != null ? referrerPropList : EMPTY_LIST;
+        _foreignKey = foreignPropList != null && !foreignPropList.isEmpty();
         _classificationMeta = classificationMeta;
         _gateway = findPropertyGateway();
         _readMethod = findReadMethod();
@@ -566,13 +568,15 @@ public class ColumnInfo {
         return _columnComment;
     }
 
+    // these methods, get foreign/referrer info list, are not called
+    // in core logic (e.g. mapping) so initialization is allowed to be here
     /**
      * Get the read-only list of the foreign info related to this column. <br />
      * It contains one-to-one relations.
      * @return The read-only list. (NotNull: when no FK, returns empty list)
      */
     public List<ForeignInfo> getForeignInfoList() {
-        // find at this timing because initialization timing of column info is before FK's one.
+        // find in this timing because initialization timing of column info is before FK's one.
         final List<ForeignInfo> foreignInfoList = new ArrayList<ForeignInfo>();
         for (String foreignProp : _foreignPropList) {
             foreignInfoList.add(getDBMeta().findForeignInfo(foreignProp));
@@ -585,12 +589,20 @@ public class ColumnInfo {
      * @return The read-only list. (NotNull: when no reference, returns empty list)
      */
     public List<ReferrerInfo> getReferrerInfoList() {
-        // find at this timing because initialization timing of column info is before FK's one.
+        // find in this timing because initialization timing of column info is before FK's one.
         final List<ReferrerInfo> referrerInfoList = new ArrayList<ReferrerInfo>();
         for (String fkProp : _referrerPropList) {
             referrerInfoList.add(getDBMeta().findReferrerInfo(fkProp));
         }
         return Collections.unmodifiableList(referrerInfoList); // as read-only
+    }
+
+    /**
+     * Is the column a part of any foreign key?
+     * @return The determination, true or false.
+     */
+    public boolean isForeignKey() {
+        return _foreignKey;
     }
 
     /**

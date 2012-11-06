@@ -27,6 +27,9 @@ import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
  */
 public interface TnBeanMetaData {
 
+    // ===================================================================================
+    //                                                                          Basic Info
+    //                                                                          ==========
     /**
      * Get the type of bean.
      * @return The type of bean. (NotNull) 
@@ -39,6 +42,15 @@ public interface TnBeanMetaData {
      */
     DBMeta getDBMeta();
 
+    /**
+     * Get the table name of the bean.
+     * @return The name of table.  (NotNull: if it's not entity, this value is 'df:Unknown')
+     */
+    String getTableName();
+
+    // ===================================================================================
+    //                                                                       Property Type
+    //                                                                       =============
     /**
      * Get the list of property type.
      * @return The list of property type. (NotNull)
@@ -59,8 +71,9 @@ public interface TnBeanMetaData {
      */
     boolean hasPropertyType(String propertyName);
 
-    String getTableName();
-
+    // ===================================================================================
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
     TnPropertyType getVersionNoPropertyType();
 
     String getVersionNoPropertyName();
@@ -73,8 +86,14 @@ public interface TnBeanMetaData {
 
     boolean hasTimestampPropertyType();
 
+    // ===================================================================================
+    //                                                                    Column Converter
+    //                                                                    ================
     String convertFullColumnName(String alias);
 
+    // ===================================================================================
+    //                                                               (Local) Property Type
+    //                                                               =====================
     TnPropertyType getPropertyTypeByAliasName(String aliasName);
 
     TnPropertyType getPropertyTypeByColumnName(String columnName);
@@ -83,12 +102,20 @@ public interface TnBeanMetaData {
 
     boolean hasPropertyTypeByAliasName(String aliasName);
 
+    // ===================================================================================
+    //                                                              Relation Property Type
+    //                                                              ======================
+    List<TnRelationPropertyType> getRelationPropertyTypeList();
+
     int getRelationPropertyTypeSize();
 
     TnRelationPropertyType getRelationPropertyType(int index);
 
     TnRelationPropertyType getRelationPropertyType(String propertyName);
 
+    // ===================================================================================
+    //                                                                         Primary Key
+    //                                                                         ===========
     int getPrimaryKeySize();
 
     String getPrimaryKeyDbName(int index);
@@ -101,5 +128,8 @@ public interface TnBeanMetaData {
 
     TnIdentifierGenerator getIdentifierGenerator(String propertyName);
 
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
     Set<String> getModifiedPropertyNames(Object bean);
 }

@@ -15,8 +15,16 @@
  */
 package org.seasar.dbflute.s2dao.metadata.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 
 /**
@@ -33,6 +41,10 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
     protected final String[] _yourKeys;
     protected final TnBeanMetaData _myBeanMetaData;
     protected final TnBeanMetaData _yourBeanMetaData;
+    protected final List<TnPropertyType> _uniquePropertyTypeList;
+    protected final boolean _hasSimpleUniqueKey;
+    protected final boolean _hasCompoundUniqueKey;
+    protected final TnPropertyType _simpleUniquePropertyType;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -46,10 +58,36 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
         _yourKeys = yourKeys;
         _myBeanMetaData = myBeanMetaData;
         _yourBeanMetaData = yourBeanMetaData;
+        _uniquePropertyTypeList = deriveUniqueKeys(yourKeys, yourBeanMetaData);
+        // save at this point for performance (suppose that many relation has the only one key)
+        _hasSimpleUniqueKey = _uniquePropertyTypeList.size() == 1;
+        _hasCompoundUniqueKey = _uniquePropertyTypeList.size() >= 2;
+        _simpleUniquePropertyType = _hasSimpleUniqueKey ? _uniquePropertyTypeList.get(0) : null;
     }
 
     protected String buildRelationNoSuffixPart(int relationNo) {
-        return "_" + relationNo;
+        return SqlClause.RELATION_PATH_DELIMITER + relationNo;
+    }
+
+    protected List<TnPropertyType> deriveUniqueKeys(String[] yourKeys, TnBeanMetaData yourBeanMetaData) {
+        final DBMeta dbmeta = yourBeanMetaData.getDBMeta();
+        final List<TnPropertyType> uniquePropertyTypeList;
+        if (dbmeta != null && dbmeta.hasPrimaryKey()) {
+            final UniqueInfo primaryUniqueInfo = dbmeta.getPrimaryUniqueInfo();
+            final List<ColumnInfo> uniqueColumnList = primaryUniqueInfo.getUniqueColumnList();
+            uniquePropertyTypeList = new ArrayList<TnPropertyType>(uniqueColumnList.size());
+            for (ColumnInfo columnInfo : uniqueColumnList) {
+                final TnPropertyType pt = yourBeanMetaData.getPropertyTypeByColumnName(columnInfo.getColumnDbName());
+                uniquePropertyTypeList.add(pt);
+            }
+        } else {
+            uniquePropertyTypeList = new ArrayList<TnPropertyType>(yourKeys.length);
+            for (String yourKey : yourKeys) {
+                final TnPropertyType pt = yourBeanMetaData.getPropertyTypeByColumnName(yourKey);
+                uniquePropertyTypeList.add(pt);
+            }
+        }
+        return uniquePropertyTypeList;
     }
 
     // ===================================================================================
@@ -103,5 +141,21 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
 
     public TnBeanMetaData getYourBeanMetaData() {
         return _yourBeanMetaData;
+    }
+
+    public List<TnPropertyType> getUniquePropertyTypeList() {
+        return _uniquePropertyTypeList;
+    }
+
+    public boolean hasSimpleUniqueKey() {
+        return _hasSimpleUniqueKey;
+    }
+
+    public boolean hasCompoundUniqueKey() {
+        return _hasCompoundUniqueKey;
+    }
+
+    public TnPropertyType getSimpleUniquePropertyType() {
+        return _simpleUniquePropertyType;
     }
 }

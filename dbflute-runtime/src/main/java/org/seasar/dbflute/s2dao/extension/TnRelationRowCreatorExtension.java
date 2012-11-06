@@ -19,11 +19,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.cbean.ConditionBean;
-import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
@@ -33,11 +30,11 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
-import org.seasar.dbflute.s2dao.rowcreator.impl.TnRelationRowCreationResource;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationKey;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCache;
+import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreationResource;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRelationRowCreatorImpl;
 import org.seasar.dbflute.s2dao.rshandler.TnBeanListResultSetHandler;
-import org.seasar.dbflute.s2dao.rshandler.TnRelationKey;
-import org.seasar.dbflute.s2dao.rshandler.TnRelationRowCache;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
@@ -63,7 +60,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         // = = = = = = = = = =/
         final TnRelationPropertyType rpt = res.getRelationPropertyType();
         final TnBeanMetaData yourBmd = rpt.getYourBeanMetaData();
-        final DBMeta dbmeta = findDBMeta(yourBmd.getBeanClass(), yourBmd.getTableName());
+        final DBMeta dbmeta = yourBmd.getDBMeta();
         if (!res.hasRowInstance()) { // always no instance here (check just in case)
             final Object row;
             if (dbmeta != null) {
@@ -73,10 +70,6 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             }
             res.setRow(row);
         }
-    }
-
-    protected DBMeta findDBMeta(Class<?> rowType, String tableName) {
-        return TnRowCreatorExtension.findCachedDBMeta(rowType, tableName);
     }
 
     protected Object newRelationRow(TnRelationPropertyType rpt) { // for non DBFlute entity
@@ -89,8 +82,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     @Override
     protected void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException {
         final Map<String, TnPropertyMapping> propertyCacheElement = res.extractPropertyCacheElement();
-        final Set<Entry<String, TnPropertyMapping>> entrySet = propertyCacheElement.entrySet();
-        for (Entry<String, TnPropertyMapping> entry : entrySet) {
+        for (Entry<String, TnPropertyMapping> entry : propertyCacheElement.entrySet()) {
             final TnPropertyMapping pt = entry.getValue();
             res.setCurrentPropertyType(pt);
             if (!isValidRelationPerPropertyLoop(res)) { // no way unless the method is overridden
@@ -104,9 +96,10 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             return;
         }
         res.clearValidValueCount();
-        if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
-            setupNextRelationRow(res);
+        if (res.isStopNextRelationMapping()) {
+            return;
         }
+        setupNextRelationRow(res);
     }
 
     protected void setupRelationProperty(TnRelationRowCreationResource res) throws SQLException {
@@ -121,10 +114,10 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     protected void registerRelationValue(TnRelationRowCreationResource res, String columnName) throws SQLException {
         final TnPropertyMapping mapping = res.getCurrentPropertyMapping();
         Object value = null;
-        if (res.containsRelKeyValueIfExists(columnName)) { // #RELKEY
+        if (res.containsRelationKeyColumn(columnName)) { // #RELKEY
             // if this column is relation key, it gets the value from relation key values
             // for performance and avoiding twice getting same column value
-            value = res.extractRelKeyValue(columnName);
+            value = res.extractRelationKeyValue(columnName);
         } else {
             final ValueType valueType = mapping.getValueType();
             final Map<String, Integer> selectIndexMap = res.getSelectIndexMap();
@@ -137,20 +130,11 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
         if (value != null) {
             res.incrementValidValueCount();
-            final DBMeta dbmeta = findDBMeta(res.getRow());
-            setValue(res, mapping, dbmeta, value);
+            setValue(res, mapping, value);
         }
     }
 
-    /**
-     * @param row The instance of row. (NotNull)
-     * @return The interface of DBMeta. (NullAllowed: If it's null, it means NotFound.)
-     */
-    protected DBMeta findDBMeta(Object row) {
-        return TnRowCreatorExtension.findCachedDBMeta(row);
-    }
-
-    protected void setValue(TnRelationRowCreationResource res, TnPropertyMapping mapping, DBMeta dbmeta, Object value) {
+    protected void setValue(TnRelationRowCreationResource res, TnPropertyMapping mapping, Object value) {
         final ColumnInfo columnInfo = mapping.getEntityColumnInfo();
         if (columnInfo != null) {
             columnInfo.write((Entity) res.getRow(), value);
@@ -168,11 +152,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         final Object row = res.getRow();
         res.prepareNextLevelMapping();
         try {
-            for (int i = 0; i < nextBmd.getRelationPropertyTypeSize(); ++i) {
-                final TnRelationPropertyType nextRpt = nextBmd.getRelationPropertyType(i);
-                if (nextRpt == null) {
-                    continue;
-                }
+            final List<TnRelationPropertyType> nextRptList = nextBmd.getRelationPropertyTypeList();
+            for (TnRelationPropertyType nextRpt : nextRptList) {
                 setupNextRelationRowElement(res, row, nextRpt);
             }
         } finally {
@@ -200,6 +181,9 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
      * @throws SQLException
      */
     protected void mappingNextRelation(TnRelationRowCreationResource res, Object row) throws SQLException {
+        if (res.isStopCurrentRelationMapping()) {
+            return;
+        }
         final TnRelationKey relKey = res.prepareRelationKey(); // also relKeyValues setup
         if (relKey == null) {
             return; // treated as no data if the relation key has no data
@@ -232,10 +216,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         // - - - - - - - - - - - 
         // Recursive Call Point!
         // - - - - - - - - - - -
-        res.initializePropertyCacheElement();
-
-        // do only selected foreign property for performance if condition-bean exists
-        if (hasConditionBean(res) && !hasSelectedForeignInfo(res)) {
+        if (res.isStopCurrentRelationMapping()) {
             return;
         }
 
@@ -247,14 +228,15 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             setupPropertyCacheElement(res);
         }
 
-        // set up next relation
-        if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
-            res.prepareNextLevelMapping();
-            try {
-                setupNextPropertyCache(res, nextBmd);
-            } finally {
-                res.closeNextLevelMapping();
-            }
+        // set up next level relation's property cache
+        if (res.isStopNextRelationMapping()) {
+            return;
+        }
+        res.prepareNextLevelMapping();
+        try {
+            setupNextPropertyCache(res, nextBmd);
+        } finally {
+            res.closeNextLevelMapping();
         }
     }
 
@@ -263,8 +245,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     //                                         -------------
     protected void setupNextPropertyCache(TnRelationRowCreationResource res, TnBeanMetaData nextBmd)
             throws SQLException {
-        for (int i = 0; i < nextBmd.getRelationPropertyTypeSize(); ++i) {
-            final TnRelationPropertyType nextRpt = nextBmd.getRelationPropertyType(i);
+        final List<TnRelationPropertyType> nextRptList = nextBmd.getRelationPropertyTypeList();
+        for (TnRelationPropertyType nextRpt : nextRptList) {
             setupNextPropertyCacheElement(res, nextRpt);
         }
     }
@@ -293,30 +275,5 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         // and ConditionBean supports unlimited relation nest level
         // so this limit size is always used after hasConditionBean()
         return 2; // for Compatible (old parameter)
-    }
-
-    // ===================================================================================
-    //                                                                       ConditionBean 
-    //                                                                       =============
-    protected boolean isConditionBeanSelectedRelation(TnRelationRowCreationResource res) {
-        if (hasConditionBean(res)) {
-            final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-            if (cb.getSqlClause().hasSelectedRelation(res.getRelationNoSuffix())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected boolean hasConditionBean(TnRelationRowCreationResource res) {
-        return ConditionBeanContext.isExistConditionBeanOnThread();
-    }
-
-    protected boolean hasSelectedForeignInfo(TnRelationRowCreationResource res) {
-        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
-        if (cb.getSqlClause().hasSelectedRelation(res.getRelationNoSuffix())) {
-            return true;
-        }
-        return false;
     }
 }

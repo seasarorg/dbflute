@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.dbmeta.info;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -39,9 +39,9 @@ public class UniqueInfo {
     public UniqueInfo(DBMeta dbmeta, List<ColumnInfo> uniqueColumnList, boolean primary) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("uniqueColumnList", uniqueColumnList);
-        this._dbmeta = dbmeta;
-        this._uniqueColumnList = uniqueColumnList;
-        this._primary = primary;
+        _dbmeta = dbmeta;
+        _uniqueColumnList = Collections.unmodifiableList(uniqueColumnList);
+        _primary = primary;
     }
 
     // ===================================================================================
@@ -107,11 +107,11 @@ public class UniqueInfo {
     }
 
     /**
-     * Get the snapshot list of unique column.
-     * @return The snapshot list of unique column. (NotNull)
+     * Get the read-only list of unique column.
+     * @return The read-only list of unique column. (NotNull)
      */
     public List<ColumnInfo> getUniqueColumnList() {
-        return new ArrayList<ColumnInfo>(_uniqueColumnList); // as snapshot
+        return _uniqueColumnList; // as snapshot
     }
 
     /**
@@ -119,14 +119,14 @@ public class UniqueInfo {
      * @return The column information of the first in primary columns. (NotNull)
      */
     public ColumnInfo getFirstColumn() {
-        return this._uniqueColumnList.get(0);
+        return _uniqueColumnList.get(0);
     }
 
     public boolean isTwoOrMore() {
-        return this._uniqueColumnList.size() > 1;
+        return _uniqueColumnList.size() > 1;
     }
 
     public boolean isPrimary() {
-        return this._primary;
+        return _primary;
     }
 }

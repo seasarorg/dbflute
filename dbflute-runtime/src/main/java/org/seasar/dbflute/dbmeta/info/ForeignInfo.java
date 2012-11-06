@@ -16,11 +16,10 @@
 package org.seasar.dbflute.dbmeta.info;
 
 import java.lang.reflect.Method;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -69,14 +68,12 @@ public class ForeignInfo implements RelationInfo {
         _foreignPropertyName = foreignPropertyName;
         _localDBMeta = localDBMeta;
         _foreignDBMeta = foreignDBMeta;
-        _localForeignColumnInfoMap = localForeignColumnInfoMap;
-        final Set<ColumnInfo> keySet = localForeignColumnInfoMap.keySet();
-        _foreignLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
-        for (final Iterator<ColumnInfo> ite = keySet.iterator(); ite.hasNext();) {
-            final ColumnInfo key = ite.next();
-            final ColumnInfo value = localForeignColumnInfoMap.get(key);
-            _foreignLocalColumnInfoMap.put(value, key);
+        _localForeignColumnInfoMap = Collections.unmodifiableMap(localForeignColumnInfoMap);
+        final Map<ColumnInfo, ColumnInfo> foreignLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
+        for (Entry<ColumnInfo, ColumnInfo> entry : localForeignColumnInfoMap.entrySet()) {
+            foreignLocalColumnInfoMap.put(entry.getValue(), entry.getKey());
         }
+        _foreignLocalColumnInfoMap = Collections.unmodifiableMap(foreignLocalColumnInfoMap);
         _relationNo = relationNo;
         _oneToOne = oneToOne;
         _bizOneToOne = bizOneToOne;
@@ -335,19 +332,19 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
-     * Get the snapshot map, key is a local column info, value is a foreign column info.
-     * @return The snapshot map. (NotNull)
+     * Get the read-only map, key is a local column info, value is a foreign column info.
+     * @return The read-only map. (NotNull)
      */
     public Map<ColumnInfo, ColumnInfo> getLocalForeignColumnInfoMap() {
-        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_localForeignColumnInfoMap); // as snapshot
+        return _localForeignColumnInfoMap;
     }
 
     /**
-     * Get the snapshot map, key is a foreign column info, value is a local column info.
-     * @return The snapshot map. (NotNull)
+     * Get the read-only map, key is a foreign column info, value is a local column info.
+     * @return The read-only map. (NotNull)
      */
     public Map<ColumnInfo, ColumnInfo> getForeignLocalColumnInfoMap() {
-        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_foreignLocalColumnInfoMap); // as snapshot
+        return _foreignLocalColumnInfoMap;
     }
 
     /**
