@@ -632,12 +632,34 @@ public class DfSchemaDiff extends DfAbstractDiff {
     // -----------------------------------------------------
     //                                         Assist Helper
     //                                         -------------
+    /**
+     * Find the table from next schema by table object. <br />
+     * This method can be used after {@link #loadNextSchema()}.
+     * @param table The object of target table that has table name. (NotNull)
+     * @return The object of found table. (NullAllowed: if null, not found)
+     */
     protected Table findNextTable(Table table) {
         return _nextDb.getTable(table.getName());
     }
 
+    /**
+     * Find the table from previous schema by table object. <br />
+     * This method can be used after {@link #loadPreviousSchema()}.
+     * @param table The object of target table that has table name. (NotNull)
+     * @return The object of found table. (NullAllowed: if null, not found)
+     */
     protected Table findPreviousTable(Table table) {
-        return _previousDb.getTable(table.getName());
+        return findPreviousTable(table.getName());
+    }
+
+    /**
+     * Find the table from previous schema by table name. <br />
+     * This method can be used after {@link #loadPreviousSchema()}.
+     * @param tableName The name of target table. (NotNull)
+     * @return The object of found table. (NullAllowed: if null, not found)
+     */
+    public Table findPreviousTable(String tableName) { // public to glance previous world
+        return _previousDb.getTable(tableName);
     }
 
     protected boolean isSameTableName(Table next, Table previous) {
@@ -1469,6 +1491,12 @@ public class DfSchemaDiff extends DfAbstractDiff {
         return !isFirstTime() && !isLoadingFailure();
     }
 
+    /**
+     * Is the first time to read the schema? <br />
+     * It also means previous schema info was not found. <br />
+     * This determination is set after {@link #loadPreviousSchema()}.
+     * @return The determination, true or false.
+     */
     public boolean isFirstTime() {
         return _firstTime;
     }

@@ -149,7 +149,6 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
@@ -158,7 +157,7 @@ import org.xml.sax.Attributes;
  * A class for information about foreign keys of a table.
  * @author modified by jflute (originated in Apache Torque)
  */
-public class ForeignKey {
+public class ForeignKey implements Constraint {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -1306,7 +1305,9 @@ public class ForeignKey {
         sb.append(getForeignSimpleDisp()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
             final String comment = resolveCommentForJavaDoc(_comment, indent);
-            sb.append(" <br />").append(ln()).append(indent).append(" * ").append(comment);
+            final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
+            sb.append(" <br />").append(sourceCodeLn);
+            sb.append(indent).append(" * ").append(comment);
         }
         return sb.toString();
     }
@@ -1337,7 +1338,9 @@ public class ForeignKey {
         sb.append(getReferrerSimpleDispAsOne()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
             final String comment = resolveCommentForJavaDoc(_comment, indent);
-            sb.append(" <br />").append(ln()).append(indent).append(" * ").append(comment);
+            final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
+            sb.append(" <br />").append(sourceCodeLn);
+            sb.append(indent).append(" * ").append(comment);
         }
         return sb.toString();
     }
@@ -1367,7 +1370,9 @@ public class ForeignKey {
         sb.append(getReferrerSimpleDisp()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
             final String comment = resolveCommentForJavaDoc(_comment, indent);
-            sb.append(" <br />").append(ln()).append(indent).append(" * ").append(comment);
+            final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
+            sb.append(" <br />").append(sourceCodeLn);
+            sb.append(indent).append(" * ").append(comment);
         }
         return sb.toString();
     }
@@ -1487,10 +1492,6 @@ public class ForeignKey {
         return Srl.initUncap(str);
     }
 
-    protected String ln() {
-        return DBFluteSystem.getBasicLn();
-    }
-
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -1517,16 +1518,15 @@ public class ForeignKey {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Returns the name attribute.
-     * @return the name
+     * {@inheritDoc}
      */
     public String getName() {
         return _name;
     }
 
     /**
-     * Sets the name attribute.
-     * @param name the name
+     * Set the constraint name of the FK.
+     * @param name the name string. (NullAllowed)
      */
     public void setName(String name) {
         this._name = name;

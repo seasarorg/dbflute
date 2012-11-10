@@ -141,7 +141,7 @@ import org.xml.sax.Attributes;
  * Information about indices of a table.
  * @author modified by jflute (originated in Apache Torque)
  */
-public class Index {
+public class Index implements Constraint {
 
     // ===================================================================================
     //                                                                          Definition
@@ -284,8 +284,7 @@ public class Index {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Gets the name of this index.
-     * @return the name of this index
+     * {@inheritDoc}
      */
     public String getName() {
         if (_indexName == null) {
@@ -304,7 +303,7 @@ public class Index {
      * @param indexName the name of this index
      */
     public void setName(String indexName) {
-        this._indexName = indexName;
+        _indexName = indexName;
     }
 
     /**

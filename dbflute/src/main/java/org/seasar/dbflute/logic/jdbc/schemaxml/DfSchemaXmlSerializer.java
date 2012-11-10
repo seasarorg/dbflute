@@ -26,6 +26,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,8 +34,13 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.Constraint;
+import org.apache.torque.engine.database.model.ForeignKey;
+import org.apache.torque.engine.database.model.Index;
+import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.apache.torque.engine.database.model.Unique;
 import org.apache.torque.engine.database.transform.DTDResolver;
 import org.apache.xerces.dom.DocumentImpl;
 import org.apache.xerces.dom.DocumentTypeImpl;
@@ -83,6 +89,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 import org.w3c.dom.DocumentType;
@@ -97,6 +104,32 @@ public class DfSchemaXmlSerializer {
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfSchemaXmlSerializer.class);
+
+    protected static final PreviousForeignKeyProvider _previousForeignKeyProvider = new PreviousForeignKeyProvider();
+    protected static final PreviousUniqueProvider _previousUniqueProvider = new PreviousUniqueProvider();
+    protected static final PreviousIndexProvider _previousIndexProvider = new PreviousIndexProvider();
+
+    protected static interface PreviousConstraintProvider<CONSTRAINT extends Constraint> {
+        List<CONSTRAINT> providePreviousList(Table previousTable);
+    }
+
+    protected static class PreviousForeignKeyProvider implements PreviousConstraintProvider<ForeignKey> {
+        public List<ForeignKey> providePreviousList(Table previousTable) {
+            return previousTable.getForeignKeyList();
+        }
+    }
+
+    protected static class PreviousUniqueProvider implements PreviousConstraintProvider<Unique> {
+        public List<Unique> providePreviousList(Table previousTable) {
+            return previousTable.getUniqueList();
+        }
+    }
+
+    protected static class PreviousIndexProvider implements PreviousConstraintProvider<Index> {
+        public List<Index> providePreviousList(Table previousTable) {
+            return previousTable.getIndexList();
+        }
+    }
 
     // ===================================================================================
     //                                                                           Attribute
@@ -151,6 +184,7 @@ public class DfSchemaXmlSerializer {
     protected boolean _suppressAdditionalSchema; // to check in processes related to additional schema
     protected boolean _craftDiffEnabled; // not null means CraftDiff enabled
     protected DfCraftDiffAssertSqlFire _craftDiffAssertSqlFire; // not null when CraftDiff enabled 
+    protected boolean _keepDefitionOrderAsPrevious; // not to get meta data change by only definition order 
 
     // ===================================================================================
     //                                                                         Constructor
@@ -177,7 +211,7 @@ public class DfSchemaXmlSerializer {
     }
 
     /**
-     * Create instance as core process. 
+     * Create instance as core process (that is JDBC task). 
      * @param dataSource The data source of the database. (NotNull)
      * @return The new instance. (NotNull)
      */
@@ -191,6 +225,7 @@ public class DfSchemaXmlSerializer {
         final DfDocumentProperties docProp = buildProp.getDocumentProperties();
         final String craftMetaDir = docProp.getCoreCraftMetaDir();
         serializer.enableCraftDiff(dataSource, craftMetaDir, DfCraftDiffAssertDirection.ROLLING_NEXT);
+        serializer.keepDefitionOrderAsPrevious(); // to avoid getting nonsense differences in JDBC task
         return serializer;
     }
 
@@ -225,6 +260,11 @@ public class DfSchemaXmlSerializer {
 
     protected DfSchemaXmlSerializer suppressAdditionalSchema() {
         _suppressAdditionalSchema = true;
+        return this;
+    }
+
+    protected DfSchemaXmlSerializer keepDefitionOrderAsPrevious() {
+        _keepDefitionOrderAsPrevious = true;
         return this;
     }
 
@@ -427,6 +467,20 @@ public class DfSchemaXmlSerializer {
         return true;
     }
 
+    protected void throwSchemaEmptyException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The schema was empty, which had no table.");
+        br.addItem("Advice");
+        br.addElement("Please confirm the database connection settings.");
+        br.addElement("If you've not created the schema yet, please create it.");
+        br.addElement("You can create easily by using replace-schema.");
+        br.addElement("Set up ./playsql/replace-schema.sql and execute ReplaceSchema task");
+        br.addItem("Connected Schema");
+        br.addElement("schema = " + _dataSource.getSchema());
+        final String msg = br.buildExceptionMessage();
+        throw new DfSchemaEmptyException(msg);
+    }
+
     // -----------------------------------------------------
     //                                                Column
     //                                                ------
@@ -509,34 +563,86 @@ public class DfSchemaXmlSerializer {
     }
 
     // -----------------------------------------------------
-    //                                            Constraint
+    //                                            ForeignKey
     //                                            ----------
     protected void processForeignKey(DatabaseMetaData metaData, DfTableMeta tableMeta, Element tableElement)
             throws SQLException {
         final Map<String, DfForeignKeyMeta> foreignKeyMap = getForeignKeys(metaData, tableMeta);
-        final Set<String> foreignKeyKeySet = foreignKeyMap.keySet();
-        for (String foreignKeyName : foreignKeyKeySet) {
-            final DfForeignKeyMeta foreignKeyMetaInfo = foreignKeyMap.get(foreignKeyName);
-            final Element foreignKeyElement = _doc.createElement("foreign-key");
-            foreignKeyElement.setAttribute("foreignTable", foreignKeyMetaInfo.getForeignTableName());
-            foreignKeyElement.setAttribute("name", foreignKeyMetaInfo.getForeignKeyName());
-            final Map<String, String> columnNameMap = foreignKeyMetaInfo.getColumnNameMap();
+        if (foreignKeyMap.isEmpty()) {
+            return;
+        }
+        final Set<String> foreignKeyNameSet = deriveForeignKeyLoopSet(foreignKeyMap, tableMeta);
+        for (String foreignKeyName : foreignKeyNameSet) {
+            final DfForeignKeyMeta fkMetaInfo = foreignKeyMap.get(foreignKeyName);
+            final Element fkElement = _doc.createElement("foreign-key");
+            fkElement.setAttribute("foreignTable", fkMetaInfo.getForeignTableName());
+            fkElement.setAttribute("name", fkMetaInfo.getForeignKeyName());
+            final Map<String, String> columnNameMap = fkMetaInfo.getColumnNameMap();
             final Set<String> columnNameKeySet = columnNameMap.keySet();
             for (String localColumnName : columnNameKeySet) {
                 final String foreignColumnName = columnNameMap.get(localColumnName);
                 final Element referenceElement = _doc.createElement("reference");
                 referenceElement.setAttribute("local", localColumnName);
                 referenceElement.setAttribute("foreign", foreignColumnName);
-                foreignKeyElement.appendChild(referenceElement);
+                fkElement.appendChild(referenceElement);
             }
-            tableElement.appendChild(foreignKeyElement);
+            tableElement.appendChild(fkElement);
         }
     }
 
+    protected Set<String> deriveForeignKeyLoopSet(Map<String, DfForeignKeyMeta> nextFkMap, DfTableMeta tableMeta) {
+        if (!_keepDefitionOrderAsPrevious) { // this is option
+            return nextFkMap.keySet(); // normal
+        }
+        final List<ForeignKey> previousFkList = findPreviousConstraintKeyList(tableMeta, _previousForeignKeyProvider);
+        return deriveConstraintKeyLoopSet(nextFkMap, previousFkList);
+    }
+
+    // constraint common
+    protected <CONSTRAINT extends Constraint> List<CONSTRAINT> findPreviousConstraintKeyList(DfTableMeta tableMeta,
+            PreviousConstraintProvider<CONSTRAINT> provider) {
+        if (!_schemaDiff.isFirstTime()) {
+            final Table previousTable = _schemaDiff.findPreviousTable(tableMeta.getTableName());
+            if (previousTable != null) {
+                return provider.providePreviousList(previousTable);
+            }
+        }
+        return DfCollectionUtil.emptyList();
+    }
+
+    // constraint common
+    protected Set<String> deriveConstraintKeyLoopSet(Map<String, ? extends Object> nextMap,
+            List<? extends Constraint> previousList) {
+        if (nextMap.size() != previousList.size()) {
+            return nextMap.keySet(); // added or deleted exists
+        }
+        final Set<String> previousNameSet = new LinkedHashSet<String>(); // order can be saved
+        for (Constraint previous : previousList) {
+            previousNameSet.add(previous.getName());
+        }
+        if (!nextMap.keySet().equals(previousNameSet)) { // compared without order
+            return nextMap.keySet(); // any constraint changed (contains added, deleted)
+        }
+        // same structure except definition order
+        // (in fact, only constraint columns may be changed but it's no problem here)
+        // then it uses previous order to save constraint definition order
+        // because DBMS sometimes returns random order in spite of no change
+        // ...after that
+        // MySQL does not returns random order, auto-generated FK names have problems
+        // however this logic is remained just in case 
+        return previousNameSet;
+    }
+
+    // -----------------------------------------------------
+    //                                             UniqueKey
+    //                                             ---------
     protected Map<String, Map<Integer, String>> processUniqueKey(DatabaseMetaData metaData, DfTableMeta tableMeta,
             Element tableElement) throws SQLException {
         final Map<String, Map<Integer, String>> uniqueMap = getUniqueKeyMap(metaData, tableMeta);
-        final java.util.Set<String> uniqueKeySet = uniqueMap.keySet();
+        if (uniqueMap.isEmpty()) {
+            return uniqueMap;
+        }
+        final Set<String> uniqueKeySet = deriveUniqueLoopSet(uniqueMap, tableMeta);
         for (final String uniqueIndexName : uniqueKeySet) {
             final Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueIndexName);
             if (uniqueElementMap.isEmpty()) {
@@ -558,10 +664,24 @@ public class DfSchemaXmlSerializer {
         return uniqueMap;
     }
 
+    protected Set<String> deriveUniqueLoopSet(Map<String, Map<Integer, String>> nextUqMap, DfTableMeta tableMeta) {
+        if (!_keepDefitionOrderAsPrevious) { // this is option
+            return nextUqMap.keySet(); // normal
+        }
+        final List<Unique> previousUqList = findPreviousConstraintKeyList(tableMeta, _previousUniqueProvider);
+        return deriveConstraintKeyLoopSet(nextUqMap, previousUqList);
+    }
+
+    // -----------------------------------------------------
+    //                                                 Index
+    //                                                 -----
     protected void processIndex(DatabaseMetaData metaData, DfTableMeta tableMeta, Element tableElement,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
         final Map<String, Map<Integer, String>> indexMap = getIndexMap(metaData, tableMeta, uniqueKeyMap);
-        final java.util.Set<String> indexKeySet = indexMap.keySet();
+        if (indexMap.isEmpty()) {
+            return;
+        }
+        final Set<String> indexKeySet = deriveIndexLoopSet(indexMap, tableMeta);
         for (final String indexName : indexKeySet) {
             final Map<Integer, String> indexElementMap = indexMap.get(indexName);
             if (indexElementMap.isEmpty()) {
@@ -582,18 +702,12 @@ public class DfSchemaXmlSerializer {
         }
     }
 
-    protected void throwSchemaEmptyException() {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The schema was empty, which had no table.");
-        br.addItem("Advice");
-        br.addElement("Please confirm the database connection settings.");
-        br.addElement("If you've not created the schema yet, please create it.");
-        br.addElement("You can create easily by using replace-schema.");
-        br.addElement("Set up ./playsql/replace-schema.sql and execute ReplaceSchema task");
-        br.addItem("Connected Schema");
-        br.addElement("schema = " + _dataSource.getSchema());
-        final String msg = br.buildExceptionMessage();
-        throw new DfSchemaEmptyException(msg);
+    protected Set<String> deriveIndexLoopSet(Map<String, Map<Integer, String>> nextIdxMap, DfTableMeta tableMeta) {
+        if (!_keepDefitionOrderAsPrevious) { // this is option
+            return nextIdxMap.keySet(); // normal
+        }
+        final List<Index> previousIdxList = findPreviousConstraintKeyList(tableMeta, _previousIndexProvider);
+        return deriveConstraintKeyLoopSet(nextIdxMap, previousIdxList);
     }
 
     // -----------------------------------------------------
@@ -1312,6 +1426,10 @@ public class DfSchemaXmlSerializer {
 
     protected String getSchemaXmlEncoding() {
         return getSchemaXmlFacadeProp().getProejctSchemaXMLEncoding();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {
