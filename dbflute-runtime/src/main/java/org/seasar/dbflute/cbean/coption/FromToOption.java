@@ -301,7 +301,7 @@ public class FromToOption implements ConditionOption {
      *  if from-date is 2011/01/01 and to-date is 2012/01/01 (means 2011, 2012 year are target),
      *  the condition is: greater-equal 2011/04/01 and less-than 2013/04/04
      * </pre>
-     * @param yearBeginMonth The month for year-begin.
+     * @param yearBeginMonth The month for year-begin. (NotMinus, 1-12)
      * @return this. (NotNull)
      */
     public FromToOption beginYear_Month(int yearBeginMonth) {
@@ -442,7 +442,7 @@ public class FromToOption implements ConditionOption {
      *  if from-date is 2011/01/01 and to-date is 2012/01/01 (means 2011, 2012 year are target),
      *  the condition is: greater-equal 2010/11/01 and less-than 2012/11/01
      * </pre>
-     * @param yearBeginMonth The month of previous year for year-begin.
+     * @param yearBeginMonth The month of previous year for year-begin. (NotMinus, 1-12)
      * @return this. (NotNull)
      */
     public FromToOption beginYear_PreviousMonth(int yearBeginMonth) {
@@ -490,7 +490,7 @@ public class FromToOption implements ConditionOption {
      *  if from-date is 2011/11/01 and to-date is 2011/12/01 (means 11th, 12th months are target),
      *  the condition is: greater-equal 2011/11/03 and less-than 2012/01/03
      * </pre>
-     * @param monthBeginDay The day for month-begin.
+     * @param monthBeginDay The day for month-begin. (NotMinus, 1-31)
      * @return this. (NotNull)
      */
     public FromToOption beginMonth_Day(int monthBeginDay) {
@@ -511,7 +511,7 @@ public class FromToOption implements ConditionOption {
      *  if from-date is 2011/11/01 and to-date is 2011/12/01 (means 11th, 12th months are target),
      *  the condition is: greater-equal 2011/10/25 and less-than 2011/12/25
      * </pre>
-     * @param monthBeginDay The day of previous month for month-begin.
+     * @param monthBeginDay The day of previous month for month-begin. (NotMinus, 1-31)
      * @return this. (NotNull)
      */
     public FromToOption beginMonth_PreviousDay(int monthBeginDay) {
@@ -558,7 +558,7 @@ public class FromToOption implements ConditionOption {
      *  if from-date is 2011/11/27 and to-date is 2011/11/28 (means 27, 28 days are target),
      *  the condition is: greater-equal 2011/11/27 06:00:00 and less-than 2011/11/28 06:00:00
      * </pre>
-     * @param dayBeginHour The day of day-begin.
+     * @param dayBeginHour The day of day-begin. (NotMinus, 1-23)
      * @return this. (NotNull)
      */
     public FromToOption beginDay_Hour(int dayBeginHour) {
@@ -579,7 +579,7 @@ public class FromToOption implements ConditionOption {
      *  if from-date is 2011/11/27 and to-date is 2011/11/28 (means 27, 28 days are target),
      *  the condition is: greater-equal 2011/11/26 22:00:00 and less-than 2011/11/27 22:00:00
      * </pre>
-     * @param dayBeginHour The day of day-begin.
+     * @param dayBeginHour The day of day-begin. (NotMinus, 1-23)
      * @return this. (NotNull)
      */
     public FromToOption beginDay_PreviousHour(int dayBeginHour) {
@@ -743,7 +743,7 @@ public class FromToOption implements ConditionOption {
      *  if both from-date is 2011/11/26 and to-date is 2011/11/28,
      *  the condition is: greater-equal 2011/11/26 and less-than 2011/11/29 
      * </pre>
-     * @param moveToCount The count to move-to.
+     * @param moveToCount The count to move-to. (MinusAllowed)
      * @return this. (NotNull)
      */
     public FromToOption moveToScope(int moveToCount) {
