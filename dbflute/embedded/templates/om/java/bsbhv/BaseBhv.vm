@@ -665,14 +665,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 #end
     // ===================================================================================
-    //                                                                    Pull out Foreign
-    //                                                                    ================
+    //                                                                   Pull out Relation
+    //                                                                   =================
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
     /**
      * Pull out the list of foreign table '${foreignEntityClassName}'.
-     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
-     * @return The list of foreign table. (NotNull)
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
+     * @return The list of foreign table. (NotNull, EmptyAllowed)
      */
     public List<${foreignEntityClassName}> pullout${foreignKey.foreignPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
@@ -698,8 +698,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
     /**
      * Pull out the list of referrer-as-one table '${referrerEntityClassName}'.
-     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
-     * @return The list of referrer-as-one table. (NotNull)
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
+     * @return The list of referrer-as-one table. (NotNull, EmptyAllowed)
      */
     public List<${referrerEntityClassName}> pullout${referrer.referrerPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}>() {
@@ -707,6 +707,23 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
             public boolean hasRf() { return ${referrer.canBeReferrer()}; }
             public void setRfLs(${referrerEntityClassName} e, List<${myExtendedObjectClassName}> ls)
             { if (!ls.isEmpty()) { e.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
+        });
+    }
+#end
+#if ($table.hasSinglePrimaryKey())
+#set ($pkCol = $table.primaryKeyAsOne)
+
+    // ===================================================================================
+    //                                                                      Extract Column
+    //                                                                      ==============
+    /**
+     * Extract the list of primary key value.
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
+     * @return The list of primary key value. (NotNull, EmptyAllowed)
+     */
+    public List<${pkCol.javaNative}> extractPrimaryKey(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpExtractInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${pkCol.javaNative}>() {
+            public ${pkCol.javaNative} getCV(${myExtendedObjectClassName} e) { return e.get${pkCol.javaName}(); }
         });
     }
 #end

@@ -971,8 +971,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     // ===================================================================================
-    //                                                                    Pull out Foreign
-    //                                                                    ================
+    //                                                                   Pull out Relation
+    //                                                                   =================
     protected <LOCAL_ENTITY extends Entity, FOREIGN_ENTITY extends Entity> List<FOREIGN_ENTITY> helpPulloutInternally(
             List<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback) {
         assertObjectNotNull("localEntityList", localEntityList);
@@ -1008,6 +1008,24 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         boolean hasRf(); // hasReferrer()
 
         void setRfLs(FOREIGN_ENTITY foreignEntity, List<LOCAL_ENTITY> localList); // setReferrerList()
+    }
+
+    // ===================================================================================
+    //                                                                      Extract Column
+    //                                                                      ==============
+    protected <LOCAL_ENTITY extends Entity, COLUMN> List<COLUMN> helpExtractInternally(
+            List<LOCAL_ENTITY> localEntityList, InternalExtractCallback<LOCAL_ENTITY, COLUMN> callback) {
+        assertObjectNotNull("localEntityList", localEntityList);
+        assertObjectNotNull("callback", callback);
+        final List<COLUMN> valueList = new ArrayList<COLUMN>();
+        for (LOCAL_ENTITY entity : localEntityList) {
+            valueList.add(callback.getCV(entity));
+        }
+        return valueList;
+    }
+
+    protected static interface InternalExtractCallback<LOCAL_ENTITY extends Entity, COLUMN> {
+        COLUMN getCV(LOCAL_ENTITY entity); // getColumnValue()
     }
 
     // ===================================================================================
