@@ -18,7 +18,9 @@ package org.seasar.dbflute.properties.assistant.freegen;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.texen.util.FileUtil;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -55,6 +57,16 @@ public class DfFreeGenManager {
     public void makeDirectory(String filePath) {
         final String basePath = Srl.substringLastFront(filePath, "/");
         FileUtil.mkdir(getGeneratorInstance().getOutputPath() + "/" + basePath);
+    }
+
+    public String resolveTextForSchemaHtml(String text) {
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        return prop.resolveTextForSchemaHtml(text);
+    }
+
+    public String resolveTextForJavaDoc(String text, String indent) {
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        return prop.resolveTextForJavaDoc(text, indent);
     }
 
     // ===================================================================================
