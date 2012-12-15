@@ -176,13 +176,15 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
                     continue;
                 }
             }
+            sb.append(columnSqlName).append(" = ");
+            final String valueExp;
             if (option != null && option.hasStatement(columnDbName)) {
                 final String statement = option.buildStatement(columnDbName);
-                sb.append(columnSqlName).append(" = ").append(statement);
-                continue;
+                valueExp = encryptIfNeeds(tableDbName, columnDbName, statement);
+            } else {
+                valueExp = encryptIfNeeds(tableDbName, columnDbName, "?");
             }
-            sb.append(columnSqlName).append(" = ");
-            sb.append(encrypt(tableDbName, columnDbName, "?"));
+            sb.append(valueExp);
         }
         sb.append(ln()).append(" where ");
         for (int i = 0; i < _beanMetaData.getPrimaryKeySize(); i++) { // never zero loop

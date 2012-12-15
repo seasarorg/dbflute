@@ -39,9 +39,15 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The specify query call-back to specify column. (NotNull) */
     protected final SpecifyQuery<CB> _specifyQuery;
-    protected ConditionBean _baseCB; // to judge database type and save parameters of conversion
+
+    /** The condition bean of target column to judge database type and save parameters of conversion. (NotNull after specify) */
+    protected ConditionBean _baseCB;
+
+    /** The specified condition bean to handle the specified column. (NotNull after specify) */
     protected CB _specifedCB;
+
     protected final List<HpCalcElement> _calculationList = DfCollectionUtil.newArrayList();
     protected boolean _leftMode;
     protected HpCalcSpecification<CB> _leftCalcSp;
@@ -435,24 +441,25 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     public String buildStatementAsSqlName(String aliasName) { // e.g. VaryingUpdate, VaryingQueryUdpate
         final ColumnSqlName columnSqlName = getResolvedSpecifiedColumnSqlName();
         final String columnExp = (aliasName != null ? aliasName : "") + columnSqlName.toString();
-        return doBuildStatement(columnExp, null);
+        final boolean removeCalcAlias = aliasName == null;
+        return doBuildStatement(columnExp, null, removeCalcAlias);
     }
 
     /**
      * {@inheritDoc}
      */
     public String buildStatementToSpecifidName(String columnExp) { // e.g. ColumnQuery, DerivedReferrer
-        return doBuildStatement(columnExp, null);
+        return doBuildStatement(columnExp, null, false);
     }
 
     /**
      * {@inheritDoc}
      */
     public String buildStatementToSpecifidName(String columnExp, Map<String, String> columnAliasMap) { // e.g. ManualOrder
-        return doBuildStatement(columnExp, columnAliasMap);
+        return doBuildStatement(columnExp, columnAliasMap, false);
     }
 
-    protected String doBuildStatement(String columnExp, Map<String, String> columnAliasMap) {
+    protected String doBuildStatement(String columnExp, Map<String, String> columnAliasMap, boolean removeCalcAlias) {
         if (_calculationList.isEmpty()) {
             return null;
         }
@@ -470,7 +477,7 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
                     calculation.setPreparedConvOption(true);
                 }
             }
-            targetExp = buildCalculationExp(targetExp, columnAliasMap, calculation);
+            targetExp = buildCalculationExp(targetExp, columnAliasMap, calculation, removeCalcAlias);
             ++index;
         }
         return targetExp;
@@ -480,9 +487,11 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
      * @param targetExp The expression of target column already handled cipher. (NotNull)
      * @param columnAliasMap The map of column alias. (NullAllowed)
      * @param calculation The element of calculation. (NotNull)
+     * @param removeCalcAlias Does it remove alias of calculation column.
      * @return The expression of calculation statement. (NotNull)
      */
-    protected String buildCalculationExp(String targetExp, Map<String, String> columnAliasMap, HpCalcElement calculation) {
+    protected String buildCalculationExp(String targetExp, Map<String, String> columnAliasMap,
+            HpCalcElement calculation, boolean removeCalcAlias) {
         final CalculationType calculationType = calculation.getCalculationType();
         if (calculationType.equals(CalculationType.CONV)) { // convert
             final ColumnConversionOption columnConversionOption = calculation.getColumnConversionOption();
@@ -494,7 +503,16 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
             calcValueExp = calculation.getCalculationValue();
         } else if (calculation.hasCalculationColumn()) { // number column
             final HpSpecifiedColumn calculationColumn = calculation.getCalculationColumn();
-            final String columnExp = calculationColumn.toColumnRealName().toString();
+            final String columnExp;
+            if (removeCalcAlias) { // means e.g. plain update
+                final String basePointAliasName = _baseCB.getSqlClause().getBasePointAliasName();
+                if (!basePointAliasName.equals(calculationColumn.getTableAliasName())) { // may be relation column
+                    throwCalculationColumnRelationUnresolvedException(targetExp, calculationColumn);
+                }
+                columnExp = calculationColumn.toColumnSqlName().toString();
+            } else {
+                columnExp = calculationColumn.toColumnRealName().toString();
+            }
             if (columnAliasMap != null) { // e.g. ManualOrder on union
                 final String mappedAlias = columnAliasMap.get(columnExp);
                 calcValueExp = mappedAlias != null ? mappedAlias : columnExp;
@@ -509,11 +527,6 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         return targetExp + " " + calculationType.operand() + " " + calcValueExp;
     }
 
-    protected void throwCalculationElementIllegalStateException(String targetExp) {
-        String msg = "The either calculationValue or calculationColumn should exist: targetExp=" + targetExp;
-        throw new IllegalStateException(msg);
-    }
-
     protected String decryptIfNeeds(String valueExp) {
         return decryptIfNeeds(getSpecifiedColumnInfo(), valueExp);
     }
@@ -524,6 +537,28 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
         }
         final ColumnFunctionCipher cipher = _baseCB.getSqlClause().findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.decrypt(valueExp) : valueExp;
+    }
+
+    protected void throwCalculationColumnRelationUnresolvedException(String targetExp,
+            HpSpecifiedColumn calculationColumn) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The relation for the calculation column was unresolved.");
+        br.addItem("Advice");
+        br.addElement("For example, you cannot use relation columns for calculation");
+        br.addElement("on set clause of update. (because of relation unresolved)");
+        br.addItem("Base ConditionBean");
+        br.addElement(_baseCB.getClass().getName());
+        br.addItem("Specified Column");
+        br.addElement(targetExp);
+        br.addItem("Calculation Column");
+        br.addElement(calculationColumn);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalConditionBeanOperationException(msg);
+    }
+
+    protected void throwCalculationElementIllegalStateException(String targetExp) {
+        String msg = "The either calculationValue or calculationColumn should exist: targetExp=" + targetExp;
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================

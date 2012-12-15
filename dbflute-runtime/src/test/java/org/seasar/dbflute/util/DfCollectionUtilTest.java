@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.seasar.dbflute.unit.core.PlainTestCase;
+import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
+import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
 import org.seasar.dbflute.util.DfCollectionUtil.OrderDiff;
 import org.seasar.dbflute.util.DfCollectionUtil.OrderDiffDetail;
 
@@ -384,5 +386,27 @@ public class DfCollectionUtilTest extends PlainTestCase {
         assertEquals(2, map.size());
         assertEquals("bar", map.get("foo"));
         assertEquals("qux", map.get("baz"));
+    }
+
+    // ===================================================================================
+    //                                                                               Order
+    //                                                                               =====
+    public void test_orderAccordingTo() throws Exception {
+        // ## Arrange ##
+        List<Integer> unorderedList = newArrayList(4, 2, 8, 5, 1111, 9);
+        AccordingToOrderResource<Integer, Integer> resource = new AccordingToOrderResource<Integer, Integer>();
+        resource.setIdExtractor(new AccordingToOrderIdExtractor<Integer, Integer>() {
+            public Integer extractId(Integer element) {
+                return element;
+            }
+        });
+        resource.setOrderedUniqueIdList(newArrayList(5, 2, 8));
+
+        // ## Act ##
+        DfCollectionUtil.orderAccordingTo(unorderedList, resource);
+
+        // ## Assert ##
+        log(unorderedList);
+        assertEquals(newArrayList(5, 2, 8, 4, 1111, 9), unorderedList);
     }
 }

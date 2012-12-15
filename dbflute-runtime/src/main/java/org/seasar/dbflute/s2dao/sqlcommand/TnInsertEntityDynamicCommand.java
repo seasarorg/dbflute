@@ -162,7 +162,7 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             }
             columnSb.append(columnSqlName);
             final String columnDbName = pt.getColumnDbName();
-            valuesSb.append(encrypt(tableDbName, columnDbName, "?"));
+            valuesSb.append(encryptIfNeeds(tableDbName, columnDbName, "?"));
         }
         final StringBuilder sb = new StringBuilder(128);
         sb.append("insert into ").append(_targetDBMeta.getTableSqlName());

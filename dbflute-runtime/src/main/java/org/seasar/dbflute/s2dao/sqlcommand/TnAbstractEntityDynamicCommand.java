@@ -73,7 +73,7 @@ public abstract class TnAbstractEntityDynamicCommand extends TnAbstractBasicSqlC
     // ===================================================================================
     //                                                                       Cipher Helper
     //                                                                       =============
-    protected String encrypt(String tableDbName, String columnDbName, String valueExp) {
+    protected String encryptIfNeeds(String tableDbName, String columnDbName, String valueExp) {
         final ColumnFunctionCipher cipher = ResourceContext.findColumnFunctionCipher(tableDbName, columnDbName);
         return cipher != null ? cipher.encrypt(valueExp) : valueExp;
     }
