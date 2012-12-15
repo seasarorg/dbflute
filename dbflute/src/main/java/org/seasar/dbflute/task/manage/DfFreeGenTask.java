@@ -115,9 +115,14 @@ public class DfFreeGenTask extends DfAbstractTexenTask {
     public Context initControlContext() throws Exception {
         _log.info("");
         _log.info("...Preparing generation of free generate");
+        final StringBuilder sb = new StringBuilder();
         for (DfFreeGenRequest request : _freeGenRequestList) {
-            _log.info("  " + request.toString());
+            sb.append(ln()).append("[").append(request.getRequestName()).append("]");
+            sb.append(ln()).append(" resource : ").append(request.getResource());
+            sb.append(ln()).append(" output   : ").append(request.getOutput());
+            sb.append(ln()).append(" tableMap : ").append(request.getTableMap());
         }
+        _log.info(sb.toString());
         return createVelocityContext();
     }
 

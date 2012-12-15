@@ -51,7 +51,7 @@ h2 {
 	font-size: 1.6em;
 }
 h3 {
-	width: 10em;
+	width: 14em;
 	margin: 0.8em 0;
 	padding-left: 1.8em;
 	border-bottom: solid 1px #333;

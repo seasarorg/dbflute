@@ -13,22 +13,22 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.properties.assistant.freegen.prop;
+package org.seasar.dbflute.helper.io.prop;
 
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute
  */
-public class DfPropTableLoaderTest extends PlainTestCase {
+public class DfJavaPropertiesReaderTest extends PlainTestCase {
 
     public void test_loadConvert() {
         // ## Arrange ##
-        DfPropTableLoader loader = new DfPropTableLoader();
+        DfJavaPropertiesReader reader = new DfJavaPropertiesReader();
         String text = "\u938c\u5009\u306e\u3044\u306c";
 
         // ## Act ##
-        String actual = loader.loadConvert(text);
+        String actual = reader.loadConvert(text);
 
         // ## Assert ##
         log(actual);

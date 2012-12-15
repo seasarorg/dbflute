@@ -32,6 +32,7 @@ import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
+import org.seasar.dbflute.properties.assistant.freegen.filepath.DfFilePathTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.prop.DfPropTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.solr.DfSolrXmlTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.xls.DfXlsTableLoader;
@@ -64,6 +65,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     //                                                                              ======
     protected final DfPropTableLoader _propTableLoader = new DfPropTableLoader();
     protected final DfXlsTableLoader _xlsTableLoader = new DfXlsTableLoader();
+    protected final DfFilePathTableLoader _filePathTableLoader = new DfFilePathTableLoader();
     protected final DfSolrXmlTableLoader _solrXmlTableLoader = new DfSolrXmlTableLoader();
 
     // ===================================================================================
@@ -145,6 +147,8 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
                     request.setTable(loadTableFromProp(requestName, resource, tableMap, mappingMap));
                 } else if (resource.isResourceTypeXls()) {
                     request.setTable(loadTableFromXls(requestName, resource, tableMap, mappingMap));
+                } else if (resource.isResourceTypeFilePath()) {
+                    request.setTable(loadTableFromFilePath(requestName, resource, tableMap, mappingMap));
                 } else if (resource.isResourceTypeSolr()) {
                     request.setTable(loadTableFromSolrXml(requestName, resource, tableMap, mappingMap));
                 } else {
@@ -186,7 +190,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         {
             @SuppressWarnings("unchecked")
             final Map<String, String> resourceMap = (Map<String, String>) elementMap.get("resourceMap");
-            final String resourceTypeStr = resourceMap.get("resourceType");
+            final String resourceTypeStr = resourceMap.get("resourceType"); // required
             final DfFreeGenerateResourceType resourceType = DfFreeGenerateResourceType.valueOf(resourceTypeStr);
             final String resourceFile = resourceMap.get("resourceFile");
             final String encoding = resourceMap.get("encoding");
@@ -214,6 +218,11 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     protected DfFreeGenTable loadTableFromXls(String requestName, DfFreeGenResource resource,
             Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
         return _xlsTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
+    }
+
+    protected DfFreeGenTable loadTableFromFilePath(String requestName, DfFreeGenResource resource,
+            Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
+        return _filePathTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
     }
 
     protected DfFreeGenTable loadTableFromSolrXml(String requestName, DfFreeGenResource resource,

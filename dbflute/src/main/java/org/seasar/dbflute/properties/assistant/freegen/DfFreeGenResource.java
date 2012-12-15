@@ -48,6 +48,10 @@ public class DfFreeGenResource {
     public boolean isResourceTypeXls() {
         return DfFreeGenerateResourceType.XLS.equals(_resourceType);
     }
+    
+    public boolean isResourceTypeFilePath() {
+        return DfFreeGenerateResourceType.FILEPATH.equals(_resourceType);
+    }
 
     public boolean isResourceTypeSolr() {
         return DfFreeGenerateResourceType.SOLR.equals(_resourceType);

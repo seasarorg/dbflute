@@ -44,7 +44,7 @@ public class DfFreeGenTable {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{tableName=" + _tableName + ", rowList.size()=" + _columnList + "}";
+        return "{tableName=" + _tableName + ", rowList.size()=" + _columnList.size() + "}";
     }
 
     // ===================================================================================

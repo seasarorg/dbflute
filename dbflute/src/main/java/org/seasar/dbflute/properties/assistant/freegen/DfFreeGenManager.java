@@ -48,6 +48,7 @@ public class DfFreeGenManager {
     //                                                                           Directory
     //                                                                           =========
     public void setOutputDirectory(String outputDirectory) {
+        _log.info("...Setting up generateOutputDirectory: " + outputDirectory);
         getGeneratorInstance().setOutputPath(outputDirectory);
     }
 
