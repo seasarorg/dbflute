@@ -46,12 +46,13 @@ public class DfJavaPropertiesReader {
     protected final Properties _reflectionProperties = new Properties();
 
     // ===================================================================================
-    //                                                                  Read as ColumnList
-    //                                                                  ==================
-    public List<Map<String, Object>> readAsColumnList(String propFile, String encoding) {
-        final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>();
-        final Map<String, String> keyCommentMap = readKeyCommentMap(propFile, encoding);
-        final Properties prop = readProperties(propFile);
+    //                                                                                Read
+    //                                                                                ====
+    public DfJavaPropertiesResult read(String propFile, String encoding) {
+        final List<Map<String, Object>> propertyList = new ArrayList<Map<String, Object>>();
+        final List<String> duplicateKeyList = new ArrayList<String>();
+        final Map<String, String> keyCommentMap = readKeyCommentMap(propFile, encoding, duplicateKeyList);
+        final Properties prop = readPlainProperties(propFile);
         final List<String> keyList = orderKeyList(prop, keyCommentMap);
         for (String key : keyList) {
             final String value = prop.getProperty(key);
@@ -103,15 +104,32 @@ public class DfJavaPropertiesReader {
             columnMap.put("comment", comment != null ? comment : "");
             columnMap.put("hasComment", comment != null);
 
-            columnList.add(columnMap);
+            propertyList.add(columnMap);
         }
-        return columnList;
+        return new DfJavaPropertiesResult(prop, propertyList, duplicateKeyList);
+    }
+
+    protected List<String> orderKeyList(Properties prop, final Map<String, String> keyCommentMap) {
+        final List<Object> orderedList = new ArrayList<Object>(prop.keySet());
+        final AccordingToOrderResource<Object, String> resource = new AccordingToOrderResource<Object, String>();
+        resource.setIdExtractor(new AccordingToOrderIdExtractor<Object, String>() {
+            public String extractId(Object element) {
+                return (String) element;
+            }
+        });
+        resource.setOrderedUniqueIdList(new ArrayList<String>(keyCommentMap.keySet()));
+        DfCollectionUtil.orderAccordingTo(orderedList, resource);
+        final List<String> keyList = new ArrayList<String>();
+        for (Object keyObj : orderedList) {
+            keyList.add((String) keyObj);
+        }
+        return keyList;
     }
 
     // ===================================================================================
     //                                                                         Read Helper
     //                                                                         ===========
-    protected Map<String, String> readKeyCommentMap(String propFile, String encoding) {
+    protected Map<String, String> readKeyCommentMap(String propFile, String encoding, List<String> duplicateKeyList) {
         final Map<String, String> keyCommentMap = new LinkedHashMap<String, String>();
         BufferedReader br = null;
         try {
@@ -139,6 +157,10 @@ public class DfJavaPropertiesReader {
                     continue;
                 }
                 final String key = Srl.substringFirstFront(ltrimmedLine, "=").trim();
+                if (keyCommentMap.containsKey(key)) {
+                    duplicateKeyList.add(key);
+                    keyCommentMap.remove(key); // remove existing key for order and override
+                }
                 keyCommentMap.put(key, loadConvert(previousComment));
                 previousComment = null;
             }
@@ -156,7 +178,7 @@ public class DfJavaPropertiesReader {
         return keyCommentMap;
     }
 
-    protected Properties readProperties(String propFile) {
+    protected Properties readPlainProperties(String propFile) {
         final Properties prop = new Properties();
         try {
             final FileInputStream fis = new FileInputStream(propFile);
@@ -166,23 +188,6 @@ public class DfJavaPropertiesReader {
             throw new IllegalStateException(msg, e);
         }
         return prop;
-    }
-
-    protected List<String> orderKeyList(Properties prop, final Map<String, String> keyCommentMap) {
-        final List<Object> orderedList = new ArrayList<Object>(prop.keySet());
-        final AccordingToOrderResource<Object, String> resource = new AccordingToOrderResource<Object, String>();
-        resource.setIdExtractor(new AccordingToOrderIdExtractor<Object, String>() {
-            public String extractId(Object element) {
-                return (String) element;
-            }
-        });
-        resource.setOrderedUniqueIdList(new ArrayList<String>(keyCommentMap.keySet()));
-        DfCollectionUtil.orderAccordingTo(orderedList, resource);
-        final List<String> keyList = new ArrayList<String>();
-        for (Object keyObj : orderedList) {
-            keyList.add((String) keyObj);
-        }
-        return keyList;
     }
 
     // ===================================================================================

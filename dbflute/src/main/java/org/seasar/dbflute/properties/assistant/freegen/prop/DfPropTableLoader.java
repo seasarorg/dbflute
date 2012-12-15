@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesReader;
+import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesResult;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.util.Srl;
@@ -55,7 +56,8 @@ public class DfPropTableLoader {
         final String resourceFile = resource.getResourceFile();
         final String encoding = resource.hasEncoding() ? resource.getEncoding() : "ISO-8859-1";
         final DfJavaPropertiesReader reader = createReader();
-        final List<Map<String, Object>> columnList = reader.readAsColumnList(resourceFile, encoding);
+        final DfJavaPropertiesResult result = reader.read(resourceFile, encoding);
+        final List<Map<String, Object>> columnList = result.getPropertyList();
         final String tableName = Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")));
         return new DfFreeGenTable(tableMap, tableName, columnList);
     }
