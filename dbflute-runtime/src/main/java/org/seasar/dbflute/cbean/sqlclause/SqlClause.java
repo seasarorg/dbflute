@@ -1028,10 +1028,23 @@ public interface SqlClause {
     String getClauseQueryInsert(Map<String, String> fixedValueQueryExpMap, SqlClause resourceSqlClause);
 
     /**
-     * @param columnParameterMap The map of column parameters. (NotNull)
+     * @param columnParameterMap The map of column parameters. The parameter may be handler. (NotNull)
      * @return The clause of query-update. (NullAllowed: If columnParameterMap is empty, return null)
      */
-    String getClauseQueryUpdate(Map<String, String> columnParameterMap);
+    String getClauseQueryUpdate(Map<String, Object> columnParameterMap);
+
+    /**
+     * The handler of calculation on set clause of query-update. <br />
+     * This is set on column parameter map as value.
+     */
+    interface QueryUpdateSetCalculationHandler {
+
+        /**
+         * @param aliasName The alias name of calculation column. (NullAllowed)
+         * @return The statement string. (NotNull)
+         */
+        String buildStatement(String aliasName);
+    }
 
     /**
      * @return The clause of query-delete. (NotNull)

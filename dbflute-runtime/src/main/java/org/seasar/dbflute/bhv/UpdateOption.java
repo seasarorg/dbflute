@@ -246,11 +246,19 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     public String buildStatement(String columnDbName) {
+        return doBuildStatement(columnDbName, null);
+    }
+
+    public String buildStatement(String columnDbName, String aliasName) {
+        return doBuildStatement(columnDbName, aliasName);
+    }
+
+    protected String doBuildStatement(String columnDbName, String aliasName) {
         final HpCalcSpecification<CB> calcSp = findStatementSpecification(columnDbName);
         if (calcSp == null) {
             return null;
         }
-        final String statement = calcSp.buildStatementAsSqlName();
+        final String statement = calcSp.buildStatementAsSqlName(aliasName);
         if (statement == null) { // means non-calculation
             throwVaryingUpdateNotFoundCalculationException(columnDbName);
         }

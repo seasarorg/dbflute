@@ -25,9 +25,10 @@ public interface HpCalcStatement {
     /**
      * Build the calculation statement of the column as SQL name. <br />
      * e.g. called by Update Calculation
+     * @param aliasName The alias name of the target column, containing dot mark. (NullAllowed)
      * @return The statement that has calculation. (NullAllowed: if null, means the column is not specified)
      */
-    String buildStatementAsSqlName();
+    String buildStatementAsSqlName(String aliasName);
 
     /**
      * Build the calculation statement to the specified column. <br />

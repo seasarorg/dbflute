@@ -432,9 +432,9 @@ public class HpCalcSpecification<CB extends ConditionBean> implements HpCalculat
     /**
      * {@inheritDoc}
      */
-    public String buildStatementAsSqlName() { // e.g. VaryingUpdate
+    public String buildStatementAsSqlName(String aliasName) { // e.g. VaryingUpdate, VaryingQueryUdpate
         final ColumnSqlName columnSqlName = getResolvedSpecifiedColumnSqlName();
-        final String columnExp = columnSqlName.toString();
+        final String columnExp = (aliasName != null ? aliasName : "") + columnSqlName.toString();
         return doBuildStatement(columnExp, null);
     }
 

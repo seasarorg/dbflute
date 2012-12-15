@@ -179,17 +179,17 @@ public class LikeSearchOption extends SimpleStringOption {
      * <pre>
      * e.g. 'and' condition
      * LikeSearchOption option = new LikeSearchOption();
-     * option.likeContain().splitByBlank();
+     * option.likeContain().<span style="color: #FD4747">splitByBlank()</span>;
      * cb.query().setFoo_ContainSearch("ab g kl", option);
-     * // FOO like '%ab%' and FOO like '%g%' and FOO like '%kl%'
-     * // (all conditions have escape statements)
+     * <span style="color: #3F7E5E">// FOO like '%ab%' and FOO like '%g%' and FOO like '%kl%'</span>
+     * <span style="color: #3F7E5E">// (all conditions have escape statements)</span>
      * 
      * e.g. 'or' condition
      * LikeSearchOption option = new LikeSearchOption();
-     * option.likeContain().splitByBlank().asOrSplit();
+     * option.likeContain().splitByBlank().<span style="color: #FD4747">asOrSplit()</span>;
      * cb.query().setFoo_ContainSearch("ab g kl", option);
-     * // FOO like '%ab%' or FOO like '%g%' or FOO like '%kl%'
-     * // (conditions have escape statements)
+     * <span style="color: #3F7E5E">// FOO like '%ab%' or FOO like '%g%' or FOO like '%kl%'</span>
+     * <span style="color: #3F7E5E">// (conditions have escape statements)</span>
      * </pre>
      * @return this.
      */

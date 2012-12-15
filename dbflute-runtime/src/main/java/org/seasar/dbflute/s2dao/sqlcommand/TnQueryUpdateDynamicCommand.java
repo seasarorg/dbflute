@@ -26,8 +26,10 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -149,20 +151,23 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
      * @param boundPropTypeList The type list of bound property. (NotNull, AlwaysEmpty)
      * @return The two-way SQL of query update. (NullAllowed: if non-modification, return null)
      */
-    protected String buildQueryUpdateTwoWaySql(Entity entity, ConditionBean cb, UpdateOption<ConditionBean> option,
-            List<TnPropertyType> boundPropTypeList) {
-        final Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
+    protected String buildQueryUpdateTwoWaySql(Entity entity, ConditionBean cb,
+            final UpdateOption<ConditionBean> option, List<TnPropertyType> boundPropTypeList) {
+        final Map<String, Object> columnParameterMap = new LinkedHashMap<String, Object>();
         final DBMeta dbmeta = entity.getDBMeta();
         final Set<String> modifiedPropertyNames = entity.modifiedProperties();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
-        for (ColumnInfo columnInfo : columnInfoList) {
+        for (final ColumnInfo columnInfo : columnInfoList) {
             if (columnInfo.isOptimisticLock()) {
                 continue; // exclusive control columns are processed after here
             }
             final String columnDbName = columnInfo.getColumnDbName();
             if (option != null && option.hasStatement(columnDbName)) {
-                final String statement = option.buildStatement(columnDbName);
-                columnParameterMap.put(columnDbName, statement);
+                columnParameterMap.put(columnDbName, new SqlClause.QueryUpdateSetCalculationHandler() {
+                    public String buildStatement(String aliasName) {
+                        return option.buildStatement(columnDbName, aliasName);
+                    }
+                });
                 continue;
             }
             final String propertyName = columnInfo.getPropertyName();
@@ -188,15 +193,21 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
         }
         if (dbmeta.hasVersionNo()) {
             final ColumnInfo columnInfo = dbmeta.getVersionNoColumnInfo();
-            final String columnName = columnInfo.getColumnDbName();
-            columnParameterMap.put(columnName, columnName + " + 1");
+            final String columnDbName = columnInfo.getColumnDbName();
+            columnParameterMap.put(columnDbName, new SqlClause.QueryUpdateSetCalculationHandler() {
+                public String buildStatement(String aliasName) {
+                    // cipher for versionNo is unsupported
+                    final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
+                    return (aliasName != null ? aliasName : "") + columnSqlName + " + 1";
+                }
+            });
         }
         if (dbmeta.hasUpdateDate()) {
             ColumnInfo columnInfo = dbmeta.getUpdateDateColumnInfo();
             columnInfo.write(entity, ResourceContext.getAccessTimestamp());
-            final String columnName = columnInfo.getColumnDbName();
+            final String columnDbName = columnInfo.getColumnDbName();
             final String propertyName = columnInfo.getPropertyName();
-            columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
+            columnParameterMap.put(columnDbName, "/*entity." + propertyName + "*/null");
 
             // add bound property type
             boundPropTypeList.add(_beanMetaData.getPropertyType(propertyName));

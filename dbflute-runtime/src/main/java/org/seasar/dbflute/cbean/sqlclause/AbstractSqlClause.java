@@ -2764,6 +2764,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         if (_suppressSelectColumnDecryption) {
             return valueExp;
         }
+        return doDecryptIfNeeds(columnInfo, valueExp);
+    }
+
+    protected String doDecryptIfNeeds(ColumnInfo columnInfo, String valueExp) {
         final ColumnFunctionCipher cipher = findColumnFunctionCipher(columnInfo);
         return cipher != null ? cipher.decrypt(valueExp) : valueExp;
     }
@@ -2919,7 +2923,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                          Query Update
     //                                          ------------
-    public String getClauseQueryUpdate(Map<String, String> columnParameterMap) {
+    public String getClauseQueryUpdate(Map<String, Object> columnParameterMap) {
         if (columnParameterMap == null) {
             String msg = "The argument 'columnParameterMap' should not be null.";
             throw new IllegalArgumentException(msg);
@@ -2946,7 +2950,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasCompoundPrimaryKey();
     }
 
-    protected void buildQueryUpdateInScopeClause(Map<String, String> columnParameterMap, DBMeta dbmeta, StringBuilder sb) {
+    protected void buildQueryUpdateInScopeClause(Map<String, Object> columnParameterMap, DBMeta dbmeta, StringBuilder sb) {
         if (columnParameterMap != null) {
             buildQueryUpdateSetClause(columnParameterMap, dbmeta, sb, null);
         }
@@ -2967,7 +2971,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append(")");
     }
 
-    protected void buildQueryUpdateDirectClause(Map<String, String> columnParameterMap, DBMeta dbmeta, StringBuilder sb) {
+    protected void buildQueryUpdateDirectClause(Map<String, Object> columnParameterMap, DBMeta dbmeta, StringBuilder sb) {
         if (hasUnionQuery()) {
             throwQueryUpdateUnavailableFunctionException("union", dbmeta);
         }
@@ -3021,7 +3025,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return whereClause.contains("exists (") || whereClause.contains("(select ");
     }
 
-    protected void buildQueryUpdateSetClause(Map<String, String> columnParameterMap, DBMeta dbmeta, StringBuilder sb,
+    protected void buildQueryUpdateSetClause(Map<String, Object> columnParameterMap, DBMeta dbmeta, StringBuilder sb,
             String aliasName) {
         if (columnParameterMap == null) {
             String msg = "The argument 'columnParameterMap' should not be null.";
@@ -3030,9 +3034,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append(ln());
         int index = 0;
         final int mapSize = columnParameterMap.size();
-        for (Entry<String, String> entry : columnParameterMap.entrySet()) {
+        for (Entry<String, Object> entry : columnParameterMap.entrySet()) {
             final String columnName = entry.getKey();
-            final String parameter = entry.getValue();
+            final Object parameter = entry.getValue();
             final ColumnInfo columnInfo = dbmeta.findColumnInfo(columnName);
             final ColumnSqlName columnSqlName = columnInfo.getColumnSqlName();
             if (index == 0) {
@@ -3044,8 +3048,15 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 sb.append(aliasName);
             }
             sb.append(columnSqlName).append(" = ");
-            sb.append(encryptIfNeeds(columnInfo, parameter));
-            if (mapSize - 1 > index) { // non last loop
+            final String valueExp;
+            if (parameter instanceof QueryUpdateSetCalculationHandler) {
+                final QueryUpdateSetCalculationHandler handler = (QueryUpdateSetCalculationHandler) parameter;
+                valueExp = handler.buildStatement(aliasName);
+            } else {
+                valueExp = parameter.toString();
+            }
+            sb.append(encryptIfNeeds(columnInfo, valueExp));
+            if (mapSize - 1 > index) { // before last loop
                 sb.append(ln());
             }
             ++index;
