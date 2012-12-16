@@ -90,19 +90,19 @@ public interface ConditionBean extends PagingBean {
 
     /**
      * Allow to auto-detect joins that can be inner-join. <br />
-     * You can use it by default on DBFlute (since 0.9.9.0A) so you don't need to call this basically.
-     * If you've suppressed it by settings of DBFlute property, you can use it by calling. <br />
-     * o You should call this before registrations of where clause. <br />
-     * o Union and SubQuery and other sub condition-bean inherit this. <br />
+     * <pre>
+     * o You should call this before registrations of where clause.
+     * o Union and SubQuery and other sub condition-bean inherit this.
      * o You should confirm your SQL on the log to be tuned by inner-join correctly.
+     * </pre>
      */
-    void allowInnerJoinAutoDetect(); // DBFlute default
+    void allowInnerJoinAutoDetect();
 
     // ===================================================================================
     //                                                                        Dream Cruise
     //                                                                        ============
     /**
-     * DBFlute of Dreams.
+     * DBFlute Dreams.
      * @param dreamCruiseTicket The ticket column specified by your Dream Cruise. (NotNull)
      */
     void overTheWaves(HpSpecifiedColumn dreamCruiseTicket);

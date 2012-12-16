@@ -1013,7 +1013,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // ===================================================================================
     //                                                                      Extract Column
     //                                                                      ==============
-    protected <LOCAL_ENTITY extends Entity, COLUMN> List<COLUMN> helpExtractInternally(
+    protected <LOCAL_ENTITY extends Entity, COLUMN> List<COLUMN> helpExtractListInternally(
             List<LOCAL_ENTITY> localEntityList, InternalExtractCallback<LOCAL_ENTITY, COLUMN> callback) {
         assertObjectNotNull("localEntityList", localEntityList);
         assertObjectNotNull("callback", callback);
@@ -1022,6 +1022,17 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             valueList.add(callback.getCV(entity));
         }
         return valueList;
+    }
+
+    protected <LOCAL_ENTITY extends Entity, COLUMN> Set<COLUMN> helpExtractSetInternally(
+            List<LOCAL_ENTITY> localEntityList, InternalExtractCallback<LOCAL_ENTITY, COLUMN> callback) {
+        assertObjectNotNull("localEntityList", localEntityList);
+        assertObjectNotNull("callback", callback);
+        final Set<COLUMN> valueSet = new LinkedHashSet<COLUMN>();
+        for (LOCAL_ENTITY entity : localEntityList) {
+            valueSet.add(callback.getCV(entity));
+        }
+        return valueSet;
     }
 
     protected static interface InternalExtractCallback<LOCAL_ENTITY extends Entity, COLUMN> {

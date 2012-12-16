@@ -710,20 +710,44 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         });
     }
 #end
-#if ($table.hasSinglePrimaryKey())
-#set ($pkCol = $table.primaryKeyAsOne)
 
     // ===================================================================================
     //                                                                      Extract Column
     //                                                                      ==============
+#if ($table.hasSinglePrimaryKey())
+#set ($pkCol = $table.primaryKeyAsOne)
     /**
-     * Extract the list of primary key value.
+     * Extract the value list of primary key ${pkCol.uncapitalisedJavaName}.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
-     * @return The list of primary key value. (NotNull, EmptyAllowed)
+     * @return The list of the column value. (NotNull, EmptyAllowed)
      */
-    public List<${pkCol.javaNative}> extractPrimaryKey(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        return helpExtractInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${pkCol.javaNative}>() {
+    public List<${pkCol.javaNative}> extract${pkCol.javaName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${pkCol.javaNative}>() {
             public ${pkCol.javaNative} getCV(${myExtendedObjectClassName} e) { return e.get${pkCol.javaName}(); }
+        });
+    }
+#end
+#foreach ($fkCol in $table.foreignKeySingleNonPkColumnList)
+
+    /**
+     * Extract the value list of foreign key ${fkCol.uncapitalisedJavaName}.
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
+     * @return The list of the column value. (NotNull, EmptyAllowed)
+     */
+    public List<${fkCol.javaNative}> extract${fkCol.javaName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${fkCol.javaNative}>() {
+            public ${fkCol.javaNative} getCV(${myExtendedObjectClassName} e) { return e.get${fkCol.javaName}(); }
+        });
+    }
+
+    /**
+     * Extract the value set of foreign key ${fkCol.uncapitalisedJavaName}.
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
+     * @return The set of the column value, ordered by extracting process. (NotNull, EmptyAllowed, OrderedByExtracting)
+     */
+    public Set<${fkCol.javaNative}> extract${fkCol.javaName}Set(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpExtractSetInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${fkCol.javaNative}>() {
+            public ${fkCol.javaNative} getCV(${myExtendedObjectClassName} e) { return e.get${fkCol.javaName}(); }
         });
     }
 #end
@@ -733,7 +757,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                       Entity Update
     //                                                                       =============
     /**
-     * Insert the entity.
+     * Insert the entity. (DefaultConstraintsEnabled)
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * <span style="color: #3F7E5E">// if auto-increment, you don't need to set the PK value</span>
@@ -745,7 +769,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">insert</span>(${myEntityVariableName});
      * ... = ${myEntityVariableName}.getPK...(); <span style="color: #3F7E5E">// if auto-increment, you can get the value after</span>
      * </pre>
-     * @param ${myEntityVariableName} The entity of insert target. (NotNull)
+     * @param ${myEntityVariableName} The entity of insert target. (NotNull, PrimaryKeyNullAllowed: when auto-increment)
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -770,7 +794,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Update the entity modified-only. {UpdateCountZeroException, ExclusiveControl}
+#if ($table.hasOptimisticLock())
+     * Update the entity modified-only. (ZeroUpdateException, ExclusiveControl)
+#else
+     * Update the entity modified-only. (ZeroUpdateException, NonExclusiveControl)
+#end
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
@@ -786,7 +814,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      *     ...
      * } 
      * </pre>
-     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+     * @param ${myEntityVariableName} The entity of update target. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnRequired)
 #if ($table.hasOptimisticLock())
      * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
 #else
@@ -837,7 +865,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonExclusiveControl}
+     * Update the entity non-strictly modified-only. (ZeroUpdateException, NonExclusiveControl)
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
@@ -850,7 +878,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">updateNonstrict</span>(${myEntityVariableName});
      * </pre>
-     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
+     * @param ${myEntityVariableName} The entity of update target. (NotNull, PrimaryKeyNotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
@@ -878,7 +906,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Insert or update the entity modified-only. {ExclusiveControl(when update)}
+#if ($table.hasOptimisticLock())
+     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, ExclusiveControl)
+#else
+     * Insert or update the entity modified-only. (DefaultConstraintsEnabled, NonExclusiveControl)
+#end
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
 #if ($table.hasOptimisticLock())
      * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
@@ -914,7 +946,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Insert or update the entity non-strictly modified-only. {NonExclusiveControl(when update)}
+     * Insert or update the entity non-strictly modified-only. (DefaultConstraintsEnabled, NonExclusiveControl)
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
@@ -948,7 +980,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Delete the entity. {UpdateCountZeroException, ExclusiveControl}
+#if ($table.hasOptimisticLock())
+     * Delete the entity. (ZeroUpdateException, ExclusiveControl)
+#else
+     * Delete the entity. (ZeroUpdateException, NonExclusiveControl)
+#end
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
@@ -960,7 +996,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      *     ...
      * } 
      * </pre>
-     * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnRequired)
 #if ($table.hasOptimisticLock())
      * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
 #else
@@ -992,7 +1028,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Delete the entity non-strictly. {UpdateCountZeroException, NonExclusiveControl}
+     * Delete the entity non-strictly. {ZeroUpdateException, NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
@@ -1001,7 +1037,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * <span style="color: #3F7E5E">//${myEntityVariableName}.setVersionNo(value);</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">deleteNonstrict</span>(${myEntityVariableName});
      * </pre>
-     * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired}
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull, PrimaryKeyNotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
@@ -1017,7 +1053,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Delete the entity non-strictly ignoring deleted. {UpdateCountZeroException, NonExclusiveControl}
+     * Delete the entity non-strictly ignoring deleted. {ZeroUpdateException, NonExclusiveControl}
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * ${myEntityVariableName}.setPK...(value); <span style="color: #3F7E5E">// required</span>
@@ -1027,7 +1063,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">deleteNonstrictIgnoreDeleted</span>(${myEntityVariableName});
      * <span style="color: #3F7E5E">// if the target entity doesn't exist, no exception</span>
      * </pre>
-     * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired}
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull, PrimaryKeyNotNull)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -1056,13 +1092,13 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                        Batch Update
     //                                                                        ============
     /**
-     * Batch-insert the list. <br />
-     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
-     * All columns are insert target. (so default constraints are not available) <br />
-     * And if the table has an identity, entities after the process do not have incremented values.
-     * (When you use the (normal) insert(), an entity after the process has an incremented value)
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
-     * @return The array of inserted count.
+     * Batch-insert the entity list. (DefaultConstraintsDisabled) <br />
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
+     * <span style="color: #FD4747">All columns are insert target. (so default constraints are not available in this method)</span> <br />
+     * And if the table has an identity, entities after the process don't have incremented values.
+     * When you use the (normal) insert(), an entity after the process has an incremented value.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNullAllowed: when auto-increment)
+     * @return The array of inserted count. (NotNull, EmptyAllowed)
      */
     public int[] batchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return doBatchInsert(${myEntityListVariableName}, null);
@@ -1081,11 +1117,24 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Batch-update the list. <br />
-     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
-     * All columns are update target. {NOT modified only}
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
-     * @return The array of updated count.
+#if ($table.hasOptimisticLock())
+     * Batch-update the entity list. (AllColumnsUpdated, ExclusiveControl) <br />
+#else
+     * Batch-update the entity list. (AllColumnsUpdated, NonExclusiveControl) <br />
+#end
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
+     * <span style="color: #FD4747">All columns are update target. {NOT modified only}</span>
+     * So you should the other batchUpdate() method, which you can specify update columns like this:
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">batchUpdate</span>(${myEntityListVariableName}, new SpecifyQuery<${myConditionBeanClassName}>() {
+     *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// FOO_STATUS_CODE, BAR_DATE only updated</span>
+     *         cb.specify().columnFooStatusCode();
+     *         cb.specify().columnBarDate();
+     *     }
+     * });
+     * </pre>
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
+     * @return The array of updated count. (NotNull, EmptyAllowed)
 #if ($table.hasOptimisticLock())
      * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
@@ -1109,14 +1158,26 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Batch-update the list. <br />
-     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
+#if ($table.hasOptimisticLock())
+     * Batch-update the entity list. (SpecifiedColumnsUpdated, ExclusiveControl) <br />
+#else
+     * Batch-update the entity list. (SpecifiedColumnsUpdated, NonExclusiveControl) <br />
+#end
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
      * You can specify update columns used on set clause of update statement.
      * However you do not need to specify common columns for update
      * and an optimistick lock column because they are specified implicitly.
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">batchUpdate</span>(${myEntityListVariableName}, new SpecifyQuery<${myConditionBeanClassName}>() {
+     *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// FOO_STATUS_CODE, BAR_DATE only updated</span>
+     *         cb.specify().columnFooStatusCode();
+     *         cb.specify().columnBarDate();
+     *     }
+     * });
+     * </pre>
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @param updateColumnSpec The specification of update columns. (NotNull)
-     * @return The array of updated count.
+     * @return The array of updated count. (NotNull, EmptyAllowed)
 #if ($table.hasOptimisticLock())
      * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
@@ -1129,11 +1190,20 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Batch-update the list non-strictly. <br />
-     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
-     * All columns are update target. {NOT modified only}
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
-     * @return The array of updated count.
+     * Batch-update the entity list non-strictly. (AllColumnsUpdated, NonExclusiveControl) <br />
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
+     * <span style="color: #FD4747">All columns are update target. {NOT modified only}</span>
+     * So you should the other batchUpdate() method, which you can specify update columns like this:
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">batchUpdateNonstrict</span>(${myEntityListVariableName}, new SpecifyQuery<${myConditionBeanClassName}>() {
+     *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// FOO_STATUS_CODE, BAR_DATE only updated</span>
+     *         cb.specify().columnFooStatusCode();
+     *         cb.specify().columnBarDate();
+     *     }
+     * });
+     * </pre>
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
+     * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -1147,14 +1217,22 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Batch-update the list non-strictly. <br />
-     * This method uses 'Batch Update' of java.sql.PreparedStatement. <br />
+     * Batch-update the entity list non-strictly. (SpecifiedColumnsUpdated, NonExclusiveControl) <br />
+     * This method uses executeBatch() of java.sql.PreparedStatement. <br />
      * You can specify update columns used on set clause of update statement.
      * However you do not need to specify common columns for update
      * and an optimistick lock column because they are specified implicitly.
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * <pre>
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">batchUpdateNonstrict</span>(${myEntityListVariableName}, new SpecifyQuery<${myConditionBeanClassName}>() {
+     *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// FOO_STATUS_CODE, BAR_DATE only updated</span>
+     *         cb.specify().columnFooStatusCode();
+     *         cb.specify().columnBarDate();
+     *     }
+     * });
+     * </pre>
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @param updateColumnSpec The specification of update columns. (NotNull)
-     * @return The array of updated count.
+     * @return The array of updated count. (NotNull, EmptyAllowed)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
     public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, SpecifyQuery<${myConditionBeanClassName}> updateColumnSpec) {
@@ -1173,10 +1251,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Batch-delete the list. <br />
-     * This method uses 'Batch Update' of java.sql.PreparedStatement.
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
-     * @return The array of deleted count.
+#if ($table.hasOptimisticLock())
+     * Batch-delete the entity list. (ExclusiveControl) <br />
+#else
+     * Batch-delete the entity list. (NonExclusiveControl) <br />
+#end
+     * This method uses executeBatch() of java.sql.PreparedStatement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
+     * @return The array of deleted count. (NotNull, EmptyAllowed)
 #if ($table.hasOptimisticLock())
      * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
@@ -1201,10 +1283,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Batch-delete the list non-strictly. <br />
-     * This method uses 'Batch Update' of java.sql.PreparedStatement.
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
-     * @return The array of deleted count.
+     * Batch-delete the entity list non-strictly. {NonExclusiveControl} <br />
+     * This method uses executeBatch() of java.sql.PreparedStatement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
+     * @return The array of deleted count. (NotNull, EmptyAllowed)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
     public int[] batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
@@ -1283,7 +1365,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Update the several entities by query non-strictly modified-only. {NonExclusiveControl}
+     * Update the several entities by query non-strictly modified-only. (NonExclusiveControl)
      * <pre>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
      * <span style="color: #3F7E5E">// you don't need to set PK value</span>
@@ -1325,7 +1407,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Delete the several entities by query. {NonExclusiveControl}
+     * Delete the several entities by query. (NonExclusiveControl)
      * <pre>
      * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
      * cb.query().setFoo...(value);
@@ -1376,7 +1458,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">varyingInsert</span>(${myEntityVariableName}, option);
      * ... = ${myEntityVariableName}.getPK...(); <span style="color: #3F7E5E">// if auto-increment, you can get the value after</span>
      * </pre>
-     * @param ${myEntityVariableName} The entity of insert target. (NotNull)
+     * @param ${myEntityVariableName} The entity of insert target. (NotNull, PrimaryKeyNullAllowed: when auto-increment)
      * @param option The option of insert for varying requests. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (unique constraint violation)
      */
@@ -1386,7 +1468,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     /**
-     * Update the entity with varying requests modified-only. {UpdateCountZeroException, ExclusiveControl} <br />
+#if ($table.hasOptimisticLock())
+     * Update the entity with varying requests modified-only. (ZeroUpdateException, ExclusiveControl) <br />
+#else
+     * Update the entity with varying requests modified-only. (ZeroUpdateException, NonExclusiveControl) <br />
+#end
      * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
      * Other specifications are same as update(entity).
      * <pre>
@@ -1408,7 +1494,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      *     ...
      * }
      * </pre>
-     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+     * @param ${myEntityVariableName} The entity of update target. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnRequired)
      * @param option The option of update for varying requests. (NotNull)
 #if ($table.hasOptimisticLock())
      * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
@@ -1425,7 +1511,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Update the entity with varying requests non-strictly modified-only. {UpdateCountZeroException, NonExclusiveControl} <br />
+     * Update the entity with varying requests non-strictly modified-only. (ZeroUpdateException, NonExclusiveControl) <br />
      * For example, self(selfCalculationSpecification), specify(updateColumnSpecification), disableCommonColumnAutoSetup(). <br />
      * Other specifications are same as updateNonstrict(entity).
      * <pre>
@@ -1444,7 +1530,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * }).plus(1); <span style="color: #3F7E5E">// FOO_COUNT = FOO_COUNT + 1</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">varyingUpdateNonstrict</span>(${myEntityVariableName}, option);
      * </pre>
-     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
+     * @param ${myEntityVariableName} The entity of update target. (NotNull, PrimaryKeyNotNull)
      * @param option The option of update for varying requests. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
@@ -1457,7 +1543,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     /**
-     * Insert or update the entity with varying requests. {ExclusiveControl(when update)}<br />
+     * Insert or update the entity with varying requests. (ExclusiveControl: when update) <br />
      * Other specifications are same as insertOrUpdate(entity).
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
      * @param insertOption The option of insert for varying requests. (NotNull)
@@ -1477,7 +1563,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Insert or update the entity with varying requests non-strictly. {NonExclusiveControl(when update)}<br />
+     * Insert or update the entity with varying requests non-strictly. (NonExclusiveControl: when update) <br />
      * Other specifications are same as insertOrUpdateNonstrict(entity).
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
      * @param insertOption The option of insert for varying requests. (NotNull)
@@ -1493,10 +1579,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     /**
-     * Delete the entity with varying requests. {UpdateCountZeroException, ExclusiveControl} <br />
+#if ($table.hasOptimisticLock())
+     * Delete the entity with varying requests. (ZeroUpdateException, ExclusiveControl) <br />
+#else
+     * Delete the entity with varying requests. (ZeroUpdateException, NonExclusiveControl) <br />
+#end
      * Now a valid option does not exist. <br />
      * Other specifications are same as delete(entity).
-     * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnRequired)
      * @param option The option of update for varying requests. (NotNull)
 #if ($table.hasOptimisticLock())
      * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
@@ -1512,10 +1602,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasOptimisticLock())
 
     /**
-     * Delete the entity with varying requests non-strictly. {UpdateCountZeroException, NonExclusiveControl} <br />
+     * Delete the entity with varying requests non-strictly. (ZeroUpdateException, NonExclusiveControl) <br />
      * Now a valid option does not exist. <br />
      * Other specifications are same as deleteNonstrict(entity).
-     * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnRequired)
      * @param option The option of update for varying requests. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
@@ -1534,9 +1624,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * For example, disableCommonColumnAutoSetup()
      * , disablePrimaryKeyIdentity(), limitBatchInsertLogging(). <br />
      * Other specifications are same as batchInsert(entityList).
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @param option The option of insert for varying requests. (NotNull)
-     * @return The array of inserted count.
+     * @return The array of updated count. (NotNull, EmptyAllowed)
      */
     public int[] varyingBatchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, InsertOption<${myConditionBeanClassName}> option) {
         assertInsertOptionNotNull(option);
@@ -1548,9 +1638,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * For example, self(selfCalculationSpecification), specify(updateColumnSpecification)
      * , disableCommonColumnAutoSetup(), limitBatchUpdateLogging(). <br />
      * Other specifications are same as batchUpdate(entityList).
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @param option The option of update for varying requests. (NotNull)
-     * @return The array of updated count.
+     * @return The array of updated count. (NotNull, EmptyAllowed)
      */
     public int[] varyingBatchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
         assertUpdateOptionNotNull(option);
@@ -1563,9 +1653,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * For example, self(selfCalculationSpecification), specify(updateColumnSpecification)
      * , disableCommonColumnAutoSetup(), limitBatchUpdateLogging(). <br />
      * Other specifications are same as batchUpdateNonstrict(entityList).
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @param option The option of update for varying requests. (NotNull)
-     * @return The array of updated count.
+     * @return The array of updated count. (NotNull, EmptyAllowed)
      */
     public int[] varyingBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
         assertUpdateOptionNotNull(option);
@@ -1577,9 +1667,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Batch-delete the list with varying requests. <br />
      * For example, limitBatchDeleteLogging(). <br />
      * Other specifications are same as batchDelete(entityList).
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @param option The option of delete for varying requests. (NotNull)
-     * @return The array of deleted count.
+     * @return The array of deleted count. (NotNull, EmptyAllowed)
      */
     public int[] varyingBatchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> option) {
         assertDeleteOptionNotNull(option);
@@ -1591,9 +1681,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Batch-delete the list with varying requests non-strictly. <br />
      * For example, limitBatchDeleteLogging(). <br />
      * Other specifications are same as batchDeleteNonstrict(entityList).
-     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull, EmptyAllowed, PrimaryKeyNotNull)
      * @param option The option of delete for varying requests. (NotNull)
-     * @return The array of deleted count.
+     * @return The array of deleted count. (NotNull, EmptyAllowed)
      */
     public int[] varyingBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> option) {
         assertDeleteOptionNotNull(option);

@@ -132,6 +132,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1209,6 +1210,21 @@ public class Table {
         }
         sb.delete(0, ", ".length());
         return sb.toString();
+    }
+
+    public List<Column> getForeignKeySingleNonPkColumnList() { // e.g. for extract FK column
+        final Map<String, Column> fkColSet = new LinkedHashMap<String, Column>();
+        for (ForeignKey fk : _foreignKeyMap.values()) {
+            if (!fk.isSimpleKeyFK()) {
+                continue;
+            }
+            final Column fkCol = fk.getLocalColumnAsOne();
+            if (fkCol.isPrimaryKey()) {
+                continue;
+            }
+            fkColSet.put(fkCol.getName(), fkCol);
+        }
+        return new ArrayList<Column>(fkColSet.values());
     }
 
     // -----------------------------------------------------
