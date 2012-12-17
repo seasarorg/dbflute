@@ -13,20 +13,20 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean.mapping;
+package org.seasar.dbflute.cbean.extracting;
 
 /**
- * The map-per of entity to DTO.
+ * The extractor of column from entity.
  * @param <ENTITY> The type of entity.
- * @param <DTO> The type of DTO.
+ * @param <COLUMN> The type of column.
  * @author jflute
  */
-public interface EntityDtoMapper<ENTITY, DTO> {
+public interface EntityColumnExtractor<ENTITY, COLUMN> {
 
     /**
-     * Map entity to data transfer object.
+     * Extract the column value from the entity.
      * @param entity Entity. (NotNull)
-     * @return The object for data transfer. (NotNull)
+     * @return The value of the column. (NullAllowed: if null, skip the element)
      */
-    DTO map(ENTITY entity);
+    COLUMN extract(ENTITY entity);
 }

@@ -29,6 +29,7 @@ import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -273,7 +274,9 @@ public abstract class TnAbstractBatchHandler extends TnAbstractEntityHandler {
             try {
                 updateCount = ps.getUpdateCount();
             } catch (SQLException e) {
-                handleSQLException(e, ps);
+                final SQLExceptionResource resource = createSQLExceptionResource();
+                resource.setNotice("Failed to get update count.");
+                handleSQLException(e, resource);
                 return; // unreachable
             }
             handleBatchUpdateResultWithOptimisticLockByUpdateCount(list, updateCount);

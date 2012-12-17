@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
@@ -81,25 +82,33 @@ public abstract class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory
             final DatabaseMetaData metaData = conn.getMetaData();
             return createBeanMetaData(metaData, beanClass, relationNestLevel);
         } catch (SQLException e) {
-            handleSQLException(e);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to get the database meta data.");
+            handleSQLException(e, resource);
             return null; // unreachable
         } finally {
             if (conn != null) {
                 try {
                     conn.close();
                 } catch (SQLException e) {
-                    handleSQLException(e);
+                    final SQLExceptionResource resource = createSQLExceptionResource();
+                    resource.setNotice("Failed to close the database connection.");
+                    handleSQLException(e, resource);
                 }
             }
         }
     }
 
-    protected void handleSQLException(SQLException e) {
-        createSQLExceptionHandler().handleSQLException(e);
+    protected void handleSQLException(SQLException e, SQLExceptionResource resource) {
+        createSQLExceptionHandler().handleSQLException(e, resource);
     }
 
     protected SQLExceptionHandler createSQLExceptionHandler() {
         return ResourceContext.createSQLExceptionHandler();
+    }
+
+    protected SQLExceptionResource createSQLExceptionResource() {
+        return new SQLExceptionResource();
     }
 
     // this is overridden but called in sub-class

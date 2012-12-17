@@ -1019,7 +1019,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         assertObjectNotNull("callback", callback);
         final List<COLUMN> valueList = new ArrayList<COLUMN>();
         for (LOCAL_ENTITY entity : localEntityList) {
-            valueList.add(callback.getCV(entity));
+            final COLUMN column = callback.getCV(entity);
+            if (column != null) {
+                valueList.add(column);
+            }
         }
         return valueList;
     }
@@ -1030,7 +1033,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         assertObjectNotNull("callback", callback);
         final Set<COLUMN> valueSet = new LinkedHashSet<COLUMN>();
         for (LOCAL_ENTITY entity : localEntityList) {
-            valueSet.add(callback.getCV(entity));
+            final COLUMN column = callback.getCV(entity);
+            if (column != null) {
+                valueSet.add(column);
+            }
         }
         return valueSet;
     }

@@ -33,6 +33,7 @@ import org.seasar.dbflute.bhv.core.SqlFireHook;
 import org.seasar.dbflute.bhv.core.SqlFireReadyInfo;
 import org.seasar.dbflute.bhv.core.SqlFireResultInfo;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.jdbc.ExecutionTimeInfo;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlLogInfo;
@@ -104,13 +105,20 @@ public abstract class TnAbstractBasicSqlHandler {
         if (args == null) {
             return;
         }
+        Object current = null;
         try {
             for (int i = 0; i < args.length; ++i) {
                 final ValueType valueType = valueTypes[i];
-                valueType.bindValue(conn, ps, i + 1, args[i]);
+                current = args[i];
+                valueType.bindValue(conn, ps, i + 1, current);
             }
         } catch (SQLException e) {
-            handleSQLException(e, ps);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to bind the value.");
+            if (current != null) {
+                resource.addResource("Bound Value", current);
+            }
+            handleSQLException(e, resource);
         }
     }
 
@@ -135,13 +143,20 @@ public abstract class TnAbstractBasicSqlHandler {
         if (args == null) {
             return;
         }
+        Object current = null;
         try {
             for (int i = beginIndex; i < args.length; ++i) {
-                final ValueType valueType = findValueType(argTypes[i], args[i]);
-                valueType.bindValue(conn, ps, i + 1, args[i]);
+                current = args[i];
+                final ValueType valueType = findValueType(argTypes[i], current);
+                valueType.bindValue(conn, ps, i + 1, current);
             }
         } catch (SQLException e) {
-            handleSQLException(e, ps);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to bind the value.");
+            if (current != null) {
+                resource.addResource("Bound Value", current);
+            }
+            handleSQLException(e, resource);
         }
     }
 
@@ -349,18 +364,18 @@ public abstract class TnAbstractBasicSqlHandler {
     // ===================================================================================
     //                                                                   Exception Handler
     //                                                                   =================
-    protected void handleSQLException(SQLException e, Statement st) {
-        handleSQLException(e, st, false);
-    }
-
-    protected void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid) {
-        final String executedSql = _sql;
-        final String displaySql = buildExceptionMessageSql();
-        createSQLExceptionHandler().handleSQLException(e, st, uniqueConstraintValid, executedSql, displaySql);
+    protected void handleSQLException(SQLException e, SQLExceptionResource resource) {
+        resource.setExecutedSql(_sql);
+        resource.setDisplaySql(buildExceptionMessageSql());
+        createSQLExceptionHandler().handleSQLException(e, resource);
     }
 
     protected SQLExceptionHandler createSQLExceptionHandler() {
         return ResourceContext.createSQLExceptionHandler();
+    }
+
+    protected SQLExceptionResource createSQLExceptionResource() {
+        return new SQLExceptionResource();
     }
 
     protected String buildExceptionMessageSql() {
@@ -397,8 +412,10 @@ public abstract class TnAbstractBasicSqlHandler {
             }
             return _dataSource.getConnection();
         } catch (SQLException e) {
-            handleSQLException(e, null);
-            return null;// unreachable
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to get database connection.");
+            handleSQLException(e, resource);
+            return null; // unreachable
         }
     }
 
@@ -471,7 +488,10 @@ public abstract class TnAbstractBasicSqlHandler {
             return updated;
         } catch (SQLException e) {
             nativeCause = e;
-            handleSQLException(e, ps, true);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to execute the SQL for update (non-select).");
+            resource.enableUniqueConstraintHandling();
+            handleSQLException(e, resource);
             return -1; // unreachable
         } finally {
             hookSqlFireFinally(updated, nativeCause);
@@ -494,7 +514,11 @@ public abstract class TnAbstractBasicSqlHandler {
             return batchResult;
         } catch (SQLException e) {
             nativeCause = e;
-            handleSQLException(e, ps, true);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to execute the SQL for BATCH update (non-select).");
+            resource.enableUniqueConstraintHandling();
+            resource.enableDisplaySqlPartHandling();
+            handleSQLException(e, resource);
             return null; // unreachable
         } finally {
             hookSqlFireFinally(batchResult, nativeCause);
@@ -505,7 +529,10 @@ public abstract class TnAbstractBasicSqlHandler {
         try {
             ps.addBatch();
         } catch (SQLException e) {
-            handleSQLException(e, ps);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to add the batch statement.");
+            resource.enableUniqueConstraintHandling();
+            handleSQLException(e, resource);
         }
     }
 
@@ -573,39 +600,47 @@ public abstract class TnAbstractBasicSqlHandler {
     // -----------------------------------------------------
     //                                           JDBC Option
     //                                           -----------
-    protected void setFetchSize(Statement statement, int fetchSize) {
-        if (statement == null) {
+    protected void setFetchSize(Statement st, int fetchSize) {
+        if (st == null) {
             return;
         }
         try {
-            statement.setFetchSize(fetchSize);
+            st.setFetchSize(fetchSize);
         } catch (SQLException e) {
-            handleSQLException(e, statement);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to set fetch size.");
+            resource.addResource("Fetch Size", fetchSize);
+            handleSQLException(e, resource);
         }
     }
 
-    protected void setMaxRows(Statement statement, int maxRows) {
-        if (statement == null) {
+    protected void setMaxRows(Statement st, int maxRows) {
+        if (st == null) {
             return;
         }
         try {
-            statement.setMaxRows(maxRows);
+            st.setMaxRows(maxRows);
         } catch (SQLException e) {
-            handleSQLException(e, statement);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to set max rows.");
+            resource.addResource("Max Rows", maxRows);
+            handleSQLException(e, resource);
         }
     }
 
     // -----------------------------------------------------
     //                                                 Close
     //                                                 -----
-    protected void close(Statement statement) {
-        if (statement == null) {
+    protected void close(Statement st) {
+        if (st == null) {
             return;
         }
         try {
-            statement.close();
+            st.close();
         } catch (SQLException e) {
-            handleSQLException(e, statement);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to close the statement.");
+            handleSQLException(e, resource);
         }
     }
 
@@ -616,7 +651,9 @@ public abstract class TnAbstractBasicSqlHandler {
         try {
             resultSet.close();
         } catch (SQLException e) {
-            handleSQLException(e, null);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to close the result set.");
+            handleSQLException(e, resource);
         }
     }
 
@@ -627,7 +664,9 @@ public abstract class TnAbstractBasicSqlHandler {
         try {
             conn.close();
         } catch (SQLException e) {
-            handleSQLException(e, null);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to close the database connection.");
+            handleSQLException(e, resource);
         }
     }
 

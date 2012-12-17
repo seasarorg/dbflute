@@ -33,8 +33,8 @@ public class ExceptionMessageBuilder {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final List<String> _noticeList = new ArrayList<String>();
-    protected final Map<String, List<Object>> _elementMap = new LinkedHashMap<String, List<Object>>();
+    protected final List<String> _noticeList = new ArrayList<String>(2);
+    protected final Map<String, List<Object>> _elementMap = new LinkedHashMap<String, List<Object>>(8);
     protected List<Object> _currentList;
 
     // ===================================================================================
@@ -45,7 +45,7 @@ public class ExceptionMessageBuilder {
     }
 
     public ExceptionMessageBuilder addItem(String item) {
-        _currentList = new ArrayList<Object>();
+        _currentList = new ArrayList<Object>(4);
         _elementMap.put(item, _currentList);
         return this;
     }

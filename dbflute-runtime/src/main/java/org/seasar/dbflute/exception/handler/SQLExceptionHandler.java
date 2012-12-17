@@ -16,7 +16,9 @@
 package org.seasar.dbflute.exception.handler;
 
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.ConditionBean;
@@ -44,41 +46,14 @@ public class SQLExceptionHandler {
     //                                                                              ======
     /**
      * @param e The instance of SQLException. (NotNull)
+     * @param resource The resource, item and elements, of SQLException message. (NotNull)
      */
-    public void handleSQLException(SQLException e) {
-        handleSQLException(e, null, false);
-    }
-
-    /**
-     * @param e The instance of SQLException. (NotNull)
-     * @param st The instance of statement. (NullAllowed)
-     */
-    public void handleSQLException(SQLException e, Statement st) {
-        handleSQLException(e, st, false);
-    }
-
-    /**
-     * @param e The instance of SQLException. (NotNull)
-     * @param st The instance of statement. (NullAllowed)
-     * @param uniqueConstraintValid Is unique constraint handling valid?
-     */
-    public void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid) {
-        handleSQLException(e, st, uniqueConstraintValid, null, null);
-    }
-
-    /**
-     * @param e The instance of SQLException. (NotNull)
-     * @param st The instance of statement. (NullAllowed)
-     * @param uniqueConstraintValid Is unique constraint handling valid?
-     * @param executedSql The executed SQL which does not have bind values. (NullAllowed)
-     * @param displaySql The SQL for display which has bind values (embedded on SQL). (NullAllowed)
-     */
-    public void handleSQLException(SQLException e, Statement st, boolean uniqueConstraintValid, String executedSql,
-            String displaySql) {
-        if (uniqueConstraintValid && isUniqueConstraintException(e)) {
-            throwEntityAlreadyExistsException(e, st, executedSql, displaySql);
+    public void handleSQLException(SQLException e, SQLExceptionResource resource) {
+        if (resource.isUniqueConstraintHandling() && isUniqueConstraintException(e)) {
+            throwEntityAlreadyExistsException(e, resource);
+        } else {
+            throwSQLFailureException(e, resource);
         }
-        throwSQLFailureException(e, st, executedSql, displaySql);
     }
 
     protected boolean isUniqueConstraintException(SQLException e) {
@@ -91,53 +66,67 @@ public class SQLExceptionHandler {
     // ===================================================================================
     //                                                                               Throw
     //                                                                               =====
-    protected void throwEntityAlreadyExistsException(SQLException e, Statement st, String executedSql, String displaySql) {
+    protected void throwEntityAlreadyExistsException(SQLException e, SQLExceptionResource resource) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The entity already exists on the database!");
+        br.addNotice("The entity already exists on the database.");
         br.addItem("Advice");
         br.addElement("Please confirm the primary key whether it already exists on the database.");
         br.addElement("And confirm the unique constraint for other columns.");
-        setupCommonElement(br, e, st, executedSql, displaySql);
+        setupCommonElement(br, e, resource);
         final String msg = br.buildExceptionMessage();
         throw new EntityAlreadyExistsException(msg, e);
     }
 
-    protected void throwSQLFailureException(SQLException sqlEx, Statement st, String executedSql, String displaySql) {
+    protected void throwSQLFailureException(SQLException e, SQLExceptionResource resource) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The SQL failed to execute!");
+        final List<String> noticeList = resource.getNoticeList();
+        if (!noticeList.isEmpty()) {
+            for (String notice : noticeList) {
+                br.addNotice(notice);
+            }
+        } else {
+            br.addNotice("The SQL failed to execute."); // as default
+        }
         br.addItem("Advice");
-        br.addElement("Please confirm the SQLException message.");
-        final String advice = askAdvice(sqlEx, ResourceContext.currentDBDef());
+        br.addElement("Read the SQLException message.");
+        final String advice = askAdvice(e, ResourceContext.currentDBDef());
         if (advice != null && advice.trim().length() > 0) {
             br.addElement("*" + advice);
         }
-        setupCommonElement(br, sqlEx, st, executedSql, displaySql);
+        setupCommonElement(br, e, resource);
         final String msg = br.buildExceptionMessage();
-        throw new SQLFailureException(msg, sqlEx);
+        throw new SQLFailureException(msg, e);
     }
 
     protected ExceptionMessageBuilder createExceptionMessageBuilder() {
         return new ExceptionMessageBuilder();
     }
 
-    protected String askAdvice(SQLException sqlEx, DBDef dbdef) {
-        return _adviser.askAdvice(sqlEx, dbdef);
+    protected String askAdvice(SQLException e, DBDef dbdef) {
+        return _adviser.askAdvice(e, dbdef);
     }
 
     // ===================================================================================
     //                                                                             Element
     //                                                                             =======
-    protected void setupCommonElement(ExceptionMessageBuilder br, SQLException e, Statement st, String executedSql,
-            String displaySql) {
+    protected void setupCommonElement(ExceptionMessageBuilder br, SQLException e, SQLExceptionResource resource) {
         br.addItem("SQLState");
         br.addElement(extractSQLState(e));
         br.addItem("ErrorCode");
         br.addElement(e.getErrorCode());
         setupSQLExceptionElement(br, e);
+        final Map<String, List<Object>> resourceMap = resource.getResourceMap();
+        for (Entry<String, List<Object>> entry : resourceMap.entrySet()) {
+            br.addItem(entry.getKey());
+            final List<Object> elementList = entry.getValue();
+            for (Object element : elementList) {
+                br.addElement(element);
+            }
+        }
         setupBehaviorElement(br);
         setupConditionBeanElement(br);
         setupOutsideSqlElement(br);
-        setupTargetSqlElement(br, executedSql, displaySql);
+        setupTargetSqlElement(br, resource);
     }
 
     protected void setupSQLExceptionElement(ExceptionMessageBuilder br, SQLException e) {
@@ -216,14 +205,18 @@ public class SQLExceptionHandler {
      * (If you hide JDBC driver's message too, you'll be at a loss when you debug)
      * </p>
      * @param br The builder of exception message. (NotNull)
-     * @param executedSql The executed SQL which does not have bind values. (NullAllowed)
-     * @param displaySql The SQL for display which has bind values (embedded on SQL). (NullAllowed)
+     * @param resource The resource, item and elements, of SQLException message. (NotNull)
      */
-    protected void setupTargetSqlElement(ExceptionMessageBuilder br, String executedSql, String displaySql) {
+    protected void setupTargetSqlElement(ExceptionMessageBuilder br, SQLExceptionResource resource) {
+        final String displaySql = resource.getDisplaySql();
         if (displaySql != null) {
-            br.addItem("Display SQL");
+            if (resource.isDisplaySqlPartHandling()) {
+                br.addItem("Display SQL");
+            }
             br.addElement(displaySql);
         }
+        // this is example to use executed SQL
+        //final String executedSql = resource.getExecutedSql();
         //if (executedSql != null) {
         //    br.addItem("Executed SQL");
         //    br.addElement(executedSql);
@@ -237,7 +230,7 @@ public class SQLExceptionHandler {
     protected String extractMessage(SQLException e) {
         String message = e.getMessage();
 
-        // Because a message of Oracle contains a line separator.
+        // because a message of Oracle contains a line separator
         return message != null ? message.trim() : message;
     }
 

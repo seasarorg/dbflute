@@ -17,12 +17,12 @@ package org.seasar.dbflute.s2dao.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.PlainResultSetWrapper;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -119,7 +119,9 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
                 }
                 _fetchCounter = _resultSet.getRow();
             } catch (SQLException e) {
-                handleSQLException(e, null);
+                final SQLExceptionResource resource = createSQLExceptionResource();
+                resource.setNotice("Failed to handle the result set.");
+                handleSQLException(e, resource);
             }
         } else {
             try {
@@ -134,7 +136,9 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
                     ++_fetchCounter;
                 }
             } catch (SQLException e) {
-                handleSQLException(e, null);
+                final SQLExceptionResource resource = createSQLExceptionResource();
+                resource.setNotice("Failed to move the cursor to next.");
+                handleSQLException(e, resource);
             }
         }
     }
@@ -290,17 +294,23 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
         try {
             return !(_resultSet.getType() == ResultSet.TYPE_FORWARD_ONLY);
         } catch (SQLException e) {
-            handleSQLException(e, null);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to get type of the result set.");
+            handleSQLException(e, resource);
             return false; // unreachable
         }
     }
 
-    protected void handleSQLException(SQLException e, Statement statement) {
-        createSQLExceptionHandler().handleSQLException(e, statement);
+    protected void handleSQLException(SQLException e, SQLExceptionResource resource) {
+        createSQLExceptionHandler().handleSQLException(e, resource);
     }
 
     protected SQLExceptionHandler createSQLExceptionHandler() {
         return ResourceContext.createSQLExceptionHandler();
+    }
+
+    protected SQLExceptionResource createSQLExceptionResource() {
+        return new SQLExceptionResource();
     }
 
     // ===================================================================================

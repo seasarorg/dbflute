@@ -34,6 +34,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbway.WayOfSQLServer;
 import org.seasar.dbflute.dbway.WayOfSybase;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
@@ -381,7 +382,9 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
                 st = conn.createStatement();
                 return st.executeUpdate(_sql);
             } catch (SQLException e) {
-                handleSQLException(e, st);
+                final SQLExceptionResource resource = createSQLExceptionResource();
+                resource.setNotice("Failed to execute the SQL update for identity.");
+                handleSQLException(e, resource);
                 return 0; // unreachable
             } finally {
                 close(st);

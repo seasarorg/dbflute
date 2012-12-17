@@ -132,7 +132,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1212,21 +1211,6 @@ public class Table {
         return sb.toString();
     }
 
-    public List<Column> getForeignKeySingleNonPkColumnList() { // e.g. for extract FK column
-        final Map<String, Column> fkColSet = new LinkedHashMap<String, Column>();
-        for (ForeignKey fk : _foreignKeyMap.values()) {
-            if (!fk.isSimpleKeyFK()) {
-                continue;
-            }
-            final Column fkCol = fk.getLocalColumnAsOne();
-            if (fkCol.isPrimaryKey()) {
-                continue;
-            }
-            fkColSet.put(fkCol.getName(), fkCol);
-        }
-        return new ArrayList<Column>(fkColSet.values());
-    }
-
     // -----------------------------------------------------
     //                                         Determination
     //                                         -------------
@@ -1470,7 +1454,7 @@ public class Table {
     // -----------------------------------------------------
     //                                               Arrange
     //                                               -------
-    protected java.util.List<ForeignKey> _singleKeyReferrers = null;
+    protected List<ForeignKey> _singleKeyReferrers = null;
 
     public boolean hasSingleKeyReferrer() {
         return !getSingleKeyReferrers().isEmpty();
@@ -1660,6 +1644,34 @@ public class Table {
             }
         }
         return uniqueColumnList;
+    }
+
+    protected List<Column> _singlePureUQColumnList;
+
+    public boolean hasSingleUniqueUQColumn() { // e.g. for extract UQ column
+        return !getSingleUniqueUQColumnList().isEmpty();
+    }
+
+    public List<Column> getSingleUniqueUQColumnList() { // e.g. for extract UQ column
+        if (_singlePureUQColumnList != null) {
+            return _singlePureUQColumnList;
+        }
+        final Map<String, Column> uqColMap = StringKeyMap.createAsFlexibleOrdered();
+        final Unique[] unices = getUnices();
+        for (Unique unique : unices) {
+            if (!unique.isOnlyOneColumn()) {
+                continue;
+            }
+            final Map<Integer, String> indexColumnMap = unique.getIndexColumnMap();
+            final String columnName = indexColumnMap.values().iterator().next();
+            final Column column = getColumn(columnName);
+            if (hasSinglePrimaryKey() && column.isPrimaryKey()) {
+                continue;
+            }
+            uqColMap.put(column.getName(), column);
+        }
+        _singlePureUQColumnList = new ArrayList<Column>(uqColMap.values());
+        return _singlePureUQColumnList;
     }
 
     // ===================================================================================

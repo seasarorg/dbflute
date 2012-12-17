@@ -20,11 +20,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.SqlLogInfo;
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -120,7 +120,9 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
             try {
                 return conn.prepareStatement(sql);
             } catch (SQLException e) {
-                handleSQLException(e, null);
+                final SQLExceptionResource resource = createSQLExceptionResource();
+                resource.setNotice("Failed to prepare the statement for identity.");
+                handleSQLException(e, resource);
                 return null; // unreachable
             }
         }
@@ -129,17 +131,23 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
             try {
                 return conn.prepareCall(sql);
             } catch (SQLException e) {
-                handleSQLException(e, null);
+                final SQLExceptionResource resource = createSQLExceptionResource();
+                resource.setNotice("Failed to prepare callable statement for identity.");
+                handleSQLException(e, resource);
                 return null; // unreachable
             }
         }
 
-        protected void handleSQLException(SQLException e, Statement st) {
-            createSQLExceptionHandler().handleSQLException(e, st);
+        protected void handleSQLException(SQLException e, SQLExceptionResource resource) {
+            createSQLExceptionHandler().handleSQLException(e, resource);
         }
 
         protected SQLExceptionHandler createSQLExceptionHandler() {
             return ResourceContext.createSQLExceptionHandler();
+        }
+
+        protected SQLExceptionResource createSQLExceptionResource() {
+            return new SQLExceptionResource();
         }
     }
 

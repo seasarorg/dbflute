@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
@@ -69,7 +70,9 @@ public class TnBasicSelectHandler extends TnBasicParameterHandler {
             bindArgs(conn, ps, args, argTypes);
             return queryResult(ps);
         } catch (SQLException e) {
-            handleSQLException(e, ps);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to execute the SQL for select.");
+            handleSQLException(e, resource);
             return null; // unreachable
         } finally {
             close(ps);

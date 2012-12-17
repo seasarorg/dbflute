@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
@@ -80,7 +81,10 @@ public class TnProcedureHandler extends TnAbstractBasicSqlHandler {
             handleOutParameter(conn, cs, pmb, executed);
             return pmb;
         } catch (SQLException e) {
-            handleSQLException(e, cs);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to execute the procedure.");
+            resource.enableUniqueConstraintHandling();
+            handleSQLException(e, resource);
             return null; // unreachable
         } finally {
             close(cs);

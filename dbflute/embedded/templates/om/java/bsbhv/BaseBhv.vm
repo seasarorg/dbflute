@@ -672,7 +672,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     /**
      * Pull out the list of foreign table '${foreignEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
-     * @return The list of foreign table. (NotNull, EmptyAllowed)
+     * @return The list of foreign table. (NotNull, EmptyAllowed, NotNullElement)
      */
     public List<${foreignEntityClassName}> pullout${foreignKey.foreignPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
@@ -699,7 +699,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     /**
      * Pull out the list of referrer-as-one table '${referrerEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
-     * @return The list of referrer-as-one table. (NotNull, EmptyAllowed)
+     * @return The list of referrer-as-one table. (NotNull, EmptyAllowed, NotNullElement)
      */
     public List<${referrerEntityClassName}> pullout${referrer.referrerPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}>() {
@@ -717,9 +717,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #if ($table.hasSinglePrimaryKey())
 #set ($pkCol = $table.primaryKeyAsOne)
     /**
-     * Extract the value list of primary key ${pkCol.uncapitalisedJavaName}.
+     * Extract the value list of (single) primary key ${pkCol.uncapitalisedJavaName}.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
-     * @return The list of the column value. (NotNull, EmptyAllowed)
+     * @return The list of the column value. (NotNull, EmptyAllowed, NotNullElement)
      */
     public List<${pkCol.javaNative}> extract${pkCol.javaName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${pkCol.javaNative}>() {
@@ -727,27 +727,16 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         });
     }
 #end
-#foreach ($fkCol in $table.foreignKeySingleNonPkColumnList)
+#foreach ($uqCol in $table.singleUniqueUQColumnList)
 
     /**
-     * Extract the value list of foreign key ${fkCol.uncapitalisedJavaName}.
+     * Extract the value list of (single) unique key ${uqCol.uncapitalisedJavaName}.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
-     * @return The list of the column value. (NotNull, EmptyAllowed)
+     * @return The list of the column value. (NotNull, EmptyAllowed, NotNullElement)
      */
-    public List<${fkCol.javaNative}> extract${fkCol.javaName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${fkCol.javaNative}>() {
-            public ${fkCol.javaNative} getCV(${myExtendedObjectClassName} e) { return e.get${fkCol.javaName}(); }
-        });
-    }
-
-    /**
-     * Extract the value set of foreign key ${fkCol.uncapitalisedJavaName}.
-     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull, EmptyAllowed)
-     * @return The set of the column value, ordered by extracting process. (NotNull, EmptyAllowed, OrderedByExtracting)
-     */
-    public Set<${fkCol.javaNative}> extract${fkCol.javaName}Set(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        return helpExtractSetInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${fkCol.javaNative}>() {
-            public ${fkCol.javaNative} getCV(${myExtendedObjectClassName} e) { return e.get${fkCol.javaName}(); }
+    public List<${uqCol.javaNative}> extract${uqCol.javaName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${uqCol.javaNative}>() {
+            public ${uqCol.javaNative} getCV(${myExtendedObjectClassName} e) { return e.get${uqCol.javaName}(); }
         });
     }
 #end

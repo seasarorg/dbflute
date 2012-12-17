@@ -19,9 +19,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
+import org.seasar.dbflute.cbean.extracting.EntityColumnExtractor;
 import org.seasar.dbflute.cbean.grouping.GroupingOption;
 import org.seasar.dbflute.cbean.grouping.GroupingRowEndDeterminer;
 import org.seasar.dbflute.cbean.grouping.GroupingRowResource;
@@ -187,6 +190,61 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
         mappingList.setAllRecordCount(getAllRecordCount());
         mappingList.setOrderByClause(getOrderByClause());
         return mappingList;
+    }
+
+    // ===================================================================================
+    //                                                                      Extract Column
+    //                                                                      ==============
+    /**
+     * Extract the value list of the column specified in extractor. <br />
+     * This method needs the property 'selectedList' only.
+     * <pre>
+     * List&lt;Integer&gt; memberIdList
+     *         = entityList.<span style="color: #FD4747">extractColumnList</span>(new EntityColumnExtractor&lt;Member, Integer&gt;() {
+     *     public Integer extract(Member entity) {
+     *         return entity.getMemberId();
+     *     }
+     * });
+     * </pre>
+     * @param <COLUMN> The type of COLUMN.
+     * @param entityColumnExtractor The value extractor of entity column. (NotNull)
+     * @return The value list of the entity column. (NotNull, NotNullElement)
+     */
+    public <COLUMN> List<COLUMN> extractColumnList(EntityColumnExtractor<ENTITY, COLUMN> entityColumnExtractor) {
+        final List<COLUMN> columnList = new ArrayList<COLUMN>();
+        for (ENTITY entity : _selectedList) {
+            final COLUMN column = entityColumnExtractor.extract(entity);
+            if (column != null) {
+                columnList.add(column);
+            }
+        }
+        return columnList;
+    }
+
+    /**
+     * Extract the value set of the column specified in extractor. <br />
+     * This method needs the property 'selectedList' only.
+     * <pre>
+     * Set&lt;Integer&gt; memberIdList
+     *         = entityList.<span style="color: #FD4747">extractColumnSet</span>(new EntityColumnExtractor&lt;Member, Integer&gt;() {
+     *     public Integer extract(Member entity) {
+     *         return entity.getMemberId();
+     *     }
+     * });
+     * </pre>
+     * @param <COLUMN> The type of COLUMN.
+     * @param entityColumnExtractor The value extractor of entity column. (NotNull)
+     * @return The value set of the entity column. (NotNull, NotNullElement)
+     */
+    public <COLUMN> Set<COLUMN> extractColumnSet(EntityColumnExtractor<ENTITY, COLUMN> entityColumnExtractor) {
+        final Set<COLUMN> columnSet = new LinkedHashSet<COLUMN>();
+        for (ENTITY entity : _selectedList) {
+            COLUMN column = entityColumnExtractor.extract(entity);
+            if (column != null) {
+                columnSet.add(column);
+            }
+        }
+        return columnSet;
     }
 
     // ===================================================================================

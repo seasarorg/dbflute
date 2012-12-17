@@ -34,6 +34,7 @@ import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractor;
@@ -302,7 +303,8 @@ public class BehaviorCommandInvoker {
     }
 
     protected void handleSQLException(SQLException e) {
-        ResourceContext.createSQLExceptionHandler().handleSQLException(e);
+        final SQLExceptionResource resource = new SQLExceptionResource();
+        ResourceContext.createSQLExceptionHandler().handleSQLException(e, resource);
     }
 
     protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,

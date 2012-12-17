@@ -20,13 +20,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
+import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
@@ -76,8 +76,10 @@ public class TnStatementFactoryImpl implements StatementFactory {
         try {
             return conn.prepareStatement(sql, resultSetType, resultSetConcurrency);
         } catch (SQLException e) {
-            handleSQLException(e, null);
-            return null;// unreachable
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to prepare the SQL statement.");
+            handleSQLException(e, resource);
+            return null; // unreachable
         }
     }
 
@@ -230,7 +232,9 @@ public class TnStatementFactoryImpl implements StatementFactory {
                 ps.setMaxRows(maxRows);
             }
         } catch (SQLException e) {
-            handleSQLException(e, ps);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to set the JDBC parameter.");
+            handleSQLException(e, resource);
         }
     }
 
@@ -253,7 +257,9 @@ public class TnStatementFactoryImpl implements StatementFactory {
         try {
             return conn.prepareCall(sql, resultSetType, resultSetConcurrency);
         } catch (SQLException e) {
-            handleSQLException(e, null);
+            final SQLExceptionResource resource = createSQLExceptionResource();
+            resource.setNotice("Failed to prepare the procedure statement.");
+            handleSQLException(e, resource);
             return null;// unreachable
         }
     }
@@ -261,12 +267,16 @@ public class TnStatementFactoryImpl implements StatementFactory {
     // ===================================================================================
     //                                                               SQLException Handling
     //                                                               =====================
-    protected void handleSQLException(SQLException e, Statement statement) {
-        createSQLExceptionHandler().handleSQLException(e, statement);
+    protected void handleSQLException(SQLException e, SQLExceptionResource resource) {
+        createSQLExceptionHandler().handleSQLException(e, resource);
     }
 
     protected SQLExceptionHandler createSQLExceptionHandler() {
         return ResourceContext.createSQLExceptionHandler();
+    }
+
+    protected SQLExceptionResource createSQLExceptionResource() {
+        return new SQLExceptionResource();
     }
 
     // ===================================================================================
