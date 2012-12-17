@@ -211,6 +211,8 @@ public class Table {
     // (fortunately, removing is not required about referrer)
     private final List<ForeignKey> _referrerList = new ArrayList<ForeignKey>(5);
 
+    private final List<ForeignKey> _cannotBeReferrerList = new ArrayList<ForeignKey>(3);
+
     // -----------------------------------------------------
     //                                                Unique
     //                                                ------
@@ -1391,6 +1393,7 @@ public class Table {
      */
     public boolean addReferrer(ForeignKey fk) {
         if (!fk.canBeReferrer()) {
+            _cannotBeReferrerList.add(fk);
             return false;
         }
         _referrerList.add(fk);
@@ -1427,6 +1430,18 @@ public class Table {
             }
         }
         return referrerListAsWhat;
+    }
+
+    public List<ForeignKey> getReferrerBothNonPKList() { // e.g. for SpecifyColumn's implicit
+        final List<ForeignKey> targetReferrerList = new ArrayList<ForeignKey>(getRefererList());
+        targetReferrerList.addAll(_cannotBeReferrerList); // contains cannotBeReferrer
+        final List<ForeignKey> nonPkReferredReferrerList = new ArrayList<ForeignKey>();
+        for (ForeignKey fk : targetReferrerList) {
+            if (!fk.isLocalColumnPrimaryKey() && !fk.isForeignColumnPrimaryKey()) { // both non PK
+                nonPkReferredReferrerList.add(fk);
+            }
+        }
+        return nonPkReferredReferrerList;
     }
 
     public List<ForeignKey> getRefererList() { // for compatibility (spell miss)
