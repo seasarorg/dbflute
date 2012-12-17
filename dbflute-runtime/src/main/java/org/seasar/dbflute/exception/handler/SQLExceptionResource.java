@@ -80,6 +80,6 @@ public class SQLExceptionResource {
     }
 
     public void enableDisplaySqlPartHandling() {
-        this._displaySqlPartHandling = true;
+        _displaySqlPartHandling = true;
     }
 }

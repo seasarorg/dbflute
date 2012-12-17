@@ -39,7 +39,7 @@ public class SQLExceptionHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final SQLExceptionAdviser _adviser = new SQLExceptionAdviser();
+    protected final SQLExceptionAdviser _adviser = createAdviser();
 
     // ===================================================================================
     //                                                                              Handle
@@ -71,7 +71,7 @@ public class SQLExceptionHandler {
         br.addNotice("The entity already exists on the database.");
         br.addItem("Advice");
         br.addElement("Please confirm the primary key whether it already exists on the database.");
-        br.addElement("And confirm the unique constraint for other columns.");
+        br.addElement("And also confirm the unique constraint for other columns.");
         setupCommonElement(br, e, resource);
         final String msg = br.buildExceptionMessage();
         throw new EntityAlreadyExistsException(msg, e);
@@ -298,6 +298,13 @@ public class SQLExceptionHandler {
             sb.append("...");
         }
         return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                             Adviser
+    //                                                                             =======
+    protected SQLExceptionAdviser createAdviser() {
+        return new SQLExceptionAdviser();
     }
 
     // ===================================================================================
