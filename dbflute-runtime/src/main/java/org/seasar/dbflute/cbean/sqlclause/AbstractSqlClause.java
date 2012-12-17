@@ -2114,11 +2114,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         throw new IllegalStateException(msg);
     }
 
-    abstract protected void doFetchFirst();
+    protected abstract void doFetchFirst();
 
-    abstract protected void doFetchPage();
+    protected abstract void doFetchPage();
 
-    abstract protected void doClearFetchPageClause();
+    protected abstract void doClearFetchPageClause();
 
     protected class RownumPagingProcessor {
         protected String _rownumExpression;
@@ -2248,13 +2248,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return true; // as default
     }
 
-    abstract protected String createSelectHint();
+    protected abstract String createSelectHint();
 
-    abstract protected String createFromBaseTableHint();
+    protected abstract String createFromBaseTableHint();
 
-    abstract protected String createFromHint();
+    protected abstract String createFromHint();
 
-    abstract protected String createSqlSuffix();
+    protected abstract String createSqlSuffix();
 
     // ===================================================================================
     //                                                                     Fetch Narrowing

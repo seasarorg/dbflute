@@ -211,6 +211,8 @@ public class SQLExceptionHandler {
         final String displaySql = resource.getDisplaySql();
         if (displaySql != null) {
             if (resource.isDisplaySqlPartHandling()) {
+                br.addItem("Display SQL (part of SQLs)");
+            } else {
                 br.addItem("Display SQL");
             }
             br.addElement(displaySql);
