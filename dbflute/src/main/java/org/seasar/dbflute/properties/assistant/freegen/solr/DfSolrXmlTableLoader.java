@@ -59,6 +59,7 @@ public class DfSolrXmlTableLoader {
     //     ; className = unused
     // }
     // ; tableMap = map:{
+    //     ; isContainsDynamicField = false
     //     ; mappingMap = map:{
     //         ; type = map:{
     //             ; INTEGER = Integer
