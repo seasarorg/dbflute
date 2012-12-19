@@ -1913,40 +1913,48 @@ public class Srl {
 
     // *DBFlute doesn't decamelize a table and column name
     // (allowed to convert decamel name to a camel name in this world)
-    //public static String decamelize(String camelName) {
-    //    assertCamelNameNotNull(camelName);
-    //    return doDecamelize(camelName, "_");
-    //}
-    //public static String decamelize(String camelName, String delimiter) {
-    //    assertCamelNameNotNull(camelName);
-    //    assertDelimiterNotNull(delimiter);
-    //    return doDecamelize(camelName, delimiter);
-    //}
-    //protected static String doDecamelize(String camelName, String delimiter) {
-    //    assertCamelNameNotNull(camelName);
-    //    if (is_Null_or_TrimmedEmpty(camelName)) {
-    //        return camelName;
-    //    }
-    //    if (camelName.length() == 1) {
-    //        return camelName.toUpperCase();
-    //    }
-    //    final StringBuilder sb = new StringBuilder();
-    //    int pos = 0;
-    //    for (int i = 1; i < camelName.length(); ++i) {
-    //        if (isUpperCase(camelName.charAt(i))) {
-    //            if (sb.length() != 0) {
-    //                sb.append(delimiter);
-    //            }
-    //            sb.append(camelName.substring(pos, i).toUpperCase());
-    //            pos = i;
-    //        }
-    //    }
-    //    if (sb.length() != 0) {
-    //        sb.append(delimiter);
-    //    }
-    //    sb.append(camelName.substring(pos, camelName.length()).toUpperCase());
-    //    return sb.toString();
-    //}
+    public static String decamelize(String camelName) {
+        assertCamelNameNotNull(camelName);
+        return doDecamelize(camelName, "_");
+    }
+
+    public static String decamelize(String camelName, String delimiter) {
+        assertCamelNameNotNull(camelName);
+        assertDelimiterNotNull(delimiter);
+        return doDecamelize(camelName, delimiter);
+    }
+
+    protected static String doDecamelize(String camelName, String delimiter) {
+        assertCamelNameNotNull(camelName);
+        if (is_Null_or_TrimmedEmpty(camelName)) {
+            return camelName;
+        }
+        if (camelName.length() == 1) {
+            return camelName.toUpperCase();
+        }
+        final StringBuilder sb = new StringBuilder();
+        boolean previousLower = false;
+        int pos = 0;
+        for (int i = 1; i < camelName.length(); i++) {
+            final char currentChar = camelName.charAt(i);
+            if (isUpperCase(currentChar)) {
+                if (sb.length() > 0 && previousLower) { // check target length not to be FOO -> F_O_O
+                    sb.append(delimiter);
+                }
+                sb.append(camelName.substring(pos, i).toUpperCase());
+                pos = i;
+                previousLower = false;
+            } else if (isLowerCase(currentChar)) {
+                previousLower = true;
+            }
+        }
+        if (sb.length() > 0 && previousLower) {
+            sb.append(delimiter);
+        }
+        sb.append(camelName.substring(pos, camelName.length()).toUpperCase());
+        final String generated = sb.toString();
+        return replace(generated, delimiter + delimiter, delimiter); // final adjustment
+    }
 
     // ===================================================================================
     //                                                                        SQL Handling
