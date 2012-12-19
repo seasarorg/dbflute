@@ -52,7 +52,7 @@ public class DfFreeGenRequest {
     //                                                                        ResourceType
     //                                                                        ============
     public enum DfFreeGenerateResourceType {
-        PROP, XLS, FILEPATH, SOLR
+        PROP, XLS, FILE_PATH, JSON_KEY, SOLR
     }
 
     public boolean isResourceTypeProp() {

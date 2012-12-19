@@ -34,7 +34,7 @@ public class DfFilePathTableLoader {
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
-    //     ; resourceType = FILEPATH
+    //     ; resourceType = FILE_PATH
     // }
     // ; outputMap = map:{
     //     ; templateFile = JspPath.vm

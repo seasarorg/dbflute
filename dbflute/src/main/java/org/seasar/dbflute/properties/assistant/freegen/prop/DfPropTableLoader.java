@@ -15,10 +15,8 @@
  */
 package org.seasar.dbflute.properties.assistant.freegen.prop;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesReader;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesResult;
@@ -30,13 +28,6 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public class DfPropTableLoader {
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected Method _convertMethod; // cached
-    protected boolean _convertMethodNotFound;
-    protected final Properties _reflectionProperties = new Properties();
 
     // ===================================================================================
     //                                                                          Load Table

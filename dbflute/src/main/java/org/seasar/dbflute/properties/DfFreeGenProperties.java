@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenManager;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenOutput;
@@ -33,6 +34,7 @@ import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGe
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.properties.assistant.freegen.filepath.DfFilePathTableLoader;
+import org.seasar.dbflute.properties.assistant.freegen.json.DfJsonKeyTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.prop.DfPropTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.solr.DfSolrXmlTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.xls.DfXlsTableLoader;
@@ -66,6 +68,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     protected final DfPropTableLoader _propTableLoader = new DfPropTableLoader();
     protected final DfXlsTableLoader _xlsTableLoader = new DfXlsTableLoader();
     protected final DfFilePathTableLoader _filePathTableLoader = new DfFilePathTableLoader();
+    protected final DfJsonKeyTableLoader _jsonKeyTableLoader = new DfJsonKeyTableLoader();
     protected final DfSolrXmlTableLoader _solrXmlTableLoader = new DfSolrXmlTableLoader();
 
     // ===================================================================================
@@ -149,11 +152,12 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
                     request.setTable(loadTableFromXls(requestName, resource, tableMap, mappingMap));
                 } else if (resource.isResourceTypeFilePath()) {
                     request.setTable(loadTableFromFilePath(requestName, resource, tableMap, mappingMap));
+                } else if (resource.isResourceTypeJsonKey()) {
+                    request.setTable(loadTableFromJsonKey(requestName, resource, tableMap, mappingMap));
                 } else if (resource.isResourceTypeSolr()) {
                     request.setTable(loadTableFromSolrXml(requestName, resource, tableMap, mappingMap));
                 } else {
-                    String msg = "The resource type is unsupported: " + resource.getResourceType();
-                    throw new DfIllegalPropertySettingException(msg);
+                    throwFreeGenResourceTypeUnknownException(requestName, resource);
                 }
             } catch (IOException e) {
                 String msg = "Failed to load table: request=" + request;
@@ -225,9 +229,25 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         return _filePathTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
     }
 
+    protected DfFreeGenTable loadTableFromJsonKey(String requestName, DfFreeGenResource resource,
+            Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
+        return _jsonKeyTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
+    }
+
     protected DfFreeGenTable loadTableFromSolrXml(String requestName, DfFreeGenResource resource,
             Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
         return _solrXmlTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
+    }
+
+    protected void throwFreeGenResourceTypeUnknownException(String requestName, DfFreeGenResource resource) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Unknown resource type for FreeGen.");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("Resource Type");
+        br.addElement(resource.getResourceType());
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================
