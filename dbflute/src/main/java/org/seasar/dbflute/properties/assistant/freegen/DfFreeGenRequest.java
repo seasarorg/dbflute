@@ -119,6 +119,10 @@ public class DfFreeGenRequest {
         return _resource.getResourceFile();
     }
 
+    public String getResourceFilePureName() {
+        return _resource.getResourceFilePureName();
+    }
+
     public DfFreeGenOutput getOutput() {
         return _output;
     }

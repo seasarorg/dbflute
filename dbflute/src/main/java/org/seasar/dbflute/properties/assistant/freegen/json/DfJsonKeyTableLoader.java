@@ -64,25 +64,25 @@ public class DfJsonKeyTableLoader {
         final String resourceFile = resource.getResourceFile();
         final String tableName = Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")));
 
-        final Map<String, Object> rootMap = decodeJsonMap(resourceFile);
+        final Map<String, Object> rootMap = decodeJsonMap(requestName, resourceFile);
         final String keyPath = (String) tableMap.get("keyPath");
         final List<String> pathList = Srl.splitListTrimmed(keyPath, "->");
-        final List<String> keyList = findKeyList(rootMap, keyPath, pathList);
+        final List<String> keyList = findKeyList(requestName, resource, rootMap, keyPath, pathList);
 
-        final List<Map<String, Object>> columnList = setupColumnList(keyList);
+        final List<Map<String, Object>> columnList = setupColumnList(requestName, resource, keyList);
         return new DfFreeGenTable(tableMap, tableName, columnList);
     }
 
     // ===================================================================================
     //                                                                         Decode JSON
     //                                                                         ===========
-    protected Map<String, Object> decodeJsonMap(final String resourceFile) {
+    protected Map<String, Object> decodeJsonMap(String requestName, String resourceFile) {
         final String decoderName = JSON_DECODER_NAME;
         final Class<?> jsonType;
         try {
             jsonType = Class.forName(decoderName);
         } catch (ClassNotFoundException e) {
-            throwJsonDecoderNotFoundException(e, decoderName);
+            throwJsonDecoderNotFoundException(requestName, resourceFile, decoderName, e);
             return null; // unreachable
         }
         final String decodeMethodName = "decode";
@@ -109,7 +109,8 @@ public class DfJsonKeyTableLoader {
         return rootMap;
     }
 
-    protected void throwJsonDecoderNotFoundException(ClassNotFoundException e, String decoderName) {
+    protected void throwJsonDecoderNotFoundException(String requestName, String resourceFile, String decoderName,
+            ClassNotFoundException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the JSON decoder for FreeGen.");
         br.addItem("Advice");
@@ -121,6 +122,10 @@ public class DfJsonKeyTableLoader {
         br.addElement("    |-extlib");
         br.addElement("    |  |-jsonic-1.2.5.jar");
         br.addElement("    |-...");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("Resource File");
+        br.addElement(resourceFile);
         br.addItem("Decoder Name");
         br.addElement(decoderName);
         final String msg = br.buildExceptionMessage();
@@ -139,7 +144,8 @@ public class DfJsonKeyTableLoader {
     // ===================================================================================
     //                                                                        Find KeyList
     //                                                                        ============
-    protected List<String> findKeyList(Map<String, Object> rootMap, String keyPath, List<String> pathList) {
+    protected List<String> findKeyList(String requestName, DfFreeGenResource resource, Map<String, Object> rootMap,
+            String keyPath, List<String> pathList) {
         // e.g.
         //  keyPath = categories -> map.keys
         //  keyPath = categories -> map.values -> list.elements
@@ -151,13 +157,13 @@ public class DfJsonKeyTableLoader {
             if (current == null) {
                 current = rootMap.get(pathElement);
                 if (current == null) {
-                    throwRootMapKeyNotFoundException(keyPath, pathElement);
+                    throwRootMapKeyNotFoundException(requestName, resource, keyPath, pathElement);
                 }
                 continue;
             }
             if (pathElement.startsWith("map.")) {
                 if (!(current instanceof Map<?, ?>)) {
-                    throwKeyPathExpectedMapButNotMapException(keyPath, pathElement, current);
+                    throwKeyPathExpectedMapButNotMapException(requestName, resource, keyPath, pathElement, current);
                 }
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> currentMap = (Map<String, Object>) current;
@@ -174,7 +180,7 @@ public class DfJsonKeyTableLoader {
                 }
             } else if (pathElement.startsWith("list.")) {
                 if (!(current instanceof List<?>)) {
-                    throwKeyPathExpectedListButNotListException(keyPath, pathElement, current);
+                    throwKeyPathExpectedListButNotListException(requestName, resource, keyPath, pathElement, current);
                 }
                 @SuppressWarnings("unchecked")
                 final List<Object> currentList = (List<Object>) current;
@@ -182,8 +188,8 @@ public class DfJsonKeyTableLoader {
                     keyList = new ArrayList<String>();
                     for (Object element : currentList) {
                         if (!(element instanceof String)) {
-                            throwKeyPathExpectedStringListButNotStringException(keyPath, pathElement, currentList,
-                                    element);
+                            throwKeyPathExpectedStringListButNotStringException(requestName, resource, keyPath,
+                                    pathElement, currentList, element);
                         }
                         keyList.add((String) element);
                     }
@@ -193,7 +199,8 @@ public class DfJsonKeyTableLoader {
                     keyList = new ArrayList<String>();
                     for (Object element : currentList) {
                         if (!(element instanceof Map<?, ?>)) {
-                            throwKeyPathExpectedMapListButNotMapException(keyPath, pathElement, currentList, element);
+                            throwKeyPathExpectedMapListButNotMapException(requestName, resource, keyPath, pathElement,
+                                    currentList, element);
                         }
                         @SuppressWarnings("unchecked")
                         final Map<String, Object> elementMap = (Map<String, Object>) element;
@@ -204,10 +211,10 @@ public class DfJsonKeyTableLoader {
                     }
                     break;
                 } else {
-                    throwIllegalKeyPathElementException(keyPath, pathElement);
+                    throwIllegalKeyPathElementException(requestName, resource, keyPath, pathElement);
                 }
             } else {
-                throwIllegalKeyPathElementException(keyPath, pathElement);
+                throwIllegalKeyPathElementException(requestName, resource, keyPath, pathElement);
             }
         }
         if (keyList == null) {
@@ -217,9 +224,14 @@ public class DfJsonKeyTableLoader {
         return keyList;
     }
 
-    protected void throwRootMapKeyNotFoundException(String keyPath, String rootMapKey) {
+    protected void throwRootMapKeyNotFoundException(String requestName, DfFreeGenResource resource, String keyPath,
+            String rootMapKey) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the key in the root map. (FreeGen)");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("JSON File");
+        br.addElement(resource.getResourceFile());
         br.addItem("keyPath");
         br.addElement(keyPath);
         br.addItem("RootMap Key");
@@ -228,9 +240,14 @@ public class DfJsonKeyTableLoader {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwKeyPathExpectedMapButNotMapException(String keyPath, String targetPath, Object current) {
+    protected void throwKeyPathExpectedMapButNotMapException(String requestName, DfFreeGenResource resource,
+            String keyPath, String targetPath, Object current) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The key path expects map type but not map. (FreeGen)");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("JSON File");
+        br.addElement(resource.getResourceFile());
         br.addItem("keyPath");
         br.addElement(keyPath);
         br.addItem("Target Path Element");
@@ -242,9 +259,14 @@ public class DfJsonKeyTableLoader {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwKeyPathExpectedListButNotListException(String keyPath, String targetPath, Object current) {
+    protected void throwKeyPathExpectedListButNotListException(String requestName, DfFreeGenResource resource,
+            String keyPath, String targetPath, Object current) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The key path expects list type but not list. (FreeGen)");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("JSON File");
+        br.addElement(resource.getResourceFile());
         br.addItem("keyPath");
         br.addElement(keyPath);
         br.addItem("Target Path Element");
@@ -256,10 +278,14 @@ public class DfJsonKeyTableLoader {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwKeyPathExpectedStringListButNotStringException(String keyPath, String targetPath,
-            List<Object> currentList, Object element) {
+    protected void throwKeyPathExpectedStringListButNotStringException(String requestName, DfFreeGenResource resource,
+            String keyPath, String targetPath, List<Object> currentList, Object element) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The key path expects string type in list but not string. (FreeGen)");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("JSON File");
+        br.addElement(resource.getResourceFile());
         br.addItem("keyPath");
         br.addElement(keyPath);
         br.addItem("Target Path Element");
@@ -274,10 +300,14 @@ public class DfJsonKeyTableLoader {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwKeyPathExpectedMapListButNotMapException(String keyPath, String targetPath,
-            List<Object> currentList, Object element) {
+    protected void throwKeyPathExpectedMapListButNotMapException(String requestName, DfFreeGenResource resource,
+            String keyPath, String targetPath, List<Object> currentList, Object element) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The key path expects string type in list but not string. (FreeGen)");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("JSON File");
+        br.addElement(resource.getResourceFile());
         br.addItem("keyPath");
         br.addElement(keyPath);
         br.addItem("Target Path Element");
@@ -292,9 +322,14 @@ public class DfJsonKeyTableLoader {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected void throwIllegalKeyPathElementException(String keyPath, String illegalPathElement) {
+    protected void throwIllegalKeyPathElementException(String requestName, DfFreeGenResource resource, String keyPath,
+            String illegalPathElement) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Illegal key path was found. (FreeGen)");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("JSON File");
+        br.addElement(resource.getResourceFile());
         br.addItem("keyPath");
         br.addElement(keyPath);
         br.addItem("Illegal Path Element");
@@ -306,7 +341,8 @@ public class DfJsonKeyTableLoader {
     // ===================================================================================
     //                                                                   Set up ColumnList
     //                                                                   =================
-    protected List<Map<String, Object>> setupColumnList(List<String> keyList) {
+    protected List<Map<String, Object>> setupColumnList(String requestName, DfFreeGenResource resource,
+            List<String> keyList) {
         final List<Map<String, Object>> columnList = new ArrayList<Map<String, Object>>();
         for (String key : keyList) {
             final Map<String, Object> columnMap = new HashMap<String, Object>();

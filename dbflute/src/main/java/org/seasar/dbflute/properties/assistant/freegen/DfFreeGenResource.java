@@ -16,6 +16,7 @@
 package org.seasar.dbflute.properties.assistant.freegen;
 
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGenerateResourceType;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -78,6 +79,13 @@ public class DfFreeGenResource {
 
     public String getResourceFile() {
         return _resourceFile;
+    }
+
+    public String getResourceFilePureName() {
+        if (_resourceFile == null) {
+            return _resourceFile;
+        }
+        return Srl.substringLastRear(_resourceFile, "/");
     }
 
     public boolean hasEncoding() {
