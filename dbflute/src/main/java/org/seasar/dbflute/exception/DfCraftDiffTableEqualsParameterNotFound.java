@@ -18,15 +18,15 @@ package org.seasar.dbflute.exception;
 /**
  * @author jflute
  */
-public class DfCraftDiffIllegalArgumentException extends RuntimeException {
+public class DfCraftDiffTableEqualsParameterNotFound extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    public DfCraftDiffIllegalArgumentException(String msg) {
+    public DfCraftDiffTableEqualsParameterNotFound(String msg) {
         super(msg);
     }
 
-    public DfCraftDiffIllegalArgumentException(String msg, Throwable e) {
+    public DfCraftDiffTableEqualsParameterNotFound(String msg, Throwable e) {
         super(msg, e);
     }
 }

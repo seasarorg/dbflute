@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
-import org.seasar.dbflute.exception.DfCraftDiffIllegalArgumentException;
+import org.seasar.dbflute.exception.DfCraftDiffTableEqualsParameterNotFound;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -166,10 +166,10 @@ public class DfCraftDiffAssertProvider {
         br.addElement(sqlFile.getPath());
         br.addItem("Target SQL");
         br.addElement(sql);
-        br.addItem("Analyzed Argument");
+        br.addItem("Found Parameter");
         br.addElement(argList);
         final String msg = br.buildExceptionMessage();
-        throw new DfCraftDiffIllegalArgumentException(msg);
+        throw new DfCraftDiffTableEqualsParameterNotFound(msg);
     }
 
     protected DfCraftDiffAssertHandler createTableEqualsAssertHandler(final String craftTitle, final String tableHint,
