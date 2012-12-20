@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +33,7 @@ import org.seasar.dbflute.exception.DfCraftDiffTableEqualsParameterNotFound;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -158,10 +160,11 @@ public class DfCraftDiffAssertProvider {
         br.addItem("Advice");
         br.addElement("You should specify two or more parameters at least like this:");
         br.addElement("  -- #df:assertTableEquals([title-name], [table-hint])");
-        br.addElement("  -- #df:assertTableEquals([title-name], [table-hint], [except-column])");
+        br.addElement("  -- #df:assertTableEquals([title-name], [table-hint], [column-adjustment])");
         br.addElement("");
         br.addElement("For example:");
         br.addElement("  -- #df:assertTableEquals(TableCls, prefix:CLS_)");
+        br.addElement("  -- #df:assertTableEquals(TableCls, prefix:CLS_, except:DESCRIPTION)");
         br.addItem("SQL File");
         br.addElement(sqlFile.getPath());
         br.addItem("Target SQL");
@@ -200,7 +203,7 @@ public class DfCraftDiffAssertProvider {
                     for (Map<String, String> recordMap : selectedList) {
                         final String pkValue = recordMap.remove(pkName);
                         final Map<String, String> adjustedMap = StringKeyMap.createAsFlexibleOrdered();
-                        final String uniqueCode = tableMeta.getTableName() + "." + pkValue;
+                        final String uniqueCode = tableMeta.getTableName() + "::" + pkValue;
                         adjustedMap.put(TABLE_EQUALS_UNIQUE_NAME, uniqueCode);
                         final StringBuilder valueSb = new StringBuilder();
                         int columnIndex = 0;
@@ -230,22 +233,29 @@ public class DfCraftDiffAssertProvider {
     }
 
     protected Map<String, String> toTableSqlMap(String tableHint, String exceptExp) {
+        final Set<String> exceptColumnSet = StringSet.createAsFlexible();
+        final String exceptMark = "except:";
+        if (exceptExp != null && exceptExp.startsWith(exceptMark)) {
+            final String columnExp = Srl.substringFirstRear(exceptExp, exceptMark);
+            final List<String> exceptColumnList = Srl.splitListTrimmed(columnExp, "/");
+            exceptColumnSet.addAll(exceptColumnList);
+        }
         final Map<String, String> tableSqlMap = new HashMap<String, String>();
         final StringBuilder logSb = new StringBuilder();
         logSb.append("...Switching table-equals SQL to:");
         for (DfTableMeta tableMeta : _tableList) {
-            final String tableSql = buildTableEqualsSql(tableMeta, tableHint, exceptExp);
+            final String tableSql = buildTableEqualsSql(tableMeta, tableHint, exceptColumnSet);
             if (tableSql == null) {
                 continue;
             }
-            logSb.append(ln()).append(tableSql);
+            logSb.append(ln()).append(tableSql).append(";");
             tableSqlMap.put(tableMeta.getTableName(), tableSql);
         }
         _log.info(logSb.toString());
         return tableSqlMap;
     }
 
-    protected String buildTableEqualsSql(DfTableMeta tableMeta, String tableHint, String exceptExp) {
+    protected String buildTableEqualsSql(DfTableMeta tableMeta, String tableHint, Set<String> exceptColumnSet) {
         final String tableName = tableMeta.getTableName();
         if (!DfNameHintUtil.isHitByTheHint(tableName, tableHint)) {
             return null;
@@ -263,6 +273,9 @@ public class DfCraftDiffAssertProvider {
                 continue;
             }
             if (optimisticLockProp.isOptimisticLockColumn(columnName)) {
+                continue;
+            }
+            if (exceptColumnSet.contains(columnName)) {
                 continue;
             }
             if (columnIndex > 0) {
