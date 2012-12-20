@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -97,5 +98,17 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
 
     public String getVersionNoFieldName() {
         return getProperty("versionNoFieldName", "version_no");
+    }
+
+    public boolean isOptimisticLockColumn(String columnName) {
+        final String updateDate = getUpdateDateFieldName();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(updateDate) && updateDate.equalsIgnoreCase(columnName)) {
+            return true;
+        }
+        final String versionNo = getVersionNoFieldName();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(versionNo) && versionNo.equalsIgnoreCase(columnName)) {
+            return true;
+        }
+        return false;
     }
 }

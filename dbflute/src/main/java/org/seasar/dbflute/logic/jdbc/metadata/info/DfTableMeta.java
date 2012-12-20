@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
@@ -38,6 +39,7 @@ public class DfTableMeta {
     protected UnifiedSchema _unifiedSchema; // NotNull
     protected boolean _existSameNameTable;
     protected boolean _outOfGenerateTarget;
+    protected List<DfColumnMeta> _lazyColumnMetaList; // NullAllowed (additional info for pinpoint)
 
     // ===================================================================================
     //                                                                       Determination
@@ -175,5 +177,13 @@ public class DfTableMeta {
 
     public void setOutOfGenerateTarget(boolean outOfGenerateTarget) {
         this._outOfGenerateTarget = outOfGenerateTarget;
+    }
+
+    public List<DfColumnMeta> getLazyColumnMetaList() {
+        return _lazyColumnMetaList;
+    }
+
+    public void setLazyColumnMetaList(List<DfColumnMeta> lazyColumnMetaList) {
+        this._lazyColumnMetaList = lazyColumnMetaList;
     }
 }

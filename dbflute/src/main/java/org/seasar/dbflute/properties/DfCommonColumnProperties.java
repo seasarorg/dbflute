@@ -80,6 +80,10 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return !getCommonColumnMap().isEmpty();
     }
 
+    public boolean isCommonColumn(String columnName) {
+        return getCommonColumnMap().containsKey(columnName);
+    }
+
     protected List<String> _commonColumnNameList;
 
     public List<String> getCommonColumnNameList() {

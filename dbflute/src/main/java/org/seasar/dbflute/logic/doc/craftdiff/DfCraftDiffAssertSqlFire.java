@@ -30,6 +30,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -63,7 +64,11 @@ public class DfCraftDiffAssertSqlFire {
     // ===================================================================================
     //                                                                            SQL Fire
     //                                                                            ========
-    public void fire() {
+    /**
+     * Fire the SQLs for assertion.
+     * @param tableList The list of table meta, e.g. to auto-generate SQL for table-equals. (NotNull)
+     */
+    public void fire(List<DfTableMeta> tableList) {
         final List<File> craftSqlFileList = getCraftSqlFileList();
         if (craftSqlFileList.isEmpty()) {
             return;
@@ -73,10 +78,16 @@ public class DfCraftDiffAssertSqlFire {
         fireMan.setExecutorName("Craft Diff");
 
         // result file is ignored because of break cause
-        fireMan.fire(getSqlFileRunner4CraftDiff(runInfo), craftSqlFileList);
+        final DfCraftDiffAssertProvider provider = createAssertProvider(tableList);
+        fireMan.fire(getSqlFileRunner4CraftDiff(runInfo, provider), craftSqlFileList);
     }
 
-    protected DfSqlFileRunner getSqlFileRunner4CraftDiff(final DfRunnerInformation runInfo) {
+    protected DfCraftDiffAssertProvider createAssertProvider(List<DfTableMeta> tableList) {
+        return new DfCraftDiffAssertProvider(_craftMetaDir, _assertDirection, tableList);
+    }
+
+    protected DfSqlFileRunner getSqlFileRunner4CraftDiff(final DfRunnerInformation runInfo,
+            final DfCraftDiffAssertProvider provider) {
         final DfSqlFileRunnerExecute runnerExecute = new DfSqlFileRunnerExecute(runInfo, _dataSource) {
             @Override
             protected String getTerminator4Tool() {
@@ -88,7 +99,6 @@ public class DfCraftDiffAssertSqlFire {
                 return isTargetEnvTypeFile(sql);
             }
         };
-        final DfCraftDiffAssertProvider provider = new DfCraftDiffAssertProvider(_craftMetaDir, _assertDirection);
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
             public DfRunnerDispatchResult dispatch(File sqlFile, Statement st, String sql) throws SQLException {
                 final DfCraftDiffAssertHandler handler = provider.provideCraftDiffAssertHandler(sqlFile, sql);

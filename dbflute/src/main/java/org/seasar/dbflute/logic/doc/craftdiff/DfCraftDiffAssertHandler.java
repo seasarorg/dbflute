@@ -30,11 +30,13 @@ import java.util.Set;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCraftDiffIllegalCraftKeyNameException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -72,6 +74,18 @@ public class DfCraftDiffAssertHandler {
     public void handle(File sqlFile, Statement st, String sql) throws SQLException {
         prepareCraftMetaDir();
         final List<Map<String, String>> diffDataList = selectDiffDataList(sqlFile, st, sql);
+        final String targetFilePath = calculateTargetFilePath(sqlFile);
+        dumpCraftMetaToDataFile(diffDataList, new File(targetFilePath));
+    }
+
+    protected void prepareCraftMetaDir() {
+        final File dir = new File(_craftMetaDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+    }
+
+    protected String calculateTargetFilePath(File sqlFile) {
         final String nextDataFilePath = buildNextDataFile(sqlFile);
         final String previousDataFilePath = buildPreviousDataFile(sqlFile);
         final String targetFilePath;
@@ -86,14 +100,7 @@ public class DfCraftDiffAssertHandler {
             String msg = "Unknown assert direction: " + _assertDirection;
             throw new IllegalStateException(msg);
         }
-        dumpCraftMetaToDataFile(diffDataList, new File(targetFilePath));
-    }
-
-    protected void prepareCraftMetaDir() {
-        final File dir = new File(_craftMetaDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        return targetFilePath;
     }
 
     protected String buildNextDataFile(File sqlFile) {
@@ -110,8 +117,8 @@ public class DfCraftDiffAssertHandler {
     }
 
     // ===================================================================================
-    //                                                                    Select Diff Data
-    //                                                                    ================
+    //                                                                     Select DiffData
+    //                                                                     ===============
     protected List<Map<String, String>> selectDiffDataList(File sqlFile, Statement st, String sql) throws SQLException {
         if (st == null) {
             String msg = "The argument 'st' should not be null: sqlFile=" + sqlFile;
@@ -125,7 +132,7 @@ public class DfCraftDiffAssertHandler {
             final int columnCount = metaData.getColumnCount();
             final Set<String> craftKeyNameSet = DfCollectionUtil.newHashSet();
             while (rs.next()) {
-                final Map<String, String> recordMap = DfCollectionUtil.newLinkedHashMap();
+                final Map<String, String> recordMap = StringKeyMap.createAsFlexibleOrdered();
                 final int firstIndex = 1; // 1 origin in JDBC
                 for (int i = firstIndex; i <= columnCount; i++) {
                     final String value = rs.getString(i);
@@ -138,11 +145,18 @@ public class DfCraftDiffAssertHandler {
                 resultList.add(recordMap);
             }
             return resultList;
+        } catch (SQLException e) {
+            handleSQLException(e, sql);
+            return null; // reachable
         } finally {
             if (rs != null) {
                 rs.close();
             }
         }
+    }
+
+    protected void handleSQLException(SQLException e, String sql) throws SQLException {
+        throw e; // directly throw it as default (you can override this)
     }
 
     protected void assertCraftKeyExists(String craftKeyName, File sqlFile, String sql) {
@@ -227,5 +241,12 @@ public class DfCraftDiffAssertHandler {
 
     protected String buildCraftMetaFileName(String craftTitle, boolean next) {
         return getDocumentProperties().buildCraftMetaFileName(craftTitle, next);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DBFluteSystem.getBasicLn();
     }
 }

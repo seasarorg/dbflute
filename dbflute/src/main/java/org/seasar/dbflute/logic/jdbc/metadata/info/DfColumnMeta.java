@@ -17,7 +17,9 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.Map;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -67,6 +69,14 @@ public class DfColumnMeta {
     //                                                                     ===============
     public boolean isSybaseAutoIncrement() {
         return Srl.equalsIgnoreCase("autoincrement", _defaultValue);
+    }
+
+    // ===================================================================================
+    //                                                                       Name Building
+    //                                                                       =============
+    public String buildColumnSqlName() {
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        return prop.quoteColumnNameIfNeedsDirectUse(_columnName);
     }
 
     // ===================================================================================

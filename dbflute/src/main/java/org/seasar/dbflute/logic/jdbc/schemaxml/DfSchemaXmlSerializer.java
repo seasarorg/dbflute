@@ -309,9 +309,11 @@ public class DfSchemaXmlSerializer {
             String msg = "Not found file: " + filePath;
             throw new IllegalStateException(msg, e);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+            String msg = "IO exception when serializing SchemaXml: " + filePath;
+            throw new IllegalStateException(msg, e);
+        } catch (SQLException e) {
+            String msg = "SQL exception when serializing SchemaXml: " + filePath;
+            throw new IllegalStateException(msg, e);
         } finally {
             if (writer != null) {
                 try {
@@ -344,9 +346,9 @@ public class DfSchemaXmlSerializer {
 
     /**
      * Generates an XML database schema from JDBC meta data.
-     * @throws Exception a generic exception.
+     * @throws SQLException
      */
-    protected void generateXML() throws Exception {
+    protected void generateXML() throws SQLException {
         _log.info("...Getting DB-connection");
         final Connection conn = _dataSource.getConnection();
 
@@ -357,7 +359,7 @@ public class DfSchemaXmlSerializer {
 
         // initialize the map of generated tables
         // this is used by synonym handling and foreign key handling
-        // so this process should be before thier processes
+        // so this process should be before their processes
         _generatedTableMap = StringKeyMap.createAsCaseInsensitive();
         for (DfTableMeta info : tableList) {
             _generatedTableMap.put(info.getTableName(), info);
@@ -391,7 +393,7 @@ public class DfSchemaXmlSerializer {
         }
 
         if (isCraftMetaEnabled()) {
-            processCraftMeta();
+            processCraftMeta(tableList);
         }
 
         _doc.appendChild(_databaseNode);
@@ -857,17 +859,18 @@ public class DfSchemaXmlSerializer {
         return _craftDiffEnabled;
     }
 
-    protected void processCraftMeta() {
-        extractCraftMeta();
+    protected void processCraftMeta(List<DfTableMeta> tableList) {
+        extractCraftMeta(tableList);
     }
 
     /**
      * Extract craft meta to meta files by SQL firing. <br />
      * This extracts them to next files after rolling existing next files to previous files.
+     * @param tableList The list of table meta. (NotNull)
      */
-    protected void extractCraftMeta() {
+    protected void extractCraftMeta(List<DfTableMeta> tableList) {
         if (_craftDiffAssertSqlFire != null) { // always not null when this called
-            _craftDiffAssertSqlFire.fire();
+            _craftDiffAssertSqlFire.fire(tableList);
         }
     }
 
@@ -1003,14 +1006,15 @@ public class DfSchemaXmlSerializer {
      * JDBC meta data.  It returns a List of Lists.  Each element
      * of the returned List is a List with:
      * @param dbMeta The meta data of a database. (NotNull)
-     * @param tableInfo The meta information of table. (NotNull)
+     * @param tableInfo The meta information of table, which has column list after this method. (NotNull)
      * @return The list of columns in <code>tableName</code>.
      * @throws SQLException
      */
-    public List<DfColumnMeta> getColumns(DatabaseMetaData dbMeta, DfTableMeta tableInfo) throws SQLException {
+    protected List<DfColumnMeta> getColumns(DatabaseMetaData dbMeta, DfTableMeta tableInfo) throws SQLException {
         List<DfColumnMeta> columnList = _columnExtractor.getColumnList(dbMeta, tableInfo);
         columnList = helpColumnAdjustment(dbMeta, tableInfo, columnList);
         helpColumnComments(tableInfo, columnList);
+        tableInfo.setLazyColumnMetaList(columnList);
         return columnList;
     }
 
