@@ -17,6 +17,7 @@ package org.seasar.dbflute.logic.doc.prophtml;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -33,7 +34,7 @@ public class DfPropHtmlPropertyLangElement {
     /** The type of the language. e.g. ja, en (NotNull) */
     protected final String _langType;
 
-    /** The value of the property. e.g. ja, en (NotNull) */
+    /** The value of the property. e.g. ja, en (NotNull, EmptyAllowed) */
     protected final String _propertyValue;
 
     /** The comment of the property. (NotNull, EmptyAllowed) */
@@ -45,8 +46,10 @@ public class DfPropHtmlPropertyLangElement {
     public DfPropHtmlPropertyLangElement(String propertyKey, String langType, String propertyValue, String comment) {
         _propertyKey = propertyKey;
         _langType = langType;
-        _propertyValue = propertyValue;
-        _comment = comment != null ? comment : ""; // empty string for velocity template
+
+        // empty string for velocity template
+        _propertyValue = propertyValue != null ? propertyValue : "";
+        _comment = comment != null ? comment : "";
     }
 
     // ===================================================================================
@@ -60,13 +63,22 @@ public class DfPropHtmlPropertyLangElement {
         return _langType;
     }
 
+    public boolean hasPropertyValue() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_propertyValue);
+    }
+
     public String getPropertyValue() {
         return _propertyValue;
     }
 
     public String getPropertyValueHtmlEncoded() {
-        DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
-        return prop.resolveTextForSchemaHtml(_propertyValue);
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        final String resolved = prop.resolveTextForSchemaHtml(_propertyValue);
+        return resolved != null ? resolved : "";
+    }
+
+    public boolean hasComment() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_comment);
     }
 
     public String getComment() {
@@ -74,8 +86,8 @@ public class DfPropHtmlPropertyLangElement {
     }
 
     public String getCommentHtmlEncoded() {
-        DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
         final String resolved = prop.resolveTextForSchemaHtml(_comment);
-        return resolved != null ? resolved : "&nbsp;";
+        return resolved != null ? resolved : "";
     }
 }

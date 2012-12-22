@@ -19,9 +19,11 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesProperty;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesReader;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesResult;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -60,12 +62,17 @@ public class DfPropTableLoader {
     //                                                                           Converter
     //                                                                           =========
     public List<Map<String, Object>> toMapList(DfJavaPropertiesResult result) {
+        final DfDocumentProperties prop = getDocumentProperties();
         final List<DfJavaPropertiesProperty> propertyList = result.getPropertyList();
         final List<Map<String, Object>> mapList = DfCollectionUtil.newArrayList();
         for (DfJavaPropertiesProperty property : propertyList) {
             final Map<String, Object> columnMap = DfCollectionUtil.newLinkedHashMap();
             columnMap.put("propertyKey", property.getPropertyKey());
-            columnMap.put("propertyValue", property.getPropertyValue());
+            final String propertyValue = property.getPropertyValue();
+            columnMap.put("propertyValue", propertyValue != null ? propertyValue : "");
+            final String valueHtmlEncoded = prop.resolveTextForSchemaHtml(propertyValue);
+            columnMap.put("propertyValueHtmlEncoded", valueHtmlEncoded != null ? valueHtmlEncoded : "");
+            columnMap.put("hasPropertyValue", Srl.is_NotNull_and_NotTrimmedEmpty(propertyValue));
 
             final String defName = Srl.replace(property.getPropertyKey(), ".", "_").toUpperCase();
             columnMap.put("defName", defName);
@@ -81,8 +88,11 @@ public class DfPropTableLoader {
             columnMap.put("variableNumberList", variableNumberList);
             columnMap.put("hasVariable", !variableNumberList.isEmpty());
 
-            columnMap.put("comment", property.getComment());
-            columnMap.put("hasComment", property.getComment() != null);
+            final String comment = property.getComment();
+            columnMap.put("comment", comment != null ? comment : "");
+            final String commentHtmlEncoded = prop.resolveTextForSchemaHtml(comment);
+            columnMap.put("commentHtmlEncoded", commentHtmlEncoded != null ? commentHtmlEncoded : "");
+            columnMap.put("hasComment", Srl.is_NotNull_and_NotTrimmedEmpty(comment));
 
             mapList.add(columnMap);
         }
@@ -91,5 +101,16 @@ public class DfPropTableLoader {
 
     protected DfJavaPropertiesReader createReader() {
         return new DfJavaPropertiesReader();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
     }
 }

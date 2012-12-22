@@ -261,13 +261,11 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #set ($envType = $envElement.envType)
 #foreach ($langElement in $envElement.langElementList)
 #set ($langType = $langElement.langType)
-#set ($propertyValue = $langElement.propertyValueHtmlEncoded)
-#set ($comment = $langElement.commentHtmlEncoded)
 				<tr>
 					<td class="envtypecell">${envType}</td>
 					<td class="langtypecell">${langType}</td>
-					<td class="valuecell">${propertyValue}</td>
-					<td class="commentcell">${comment}</td>
+					<td class="valuecell">#if ($langElement.hasPropertyValue())${langElement.propertyValueHtmlEncoded}#else &nbsp;#end</td>
+					<td class="commentcell"#if ($langElement.hasPropertyValue())${langElement.commentHtmlEncoded}#else &nbsp;#end</td>
 				</tr>
 #end
 #end
