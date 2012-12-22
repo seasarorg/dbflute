@@ -21,6 +21,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
+import org.seasar.dbflute.logic.doc.prophtml.DfPropHtmlManager;
+import org.seasar.dbflute.logic.doc.prophtml.DfPropHtmlRequest;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -44,8 +46,10 @@ public class DfDocumentSelector {
     protected boolean _historyHtml;
     protected boolean _schemaSyncCheckResultHtml;
     protected boolean _alterCheckResultHtml;
+    protected boolean _propertiesHtml;
     protected DocumentType _currentDocumentType;
     protected DfSchemaHistory _schemaHistory;
+    protected DfPropHtmlManager _propHtmlManager;
 
     // ===================================================================================
     //                                                                         Coin Method
@@ -97,6 +101,10 @@ public class DfDocumentSelector {
         return _currentDocumentType != null && _currentDocumentType.equals(DocumentType.AlterCheckResultHtml);
     }
 
+    public boolean isCurrentPropertiesHtml() {
+        return _currentDocumentType != null && _currentDocumentType.equals(DocumentType.PropertiesHtml);
+    }
+
     public void markSchemaHtml() {
         _currentDocumentType = DocumentType.SchemaHtml;
     }
@@ -113,8 +121,12 @@ public class DfDocumentSelector {
         _currentDocumentType = DocumentType.AlterCheckResultHtml;
     }
 
+    public void markPropertiesHtml() {
+        _currentDocumentType = DocumentType.PropertiesHtml;
+    }
+
     public enum DocumentType {
-        SchemaHtml, HistoryHtml, SchemaSyncCheckResultHtml, AlterCheckResultHtml
+        SchemaHtml, HistoryHtml, SchemaSyncCheckResultHtml, AlterCheckResultHtml, PropertiesHtml
     }
 
     // ===================================================================================
@@ -155,6 +167,22 @@ public class DfDocumentSelector {
     }
 
     // ===================================================================================
+    //                                                                  Properties Request
+    //                                                                  ==================
+    public void loadProppertiesHtmlRequest() {
+        _propHtmlManager = new DfPropHtmlManager();
+        _propHtmlManager.loadRequest();
+    }
+
+    public boolean existsProppertiesHtmlRequest() {
+        return !_propHtmlManager.getRequestList().isEmpty();
+    }
+
+    public List<DfPropHtmlRequest> getProppertiesHtmlRequestList() {
+        return _propHtmlManager.getRequestList();
+    }
+
+    // ===================================================================================
     //                                                                           File Name
     //                                                                           =========
     public String getSchemaHtmlFileName() {
@@ -173,6 +201,11 @@ public class DfDocumentSelector {
 
     public String getAlterCheckResultFileName() {
         return getReplaceSchemaProperties().getMigrationAlterCheckResultFileName();
+    }
+
+    public String getPropertiesHtmlFileName() {
+        final String projectName = getProjectName();
+        return getDocumentProperties().getPropertiesHtmlFileName(projectName);
     }
 
     // ===================================================================================
@@ -280,6 +313,15 @@ public class DfDocumentSelector {
 
     public DfDocumentSelector selectAlterCheckResultHtml() {
         _alterCheckResultHtml = true;
+        return this;
+    }
+
+    public boolean isPropertiesHtml() {
+        return _propertiesHtml;
+    }
+
+    public DfDocumentSelector selectPropertiesHtml() {
+        _propertiesHtml = true;
         return this;
     }
 }

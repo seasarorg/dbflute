@@ -2070,7 +2070,7 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                            SchemaHTML
+    //                                            SchemaHtml
     //                                            ----------
     public boolean isSchemaHtmlOutsideSqlValid() {
         if (getProperties().getDocumentProperties().isSuppressSchemaHtmlOutsideSql()) {
@@ -2112,7 +2112,7 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                           HistoryHTML
+    //                                           HistoryHtml
     //                                           -----------
     public boolean isHistoryHtmlStyleSheetEmbedded() {
         return getProperties().getDocumentProperties().isHistoryHtmlStyleSheetEmbedded();
@@ -2144,6 +2144,41 @@ public class Database {
 
     public String getHistoryHtmlJavaScriptLink() {
         return getProperties().getDocumentProperties().getHistoryHtmlJavaScriptLink();
+    }
+
+    // -----------------------------------------------------
+    //                                        PropertiesHtml
+    //                                        --------------
+    public boolean isPropertiesHtmlStyleSheetEmbedded() {
+        return getProperties().getDocumentProperties().isPropertiesHtmlStyleSheetEmbedded();
+    }
+
+    public boolean isPropertiesHtmlStyleSheetLink() {
+        return getProperties().getDocumentProperties().isPropertiesHtmlStyleSheetLink();
+    }
+
+    public String getPropertiesHtmlStyleSheetEmbedded() {
+        return getProperties().getDocumentProperties().getPropertiesHtmlStyleSheetEmbedded();
+    }
+
+    public String getPropertiesHtmlStyleSheetLink() {
+        return getProperties().getDocumentProperties().getPropertiesHtmlStyleSheetLink();
+    }
+
+    public boolean isPropertiesHtmlJavaScriptEmbedded() {
+        return getProperties().getDocumentProperties().isPropertiesHtmlJavaScriptEmbedded();
+    }
+
+    public boolean isPropertiesHtmlJavaScriptLink() {
+        return getProperties().getDocumentProperties().isPropertiesHtmlJavaScriptLink();
+    }
+
+    public String getPropertiesHtmlJavaScriptEmbedded() {
+        return getProperties().getDocumentProperties().getPropertiesHtmlJavaScriptEmbedded();
+    }
+
+    public String getPropertiesHtmlJavaScriptLink() {
+        return getProperties().getDocumentProperties().getPropertiesHtmlJavaScriptLink();
     }
 
     // ===================================================================================

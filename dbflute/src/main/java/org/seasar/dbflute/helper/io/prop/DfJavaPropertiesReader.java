@@ -16,6 +16,7 @@
 package org.seasar.dbflute.helper.io.prop;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
 import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
@@ -35,6 +37,7 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author jflute
+ * @since 1.0.1 (2012/12/15 Saturday)
  */
 public class DfJavaPropertiesReader {
 
@@ -48,8 +51,8 @@ public class DfJavaPropertiesReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public DfJavaPropertiesResult read(String propFile, String encoding) {
-        final List<Map<String, Object>> propertyList = new ArrayList<Map<String, Object>>();
+    public DfJavaPropertiesResult read(File propFile, String encoding) {
+        final List<DfJavaPropertiesProperty> propertyList = DfCollectionUtil.newArrayList();
         final List<String> duplicateKeyList = new ArrayList<String>();
         final Map<String, String> keyCommentMap = readKeyCommentMap(propFile, encoding, duplicateKeyList);
         final Properties prop = readPlainProperties(propFile);
@@ -58,35 +61,30 @@ public class DfJavaPropertiesReader {
             final String value = prop.getProperty(key);
             final String comment = keyCommentMap.get(key);
 
-            final Map<String, Object> columnMap = new LinkedHashMap<String, Object>();
-            columnMap.put("key", key);
+            final DfJavaPropertiesProperty property = new DfJavaPropertiesProperty(key, value);
 
             final String defName = Srl.replace(key, ".", "_").toUpperCase();
-            columnMap.put("defName", defName);
+            property.setDefName(defName);
 
             final String camelizedName = Srl.camelize(defName);
-            columnMap.put("camelizedName", camelizedName);
-            columnMap.put("capCamelName", Srl.initCap(camelizedName));
-            columnMap.put("uncapCamelName", Srl.initUncap(camelizedName));
+            property.setCamelizedName(camelizedName);
+            property.setCapCamelName(Srl.initCap(camelizedName));
+            property.setUncapCamelName(Srl.initUncap(camelizedName));
 
             final List<ScopeInfo> variableScopeList = new ArrayList<ScopeInfo>();
             {
-                final String registeredValue;
                 final List<ScopeInfo> scopeList;
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(value)) {
-                    registeredValue = value;
                     scopeList = Srl.extractScopeList(value, "{", "}"); // e.g. {0} is for {1}.
-                } else { // basically no way
-                    registeredValue = "";
-                    scopeList = new ArrayList<ScopeInfo>();
+                } else {
+                    scopeList = DfCollectionUtil.emptyList();
                 }
-                columnMap.put("value", registeredValue); // basically unused
                 for (ScopeInfo scopeInfo : scopeList) {
                     final String content = scopeInfo.getContent();
                     try {
                         Integer.valueOf(content);
                         variableScopeList.add(scopeInfo);
-                    } catch (NumberFormatException ignored) {
+                    } catch (NumberFormatException ignored) { // e.g. {A} is for {B}
                     }
                 }
             }
@@ -94,17 +92,12 @@ public class DfJavaPropertiesReader {
             for (ScopeInfo scopeInfo : variableScopeList) {
                 variableNumberList.add(valueOfVariableNumber(propFile, key, scopeInfo.getContent()));
             }
-            columnMap.put("variableArgDef", buildVariableArgDef(variableNumberList));
-            columnMap.put("variableArgSet", buildVariableArgSet(variableNumberList));
-            columnMap.put("variableCount", variableScopeList.size());
-            columnMap.put("variableNumberList", variableNumberList);
-            columnMap.put("variableScopeList", variableScopeList);
-            columnMap.put("hasVariable", !variableScopeList.isEmpty());
+            property.setVariableArgDef(buildVariableArgDef(variableNumberList));
+            property.setVariableArgSet(buildVariableArgSet(variableNumberList));
+            property.setVariableNumberList(variableNumberList);
+            property.setComment(comment);
 
-            columnMap.put("comment", comment != null ? comment : "");
-            columnMap.put("hasComment", comment != null);
-
-            propertyList.add(columnMap);
+            propertyList.add(property);
         }
         return new DfJavaPropertiesResult(prop, propertyList, duplicateKeyList);
     }
@@ -129,7 +122,7 @@ public class DfJavaPropertiesReader {
     // ===================================================================================
     //                                                                         Read Helper
     //                                                                         ===========
-    protected Map<String, String> readKeyCommentMap(String propFile, String encoding, List<String> duplicateKeyList) {
+    protected Map<String, String> readKeyCommentMap(File propFile, String encoding, List<String> duplicateKeyList) {
         final Map<String, String> keyCommentMap = new LinkedHashMap<String, String>();
         BufferedReader br = null;
         try {
@@ -165,8 +158,7 @@ public class DfJavaPropertiesReader {
                 previousComment = null;
             }
         } catch (IOException e) {
-            String msg = "Failed to the properties file: " + propFile;
-            throw new IllegalStateException(msg, e);
+            throwJavaPropertiesReadFailureException(propFile, e);
         } finally {
             if (br != null) {
                 try {
@@ -178,22 +170,33 @@ public class DfJavaPropertiesReader {
         return keyCommentMap;
     }
 
-    protected Properties readPlainProperties(String propFile) {
+    protected Properties readPlainProperties(File propFile) {
         final Properties prop = new Properties();
         try {
             final FileInputStream fis = new FileInputStream(propFile);
             prop.load(fis);
         } catch (IOException e) {
-            String msg = "Failed to the properties file: " + propFile;
-            throw new IllegalStateException(msg, e);
+            throwJavaPropertiesReadFailureException(propFile, e);
         }
         return prop;
+    }
+
+    protected void throwJavaPropertiesReadFailureException(File propFile, IOException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to read the properties file.");
+        br.addItem("Properties");
+        br.addElement(propFile);
+        br.addItem("IOException");
+        br.addElement(e.getClass().getName());
+        br.addElement(e.getMessage());
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg, e);
     }
 
     // ===================================================================================
     //                                                                     Variable Helper
     //                                                                     ===============
-    protected Integer valueOfVariableNumber(String propFile, String key, String content) {
+    protected Integer valueOfVariableNumber(File propFile, String key, String content) {
         try {
             return Integer.valueOf(content);
         } catch (NumberFormatException e) {

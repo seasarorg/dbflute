@@ -13,46 +13,59 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.io.prop;
+package org.seasar.dbflute.logic.doc.prophtml;
 
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
+
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  * @since 1.0.1 (2012/12/21 Friday)
  */
-public class DfJavaPropertiesResult {
+public class DfPropHtmlPropertyEnvElement {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Properties _plainProp;
-    protected final List<DfJavaPropertiesProperty> _propertyList;
-    protected final List<String> _duplicateKeyList;
+    /** The key of the property. (NotNull) */
+    protected final String _propertyKey;
+
+    /** The type of the language. e.g. production, integration (NotNull) */
+    protected final String _envType;
+
+    /** The language element of the property. (NotNull) */
+    protected final Map<String, DfPropHtmlPropertyLangElement> _langElementMap = DfCollectionUtil.newLinkedHashMap();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfJavaPropertiesResult(Properties plainProp, List<DfJavaPropertiesProperty> propertyList,
-            List<String> duplicateKeyList) {
-        _plainProp = plainProp;
-        _propertyList = propertyList;
-        _duplicateKeyList = duplicateKeyList;
+    public DfPropHtmlPropertyEnvElement(String propertyKey, String envType) {
+        _propertyKey = propertyKey;
+        _envType = envType;
     }
 
     // ===================================================================================
-    //                                                                            Accessor
+    //                                                                            Accessor
     //                                                                            ========
-    public Properties getPlainProp() {
-        return _plainProp;
+    public String getProeprtyKey() {
+        return _propertyKey;
     }
 
-    public List<DfJavaPropertiesProperty> getPropertyList() {
-        return _propertyList;
+    public String getEnvType() {
+        return _envType;
     }
 
-    public List<String> getDuplicateKeyList() {
-        return _duplicateKeyList;
+    public List<DfPropHtmlPropertyLangElement> getLangElementList() {
+        return DfCollectionUtil.newArrayList(_langElementMap.values());
+    }
+
+    public void setPropertyValue(String langType, String propertyValue, String comment) {
+        _langElementMap.put(langType, createLangElement(langType, propertyValue, comment));
+    }
+
+    protected DfPropHtmlPropertyLangElement createLangElement(String langType, String propertyValue, String comment) {
+        return new DfPropHtmlPropertyLangElement(_propertyKey, langType, propertyValue, comment);
     }
 }

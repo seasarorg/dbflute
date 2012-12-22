@@ -74,3 +74,15 @@ $generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
 #end
 $database.backToDocumentOutputDirectory()
 #end
+
+## - - - - - - - -
+## Properties HTML
+## - - - - - - - -
+#if ($selector.isPropertiesHtml())
+$selector.markPropertiesHtml()
+$selector.loadProppertiesHtmlRequest()
+#if ($selector.existsProppertiesHtmlRequest())
+#set ($outFile = "${selector.propertiesHtmlFileName}")
+$generator.parse("doc/html/propmodel.vm", $outFile, "dataModel", $dataModel)
+#end
+#end

@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
@@ -810,4 +811,144 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             }
         };
     }
+
+    // ===================================================================================
+    //                                                                      PropertiesHtml
+    //                                                                      ==============
+    // ; propertiesHtmlMap = map:{
+    //     ; ApplicationProp = map:{
+    //         ; baseDir = ../src
+    //         ; rootFile = $$baseDir$$/main/resources/application_ja.properties
+    //         ; environmentMap = map:{
+    //             ; production = $$baseDir$$/production/resources
+    //             ; integration = $$baseDir$$/integration/resources
+    //         }
+    //     }
+    // }
+    protected Map<String, Map<String, Object>> _propertiesHtmlMap;
+
+    public Map<String, Map<String, Object>> getPropertiesHtmlMap() { // closet
+        if (_propertiesHtmlMap != null) {
+            return _propertiesHtmlMap;
+        }
+        final String key = "propertiesHtmlMap";
+        final Map<String, Object> definitionMap = getDocumentDefinitionMap();
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> propertiesHtmlMap = (Map<String, Object>) definitionMap.get(key);
+        if (propertiesHtmlMap != null) {
+            _propertiesHtmlMap = filterPropertiesHtmlBaseDirVariable(propertiesHtmlMap);
+        } else {
+            _propertiesHtmlMap = DfCollectionUtil.emptyMap();
+        }
+        return _propertiesHtmlMap;
+    }
+
+    protected Map<String, Map<String, Object>> filterPropertiesHtmlBaseDirVariable(Map<String, Object> propertiesHtmlMap) {
+        final String baseDirKey = "baseDir";
+        final String baseDirVariable = "$$" + baseDirKey + "$$";
+        final String rootFileKey = "rootFile";
+        final String envMapKey = "environmentMap";
+        final Map<String, Map<String, Object>> resolvedMap = newLinkedHashMap();
+        for (Entry<String, Object> requestEntry : propertiesHtmlMap.entrySet()) {
+            final String requestName = requestEntry.getKey();
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> requestMap = (Map<String, Object>) requestEntry.getValue();
+            final String baseDir = (String) requestMap.get(baseDirKey);
+            if (baseDir != null) {
+                final Map<String, Object> filteredRequestMap = newLinkedHashMap();
+                filteredRequestMap.put(baseDirKey, baseDir);
+                for (Entry<String, Object> elementEntry : requestMap.entrySet()) {
+                    final String elementKey = elementEntry.getKey();
+                    final Object elementValue = elementEntry.getValue();
+                    if (rootFileKey.equals(elementKey)) {
+                        final String replaced = Srl.replace((String) elementValue, baseDirVariable, baseDir);
+                        filteredRequestMap.put(elementKey, replaced);
+                    } else if (envMapKey.equals(elementKey)) {
+                        final Map<String, String> filteredEnvMap = newLinkedHashMap();
+                        @SuppressWarnings("unchecked")
+                        final Map<String, String> environmentMap = (Map<String, String>) elementValue;
+                        for (Entry<String, String> envEntry : environmentMap.entrySet()) {
+                            final String envName = envEntry.getKey();
+                            final String envValue = envEntry.getValue();
+                            final String replaced = Srl.replace(envValue, baseDirVariable, baseDir);
+                            filteredEnvMap.put(envName, replaced);
+                        }
+                        filteredRequestMap.put(elementKey, filteredEnvMap);
+                    }
+                }
+                resolvedMap.put(requestName, filteredRequestMap);
+            } else {
+                resolvedMap.put(requestName, requestMap);
+            }
+        }
+        return resolvedMap;
+    }
+
+    public String getPropertiesHtmlResourceRootFile(Map<String, Object> requestMap) {
+        return (String) requestMap.get("rootFile");
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, String> getPropertiesHtmlResourceEnvironmentMap(Map<String, Object> requestMap) {
+        return (Map<String, String>) requestMap.get("environmentMap");
+    }
+
+    // -----------------------------------------------------
+    //                                             File Name
+    //                                             ---------
+    public String getPropertiesHtmlFileName(String projectName) { // closet
+        final String defaultName = "properties-" + projectName + ".html";
+        return getProperty("propertiesHtmlFileName", defaultName, getDocumentDefinitionMap());
+    }
+
+    // -----------------------------------------------------
+    //                                           Style Sheet
+    //                                           -----------
+    public boolean isPropertiesHtmlStyleSheetEmbedded() {
+        final String styleSheet = getPropertiesHtmlStyleSheet();
+        return styleSheet != null && hasSchemaHtmlStyleSheetEmbeddedMark(styleSheet);
+    }
+
+    public boolean isPropertiesHtmlStyleSheetLink() {
+        final String styleSheet = getPropertiesHtmlStyleSheet();
+        return styleSheet != null && !hasSchemaHtmlStyleSheetEmbeddedMark(styleSheet);
+    }
+
+    public String getPropertiesHtmlStyleSheetEmbedded() {
+        return readSchemaHtmlStyleSheetEmbedded(getSchemaHtmlStyleSheet());
+    }
+
+    public String getPropertiesHtmlStyleSheetLink() {
+        return buildSchemaHtmlStyleSheetLink(getSchemaHtmlStyleSheet());
+    }
+
+    protected String getPropertiesHtmlStyleSheet() { // closet
+        return getProperty("propertiesHtmlStyleSheet", null, getDocumentDefinitionMap());
+    }
+
+    // -----------------------------------------------------
+    //                                            JavaScript
+    //                                            ----------
+    public boolean isPropertiesHtmlJavaScriptEmbedded() {
+        final String javaScript = getPropertiesHtmlJavaScript();
+        return javaScript != null && hasSchemaHtmlJavaScriptEmbeddedMark(javaScript);
+    }
+
+    public boolean isPropertiesHtmlJavaScriptLink() {
+        final String javaScript = getPropertiesHtmlJavaScript();
+        return javaScript != null && !hasSchemaHtmlJavaScriptEmbeddedMark(javaScript);
+    }
+
+    public String getPropertiesHtmlJavaScriptEmbedded() {
+        return readSchemaHtmlJavaScriptEmbedded(getPropertiesHtmlJavaScript());
+    }
+
+    public String getPropertiesHtmlJavaScriptLink() {
+        return buildSchemaHtmlJavaScriptLink(getSchemaHtmlJavaScript());
+    }
+
+    protected String getPropertiesHtmlJavaScript() { // closet
+        return getProperty("propertiesHtmlJavaScript", null, getDocumentDefinitionMap());
+    }
+
 }
