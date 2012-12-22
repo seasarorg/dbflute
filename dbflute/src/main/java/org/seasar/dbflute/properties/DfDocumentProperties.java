@@ -264,7 +264,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                          SchemaHTML
+    //                                                                          SchemaHtml
     //                                                                          ==========
     public String getSchemaHtmlFileName(String projectName) {
         final String defaultName = "schema-" + projectName + ".html";
@@ -388,7 +388,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                         HistoryHTML
+    //                                                                         HistoryHtml
     //                                                                         ===========
     public String getHistoryHtmlFileName(String projectName) {
         final String defaultName = "history-" + projectName + ".html";

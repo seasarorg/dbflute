@@ -15,8 +15,12 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -60,6 +64,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -110,6 +115,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     public void writeSeveralData(DfXlsDataResource resource, DfLoadedDataInfo loadedDataInfo) {
         final String dataDirectory = resource.getDataDirectory();
         final List<File> xlsList = getXlsList(resource);
+        if (xlsList.isEmpty()) {
+            return;
+        }
+        final StringBuilder msgSb = new StringBuilder();
         for (File file : xlsList) {
             _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
             _log.info("writeData(" + file + ")");
@@ -118,30 +127,33 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final DfDataSet dataSet = xlsReader.read();
             filterValidColumn(dataSet);
             setupDefaultValue(dataDirectory, dataSet);
-            doWriteDataSet(resource, file, dataSet);
+            doWriteDataSet(resource, file, dataSet, msgSb);
             final boolean warned = false; // this has no warning fixedly
             loadedDataInfo.addLoadedFile(resource.getEnvType(), "xls", null, file.getName(), warned);
         }
+        outputResultMark(resource.getDataDirectory(), msgSb.toString());
     }
 
     // -----------------------------------------------------
     //                                               DataSet
     //                                               -------
-    protected void doWriteDataSet(DfXlsDataResource resource, File file, DfDataSet dataSet) {
+    protected void doWriteDataSet(DfXlsDataResource resource, File file, DfDataSet dataSet, StringBuilder msgSb) {
+        msgSb.append(ln()).append(ln()).append("[" + file.getName() + "]");
         for (int i = 0; i < dataSet.getTableSize(); i++) {
             final DfDataTable dataTable = dataSet.getTable(i);
-            doWriteDataTable(resource, file, dataTable);
+            final int loadedCount = doWriteDataTable(resource, file, dataTable);
+            msgSb.append(ln()).append("  " + dataTable.getTableDbName() + " (" + loadedCount + ")");
         }
     }
 
     // -----------------------------------------------------
     //                                             DataTable
     //                                             ---------
-    protected void doWriteDataTable(DfXlsDataResource resource, File file, DfDataTable dataTable) {
+    protected int doWriteDataTable(DfXlsDataResource resource, File file, DfDataTable dataTable) {
         final String tableDbName = dataTable.getTableDbName();
         if (dataTable.getRowSize() == 0) {
             _log.info("*Not found row at the table: " + tableDbName);
-            return;
+            return 0;
         }
 
         // set up columnMetaInfo
@@ -238,8 +250,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             }
             noticeLoadedRowSize(tableDbName, loadedRowCount);
             checkImplicitClassification(file, tableDbName, columnNameList, conn);
+            return loadedRowCount;
         } catch (SQLException e) {
             handleWriteTableException(file, dataTable, e, retryEx, retryDataRow, columnNameList);
+            return -1; // unreachable
         } finally {
             closeResource(conn, ps);
 
@@ -479,7 +493,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return xlsReader;
     }
 
-    public List<File> getXlsList(DfXlsDataResource resource) {
+    protected List<File> getXlsList(DfXlsDataResource resource) {
         final Comparator<File> fileNameAscComparator = new Comparator<File>() {
             public int compare(File o1, File o2) {
                 return o1.getName().compareTo(o2.getName());
@@ -785,6 +799,45 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             };
             return createdState.toString();
         }
+    }
+
+    // ===================================================================================
+    //                                                                         Result Mark
+    //                                                                         ===========
+    protected void outputResultMark(String outputDir, String outputMsg) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(ln()).append("* * * * * * * * * *");
+        sb.append(ln()).append("*                 *");
+        sb.append(ln()).append("* Xls Data Result *");
+        sb.append(ln()).append("*                 *");
+        sb.append(ln()).append("* * * * * * * * * *");
+        sb.append(ln()).append("data-directory: ").append(outputDir);
+        sb.append(ln());
+        sb.append(ln()).append(Srl.ltrim(outputMsg));
+        final File dataPropFile = new File(outputDir + "/xls-data-result.dfmark");
+        if (dataPropFile.exists()) {
+            dataPropFile.delete();
+        }
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataPropFile), "UTF-8"));
+            bw.write(sb.toString());
+            bw.flush();
+        } catch (IOException e) {
+            String msg = "Failed to write xls-data-result.dfmark: " + dataPropFile;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    protected String ln() {
+        return DBFluteSystem.getBasicLn();
     }
 
     // ===================================================================================

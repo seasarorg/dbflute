@@ -235,7 +235,6 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Create Schema");
         final DfSqlFileFireResult result = fireMan.fire(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
-        _log.info(""); // for space line
         destroyChangeUserConnection();
         return result;
     }

@@ -397,6 +397,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                            Continue
     //                                                                            ========
     public boolean isErrorSqlContinue() {
+        // default is false (at an old time, true)
+        // though DBFlute task returns failure when this property is true,
+        // load data may have big cost so change the default value
         return isProperty("isErrorSqlContinue", false, getReplaceSchemaDefinitionMap());
     }
 

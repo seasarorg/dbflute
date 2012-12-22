@@ -200,7 +200,7 @@ public class DfLReverseProcess {
             bw.write(sb.toString());
             bw.flush();
         } catch (IOException e) {
-            String msg = "Failed to write tableNameMap.dataprop: " + dataPropFile;
+            String msg = "Failed to write load-data-result.dfmark: " + dataPropFile;
             throw new IllegalStateException(msg, e);
         } finally {
             if (bw != null) {
@@ -213,6 +213,6 @@ public class DfLReverseProcess {
     }
 
     protected String ln() {
-        return "\n";
+        return DBFluteSystem.getBasicLn();
     }
 }

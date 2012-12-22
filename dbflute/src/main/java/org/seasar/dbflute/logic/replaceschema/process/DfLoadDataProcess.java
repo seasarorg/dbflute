@@ -43,6 +43,9 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWriting
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.util.Srl;
 
+/**
+ * @author jflute
+ */
 public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
 
     // ===================================================================================

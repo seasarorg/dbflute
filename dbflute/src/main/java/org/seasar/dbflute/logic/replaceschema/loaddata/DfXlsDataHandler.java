@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata;
 
-import java.io.File;
 import java.util.List;
 
 import org.seasar.dbflute.helper.dataset.DfDataSet;
@@ -33,6 +32,4 @@ public interface DfXlsDataHandler {
      * @param loadedDataInfo The info of loaded data for history. (NotNull)
      */
     void writeSeveralData(DfXlsDataResource resource, DfLoadedDataInfo loadedDataInfo);
-
-    List<File> getXlsList(DfXlsDataResource resource);
 }
