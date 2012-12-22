@@ -29,6 +29,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,6 +46,7 @@ import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueException;
 import org.seasar.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.HandyDate;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
@@ -433,7 +435,8 @@ public abstract class DfAbsractDataWriter {
                 if (!java.util.Date.class.isAssignableFrom(columnType)) {
                     return false;
                 }
-                bindNotNullValueByColumnType(tableName, columnName, conn, ps, bindCount, value, columnType);
+                final String resolved = resolveCalculationDate(value); // only when column type specified
+                bindNotNullValueByColumnType(tableName, columnName, conn, ps, bindCount, resolved, columnType);
                 return true;
             }
         }
@@ -451,6 +454,39 @@ public abstract class DfAbsractDataWriter {
             } catch (ParseTimeException ignored2) {
             }
             return false; // couldn't parse as timestamp and time
+        }
+    }
+
+    protected String resolveCalculationDate(String value) {
+        final String currentMark = "$sysdate";
+        if (value.startsWith(currentMark)) {
+            final Date currentDate = DBFluteSystem.currentDate();
+            final HandyDate handyDate = new HandyDate(currentDate);
+            final String calcPart = Srl.substringFirstRear(value, currentMark).trim();
+            final String plusMark = "+";
+            final String minusMark = "-";
+            String resolved = null;
+            if (calcPart.startsWith(plusMark)) {
+                final String daysExp = Srl.substringFirstRear(calcPart, plusMark).trim();
+                resolved = doResolvedCalculationDate(handyDate, daysExp, false);
+            } else if (calcPart.startsWith(minusMark)) {
+                final String daysExp = Srl.substringFirstRear(calcPart, minusMark).trim();
+                resolved = doResolvedCalculationDate(handyDate, daysExp, true);
+            }
+            if (resolved != null) {
+                return resolved;
+            }
+        }
+        return value;
+    }
+
+    protected String doResolvedCalculationDate(HandyDate handyDate, String daysExp, boolean minus) {
+        try {
+            final Integer plusDays = DfTypeUtil.toInteger(daysExp);
+            final String pattern = "yyyy/MM/dd HH:mm:ss.SSS";
+            return DfTypeUtil.toString(handyDate.addDay(minus ? plusDays * -1 : plusDays).getDate(), pattern);
+        } catch (NumberFormatException e) {
+            return null; // may be error when insert
         }
     }
 

@@ -34,21 +34,22 @@ public class DfFilePathTableLoader {
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
+    //     ; baseDir = ../src/main
     //     ; resourceType = FILE_PATH
     // }
     // ; outputMap = map:{
     //     ; templateFile = JspPath.vm
-    //     ; outputDirectory = ../src/main/java
+    //     ; outputDirectory = $$baseDir$$/java
     //     ; package = org.seasar.dbflute...
     //     ; className = JspPath
     // }
     // ; tableMap = map:{
-    //     ; targetDir = ../src/main/webapp/WEB-INF/view
+    //     ; targetDir = $$baseDir$$/webapp/WEB-INF/view
     //     ; targetSuffix = .jsp
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) {
-        final String targetDir = (String) tableMap.get("targetDir");
+        final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
         final String targetSuffix = (String) tableMap.get("targetSuffix");
         final List<File> fileList = DfCollectionUtil.newArrayList();
         collectFile(fileList, targetSuffix, new File(targetDir));

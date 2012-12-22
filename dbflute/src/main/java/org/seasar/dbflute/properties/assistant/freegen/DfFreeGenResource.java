@@ -26,17 +26,30 @@ public class DfFreeGenResource {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DfFreeGenerateResourceType _resourceType;
-    protected final String _resourceFile;
-    protected final String _encoding;
+    protected final String _baseDir; // NullAllowed
+    protected final DfFreeGenerateResourceType _resourceType; // NotNull
+    protected final String _resourceFile; // NotNull
+    protected final String _encoding; // NullAllowed
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfFreeGenResource(DfFreeGenerateResourceType resourceType, String resourceFile, String encoding) {
+    public DfFreeGenResource(String baseDir, DfFreeGenerateResourceType resourceType, String resourceFile,
+            String encoding) {
+        _baseDir = baseDir;
         _resourceType = resourceType;
-        _resourceFile = resourceFile;
+        _resourceFile = resolveBaseDir(resourceFile);
         _encoding = encoding;
+    }
+
+    // ===================================================================================
+    //                                                                  Directory Resolver
+    //                                                                  ==================
+    public String resolveBaseDir(String path) {
+        if (path != null && _baseDir != null) {
+            return Srl.replace(path, "$$baseDir$$", _baseDir);
+        }
+        return path;
     }
 
     // ===================================================================================
@@ -94,5 +107,9 @@ public class DfFreeGenResource {
 
     public String getEncoding() {
         return _encoding;
+    }
+
+    public String getBaseDir() {
+        return _baseDir;
     }
 }

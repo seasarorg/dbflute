@@ -76,8 +76,9 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     //                                                                      ==============
     // - - - - - - - - - - - - - - - - - - - - - - - - - - PROP
     // ; resourceMap = map:{
+    //     ; baseDir = ../..
     //     ; resourceType = PROP
-    //     ; resourceFile = ../../.../foo.properties
+    //     ; resourceFile = $$baseDir$$/.../foo.properties
     // }
     // ; outputMap = map:{
     //     ; templateFile = MessageDef.vm
@@ -194,24 +195,24 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
         {
             @SuppressWarnings("unchecked")
             final Map<String, String> resourceMap = (Map<String, String>) elementMap.get("resourceMap");
+            final String baseDir = resourceMap.get("baseDir");
             final String resourceTypeStr = resourceMap.get("resourceType"); // required
             final DfFreeGenerateResourceType resourceType = DfFreeGenerateResourceType.valueOf(resourceTypeStr);
             final String resourceFile = resourceMap.get("resourceFile");
             final String encoding = resourceMap.get("encoding");
-            resource = new DfFreeGenResource(resourceType, resourceFile, encoding);
+            resource = new DfFreeGenResource(baseDir, resourceType, resourceFile, encoding);
         }
         final DfFreeGenOutput output;
         {
             @SuppressWarnings("unchecked")
             final Map<String, String> outputMap = (Map<String, String>) elementMap.get("outputMap");
-            final String templateFile = outputMap.get("templateFile");
-            final String outputDirectory = outputMap.get("outputDirectory");
+            final String templateFile = resource.resolveBaseDir(outputMap.get("templateFile"));
+            final String outputDirectory = resource.resolveBaseDir(outputMap.get("outputDirectory"));
             final String pkg = outputMap.get("package");
             final String className = outputMap.get("className");
             output = new DfFreeGenOutput(templateFile, outputDirectory, pkg, className);
         }
-        final DfFreeGenRequest request = new DfFreeGenRequest(_manager, requestName, resource, output);
-        return request;
+        return new DfFreeGenRequest(_manager, requestName, resource, output);
     }
 
     protected DfFreeGenTable loadTableFromProp(String requestName, DfFreeGenResource resource,
