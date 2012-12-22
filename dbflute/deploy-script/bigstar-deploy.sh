@@ -5,7 +5,7 @@ ant -f build.xml reflect-to-guice
 ant -f build.xml reflect-to-mysql
 ant -f build.xml reflect-to-postgresql
 ant -f build.xml reflect-to-db2
-ant -f build.xml reflect-to-sqlite
+ant -f build.xml reflect-to-sastruts
 
 cd ../dbflute-basic-example
 mvn -e eclipath:sync eclipath:clean
@@ -60,7 +60,7 @@ rm ./log/*.log
 . sql2entity.sh
 . outside-sql-test.sh
 
-cd ../../dbflute-sqlite-example/dbflute_exampledb
+cd ../../dbflute-sastruts-example/dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
