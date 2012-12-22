@@ -65,11 +65,11 @@ public class DfPropHtmlManager {
     //                                                                        Load Request
     //                                                                        ============
     public void loadRequest() {
-        _log.info("...Loading properties HTML request");
         final DfDocumentProperties prop = getDocumentProperties();
         final Map<String, Map<String, Object>> propertiesHtmlMap = prop.getPropertiesHtmlMap();
         for (Entry<String, Map<String, Object>> requestEntry : propertiesHtmlMap.entrySet()) {
             final String requestName = requestEntry.getKey();
+            _log.info("...Loading properties HTML request: " + requestName);
             final Map<String, Object> requestMap = requestEntry.getValue();
             final DfPropHtmlRequest request = new DfPropHtmlRequest(requestName);
             setupRequest(requestMap, request);
@@ -90,6 +90,8 @@ public class DfPropHtmlManager {
             final String envFile = envDir + "/" + standardPureFileName;
             setupEnvironmentProperty(request, envFile, envType, stdAttrMap);
         }
+        final List<String> ignoredKeyList = prop.getPropertiesHtmlDiffIgnoredKeyList(requestMap);
+        request.addDiffIgnoredKeyAll(ignoredKeyList);
     }
 
     // ===================================================================================
@@ -121,7 +123,7 @@ public class DfPropHtmlManager {
         }
         for (File familyFile : familyFileList) {
             final String langType = extractLangType(familyFile.getName());
-            final String fileKey = "" + envType + "->" + familyFile.getName();
+            final String fileKey = "" + envType + ":" + familyFile.getName();
             _log.info("...Reading properties file: " + fileKey);
             final DfJavaPropertiesResult jpropResult = reader.read(familyFile, "UTF-8");
             final List<DfJavaPropertiesProperty> jpropList = jpropResult.getPropertyList();
@@ -219,6 +221,7 @@ public class DfPropHtmlManager {
     protected void analyzePropertiesDiff() {
         for (Entry<String, DfPropHtmlRequest> entry : _requestMap.entrySet()) {
             final DfPropHtmlRequest request = entry.getValue();
+            final Set<String> ignoredSet = DfCollectionUtil.newHashSet(request.getDiffIgnoredKeyList());
             final List<DfPropHtmlFileAttribute> attributeList = request.getFileAttributeList();
             for (DfPropHtmlFileAttribute attribute : attributeList) {
                 if (attribute.isRootFile()) {
@@ -232,11 +235,17 @@ public class DfPropHtmlManager {
                 final Set<String> standardPropertyKeySet = standardAttribute.getPropertyKeySet();
                 final Set<String> propertyKeySet = attribute.getPropertyKeySet();
                 for (String propertyKey : propertyKeySet) {
+                    if (ignoredSet.contains(propertyKey)) {
+                        continue;
+                    }
                     if (!standardPropertyKeySet.contains(propertyKey)) {
                         attribute.addOverKey(propertyKey);
                     }
                 }
                 for (String standardPropertyKey : standardPropertyKeySet) {
+                    if (ignoredSet.contains(standardPropertyKey)) {
+                        continue;
+                    }
                     if (!propertyKeySet.contains(standardPropertyKey)) {
                         attribute.addShortKey(standardPropertyKey);
                     }

@@ -53,7 +53,7 @@ h2 {
 h3 {
 	padding: 0 0 0 10px;
 	margin: 1em 10% 4px 0;
-	border-top: double 3px #af0000;
+	border-left: double 3px #af0000;
 	font-size: 1.5em;
 	color: #333333;
 }

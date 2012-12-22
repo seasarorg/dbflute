@@ -34,6 +34,7 @@ public class DfPropHtmlRequest {
     protected final Map<String, String> _langFileMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, String> _envFileMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, DfPropHtmlProperty> _propertyMap = DfCollectionUtil.newLinkedHashMap();
+    protected final List<String> _diffIgnoredKeyList = DfCollectionUtil.newArrayList();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -72,5 +73,13 @@ public class DfPropHtmlRequest {
             _propertyMap.put(propertyKey, property);
         }
         property.setPropertyValue(envType, langType, propertyValue, comment);
+    }
+
+    public List<String> getDiffIgnoredKeyList() {
+        return _diffIgnoredKeyList;
+    }
+
+    public void addDiffIgnoredKeyAll(List<String> diffIgnoredKeyList) {
+        _diffIgnoredKeyList.addAll(diffIgnoredKeyList);
     }
 }

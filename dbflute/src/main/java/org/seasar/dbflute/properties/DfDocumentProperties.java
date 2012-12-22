@@ -823,6 +823,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //             ; production = $$baseDir$$/production/resources
     //             ; integration = $$baseDir$$/integration/resources
     //         }
+    //         ; diffIgnoredKeyList = list:{ errors.ignored.key }
     //     }
     // }
     protected Map<String, Map<String, Object>> _propertiesHtmlMap;
@@ -874,6 +875,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
                             filteredEnvMap.put(envName, replaced);
                         }
                         filteredRequestMap.put(elementKey, filteredEnvMap);
+                    } else {
+                        filteredRequestMap.put(elementKey, elementValue);
                     }
                 }
                 resolvedMap.put(requestName, filteredRequestMap);
@@ -890,7 +893,20 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     @SuppressWarnings("unchecked")
     public Map<String, String> getPropertiesHtmlResourceEnvironmentMap(Map<String, Object> requestMap) {
-        return (Map<String, String>) requestMap.get("environmentMap");
+        final Map<String, String> environmentMap = (Map<String, String>) requestMap.get("environmentMap");
+        if (environmentMap != null) {
+            return environmentMap;
+        }
+        return DfCollectionUtil.emptyMap();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> getPropertiesHtmlDiffIgnoredKeyList(Map<String, Object> requestMap) {
+        final List<String> ignoredKeyList = (List<String>) requestMap.get("diffIgnoredKeyList");
+        if (ignoredKeyList != null) {
+            return ignoredKeyList;
+        }
+        return DfCollectionUtil.emptyList();
     }
 
     // -----------------------------------------------------
