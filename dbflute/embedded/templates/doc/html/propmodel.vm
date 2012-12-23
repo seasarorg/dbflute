@@ -65,6 +65,9 @@ h4 {
 	font-size: 1.4em;
 	color: #333333;
 }
+.linkarea {
+	text-align: right;
+}
 
 /* table */
 table {
@@ -156,8 +159,14 @@ ${database.schemaHtmlJavaScriptEmbedded}
 <body>
 <h1>Properties for ${database.projectName}</h1>
 
+<div class="linkarea">
 #foreach ($request in $selector.proppertiesHtmlRequestList)
-<h2>${request.requestName}</h2>
+	<p><a href="#${request.requestLowerName}">${request.requestName}</a></p>
+#end
+</div>
+
+#foreach ($request in $selector.proppertiesHtmlRequestList)
+<h2 id="${request.requestLowerName}">${request.requestName}</h2>
 
 <h3>File Attributes</h3>
 <table summary="File Attributes">
@@ -265,7 +274,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 					<td class="envtypecell">${envType}</td>
 					<td class="langtypecell">${langType}</td>
 					<td class="valuecell">#if ($langElement.hasPropertyValue())${langElement.propertyValueHtmlEncoded}#else &nbsp;#end</td>
-					<td class="commentcell"#if ($langElement.hasPropertyValue())${langElement.commentHtmlEncoded}#else &nbsp;#end</td>
+					<td class="commentcell">#if ($langElement.hasComment())${langElement.commentHtmlEncoded}#else &nbsp;#end</td>
 				</tr>
 #end
 #end

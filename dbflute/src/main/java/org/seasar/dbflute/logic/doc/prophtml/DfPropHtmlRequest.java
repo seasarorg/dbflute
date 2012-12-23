@@ -50,6 +50,10 @@ public class DfPropHtmlRequest {
         return _requestName;
     }
 
+    public String getRequestLowerName() {
+        return _requestName.toLowerCase();
+    }
+
     public List<DfPropHtmlFileAttribute> getFileAttributeList() {
         return _fileAttributeList;
     }
