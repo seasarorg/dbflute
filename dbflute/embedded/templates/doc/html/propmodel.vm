@@ -112,14 +112,15 @@ td {
 }
 .envtypecell {
 	text-align: center;
-	font-size: 0.7em;
+	font-size: 0.6em;
 }
 .langtypecell {
 	text-align: center;
-	font-size: 0.7em;
+	font-size: 0.6em;
 }
 .valuecell {
-	font-size: 0.7em;
+	font-size: 0.8em;
+	font-weight: bold;
 }
 .sizecell {
 	text-align: center;

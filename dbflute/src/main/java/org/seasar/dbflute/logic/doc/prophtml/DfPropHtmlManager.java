@@ -45,11 +45,11 @@ public class DfPropHtmlManager {
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfPropHtmlManager.class);
 
-    /** The root for language type. */
-    private static final String LANG_TYPE_DEFAULT = "(default)";
-
     /** The standard environment type. */
-    private static final String ENV_TYPE_DEFAULT = "(default)";
+    private static final String ENV_TYPE_DEFAULT = "-";
+
+    /** The root for language type. */
+    private static final String LANG_TYPE_DEFAULT = "-";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -107,7 +107,7 @@ public class DfPropHtmlManager {
             return;
         }
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the root file for properties HTML.");
+        br.addNotice("Not found the root file for PropertiesHtml.");
         br.addItem("Request Name");
         br.addElement(requestName);
         br.addItem("Root File");
@@ -132,7 +132,7 @@ public class DfPropHtmlManager {
     protected Map<String, DfPropHtmlFileAttribute> doSetupEnvironmentProperty(DfPropHtmlRequest request,
             String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
         final DfJavaPropertiesReader reader = new DfJavaPropertiesReader();
-        final List<File> familyFileList = extractFamilyFileList(propertiesFile);
+        final List<File> familyFileList = extractFamilyFileList(request.getRequestName(), propertiesFile);
         if (familyFileList.isEmpty()) {
             return DfCollectionUtil.emptyMap();
         }
@@ -196,7 +196,7 @@ public class DfPropHtmlManager {
         return attributeMap;
     }
 
-    protected List<File> extractFamilyFileList(String propertiesFile) {
+    protected List<File> extractFamilyFileList(String requestName, String propertiesFile) {
         final List<File> familyFileList = DfCollectionUtil.newArrayList();
         final File targetDir = new File(Srl.substringLastFront(propertiesFile, "/"));
         final String pureFileName = Srl.substringLastRear(propertiesFile, "/");
@@ -209,6 +209,7 @@ public class DfPropHtmlManager {
         } else {
             pureFileNameNoExtNoLang = pureFileNameNoExt;
         }
+        assertPropHtmlEnvironmentDirectoryExists(targetDir, requestName, propertiesFile);
         final File[] listFiles = targetDir.listFiles(new FileFilter() {
             public boolean accept(File file) {
                 if (file.isDirectory()) {
@@ -236,6 +237,20 @@ public class DfPropHtmlManager {
             }
         }
         return LANG_TYPE_DEFAULT; // as default
+    }
+
+    protected void assertPropHtmlEnvironmentDirectoryExists(File targetDir, String requestName, String propertiesFile) {
+        if (targetDir.exists()) {
+            return;
+        }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the directory for the file for PropertiesHtml.");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("Properties File");
+        br.addElement(propertiesFile);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     // ===================================================================================
