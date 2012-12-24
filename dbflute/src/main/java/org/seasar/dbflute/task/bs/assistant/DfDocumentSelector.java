@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012 the Seasar Foundation and the Others.
+ * Copyright 2004-2013 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,6 +169,10 @@ public class DfDocumentSelector {
     // ===================================================================================
     //                                                                  Properties Request
     //                                                                  ==================
+    /**
+     * Load requests for properties HTML. <br />
+     * If no property, do nothing.
+     */
     public void loadProppertiesHtmlRequest() {
         _propHtmlManager = new DfPropHtmlManager();
         _propHtmlManager.loadRequest();

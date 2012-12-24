@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012 the Seasar Foundation and the Others.
+ * Copyright 2004-2013 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,7 +243,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("*    Schema HTML    *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        _selector.selectSchemaHtml().selectHistoryHtml().selectPropertiesHtml();
+        _selector.selectSchemaHtml(); // regular
+        _selector.selectHistoryHtml(); // regular
+        _selector.selectPropertiesHtml(); // option
         fireVelocityProcess();
     }
 

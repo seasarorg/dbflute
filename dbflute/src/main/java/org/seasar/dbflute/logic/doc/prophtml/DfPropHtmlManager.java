@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012 the Seasar Foundation and the Others.
+ * Copyright 2004-2013 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,31 +67,35 @@ public class DfPropHtmlManager {
     public void loadRequest() {
         final DfDocumentProperties prop = getDocumentProperties();
         final Map<String, Map<String, Object>> propertiesHtmlMap = prop.getPropertiesHtmlMap();
-        for (Entry<String, Map<String, Object>> requestEntry : propertiesHtmlMap.entrySet()) {
-            final String requestName = requestEntry.getKey();
+        if (propertiesHtmlMap.isEmpty()) {
+            return;
+        }
+        for (Entry<String, Map<String, Object>> entry : propertiesHtmlMap.entrySet()) {
+            final String requestName = entry.getKey();
             _log.info("...Loading properties HTML request: " + requestName);
-            final Map<String, Object> requestMap = requestEntry.getValue();
-            final DfPropHtmlRequest request = new DfPropHtmlRequest(requestName);
-            setupRequest(requestMap, request);
+            final Map<String, Object> requestMap = entry.getValue();
+            final DfPropHtmlRequest request = prepareRequest(requestMap, requestName);
             _requestMap.put(requestName, request);
         }
         analyzePropertiesDiff();
     }
 
-    protected void setupRequest(Map<String, Object> requestMap, DfPropHtmlRequest request) {
+    protected DfPropHtmlRequest prepareRequest(Map<String, Object> requestMap, String requestName) {
+        final DfPropHtmlRequest request = new DfPropHtmlRequest(requestName);
         final DfDocumentProperties prop = getDocumentProperties();
         final String rootFile = prop.getPropertiesHtmlResourceRootFile(requestMap);
-        final Map<String, DfPropHtmlFileAttribute> stdAttrMap = setupDefaultEnvProperty(request, rootFile);
+        final Map<String, DfPropHtmlFileAttribute> defaultEnvMap = setupDefaultEnvProperty(request, rootFile);
         final Map<String, String> environmentMap = prop.getPropertiesHtmlResourceEnvironmentMap(requestMap);
         final String standardPureFileName = Srl.substringLastRear(rootFile, "/");
         for (Entry<String, String> envEntry : environmentMap.entrySet()) {
             final String envType = envEntry.getKey();
             final String envDir = envEntry.getValue();
             final String envFile = envDir + "/" + standardPureFileName;
-            setupEnvironmentProperty(request, envFile, envType, stdAttrMap);
+            setupEnvironmentProperty(request, envFile, envType, defaultEnvMap);
         }
         final List<String> ignoredKeyList = prop.getPropertiesHtmlDiffIgnoredKeyList(requestMap);
         request.addDiffIgnoredKeyAll(ignoredKeyList);
+        return request;
     }
 
     // ===================================================================================
@@ -103,19 +107,19 @@ public class DfPropHtmlManager {
     }
 
     protected Map<String, DfPropHtmlFileAttribute> setupEnvironmentProperty(DfPropHtmlRequest request,
-            String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> standardAttributeMap) {
-        return doSetupEnvironmentProperty(request, propertiesFile, envType, standardAttributeMap);
+            String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
+        return doSetupEnvironmentProperty(request, propertiesFile, envType, defaultEnvMap);
     }
 
     protected Map<String, DfPropHtmlFileAttribute> doSetupEnvironmentProperty(DfPropHtmlRequest request,
-            String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvAttributeMap) {
+            String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
         final DfJavaPropertiesReader reader = new DfJavaPropertiesReader();
         final List<File> familyFileList = extractFamilyFileList(propertiesFile);
         final String specifiedPureFileName = Srl.substringLastRear(propertiesFile, "/");
         final Map<String, DfPropHtmlFileAttribute> attributeMap = DfCollectionUtil.newLinkedHashMap();
         DfPropHtmlFileAttribute rootAttribute = null;
-        if (defaultEnvAttributeMap != null) { // when specified environment
-            for (DfPropHtmlFileAttribute attribute : defaultEnvAttributeMap.values()) {
+        if (defaultEnvMap != null) { // when specified environment
+            for (DfPropHtmlFileAttribute attribute : defaultEnvMap.values()) {
                 if (attribute.isRootFile()) { // always exists here
                     rootAttribute = attribute;
                 }
@@ -136,12 +140,12 @@ public class DfPropHtmlManager {
                 propertyKeySet.add(propertyKey);
             }
             final DfPropHtmlFileAttribute attribute = new DfPropHtmlFileAttribute(familyFile, envType, langType);
-            if (defaultEnvAttributeMap != null) { // when specified environment
+            if (defaultEnvMap != null) { // when specified environment
                 if (rootAttribute != null) { // always true
                     // every files compare with root file here
                     attribute.setStandardAttribute(rootAttribute);
                 } else { // no way but just in case
-                    final DfPropHtmlFileAttribute standardAttribute = defaultEnvAttributeMap.get(langType);
+                    final DfPropHtmlFileAttribute standardAttribute = defaultEnvMap.get(langType);
                     if (standardAttribute != null) {
                         // same language on standard environment is my standard here
                         attribute.setStandardAttribute(standardAttribute);

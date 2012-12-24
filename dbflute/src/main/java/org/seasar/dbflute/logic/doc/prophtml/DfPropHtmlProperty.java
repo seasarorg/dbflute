@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012 the Seasar Foundation and the Others.
+ * Copyright 2004-2013 the Seasar Foundation and the Others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,14 +69,14 @@ public class DfPropHtmlProperty {
     }
 
     public void setPropertyValue(String envType, String langType, String propertyValue, String comment) {
-        _envTypeSet.add(envType);
-        _langTypeSet.add(langType);
         DfPropHtmlPropertyEnvElement envElement = _envElementMap.get(envType);
         if (envElement == null) {
             envElement = createEnvElement(envType);
             _envElementMap.put(envType, envElement);
         }
         envElement.setPropertyValue(langType, propertyValue, comment);
+        _envTypeSet.add(envType);
+        _langTypeSet.add(langType);
     }
 
     protected DfPropHtmlPropertyEnvElement createEnvElement(String envType) {
