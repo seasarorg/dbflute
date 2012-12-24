@@ -166,10 +166,10 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #end
 </div>
 
-#foreach ($request in $selector.proppertiesHtmlRequestList)
-<h2 id="${request.requestLowerName}">${request.requestName}</h2>
+<h2 id="propertieslist">Properties List</h2>
 
-<h3>File Attributes</h3>
+#foreach ($request in $selector.proppertiesHtmlRequestList)
+<h3><a href="#${request.requestLowerName}">${request.requestName}</a></h3>
 <table summary="File Attributes">
 	<thead>
 		<tr>
@@ -242,8 +242,10 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #end
 	</tbody>
 </table>
+#end
 
-<h3>Properties</h3>
+#foreach ($request in $selector.proppertiesHtmlRequestList)
+<h2 id="${request.requestLowerName}">${request.requestName}</h2>
 <table summary="Properties">
 	<thead>
 	<tr>
