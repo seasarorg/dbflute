@@ -25,6 +25,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesProperty;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesReader;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesResult;
@@ -85,6 +87,7 @@ public class DfPropHtmlManager {
         final DfDocumentProperties prop = getDocumentProperties();
         final String rootFile = prop.getPropertiesHtmlResourceRootFile(requestMap);
         final Map<String, DfPropHtmlFileAttribute> defaultEnvMap = setupDefaultEnvProperty(request, rootFile);
+        assertPropHtmlRootFileExists(defaultEnvMap, requestName, rootFile);
         final Map<String, String> environmentMap = prop.getPropertiesHtmlResourceEnvironmentMap(requestMap);
         final String standardPureFileName = Srl.substringLastRear(rootFile, "/");
         for (Entry<String, String> envEntry : environmentMap.entrySet()) {
@@ -96,6 +99,21 @@ public class DfPropHtmlManager {
         final List<String> ignoredKeyList = prop.getPropertiesHtmlDiffIgnoredKeyList(requestMap);
         request.addDiffIgnoredKeyAll(ignoredKeyList);
         return request;
+    }
+
+    protected void assertPropHtmlRootFileExists(Map<String, DfPropHtmlFileAttribute> defaultEnvMap, String requestName,
+            String rootFile) {
+        if (!defaultEnvMap.isEmpty()) {
+            return;
+        }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the root file for properties HTML.");
+        br.addItem("Request Name");
+        br.addElement(requestName);
+        br.addItem("Root File");
+        br.addElement(rootFile);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     // ===================================================================================
@@ -115,6 +133,9 @@ public class DfPropHtmlManager {
             String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
         final DfJavaPropertiesReader reader = new DfJavaPropertiesReader();
         final List<File> familyFileList = extractFamilyFileList(propertiesFile);
+        if (familyFileList.isEmpty()) {
+            return DfCollectionUtil.emptyMap();
+        }
         final String specifiedPureFileName = Srl.substringLastRear(propertiesFile, "/");
         final Map<String, DfPropHtmlFileAttribute> attributeMap = DfCollectionUtil.newLinkedHashMap();
         DfPropHtmlFileAttribute rootAttribute = null;
@@ -197,12 +218,10 @@ public class DfPropHtmlManager {
                 return pureName.startsWith(pureFileNameNoExtNoLang) && pureName.endsWith("." + ext);
             }
         });
-        if (listFiles == null || listFiles.length == 0) { // no way
-            String msg = "Not found the family files: " + propertiesFile;
-            throw new IllegalStateException(msg);
-        }
-        for (File file : listFiles) {
-            familyFileList.add(file);
+        if (listFiles != null && listFiles.length > 0) {
+            for (File file : listFiles) {
+                familyFileList.add(file);
+            }
         }
         return familyFileList;
     }
