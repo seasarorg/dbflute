@@ -126,9 +126,6 @@ public abstract class DfAbsractDataWriter {
     /** The cache map of null type. The key is table name. (ordered for display) */
     protected final Map<String, Map<String, Integer>> _nullTypeCacheMap = StringKeyMap.createAsFlexibleOrdered();
 
-    /** The resolver of relative date. (NotNull) */
-    protected final DfRelativeDateResolver _relativeDateResolver = new DfRelativeDateResolver();
-
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -436,7 +433,7 @@ public abstract class DfAbsractDataWriter {
                 if (!java.util.Date.class.isAssignableFrom(columnType)) {
                     return false;
                 }
-                final String resolved = resolveRelativeDate(value); // only when column type specified
+                final String resolved = resolveRelativeDate(tableName, columnName, value); // only when column type specified
                 bindNotNullValueByColumnType(tableName, columnName, conn, ps, bindCount, resolved, columnType);
                 return true;
             }
@@ -458,8 +455,12 @@ public abstract class DfAbsractDataWriter {
         }
     }
 
-    protected String resolveRelativeDate(String value) {
-        return _relativeDateResolver.resolveRelativeDate(value);
+    protected String resolveRelativeDate(String tableName, String columnName, String value) {
+        if (!value.startsWith(DfRelativeDateResolver.CURRENT_MARK)) {
+            return value;
+        }
+        final DfRelativeDateResolver resolver = new DfRelativeDateResolver(tableName, columnName);
+        return resolver.resolveRelativeDate(value);
     }
 
     // -----------------------------------------------------
