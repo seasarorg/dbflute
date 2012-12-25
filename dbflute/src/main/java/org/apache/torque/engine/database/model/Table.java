@@ -1680,6 +1680,11 @@ public class Table {
             final Map<Integer, String> indexColumnMap = unique.getIndexColumnMap();
             final String columnName = indexColumnMap.values().iterator().next();
             final Column column = getColumn(columnName);
+            if (column == null) { // basically no way
+                // Oracle's materialized view has internal unique index
+                // so this column variable can be null
+                continue;
+            }
             if (hasSinglePrimaryKey() && column.isPrimaryKey()) {
                 continue;
             }
