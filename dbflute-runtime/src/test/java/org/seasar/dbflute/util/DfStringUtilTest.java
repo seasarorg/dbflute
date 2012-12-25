@@ -74,6 +74,10 @@ import static org.seasar.dbflute.util.Srl.indexOfFirstIgnoreCase;
 import static org.seasar.dbflute.util.Srl.indexOfLast;
 import static org.seasar.dbflute.util.Srl.indexOfLastIgnoreCase;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
+import static org.seasar.dbflute.util.Srl.isAlphabetHarf;
+import static org.seasar.dbflute.util.Srl.isAlphabetHarfLower;
+import static org.seasar.dbflute.util.Srl.isAlphabetHarfUpper;
+import static org.seasar.dbflute.util.Srl.isNumberHarf;
 import static org.seasar.dbflute.util.Srl.is_NotNull_and_NotEmpty;
 import static org.seasar.dbflute.util.Srl.is_NotNull_and_NotTrimmedEmpty;
 import static org.seasar.dbflute.util.Srl.is_Null_or_Empty;
@@ -1488,5 +1492,50 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("  foo\n  bar\n  qux", indent(2, "foo\r\nbar\r\nqux"));
         assertEquals("  foo\n  bar\n  qux\n  ", indent(2, "foo\nbar\nqux\n"));
         assertEquals("  \n  foo\n  bar\n  qux\n  ", indent(2, "\nfoo\nbar\nqux\n"));
+    }
+
+    // ===================================================================================
+    //                                                                  Character Handling
+    //                                                                  ==================
+    public void test_isAlphabetHarf_basic() throws Exception {
+        assertTrue(isAlphabetHarf("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertTrue(isAlphabetHarf("A"));
+        assertTrue(isAlphabetHarf("BL"));
+        assertTrue(isAlphabetHarf("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertTrue(isAlphabetHarf("a"));
+        assertTrue(isAlphabetHarf("bbbOoo"));
+        assertFalse(isAlphabetHarf("ab2"));
+        assertFalse(isAlphabetHarf("-ab"));
+    }
+
+    public void test_isAlphabetHarfLower_basic() throws Exception {
+        assertFalse(isAlphabetHarfLower("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertFalse(isAlphabetHarfLower("A"));
+        assertFalse(isAlphabetHarfLower("BL"));
+        assertTrue(isAlphabetHarfLower("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertTrue(isAlphabetHarfLower("a"));
+        assertFalse(isAlphabetHarfLower("bbbOoo"));
+        assertFalse(isAlphabetHarfLower("ab2"));
+        assertFalse(isAlphabetHarfLower("-ab"));
+    }
+
+    public void test_isAlphabetHarfUpper_basic() throws Exception {
+        assertTrue(isAlphabetHarfUpper("ABCDEFGHIJKLMONPQRSTUVWXYZ"));
+        assertTrue(isAlphabetHarfUpper("A"));
+        assertTrue(isAlphabetHarfUpper("BL"));
+        assertFalse(isAlphabetHarfUpper("ABCDEFGHIJKLMONPQRSTUVWXYZ".toLowerCase()));
+        assertFalse(isAlphabetHarfUpper("a"));
+        assertFalse(isAlphabetHarfUpper("bbbOoo"));
+        assertFalse(isAlphabetHarfUpper("ab2"));
+        assertFalse(isAlphabetHarfUpper("-ab"));
+    }
+
+    public void test_isNumberHarf_basic() throws Exception {
+        assertTrue(isNumberHarf("0123456789"));
+        assertTrue(isNumberHarf("0"));
+        assertTrue(isNumberHarf("99"));
+        assertFalse(isNumberHarf("9a9"));
+        assertFalse(isNumberHarf("-1"));
+        assertFalse(isNumberHarf("1.1"));
     }
 }

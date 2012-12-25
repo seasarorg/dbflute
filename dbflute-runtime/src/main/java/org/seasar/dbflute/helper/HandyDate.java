@@ -24,8 +24,7 @@ import java.util.GregorianCalendar;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * The date which provides you handy manipulations for Date. <br />
- * Now making...
+ * The date which provides you handy manipulations for Date.
  * <pre>
  * e.g.
  * HandyDate date = new HandyDate("2011/11/27 12:34:56.789");

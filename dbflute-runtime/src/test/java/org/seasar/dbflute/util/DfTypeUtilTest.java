@@ -112,14 +112,22 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     }
 
     public void test_toInteger_notNumber() {
-        // ## Arrange ##
-        String notNumber = "foo";
-
-        // ## Act ##
         try {
-            DfTypeUtil.toInteger(notNumber);
-
-            // ## Assert ##
+            DfTypeUtil.toInteger("foo");
+            fail();
+        } catch (NumberFormatException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            DfTypeUtil.toInteger("3.3");
+            fail();
+        } catch (NumberFormatException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            DfTypeUtil.toInteger("+3");
             fail();
         } catch (NumberFormatException e) {
             // OK

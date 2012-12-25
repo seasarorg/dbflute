@@ -16,6 +16,7 @@
 package org.seasar.dbflute.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +27,56 @@ import java.util.Set;
  * @author jflute
  */
 public class Srl {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final String HARF_LOWER_ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    private static final String HARF_NUMBER = "0123456789";
+    private static final Set<Character> _alphabetHarfCharSet;
+    static {
+        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(HARF_LOWER_ALPHABET);
+        sb.append(sb.toString().toUpperCase());
+        char[] chAry = sb.toString().toCharArray();
+        for (char ch : chAry) {
+            setupSet.add(ch);
+        }
+        _alphabetHarfCharSet = Collections.unmodifiableSet(setupSet);
+    }
+    private static final Set<Character> _alphabetHarfLowerCharSet;
+    static {
+        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(HARF_LOWER_ALPHABET);
+        char[] chAry = sb.toString().toCharArray();
+        for (char ch : chAry) {
+            setupSet.add(ch);
+        }
+        _alphabetHarfLowerCharSet = Collections.unmodifiableSet(setupSet);
+    }
+    private static final Set<Character> _alphabetHarfUpperCharSet;
+    static {
+        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(HARF_LOWER_ALPHABET.toUpperCase());
+        char[] chAry = sb.toString().toCharArray();
+        for (char ch : chAry) {
+            setupSet.add(ch);
+        }
+        _alphabetHarfUpperCharSet = Collections.unmodifiableSet(setupSet);
+    }
+    private static final Set<Character> _numberHarfCharSet;
+    static {
+        final Set<Character> setupSet = DfCollectionUtil.newHashSet();
+        final String chStr = HARF_NUMBER;
+        char[] chAry = chStr.toCharArray();
+        for (char ch : chAry) {
+            setupSet.add(ch);
+        }
+        _numberHarfCharSet = Collections.unmodifiableSet(setupSet);
+    }
 
     // ===================================================================================
     //                                                                        Null & Empty
@@ -2047,6 +2098,33 @@ public class Srl {
     // ===================================================================================
     //                                                                  Character Handling
     //                                                                  ==================
+    public static boolean isAlphabetHarf(String str) {
+        return isAnyChar(str, _alphabetHarfCharSet);
+    }
+
+    public static boolean isAlphabetHarfLower(String str) {
+        return isAnyChar(str, _alphabetHarfLowerCharSet);
+    }
+
+    public static boolean isAlphabetHarfUpper(String str) {
+        return isAnyChar(str, _alphabetHarfUpperCharSet);
+    }
+
+    public static boolean isNumberHarf(String str) {
+        return isAnyChar(str, _numberHarfCharSet);
+    }
+
+    protected static boolean isAnyChar(String str, Set<Character> charSet) {
+        final char[] chAry = str.toCharArray();
+        for (int i = 0; i < chAry.length; i++) {
+            final char ch = chAry[i];
+            if (!charSet.contains(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected static boolean isUpperCase(char c) {
         return Character.isUpperCase(c);
     }
