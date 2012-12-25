@@ -30,6 +30,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesProperty;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesReader;
 import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesResult;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -85,10 +86,10 @@ public class DfPropHtmlManager {
     protected DfPropHtmlRequest prepareRequest(Map<String, Object> requestMap, String requestName) {
         final DfPropHtmlRequest request = new DfPropHtmlRequest(requestName);
         final DfDocumentProperties prop = getDocumentProperties();
-        final String rootFile = prop.getPropertiesHtmlResourceRootFile(requestMap);
+        final String rootFile = prop.getPropertiesHtmlRootFile(requestMap);
         final Map<String, DfPropHtmlFileAttribute> defaultEnvMap = setupDefaultEnvProperty(request, rootFile);
         assertPropHtmlRootFileExists(defaultEnvMap, requestName, rootFile);
-        final Map<String, String> environmentMap = prop.getPropertiesHtmlResourceEnvironmentMap(requestMap);
+        final Map<String, String> environmentMap = prop.getPropertiesHtmlEnvironmentMap(requestMap);
         final String standardPureFileName = Srl.substringLastRear(rootFile, "/");
         for (Entry<String, String> envEntry : environmentMap.entrySet()) {
             final String envType = envEntry.getKey();
@@ -293,19 +294,82 @@ public class DfPropHtmlManager {
     }
 
     // ===================================================================================
+    //                                                                         Header Info
+    //                                                                         ===========
+    public boolean hasTitle() {
+        final String title = getTitle();
+        return Srl.is_NotNull_and_NotTrimmedEmpty(title);
+    }
+
+    public String getTitle() {
+        final DfDocumentProperties prop = getDocumentProperties();
+        return prop.getPropertiesHtmlHeaderTitle();
+    }
+
+    // -----------------------------------------------------
+    //                                           Style Sheet
+    //                                           -----------
+    public boolean isStyleSheetEmbedded() {
+        return getDocumentProperties().isPropertiesHtmlStyleSheetEmbedded();
+    }
+
+    public boolean isStyleSheetLink() {
+        return getDocumentProperties().isPropertiesHtmlStyleSheetLink();
+    }
+
+    public String getStyleSheetEmbedded() {
+        return getDocumentProperties().getPropertiesHtmlStyleSheetEmbedded();
+    }
+
+    public String getStyleSheetLink() {
+        return getDocumentProperties().getPropertiesHtmlStyleSheetLink();
+    }
+
+    // -----------------------------------------------------
+    //                                            JavaScript
+    //                                            ----------
+    public boolean isJavaScriptEmbedded() {
+        return getDocumentProperties().isPropertiesHtmlJavaScriptEmbedded();
+    }
+
+    public boolean isJavaScriptLink() {
+        return getDocumentProperties().isPropertiesHtmlJavaScriptLink();
+    }
+
+    public String getJavaScriptEmbedded() {
+        return getDocumentProperties().getPropertiesHtmlJavaScriptEmbedded();
+    }
+
+    public String getJavaScriptLink() {
+        return getDocumentProperties().getPropertiesHtmlJavaScriptLink();
+    }
+
+    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
 
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
+    }
+
+    public String getProjectName() {
+        return getBasicProperties().getProjectName();
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public boolean existsRequest() {
+        return !_requestMap.isEmpty();
+    }
+
     public List<DfPropHtmlRequest> getRequestList() {
         return DfCollectionUtil.newArrayList(_requestMap.values());
     }

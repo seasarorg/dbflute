@@ -80,8 +80,8 @@ $database.backToDocumentOutputDirectory()
 ## - - - - - - - -
 #if ($selector.isPropertiesHtml())
 $selector.markPropertiesHtml()
-$selector.loadProppertiesHtmlRequest()
-#if ($selector.existsProppertiesHtmlRequest())
+$selector.loadPropertiesHtmlRequest()
+#if ($selector.existsPropertiesHtmlRequest())
 #set ($outFile = "${selector.propertiesHtmlFileName}")
 $generator.parse("doc/html/propmodel.vm", $outFile, "dataModel", $dataModel)
 #end

@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.doc.prophtml.DfPropHtmlManager;
-import org.seasar.dbflute.logic.doc.prophtml.DfPropHtmlRequest;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -173,17 +172,17 @@ public class DfDocumentSelector {
      * Load requests for properties HTML. <br />
      * If no property, do nothing.
      */
-    public void loadProppertiesHtmlRequest() {
+    public void loadPropertiesHtmlRequest() {
         _propHtmlManager = new DfPropHtmlManager();
         _propHtmlManager.loadRequest();
     }
 
-    public boolean existsProppertiesHtmlRequest() {
-        return !_propHtmlManager.getRequestList().isEmpty();
+    public boolean existsPropertiesHtmlRequest() {
+        return _propHtmlManager.existsRequest();
     }
 
-    public List<DfPropHtmlRequest> getProppertiesHtmlRequestList() {
-        return _propHtmlManager.getRequestList();
+    public DfPropHtmlManager getPropertiesHtmlManager() {
+        return _propHtmlManager;
     }
 
     // ===================================================================================

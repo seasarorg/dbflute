@@ -816,6 +816,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                                                      PropertiesHtml
     //                                                                      ==============
     // ; propertiesHtmlMap = map:{
+    //     ; df:header = map:{
+    //         ; title = Properties Overview
+    //     }
     //     ; ApplicationProp = map:{
     //         ; baseDir = ../src
     //         ; rootFile = $$baseDir$$/main/resources/application_ja.properties
@@ -826,6 +829,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //         ; diffIgnoredKeyList = list:{ errors.ignored.key }
     //     }
     // }
+    protected Map<String, Object> _propertiesHtmlHeaderMap;
     protected Map<String, Map<String, Object>> _propertiesHtmlMap;
 
     public Map<String, Map<String, Object>> getPropertiesHtmlMap() {
@@ -837,14 +841,14 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         @SuppressWarnings("unchecked")
         final Map<String, Object> propertiesHtmlMap = (Map<String, Object>) definitionMap.get(key);
         if (propertiesHtmlMap != null) {
-            _propertiesHtmlMap = filterPropertiesHtmlBaseDirVariable(propertiesHtmlMap);
+            _propertiesHtmlMap = resolvePropertiesHtmlMap(propertiesHtmlMap);
         } else {
             _propertiesHtmlMap = DfCollectionUtil.emptyMap();
         }
         return _propertiesHtmlMap;
     }
 
-    protected Map<String, Map<String, Object>> filterPropertiesHtmlBaseDirVariable(Map<String, Object> propertiesHtmlMap) {
+    protected Map<String, Map<String, Object>> resolvePropertiesHtmlMap(Map<String, Object> propertiesHtmlMap) {
         final String baseDirKey = "baseDir";
         final String baseDirVariable = "$$" + baseDirKey + "$$";
         final String rootFileKey = "rootFile";
@@ -854,6 +858,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             final String requestName = requestEntry.getKey();
             @SuppressWarnings("unchecked")
             final Map<String, Object> requestMap = (Map<String, Object>) requestEntry.getValue();
+            if (requestName.equals("df:header")) {
+                _propertiesHtmlHeaderMap = requestMap;
+                continue;
+            }
             final String baseDir = (String) requestMap.get(baseDirKey);
             if (baseDir != null) {
                 final Map<String, Object> filteredRequestMap = newLinkedHashMap();
@@ -884,15 +892,44 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
                 resolvedMap.put(requestName, requestMap);
             }
         }
+        if (_propertiesHtmlHeaderMap == null) {
+            _propertiesHtmlHeaderMap = DfCollectionUtil.emptyMap();
+        }
         return resolvedMap;
     }
 
-    public String getPropertiesHtmlResourceRootFile(Map<String, Object> requestMap) {
+    // -----------------------------------------------------
+    //                                                Header
+    //                                                ------
+    public String getPropertiesHtmlHeaderTitle() {
+        final String title = (String) _propertiesHtmlHeaderMap.get("title");
+        return title != null ? title : null;
+    }
+
+    protected String getPropertiesHtmlHeaderHtmlFileName() {
+        final String fileName = (String) _propertiesHtmlHeaderMap.get("htmlFileName");
+        return fileName != null ? fileName : null;
+    }
+
+    protected String getPropertiesHtmlHeaderStyleSheet() {
+        final String sheet = (String) _propertiesHtmlHeaderMap.get("styleSheet");
+        return sheet != null ? sheet : null;
+    }
+
+    protected String getPropertiesHtmlHeaderJavaScript() {
+        final String sheet = (String) _propertiesHtmlHeaderMap.get("javaScript");
+        return sheet != null ? sheet : null;
+    }
+
+    // -----------------------------------------------------
+    //                                               Request
+    //                                               -------
+    public String getPropertiesHtmlRootFile(Map<String, Object> requestMap) {
         return (String) requestMap.get("rootFile");
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, String> getPropertiesHtmlResourceEnvironmentMap(Map<String, Object> requestMap) {
+    public Map<String, String> getPropertiesHtmlEnvironmentMap(Map<String, Object> requestMap) {
         final Map<String, String> environmentMap = (Map<String, String>) requestMap.get("environmentMap");
         if (environmentMap != null) {
             return environmentMap;
@@ -914,7 +951,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                             ---------
     public String getPropertiesHtmlFileName(String projectName) { // closet
         final String defaultName = "properties-" + projectName + ".html";
-        return getProperty("propertiesHtmlFileName", defaultName, getDocumentDefinitionMap());
+        final String htmlFileName = getPropertiesHtmlHeaderHtmlFileName();
+        return Srl.is_NotNull_and_NotTrimmedEmpty(htmlFileName) ? htmlFileName : defaultName;
     }
 
     // -----------------------------------------------------
@@ -939,7 +977,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     protected String getPropertiesHtmlStyleSheet() { // closet
-        return getProperty("propertiesHtmlStyleSheet", null, getDocumentDefinitionMap());
+        return getPropertiesHtmlHeaderStyleSheet();
     }
 
     // -----------------------------------------------------
@@ -964,7 +1002,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     protected String getPropertiesHtmlJavaScript() { // closet
-        return getProperty("propertiesHtmlJavaScript", null, getDocumentDefinitionMap());
+        return getPropertiesHtmlHeaderJavaScript();
     }
 
 }

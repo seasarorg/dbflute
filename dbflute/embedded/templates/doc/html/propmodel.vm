@@ -13,17 +13,22 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
+#set ($manager = $selector.propertiesHtmlManager)
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8" />
-	<title>${database.projectName} properties</title>
-#if ($database.isPropertiesHtmlStyleSheetEmbedded())
+#if ($manager.hasTitle())
+	<title>${manager.title}</title>
+#else
+	<title>${manager.projectName} properties</title>
+#end
+#if ($manager.isStyleSheetEmbedded())
 	<style type="text/css">
-${database.schemaHtmlStyleSheetEmbedded}
+${manager.styleSheetEmbedded}
 	</style>
-#elseif ($database.isPropertiesHtmlStyleSheetLink())
-	${database.schemaHtmlStyleSheetLink}
+#elseif ($manager.isstyleSheetLink())
+	${manager.styleSheetLink}
 #else
 	<style type="text/css">
 * {
@@ -148,27 +153,31 @@ table.child, table.child td, table.child th {
 }
 	</style>
 #end
-#if ($database.isPropertiesHtmlJavaScriptEmbedded())
+#if ($manager.isJavaScriptEmbedded())
 	<script type="text/javascript">
-${database.schemaHtmlJavaScriptEmbedded}
+${manager.javaScriptEmbedded}
 	</script>
-#elseif ($database.isPropertiesHtmlJavaScriptLink())
-	${database.schemaHtmlJavaScriptLink}
+#elseif ($manager.isJavaScriptLink())
+	${manager.javaScriptLink}
 #end
 </head>
 
 <body>
-<h1>Properties for ${database.projectName}</h1>
+#if ($manager.hasTitle())
+<h1>${manager.title}</h1>
+#else
+<h1>Properties for ${manager.projectName}</h1>
+#end
 
 <div class="linkarea">
-#foreach ($request in $selector.proppertiesHtmlRequestList)
+#foreach ($request in $manager.requestList)
 	<p><a href="#${request.requestLowerName}">${request.requestName}</a></p>
 #end
 </div>
 
 <h2 id="propertieslist">Properties List</h2>
 
-#foreach ($request in $selector.proppertiesHtmlRequestList)
+#foreach ($request in $manager.requestList)
 <h3><a href="#${request.requestLowerName}">${request.requestName}</a></h3>
 <table summary="File Attributes">
 	<thead>
@@ -244,7 +253,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 </table>
 #end
 
-#foreach ($request in $selector.proppertiesHtmlRequestList)
+#foreach ($request in $manager.requestList)
 <h2 id="${request.requestLowerName}">${request.requestName}</h2>
 <table summary="Properties">
 	<thead>
