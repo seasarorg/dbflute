@@ -1,5 +1,6 @@
 cd ..
 ant -f build.xml reflect-to-all-regulars
+export answer = y
 
 cd ../dbflute-basic-example
 . sync-lib.sh
@@ -126,6 +127,7 @@ rm ./log/*.log
 . doc.sh
 . generate.sh
 . sql2entity.sh
+. manage.sh freegen
 
 cd ../../dbflute-sqlite-example/dbflute_exampledb
 rm ./log/*.log

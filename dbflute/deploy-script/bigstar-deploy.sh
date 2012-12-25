@@ -6,6 +6,7 @@ ant -f build.xml reflect-to-mysql
 ant -f build.xml reflect-to-postgresql
 ant -f build.xml reflect-to-db2
 ant -f build.xml reflect-to-sastruts
+export answer = y
 
 cd ../dbflute-basic-example
 mvn -e eclipath:sync eclipath:clean
@@ -38,6 +39,7 @@ rm ./log/*.log
 
 cd ../../dbflute-mysql-example/dbflute_exampledb
 rm ./log/*.log
+. replace-schema.sh
 . jdbc.sh
 . doc.sh
 . generate.sh
