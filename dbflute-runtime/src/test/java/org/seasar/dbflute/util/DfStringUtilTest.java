@@ -409,12 +409,19 @@ public class DfStringUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                               Split
     //                                                                               =====
-    public void test_splitList() {
+    public void test_splitList_basic() {
         String ln = "\n";
         List<String> splitList = splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
+    }
+
+    public void test_splitList_empty() {
+        String ln = "\n";
+        List<String> splitList = splitList("", ln);
+        assertHasOnlyOneElement(splitList);
+        assertEquals("", splitList.get(0));
     }
 
     public void test_splitList_notTrim() {
@@ -1506,6 +1513,9 @@ public class DfStringUtilTest extends PlainTestCase {
         assertTrue(isAlphabetHarf("bbbOoo"));
         assertFalse(isAlphabetHarf("ab2"));
         assertFalse(isAlphabetHarf("-ab"));
+        assertFalse(isAlphabetHarf(""));
+        assertFalse(isAlphabetHarf(" "));
+        assertFalse(isAlphabetHarf(" Ab"));
     }
 
     public void test_isAlphabetHarfLower_basic() throws Exception {
@@ -1517,6 +1527,9 @@ public class DfStringUtilTest extends PlainTestCase {
         assertFalse(isAlphabetHarfLower("bbbOoo"));
         assertFalse(isAlphabetHarfLower("ab2"));
         assertFalse(isAlphabetHarfLower("-ab"));
+        assertFalse(isAlphabetHarfLower(""));
+        assertFalse(isAlphabetHarfLower(" "));
+        assertFalse(isAlphabetHarfLower(" a"));
     }
 
     public void test_isAlphabetHarfUpper_basic() throws Exception {
@@ -1528,6 +1541,9 @@ public class DfStringUtilTest extends PlainTestCase {
         assertFalse(isAlphabetHarfUpper("bbbOoo"));
         assertFalse(isAlphabetHarfUpper("ab2"));
         assertFalse(isAlphabetHarfUpper("-ab"));
+        assertFalse(isAlphabetHarfUpper(""));
+        assertFalse(isAlphabetHarfUpper(" "));
+        assertFalse(isAlphabetHarfUpper(" A"));
     }
 
     public void test_isNumberHarf_basic() throws Exception {
@@ -1537,5 +1553,8 @@ public class DfStringUtilTest extends PlainTestCase {
         assertFalse(isNumberHarf("9a9"));
         assertFalse(isNumberHarf("-1"));
         assertFalse(isNumberHarf("1.1"));
+        assertFalse(isNumberHarf(""));
+        assertFalse(isNumberHarf(" "));
+        assertFalse(isNumberHarf(" 1"));
     }
 }

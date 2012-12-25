@@ -386,8 +386,8 @@ public final class DfTypeUtil {
     //                                                                             =======
     /**
      * @param obj The resource value to integer. (NullAllowed)
-     * @return The value as integer. (NullAllowed)
-     * @throws NumberFormatException
+     * @return The value as integer. (NullAllowed: if null or empty argument, returns null)
+     * @throws NumberFormatException When the object cannot be parsed.
      */
     public static Integer toInteger(Object obj) {
         return toInteger(obj, null);
@@ -435,6 +435,11 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                                Long
     //                                                                                ====
+    /**
+     * @param obj The resource value to long. (NullAllowed)
+     * @return The value as long. (NullAllowed: if null or empty argument, returns null)
+     * @throws NumberFormatException When the object cannot be parsed.
+     */
     public static Long toLong(Object obj) {
         return toLong(obj, null);
     }

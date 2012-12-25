@@ -2115,6 +2115,9 @@ public class Srl {
     }
 
     protected static boolean isAnyChar(String str, Set<Character> charSet) {
+        if (is_Null_or_Empty(str)) {
+            return false;
+        }
         final char[] chAry = str.toCharArray();
         for (int i = 0; i < chAry.length; i++) {
             final char ch = chAry[i];

@@ -1682,25 +1682,25 @@ public class HandyDate implements Serializable {
     // ===================================================================================
     //                                                                           Get Parts
     //                                                                           =========
-    protected int getYear() {
+    public int getYear() {
         final int year = _cal.get(Calendar.YEAR);
         final int era = _cal.get(Calendar.ERA);
         return era == GregorianCalendar.AD ? year : -year;
     }
 
-    protected int getMonth() {
+    public int getMonth() {
         return _cal.get(Calendar.MONTH) + 1; // zero origin headache
     }
 
-    protected int getDay() {
+    public int getDay() {
         return _cal.get(Calendar.DAY_OF_MONTH);
     }
 
-    protected int getFirstDayOfMonth() {
+    public int getFirstDayOfMonth() {
         return _cal.getActualMinimum(Calendar.DAY_OF_MONTH);
     }
 
-    protected int getLastDayOfMonth() {
+    public int getLastDayOfMonth() {
         return _cal.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 
