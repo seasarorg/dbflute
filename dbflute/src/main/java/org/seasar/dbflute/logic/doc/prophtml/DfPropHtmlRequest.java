@@ -17,6 +17,7 @@ package org.seasar.dbflute.logic.doc.prophtml;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.seasar.dbflute.util.DfCollectionUtil;
 
@@ -27,6 +28,11 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 public class DfPropHtmlRequest {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final String MASKING_VALUE = "********";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final String _requestName;
@@ -34,13 +40,16 @@ public class DfPropHtmlRequest {
     protected final Map<String, String> _langFileMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, String> _envFileMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, DfPropHtmlProperty> _propertyMap = DfCollectionUtil.newLinkedHashMap();
-    protected final List<String> _diffIgnoredKeyList = DfCollectionUtil.newArrayList();
+    protected final Set<String> _diffIgnoredKeySet = DfCollectionUtil.newLinkedHashSet();
+    protected final Set<String> _maskedKeySet = DfCollectionUtil.newLinkedHashSet();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropHtmlRequest(String requestName) {
+    public DfPropHtmlRequest(String requestName, List<String> diffIgnoredKeyList, List<String> maskedKeyList) {
         _requestName = requestName;
+        addDiffIgnoredKeyAll(diffIgnoredKeyList);
+        addMaskedKeyAll(maskedKeyList);
     }
 
     // ===================================================================================
@@ -76,14 +85,28 @@ public class DfPropHtmlRequest {
             property = new DfPropHtmlProperty(propertyKey);
             _propertyMap.put(propertyKey, property);
         }
-        property.setPropertyValue(envType, langType, propertyValue, comment);
+        final String registeredValue;
+        if (_maskedKeySet.contains(propertyKey)) { // maskedKeySet should be set before
+            registeredValue = MASKING_VALUE; // masked here
+        } else {
+            registeredValue = propertyValue;
+        }
+        property.setPropertyValue(envType, langType, registeredValue, comment);
     }
 
-    public List<String> getDiffIgnoredKeyList() {
-        return _diffIgnoredKeyList;
+    public Set<String> getDiffIgnoredKeySet() {
+        return _diffIgnoredKeySet;
     }
 
-    public void addDiffIgnoredKeyAll(List<String> diffIgnoredKeyList) {
-        _diffIgnoredKeyList.addAll(diffIgnoredKeyList);
+    protected void addDiffIgnoredKeyAll(List<String> diffIgnoredKeyList) {
+        _diffIgnoredKeySet.addAll(diffIgnoredKeyList);
+    }
+
+    public Set<String> getMaskedKeySet() {
+        return _maskedKeySet;
+    }
+
+    protected void addMaskedKeyAll(List<String> maskedKeyList) {
+        _maskedKeySet.addAll(maskedKeyList);
     }
 }

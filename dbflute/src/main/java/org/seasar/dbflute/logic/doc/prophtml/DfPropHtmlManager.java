@@ -84,7 +84,7 @@ public class DfPropHtmlManager {
     }
 
     protected DfPropHtmlRequest prepareRequest(Map<String, Object> requestMap, String requestName) {
-        final DfPropHtmlRequest request = new DfPropHtmlRequest(requestName);
+        final DfPropHtmlRequest request = createPropHtmlRequest(requestMap, requestName);
         final DfDocumentProperties prop = getDocumentProperties();
         final String rootFile = prop.getPropertiesHtmlRootFile(requestMap);
         final Map<String, DfPropHtmlFileAttribute> defaultEnvMap = setupDefaultEnvProperty(request, rootFile);
@@ -97,9 +97,14 @@ public class DfPropHtmlManager {
             final String envFile = envDir + "/" + standardPureFileName;
             setupEnvironmentProperty(request, envFile, envType, defaultEnvMap);
         }
-        final List<String> ignoredKeyList = prop.getPropertiesHtmlDiffIgnoredKeyList(requestMap);
-        request.addDiffIgnoredKeyAll(ignoredKeyList);
         return request;
+    }
+
+    protected DfPropHtmlRequest createPropHtmlRequest(Map<String, Object> requestMap, String requestName) {
+        final DfDocumentProperties prop = getDocumentProperties();
+        final List<String> diffIgnoredKeyList = prop.getPropertiesHtmlDiffIgnoredKeyList(requestMap);
+        final List<String> maskedKeyList = prop.getPropertiesHtmlMaskedKeyList(requestMap);
+        return new DfPropHtmlRequest(requestName, diffIgnoredKeyList, maskedKeyList);
     }
 
     protected void assertPropHtmlRootFileExists(Map<String, DfPropHtmlFileAttribute> defaultEnvMap, String requestName,
@@ -149,8 +154,7 @@ public class DfPropHtmlManager {
         }
         for (File familyFile : familyFileList) {
             final String langType = extractLangType(familyFile.getName());
-            final String fileKey = "" + envType + ":" + familyFile.getName();
-            _log.info("...Reading properties file: " + fileKey);
+            _log.info("...Reading properties file: " + buildLoggingFileKey(familyFile, envType));
             final DfJavaPropertiesResult jpropResult = reader.read(familyFile, "UTF-8");
             final List<DfJavaPropertiesProperty> jpropList = jpropResult.getPropertyList();
             final Set<String> propertyKeySet = DfCollectionUtil.newLinkedHashSet();
@@ -254,13 +258,17 @@ public class DfPropHtmlManager {
         throw new DfIllegalPropertySettingException(msg);
     }
 
+    protected String buildLoggingFileKey(File familyFile, String envType) {
+        return (ENV_TYPE_DEFAULT.equals(envType) ? "default" : envType) + ":" + familyFile.getName();
+    }
+
     // ===================================================================================
     //                                                                  Analyze Difference
     //                                                                  ==================
     protected void analyzePropertiesDiff() {
         for (Entry<String, DfPropHtmlRequest> entry : _requestMap.entrySet()) {
             final DfPropHtmlRequest request = entry.getValue();
-            final Set<String> ignoredSet = DfCollectionUtil.newHashSet(request.getDiffIgnoredKeyList());
+            final Set<String> ignoredSet = request.getDiffIgnoredKeySet();
             final List<DfPropHtmlFileAttribute> attributeList = request.getFileAttributeList();
             for (DfPropHtmlFileAttribute attribute : attributeList) {
                 if (attribute.isRootFile()) {

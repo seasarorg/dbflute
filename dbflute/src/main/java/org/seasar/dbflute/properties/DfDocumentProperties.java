@@ -827,6 +827,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //             ; integration = $$baseDir$$/integration/resources
     //         }
     //         ; diffIgnoredKeyList = list:{ errors.ignored.key }
+    //         ; maskedKeyList = list:{ errors.masked.key }
     //     }
     // }
     protected Map<String, Object> _propertiesHtmlHeaderMap;
@@ -942,6 +943,15 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         final List<String> ignoredKeyList = (List<String>) requestMap.get("diffIgnoredKeyList");
         if (ignoredKeyList != null) {
             return ignoredKeyList;
+        }
+        return DfCollectionUtil.emptyList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> getPropertiesHtmlMaskedKeyList(Map<String, Object> requestMap) {
+        final List<String> maskedKeyList = (List<String>) requestMap.get("maskedKeyList");
+        if (maskedKeyList != null) {
+            return maskedKeyList;
         }
         return DfCollectionUtil.emptyList();
     }
