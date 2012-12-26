@@ -71,4 +71,9 @@ public class TnBatchInsertHandler extends TnAbstractBatchHandler {
             }
         }
     }
+
+    @Override
+    protected String getBatchUpdateSQLFailureProcessTitle() {
+        return "batch insert";
+    }
 }

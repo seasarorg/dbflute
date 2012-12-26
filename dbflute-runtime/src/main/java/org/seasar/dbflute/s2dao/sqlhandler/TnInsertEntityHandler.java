@@ -106,4 +106,9 @@ public class TnInsertEntityHandler extends TnAbstractEntityHandler {
     protected static interface IdentityProcessCallback {
         void callback(TnIdentifierGenerator generator);
     }
+
+    @Override
+    protected String getUpdateSQLFailureProcessTitle() {
+        return "insert";
+    }
 }

@@ -41,11 +41,13 @@ public abstract class TnAbstractQueryDynamicCommand extends TnAbstractBasicSqlCo
     }
 
     // ===================================================================================
-    //                                                                      CommandContext
-    //                                                                      ==============
+    //                                                              CommandContext Handler
+    //                                                              ======================
     protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
         final String executedSql = filterSqlStringByCallbackFilter(context.getSql());
-        return new TnCommandContextHandler(_dataSource, _statementFactory, executedSql, context);
+        final TnCommandContextHandler handler = newCommandContextHandler(executedSql, context);
+        handler.setUpdateSQLFailureProcessTitle(getUpdateSQLFailureProcessTitle());
+        return handler;
     }
 
     protected String filterSqlStringByCallbackFilter(String executedSql) {
@@ -65,6 +67,15 @@ public abstract class TnAbstractQueryDynamicCommand extends TnAbstractBasicSqlCo
         return CallbackContext.getCallbackContextOnThread().getSqlStringFilter();
     }
 
+    protected TnCommandContextHandler newCommandContextHandler(String executedSql, CommandContext context) {
+        return new TnCommandContextHandler(_dataSource, _statementFactory, executedSql, context);
+    }
+
+    protected abstract String getUpdateSQLFailureProcessTitle();
+
+    // ===================================================================================
+    //                                                                      CommandContext
+    //                                                                      ==============
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,
             Object[] args) {
         final CommandContext ctx;

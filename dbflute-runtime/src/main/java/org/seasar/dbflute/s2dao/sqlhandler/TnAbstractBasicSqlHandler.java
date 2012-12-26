@@ -489,13 +489,18 @@ public abstract class TnAbstractBasicSqlHandler {
         } catch (SQLException e) {
             nativeCause = e;
             final SQLExceptionResource resource = createSQLExceptionResource();
-            resource.setNotice("Failed to execute the SQL for update (non-select).");
+            final String processTitle = getUpdateSQLFailureProcessTitle();
+            resource.setNotice("Failed to execute the SQL for " + processTitle + ".");
             resource.enableUniqueConstraintHandling();
             handleSQLException(e, resource);
             return -1; // unreachable
         } finally {
             hookSqlFireFinally(updated, nativeCause);
         }
+    }
+
+    protected String getUpdateSQLFailureProcessTitle() {
+        return "update (non-select)"; // as default
     }
 
     protected int[] executeBatch(PreparedStatement ps, List<?> list) {
@@ -515,7 +520,8 @@ public abstract class TnAbstractBasicSqlHandler {
         } catch (SQLException e) {
             nativeCause = e;
             final SQLExceptionResource resource = createSQLExceptionResource();
-            resource.setNotice("Failed to execute the SQL for BATCH update (non-select).");
+            final String processTitle = getBatchUpdateSQLFailureProcessTitle();
+            resource.setNotice("Failed to execute the SQL for " + processTitle + ".");
             resource.enableUniqueConstraintHandling();
             resource.enableDisplaySqlPartHandling();
             handleSQLException(e, resource);
@@ -523,6 +529,10 @@ public abstract class TnAbstractBasicSqlHandler {
         } finally {
             hookSqlFireFinally(batchResult, nativeCause);
         }
+    }
+
+    protected String getBatchUpdateSQLFailureProcessTitle() {
+        return "batch update (non-select)";
     }
 
     protected void addBatch(PreparedStatement ps) {

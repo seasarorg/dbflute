@@ -41,6 +41,9 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
     /** The list of bound property type in first scope. (NullAllowed) */
     protected List<TnPropertyType> _firstBoundPropTypeList;
 
+    /** The process title when SQL failure for update. (NullAllowed) */
+    protected String _updateSQLFailureProcessTitle;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -110,6 +113,17 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
     }
 
     // ===================================================================================
+    //                                                                       Process Title
+    //                                                                       =============
+    @Override
+    protected String getUpdateSQLFailureProcessTitle() {
+        if (_updateSQLFailureProcessTitle != null) {
+            return _updateSQLFailureProcessTitle;
+        }
+        return super.getUpdateSQLFailureProcessTitle();
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     /**
@@ -119,5 +133,9 @@ public class TnCommandContextHandler extends TnAbstractBasicSqlHandler {
      */
     public void setFirstBoundPropTypeList(List<TnPropertyType> firstBoundPropTypeList) {
         _firstBoundPropTypeList = firstBoundPropTypeList;
+    }
+
+    public void setUpdateSQLFailureProcessTitle(String updateSQLFailureProcessTitle) { // option
+        _updateSQLFailureProcessTitle = updateSQLFailureProcessTitle;
     }
 }

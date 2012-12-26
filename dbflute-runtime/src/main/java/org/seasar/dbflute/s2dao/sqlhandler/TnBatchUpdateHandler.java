@@ -46,4 +46,9 @@ public class TnBatchUpdateHandler extends TnAbstractBatchHandler {
     protected Integer getBatchLoggingLimit() {
         return _updateOption != null ? _updateOption.getBatchUpdateLoggingLimit() : null;
     }
+
+    @Override
+    protected String getBatchUpdateSQLFailureProcessTitle() {
+        return "batch update";
+    }
 }

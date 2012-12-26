@@ -48,4 +48,9 @@ public class TnUpdateEntityHandler extends TnAbstractEntityHandler {
         updateVersionNoIfNeed(bean);
         updateTimestampIfNeed(bean);
     }
+
+    @Override
+    protected String getUpdateSQLFailureProcessTitle() {
+        return "update";
+    }
 }

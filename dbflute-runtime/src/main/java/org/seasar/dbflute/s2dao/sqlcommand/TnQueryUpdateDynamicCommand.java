@@ -219,6 +219,14 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
     }
 
     // ===================================================================================
+    //                                                                       Process Title
+    //                                                                       =============
+    @Override
+    protected String getUpdateSQLFailureProcessTitle() {
+        return "query update";
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String replace(String text, String fromText, String toText) {

@@ -42,4 +42,9 @@ public class TnDeleteEntityHandler extends TnAbstractEntityHandler {
         setupDeleteBindVariables(bean);
         setExceptionMessageSqlArgs(_bindVariables);
     }
+
+    @Override
+    protected String getUpdateSQLFailureProcessTitle() {
+        return "delete";
+    }
 }

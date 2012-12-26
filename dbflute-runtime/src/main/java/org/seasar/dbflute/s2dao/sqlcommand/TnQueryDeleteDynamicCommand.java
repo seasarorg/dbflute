@@ -112,4 +112,12 @@ public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
         }
         return cb.getSqlClause().getClauseQueryDelete();
     }
+
+    // ===================================================================================
+    //                                                                       Process Title
+    //                                                                       =============
+    @Override
+    protected String getUpdateSQLFailureProcessTitle() {
+        return "query delete";
+    }
 }

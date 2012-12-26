@@ -207,6 +207,14 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
     }
 
     // ===================================================================================
+    //                                                                       Process Title
+    //                                                                       =============
+    @Override
+    protected String getUpdateSQLFailureProcessTitle() {
+        return "query insert";
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String replace(String text, String fromText, String toText) {

@@ -51,7 +51,9 @@ public class OutsideSqlExecuteExecution extends AbstractOutsideSqlExecution {
     //                                                                             =======
     @Override
     protected TnBasicParameterHandler newBasicParameterHandler(String executedSql) {
-        return new TnBasicUpdateHandler(_dataSource, _statementFactory, executedSql);
+        final TnBasicUpdateHandler handler = new TnBasicUpdateHandler(_dataSource, _statementFactory, executedSql);
+        handler.setUpdateSQLFailureProcessTitle("outside-SQL execute");
+        return handler;
     }
 
     // ===================================================================================

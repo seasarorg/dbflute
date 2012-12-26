@@ -46,4 +46,9 @@ public class TnBatchDeleteHandler extends TnAbstractBatchHandler {
     protected Integer getBatchLoggingLimit() {
         return _deleteOption != null ? _deleteOption.getBatchLoggingDeleteLimit() : null;
     }
+
+    @Override
+    protected String getBatchUpdateSQLFailureProcessTitle() {
+        return "batch delete";
+    }
 }

@@ -28,6 +28,12 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 public class TnBasicUpdateHandler extends TnBasicParameterHandler {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The process title when SQL failure for update. (NullAllowed) */
+    protected String _updateSQLFailureProcessTitle;
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnBasicUpdateHandler(DataSource dataSource, StatementFactory statementFactory, String sql) {
@@ -47,5 +53,23 @@ public class TnBasicUpdateHandler extends TnBasicParameterHandler {
         } finally {
             close(ps);
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Process Title
+    //                                                                       =============
+    @Override
+    protected String getUpdateSQLFailureProcessTitle() {
+        if (_updateSQLFailureProcessTitle != null) {
+            return _updateSQLFailureProcessTitle;
+        }
+        return super.getUpdateSQLFailureProcessTitle();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setUpdateSQLFailureProcessTitle(String updateSQLFailureProcessTitle) { // option
+        _updateSQLFailureProcessTitle = updateSQLFailureProcessTitle;
     }
 }

@@ -383,7 +383,7 @@ public abstract class TnAbstractEntityHandler extends TnAbstractBasicSqlHandler 
                 return st.executeUpdate(_sql);
             } catch (SQLException e) {
                 final SQLExceptionResource resource = createSQLExceptionResource();
-                resource.setNotice("Failed to execute the SQL update for identity.");
+                resource.setNotice("Failed to execute the SQL to adjust identity.");
                 handleSQLException(e, resource);
                 return 0; // unreachable
             } finally {
