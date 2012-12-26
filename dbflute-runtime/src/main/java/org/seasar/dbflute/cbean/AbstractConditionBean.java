@@ -1029,9 +1029,12 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                      Entity Mapping
     //                                                                      ==============
     /**
-     * {@inheritDoc}
+     * Disable (entity instance) cache of relation mapping. <br />
+     * Basically you don't need this. This is for accidents.
+     * @deprecated You should not use this easily. It's a dangerous function.
      */
     public void disableRelationMappingCache() {
+        // deprecated methods from the beginning are not defined as interface methods
         _relationMappingCache = false;
     }
 
@@ -1056,6 +1059,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * @deprecated You should not use this easily. It's a dangerous function.
      */
     public void embedCondition(Set<ColumnInfo> embeddedColumnInfoSet, boolean quote) {
+        // deprecated methods from the beginning are not defined as interface methods
         if (embeddedColumnInfoSet == null) {
             String msg = "The argument 'embedCondition' should not be null.";
             throw new IllegalArgumentException(msg);

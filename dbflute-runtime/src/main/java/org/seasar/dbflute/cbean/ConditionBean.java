@@ -263,11 +263,12 @@ public interface ConditionBean extends PagingBean {
     // ===================================================================================
     //                                                                      Entity Mapping
     //                                                                      ==============
-    /**
-     * Disable (entity instance) cache of relation mapping. <br />
-     * Basically you don't need this. This is for accidents.
-     */
-    void disableRelationMappingCache();
+    // no need to use it as interface method so comment out
+    ///**
+    // * Disable (entity instance) cache of relation mapping. <br />
+    // * Basically you don't need this. This is for accidents.
+    // */
+    //void disableRelationMappingCache();
 
     /**
      * Can the relation mapping (entity instance) cache?
