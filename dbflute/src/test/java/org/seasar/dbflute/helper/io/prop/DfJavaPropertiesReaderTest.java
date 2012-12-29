@@ -21,17 +21,17 @@ import org.seasar.dbflute.unit.core.PlainTestCase;
  * @author jflute
  */
 public class DfJavaPropertiesReaderTest extends PlainTestCase {
-
-    public void test_loadConvert() {
-        // ## Arrange ##
-        DfJavaPropertiesReader reader = new DfJavaPropertiesReader();
-        String text = "\u938c\u5009\u306e\u3044\u306c";
-
-        // ## Act ##
-        String actual = reader.loadConvert(text);
-
-        // ## Assert ##
-        log(actual);
-        assertEquals("鎌倉のいぬ", actual);
-    }
+//
+//    public void test_loadConvert() {
+//        // ## Arrange ##
+//        DfJavaPropertiesReader reader = new DfJavaPropertiesReader();
+//        String text = "\u938c\u5009\u306e\u3044\u306c";
+//
+//        // ## Act ##
+//        String actual = reader.loadConvert(text);
+//
+//        // ## Assert ##
+//        log(actual);
+//        assertEquals("鎌倉のいぬ", actual);
+//    }
 }

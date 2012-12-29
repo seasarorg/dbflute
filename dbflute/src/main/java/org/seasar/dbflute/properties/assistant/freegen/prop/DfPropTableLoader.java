@@ -21,9 +21,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesProperty;
-import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesReader;
-import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesResult;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesReader;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesResult;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
@@ -56,30 +56,31 @@ public class DfPropTableLoader {
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) {
-        final String resourceFile = resource.getResourceFile();
-        final String encoding = resource.hasEncoding() ? resource.getEncoding() : "UTF-8";
-        final DfJavaPropertiesReader reader = createReader();
-        final DfJavaPropertiesResult result = reader.read(new File(resourceFile), encoding);
+        final JavaPropertiesReader reader = createReader(resource);
+        final JavaPropertiesResult result = reader.read();
         final List<Map<String, Object>> columnList = toMapList(result, tableMap);
+        final String resourceFile = resource.getResourceFile();
         final String tableName = Srl.substringLastFront((Srl.substringLastRear(resourceFile, "/")));
         return new DfFreeGenTable(tableMap, tableName, columnList);
     }
 
-    protected DfJavaPropertiesReader createReader() {
-        return new DfJavaPropertiesReader();
+    protected JavaPropertiesReader createReader(DfFreeGenResource resource) {
+        final String resourceFile = resource.getResourceFile();
+        final String encoding = resource.hasEncoding() ? resource.getEncoding() : "UTF-8";
+        return new JavaPropertiesReader(new File(resourceFile), encoding);
     }
 
     // ===================================================================================
     //                                                                           Converter
     //                                                                           =========
-    public List<Map<String, Object>> toMapList(DfJavaPropertiesResult result, Map<String, Object> tableMap) {
+    public List<Map<String, Object>> toMapList(JavaPropertiesResult result, Map<String, Object> tableMap) {
         final List<String> targetKeyList = extractTargetKeyList(tableMap);
         final List<String> exceptKeyList = extractExceptKeyList(tableMap);
         final Map<String, String> groupingKeyMap = extractDeterminationMap(tableMap);
         final DfDocumentProperties prop = getDocumentProperties();
-        final List<DfJavaPropertiesProperty> propertyList = result.getPropertyList();
+        final List<JavaPropertiesProperty> propertyList = result.getPropertyList();
         final List<Map<String, Object>> mapList = DfCollectionUtil.newArrayList();
-        for (DfJavaPropertiesProperty property : propertyList) {
+        for (JavaPropertiesProperty property : propertyList) {
             final Map<String, Object> columnMap = DfCollectionUtil.newLinkedHashMap();
             final String propertyKey = property.getPropertyKey();
             if (!isTargetKey(propertyKey, targetKeyList, exceptKeyList)) {

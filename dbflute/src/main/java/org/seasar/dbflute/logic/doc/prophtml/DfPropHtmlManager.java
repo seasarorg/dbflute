@@ -27,9 +27,9 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesProperty;
-import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesReader;
-import org.seasar.dbflute.helper.io.prop.DfJavaPropertiesResult;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesReader;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesResult;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -137,7 +137,6 @@ public class DfPropHtmlManager {
 
     protected Map<String, DfPropHtmlFileAttribute> doSetupEnvironmentProperty(DfPropHtmlRequest request,
             String propertiesFile, String envType, Map<String, DfPropHtmlFileAttribute> defaultEnvMap) {
-        final DfJavaPropertiesReader reader = new DfJavaPropertiesReader();
         final List<File> familyFileList = extractFamilyFileList(request.getRequestName(), propertiesFile);
         if (familyFileList.isEmpty()) {
             return DfCollectionUtil.emptyMap();
@@ -155,10 +154,11 @@ public class DfPropHtmlManager {
         for (File familyFile : familyFileList) {
             final String langType = extractLangType(familyFile.getName());
             _log.info("...Reading properties file: " + buildLoggingFileKey(familyFile, envType));
-            final DfJavaPropertiesResult jpropResult = reader.read(familyFile, "UTF-8");
-            final List<DfJavaPropertiesProperty> jpropList = jpropResult.getPropertyList();
+            final JavaPropertiesReader reader = new JavaPropertiesReader(familyFile, "UTF-8");
+            final JavaPropertiesResult jpropResult = reader.read();
+            final List<JavaPropertiesProperty> jpropList = jpropResult.getPropertyList();
             final Set<String> propertyKeySet = DfCollectionUtil.newLinkedHashSet();
-            for (DfJavaPropertiesProperty jprop : jpropList) {
+            for (JavaPropertiesProperty jprop : jpropList) {
                 final String propertyKey = jprop.getPropertyKey();
                 final String propertyValue = jprop.getPropertyValue();
                 final String comment = jprop.getComment();
