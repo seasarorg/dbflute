@@ -82,20 +82,30 @@ public class ObjectiveProperties {
      * @return this. (NotNull)
      */
     public ObjectiveProperties load() {
-        final JavaPropertiesReader reader = new JavaPropertiesReader(new JavaPropertiesStreamProvider() {
-            public JavaPropertiesStream provideStream() throws IOException {
-                return new JavaPropertiesStream(_resourcePath, toStream(_resourcePath));
+        final String title = toTitle(_resourcePath);
+        final JavaPropertiesReader reader = new JavaPropertiesReader(title, new JavaPropertiesStreamProvider() {
+            public InputStream provideStream() throws IOException {
+                return toStream(_resourcePath);
             }
         });
+        prepareExtendsProperties(reader);
+        _javaPropertiesResult = reader.read();
+        return this;
+    }
+
+    protected void prepareExtendsProperties(final JavaPropertiesReader reader) {
         for (final String extendsResourcePath : _extendsResourcePathList) {
-            reader.extendsProperties(new JavaPropertiesStreamProvider() {
-                public JavaPropertiesStream provideStream() throws IOException {
-                    return new JavaPropertiesStream(extendsResourcePath, toStream(extendsResourcePath));
+            final String title = toTitle(extendsResourcePath);
+            reader.extendsProperties(title, new JavaPropertiesStreamProvider() {
+                public InputStream provideStream() throws IOException {
+                    return toStream(extendsResourcePath);
                 }
             });
         }
-        _javaPropertiesResult = reader.read();
-        return this;
+    }
+
+    protected String toTitle(String path) {
+        return DfTypeUtil.toClassTitle(this) + ":" + path;
     }
 
     protected InputStream toStream(String resourcePath) {
