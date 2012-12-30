@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -42,7 +43,10 @@ public class DfPropHtmlProperty {
     /** The map of environment element that contains language value. map:{envType = map:{langType = value}} (NotNull) */
     protected final Map<String, DfPropHtmlPropertyEnvElement> _envElementMap = DfCollectionUtil.newLinkedHashMap();
 
-    /** Does the property have override element at least one? */
+    /** Does the property have property comments at least one? */
+    protected boolean _hasComment;
+
+    /** Does the property have override elements at least one? */
     protected boolean _hasOverride;
 
     // ===================================================================================
@@ -80,6 +84,9 @@ public class DfPropHtmlProperty {
         envElement.setPropertyValue(langType, propertyValue, comment, override);
         _envTypeSet.add(envType);
         _langTypeSet.add(langType);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+            _hasComment = true;
+        }
         if (override) {
             _hasOverride = true;
         }

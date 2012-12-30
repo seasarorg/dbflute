@@ -187,6 +187,7 @@ map:{
     #   o environmentMap: map of environment files, the value is dir path (NotRequired)
     #   o diffIgnoredKeyList: list of ignored keys for differences (NotRequired)
     #   o maskedKeyList: list of masked keys for security (NotRequired)
+    #   o extendsPropRequest: other request name of exnteds-properties (NotRequired)
     #
     #; propertiesHtmlMap = map:{
     #    ; ApplicationProperties = map:{
@@ -198,6 +199,7 @@ map:{
     #        }
     #        ; diffIgnoredKeyList = list:{}
     #        ; maskedKeyList = list:{}
+    #        ; extendsPropRequest = null
     #    }
     #}
     # - - - - - - - - - -/

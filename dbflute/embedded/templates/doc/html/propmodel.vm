@@ -190,7 +190,9 @@ ${manager.javaScriptEmbedded}
 			<th>Env</th>
 			<th>Lang</th>
 			<th>Key Count</th>
+#if ($request.hasExtendsPropRequest())
 			<th>Extends</th>
+#end
 			<th>Duplicate Key</th>
 			<th>Over Key</th>
 			<th>Short Key</th>
@@ -209,7 +211,9 @@ ${manager.javaScriptEmbedded}
 			<td class="envtypecell">${envType}</td>
 			<td class="langtypecell">${langType}</td>
 			<td class="sizecell">${attribute.keyCount}</td>
-			<td class="extendsfilecell">${attribute.extendsAttribute.propertiesFile}</td>
+#if ($request.hasExtendsPropRequest())
+			<td class="extendsfilecell">#if ($attribute.hasExtendsAttribute())${attribute.extendsAttribute.propertiesFile}#else &nbsp;#end</td>
+#end
 #if ($attribute.hasDuplicateKey())
 			<td class="keylistcell">
 #foreach ($duplicateKey in $attribute.duplicateKeyList)
@@ -282,7 +286,9 @@ ${manager.javaScriptEmbedded}
 					<th>Env</th>
 					<th>Lang</th>
 					<th>Property</th>
+#if ($property.hasComment())
 					<th>Comment</th>
+#end
 #if ($property.hasOverride())
 					<th>Override</th>
 #end
@@ -295,7 +301,9 @@ ${manager.javaScriptEmbedded}
 					<td class="envtypecell">${envType}</td>
 					<td class="langtypecell">${langType}</td>
 					<td class="valuecell">#if ($langElement.hasPropertyValue())${langElement.propertyValueHtmlEncoded}#else &nbsp;#end</td>
+#if ($property.hasComment())
 					<td class="commentcell">#if ($langElement.hasComment())${langElement.commentHtmlEncoded}#else &nbsp;#end</td>
+#end
 #if ($property.hasOverride())
 					<td class="checkcell">#if ($langElement.isOverride())o#else &nbsp;#end</td>
 #end

@@ -121,6 +121,10 @@ public class DfPropHtmlRequest {
     protected void addMaskedKeyAll(List<String> maskedKeyList) {
         _maskedKeySet.addAll(maskedKeyList);
     }
+    
+    public boolean hasExtendsPropRequest() {
+        return _extendsPropRequest != null;
+    }
 
     public String getExtendsPropRequest() {
         return _extendsPropRequest;
