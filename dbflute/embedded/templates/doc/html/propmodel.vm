@@ -188,7 +188,7 @@ ${manager.javaScriptEmbedded}
 <h2 id="propertieslist">Properties List</h2>
 
 #foreach ($request in $manager.requestList)
-<h3><a href="#${request.requestLowerName}">${request.requestName}</a></h3>
+<h3><a href="#${request.requestLowerName}">${request.requestName}</a>#if ($request.hasExtendsPropRequest()) <span class="freecomment">(extends ${request.extendsPropRequest})</span>#end</h3>
 <table summary="File Attributes">
 	<thead>
 		<tr>
@@ -278,7 +278,7 @@ ${manager.javaScriptEmbedded}
 #end
 
 #foreach ($request in $manager.requestList)
-<h2 id="${request.requestLowerName}">${request.requestName}</h2>
+<h2 id="${request.requestLowerName}">${request.requestName}#if ($request.hasExtendsPropRequest()) <span class="freecomment">(extends ${request.extendsPropRequest})</span>#end</h2>
 <table summary="Properties">
 	<thead>
 	<tr>
