@@ -191,12 +191,12 @@ public class JavaPropertiesReader {
             JavaPropertiesResult extendsPropResult) {
         final List<JavaPropertiesProperty> extendsPropertyList = extendsPropResult.getPropertyList();
         for (JavaPropertiesProperty property : extendsPropertyList) {
-            property.toBeExtendsProperty();
+            property.toBeExtends();
         }
         final Set<JavaPropertiesProperty> extendsPropertySet = DfCollectionUtil.newLinkedHashSet(extendsPropertyList);
         for (JavaPropertiesProperty property : propertyList) {
             if (extendsPropertySet.contains(property)) {
-                property.toBeOverrideProperty();
+                property.toBeOverride();
                 if (_checkImplicitOverride) {
                     final String comment = property.getComment();
                     if (comment == null || !Srl.containsIgnoreCase(comment, "@Override")) {

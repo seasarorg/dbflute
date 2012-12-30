@@ -50,7 +50,7 @@ public class JavaPropertiesResult {
         _propertyBasePointOnlyList = new ArrayList<JavaPropertiesProperty>();
         _propertyExtendsOnlyList = new ArrayList<JavaPropertiesProperty>();
         for (JavaPropertiesProperty property : propertyList) {
-            if (property.isExtendsProperty()) {
+            if (property.isExtends()) {
                 _propertyExtendsOnlyList.add(property);
             } else {
                 _propertyBasePointOnlyList.add(property);

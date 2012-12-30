@@ -38,8 +38,8 @@ public class JavaPropertiesProperty {
     protected String _variableArgSet;
     protected List<Integer> _variableNumberList;
     protected String _comment;
-    protected boolean _extendsProperty;
-    protected boolean _overrideProperty;
+    protected boolean _extends;
+    protected boolean _override;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -146,19 +146,19 @@ public class JavaPropertiesProperty {
         _comment = comment;
     }
 
-    public boolean isExtendsProperty() {
-        return _extendsProperty;
+    public boolean isExtends() {
+        return _extends;
     }
 
-    public void toBeExtendsProperty() {
-        _extendsProperty = true;
+    public void toBeExtends() {
+        _extends = true;
     }
 
-    public boolean isOverrideProperty() {
-        return _overrideProperty;
+    public boolean isOverride() {
+        return _override;
     }
 
-    public void toBeOverrideProperty() {
-        _overrideProperty = true;
+    public void toBeOverride() {
+        _override = true;
     }
 }
