@@ -46,6 +46,7 @@ public class DfPropTableLoader {
     // ; resourceMap = map:{
     //     ; resourceType = PROP
     //     ; resourceFile = ../../../foo.properties
+    //     ; encoding = UTF-8
     // }
     // ; outputMap = map:{
     //     ; templateFile = MessageDef.vm
@@ -138,8 +139,8 @@ public class DfPropTableLoader {
             final String commentHtmlEncoded = prop.resolveTextForSchemaHtml(comment);
             columnMap.put("commentHtmlEncoded", commentHtmlEncoded != null ? commentHtmlEncoded : "");
             columnMap.put("hasComment", Srl.is_NotNull_and_NotTrimmedEmpty(comment));
-            columnMap.put("isExtendsProperty", property.isExtendsProperty());
-            columnMap.put("isOverrideProperty", property.isOverrideProperty());
+            columnMap.put("isExtends", property.isExtends());
+            columnMap.put("isOverride", property.isOverride());
 
             for (Entry<String, String> entry : groupingKeyMap.entrySet()) {
                 final String groupingName = entry.getKey();

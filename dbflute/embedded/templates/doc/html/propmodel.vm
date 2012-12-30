@@ -103,6 +103,10 @@ td {
 	font-size: 0.9em;
 	white-space: nowrap;
 }
+.extendsfilecell {
+	font-size: 0.6em;
+	white-space: nowrap;
+}
 .markcell {
 	text-align: center;
 	font-size: 0.8em;
@@ -131,11 +135,11 @@ td {
 	text-align: center;
 	font-size: 0.8em;
 }
+.checkcell {
+	font-size: 0.8em;
+}
 .commentcell {
 	font-size: 0.7em;
-}
-.subcell {
-	font-size: 0.6em;
 }
 
 /* inner table */
@@ -186,6 +190,7 @@ ${manager.javaScriptEmbedded}
 			<th>Env</th>
 			<th>Lang</th>
 			<th>Key Count</th>
+			<th>Extends</th>
 			<th>Duplicate Key</th>
 			<th>Over Key</th>
 			<th>Short Key</th>
@@ -204,6 +209,7 @@ ${manager.javaScriptEmbedded}
 			<td class="envtypecell">${envType}</td>
 			<td class="langtypecell">${langType}</td>
 			<td class="sizecell">${attribute.keyCount}</td>
+			<td class="extendsfilecell">${attribute.extendsAttribute.propertiesFile}</td>
 #if ($attribute.hasDuplicateKey())
 			<td class="keylistcell">
 #foreach ($duplicateKey in $attribute.duplicateKeyList)
@@ -277,6 +283,9 @@ ${manager.javaScriptEmbedded}
 					<th>Lang</th>
 					<th>Property</th>
 					<th>Comment</th>
+#if ($property.hasOverride())
+					<th>Override</th>
+#end
 				</tr>
 #foreach ($envElement in $property.envElementList)
 #set ($envType = $envElement.envType)
@@ -287,6 +296,9 @@ ${manager.javaScriptEmbedded}
 					<td class="langtypecell">${langType}</td>
 					<td class="valuecell">#if ($langElement.hasPropertyValue())${langElement.propertyValueHtmlEncoded}#else &nbsp;#end</td>
 					<td class="commentcell">#if ($langElement.hasComment())${langElement.commentHtmlEncoded}#else &nbsp;#end</td>
+#if ($property.hasOverride())
+					<td class="checkcell">#if ($langElement.isOverride())o#else &nbsp;#end</td>
+#end
 				</tr>
 #end
 #end

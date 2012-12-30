@@ -41,7 +41,7 @@ public class DfPropHtmlPropertyLangElement {
     protected final String _comment;
 
     /** Is the property override extends-property? */
-    protected final boolean _overrideProperty;
+    protected final boolean _override;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -54,7 +54,7 @@ public class DfPropHtmlPropertyLangElement {
         // empty string for velocity template
         _propertyValue = propertyValue != null ? propertyValue : "";
         _comment = comment != null ? comment : "";
-        _overrideProperty = override;
+        _override = override;
     }
 
     // ===================================================================================
@@ -96,7 +96,7 @@ public class DfPropHtmlPropertyLangElement {
         return resolved != null ? resolved : "";
     }
 
-    public boolean isOverrideProperty() {
-        return _overrideProperty;
+    public boolean isOverride() {
+        return _override;
     }
 }

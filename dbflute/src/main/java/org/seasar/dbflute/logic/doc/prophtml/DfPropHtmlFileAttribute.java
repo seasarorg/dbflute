@@ -38,11 +38,11 @@ public class DfPropHtmlFileAttribute {
     protected boolean _rootFile;
     protected boolean _defaultEnv;
     protected boolean _lonely;
+    protected DfPropHtmlFileAttribute _extendsAttribute;
     protected final List<String> _duplicateKeyList = DfCollectionUtil.newArrayList();
     protected DfPropHtmlFileAttribute _standardAttribute;
     protected final List<String> _overKeyList = DfCollectionUtil.newArrayList();
     protected final List<String> _shortKeyList = DfCollectionUtil.newArrayList();
-    protected DfPropHtmlFileAttribute _extendsAttribute;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -108,6 +108,18 @@ public class DfPropHtmlFileAttribute {
         _lonely = true;
     }
 
+    public boolean hasExtendsAttribute() {
+        return _extendsAttribute != null;
+    }
+
+    public DfPropHtmlFileAttribute getExtendsAttribute() {
+        return _extendsAttribute;
+    }
+
+    public void setExtendsAttribute(DfPropHtmlFileAttribute extendsAttribute) {
+        _extendsAttribute = extendsAttribute;
+    }
+
     public boolean hasDuplicateKey() {
         return !_duplicateKeyList.isEmpty();
     }
@@ -150,13 +162,5 @@ public class DfPropHtmlFileAttribute {
 
     public void addShortKey(String propertyKey) {
         _shortKeyList.add(propertyKey);
-    }
-
-    public DfPropHtmlFileAttribute getExtendsAttribute() {
-        return _extendsAttribute;
-    }
-
-    public void setExtendsAttribute(DfPropHtmlFileAttribute extendsAttribute) {
-        _extendsAttribute = extendsAttribute;
     }
 }

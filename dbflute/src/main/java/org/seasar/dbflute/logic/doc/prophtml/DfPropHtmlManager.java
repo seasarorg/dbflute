@@ -157,6 +157,7 @@ public class DfPropHtmlManager {
             }
         }
         final DfPropHtmlRequest extendsRequest = getExtendsRequest(request);
+        final String encoding = "UTF-8"; // fixed because Japanese strings in properties are written by unicode
         for (final File familyFile : familyFileList) {
             final String langType = extractLangType(familyFile.getName());
             _log.info("...Reading properties file: " + buildLoggingFileKey(familyFile, envType));
@@ -164,7 +165,7 @@ public class DfPropHtmlManager {
                 public JavaPropertiesStream provideStream() throws IOException {
                     return new JavaPropertiesStream(familyFile.getPath(), new FileInputStream(familyFile));
                 }
-            }, "UTF-8");
+            }, encoding);
             final DfPropHtmlFileAttribute extendsAttribute = findExtendsAttribute(extendsRequest, envType, langType);
             if (extendsAttribute != null) {
                 final File extendsFile = extendsAttribute.getPropertiesFile();
@@ -184,7 +185,7 @@ public class DfPropHtmlManager {
                 final String propertyKey = jprop.getPropertyKey();
                 final String propertyValue = jprop.getPropertyValue();
                 final String comment = jprop.getComment();
-                final boolean override = jprop.isOverrideProperty();
+                final boolean override = jprop.isOverride();
                 request.addProperty(propertyKey, envType, langType, propertyValue, comment, override);
                 propertyKeySet.add(propertyKey);
             }
@@ -192,6 +193,7 @@ public class DfPropHtmlManager {
             final DfPropHtmlFileAttribute attribute = new DfPropHtmlFileAttribute(familyFile, envType, langType);
             attribute.addPropertyKeyAll(propertyKeySet);
             attribute.setKeyCount(jpropList.size());
+            attribute.setExtendsAttribute(extendsAttribute);
             attribute.addDuplicateKeyAll(jpropResult.getDuplicateKeyList());
             if (defaultEnvMap != null) { // when specified environment
                 if (rootAttribute != null) { // always true
@@ -211,9 +213,6 @@ public class DfPropHtmlManager {
                     attribute.toBeRootFile();
                     rootAttribute = attribute; // save for relation to root
                 }
-            }
-            if (extendsAttribute != null) {
-                attribute.setExtendsAttribute(extendsAttribute);
             }
             request.addFileAttribute(attribute);
             attributeMap.put(langType, attribute);

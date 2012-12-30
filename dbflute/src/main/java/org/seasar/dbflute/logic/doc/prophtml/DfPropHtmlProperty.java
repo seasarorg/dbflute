@@ -42,6 +42,9 @@ public class DfPropHtmlProperty {
     /** The map of environment element that contains language value. map:{envType = map:{langType = value}} (NotNull) */
     protected final Map<String, DfPropHtmlPropertyEnvElement> _envElementMap = DfCollectionUtil.newLinkedHashMap();
 
+    /** Does the property have override element at least one? */
+    protected boolean _hasOverride;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -77,9 +80,16 @@ public class DfPropHtmlProperty {
         envElement.setPropertyValue(langType, propertyValue, comment, override);
         _envTypeSet.add(envType);
         _langTypeSet.add(langType);
+        if (override) {
+            _hasOverride = true;
+        }
     }
 
     protected DfPropHtmlPropertyEnvElement createEnvElement(String envType) {
         return new DfPropHtmlPropertyEnvElement(_propertyKey, envType);
+    }
+
+    public boolean hasOverride() {
+        return _hasOverride;
     }
 }
