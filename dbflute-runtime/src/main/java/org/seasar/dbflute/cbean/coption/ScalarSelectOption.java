@@ -62,6 +62,9 @@ public class ScalarSelectOption extends FunctionFilterOption {
     //                                                                      ==============
     /**
      * Truncate the month and day and time part of the date or the date-time value.
+     * <pre>
+     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/<span style="color: #FD4747">01/01 00:00:00</span>
+     * </pre>
      * @return this. (NotNull)
      */
     public ScalarSelectOption truncMonth() {
@@ -71,6 +74,9 @@ public class ScalarSelectOption extends FunctionFilterOption {
 
     /**
      * Truncate the day and time part of the date or the date-time value.
+     * <pre>
+     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/<span style="color: #FD4747">01 00:00:00</span>
+     * </pre>
      * @return this. (NotNull)
      */
     public ScalarSelectOption truncDay() {
@@ -80,6 +86,9 @@ public class ScalarSelectOption extends FunctionFilterOption {
 
     /**
      * Truncate the time part of the date-time value.
+     * <pre>
+     *  e.g. 2012/12/31 01:50:46 -&gt; 2012/12/31 <span style="color: #FD4747">00:00:00</span>
+     * </pre>
      * @return this. (NotNull)
      */
     public ScalarSelectOption truncTime() {

@@ -52,6 +52,9 @@ public class ObjectiveProperties {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * @param resourcePath The path of the property as resource for this class loader. (NotNull)
+     */
     public ObjectiveProperties(String resourcePath) {
         _resourcePath = resourcePath;
     }
@@ -123,6 +126,16 @@ public class ObjectiveProperties {
     public String get(String propertyKey) {
         final JavaPropertiesProperty property = _javaPropertiesResult.getProperty(propertyKey);
         return property != null ? property.getPropertyValue() : null;
+    }
+
+    /**
+     * Is the property true?
+     * @param propertyKey The key of the property which is boolean type. (NotNull)
+     * @return The determination, true or false. (if the property can be true, returns true)
+     */
+    public boolean is(String propertyKey) {
+        final String value = get(propertyKey);
+        return value != null && value.trim().equalsIgnoreCase("true");
     }
 
     // ===================================================================================

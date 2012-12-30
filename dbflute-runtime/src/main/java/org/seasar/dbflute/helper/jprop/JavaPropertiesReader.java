@@ -214,14 +214,13 @@ public class JavaPropertiesReader {
         }
         final Set<JavaPropertiesProperty> extendsPropertySet = DfCollectionUtil.newLinkedHashSet(extendsPropertyList);
         for (JavaPropertiesProperty property : propertyList) {
-            final boolean checkExplicitOverride = isCheckExplicitOverride(property);
             if (extendsPropertySet.contains(property)) {
                 property.toBeOverride();
-                if (checkExplicitOverride) {
+                if (_checkImplicitOverride && !containsOverrideAnnotation(property)) {
                     throwJavaPropertiesImplicitOverrideException(property);
                 }
             } else {
-                if (checkExplicitOverride) {
+                if (_checkImplicitOverride && containsOverrideAnnotation(property)) {
                     throwJavaPropertiesLonelyOverrideException(property);
                 }
             }
@@ -229,10 +228,6 @@ public class JavaPropertiesReader {
         final Set<JavaPropertiesProperty> mergedPropertySet = DfCollectionUtil.newLinkedHashSet(propertyList);
         mergedPropertySet.addAll(extendsPropertySet); // merge (add if not exists)
         return DfCollectionUtil.newArrayList(mergedPropertySet);
-    }
-
-    protected boolean isCheckExplicitOverride(JavaPropertiesProperty property) {
-        return _checkImplicitOverride && containsOverrideAnnotation(property);
     }
 
     protected boolean containsOverrideAnnotation(JavaPropertiesProperty property) {
@@ -243,6 +238,13 @@ public class JavaPropertiesReader {
     protected void throwJavaPropertiesImplicitOverrideException(JavaPropertiesProperty property) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the implicit override property.");
+        br.addItem("Advice");
+        br.addElement("The property overrides the inherited property.");
+        br.addElement("Do you want to override it? Or is it your mistake?");
+        br.addElement("If you override it, set the annotation " + OVERRIDE_ANNOTATION + " in the property.");
+        br.addElement("For example:");
+        br.addElement("  # " + OVERRIDE_ANNOTATION);
+        br.addElement("  foo.bar.prop = abc");
         br.addItem("Properties");
         br.addElement(_title);
         br.addItem("Implicit Override Property");
@@ -255,6 +257,10 @@ public class JavaPropertiesReader {
     protected void throwJavaPropertiesLonelyOverrideException(JavaPropertiesProperty property) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the lonely override property.");
+        br.addItem("Advice");
+        br.addElement("The property does not override any inherited property");
+        br.addElement("but the property have the annotation " + OVERRIDE_ANNOTATION + ".");
+        br.addElement("Remove the annotation or fix the mistake of the property key.");
         br.addItem("Properties");
         br.addElement(_title);
         br.addItem("Lonely Override Property");

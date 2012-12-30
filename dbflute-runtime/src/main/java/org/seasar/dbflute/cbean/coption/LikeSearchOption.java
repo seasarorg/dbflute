@@ -90,7 +90,7 @@ public class LikeSearchOption extends SimpleStringOption {
     //                                                                                Like
     //                                                                                ====
     /**
-     * Set up prefix-search. {like 'foo%' escape '|'}
+     * Set up prefix-search. e.g. like 'foo%' escape '|'
      * @return this. (NotNull)
      */
     public LikeSearchOption likePrefix() {
@@ -100,7 +100,7 @@ public class LikeSearchOption extends SimpleStringOption {
     }
 
     /**
-     * Set up suffix-search. {like '%foo' escape '|'}
+     * Set up suffix-search. e.g. like '%foo' escape '|'
      * @return this. (NotNull)
      */
     public LikeSearchOption likeSuffix() {
@@ -110,7 +110,7 @@ public class LikeSearchOption extends SimpleStringOption {
     }
 
     /**
-     * Set up contain-search. {like '%foo%' escape '|'}
+     * Set up contain-search. e.g. like '%foo%' escape '|'
      * @return this. (NotNull)
      */
     public LikeSearchOption likeContain() {

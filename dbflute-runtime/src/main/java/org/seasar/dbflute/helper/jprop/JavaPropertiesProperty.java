@@ -50,6 +50,17 @@ public class JavaPropertiesProperty {
     }
 
     // ===================================================================================
+    //                                                                    Derived Property
+    //                                                                    ================
+    public boolean mayBeBooleanProperty() {
+        return _propertyValue != null && isTrueOrFalseProperty(_propertyValue.trim());
+    }
+
+    protected boolean isTrueOrFalseProperty(String propertyValue) {
+        return propertyValue.equalsIgnoreCase("true") || propertyValue.equalsIgnoreCase("false");
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
