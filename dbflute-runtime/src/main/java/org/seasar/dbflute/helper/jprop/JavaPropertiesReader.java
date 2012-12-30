@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -29,6 +27,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jprop.exception.JavaPropertiesImplicitOverrideException;
+import org.seasar.dbflute.helper.jprop.exception.JavaPropertiesLonelyOverrideException;
 import org.seasar.dbflute.helper.jprop.exception.JavaPropertiesReadFailureException;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
@@ -44,13 +43,18 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
 public class JavaPropertiesReader {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String OVERRIDE_ANNOTATION = "@Override";
+
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
     protected final JavaPropertiesStreamProvider _streamProvider;
-    protected final String _encoding;
+    protected String _title; // lazy-loaded
 
     // -----------------------------------------------------
     //                                                Option
@@ -68,9 +72,8 @@ public class JavaPropertiesReader {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public JavaPropertiesReader(JavaPropertiesStreamProvider streamProvider, String encoding) {
+    public JavaPropertiesReader(JavaPropertiesStreamProvider streamProvider) {
         _streamProvider = streamProvider;
-        _encoding = encoding;
     }
 
     // -----------------------------------------------------
@@ -78,7 +81,7 @@ public class JavaPropertiesReader {
     //                                                ------
     public JavaPropertiesReader extendsProperties(JavaPropertiesStreamProvider extendsStreamProvider) {
         if (_extendsProviderList == null) {
-            _extendsProviderList = new ArrayList<JavaPropertiesStreamProvider>(4);
+            _extendsProviderList = DfCollectionUtil.newArrayListSized(4);
         }
         _extendsProviderList.add(extendsStreamProvider);
         return this;
@@ -94,7 +97,7 @@ public class JavaPropertiesReader {
     //                                                                                ====
     public JavaPropertiesResult read() {
         final List<JavaPropertiesProperty> propertyList = DfCollectionUtil.newArrayList();
-        final List<String> duplicateKeyList = new ArrayList<String>();
+        final List<String> duplicateKeyList = DfCollectionUtil.newArrayList();
         final Map<String, String> keyCommentMap = readKeyCommentMap(duplicateKeyList);
         final Properties prop = readPlainProperties();
         final List<String> keyList = orderKeyList(prop, keyCommentMap);
@@ -112,7 +115,7 @@ public class JavaPropertiesReader {
             property.setCapCamelName(Srl.initCap(camelizedName));
             property.setUncapCamelName(Srl.initUncap(camelizedName));
 
-            final List<ScopeInfo> variableScopeList = new ArrayList<ScopeInfo>();
+            final List<ScopeInfo> variableScopeList = DfCollectionUtil.newArrayList();
             {
                 final List<ScopeInfo> scopeList;
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(value)) {
@@ -129,7 +132,7 @@ public class JavaPropertiesReader {
                     }
                 }
             }
-            final List<Integer> variableNumberList = new ArrayList<Integer>();
+            final List<Integer> variableNumberList = DfCollectionUtil.newArrayList();
             for (ScopeInfo scopeInfo : variableScopeList) {
                 variableNumberList.add(valueOfVariableNumber(key, scopeInfo.getContent()));
             }
@@ -143,23 +146,29 @@ public class JavaPropertiesReader {
         return prepareResult(prop, propertyList, duplicateKeyList);
     }
 
+    // -----------------------------------------------------
+    //                                             Order Key
+    //                                             ---------
     protected List<String> orderKeyList(Properties prop, final Map<String, String> keyCommentMap) {
-        final List<Object> orderedList = new ArrayList<Object>(prop.keySet());
+        final List<Object> orderedList = DfCollectionUtil.newArrayList(prop.keySet());
         final AccordingToOrderResource<Object, String> resource = new AccordingToOrderResource<Object, String>();
         resource.setIdExtractor(new AccordingToOrderIdExtractor<Object, String>() {
             public String extractId(Object element) {
                 return (String) element;
             }
         });
-        resource.setOrderedUniqueIdList(new ArrayList<String>(keyCommentMap.keySet()));
+        resource.setOrderedUniqueIdList(DfCollectionUtil.newArrayList(keyCommentMap.keySet()));
         DfCollectionUtil.orderAccordingTo(orderedList, resource);
-        final List<String> keyList = new ArrayList<String>();
+        final List<String> keyList = DfCollectionUtil.newArrayList();
         for (Object keyObj : orderedList) {
             keyList.add((String) keyObj);
         }
         return keyList;
     }
 
+    // -----------------------------------------------------
+    //                                        Prepare Result
+    //                                        --------------
     protected JavaPropertiesResult prepareResult(Properties prop, List<JavaPropertiesProperty> propertyList,
             List<String> duplicateKeyList) {
         final JavaPropertiesResult propResult;
@@ -177,7 +186,7 @@ public class JavaPropertiesReader {
     protected JavaPropertiesReader createExtendsReader() {
         final List<JavaPropertiesStreamProvider> extendsList = DfCollectionUtil.newArrayList(_extendsProviderList);
         final JavaPropertiesStreamProvider firstExtends = extendsList.remove(0);
-        final JavaPropertiesReader extendsReader = new JavaPropertiesReader(firstExtends, _encoding);
+        final JavaPropertiesReader extendsReader = new JavaPropertiesReader(firstExtends);
         for (JavaPropertiesStreamProvider nestedExtends : extendsList) {
             extendsReader.extendsProperties(nestedExtends);
         }
@@ -195,25 +204,37 @@ public class JavaPropertiesReader {
         }
         final Set<JavaPropertiesProperty> extendsPropertySet = DfCollectionUtil.newLinkedHashSet(extendsPropertyList);
         for (JavaPropertiesProperty property : propertyList) {
+            final boolean checkExplicitOverride = isCheckExplicitOverride(property);
             if (extendsPropertySet.contains(property)) {
                 property.toBeOverride();
-                if (_checkImplicitOverride) {
-                    final String comment = property.getComment();
-                    if (comment == null || !Srl.containsIgnoreCase(comment, "@Override")) {
-                        throwJavaPropertiesImplicitOverrideException(property);
-                    }
+                if (checkExplicitOverride) {
+                    throwJavaPropertiesImplicitOverrideException(property);
+                }
+            } else {
+                if (checkExplicitOverride) {
+                    throwJavaPropertiesLonelyOverrideException(property);
                 }
             }
         }
-        extendsPropertySet.addAll(propertyList); // merge (add or override if exists)
-        return DfCollectionUtil.newArrayList(extendsPropertySet);
+        final Set<JavaPropertiesProperty> mergedPropertySet = DfCollectionUtil.newLinkedHashSet(propertyList);
+        mergedPropertySet.addAll(extendsPropertySet); // merge (add if not exists)
+        return DfCollectionUtil.newArrayList(mergedPropertySet);
+    }
+
+    protected boolean isCheckExplicitOverride(JavaPropertiesProperty property) {
+        return _checkImplicitOverride && containsOverrideAnnotation(property);
+    }
+
+    protected boolean containsOverrideAnnotation(JavaPropertiesProperty property) {
+        final String comment = property.getComment();
+        return comment != null && Srl.containsIgnoreCase(comment, OVERRIDE_ANNOTATION);
     }
 
     protected void throwJavaPropertiesImplicitOverrideException(JavaPropertiesProperty property) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Found the implicit override property.");
         br.addItem("Properties (Stream Provider)");
-        br.addElement(_streamProvider);
+        br.addElement(_title != null ? _title : _streamProvider);
         br.addItem("Implicit Override Property");
         br.addElement(property.getPropertyKey());
         br.addElement(property.getPropertyValue());
@@ -221,16 +242,29 @@ public class JavaPropertiesReader {
         throw new JavaPropertiesImplicitOverrideException(msg);
     }
 
+    protected void throwJavaPropertiesLonelyOverrideException(JavaPropertiesProperty property) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found the lonely override property.");
+        br.addItem("Properties (Stream Provider)");
+        br.addElement(_title != null ? _title : _streamProvider);
+        br.addItem("Lonely Override Property");
+        br.addElement(property.getPropertyKey());
+        br.addElement(property.getPropertyValue());
+        final String msg = br.buildExceptionMessage();
+        throw new JavaPropertiesLonelyOverrideException(msg);
+    }
+
     // ===================================================================================
     //                                                                         Read Helper
     //                                                                         ===========
     protected Map<String, String> readKeyCommentMap(List<String> duplicateKeyList) {
-        final Map<String, String> keyCommentMap = new LinkedHashMap<String, String>();
+        final Map<String, String> keyCommentMap = DfCollectionUtil.newLinkedHashMap();
+        final String encoding = "UTF-8"; // because properties normally cannot have double bytes
         JavaPropertiesStream stream = null;
         BufferedReader br = null;
         try {
-            stream = getPropFileStream();
-            br = new BufferedReader(new InputStreamReader(stream.getInputStream(), _encoding));
+            stream = preparePropFileStream();
+            br = new BufferedReader(new InputStreamReader(stream.getInputStream(), encoding));
             String previousComment = null;
             while (true) {
                 final String line = br.readLine();
@@ -279,7 +313,7 @@ public class JavaPropertiesReader {
         JavaPropertiesStream stream = null;
         InputStream ins = null;
         try {
-            stream = getPropFileStream();
+            stream = preparePropFileStream();
             ins = stream.getInputStream();
             prop.load(ins);
         } catch (IOException e) {
@@ -295,15 +329,23 @@ public class JavaPropertiesReader {
         return prop;
     }
 
-    protected JavaPropertiesStream getPropFileStream() throws IOException {
-        return _streamProvider.provideStream();
+    protected JavaPropertiesStream preparePropFileStream() throws IOException {
+        final JavaPropertiesStream stream = _streamProvider.provideStream();
+        initializeTitleIfNeeds(stream);
+        return stream;
+    }
+
+    protected void initializeTitleIfNeeds(JavaPropertiesStream stream) {
+        if (_title == null) {
+            _title = stream.getTitle();
+        }
     }
 
     protected void throwJavaPropertiesReadFailureException(JavaPropertiesStream stream, IOException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to read the properties file.");
         br.addItem("Properties");
-        br.addElement(stream.getTitle());
+        br.addElement(_title != null ? _title : stream.getTitle());
         br.addItem("IOException");
         br.addElement(e.getClass().getName());
         br.addElement(e.getMessage());

@@ -84,6 +84,10 @@ public class DfCollectionUtil {
         return list;
     }
 
+    public static <ELEMENT> ArrayList<ELEMENT> newArrayListSized(int size) {
+        return new ArrayList<ELEMENT>(size);
+    }
+
     @SuppressWarnings("unchecked")
     public static <ELEMENT> List<ELEMENT> emptyList() {
         return (List<ELEMENT>) EMPTY_LIST;
@@ -276,6 +280,10 @@ public class DfCollectionUtil {
         return map;
     }
 
+    public static <KEY, VALUE> HashMap<KEY, VALUE> newHashMapSized(int size) {
+        return new HashMap<KEY, VALUE>(size);
+    }
+
     public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }
@@ -295,6 +303,10 @@ public class DfCollectionUtil {
         map.put(key1, value1);
         map.put(key2, value2);
         return map;
+    }
+
+    public static <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMapSized(int size) {
+        return new LinkedHashMap<KEY, VALUE>(size);
     }
 
     public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
@@ -317,6 +329,10 @@ public class DfCollectionUtil {
         map.put(key1, value1);
         map.put(key2, value2);
         return map;
+    }
+
+    public static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMapSized(int size) {
+        return new ConcurrentHashMap<KEY, VALUE>(size);
     }
 
     @SuppressWarnings("unchecked")
@@ -345,6 +361,10 @@ public class DfCollectionUtil {
         return set;
     }
 
+    public static <ELEMENT> HashSet<ELEMENT> newHashSetSized(int size) {
+        return new HashSet<ELEMENT>(size);
+    }
+
     public static <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSet() {
         return new LinkedHashSet<ELEMENT>();
     }
@@ -361,6 +381,10 @@ public class DfCollectionUtil {
             set.add(element);
         }
         return set;
+    }
+
+    public static <ELEMENT> LinkedHashSet<ELEMENT> newLinkedHashSetSized(int size) {
+        return new LinkedHashSet<ELEMENT>(size);
     }
 
     @SuppressWarnings("unchecked")

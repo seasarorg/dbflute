@@ -24,7 +24,7 @@ public class JavaPropertiesReaderTest extends PlainTestCase {
 
     public void test_loadConvert() {
         // ## Arrange ##
-        JavaPropertiesReader reader = new JavaPropertiesReader(null, null);
+        JavaPropertiesReader reader = new JavaPropertiesReader(null);
         String text = "\u938c\u5009\u306e\u3044\u306c";
 
         // ## Act ##

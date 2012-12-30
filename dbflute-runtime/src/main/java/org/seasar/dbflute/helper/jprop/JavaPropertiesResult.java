@@ -15,9 +15,12 @@
  */
 package org.seasar.dbflute.helper.jprop;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+
+import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -30,6 +33,7 @@ public class JavaPropertiesResult {
     //                                                                           =========
     protected final Properties _plainProp;
     protected final List<JavaPropertiesProperty> _propertyList; // merged list
+    protected final Map<String, JavaPropertiesProperty> _propertyMap;
     protected final List<JavaPropertiesProperty> _propertyBasePointOnlyList;
     protected final List<JavaPropertiesProperty> _propertyExtendsOnlyList;
     protected final List<String> _duplicateKeyList;
@@ -47,9 +51,11 @@ public class JavaPropertiesResult {
             List<String> duplicateKeyList, JavaPropertiesResult extendsPropResult) {
         _plainProp = plainProp;
         _propertyList = propertyList;
-        _propertyBasePointOnlyList = new ArrayList<JavaPropertiesProperty>();
-        _propertyExtendsOnlyList = new ArrayList<JavaPropertiesProperty>();
+        _propertyMap = DfCollectionUtil.newLinkedHashMapSized(propertyList.size());
+        _propertyBasePointOnlyList = DfCollectionUtil.newArrayList();
+        _propertyExtendsOnlyList = DfCollectionUtil.newArrayList();
         for (JavaPropertiesProperty property : propertyList) {
+            _propertyMap.put(property.getPropertyKey(), property);
             if (property.isExtends()) {
                 _propertyExtendsOnlyList.add(property);
             } else {
@@ -61,14 +67,44 @@ public class JavaPropertiesResult {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof JavaPropertiesResult)) {
+            return false;
+        }
+        final JavaPropertiesResult another = (JavaPropertiesResult) obj;
+        return _propertyList.equals(another._propertyList);
+    }
+
+    @Override
+    public int hashCode() {
+        return _propertyList.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return DfTypeUtil.toClassTitle(this) + ":{" + _propertyMap.keySet() + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public Properties getPlainProp() {
         return _plainProp;
     }
 
+    public JavaPropertiesProperty getProperty(String propertyKey) {
+        return _propertyMap.get(propertyKey);
+    }
+
     public List<JavaPropertiesProperty> getPropertyList() {
         return _propertyList;
+    }
+
+    public Map<String, JavaPropertiesProperty> getPropertyMap() {
+        return _propertyMap;
     }
 
     public List<JavaPropertiesProperty> getPropertyBasePointOnlyList() {
