@@ -277,6 +277,21 @@ public class DfPropertyUtil {
         return result;
     }
 
+    // ===============================================================================
+    //                                                                 Boolean Utility
+    //                                                                 ===============
+    public static String deriveBooleanAnotherKey(String key) {
+        if (key.length() > "is".length() && key.startsWith("is")) {
+            if (Character.isUpperCase(key.substring("is".length()).charAt(0))) {
+                return DfStringUtil.initUncap(key.substring("is".length()));
+            }
+        }
+        return null;
+    }
+
+    // ===============================================================================
+    //                                                                       Exception
+    //                                                                       =========
     public static class PropertyNotFoundException extends RuntimeException {
 
         /** Serial version UID. (Default) */

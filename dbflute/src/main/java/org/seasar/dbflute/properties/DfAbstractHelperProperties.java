@@ -215,12 +215,7 @@ public abstract class DfAbstractHelperProperties {
     }
 
     static String deriveBooleanAnotherKey(String key) {
-        if (key.length() > "is".length() && key.startsWith("is")) {
-            if (Character.isUpperCase(key.substring("is".length()).charAt(0))) {
-                return DfStringUtil.initUncap(key.substring("is".length()));
-            }
-        }
-        return null;
+        return DfPropertyUtil.deriveBooleanAnotherKey(key);
     }
 
     // -----------------------------------------------------

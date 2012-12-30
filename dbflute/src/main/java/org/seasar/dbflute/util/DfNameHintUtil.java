@@ -34,12 +34,12 @@ public class DfNameHintUtil {
     //                                                                              ======
     public static boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
         if (targetList == null) {
-            throw new IllegalArgumentException("The argument 'targetList' should not be null!");
+            throw new IllegalArgumentException("The argument 'targetList' should not be null.");
         }
         if (exceptList == null) {
-            throw new IllegalArgumentException("The argument 'exceptList' should not be null!");
+            throw new IllegalArgumentException("The argument 'exceptList' should not be null.");
         }
-        if (targetList != null && !targetList.isEmpty()) {
+        if (!targetList.isEmpty()) {
             return isHitByTargetList(name, targetList);
         }
         for (String tableHint : exceptList) {

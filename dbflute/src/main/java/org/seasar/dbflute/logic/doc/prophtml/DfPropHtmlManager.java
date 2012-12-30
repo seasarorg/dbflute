@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,7 +33,6 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesReader;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesResult;
-import org.seasar.dbflute.helper.jprop.JavaPropertiesStream;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesStreamProvider;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -79,7 +79,7 @@ public class DfPropHtmlManager {
         }
         for (Entry<String, Map<String, Object>> entry : propertiesHtmlMap.entrySet()) {
             final String requestName = entry.getKey();
-            _log.info("...Loading properties HTML request: " + requestName);
+            _log.info("[" + requestName + "]");
             final Map<String, Object> requestMap = entry.getValue();
             final DfPropHtmlRequest request = prepareRequest(requestMap, requestName);
             _requestMap.put(requestName, request);
@@ -159,20 +159,13 @@ public class DfPropHtmlManager {
         final DfPropHtmlRequest extendsRequest = getExtendsRequest(request);
         for (final File familyFile : familyFileList) {
             final String langType = extractLangType(familyFile.getName());
-            _log.info("...Reading properties file: " + buildLoggingFileKey(familyFile, envType));
-            final JavaPropertiesReader reader = new JavaPropertiesReader(new JavaPropertiesStreamProvider() {
-                public JavaPropertiesStream provideStream() throws IOException {
-                    return new JavaPropertiesStream(familyFile.getPath(), new FileInputStream(familyFile));
-                }
-            });
+            final String fileKey = buildFileKey(familyFile, envType);
+            _log.info("...Reading properties file: " + fileKey);
+            final String title = fileKey + ":" + familyFile.getPath();
+            final JavaPropertiesReader reader = createReader(title, familyFile);
             final DfPropHtmlFileAttribute extendsAttribute = findExtendsAttribute(extendsRequest, envType, langType);
             if (extendsAttribute != null) {
-                final File extendsFile = extendsAttribute.getPropertiesFile();
-                reader.extendsProperties(new JavaPropertiesStreamProvider() {
-                    public JavaPropertiesStream provideStream() throws IOException {
-                        return new JavaPropertiesStream(extendsFile.getPath(), new FileInputStream(extendsFile));
-                    }
-                });
+                prepareExtendsProperties(reader, extendsAttribute);
             }
             final JavaPropertiesResult jpropResult = reader.read();
 
@@ -226,6 +219,13 @@ public class DfPropHtmlManager {
         return attributeMap;
     }
 
+    protected String buildFileKey(File familyFile, String envType) {
+        return (ENV_TYPE_DEFAULT.equals(envType) ? "default" : envType) + ":" + familyFile.getName();
+    }
+
+    // ===================================================================================
+    //                                                                         Family File
+    //                                                                         ===========
     protected List<File> extractFamilyFileList(String requestName, String propertiesFile) {
         final List<File> familyFileList = DfCollectionUtil.newArrayList();
         final File targetDir = new File(Srl.substringLastFront(propertiesFile, "/"));
@@ -283,8 +283,26 @@ public class DfPropHtmlManager {
         throw new DfIllegalPropertySettingException(msg);
     }
 
-    protected String buildLoggingFileKey(File familyFile, String envType) {
-        return (ENV_TYPE_DEFAULT.equals(envType) ? "default" : envType) + ":" + familyFile.getName();
+    // ===================================================================================
+    //                                                                   Properties Reader
+    //                                                                   =================
+    protected JavaPropertiesReader createReader(String title, final File familyFile) {
+        return new JavaPropertiesReader(title, new JavaPropertiesStreamProvider() {
+            public InputStream provideStream() throws IOException {
+                return new FileInputStream(familyFile);
+            }
+        });
+    }
+
+    protected void prepareExtendsProperties(JavaPropertiesReader reader, DfPropHtmlFileAttribute extendsAttribute) {
+        final File extendsFile = extendsAttribute.getPropertiesFile();
+        final String extendsFileKey = buildFileKey(extendsFile, extendsAttribute.getEnvType());
+        final String extendsTitle = extendsFileKey + ":" + extendsFile.getPath();
+        reader.extendsProperties(extendsTitle, new JavaPropertiesStreamProvider() {
+            public InputStream provideStream() throws IOException {
+                return new FileInputStream(extendsFile);
+            }
+        });
     }
 
     // ===================================================================================

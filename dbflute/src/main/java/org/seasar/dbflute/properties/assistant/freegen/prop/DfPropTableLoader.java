@@ -18,6 +18,7 @@ package org.seasar.dbflute.properties.assistant.freegen.prop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,13 +27,13 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesReader;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesResult;
-import org.seasar.dbflute.helper.jprop.JavaPropertiesStream;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesStreamProvider;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfNameHintUtil;
+import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -54,14 +55,14 @@ public class DfPropTableLoader {
     //     ; className = MessageDef
     // }
     // ; tableMap = map:{
-    //     ; targetKeyList = list:{}
     //     ; exceptKeyList = list:{ prefix:config. }
     //     ; groupingKeyMap = map:{ label = prefix:label. }
     //     ; extendsPropFileList = list:{ ../../../bar.properties }
+    //     ; isCheckImplicitOverride = false
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) {
-        final JavaPropertiesReader reader = createReader(resource, tableMap);
+        final JavaPropertiesReader reader = createReader(requestName, resource, tableMap);
         final JavaPropertiesResult result = reader.read();
         final List<Map<String, Object>> columnList = toMapList(result, tableMap);
         final String resourceFile = resource.getResourceFile();
@@ -69,25 +70,47 @@ public class DfPropTableLoader {
         return new DfFreeGenTable(tableMap, tableName, columnList);
     }
 
-    protected JavaPropertiesReader createReader(DfFreeGenResource resource, Map<String, Object> tableMap) {
+    protected JavaPropertiesReader createReader(String requestName, DfFreeGenResource resource,
+            Map<String, Object> tableMap) {
         final String resourceFile = resource.getResourceFile();
-        final JavaPropertiesReader reader = new JavaPropertiesReader(new JavaPropertiesStreamProvider() {
-            public JavaPropertiesStream provideStream() throws IOException {
-                return new JavaPropertiesStream(resourceFile, new FileInputStream(new File(resourceFile)));
+        final String title = requestName + ":" + resourceFile;
+        final JavaPropertiesReader reader = new JavaPropertiesReader(title, new JavaPropertiesStreamProvider() {
+            public InputStream provideStream() throws IOException {
+                return new FileInputStream(new File(resourceFile));
             }
         });
         @SuppressWarnings("unchecked")
         final List<String> extendsPropFileList = (List<String>) tableMap.get("extendsPropFileList");
         if (extendsPropFileList != null && !extendsPropFileList.isEmpty()) {
-            for (final String extendsPropFile : extendsPropFileList) {
-                reader.extendsProperties(new JavaPropertiesStreamProvider() {
-                    public JavaPropertiesStream provideStream() throws IOException {
-                        return new JavaPropertiesStream(extendsPropFile, new FileInputStream(new File(extendsPropFile)));
+            for (String extendsPropFile : extendsPropFileList) {
+                final String resolvedFile = resource.resolveBaseDir(extendsPropFile);
+                final String extendsTitle = requestName + ":" + extendsPropFile;
+                reader.extendsProperties(extendsTitle, new JavaPropertiesStreamProvider() {
+                    public InputStream provideStream() throws IOException {
+                        return new FileInputStream(new File(resolvedFile));
                     }
                 });
             }
         }
+        if (isProperty("isCheckImplicitOverride", tableMap)) {
+            reader.checkImplicitOverride();
+        }
         return reader;
+    }
+
+    protected boolean isProperty(String key, Map<String, Object> tableMap) {
+        String value = (String) tableMap.get(key);
+        if (value == null) {
+            final String derived = deriveBooleanAnotherKey(key);
+            if (derived != null) {
+                value = (String) tableMap.get(derived);
+            }
+        }
+        return value != null && value.trim().equalsIgnoreCase("true");
+    }
+
+    protected String deriveBooleanAnotherKey(String key) {
+        return DfPropertyUtil.deriveBooleanAnotherKey(key);
     }
 
     // ===================================================================================
@@ -100,7 +123,6 @@ public class DfPropTableLoader {
 
     protected List<Map<String, Object>> doConvertToMapList(final List<JavaPropertiesProperty> propertyList,
             Map<String, Object> tableMap) {
-        final List<String> targetKeyList = extractTargetKeyList(tableMap);
         final List<String> exceptKeyList = extractExceptKeyList(tableMap);
         final Map<String, String> groupingKeyMap = extractDeterminationMap(tableMap);
         final DfDocumentProperties prop = getDocumentProperties();
@@ -108,7 +130,7 @@ public class DfPropTableLoader {
         for (JavaPropertiesProperty property : propertyList) {
             final Map<String, Object> columnMap = DfCollectionUtil.newLinkedHashMap();
             final String propertyKey = property.getPropertyKey();
-            if (!isTargetKey(propertyKey, targetKeyList, exceptKeyList)) {
+            if (!isTargetKey(propertyKey, exceptKeyList)) {
                 continue;
             }
             columnMap.put("propertyKey", propertyKey);
@@ -139,6 +161,7 @@ public class DfPropTableLoader {
             columnMap.put("hasComment", Srl.is_NotNull_and_NotTrimmedEmpty(comment));
             columnMap.put("isExtends", property.isExtends());
             columnMap.put("isOverride", property.isOverride());
+            columnMap.put("mayBeBooleanProperty", property.mayBeBooleanProperty());
 
             for (Entry<String, String> entry : groupingKeyMap.entrySet()) {
                 final String groupingName = entry.getKey();
@@ -150,15 +173,6 @@ public class DfPropTableLoader {
             mapList.add(columnMap);
         }
         return mapList;
-    }
-
-    protected List<String> extractTargetKeyList(Map<String, Object> tableMap) {
-        @SuppressWarnings("unchecked")
-        final List<String> targetKeyList = (List<String>) tableMap.get("targetKeyList");
-        if (targetKeyList != null) {
-            return targetKeyList;
-        }
-        return DfCollectionUtil.emptyList();
     }
 
     protected List<String> extractExceptKeyList(Map<String, Object> tableMap) {
@@ -179,8 +193,9 @@ public class DfPropTableLoader {
         return DfCollectionUtil.emptyMap();
     }
 
-    protected boolean isTargetKey(String propertyKey, List<String> targetKeyList, List<String> exceptKeyList) {
-        return DfNameHintUtil.isTargetByHint(propertyKey, targetKeyList, exceptKeyList);
+    protected boolean isTargetKey(String propertyKey, List<String> exceptKeyList) {
+        final List<String> targetDummyList = DfCollectionUtil.emptyList();
+        return DfNameHintUtil.isTargetByHint(propertyKey, targetDummyList, exceptKeyList);
     }
 
     protected boolean isGroupingTarget(final String propertyKey, final String keyHint) {

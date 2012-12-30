@@ -16,6 +16,7 @@
 package org.seasar.dbflute.properties.assistant.freegen.filepath;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.List;
 import java.util.Map;
 
@@ -52,11 +53,12 @@ public class DfFilePathTableLoader {
             Map<String, Map<String, String>> mappingMap) {
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
 
-        final List<String> targetPathList = extractTargetPathList(tableMap);
+        final String targetExt = extractTargetExt(tableMap);
+        final String targetKeyword = extractTargetKeyword(tableMap);
         final List<String> exceptPathList = extractExceptPathList(tableMap);
         final List<File> fileList = DfCollectionUtil.newArrayList();
 
-        collectFile(fileList, targetPathList, exceptPathList, new File(targetDir));
+        collectFile(fileList, targetExt, targetKeyword, exceptPathList, new File(targetDir));
         final List<Map<String, Object>> columnList = DfCollectionUtil.newArrayList();
         for (File file : fileList) {
             final Map<String, Object> columnMap = DfCollectionUtil.newHashMap();
@@ -88,47 +90,84 @@ public class DfFilePathTableLoader {
         return new DfFreeGenTable(tableMap, "dummy", columnList);
     }
 
-    protected List<String> extractTargetPathList(Map<String, Object> tableMap) {
-        @SuppressWarnings("unchecked")
-        final List<String> targetPathList = (List<String>) tableMap.get("targetPathList");
-        if (targetPathList != null) {
-            return targetPathList;
+    protected String extractTargetExt(Map<String, Object> tableMap) {
+        final String targetExt = (String) tableMap.get("targetExt"); // not required
+        if (targetExt != null && !targetExt.startsWith(".")) {
+            return "." + targetExt;
         }
-        return DfCollectionUtil.emptyList();
+        return targetExt;
+    }
+
+    protected String extractTargetKeyword(Map<String, Object> tableMap) {
+        return (String) tableMap.get("targetKeyword"); // not required
     }
 
     protected List<String> extractExceptPathList(Map<String, Object> tableMap) {
         @SuppressWarnings("unchecked")
-        final List<String> exceptPathList = (List<String>) tableMap.get("exceptPathList");
-        if (exceptPathList != null) {
-            return exceptPathList;
+        List<String> exceptPathList = (List<String>) tableMap.get("exceptPathList"); // not required
+        if (exceptPathList == null) {
+            exceptPathList = DfCollectionUtil.newArrayListSized(4);
         }
-        return DfCollectionUtil.emptyList();
+        exceptPathList.add("contain:.svn");
+        return exceptPathList;
     }
 
     // ===================================================================================
     //                                                                        Collect File
     //                                                                        ============
-    protected void collectFile(List<File> fileList, final List<String> targetPathList,
-            final List<String> exceptPathList, File baseFile) {
-        if (isExceptFile(targetPathList, exceptPathList, baseFile)) {
+    /**
+     * @param fileList The list of saved list. (NotNull)
+     * @param targetExt The extension of target path. (NullAllowed)
+     * @param targetKeyword The keyword of target path. (NullAllowed)
+     * @param exceptPathList The list of except path. (NotNull)
+     * @param baseFile The base file. (NotNull)
+     */
+    protected void collectFile(List<File> fileList, final String targetExt, final String targetKeyword,
+            List<String> exceptPathList, File baseFile) {
+        if (isExceptFile(exceptPathList, baseFile)) {
             return;
         }
         if (baseFile.isFile()) { // only target extension here
             fileList.add(baseFile);
         } else if (baseFile.isDirectory()) {
-            final File[] listFiles = baseFile.listFiles();
+            final File[] listFiles = baseFile.listFiles(new FileFilter() {
+                public boolean accept(File file) {
+                    return file.isDirectory() || isHitByTargetExt(toPath(file), targetExt, targetKeyword);
+                }
+            });
             if (listFiles != null) {
                 for (File currentFile : listFiles) {
-                    collectFile(fileList, targetPathList, exceptPathList, currentFile);
+                    collectFile(fileList, targetExt, targetKeyword, exceptPathList, currentFile);
                 }
             }
         }
     }
 
-    protected boolean isExceptFile(List<String> targetPathList, List<String> exceptPathList, File baseFile) {
+    protected boolean isExceptFile(List<String> exceptPathList, File baseFile) {
+        if (baseFile.isDirectory()) {
+            return false;
+        }
         final String baseFilePath = toPath(baseFile);
-        return !DfNameHintUtil.isTargetByHint(baseFilePath, targetPathList, exceptPathList);
+        final List<String> targetDummyList = DfCollectionUtil.emptyList();
+        return !DfNameHintUtil.isTargetByHint(baseFilePath, targetDummyList, exceptPathList);
+    }
+
+    protected boolean isHitByTargetExt(String path, String targetExt, String targetKeyword) {
+        final boolean validExt = Srl.is_NotNull_and_NotTrimmedEmpty(targetExt);
+        final boolean validKeyword = Srl.is_NotNull_and_NotTrimmedEmpty(targetKeyword);
+        final boolean isTargetByExt = validExt ? path.endsWith(targetExt) : false;
+        final boolean isTargetByKeyword = validKeyword ? path.contains(targetKeyword) : false;
+        final boolean result;
+        if (validExt && validKeyword) { // both specified
+            result = isTargetByExt || isTargetByKeyword;
+        } else if (validExt) { // extension only
+            result = isTargetByExt;
+        } else if (validKeyword) { // keyword only
+            result = isTargetByKeyword;
+        } else { // both no specified
+            result = true;
+        }
+        return result;
     }
 
     // ===================================================================================
