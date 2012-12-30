@@ -145,11 +145,11 @@ public class JavaPropertiesProperty {
     public void setComment(String comment) {
         _comment = comment;
     }
-    
+
     public boolean isExtendsProperty() {
         return _extendsProperty;
     }
-    
+
     public void toBeExtendsProperty() {
         _extendsProperty = true;
     }
