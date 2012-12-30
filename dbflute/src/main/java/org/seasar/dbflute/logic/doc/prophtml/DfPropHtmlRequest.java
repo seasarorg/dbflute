@@ -36,20 +36,21 @@ public class DfPropHtmlRequest {
     //                                                                           Attribute
     //                                                                           =========
     protected final String _requestName;
-    protected final List<DfPropHtmlFileAttribute> _fileAttributeList = DfCollectionUtil.newArrayList();
-    protected final Map<String, String> _langFileMap = DfCollectionUtil.newLinkedHashMap();
-    protected final Map<String, String> _envFileMap = DfCollectionUtil.newLinkedHashMap();
+    protected final Map<String, DfPropHtmlFileAttribute> _fileAttributeMap = DfCollectionUtil.newLinkedHashMap();
     protected final Map<String, DfPropHtmlProperty> _propertyMap = DfCollectionUtil.newLinkedHashMap();
     protected final Set<String> _diffIgnoredKeySet = DfCollectionUtil.newLinkedHashSet();
     protected final Set<String> _maskedKeySet = DfCollectionUtil.newLinkedHashSet();
+    protected final String _extendsPropRequest;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropHtmlRequest(String requestName, List<String> diffIgnoredKeyList, List<String> maskedKeyList) {
+    public DfPropHtmlRequest(String requestName, List<String> diffIgnoredKeyList, List<String> maskedKeyList,
+            String extendsPropRequest) {
         _requestName = requestName;
         addDiffIgnoredKeyAll(diffIgnoredKeyList);
         addMaskedKeyAll(maskedKeyList);
+        _extendsPropRequest = extendsPropRequest;
     }
 
     // ===================================================================================
@@ -63,12 +64,22 @@ public class DfPropHtmlRequest {
         return _requestName.toLowerCase();
     }
 
+    public DfPropHtmlFileAttribute getFileAttribute(String envType, String langType) {
+        return _fileAttributeMap.get(generateFileAttributeKey(envType, langType));
+    }
+
     public List<DfPropHtmlFileAttribute> getFileAttributeList() {
-        return _fileAttributeList;
+        return DfCollectionUtil.newArrayList(_fileAttributeMap.values());
     }
 
     public void addFileAttribute(DfPropHtmlFileAttribute attribute) {
-        _fileAttributeList.add(attribute);
+        final String envType = attribute.getEnvType();
+        final String langType = attribute.getLangType();
+        _fileAttributeMap.put(generateFileAttributeKey(envType, langType), attribute);
+    }
+
+    protected String generateFileAttributeKey(final String envType, final String langType) {
+        return envType + ":" + langType;
     }
 
     public DfPropHtmlProperty getProperty(String propertyKey) {
@@ -79,7 +90,8 @@ public class DfPropHtmlRequest {
         return DfCollectionUtil.newArrayList(_propertyMap.values());
     }
 
-    public void addProperty(String propertyKey, String envType, String langType, String propertyValue, String comment) {
+    public void addProperty(String propertyKey, String envType, String langType, String propertyValue, String comment,
+            boolean override) {
         DfPropHtmlProperty property = _propertyMap.get(propertyKey);
         if (property == null) {
             property = new DfPropHtmlProperty(propertyKey);
@@ -91,7 +103,7 @@ public class DfPropHtmlRequest {
         } else {
             registeredValue = propertyValue;
         }
-        property.setPropertyValue(envType, langType, registeredValue, comment);
+        property.setPropertyValue(envType, langType, registeredValue, comment, override);
     }
 
     public Set<String> getDiffIgnoredKeySet() {
@@ -108,5 +120,9 @@ public class DfPropHtmlRequest {
 
     protected void addMaskedKeyAll(List<String> maskedKeyList) {
         _maskedKeySet.addAll(maskedKeyList);
+    }
+
+    public String getExtendsPropRequest() {
+        return _extendsPropRequest;
     }
 }

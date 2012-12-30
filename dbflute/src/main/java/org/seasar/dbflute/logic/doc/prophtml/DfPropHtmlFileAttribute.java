@@ -33,15 +33,16 @@ public class DfPropHtmlFileAttribute {
     protected final File _propertiesFile;
     protected final String _envType;
     protected final String _langType;
-    protected Integer _keyCount;
     protected final Set<String> _propertyKeySet = DfCollectionUtil.newLinkedHashSet();
+    protected Integer _keyCount;
     protected boolean _rootFile;
     protected boolean _defaultEnv;
     protected boolean _lonely;
-    protected DfPropHtmlFileAttribute _standardAttribute;
     protected final List<String> _duplicateKeyList = DfCollectionUtil.newArrayList();
+    protected DfPropHtmlFileAttribute _standardAttribute;
     protected final List<String> _overKeyList = DfCollectionUtil.newArrayList();
     protected final List<String> _shortKeyList = DfCollectionUtil.newArrayList();
+    protected DfPropHtmlFileAttribute _extendsAttribute;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -65,6 +66,14 @@ public class DfPropHtmlFileAttribute {
 
     public String getLangType() {
         return _langType;
+    }
+
+    public Set<String> getPropertyKeySet() {
+        return _propertyKeySet;
+    }
+
+    public void addPropertyKeyAll(Set<String> propertyKeySet) {
+        _propertyKeySet.addAll(propertyKeySet);
     }
 
     public Integer getKeyCount() {
@@ -99,22 +108,6 @@ public class DfPropHtmlFileAttribute {
         _lonely = true;
     }
 
-    public DfPropHtmlFileAttribute getStandardAttribute() {
-        return _standardAttribute;
-    }
-
-    public void setStandardAttribute(DfPropHtmlFileAttribute standardAttribute) {
-        _standardAttribute = standardAttribute;
-    }
-
-    public Set<String> getPropertyKeySet() {
-        return _propertyKeySet;
-    }
-
-    public void addPropertyKeyAll(Set<String> propertyKeySet) {
-        _propertyKeySet.addAll(propertyKeySet);
-    }
-
     public boolean hasDuplicateKey() {
         return !_duplicateKeyList.isEmpty();
     }
@@ -125,6 +118,14 @@ public class DfPropHtmlFileAttribute {
 
     public void addDuplicateKeyAll(List<String> duplicateKeyList) {
         _duplicateKeyList.addAll(duplicateKeyList);
+    }
+
+    public DfPropHtmlFileAttribute getStandardAttribute() {
+        return _standardAttribute;
+    }
+
+    public void setStandardAttribute(DfPropHtmlFileAttribute standardAttribute) {
+        _standardAttribute = standardAttribute;
     }
 
     public boolean hasOverKey() {
@@ -149,5 +150,13 @@ public class DfPropHtmlFileAttribute {
 
     public void addShortKey(String propertyKey) {
         _shortKeyList.add(propertyKey);
+    }
+
+    public DfPropHtmlFileAttribute getExtendsAttribute() {
+        return _extendsAttribute;
+    }
+
+    public void setExtendsAttribute(DfPropHtmlFileAttribute extendsAttribute) {
+        _extendsAttribute = extendsAttribute;
     }
 }

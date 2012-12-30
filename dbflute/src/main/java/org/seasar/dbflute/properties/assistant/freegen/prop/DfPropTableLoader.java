@@ -16,6 +16,8 @@
 package org.seasar.dbflute.properties.assistant.freegen.prop;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +26,8 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesReader;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesResult;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesStream;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesStreamProvider;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
@@ -53,10 +57,11 @@ public class DfPropTableLoader {
     //     ; targetKeyList = list:{}
     //     ; exceptKeyList = list:{ prefix:config. }
     //     ; groupingKeyMap = map:{ label = prefix:label. }
+    //     ; extendsPropFileList = list:{ ../../../bar.properties }
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) {
-        final JavaPropertiesReader reader = createReader(resource);
+        final JavaPropertiesReader reader = createReader(resource, tableMap);
         final JavaPropertiesResult result = reader.read();
         final List<Map<String, Object>> columnList = toMapList(result, tableMap);
         final String resourceFile = resource.getResourceFile();
@@ -64,21 +69,42 @@ public class DfPropTableLoader {
         return new DfFreeGenTable(tableMap, tableName, columnList);
     }
 
-    protected JavaPropertiesReader createReader(DfFreeGenResource resource) {
+    protected JavaPropertiesReader createReader(DfFreeGenResource resource, Map<String, Object> tableMap) {
         final String resourceFile = resource.getResourceFile();
         final String encoding = resource.hasEncoding() ? resource.getEncoding() : "UTF-8";
-        return new JavaPropertiesReader(new File(resourceFile), encoding);
+        final JavaPropertiesReader reader = new JavaPropertiesReader(new JavaPropertiesStreamProvider() {
+            public JavaPropertiesStream provideStream() throws IOException {
+                return new JavaPropertiesStream(resourceFile, new FileInputStream(new File(resourceFile)));
+            }
+        }, encoding);
+        @SuppressWarnings("unchecked")
+        final List<String> extendsPropFileList = (List<String>) tableMap.get("extendsPropFileList");
+        if (extendsPropFileList != null && !extendsPropFileList.isEmpty()) {
+            for (final String extendsPropFile : extendsPropFileList) {
+                reader.extendsProperties(new JavaPropertiesStreamProvider() {
+                    public JavaPropertiesStream provideStream() throws IOException {
+                        return new JavaPropertiesStream(extendsPropFile, new FileInputStream(new File(extendsPropFile)));
+                    }
+                });
+            }
+        }
+        return reader;
     }
 
     // ===================================================================================
     //                                                                           Converter
     //                                                                           =========
     public List<Map<String, Object>> toMapList(JavaPropertiesResult result, Map<String, Object> tableMap) {
+        final List<JavaPropertiesProperty> propertyList = result.getPropertyList();
+        return doConvertToMapList(propertyList, tableMap);
+    }
+
+    protected List<Map<String, Object>> doConvertToMapList(final List<JavaPropertiesProperty> propertyList,
+            Map<String, Object> tableMap) {
         final List<String> targetKeyList = extractTargetKeyList(tableMap);
         final List<String> exceptKeyList = extractExceptKeyList(tableMap);
         final Map<String, String> groupingKeyMap = extractDeterminationMap(tableMap);
         final DfDocumentProperties prop = getDocumentProperties();
-        final List<JavaPropertiesProperty> propertyList = result.getPropertyList();
         final List<Map<String, Object>> mapList = DfCollectionUtil.newArrayList();
         for (JavaPropertiesProperty property : propertyList) {
             final Map<String, Object> columnMap = DfCollectionUtil.newLinkedHashMap();
@@ -112,6 +138,8 @@ public class DfPropTableLoader {
             final String commentHtmlEncoded = prop.resolveTextForSchemaHtml(comment);
             columnMap.put("commentHtmlEncoded", commentHtmlEncoded != null ? commentHtmlEncoded : "");
             columnMap.put("hasComment", Srl.is_NotNull_and_NotTrimmedEmpty(comment));
+            columnMap.put("isExtendsProperty", property.isExtendsProperty());
+            columnMap.put("isOverrideProperty", property.isOverrideProperty());
 
             for (Entry<String, String> entry : groupingKeyMap.entrySet()) {
                 final String groupingName = entry.getKey();

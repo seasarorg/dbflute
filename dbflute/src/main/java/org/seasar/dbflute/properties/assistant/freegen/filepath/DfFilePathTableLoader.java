@@ -16,13 +16,13 @@
 package org.seasar.dbflute.properties.assistant.freegen.filepath;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -45,14 +45,18 @@ public class DfFilePathTableLoader {
     // }
     // ; tableMap = map:{
     //     ; targetDir = $$baseDir$$/webapp/WEB-INF/view
-    //     ; targetSuffix = .jsp
+    //     ; targetPathList = list:{ suffix:.jsp }
+    //     ; exceptPathList = list:{ contain:/view/common/ }
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
             Map<String, Map<String, String>> mappingMap) {
         final String targetDir = resource.resolveBaseDir((String) tableMap.get("targetDir"));
-        final String targetSuffix = (String) tableMap.get("targetSuffix");
+
+        final List<String> targetPathList = extractTargetPathList(tableMap);
+        final List<String> exceptPathList = extractExceptPathList(tableMap);
         final List<File> fileList = DfCollectionUtil.newArrayList();
-        collectFile(fileList, targetSuffix, new File(targetDir));
+
+        collectFile(fileList, targetPathList, exceptPathList, new File(targetDir));
         final List<Map<String, Object>> columnList = DfCollectionUtil.newArrayList();
         for (File file : fileList) {
             final Map<String, Object> columnMap = DfCollectionUtil.newHashMap();
@@ -62,30 +66,21 @@ public class DfFilePathTableLoader {
             final String domainPath = buildDomainPath(file, targetDir);
             columnMap.put("domainPath", domainPath); // e.g. /view/member/index.jsp
 
-            columnMap.put("defName", buildUpperSnakeName(domainPath, targetSuffix, false));
-            columnMap.put("defNameNoSuffix", buildUpperSnakeName(domainPath, targetSuffix, true));
-
+            columnMap.put("defName", buildUpperSnakeName(domainPath));
             {
                 final String dirPath = Srl.substringLastFront(domainPath, "/");
-                final String snakeCase = buildPlainSnakeName(dirPath, targetSuffix, false);
+                final String snakeCase = buildPlainSnakeName(dirPath);
                 final String camelizedName = Srl.camelize(snakeCase);
                 columnMap.put("camelizedDir", camelizedName);
                 columnMap.put("capCamelDir", Srl.initCap(camelizedName));
                 columnMap.put("uncapCamelDir", Srl.initUncap(camelizedName));
             }
             {
-                final String snakeCase = buildPlainSnakeName(fileName, targetSuffix, false);
+                final String snakeCase = buildPlainSnakeName(fileName);
                 final String camelizedName = Srl.camelize(snakeCase);
                 columnMap.put("camelizedFile", camelizedName);
                 columnMap.put("capCamelFile", Srl.initCap(camelizedName));
                 columnMap.put("uncapCamelFile", Srl.initUncap(camelizedName));
-            }
-            {
-                final String snakeCase = buildPlainSnakeName(fileName, targetSuffix, true);
-                final String camelizedName = Srl.camelize(snakeCase);
-                columnMap.put("camelizedFileNoSuffix", camelizedName);
-                columnMap.put("capCamelFileNoSuffix", Srl.initCap(camelizedName));
-                columnMap.put("uncapCamelFileNoSuffix", Srl.initUncap(camelizedName));
             }
 
             columnList.add(columnMap);
@@ -93,41 +88,72 @@ public class DfFilePathTableLoader {
         return new DfFreeGenTable(tableMap, "dummy", columnList);
     }
 
-    protected void collectFile(List<File> fileList, final String targetSuffix, File baseFile) {
+    protected List<String> extractTargetPathList(Map<String, Object> tableMap) {
+        @SuppressWarnings("unchecked")
+        final List<String> targetPathList = (List<String>) tableMap.get("targetPathList");
+        if (targetPathList != null) {
+            return targetPathList;
+        }
+        return DfCollectionUtil.emptyList();
+    }
+
+    protected List<String> extractExceptPathList(Map<String, Object> tableMap) {
+        @SuppressWarnings("unchecked")
+        final List<String> exceptPathList = (List<String>) tableMap.get("exceptPathList");
+        if (exceptPathList != null) {
+            return exceptPathList;
+        }
+        return DfCollectionUtil.emptyList();
+    }
+
+    // ===================================================================================
+    //                                                                        Collect File
+    //                                                                        ============
+    protected void collectFile(List<File> fileList, final List<String> targetPathList,
+            final List<String> exceptPathList, File baseFile) {
+        if (isExceptFile(targetPathList, exceptPathList, baseFile)) {
+            return;
+        }
         if (baseFile.isFile()) { // only target extension here
             fileList.add(baseFile);
         } else if (baseFile.isDirectory()) {
-            final File[] listFiles = baseFile.listFiles(new FileFilter() {
-                public boolean accept(File currentFile) {
-                    return currentFile.getName().endsWith(targetSuffix) || currentFile.isDirectory();
-                }
-            });
+            final File[] listFiles = baseFile.listFiles();
             if (listFiles != null) {
                 for (File currentFile : listFiles) {
-                    collectFile(fileList, targetSuffix, currentFile);
+                    collectFile(fileList, targetPathList, exceptPathList, currentFile);
                 }
             }
         }
     }
 
+    protected boolean isExceptFile(List<String> targetPathList, List<String> exceptPathList, File baseFile) {
+        final String baseFilePath = toPath(baseFile);
+        return !DfNameHintUtil.isTargetByHint(baseFilePath, targetPathList, exceptPathList);
+    }
+
+    // ===================================================================================
+    //                                                                        Build String
+    //                                                                        ============
     protected String buildDomainPath(File file, String targetDir) {
-        final String resolvedPath = Srl.replace(file.getPath(), "\\", "/");
-        return Srl.substringFirstRear(resolvedPath, targetDir);
+        return Srl.substringFirstRear(toPath(file), targetDir);
     }
 
-    protected String buildUpperSnakeName(String domainPath, String targetSuffix, boolean suppressSuffix) {
-        return buildPlainSnakeName(domainPath, targetSuffix, suppressSuffix).toUpperCase();
+    protected String buildUpperSnakeName(String domainPath) {
+        return buildPlainSnakeName(domainPath).toUpperCase();
     }
 
-    protected String buildPlainSnakeName(String domainPath, String targetSuffix, boolean suppressSuffix) {
-        String tmp;
-        if (suppressSuffix && domainPath.endsWith(targetSuffix)) {
-            tmp = Srl.substringLastFrontIgnoreCase(domainPath, targetSuffix);
-        } else {
-            tmp = domainPath;
-        }
-        tmp = replace(replace(replace(tmp, ".", "_"), "-", "_"), "/", "_");
-        return Srl.trim(tmp, "_");
+    protected String buildPlainSnakeName(String domainPath) {
+        final String dlm = "_";
+        String tmp = domainPath;
+        tmp = replace(replace(replace(replace(tmp, ".", dlm), "-", dlm), "/", dlm), "__", dlm);
+        return Srl.trim(tmp, dlm);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String toPath(File file) {
+        return replace(file.getPath(), "\\", "/");
     }
 
     protected String replace(String str, String fromStr, String toStr) {

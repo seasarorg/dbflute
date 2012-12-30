@@ -828,6 +828,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //         }
     //         ; diffIgnoredKeyList = list:{ errors.ignored.key }
     //         ; maskedKeyList = list:{ errors.masked.key }
+    //         ; extendsPropRequest = CommonApplicationProp
     //     }
     // }
     protected Map<String, Object> _propertiesHtmlHeaderMap;
@@ -954,6 +955,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return maskedKeyList;
         }
         return DfCollectionUtil.emptyList();
+    }
+
+    public String getPropertiesHtmlExtendsPropRequest(Map<String, Object> requestMap) {
+        return (String) requestMap.get("extendsPropRequest");
     }
 
     // -----------------------------------------------------

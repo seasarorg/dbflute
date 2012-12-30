@@ -68,13 +68,13 @@ public class DfPropHtmlProperty {
         return DfCollectionUtil.newArrayList(_envElementMap.values());
     }
 
-    public void setPropertyValue(String envType, String langType, String propertyValue, String comment) {
+    public void setPropertyValue(String envType, String langType, String propertyValue, String comment, boolean override) {
         DfPropHtmlPropertyEnvElement envElement = _envElementMap.get(envType);
         if (envElement == null) {
             envElement = createEnvElement(envType);
             _envElementMap.put(envType, envElement);
         }
-        envElement.setPropertyValue(langType, propertyValue, comment);
+        envElement.setPropertyValue(langType, propertyValue, comment, override);
         _envTypeSet.add(envType);
         _langTypeSet.add(langType);
     }

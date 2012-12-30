@@ -17,6 +17,8 @@ package org.seasar.dbflute.logic.doc.prophtml;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,6 +32,8 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesReader;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesResult;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesStream;
+import org.seasar.dbflute.helper.jprop.JavaPropertiesStreamProvider;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -104,7 +108,8 @@ public class DfPropHtmlManager {
         final DfDocumentProperties prop = getDocumentProperties();
         final List<String> diffIgnoredKeyList = prop.getPropertiesHtmlDiffIgnoredKeyList(requestMap);
         final List<String> maskedKeyList = prop.getPropertiesHtmlMaskedKeyList(requestMap);
-        return new DfPropHtmlRequest(requestName, diffIgnoredKeyList, maskedKeyList);
+        final String extendsPropRequest = prop.getPropertiesHtmlExtendsPropRequest(requestMap);
+        return new DfPropHtmlRequest(requestName, diffIgnoredKeyList, maskedKeyList, extendsPropRequest);
     }
 
     protected void assertPropHtmlRootFileExists(Map<String, DfPropHtmlFileAttribute> defaultEnvMap, String requestName,
@@ -151,21 +156,43 @@ public class DfPropHtmlManager {
                 }
             }
         }
-        for (File familyFile : familyFileList) {
+        final DfPropHtmlRequest extendsRequest = getExtendsRequest(request);
+        for (final File familyFile : familyFileList) {
             final String langType = extractLangType(familyFile.getName());
             _log.info("...Reading properties file: " + buildLoggingFileKey(familyFile, envType));
-            final JavaPropertiesReader reader = new JavaPropertiesReader(familyFile, "UTF-8");
+            final JavaPropertiesReader reader = new JavaPropertiesReader(new JavaPropertiesStreamProvider() {
+                public JavaPropertiesStream provideStream() throws IOException {
+                    return new JavaPropertiesStream(familyFile.getPath(), new FileInputStream(familyFile));
+                }
+            }, "UTF-8");
+            final DfPropHtmlFileAttribute extendsAttribute = findExtendsAttribute(extendsRequest, envType, langType);
+            if (extendsAttribute != null) {
+                final File extendsFile = extendsAttribute.getPropertiesFile();
+                reader.extendsProperties(new JavaPropertiesStreamProvider() {
+                    public JavaPropertiesStream provideStream() throws IOException {
+                        return new JavaPropertiesStream(extendsFile.getPath(), new FileInputStream(extendsFile));
+                    }
+                });
+            }
             final JavaPropertiesResult jpropResult = reader.read();
-            final List<JavaPropertiesProperty> jpropList = jpropResult.getPropertyList();
+
+            // only base-point properties are target here
+            // extends properties are used only for override
+            final List<JavaPropertiesProperty> jpropList = jpropResult.getPropertyBasePointOnlyList();
             final Set<String> propertyKeySet = DfCollectionUtil.newLinkedHashSet();
             for (JavaPropertiesProperty jprop : jpropList) {
                 final String propertyKey = jprop.getPropertyKey();
                 final String propertyValue = jprop.getPropertyValue();
                 final String comment = jprop.getComment();
-                request.addProperty(propertyKey, envType, langType, propertyValue, comment);
+                final boolean override = jprop.isOverrideProperty();
+                request.addProperty(propertyKey, envType, langType, propertyValue, comment, override);
                 propertyKeySet.add(propertyKey);
             }
+
             final DfPropHtmlFileAttribute attribute = new DfPropHtmlFileAttribute(familyFile, envType, langType);
+            attribute.addPropertyKeyAll(propertyKeySet);
+            attribute.setKeyCount(jpropList.size());
+            attribute.addDuplicateKeyAll(jpropResult.getDuplicateKeyList());
             if (defaultEnvMap != null) { // when specified environment
                 if (rootAttribute != null) { // always true
                     // every files compare with root file here
@@ -185,9 +212,9 @@ public class DfPropHtmlManager {
                     rootAttribute = attribute; // save for relation to root
                 }
             }
-            attribute.setKeyCount(jpropList.size());
-            attribute.addDuplicateKeyAll(jpropResult.getDuplicateKeyList());
-            attribute.addPropertyKeyAll(propertyKeySet);
+            if (extendsAttribute != null) {
+                attribute.setExtendsAttribute(extendsAttribute);
+            }
             request.addFileAttribute(attribute);
             attributeMap.put(langType, attribute);
         }
@@ -260,6 +287,35 @@ public class DfPropHtmlManager {
 
     protected String buildLoggingFileKey(File familyFile, String envType) {
         return (ENV_TYPE_DEFAULT.equals(envType) ? "default" : envType) + ":" + familyFile.getName();
+    }
+
+    // ===================================================================================
+    //                                                                    Extends Property
+    //                                                                    ================
+    protected DfPropHtmlRequest getExtendsRequest(DfPropHtmlRequest request) {
+        final String requestName = request.getExtendsPropRequest();
+        if (Srl.is_Null_or_TrimmedEmpty(requestName)) {
+            return null;
+        }
+        final DfPropHtmlRequest extendsPropRequest = _requestMap.get(requestName);
+        if (extendsPropRequest == null) {
+            String msg = "Not found the extends-property request: " + requestName;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        return extendsPropRequest;
+    }
+
+    protected DfPropHtmlFileAttribute findExtendsAttribute(DfPropHtmlRequest extendsRequest, String envType,
+            String langType) {
+        if (extendsRequest == null) {
+            return null;
+        }
+        DfPropHtmlFileAttribute attribute = extendsRequest.getFileAttribute(envType, langType);
+        if (attribute == null) { // retry by default environment
+            attribute = extendsRequest.getFileAttribute(ENV_TYPE_DEFAULT, langType);
+            // but no retry by language because different language is not extends-target
+        }
+        return attribute;
     }
 
     // ===================================================================================

@@ -61,11 +61,12 @@ public class DfPropHtmlPropertyEnvElement {
         return DfCollectionUtil.newArrayList(_langElementMap.values());
     }
 
-    public void setPropertyValue(String langType, String propertyValue, String comment) {
-        _langElementMap.put(langType, createLangElement(langType, propertyValue, comment));
+    public void setPropertyValue(String langType, String propertyValue, String comment, boolean override) {
+        _langElementMap.put(langType, createLangElement(langType, propertyValue, comment, override));
     }
 
-    protected DfPropHtmlPropertyLangElement createLangElement(String langType, String propertyValue, String comment) {
-        return new DfPropHtmlPropertyLangElement(_propertyKey, langType, propertyValue, comment);
+    protected DfPropHtmlPropertyLangElement createLangElement(String langType, String propertyValue, String comment,
+            boolean override) {
+        return new DfPropHtmlPropertyLangElement(_propertyKey, langType, propertyValue, comment, override);
     }
 }

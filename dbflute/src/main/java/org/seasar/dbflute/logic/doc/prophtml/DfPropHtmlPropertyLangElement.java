@@ -40,16 +40,21 @@ public class DfPropHtmlPropertyLangElement {
     /** The comment of the property. (NotNull, EmptyAllowed) */
     protected final String _comment;
 
+    /** Is the property override extends-property? */
+    protected final boolean _overrideProperty;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropHtmlPropertyLangElement(String propertyKey, String langType, String propertyValue, String comment) {
+    public DfPropHtmlPropertyLangElement(String propertyKey, String langType, String propertyValue, String comment,
+            boolean override) {
         _propertyKey = propertyKey;
         _langType = langType;
 
         // empty string for velocity template
         _propertyValue = propertyValue != null ? propertyValue : "";
         _comment = comment != null ? comment : "";
+        _overrideProperty = override;
     }
 
     // ===================================================================================
@@ -89,5 +94,9 @@ public class DfPropHtmlPropertyLangElement {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
         final String resolved = prop.resolveTextForSchemaHtml(_comment);
         return resolved != null ? resolved : "";
+    }
+
+    public boolean isOverrideProperty() {
+        return _overrideProperty;
     }
 }
