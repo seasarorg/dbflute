@@ -60,7 +60,7 @@ public class ObjectiveProperties {
     //                                                Option
     //                                                ------
     public ObjectiveProperties extendsProperties(String... extendsResourcePaths) {
-        if (extendsResourcePaths == null && extendsResourcePaths.length == 0) {
+        if (extendsResourcePaths == null || extendsResourcePaths.length == 0) {
             return this;
         }
         for (String extendsResourcePath : extendsResourcePaths) {
