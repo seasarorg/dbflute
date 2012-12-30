@@ -15,62 +15,34 @@
  */
 package org.seasar.dbflute.logic.doc.prophtml;
 
-import java.util.List;
-import java.util.Map;
-
-import org.seasar.dbflute.util.DfCollectionUtil;
-
 /**
  * @author jflute
  * @since 1.0.1 (2012/12/21 Friday)
  */
-public class DfPropHtmlPropertyEnvElement {
+public class DfPropHtmlDiffKey {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The key of the property. (NotNull) */
     protected final String _propertyKey;
-
-    /** The type of the language. e.g. production, integration (NotNull) */
-    protected final String _envType;
-
-    /** The language element of the property. (NotNull) */
-    protected final Map<String, DfPropHtmlPropertyLangElement> _langElementMap = DfCollectionUtil.newLinkedHashMap();
+    protected final boolean _override;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropHtmlPropertyEnvElement(String propertyKey, String envType) {
+    public DfPropHtmlDiffKey(String propertyKey, boolean override) {
         _propertyKey = propertyKey;
-        _envType = envType;
+        _override = override;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getProeprtyKey() {
+    public String getPropertyKey() {
         return _propertyKey;
     }
 
-    public String getEnvType() {
-        return _envType;
-    }
-
-    public DfPropHtmlPropertyLangElement getLangElement(String langType) {
-        return _langElementMap.get(langType);
-    }
-
-    public List<DfPropHtmlPropertyLangElement> getLangElementList() {
-        return DfCollectionUtil.newArrayList(_langElementMap.values());
-    }
-
-    public void setPropertyValue(String langType, String propertyValue, String comment, boolean override) {
-        _langElementMap.put(langType, createLangElement(langType, propertyValue, comment, override));
-    }
-
-    protected DfPropHtmlPropertyLangElement createLangElement(String langType, String propertyValue, String comment,
-            boolean override) {
-        return new DfPropHtmlPropertyLangElement(_propertyKey, langType, propertyValue, comment, override);
+    public boolean isOverride() {
+        return _override;
     }
 }

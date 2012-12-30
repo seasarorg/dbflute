@@ -46,7 +46,6 @@ public class DfPropTableLoader {
     // ; resourceMap = map:{
     //     ; resourceType = PROP
     //     ; resourceFile = ../../../foo.properties
-    //     ; encoding = UTF-8
     // }
     // ; outputMap = map:{
     //     ; templateFile = MessageDef.vm
@@ -72,12 +71,11 @@ public class DfPropTableLoader {
 
     protected JavaPropertiesReader createReader(DfFreeGenResource resource, Map<String, Object> tableMap) {
         final String resourceFile = resource.getResourceFile();
-        final String encoding = resource.hasEncoding() ? resource.getEncoding() : "UTF-8";
         final JavaPropertiesReader reader = new JavaPropertiesReader(new JavaPropertiesStreamProvider() {
             public JavaPropertiesStream provideStream() throws IOException {
                 return new JavaPropertiesStream(resourceFile, new FileInputStream(new File(resourceFile)));
             }
-        }, encoding);
+        });
         @SuppressWarnings("unchecked")
         final List<String> extendsPropFileList = (List<String>) tableMap.get("extendsPropFileList");
         if (extendsPropFileList != null && !extendsPropFileList.isEmpty()) {

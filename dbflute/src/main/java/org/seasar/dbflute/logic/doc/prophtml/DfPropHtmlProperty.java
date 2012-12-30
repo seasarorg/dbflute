@@ -71,6 +71,10 @@ public class DfPropHtmlProperty {
         return _langTypeSet;
     }
 
+    public DfPropHtmlPropertyEnvElement getEnvElement(String envType) {
+        return _envElementMap.get(envType);
+    }
+
     public List<DfPropHtmlPropertyEnvElement> getEnvElementList() {
         return DfCollectionUtil.newArrayList(_envElementMap.values());
     }
@@ -102,5 +106,19 @@ public class DfPropHtmlProperty {
 
     public boolean hasOverride() {
         return _hasOverride;
+    }
+
+    public boolean isOverride(String envType, String langType) {
+        final DfPropHtmlPropertyEnvElement envElement = getEnvElement(envType);
+        if (envElement == null) {
+            String msg = "Not found the environment element: envType=" + envType;
+            throw new IllegalStateException(msg);
+        }
+        final DfPropHtmlPropertyLangElement langElement = envElement.getLangElement(langType);
+        if (langElement == null) {
+            String msg = "Not found the language element: envType=" + envType + " langType=" + langType;
+            throw new IllegalStateException(msg);
+        }
+        return langElement.isOverride();
     }
 }

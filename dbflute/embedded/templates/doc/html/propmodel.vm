@@ -136,10 +136,16 @@ td {
 	font-size: 0.8em;
 }
 .checkcell {
+	text-align: center;
 	font-size: 0.8em;
 }
 .commentcell {
+	color: green;
 	font-size: 0.7em;
+}
+.freecomment {
+	color: green;
+	font-size: 0.6em;
 }
 
 /* inner table */
@@ -227,7 +233,11 @@ ${manager.javaScriptEmbedded}
 #if ($attribute.hasOverKey())
 			<td class="keylistcell">
 #foreach ($overKey in $attribute.overKeyList)
-				<p>${overKey}</p>
+#if ($overKey.isOverride())
+				<p>${overKey.propertyKey} <span class="freecomment">(override)</span></p>
+#else
+				<p>${overKey.propertyKey}</p>
+#end
 #end
 			</td>
 #else
@@ -244,7 +254,11 @@ ${manager.javaScriptEmbedded}
 #if ($attribute.hasShortKey())
 			<td class="keylistcell">
 #foreach ($shortKey in $attribute.shortKeyList)
-				<p>${shortKey}</p>
+#if ($shortKey.isOverride())
+				<p>${shortKey.propertyKey} <span class="freecomment">(extends)</span></p>
+#else
+				<p>${shortKey.propertyKey}</p>
+#end
 #end
 			</td>
 #else

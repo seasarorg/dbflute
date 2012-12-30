@@ -157,7 +157,6 @@ public class DfPropHtmlManager {
             }
         }
         final DfPropHtmlRequest extendsRequest = getExtendsRequest(request);
-        final String encoding = "UTF-8"; // fixed because Japanese strings in properties are written by unicode
         for (final File familyFile : familyFileList) {
             final String langType = extractLangType(familyFile.getName());
             _log.info("...Reading properties file: " + buildLoggingFileKey(familyFile, envType));
@@ -165,7 +164,7 @@ public class DfPropHtmlManager {
                 public JavaPropertiesStream provideStream() throws IOException {
                     return new JavaPropertiesStream(familyFile.getPath(), new FileInputStream(familyFile));
                 }
-            }, encoding);
+            });
             final DfPropHtmlFileAttribute extendsAttribute = findExtendsAttribute(extendsRequest, envType, langType);
             if (extendsAttribute != null) {
                 final File extendsFile = extendsAttribute.getPropertiesFile();
@@ -326,32 +325,45 @@ public class DfPropHtmlManager {
             final Set<String> ignoredSet = request.getDiffIgnoredKeySet();
             final List<DfPropHtmlFileAttribute> attributeList = request.getFileAttributeList();
             for (DfPropHtmlFileAttribute attribute : attributeList) {
-                if (attribute.isRootFile()) {
-                    continue;
-                }
-                final DfPropHtmlFileAttribute standardAttribute = attribute.getStandardAttribute();
-                if (standardAttribute == null) {
-                    attribute.toBeLonely();
-                    continue;
-                }
-                final Set<String> standardPropertyKeySet = standardAttribute.getPropertyKeySet();
-                final Set<String> propertyKeySet = attribute.getPropertyKeySet();
-                for (String propertyKey : propertyKeySet) {
-                    if (ignoredSet.contains(propertyKey)) {
-                        continue;
-                    }
-                    if (!standardPropertyKeySet.contains(propertyKey)) {
-                        attribute.addOverKey(propertyKey);
-                    }
-                }
-                for (String standardPropertyKey : standardPropertyKeySet) {
-                    if (ignoredSet.contains(standardPropertyKey)) {
-                        continue;
-                    }
-                    if (!propertyKeySet.contains(standardPropertyKey)) {
-                        attribute.addShortKey(standardPropertyKey);
-                    }
-                }
+                doAnalyzePropertiesDiff(request, ignoredSet, attribute);
+            }
+        }
+    }
+
+    protected void doAnalyzePropertiesDiff(DfPropHtmlRequest request, Set<String> ignoredSet,
+            DfPropHtmlFileAttribute attribute) {
+        if (attribute.isRootFile()) {
+            return;
+        }
+        final DfPropHtmlFileAttribute standardAttribute = attribute.getStandardAttribute();
+        if (standardAttribute == null) {
+            attribute.toBeLonely();
+            return;
+        }
+        final Set<String> standardPropertyKeySet = standardAttribute.getPropertyKeySet();
+        final Set<String> propertyKeySet = attribute.getPropertyKeySet();
+        for (String propertyKey : propertyKeySet) {
+            if (ignoredSet.contains(propertyKey)) {
+                continue;
+            }
+            if (!standardPropertyKeySet.contains(propertyKey)) {
+                final DfPropHtmlProperty property = request.getProperty(propertyKey);
+                final String envType = attribute.getEnvType();
+                final String langType = attribute.getLangType();
+                final boolean override = property.isOverride(envType, langType);
+                attribute.addOverKey(new DfPropHtmlDiffKey(propertyKey, override));
+            }
+        }
+        for (String standardPropertyKey : standardPropertyKeySet) {
+            if (ignoredSet.contains(standardPropertyKey)) {
+                continue;
+            }
+            if (!propertyKeySet.contains(standardPropertyKey)) {
+                final DfPropHtmlProperty standardProperty = request.getProperty(standardPropertyKey);
+                final String envType = standardAttribute.getEnvType();
+                final String langType = standardAttribute.getLangType();
+                final boolean override = standardProperty.isOverride(envType, langType);
+                attribute.addShortKey(new DfPropHtmlDiffKey(standardPropertyKey, override));
             }
         }
     }

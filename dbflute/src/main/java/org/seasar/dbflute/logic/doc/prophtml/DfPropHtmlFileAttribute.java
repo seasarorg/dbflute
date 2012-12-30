@@ -41,8 +41,8 @@ public class DfPropHtmlFileAttribute {
     protected DfPropHtmlFileAttribute _extendsAttribute;
     protected final List<String> _duplicateKeyList = DfCollectionUtil.newArrayList();
     protected DfPropHtmlFileAttribute _standardAttribute;
-    protected final List<String> _overKeyList = DfCollectionUtil.newArrayList();
-    protected final List<String> _shortKeyList = DfCollectionUtil.newArrayList();
+    protected final List<DfPropHtmlDiffKey> _overKeyList = DfCollectionUtil.newArrayList();
+    protected final List<DfPropHtmlDiffKey> _shortKeyList = DfCollectionUtil.newArrayList();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -144,11 +144,11 @@ public class DfPropHtmlFileAttribute {
         return !_overKeyList.isEmpty();
     }
 
-    public List<String> getOverKeyList() {
+    public List<DfPropHtmlDiffKey> getOverKeyList() {
         return _overKeyList;
     }
 
-    public void addOverKey(String propertyKey) {
+    public void addOverKey(DfPropHtmlDiffKey propertyKey) {
         _overKeyList.add(propertyKey);
     }
 
@@ -156,11 +156,11 @@ public class DfPropHtmlFileAttribute {
         return !_shortKeyList.isEmpty();
     }
 
-    public List<String> getShortKeyList() {
+    public List<DfPropHtmlDiffKey> getShortKeyList() {
         return _shortKeyList;
     }
 
-    public void addShortKey(String propertyKey) {
+    public void addShortKey(DfPropHtmlDiffKey propertyKey) {
         _shortKeyList.add(propertyKey);
     }
 }
