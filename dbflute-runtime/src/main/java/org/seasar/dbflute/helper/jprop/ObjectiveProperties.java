@@ -60,11 +60,10 @@ public class ObjectiveProperties {
     //                                                Option
     //                                                ------
     public ObjectiveProperties extendsProperties(String... extendsResourcePaths) {
-        if (extendsResourcePaths == null || extendsResourcePaths.length == 0) {
-            return this;
-        }
-        for (String extendsResourcePath : extendsResourcePaths) {
-            _extendsResourcePathList.add(extendsResourcePath);
+        if (extendsResourcePaths != null && extendsResourcePaths.length > 0) {
+            for (String extendsResourcePath : extendsResourcePaths) {
+                _extendsResourcePathList.add(extendsResourcePath);
+            }
         }
         return this;
     }
@@ -77,6 +76,11 @@ public class ObjectiveProperties {
     // ===================================================================================
     //                                                                     Load Properties
     //                                                                     ===============
+    /**
+     * Load properties. <br />
+     * You can get properties after loading.
+     * @return this. (NotNull)
+     */
     public ObjectiveProperties load() {
         final JavaPropertiesReader reader = new JavaPropertiesReader(new JavaPropertiesStreamProvider() {
             public JavaPropertiesStream provideStream() throws IOException {
@@ -101,6 +105,11 @@ public class ObjectiveProperties {
     // ===================================================================================
     //                                                                        Get Property
     //                                                                        ============
+    /**
+     * Get the value of property.
+     * @param propertyKey The key of the property. (NotNull)
+     * @return The value of found property. (NullAllowed: if null, not found)
+     */
     public String get(String propertyKey) {
         final JavaPropertiesProperty property = _javaPropertiesResult.getProperty(propertyKey);
         return property != null ? property.getPropertyValue() : null;
