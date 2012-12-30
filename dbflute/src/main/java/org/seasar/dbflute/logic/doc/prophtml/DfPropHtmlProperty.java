@@ -96,6 +96,10 @@ public class DfPropHtmlProperty {
         return new DfPropHtmlPropertyEnvElement(_propertyKey, envType);
     }
 
+    public boolean hasComment() {
+        return _hasComment;
+    }
+
     public boolean hasOverride() {
         return _hasOverride;
     }
