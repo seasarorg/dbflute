@@ -1167,7 +1167,7 @@ public class HandyDate implements Serializable {
      * @return The determination, true or false.
      */
     public boolean isMonth(int month) {
-        return getMonth() == month; // zero origin headache
+        return getMonthAsOneOrigin() == month; // zero origin headache
     }
 
     public boolean isMonth01_January() {
@@ -1688,12 +1688,32 @@ public class HandyDate implements Serializable {
         return era == GregorianCalendar.AD ? year : -year;
     }
 
-    public int getMonth() {
-        return _cal.get(Calendar.MONTH) + 1; // zero origin headache
+    public int getMonthAsOneOrigin() { // resolved zero origin headache
+        return _cal.get(Calendar.MONTH) + 1;
+    }
+
+    public int getMonthAsZeroOrigin() { // for calendar
+        return _cal.get(Calendar.MONTH);
     }
 
     public int getDay() {
         return _cal.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public int getHour() {
+        return _cal.get(Calendar.HOUR_OF_DAY);
+    }
+
+    public int getMinute() {
+        return _cal.get(Calendar.MINUTE);
+    }
+
+    public int getSecond() {
+        return _cal.get(Calendar.SECOND);
+    }
+
+    public int getMillisecond() {
+        return _cal.get(Calendar.MILLISECOND);
     }
 
     public int getFirstDayOfMonth() {
