@@ -30,6 +30,11 @@ public class JavaPropertiesProperty {
     //                                                                           =========
     protected final String _propertyKey; // errors.required
     protected final String _propertyValue;
+    protected final boolean _canBeIntegerProperty;
+    protected final boolean _canBeLongProperty;
+    protected final boolean _canBeDecimalProperty;
+    protected final boolean _canBeDateProperty;
+    protected final boolean _mayBeBooleanProperty;
     protected String _defName; // e.g. ERRORS_REQUIRED
     protected String _camelizedName;
     protected String _capCamelName;
@@ -47,17 +52,93 @@ public class JavaPropertiesProperty {
     public JavaPropertiesProperty(String propertyKey, String propertyValue) {
         _propertyKey = propertyKey;
         _propertyValue = propertyValue;
+        _canBeIntegerProperty = deriveCanBeIntegerProperty();
+        _canBeLongProperty = deriveCanBeLongProperty();
+        _canBeDecimalProperty = deriveCanBeDecimalProperty();
+        _canBeDateProperty = deriveCanBeDateProperty();
+        _mayBeBooleanProperty = deriveMayBeBooleanProperty();
     }
 
-    // ===================================================================================
-    //                                                                    Derived Property
-    //                                                                    ================
-    public boolean mayBeBooleanProperty() {
+    // -----------------------------------------------------
+    //                                         Deriving Type
+    //                                         -------------
+    protected boolean deriveCanBeIntegerProperty() {
+        if (_propertyValue != null) {
+            try {
+                DfTypeUtil.toInteger(_propertyValue);
+                return true;
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return false;
+    }
+
+    protected boolean deriveCanBeLongProperty() {
+        if (_propertyValue != null) {
+            try {
+                DfTypeUtil.toLong(_propertyValue);
+                return true;
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return false;
+    }
+
+    protected boolean deriveCanBeDecimalProperty() {
+        if (_propertyValue != null) {
+            try {
+                DfTypeUtil.toBigDecimal(_propertyValue);
+                return true;
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return false;
+    }
+
+    protected boolean deriveCanBeDateProperty() {
+        if (_propertyValue != null) {
+            try {
+                DfTypeUtil.toDate(_propertyValue);
+                return true;
+            } catch (RuntimeException ignored) {
+            }
+        }
+        return false;
+    }
+
+    protected boolean deriveMayBeBooleanProperty() {
         return _propertyValue != null && isTrueOrFalseProperty(_propertyValue.trim());
     }
 
     protected boolean isTrueOrFalseProperty(String propertyValue) {
         return propertyValue.equalsIgnoreCase("true") || propertyValue.equalsIgnoreCase("false");
+    }
+
+    // ===================================================================================
+    //                                                                    Derived Property
+    //                                                                    ================
+    public boolean mayBeIntegerProperty() {
+        return _canBeIntegerProperty;
+    }
+
+    public boolean mayBeLongProperty() {
+        return !mayBeIntegerProperty() && _canBeLongProperty;
+    }
+
+    public boolean mayBeDecimalProperty() {
+        return !mayBeIntegerProperty() && !mayBeLongProperty() && _canBeDecimalProperty;
+    }
+
+    protected boolean mayBeNumber() {
+        return mayBeIntegerProperty() || mayBeLongProperty() || mayBeDecimalProperty();
+    }
+
+    public boolean mayBeDateProperty() {
+        return !mayBeNumber() && _canBeDateProperty;
+    }
+
+    public boolean mayBeBooleanProperty() {
+        return _mayBeBooleanProperty;
     }
 
     // ===================================================================================

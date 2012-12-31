@@ -17,10 +17,15 @@ package org.seasar.dbflute.helper.jprop;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfTypeUtil.ParseDateException;
+import org.seasar.dbflute.util.DfTypeUtil.ParseDateNumberFormatException;
+import org.seasar.dbflute.util.DfTypeUtil.ParseDateOutOfCalendarException;
 
 /**
  * @author jflute
@@ -119,13 +124,59 @@ public class ObjectiveProperties {
     //                                                                        Get Property
     //                                                                        ============
     /**
-     * Get the value of property.
+     * Get the value of property as {@link String}.
      * @param propertyKey The key of the property. (NotNull)
      * @return The value of found property. (NullAllowed: if null, not found)
      */
     public String get(String propertyKey) {
         final JavaPropertiesProperty property = _javaPropertiesResult.getProperty(propertyKey);
         return property != null ? property.getPropertyValue() : null;
+    }
+
+    /**
+     * Get the value of property as {@link Integer}.
+     * @param propertyKey The key of the property. (NotNull)
+     * @return The value of found property. (NullAllowed: if null, not found)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    public Integer getAsInteger(String propertyKey) {
+        final String value = get(propertyKey);
+        return value != null ? DfTypeUtil.toInteger(value) : null;
+    }
+
+    /**
+     * Get the value of property as {@link Long}.
+     * @param propertyKey The key of the property. (NotNull)
+     * @return The value of found property. (NullAllowed: if null, not found)
+     * @throws NumberFormatException When the property is not long.
+     */
+    public Long getAsLong(String propertyKey) {
+        final String value = get(propertyKey);
+        return value != null ? DfTypeUtil.toLong(value) : null;
+    }
+
+    /**
+     * Get the value of property as {@link BigDecimal}.
+     * @param propertyKey The key of the property. (NotNull)
+     * @return The value of found property. (NullAllowed: if null, not found)
+     * @throws NumberFormatException When the property is not decimal.
+     */
+    public BigDecimal getAsDecimal(String propertyKey) {
+        final String value = get(propertyKey);
+        return value != null ? DfTypeUtil.toBigDecimal(value) : null;
+    }
+
+    /**
+     * Get the value of property as {@link Date}.
+     * @param propertyKey The key of the property. (NotNull)
+     * @return The value of found property. (NullAllowed: if null, not found)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
+     */
+    public Date getAsDate(String propertyKey) {
+        final String value = get(propertyKey);
+        return value != null ? DfTypeUtil.toDate(value) : null;
     }
 
     /**
