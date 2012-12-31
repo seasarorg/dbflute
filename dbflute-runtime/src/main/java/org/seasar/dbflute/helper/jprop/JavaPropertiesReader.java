@@ -33,6 +33,7 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jprop.exception.JavaPropertiesImplicitOverrideException;
 import org.seasar.dbflute.helper.jprop.exception.JavaPropertiesLonelyOverrideException;
 import org.seasar.dbflute.helper.jprop.exception.JavaPropertiesReadFailureException;
+import org.seasar.dbflute.helper.jprop.exception.JavaPropertiesStreamNotFoundException;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
 import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
@@ -344,10 +345,23 @@ public class JavaPropertiesReader {
     protected InputStream preparePropFileStream() throws IOException {
         final InputStream stream = _streamProvider.provideStream();
         if (stream == null) {
-            String msg = "The stream provider returned null steram: " + _streamProvider;
-            throw new IllegalStateException(msg);
+            throwJavaPropertiesStreamNotFoundException();
         }
         return stream;
+    }
+
+    protected void throwJavaPropertiesStreamNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the steram for the properties file.");
+        br.addItem("Advice");
+        br.addElement("The stream provider should not return null but null returned.");
+        br.addElement("Make sure your resource path for the properties.");
+        br.addItem("Properties");
+        br.addElement(_title);
+        br.addItem("Stream Provider");
+        br.addElement(_streamProvider);
+        final String msg = br.buildExceptionMessage();
+        throw new JavaPropertiesStreamNotFoundException(msg);
     }
 
     protected void throwJavaPropertiesReadFailureException(IOException e) {

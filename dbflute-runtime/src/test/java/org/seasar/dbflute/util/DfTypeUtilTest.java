@@ -979,7 +979,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
         final byte[] bytes = "foo".getBytes("UTF-8");
 
         // ## Act & Assert ##
-        assertEquals(bytes, DfTypeUtil.toBinary(bytes));
+        assertEquals(bytes.length, DfTypeUtil.toBinary(bytes).length);
         assertTrue(bytes instanceof Serializable); // confirmation
     }
 

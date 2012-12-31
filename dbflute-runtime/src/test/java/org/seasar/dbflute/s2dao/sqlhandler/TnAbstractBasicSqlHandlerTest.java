@@ -159,8 +159,8 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
                 public void handle(SqlLogInfo info) {
                     markList.add("handle");
                     assertEquals("select ...", info.getDisplaySql());
-                    assertEquals(args, info.getBindArgs());
-                    assertEquals(argsTypes, info.getBindArgTypes());
+                    assertEquals(newArrayList(args), newArrayList(info.getBindArgs()));
+                    assertEquals(newArrayList(argsTypes), newArrayList(info.getBindArgTypes()));
                 }
             });
             CallbackContext.setCallbackContextOnThread(callbackContext);
@@ -290,8 +290,8 @@ public class TnAbstractBasicSqlHandlerTest extends PlainTestCase {
                 public void handle(SqlLogInfo info) {
                     markList.add("handle");
                     assertEquals("select ..." + ln() + "  from ...", info.getDisplaySql());
-                    assertEquals(args, info.getBindArgs());
-                    assertEquals(argsTypes, info.getBindArgTypes());
+                    assertEquals(newArrayList(args), newArrayList(info.getBindArgs()));
+                    assertEquals(newArrayList(argsTypes), newArrayList(info.getBindArgTypes()));
                 }
             });
             callbackContext.setSqlResultHandler(new SqlResultHandler() {

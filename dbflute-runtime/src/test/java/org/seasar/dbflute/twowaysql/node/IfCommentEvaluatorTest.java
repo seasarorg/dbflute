@@ -598,7 +598,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         BasePmb pmb = new BasePmb() {
             @Override
             public String getMemberName() { // not accessible
-                throw null;
+                return null;
             }
         };
 
