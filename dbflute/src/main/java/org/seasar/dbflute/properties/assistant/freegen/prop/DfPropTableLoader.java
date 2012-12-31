@@ -136,7 +136,7 @@ public class DfPropTableLoader {
             columnMap.put("propertyKey", propertyKey);
             final String propertyValue = property.getPropertyValue();
             columnMap.put("propertyValue", propertyValue != null ? propertyValue : "");
-            final String valueHtmlEncoded = prop.resolveTextForSchemaHtml(propertyValue);
+            final String valueHtmlEncoded = prop.resolveTextForSimpleLineHtml(propertyValue);
             columnMap.put("propertyValueHtmlEncoded", valueHtmlEncoded != null ? valueHtmlEncoded : "");
             columnMap.put("hasPropertyValue", Srl.is_NotNull_and_NotTrimmedEmpty(propertyValue));
 
@@ -156,11 +156,15 @@ public class DfPropTableLoader {
 
             final String comment = property.getComment();
             columnMap.put("comment", comment != null ? comment : "");
-            final String commentHtmlEncoded = prop.resolveTextForSchemaHtml(comment);
+            final String commentHtmlEncoded = prop.resolveTextForSimpleLineHtml(comment);
             columnMap.put("commentHtmlEncoded", commentHtmlEncoded != null ? commentHtmlEncoded : "");
             columnMap.put("hasComment", Srl.is_NotNull_and_NotTrimmedEmpty(comment));
             columnMap.put("isExtends", property.isExtends());
             columnMap.put("isOverride", property.isOverride());
+            columnMap.put("mayBeIntegerProperty", property.mayBeIntegerProperty());
+            columnMap.put("mayBeLongProperty", property.mayBeLongProperty());
+            columnMap.put("mayBeDecimalProperty", property.mayBeDecimalProperty());
+            columnMap.put("mayBeDateProperty", property.mayBeDateProperty());
             columnMap.put("mayBeBooleanProperty", property.mayBeBooleanProperty());
 
             for (Entry<String, String> entry : groupingKeyMap.entrySet()) {

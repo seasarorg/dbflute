@@ -239,6 +239,16 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return comment;
     }
 
+    public String resolveTextForSimpleLineHtml(String text) {
+        if (text == null || text.trim().length() == 0) {
+            return null;
+        }
+        // escape
+        text = Srl.replace(text, "<", "&lt;");
+        text = Srl.replace(text, ">", "&gt;");
+        return text;
+    }
+
     // ===================================================================================
     //                                                             Entity DBMeta DbComment
     //                                                             =======================
