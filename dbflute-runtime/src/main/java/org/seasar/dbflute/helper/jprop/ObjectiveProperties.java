@@ -97,6 +97,9 @@ public class ObjectiveProperties {
             }
         });
         prepareExtendsProperties(reader);
+        if (_checkImplicitOverride) {
+            reader.checkImplicitOverride();
+        }
         _javaPropertiesResult = reader.read();
         return this;
     }
