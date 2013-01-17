@@ -26,7 +26,7 @@ public class DfFreeGenOutput {
     protected final String _templateFile;
     protected final String _outputDirectory;
     protected final String _package;
-    protected final String _className;
+    protected final String _className; // (NullAllowed: when table list)
 
     // ===================================================================================
     //                                                                         Constructor

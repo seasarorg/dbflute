@@ -52,7 +52,7 @@ public class DfFreeGenRequest {
     //                                                                        ResourceType
     //                                                                        ============
     public enum DfFreeGenerateResourceType {
-        PROP, XLS, FILE_PATH, JSON_KEY, SOLR
+        PROP, XLS, FILE_PATH, JSON_KEY, JSON_SCHEMA, SOLR
     }
 
     public boolean isResourceTypeProp() {
@@ -61,6 +61,18 @@ public class DfFreeGenRequest {
 
     public boolean isResourceTypeXls() {
         return _resource.isResourceTypeXls();
+    }
+
+    public boolean isResourceTypeFilePath() {
+        return _resource.isResourceTypeFilePath();
+    }
+
+    public boolean isResourceTypeJsonKey() {
+        return _resource.isResourceTypeJsonKey();
+    }
+
+    public boolean isResourceTypeJsonSchema() {
+        return _resource.isResourceTypeJsonSchema();
     }
 
     public boolean isResourceTypeSolr() {
@@ -143,8 +155,16 @@ public class DfFreeGenRequest {
         return _output.getClassName();
     }
 
+    public DfFreeGenTable getTable() {
+        return _table;
+    }
+
     public Map<String, Object> getTableMap() {
         return _table.getTableMap();
+    }
+
+    public boolean isOneTable() {
+        return _table.isOneTable();
     }
 
     public String getTableName() {
@@ -155,11 +175,15 @@ public class DfFreeGenRequest {
         return _table.getColumnList();
     }
 
-    public void setTable(DfFreeGenTable _table) {
-        this._table = _table;
+    public List<Map<String, Object>> getTableList() {
+        return _table.getTableList();
+    }
+
+    public void setTable(DfFreeGenTable table) {
+        _table = table;
     }
 
     public void setPackagePathHandler(DfPackagePathHandler packagePathHandler) {
-        this._packagePathHandler = packagePathHandler;
+        _packagePathHandler = packagePathHandler;
     }
 }

@@ -49,7 +49,7 @@ public class DfSolrXmlTableLoader {
     //                                                                          Load Table
     //                                                                          ==========
     // ; resourceMap = map:{
-    //     ; resourceType = PROP
+    //     ; resourceType = SOLR
     //     ; resourceFile = ../../.../schema.xml
     // }
     // ; outputMap = map:{
@@ -60,11 +60,11 @@ public class DfSolrXmlTableLoader {
     // }
     // ; tableMap = map:{
     //     ; isContainsDynamicField = false
-    //     ; mappingMap = map:{
-    //         ; type = map:{
-    //             ; INTEGER = Integer
-    //             ; VARCHAR = String
-    //         }
+    // }
+    // ; mappingMap = map:{
+    //     ; type = map:{
+    //         ; INTEGER = Integer
+    //         ; VARCHAR = String
     //     }
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,

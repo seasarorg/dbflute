@@ -71,6 +71,10 @@ public class DfFreeGenResource {
         return DfFreeGenerateResourceType.JSON_KEY.equals(_resourceType);
     }
 
+    public boolean isResourceTypeJsonSchema() {
+        return DfFreeGenerateResourceType.JSON_SCHEMA.equals(_resourceType);
+    }
+
     public boolean isResourceTypeSolr() {
         return DfFreeGenerateResourceType.SOLR.equals(_resourceType);
     }

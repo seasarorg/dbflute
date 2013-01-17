@@ -34,28 +34,14 @@ public class DfFreeGenMethodConverter {
     public boolean processConvertMethod(final String requestName, final Map<String, Object> resultMap,
             final String key, final String value, List<DfConvertMethodReflector> reflectorList) {
         {
-            final ScopeInfo capScope = Srl.extractScopeFirst(value, "df:cap(", ")");
-            if (capScope != null) {
+            final ScopeInfo camelizeScope = Srl.extractScopeFirst(value, "df:camelize(", ")");
+            if (camelizeScope != null) {
                 reflectorList.add(new DfConvertMethodReflector() {
                     public void reflect() {
-                        final String content = capScope.getContent();
+                        final String content = camelizeScope.getContent();
                         final String refValue = (String) resultMap.get(content);
                         assertColumnRefValueExists(content, refValue, requestName, key, refValue);
-                        resultMap.put(key, Srl.initCap(refValue));
-                    }
-                });
-                return true;
-            }
-        }
-        {
-            final ScopeInfo uncapScope = Srl.extractScopeFirst(value, "df:uncap(", ")");
-            if (uncapScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
-                    public void reflect() {
-                        final String content = uncapScope.getContent();
-                        final String refValue = (String) resultMap.get(content);
-                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
-                        resultMap.put(key, Srl.initUncap(refValue));
+                        resultMap.put(key, Srl.camelize(refValue));
                     }
                 });
                 return true;
@@ -84,6 +70,34 @@ public class DfFreeGenMethodConverter {
                         final String refValue = (String) resultMap.get(content);
                         assertColumnRefValueExists(content, refValue, requestName, key, refValue);
                         resultMap.put(key, Srl.initUncap(Srl.camelize(refValue)));
+                    }
+                });
+                return true;
+            }
+        }
+        {
+            final ScopeInfo capScope = Srl.extractScopeFirst(value, "df:initCap(", ")");
+            if (capScope != null) {
+                reflectorList.add(new DfConvertMethodReflector() {
+                    public void reflect() {
+                        final String content = capScope.getContent();
+                        final String refValue = (String) resultMap.get(content);
+                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
+                        resultMap.put(key, Srl.initCap(refValue));
+                    }
+                });
+                return true;
+            }
+        }
+        {
+            final ScopeInfo uncapScope = Srl.extractScopeFirst(value, "df:initUncap(", ")");
+            if (uncapScope != null) {
+                reflectorList.add(new DfConvertMethodReflector() {
+                    public void reflect() {
+                        final String content = uncapScope.getContent();
+                        final String refValue = (String) resultMap.get(content);
+                        assertColumnRefValueExists(content, refValue, requestName, key, refValue);
+                        resultMap.put(key, Srl.initUncap(refValue));
                     }
                 });
                 return true;

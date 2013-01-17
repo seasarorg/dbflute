@@ -34,6 +34,7 @@ import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGe
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.properties.assistant.freegen.filepath.DfFilePathTableLoader;
+import org.seasar.dbflute.properties.assistant.freegen.json.DfJsonSchemaTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.json.DfJsonKeyTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.prop.DfPropTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.solr.DfSolrXmlTableLoader;
@@ -69,6 +70,7 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     protected final DfXlsTableLoader _xlsTableLoader = new DfXlsTableLoader();
     protected final DfFilePathTableLoader _filePathTableLoader = new DfFilePathTableLoader();
     protected final DfJsonKeyTableLoader _jsonKeyTableLoader = new DfJsonKeyTableLoader();
+    protected final DfJsonSchemaTableLoader _jsonSchemaTableLoader = new DfJsonSchemaTableLoader();
     protected final DfSolrXmlTableLoader _solrXmlTableLoader = new DfSolrXmlTableLoader();
 
     // ===================================================================================
@@ -155,6 +157,8 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
                     request.setTable(loadTableFromFilePath(requestName, resource, tableMap, mappingMap));
                 } else if (resource.isResourceTypeJsonKey()) {
                     request.setTable(loadTableFromJsonKey(requestName, resource, tableMap, mappingMap));
+                } else if (resource.isResourceTypeJsonSchema()) {
+                    request.setTable(loadTableFromJsonSchema(requestName, resource, tableMap, mappingMap));
                 } else if (resource.isResourceTypeSolr()) {
                     request.setTable(loadTableFromSolrXml(requestName, resource, tableMap, mappingMap));
                 } else {
@@ -233,6 +237,11 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     protected DfFreeGenTable loadTableFromJsonKey(String requestName, DfFreeGenResource resource,
             Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
         return _jsonKeyTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
+    }
+
+    protected DfFreeGenTable loadTableFromJsonSchema(String requestName, DfFreeGenResource resource,
+            Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
+        return _jsonSchemaTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
     }
 
     protected DfFreeGenTable loadTableFromSolrXml(String requestName, DfFreeGenResource resource,

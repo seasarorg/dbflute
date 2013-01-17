@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +34,7 @@ import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.properties.assistant.freegen.converter.DfFreeGenMethodConverter;
 import org.seasar.dbflute.properties.assistant.freegen.converter.DfFreeGenMethodConverter.DfConvertMethodReflector;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -63,12 +63,8 @@ public class DfXlsTableLoader {
     //     ; sheetName = [sheet-name]
     //     ; rowBeginNumber = 3
     //     ; columnMap = map:{
-    //         ; name = 3
-    //         ; capName = df:cap(name)
-    //         ; uncapName = df:uncap(name)
-    //         ; capCamelName = df:capCamel(name)
-    //         ; uncapCamelName = df:uncapCamel(name)
-    //         ; type = 4
+    //         ; columnName = 3
+    //         ; columnType = 4
     //     }
     //     ; mappingMap = map:{
     //         ; type = map:{
@@ -118,8 +114,8 @@ public class DfXlsTableLoader {
             if (row == null) {
                 break;
             }
-            final Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
-            final List<DfConvertMethodReflector> reflectorList = new ArrayList<DfConvertMethodReflector>();
+            final Map<String, Object> beanMap = DfCollectionUtil.newLinkedHashMap();
+            final List<DfConvertMethodReflector> reflectorList = DfCollectionUtil.newArrayList();
             boolean exists = false;
             for (Entry<String, String> entry : columnMap.entrySet()) {
                 final String key = entry.getKey();
@@ -128,12 +124,13 @@ public class DfXlsTableLoader {
                     String msg = "Not found the value of the key in FreeGen " + requestName + ": " + key;
                     throw new DfIllegalPropertySettingException(msg);
                 }
-                if (processColumnValue(requestName, columnMap, row, resultMap, key, value, reflectorList, mappingMap)) {
+                if (processColumnValue(requestName, columnMap, row, beanMap, key, value, reflectorList, mappingMap)) {
                     exists = true;
                 }
             }
+            prepareColumnNameConversion(requestName, beanMap, reflectorList);
             if (exists) {
-                rowList.add(resultMap);
+                rowList.add(beanMap);
             } else { // means empty row
                 break;
             }
@@ -145,9 +142,9 @@ public class DfXlsTableLoader {
     }
 
     protected boolean processColumnValue(final String requestName, final Map<String, String> columnMap,
-            final HSSFRow row, final Map<String, Object> resultMap, final String key, final String value,
+            final HSSFRow row, final Map<String, Object> beanMap, final String key, final String value,
             List<DfConvertMethodReflector> reflectorList, Map<String, Map<String, String>> mappingMap) {
-        if (processConvertMethod(requestName, resultMap, key, value, reflectorList)) {
+        if (convertByMethod(requestName, beanMap, key, value, reflectorList)) {
             return false;
         }
         // normal setting (cell number)
@@ -177,12 +174,19 @@ public class DfXlsTableLoader {
                 resultValue = mappingValue;
             }
         }
-        resultMap.put(key, resultValue);
+        beanMap.put(key, resultValue);
         return exists;
     }
 
-    protected boolean processConvertMethod(final String requestName, final Map<String, Object> resultMap,
-            final String key, final String value, List<DfConvertMethodReflector> reflectorList) {
-        return _methodConverter.processConvertMethod(requestName, resultMap, key, value, reflectorList);
+    protected void prepareColumnNameConversion(String requestName, final Map<String, Object> beanMap,
+            final List<DfConvertMethodReflector> reflectorList) {
+        convertByMethod(requestName, beanMap, "camelizedName", "df:camelize(name)", reflectorList);
+        convertByMethod(requestName, beanMap, "capCamelName", "df:capCamel(name)", reflectorList);
+        convertByMethod(requestName, beanMap, "uncapCamelName", "df:uncapCamel(name)", reflectorList);
+    }
+
+    protected boolean convertByMethod(final String requestName, final Map<String, Object> beanMap, final String key,
+            final String value, List<DfConvertMethodReflector> reflectorList) {
+        return _methodConverter.processConvertMethod(requestName, beanMap, key, value, reflectorList);
     }
 }

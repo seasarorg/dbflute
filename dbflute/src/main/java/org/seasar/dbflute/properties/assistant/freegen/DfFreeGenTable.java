@@ -18,6 +18,8 @@ package org.seasar.dbflute.properties.assistant.freegen;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.util.DfCollectionUtil;
+
 /**
  * @author jflute
  */
@@ -29,6 +31,7 @@ public class DfFreeGenTable {
     protected final Map<String, Object> _tableMap;
     protected final String _tableName;
     protected final List<Map<String, Object>> _columnList;
+    protected final List<Map<String, Object>> _tableList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -37,6 +40,14 @@ public class DfFreeGenTable {
         _tableMap = tableMap;
         _tableName = tableName;
         _columnList = columnList;
+        _tableList = DfCollectionUtil.emptyList();
+    }
+
+    public DfFreeGenTable(Map<String, Object> tableMap, List<Map<String, Object>> tableList) {
+        _tableMap = tableMap;
+        _tableName = null;
+        _columnList = DfCollectionUtil.emptyList();
+        _tableList = tableList;
     }
 
     // ===================================================================================
@@ -44,7 +55,11 @@ public class DfFreeGenTable {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{tableName=" + _tableName + ", rowList.size()=" + _columnList.size() + "}";
+        if (_tableName != null) {
+            return "{tableName=" + _tableName + ", rowList.size()=" + _columnList.size() + "}";
+        } else {
+            return "{tableList.size=" + _tableList.size() + "}";
+        }
     }
 
     // ===================================================================================
@@ -54,11 +69,19 @@ public class DfFreeGenTable {
         return _tableMap;
     }
 
+    public boolean isOneTable() {
+        return _tableName != null;
+    }
+
     public String getTableName() {
         return _tableName;
     }
 
     public List<Map<String, Object>> getColumnList() {
         return _columnList;
+    }
+
+    public List<Map<String, Object>> getTableList() {
+        return _tableList;
     }
 }
