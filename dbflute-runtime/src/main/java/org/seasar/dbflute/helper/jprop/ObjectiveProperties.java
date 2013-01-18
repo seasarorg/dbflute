@@ -28,6 +28,8 @@ import org.seasar.dbflute.util.DfTypeUtil.ParseDateNumberFormatException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseDateOutOfCalendarException;
 
 /**
+ * The properties object that can be objective. <br />
+ * You can make properties that extends other (super) properties.
  * @author jflute
  * @since 1.0.1 (2012/12/30 Sunday)
  */
@@ -67,6 +69,11 @@ public class ObjectiveProperties {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
+    /**
+     * Set the properties paths to extends them.
+     * @param extendsResourcePaths The varying array of path for resources to extends. (NotNull)
+     * @return this. (NotNull)
+     */
     public ObjectiveProperties extendsProperties(String... extendsResourcePaths) {
         if (extendsResourcePaths != null && extendsResourcePaths.length > 0) {
             for (String extendsResourcePath : extendsResourcePaths) {
@@ -76,6 +83,19 @@ public class ObjectiveProperties {
         return this;
     }
 
+    /**
+     * Enable implicit override check. <br />
+     * If the property existing in super-properties is set in sub-properties implicitly,
+     * an exception is thrown (you can detect the wrong situation).
+     * You can override by override annotation in the line comment like this:
+     * <pre>
+     * # @Override here is comment area, you can write about the property
+     * foo.bar = qux
+     * </pre>
+     * And if the property with override annotation but no existence in super-properties,
+     * an exception is thrown (you can detect the wrong situation).
+     * @return this. (NotNull)
+     */
     public ObjectiveProperties checkImplicitOverride() {
         _checkImplicitOverride = true;
         return this;
