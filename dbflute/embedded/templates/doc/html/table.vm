@@ -22,6 +22,9 @@ ${table.aliasExpression}${table.tableDispName}
 &nbsp;<span class="bqpcount"><a href="${database.sharp}${table.javaName}Sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>
 #end
 </h2>
+#if ($table.hasComment())
+<p class="tablecomment">${table.commentForSchemaHtml}</p>
+#end
 #set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
 #set ($hasDefaultValue = $table.hasDefaultValueExceptAutoIncrement())
 #set ($hasColumnComment = $table.hasColumnComment())

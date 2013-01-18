@@ -94,6 +94,11 @@ td {
 	border-left: 1px solid #555;
 	padding:2px;
 }
+.tablecomment {
+	font-size: 0.8em;
+	color: #3F7E5E;
+	padding:0 0 0.2em 1em;
+}
 .rownumhead {
 	text-align: center;
 	font-size: 0.4em;
@@ -132,6 +137,7 @@ td {
 }
 .commentcell {
 	font-size: 0.7em;
+	color: #3F7E5E;
 }
 .subcell {
 	font-size: 0.6em;
@@ -151,6 +157,9 @@ td {
 .clstypecell {
 	text-align: center;
 	font-size: 0.8em;
+}
+.commentdesc {
+	color: #3F7E5E;
 }
 
 /* inner table */
@@ -355,7 +364,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #if ($database.hasClassificationAlias($classificationName))
 				<td>#if ($classificationElement.hasAlias())${classificationElement.alias}#else &nbsp;#end</td>
 #end
-				<td>#if ($classificationElement.hasComment())${classificationElement.comment}#else &nbsp;#end</td>
+				<td class="commentcell">#if ($classificationElement.hasComment())${classificationElement.comment}#else &nbsp;#end</td>
 #if ($classificationTop.hasSubItem())
 				<td>${classificationElement.buildSubItemExpForSchemaHtml()}</td>
 #end
@@ -382,7 +391,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 	<dt>$table.getBehaviorQueryPathTitleForSchemaHtml($behaviorQueryPath)$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>
 #if ($table.hasBehaviorQueryPathDescription($behaviorQueryPath))
 	<dd>
-		<pre>$table.getBehaviorQueryPathDescriptionForSchemaHtml($behaviorQueryPath)</pre>
+		<pre class="commentdesc">$table.getBehaviorQueryPathDescriptionForSchemaHtml($behaviorQueryPath)</pre>
 	</dd>
 #end
 	<dd class="subinfo">
@@ -408,7 +417,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 	<dt>${procedure.procedureDisplayNameForSchemaHtml}</dt>
 #if ($procedure.hasProcedureComment())
 	<dd>
-		<pre>${procedure.procedureCommentForSchemaHtml}</pre>
+		<pre class="commentcell">${procedure.procedureCommentForSchemaHtml}</pre>
 	</dd>
 #end
 #if ($procedure.procedureColumnList.isEmpty())
@@ -418,7 +427,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 	<dd class="column">
 		${column.columnDisplayNameForSchemaHtml}
 #if ($column.hasColumnComment())
-		<pre>${column.columnCommentForSchemaHtml}</pre>
+		<pre class="commentdesc">${column.columnCommentForSchemaHtml}</pre>
 #end
 	</dd>
 #end
