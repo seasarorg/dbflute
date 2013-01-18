@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
-import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
@@ -255,8 +254,7 @@ public class DfJsonSchemaTableLoader {
             }
             columnBeanMap.put(attrKey, resultValue);
         } else {
-            String msg = "Unknown type for the column attribute in Json schema (FreeGen): " + attrValue;
-            throw new DfIllegalPropertyTypeException(msg);
+            columnBeanMap.put(attrKey, attrValue);
         }
     }
 
