@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.properties.assistant.freegen.converter;
+package org.seasar.dbflute.properties.assistant.freegen.reflector;
 
 import java.util.List;
 import java.util.Map;
@@ -27,16 +27,12 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
  */
 public class DfFreeGenMethodConverter {
 
-    public static interface DfConvertMethodReflector {
-        void reflect();
-    }
-
     public boolean processConvertMethod(final String requestName, final Map<String, Object> resultMap,
-            final String key, final String value, List<DfConvertMethodReflector> reflectorList) {
+            final String key, final String value, List<DfFreeGenLazyReflector> reflectorList) {
         {
             final ScopeInfo camelizeScope = Srl.extractScopeFirst(value, "df:camelize(", ")");
             if (camelizeScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
+                reflectorList.add(new DfFreeGenLazyReflector() {
                     public void reflect() {
                         final String content = camelizeScope.getContent();
                         final String refValue = (String) resultMap.get(content);
@@ -50,7 +46,7 @@ public class DfFreeGenMethodConverter {
         {
             final ScopeInfo capCamelScope = Srl.extractScopeFirst(value, "df:capCamel(", ")");
             if (capCamelScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
+                reflectorList.add(new DfFreeGenLazyReflector() {
                     public void reflect() {
                         final String content = capCamelScope.getContent();
                         final String refValue = (String) resultMap.get(content);
@@ -64,7 +60,7 @@ public class DfFreeGenMethodConverter {
         {
             final ScopeInfo uncapCamelScope = Srl.extractScopeFirst(value, "df:uncapCamel(", ")");
             if (uncapCamelScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
+                reflectorList.add(new DfFreeGenLazyReflector() {
                     public void reflect() {
                         final String content = uncapCamelScope.getContent();
                         final String refValue = (String) resultMap.get(content);
@@ -78,7 +74,7 @@ public class DfFreeGenMethodConverter {
         {
             final ScopeInfo capScope = Srl.extractScopeFirst(value, "df:initCap(", ")");
             if (capScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
+                reflectorList.add(new DfFreeGenLazyReflector() {
                     public void reflect() {
                         final String content = capScope.getContent();
                         final String refValue = (String) resultMap.get(content);
@@ -92,7 +88,7 @@ public class DfFreeGenMethodConverter {
         {
             final ScopeInfo uncapScope = Srl.extractScopeFirst(value, "df:initUncap(", ")");
             if (uncapScope != null) {
-                reflectorList.add(new DfConvertMethodReflector() {
+                reflectorList.add(new DfFreeGenLazyReflector() {
                     public void reflect() {
                         final String content = uncapScope.getContent();
                         final String refValue = (String) resultMap.get(content);

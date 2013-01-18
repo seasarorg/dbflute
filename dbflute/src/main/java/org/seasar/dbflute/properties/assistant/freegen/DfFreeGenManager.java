@@ -59,6 +59,9 @@ public class DfFreeGenManager {
         FileUtil.mkdir(getGeneratorInstance().getOutputPath() + "/" + basePath);
     }
 
+    // ===================================================================================
+    //                                                                      Resolve Helper
+    //                                                                      ==============
     public String resolveTextForSchemaHtml(String text) {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
         return prop.resolveTextForSchemaHtml(text);
@@ -67,6 +70,25 @@ public class DfFreeGenManager {
     public String resolveTextForJavaDoc(String text, String indent) {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
         return prop.resolveTextForJavaDoc(text, indent);
+    }
+
+    // ===================================================================================
+    //                                                                      Convert Helper
+    //                                                                      ==============
+    public String initCap(String decamelName) {
+        return Srl.initCap(decamelName);
+    }
+
+    public String initUncap(String decamelName) {
+        return Srl.initUncap(decamelName);
+    }
+
+    public String camelize(String decamelName) {
+        return Srl.camelize(decamelName);
+    }
+
+    public String decamelize(String camelName) {
+        return Srl.decamelize(camelName);
     }
 
     // ===================================================================================

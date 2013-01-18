@@ -163,8 +163,8 @@ public class DfFreeGenRequest {
         return _table.getTableMap();
     }
 
-    public boolean isOneTable() {
-        return _table.isOneTable();
+    public boolean isOnlyOneTable() {
+        return _table.isOnlyOneTable();
     }
 
     public String getTableName() {

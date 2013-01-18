@@ -34,8 +34,8 @@ import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest.DfFreeGe
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.properties.assistant.freegen.filepath.DfFilePathTableLoader;
-import org.seasar.dbflute.properties.assistant.freegen.json.DfJsonSchemaTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.json.DfJsonKeyTableLoader;
+import org.seasar.dbflute.properties.assistant.freegen.json.DfJsonSchemaTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.prop.DfPropTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.solr.DfSolrXmlTableLoader;
 import org.seasar.dbflute.properties.assistant.freegen.xls.DfXlsTableLoader;
@@ -70,7 +70,6 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
     protected final DfXlsTableLoader _xlsTableLoader = new DfXlsTableLoader();
     protected final DfFilePathTableLoader _filePathTableLoader = new DfFilePathTableLoader();
     protected final DfJsonKeyTableLoader _jsonKeyTableLoader = new DfJsonKeyTableLoader();
-    protected final DfJsonSchemaTableLoader _jsonSchemaTableLoader = new DfJsonSchemaTableLoader();
     protected final DfSolrXmlTableLoader _solrXmlTableLoader = new DfSolrXmlTableLoader();
 
     // ===================================================================================
@@ -241,7 +240,8 @@ public final class DfFreeGenProperties extends DfAbstractHelperProperties {
 
     protected DfFreeGenTable loadTableFromJsonSchema(String requestName, DfFreeGenResource resource,
             Map<String, Object> tableMap, Map<String, Map<String, String>> mappingMap) throws IOException {
-        return _jsonSchemaTableLoader.loadTable(requestName, resource, tableMap, mappingMap);
+        final DfJsonSchemaTableLoader loader = new DfJsonSchemaTableLoader(requestName, resource, tableMap, mappingMap);
+        return loader.loadTable();
     }
 
     protected DfFreeGenTable loadTableFromSolrXml(String requestName, DfFreeGenResource resource,

@@ -31,7 +31,7 @@ public class DfFreeGenTable {
     protected final Map<String, Object> _tableMap;
     protected final String _tableName;
     protected final List<Map<String, Object>> _columnList;
-    protected final List<Map<String, Object>> _tableList;
+    protected final Map<String, Map<String, Object>> _schemaMap;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -40,14 +40,14 @@ public class DfFreeGenTable {
         _tableMap = tableMap;
         _tableName = tableName;
         _columnList = columnList;
-        _tableList = DfCollectionUtil.emptyList();
+        _schemaMap = DfCollectionUtil.emptyMap();
     }
 
-    public DfFreeGenTable(Map<String, Object> tableMap, List<Map<String, Object>> tableList) {
+    public DfFreeGenTable(Map<String, Object> tableMap, Map<String, Map<String, Object>> schemaMap) {
         _tableMap = tableMap;
         _tableName = null;
         _columnList = DfCollectionUtil.emptyList();
-        _tableList = tableList;
+        _schemaMap = schemaMap;
     }
 
     // ===================================================================================
@@ -58,7 +58,7 @@ public class DfFreeGenTable {
         if (_tableName != null) {
             return "{tableName=" + _tableName + ", rowList.size()=" + _columnList.size() + "}";
         } else {
-            return "{tableList.size=" + _tableList.size() + "}";
+            return "{schemaMap.size=" + _schemaMap.size() + ", keys=" + _schemaMap.keySet() + "}";
         }
     }
 
@@ -69,7 +69,7 @@ public class DfFreeGenTable {
         return _tableMap;
     }
 
-    public boolean isOneTable() {
+    public boolean isOnlyOneTable() {
         return _tableName != null;
     }
 
@@ -81,7 +81,11 @@ public class DfFreeGenTable {
         return _columnList;
     }
 
+    public Map<String, Map<String, Object>> getSchemaMap() {
+        return _schemaMap;
+    }
+
     public List<Map<String, Object>> getTableList() {
-        return _tableList;
+        return DfCollectionUtil.newArrayList(_schemaMap.values());
     }
 }
