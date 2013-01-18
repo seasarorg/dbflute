@@ -71,7 +71,7 @@ public class ManualOrderBean implements HpCalculator {
     //                                              when_...
     //                                              --------
     /**
-     * Add 'when' element for 'case' statement as Equal.
+     * Add 'when' element for 'case' statement as Equal(=).
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
@@ -80,7 +80,7 @@ public class ManualOrderBean implements HpCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as NotEqual.
+     * Add 'when' element for 'case' statement as NotEqual(&lt;&gt;).
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
@@ -89,7 +89,7 @@ public class ManualOrderBean implements HpCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as GreaterThan.
+     * Add 'when' element for 'case' statement as GreaterThan(&gt;).
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
@@ -98,7 +98,7 @@ public class ManualOrderBean implements HpCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as LessThan.
+     * Add 'when' element for 'case' statement as LessThan(&lt;).
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
@@ -107,7 +107,7 @@ public class ManualOrderBean implements HpCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as GreaterEqual.
+     * Add 'when' element for 'case' statement as GreaterEqual(&gt;=).
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
@@ -116,7 +116,7 @@ public class ManualOrderBean implements HpCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as LessEqual.
+     * Add 'when' element for 'case' statement as LessEqual(&lt;=).
      * @param orderValue The value for ordering. (NullAllowed: if null, means invalid condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
      */
@@ -141,7 +141,10 @@ public class ManualOrderBean implements HpCalculator {
     }
 
     /**
-     * Add 'when' element for 'case' statement as FromTo.
+     * Add 'when' element for 'case' statement as FromTo. <br />
+     * You can set various from-to patterns by the from-to option. <br />
+     * compareAsDate(), compareAsMonth(), compareAsYear(), and so on... <br />
+     * See the {@link FromToOption} class for the details.
      * @param fromDate The from-date for ordering. (NullAllowed: if null, means invalid from-condition)
      * @param toDate The to-date for ordering. (NullAllowed: if null, means invalid to-condition)
      * @param option The option of from-to. (NotNull)
@@ -153,6 +156,13 @@ public class ManualOrderBean implements HpCalculator {
 
     /**
      * Add 'when' element for 'case' statement as DateFromTo.
+     * <pre>
+     * e.g. from:{<span style="color: #FD4747">2007/04/10</span> 08:24:53} to:{<span style="color: #FD4747">2007/04/16</span> 14:36:29}
+     * 
+     *   mob.when_DateFromTo(fromDate, toDate);
+     *     --&gt; column &gt;= '2007/04/10 00:00:00'
+     *     and column &lt; '2007/04/17 00:00:00'
+     * </pre>
      * @param fromDate The from-date for ordering. (NullAllowed: if null, means invalid from-condition)
      * @param toDate The to-date for ordering. (NullAllowed: if null, means invalid to-condition)
      * @return The bean for connected order, which you can set second or more conditions by. (NotNull)
