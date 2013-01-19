@@ -744,18 +744,23 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final String codeAliasVariables = buildClassificationCodeAliasVariables(classificationElement);
         sb.append(codeAliasVariables);
         final String[] sisters = classificationElement.getSisters();
-        sb.append(", new String[] {");
+        sb.append(", ");
         if (sisters != null && sisters.length > 0) {
-            int index = 0;
-            for (String sister : sisters) {
-                if (index > 0) {
-                    sb.append(", ");
+            sb.append("new String[] {");
+            if (sisters != null && sisters.length > 0) {
+                int index = 0;
+                for (String sister : sisters) {
+                    if (index > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append("\"").append(sister).append("\"");
+                    ++index;
                 }
-                sb.append("\"").append(sister).append("\"");
-                ++index;
             }
+            sb.append("}");
+        } else {
+            sb.append("EMPTY_SISTERS");
         }
-        sb.append("}");
         return sb.toString();
     }
 

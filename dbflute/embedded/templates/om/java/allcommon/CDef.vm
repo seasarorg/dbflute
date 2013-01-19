@@ -27,6 +27,13 @@ import org.seasar.dbflute.jdbc.ClassificationMeta;
  */
 public interface ${glCDef} extends Classification {
 
+    /** The empty array for no sisters. */
+    String[] EMPTY_SISTERS = new String[]{};
+
+    /** The empty map for no sub-items. */
+    @SuppressWarnings("unchecked")
+    Map<String, Object> EMPTY_SUB_ITEM_MAP = (Map<String, Object>)Collections.EMPTY_MAP;
+
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
 #if ($classificationTop.hasTopComment())
@@ -82,8 +89,7 @@ public interface ${glCDef} extends Classification {
 #if ($database.hasClassificationSubItemMap($classificationName))
         public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
 #else
-        @SuppressWarnings("unchecked")
-        public Map<String, Object> subItemMap() { return (Map<String, Object>)Collections.EMPTY_MAP; }
+        public Map<String, Object> subItemMap() { return EMPTY_SUB_ITEM_MAP; }
 #end
         public ClassificationMeta meta() { return ${glCDef}.DefMeta.${classificationName}; }
 
@@ -131,7 +137,7 @@ public interface ${glCDef} extends Classification {
          * @param name The string of name, which is case-sensitive. (NullAllowed: if null, returns null)
          * @return The instance of the corresponding classification to the name. (NullAllowed: if not found, returns null)
          */
-        public static ${classificationName} nameOf(String name) { // null allowed
+        public static ${classificationName} nameOf(String name) {
             if (name == null) { return null; }
             try { return valueOf(name); } catch (RuntimeException ignored) { return null; }
         }
