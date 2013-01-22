@@ -42,11 +42,22 @@ public class JavaPropertiesResult {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * @param plainProp The plain properties as base point properties. (NotNull)
+     * @param propertyList The list of property merged with extends-properties. (NotNull)
+     * @param duplicateKeyList The list of duplicate property keys. (NotNull)
+     */
     public JavaPropertiesResult(Properties plainProp, List<JavaPropertiesProperty> propertyList,
             List<String> duplicateKeyList) {
         this(plainProp, propertyList, duplicateKeyList, null);
     }
 
+    /**
+     * @param plainProp The plain properties as base point properties. (NotNull)
+     * @param propertyList The list of property merged with extends-properties. (NotNull)
+     * @param duplicateKeyList The list of duplicate property keys. (NotNull)
+     * @param extendsPropResult The result for extends-properties. (NullAllowed: if null, no extends)
+     */
     public JavaPropertiesResult(Properties plainProp, List<JavaPropertiesProperty> propertyList,
             List<String> duplicateKeyList, JavaPropertiesResult extendsPropResult) {
         _plainProp = plainProp;
@@ -91,18 +102,35 @@ public class JavaPropertiesResult {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    /**
+     * Get the plain properties as base point properties.
+     * @return The properties object of Java standard. (NotNull)
+     */
     public Properties getPlainProp() {
         return _plainProp;
     }
 
+    /**
+     * Get the property by the key.
+     * @param propertyKey The key string of property. (NotNull)
+     * @return The property object for Java properties. (NullAllowed: if null, means not found)
+     */
     public JavaPropertiesProperty getProperty(String propertyKey) {
         return _propertyMap.get(propertyKey);
     }
 
+    /**
+     * Get the property list merged with extends-properties.
+     * @return The list of property object. (NotNull)
+     */
     public List<JavaPropertiesProperty> getPropertyList() {
         return _propertyList;
     }
 
+    /**
+     * Get the property map merged with extends-properties.
+     * @return The map of property object, the key of map is property key. (NotNull)
+     */
     public Map<String, JavaPropertiesProperty> getPropertyMap() {
         return _propertyMap;
     }
@@ -115,6 +143,10 @@ public class JavaPropertiesResult {
         return _propertyExtendsOnlyList;
     }
 
+    /**
+     * Get the list of duplicate property keys.
+     * @return The list of duplicate property keys. (NotNull, EmptyAllowed)
+     */
     public List<String> getDuplicateKeyList() {
         return _duplicateKeyList;
     }

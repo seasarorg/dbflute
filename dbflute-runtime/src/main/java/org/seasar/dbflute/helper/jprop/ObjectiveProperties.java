@@ -44,7 +44,7 @@ public class ObjectiveProperties {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
-    /** The list of resource path of extends properties loaded by class loader. (NullAllowed) */
+    /** The list of resource path of extends properties loaded by class loader. (NotNull, EmptyAllowed) */
     protected List<String> _extendsResourcePathList = DfCollectionUtil.newArrayListSized(4);
 
     /** Does it check the implicit override property? */
@@ -240,18 +240,34 @@ public class ObjectiveProperties {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    /**
+     * Get the resource path of (base-point) properties loaded by class loader. (NotNull)
+     * @return The path string for the resource. (NotNull)
+     */
     public String getResourcePath() {
         return _resourcePath;
     }
 
+    /**
+     * Get the list of resource path of extends properties loaded by class loader.
+     * @return The list of path string for the resource. (NotNull, EmptyAllowed)
+     */
     public List<String> getExtendsResourcePathList() {
         return _extendsResourcePathList;
     }
 
+    /**
+     * Does it check the implicit override property?
+     * @return The determination, true or false.
+     */
     public boolean isCheckImplicitOverride() {
         return _checkImplicitOverride;
     }
 
+    /**
+     * Get the result of java properties reading.
+     * @return The result of java properties reading. (NotNull: after loading)
+     */
     public JavaPropertiesResult getJavaPropertiesResult() {
         return _javaPropertiesResult;
     }
