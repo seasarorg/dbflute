@@ -32,16 +32,11 @@ public class InternalMapContext {
     /** The thread-local for this. */
     private static final ThreadLocal<Map<String, Object>> threadLocal = new ThreadLocal<Map<String, Object>>();
 
-    protected static void initialize() {
+    protected static void initializeIfNeeds() {
         if (threadLocal.get() != null) {
             return;
         }
         threadLocal.set(new HashMap<String, Object>());
-    }
-
-    public static Map<String, Object> getInternalMap() {
-        initialize();
-        return threadLocal.get();
     }
 
     /**
@@ -50,7 +45,7 @@ public class InternalMapContext {
      * @return The value of the object. (NullAllowed)
      */
     public static Object getObject(String key) {
-        initialize();
+        initializeIfNeeds();
         return threadLocal.get().get(key);
     }
 
@@ -60,8 +55,13 @@ public class InternalMapContext {
      * @param value The value of the object. (NullAllowed)
      */
     public static void setObject(String key, Object value) {
-        initialize();
+        initializeIfNeeds();
         threadLocal.get().put(key, value);
+    }
+
+    public static Map<String, Object> internalMap() {
+        initializeIfNeeds();
+        return threadLocal.get();
     }
 
     /**

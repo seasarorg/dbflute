@@ -45,6 +45,7 @@ public class JavaPropertiesProperty {
     protected String _comment;
     protected boolean _extends;
     protected boolean _override;
+    protected boolean _secure;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -252,5 +253,13 @@ public class JavaPropertiesProperty {
 
     public void toBeOverride() {
         _override = true;
+    }
+
+    public boolean isSecure() {
+        return _secure;
+    }
+
+    public void toBeSecure() {
+        _secure = true;
     }
 }

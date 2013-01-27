@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ public class JavaPropertiesReader {
     //                                                                          Definition
     //                                                                          ==========
     public static final String OVERRIDE_ANNOTATION = "@Override";
+    public static final String SECURE_ANNOTATION = "@Secure";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -207,19 +209,31 @@ public class JavaPropertiesReader {
         return extendsReader;
     }
 
+    // ===================================================================================
+    //                                                                               Merge
+    //                                                                               =====
     protected List<JavaPropertiesProperty> mergeExtendsPropResult(List<JavaPropertiesProperty> propertyList,
             JavaPropertiesResult extendsPropResult) {
         final List<JavaPropertiesProperty> extendsPropertyList = extendsPropResult.getPropertyList();
         for (JavaPropertiesProperty property : extendsPropertyList) {
             property.toBeExtends();
+            if (containsSecureAnnotation(property)) {
+                property.toBeSecure();
+            }
         }
-        final Set<JavaPropertiesProperty> extendsPropertySet = DfCollectionUtil.newLinkedHashSet(extendsPropertyList);
+        final Map<String, JavaPropertiesProperty> extendsPropertyMap = toPropertyMap(extendsPropertyList);
         for (JavaPropertiesProperty property : propertyList) {
-            if (extendsPropertySet.contains(property)) {
+            final String propertyKey = property.getPropertyKey();
+            if (extendsPropertyMap.containsKey(propertyKey)) {
                 property.toBeOverride();
                 if (_checkImplicitOverride && !containsOverrideAnnotation(property)) {
                     throwJavaPropertiesImplicitOverrideException(property);
                 }
+                final JavaPropertiesProperty extendsProperty = extendsPropertyMap.get(propertyKey);
+                if (extendsProperty.isSecure()) {
+                    property.toBeSecure(); // inherit
+                }
+                inheritComment(property, extendsProperty);
             } else {
                 if (_checkImplicitOverride && containsOverrideAnnotation(property)) {
                     throwJavaPropertiesLonelyOverrideException(property);
@@ -227,13 +241,58 @@ public class JavaPropertiesReader {
             }
         }
         final Set<JavaPropertiesProperty> mergedPropertySet = DfCollectionUtil.newLinkedHashSet(propertyList);
-        mergedPropertySet.addAll(extendsPropertySet); // merge (add if not exists)
+        mergedPropertySet.addAll(extendsPropertyMap.values()); // merge (add if not exists)
         return DfCollectionUtil.newArrayList(mergedPropertySet);
+    }
+
+    protected Map<String, JavaPropertiesProperty> toPropertyMap(List<JavaPropertiesProperty> propertyList) {
+        final Map<String, JavaPropertiesProperty> propertyMap = DfCollectionUtil.newLinkedHashMap();
+        for (JavaPropertiesProperty property : propertyList) {
+            propertyMap.put(property.getPropertyKey(), property);
+        }
+        return propertyMap;
     }
 
     protected boolean containsOverrideAnnotation(JavaPropertiesProperty property) {
         final String comment = property.getComment();
         return comment != null && Srl.containsIgnoreCase(comment, OVERRIDE_ANNOTATION);
+    }
+
+    protected boolean containsSecureAnnotation(JavaPropertiesProperty property) {
+        final String comment = property.getComment();
+        return comment != null && Srl.containsIgnoreCase(comment, SECURE_ANNOTATION);
+    }
+
+    protected void inheritComment(JavaPropertiesProperty property, JavaPropertiesProperty extendsProperty) {
+        final String comment = property.getComment();
+        if (hasCommentIgnoreAnnotation(comment)) {
+            return;
+        }
+        // only annotations or empty
+        final String extendsPureComment = extractPureComment(extendsProperty.getComment());
+        if (Srl.is_Null_or_TrimmedEmpty(extendsPureComment)) {
+            return;
+        }
+        final String baseComment = Srl.is_NotNull_and_NotTrimmedEmpty(comment) ? comment + " " : "";
+        property.setComment(baseComment + extendsPureComment);
+    }
+
+    protected boolean hasCommentIgnoreAnnotation(String comment) {
+        if (Srl.is_Null_or_TrimmedEmpty(comment)) {
+            return false;
+        }
+        final String replaced = extractPureComment(comment);
+        return Srl.is_NotNull_and_NotTrimmedEmpty(replaced);
+    }
+
+    protected String extractPureComment(String comment) {
+        if (Srl.is_Null_or_TrimmedEmpty(comment)) {
+            return comment;
+        }
+        final Map<String, String> fromToMap = new HashMap<String, String>();
+        fromToMap.put(OVERRIDE_ANNOTATION, "");
+        fromToMap.put(SECURE_ANNOTATION, "");
+        return Srl.replaceBy(comment, fromToMap);
     }
 
     protected void throwJavaPropertiesImplicitOverrideException(JavaPropertiesProperty property) {

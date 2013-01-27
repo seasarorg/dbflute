@@ -89,7 +89,7 @@ public class ContextStack {
             contextStack.setFetchBean(FetchAssistContext.getFetchBeanOnThread());
         }
         if (InternalMapContext.isExistInternalMapContextOnThread()) {
-            contextStack.setInternalMap(InternalMapContext.getInternalMap());
+            contextStack.setInternalMap(InternalMapContext.internalMap());
         }
         if (ResourceContext.isExistResourceContextOnThread()) {
             contextStack.setResourceContext(ResourceContext.getResourceContextOnThread());
