@@ -150,10 +150,18 @@ public class JavaPropertiesReader {
             property.setVariableArgSet(buildVariableArgSet(variableNumberList));
             property.setVariableNumberList(variableNumberList);
             property.setComment(comment);
+            if (containsSecureAnnotation(property)) {
+                property.toBeSecure();
+            }
 
             propertyList.add(property);
         }
         return prepareResult(prop, propertyList, duplicateKeyList);
+    }
+
+    protected boolean containsSecureAnnotation(JavaPropertiesProperty property) {
+        final String comment = property.getComment();
+        return comment != null && Srl.containsIgnoreCase(comment, SECURE_ANNOTATION);
     }
 
     // -----------------------------------------------------
@@ -217,30 +225,18 @@ public class JavaPropertiesReader {
         final List<JavaPropertiesProperty> extendsPropertyList = extendsPropResult.getPropertyList();
         for (JavaPropertiesProperty property : extendsPropertyList) {
             property.toBeExtends();
-            if (containsSecureAnnotation(property)) {
-                property.toBeSecure();
-            }
         }
         final Map<String, JavaPropertiesProperty> extendsPropertyMap = toPropertyMap(extendsPropertyList);
         for (JavaPropertiesProperty property : propertyList) {
             final String propertyKey = property.getPropertyKey();
             if (extendsPropertyMap.containsKey(propertyKey)) {
                 property.toBeOverride();
-                if (_checkImplicitOverride && !containsOverrideAnnotation(property)) {
-                    throwJavaPropertiesImplicitOverrideException(property);
-                }
+                checkImplicitOverride(property);
                 final JavaPropertiesProperty extendsProperty = extendsPropertyMap.get(propertyKey);
-                if (extendsProperty.isSecure()) {
-                    property.toBeSecure(); // inherit
-                }
+                inheritSecure(property, extendsProperty);
                 inheritComment(property, extendsProperty);
             } else {
-                if (_checkImplicitOverride && containsOverrideAnnotation(property)) {
-                    throwJavaPropertiesLonelyOverrideException(property);
-                }
-            }
-            if (containsSecureAnnotation(property)) {
-                property.toBeSecure();
+                checkLonelyOverride(property);
             }
         }
         final Set<JavaPropertiesProperty> mergedPropertySet = DfCollectionUtil.newLinkedHashSet(propertyList);
@@ -256,14 +252,27 @@ public class JavaPropertiesReader {
         return propertyMap;
     }
 
+    protected void checkImplicitOverride(JavaPropertiesProperty property) {
+        if (_checkImplicitOverride && !containsOverrideAnnotation(property)) {
+            throwJavaPropertiesImplicitOverrideException(property);
+        }
+    }
+
+    protected void checkLonelyOverride(JavaPropertiesProperty property) {
+        if (_checkImplicitOverride && containsOverrideAnnotation(property)) {
+            throwJavaPropertiesLonelyOverrideException(property);
+        }
+    }
+
     protected boolean containsOverrideAnnotation(JavaPropertiesProperty property) {
         final String comment = property.getComment();
         return comment != null && Srl.containsIgnoreCase(comment, OVERRIDE_ANNOTATION);
     }
 
-    protected boolean containsSecureAnnotation(JavaPropertiesProperty property) {
-        final String comment = property.getComment();
-        return comment != null && Srl.containsIgnoreCase(comment, SECURE_ANNOTATION);
+    protected void inheritSecure(JavaPropertiesProperty property, JavaPropertiesProperty extendsProperty) {
+        if (extendsProperty.isSecure()) {
+            property.toBeSecure(); // inherit
+        }
     }
 
     protected void inheritComment(JavaPropertiesProperty property, JavaPropertiesProperty extendsProperty) {
@@ -277,7 +286,7 @@ public class JavaPropertiesReader {
             return;
         }
         final String baseComment = Srl.is_NotNull_and_NotTrimmedEmpty(comment) ? comment + " " : "";
-        property.setComment(baseComment + extendsPureComment);
+        property.setComment(baseComment + extendsPureComment); // inherit
     }
 
     protected boolean hasCommentIgnoreAnnotation(String comment) {
