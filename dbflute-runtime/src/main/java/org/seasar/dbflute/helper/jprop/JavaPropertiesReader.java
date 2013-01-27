@@ -239,6 +239,9 @@ public class JavaPropertiesReader {
                     throwJavaPropertiesLonelyOverrideException(property);
                 }
             }
+            if (containsSecureAnnotation(property)) {
+                property.toBeSecure();
+            }
         }
         final Set<JavaPropertiesProperty> mergedPropertySet = DfCollectionUtil.newLinkedHashSet(propertyList);
         mergedPropertySet.addAll(extendsPropertyMap.values()); // merge (add if not exists)
