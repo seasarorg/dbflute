@@ -49,6 +49,9 @@ public class DfPropHtmlProperty {
     /** Does the property have override elements at least one? */
     protected boolean _hasOverride;
 
+    /** Is the property secure? */
+    protected boolean _secure;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -79,7 +82,8 @@ public class DfPropHtmlProperty {
         return DfCollectionUtil.newArrayList(_envElementMap.values());
     }
 
-    public void setPropertyValue(String envType, String langType, String propertyValue, String comment, boolean override) {
+    public void setPropertyValue(String envType, String langType, String propertyValue, String comment,
+            boolean override, boolean secure) {
         DfPropHtmlPropertyEnvElement envElement = _envElementMap.get(envType);
         if (envElement == null) {
             envElement = createEnvElement(envType);
@@ -94,6 +98,7 @@ public class DfPropHtmlProperty {
         if (override) {
             _hasOverride = true;
         }
+        _secure = secure;
     }
 
     protected DfPropHtmlPropertyEnvElement createEnvElement(String envType) {
@@ -120,5 +125,9 @@ public class DfPropHtmlProperty {
             throw new IllegalStateException(msg);
         }
         return langElement.isOverride();
+    }
+
+    public boolean isSecure() {
+        return _secure;
     }
 }

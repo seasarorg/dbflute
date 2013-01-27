@@ -23,6 +23,13 @@ import java.util.*;
  */
 public interface ${glCDef} {
 
+    /** The empty array for no sisters. */
+    String[] EMPTY_SISTERS = new String[]{};
+
+    /** The empty map for no sub-items. */
+    @SuppressWarnings("unchecked")
+    Map<String, Object> EMPTY_SUB_ITEM_MAP = (Map<String, Object>)Collections.EMPTY_MAP;
+
     /**
      * @return The code of the classification. (NotNull)
      */
@@ -92,8 +99,7 @@ public interface ${glCDef} {
 #if ($database.hasClassificationSubItemMap($classificationName))
         public Map<String, Object> subItemMap() { return _subItemMapMap.get(code()); }
 #else
-        @SuppressWarnings("unchecked")
-        public Map<String, Object> subItemMap() { return (Map<String, Object>)Collections.EMPTY_MAP; }
+        public Map<String, Object> subItemMap() { return EMPTY_SUB_ITEM_MAP; }
 #end
 
         /**

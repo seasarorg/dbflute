@@ -174,12 +174,8 @@ public class DfPropHtmlManager {
             final List<JavaPropertiesProperty> jpropList = jpropResult.getPropertyBasePointOnlyList();
             final Set<String> propertyKeySet = DfCollectionUtil.newLinkedHashSet();
             for (JavaPropertiesProperty jprop : jpropList) {
-                final String propertyKey = jprop.getPropertyKey();
-                final String propertyValue = jprop.getPropertyValue();
-                final String comment = jprop.getComment();
-                final boolean override = jprop.isOverride();
-                request.addProperty(propertyKey, envType, langType, propertyValue, comment, override);
-                propertyKeySet.add(propertyKey);
+                request.addProperty(envType, langType, jprop);
+                propertyKeySet.add(jprop.getPropertyKey());
             }
 
             final DfPropHtmlFileAttribute attribute = new DfPropHtmlFileAttribute(familyFile, envType, langType);

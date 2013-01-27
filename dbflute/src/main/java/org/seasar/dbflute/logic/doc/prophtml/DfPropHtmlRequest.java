@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -90,20 +91,39 @@ public class DfPropHtmlRequest {
         return DfCollectionUtil.newArrayList(_propertyMap.values());
     }
 
-    public void addProperty(String propertyKey, String envType, String langType, String propertyValue, String comment,
-            boolean override) {
+    public void addProperty(String envType, String langType, JavaPropertiesProperty jprop) {
+        final String propertyKey = jprop.getPropertyKey();
+        final String propertyValue = jprop.getPropertyValue();
+        final String comment = jprop.getComment();
+        final boolean override = jprop.isOverride();
+        final boolean secure = jprop.isSecure();
+        doAddProperty(propertyKey, envType, langType, propertyValue, comment, override, secure);
+    }
+
+    protected void doAddProperty(String propertyKey, String envType, String langType, String propertyValue,
+            String comment, boolean override, boolean secure) {
+        final DfPropHtmlProperty property = prepareManagedProperty(propertyKey);
+        final String registeredValue = filterRegisteredValue(propertyKey, propertyValue, secure);
+        property.setPropertyValue(envType, langType, registeredValue, comment, override, secure);
+    }
+
+    protected DfPropHtmlProperty prepareManagedProperty(String propertyKey) {
         DfPropHtmlProperty property = _propertyMap.get(propertyKey);
         if (property == null) {
             property = new DfPropHtmlProperty(propertyKey);
             _propertyMap.put(propertyKey, property);
         }
+        return property;
+    }
+
+    protected String filterRegisteredValue(String propertyKey, String propertyValue, boolean secure) {
         final String registeredValue;
-        if (_maskedKeySet.contains(propertyKey)) { // maskedKeySet should be set before
+        if (secure || _maskedKeySet.contains(propertyKey)) { // maskedKeySet should be set before
             registeredValue = MASKING_VALUE; // masked here
         } else {
             registeredValue = propertyValue;
         }
-        property.setPropertyValue(envType, langType, registeredValue, comment, override);
+        return registeredValue;
     }
 
     public Set<String> getDiffIgnoredKeySet() {
