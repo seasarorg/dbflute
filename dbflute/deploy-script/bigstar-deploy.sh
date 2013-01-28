@@ -4,7 +4,6 @@ ant -f build.xml reflect-to-spring
 ant -f build.xml reflect-to-guice
 ant -f build.xml reflect-to-mysql
 ant -f build.xml reflect-to-postgresql
-ant -f build.xml reflect-to-db2
 ant -f build.xml reflect-to-sastruts
 export answer = y
 
@@ -56,14 +55,6 @@ rm ./log/*.log
 . sql2entity.sh
 . outside-sql-test.sh
 . manage.sh load-data-reverse
-
-cd ../../dbflute-db2-example/dbflute_exampledb
-rm ./log/*.log
-. jdbc.sh
-. doc.sh
-. generate.sh
-. sql2entity.sh
-. outside-sql-test.sh
 
 cd ../../dbflute-sastruts-example/dbflute_exampledb
 rm ./log/*.log
