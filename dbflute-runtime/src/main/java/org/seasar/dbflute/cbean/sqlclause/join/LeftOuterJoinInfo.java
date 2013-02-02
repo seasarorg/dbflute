@@ -114,12 +114,16 @@ public class LeftOuterJoinInfo implements Serializable {
         if (!isPureStructuralPossibleInnerJoin()) {
             return false;
         }
+        // pure structural-possible inner-join here
+        // but check all relations from base point are inner-join or not
+        // (lonely structural-possible is out of target for safety and simplicity)
         LeftOuterJoinInfo current = _localJoinInfo;
         while (true) {
             if (current == null) { // means first level (not nested) join
                 break;
             }
-            // means nested join (e.g. SERVICE_RANK if MEMBER is base point)
+            // means nested join here
+            // (e.g. SERVICE_RANK if MEMBER is base point)
             if (!current.isTraceStructuralPossibleInnerJoin()) {
                 return false;
             }
@@ -133,7 +137,7 @@ public class LeftOuterJoinInfo implements Serializable {
     }
 
     protected boolean isTraceStructuralPossibleInnerJoin() {
-        // more pattern may exist but it save logic simple for safety
+        // more pattern may exist but it keeps logic simple for safety
         return isInnerJoin() || isPureStructuralPossibleInnerJoin();
     }
 
