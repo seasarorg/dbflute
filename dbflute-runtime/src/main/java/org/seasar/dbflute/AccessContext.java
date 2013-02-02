@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.exception.AccessContextNoValueException;
 import org.seasar.dbflute.exception.AccessContextNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.resource.DBFluteSystem;
 
 /**
@@ -50,7 +51,7 @@ public class AccessContext {
      */
     public static void setAccessContextOnThread(AccessContext accessContext) {
         if (accessContext == null) {
-            String msg = "The argument[accessContext] must not be null.";
+            String msg = "The argument 'accessContext' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         _threadLocal.set(accessContext);
@@ -76,8 +77,8 @@ public class AccessContext {
     //                                                                  ==================
     /**
      * Get access date on thread. <br />
-     * If it couldn't get access date from access-context, it returns application current date!
-     * @return Access date. (NotNull)
+     * If it couldn't get access date from access-context, it returns current date of {@link DBFluteSystem}.
+     * @return The date that specifies access time. (NotNull)
      */
     public static Date getAccessDateOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -86,17 +87,21 @@ public class AccessContext {
             if (accessDate != null) {
                 return accessDate;
             }
-            if (userContextOnThread.getAccessDateProvider() != null) {
-                return userContextOnThread.getAccessDateProvider().getAccessDate();
+            final AccessDateProvider provider = userContextOnThread.getAccessDateProvider();
+            if (provider != null) {
+                final Date provided = provider.getAccessDate();
+                if (provided != null) {
+                    return provided;
+                }
             }
         }
-        return new Date();
+        return DBFluteSystem.currentDate();
     }
 
     /**
      * Get access time-stamp on thread. <br />
-     * If it couldn't get access time-stamp from access-context, it returns application current time-stamp!
-     * @return Access time-stamp. (NotNull)
+     * If it couldn't get access time-stamp from access-context, it returns current time-stamp of {@link DBFluteSystem}.
+     * @return The time-stamp that specifies access time. (NotNull)
      */
     public static Timestamp getAccessTimestampOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -105,8 +110,12 @@ public class AccessContext {
             if (accessTimestamp != null) {
                 return accessTimestamp;
             }
-            if (userContextOnThread.getAccessTimestampProvider() != null) {
-                return userContextOnThread.getAccessTimestampProvider().getAccessTimestamp();
+            final AccessTimestampProvider provider = userContextOnThread.getAccessTimestampProvider();
+            if (provider != null) {
+                final Timestamp provided = provider.getAccessTimestamp();
+                if (provided != null) {
+                    return provided;
+                }
             }
         }
         return DBFluteSystem.currentTimestamp();
@@ -114,8 +123,7 @@ public class AccessContext {
 
     /**
      * Get access user on thread.
-     * @return Access user. (NotNull)
-     * @exception IllegalStateException When it couldn't get access user.
+     * @return The expression for access user. (NotNull)
      */
     public static String getAccessUserOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -124,8 +132,15 @@ public class AccessContext {
             if (accessUser != null) {
                 return accessUser;
             }
+            final AccessUserProvider provider = userContextOnThread.getAccessUserProvider();
+            if (provider != null) {
+                final String user = provider.getAccessUser();
+                if (user != null) {
+                    return user;
+                }
+            }
         }
-        String methodName = "getAccessUserOnThread()";
+        final String methodName = "getAccessUserOnThread()";
         if (isExistAccessContextOnThread()) {
             throwAccessContextNoValueException(methodName, "AccessUser", "user");
         } else {
@@ -136,8 +151,7 @@ public class AccessContext {
 
     /**
      * Get access process on thread.
-     * @return Access process. (NotNull)
-     * @exception IllegalStateException When it couldn't get access process.
+     * @return The expression for access module. (NotNull)
      */
     public static String getAccessProcessOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -146,8 +160,15 @@ public class AccessContext {
             if (accessProcess != null) {
                 return accessProcess;
             }
+            final AccessProcessProvider provider = userContextOnThread.getAccessProcessProvider();
+            if (provider != null) {
+                final String provided = provider.getAccessProcess();
+                if (provided != null) {
+                    return provided;
+                }
+            }
         }
-        String methodName = "getAccessProcessOnThread()";
+        final String methodName = "getAccessProcessOnThread()";
         if (isExistAccessContextOnThread()) {
             throwAccessContextNoValueException(methodName, "AccessProcess", "process");
         } else {
@@ -158,8 +179,7 @@ public class AccessContext {
 
     /**
      * Get access module on thread.
-     * @return Access module. (NotNull)
-     * @exception IllegalStateException When it couldn't get access module.
+     * @return The expression for access module. (NotNull)
      */
     public static String getAccessModuleOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -168,8 +188,15 @@ public class AccessContext {
             if (accessModule != null) {
                 return accessModule;
             }
+            final AccessModuleProvider provider = userContextOnThread.getAccessModuleProvider();
+            if (provider != null) {
+                final String provided = provider.getAccessModule();
+                if (provided != null) {
+                    return provided;
+                }
+            }
         }
-        String methodName = "getAccessModuleOnThread()";
+        final String methodName = "getAccessModuleOnThread()";
         if (isExistAccessContextOnThread()) {
             throwAccessContextNoValueException(methodName, "AccessModule", "module");
         } else {
@@ -181,18 +208,20 @@ public class AccessContext {
     /**
      * Get access value on thread.
      * @param key Key. (NotNull)
-     * @return Access value. (NullAllowed: If the key has null value, it returns null)
-     * @exception IllegalStateException When it couldn't get access value.
+     * @return The object of access value. (NotNull)
      */
     public static Object getAccessValueOnThread(String key) {
         if (isExistAccessContextOnThread()) {
             final AccessContext userContextOnThread = getAccessContextOnThread();
             final Map<String, Object> accessValueMap = userContextOnThread.getAccessValueMap();
             if (accessValueMap != null) {
-                return accessValueMap.get(key);
+                final Object value = accessValueMap.get(key);
+                if (value != null) {
+                    return value;
+                }
             }
         }
-        String methodName = "getAccessValueOnThread(\"" + key + "\")";
+        final String methodName = "getAccessValueOnThread(\"" + key + "\")";
         if (isExistAccessContextOnThread()) {
             throwAccessContextNoValueException(methodName, "AccessValue", "value");
         } else {
@@ -202,43 +231,44 @@ public class AccessContext {
     }
 
     protected static void throwAccessContextNotFoundException(String methodName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The access context was not found on thread!" + ln();
-        msg = msg + "{When you used AccessContext." + methodName + "}" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please set up the access context before DB access(using common column auto set-up)." + ln();
-        msg = msg + "You should set up it at your application's interceptor or filter." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    try {" + ln();
-        msg = msg + "        AccessContext context = new AccessContext();" + ln();
-        msg = msg + "        context.setAccessTimestamp(accessTimestamp);" + ln();
-        msg = msg + "        context.setAccessUser(accessUser);" + ln();
-        msg = msg + "        context.setAccessProcess(accessProcess);" + ln();
-        msg = msg + "        AccessContext.setAccessContextOnThread(context);" + ln();
-        msg = msg + "        return invocation.proceed();" + ln();
-        msg = msg + "    } finally {" + ln();
-        msg = msg + "        AccessContext.clearAccessContextOnThread();" + ln();
-        msg = msg + "    }" + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The access context was not found on thread.");
+        br.addItem("Advice");
+        br.addElement("Set up the value before DB access (using common column auto set-up)");
+        br.addElement("You should set up it at your application's interceptor or filter.");
+        br.addElement("For example:");
+        br.addElement("  try {");
+        br.addElement("      AccessContext context = new AccessContext();");
+        br.addElement("      context.setAccessTimestamp(accessTimestamp);");
+        br.addElement("      context.setAccessUser(accessUser);");
+        br.addElement("      context.setAccessProcess(accessProcess);");
+        br.addElement("      AccessContext.setAccessContextOnThread(context);");
+        br.addElement("      return invocation.proceed();");
+        br.addElement("  } finally {");
+        br.addElement("      AccessContext.clearAccessContextOnThread();");
+        br.addElement("  }");
+        final String msg = br.buildExceptionMessage();
         throw new AccessContextNotFoundException(msg);
     }
 
     protected static void throwAccessContextNoValueException(String methodName, String capPropName, String aliasName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to get the access " + aliasName + " in access context on thread!" + ln();
-        msg = msg + "{When you used AccessContext." + methodName + "}" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please set up the value before DB access(using common column auto set-up)." + ln();
-        msg = msg + "You should set up it at your application's interceptor or filter." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    AccessContext context = new AccessContext();" + ln();
-        msg = msg + "    context.set" + capPropName + "(...);" + ln();
-        msg = msg + "    AccessContext.setAccessContextOnThread(context);" + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to get the access " + aliasName + " in access context on thread.");
+        br.addItem("Advice");
+        br.addElement("Set up the value before DB access (using common column auto set-up)");
+        br.addElement("You should set up it at your application's interceptor or filter.");
+        br.addElement("For example:");
+        br.addElement("  try {");
+        br.addElement("      AccessContext context = new AccessContext();");
+        br.addElement("      context.setAccessTimestamp(accessTimestamp);");
+        br.addElement("      context.setAccessUser(accessUser);");
+        br.addElement("      context.setAccessProcess(accessProcess);");
+        br.addElement("      AccessContext.setAccessContextOnThread(context);");
+        br.addElement("      return invocation.proceed();");
+        br.addElement("  } finally {");
+        br.addElement("      AccessContext.clearAccessContextOnThread();");
+        br.addElement("  }");
+        final String msg = br.buildExceptionMessage();
         throw new AccessContextNoValueException(msg);
     }
 
@@ -254,11 +284,19 @@ public class AccessContext {
     //                                                                           =========
     protected Date _accessDate;
     protected AccessDateProvider _accessDateProvider;
+
     protected Timestamp _accessTimestamp;
     protected AccessTimestampProvider _accessTimestampProvider;
+
     protected String _accessUser;
+    protected AccessUserProvider _accessUserProvider;
+
     protected String _accessProcess;
+    protected AccessProcessProvider _accessProcessProvider;
+
     protected String _accessModule;
+    protected AccessModuleProvider _accessModuleProvider;
+
     protected Map<String, Object> _accessValueMap;
 
     // ===================================================================================
@@ -313,6 +351,14 @@ public class AccessContext {
         this._accessUser = accessUser;
     }
 
+    public AccessUserProvider getAccessUserProvider() {
+        return _accessUserProvider;
+    }
+
+    public void setAccessUserProvider(AccessUserProvider accessUserProvider) {
+        this._accessUserProvider = accessUserProvider;
+    }
+
     public String getAccessProcess() {
         return _accessProcess;
     }
@@ -321,12 +367,28 @@ public class AccessContext {
         this._accessProcess = accessProcess;
     }
 
+    public AccessProcessProvider getAccessProcessProvider() {
+        return _accessProcessProvider;
+    }
+
+    public void setAccessProcessProvider(AccessProcessProvider accessProcessProvider) {
+        this._accessProcessProvider = accessProcessProvider;
+    }
+
     public String getAccessModule() {
         return _accessModule;
     }
 
     public void setAccessModule(String accessModule) {
         this._accessModule = accessModule;
+    }
+
+    public AccessModuleProvider getAccessModuleProvider() {
+        return _accessModuleProvider;
+    }
+
+    public void setAccessModuleProvider(AccessModuleProvider accessModuleProvider) {
+        this._accessModuleProvider = accessModuleProvider;
     }
 
     public Map<String, Object> getAccessValueMap() {
@@ -350,20 +412,56 @@ public class AccessContext {
 
         /**
          * Get access date.
-         * @return Access date. (NotNull)
+         * @return The date that specifies access time. (NotNull)
          */
-        public Date getAccessDate();
+        Date getAccessDate();
     }
 
     /**
-     * The provider interface of access date.
+     * The provider interface of access time-stamp.
      */
     public static interface AccessTimestampProvider {
 
         /**
-         * Get access timestamp.
-         * @return Access timestamp. (NotNull)
+         * Get access time-stamp.
+         * @return The time-stamp that specifies access time. (NotNull)
          */
-        public Timestamp getAccessTimestamp();
+        Timestamp getAccessTimestamp();
+    }
+
+    /**
+     * The provider interface of access user.
+     */
+    public static interface AccessUserProvider {
+
+        /**
+         * Get access user.
+         * @return The expression for access user. (NotNull)
+         */
+        String getAccessUser();
+    }
+
+    /**
+     * The provider interface of access process.
+     */
+    public static interface AccessProcessProvider {
+
+        /**
+         * Get access process.
+         * @return The expression for access process. (NotNull)
+         */
+        String getAccessProcess();
+    }
+
+    /**
+     * The provider interface of access module.
+     */
+    public static interface AccessModuleProvider {
+
+        /**
+         * Get access module.
+         * @return The expression for access module. (NotNull)
+         */
+        String getAccessModule();
     }
 }

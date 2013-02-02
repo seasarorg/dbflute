@@ -18,6 +18,11 @@ package org.seasar.dbflute;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import org.seasar.dbflute.AccessContext.AccessDateProvider;
+import org.seasar.dbflute.AccessContext.AccessModuleProvider;
+import org.seasar.dbflute.AccessContext.AccessProcessProvider;
+import org.seasar.dbflute.AccessContext.AccessTimestampProvider;
+import org.seasar.dbflute.AccessContext.AccessUserProvider;
 import org.seasar.dbflute.exception.AccessContextNoValueException;
 import org.seasar.dbflute.exception.AccessContextNotFoundException;
 import org.seasar.dbflute.unit.core.PlainTestCase;
@@ -42,23 +47,63 @@ public class AccessContextTest extends PlainTestCase {
     public void test_getValue_whenAccessContextExists_Tx() throws Exception {
         // ## Arrange ##
         AccessContext accessContext = new AccessContext();
-        accessContext.setAccessUser("accessUser");
-        accessContext.setAccessProcess("accessProcess");
-        accessContext.setAccessModule("accessModule");
         Date currentDate = currentDate();
         accessContext.setAccessDate(currentDate);
         Timestamp currentTimestamp = currentTimestamp();
         accessContext.setAccessTimestamp(currentTimestamp);
+        accessContext.setAccessUser("accessUser");
+        accessContext.setAccessProcess("accessProcess");
+        accessContext.setAccessModule("accessModule");
         accessContext.registerAccessValue("foo", "bar");
         AccessContext.setAccessContextOnThread(accessContext);
 
         // ## Act & Assert ##
+        assertEquals(currentDate, AccessContext.getAccessDateOnThread());
+        assertEquals(currentTimestamp, AccessContext.getAccessTimestampOnThread());
         assertEquals("accessUser", AccessContext.getAccessUserOnThread());
         assertEquals("accessProcess", AccessContext.getAccessProcessOnThread());
         assertEquals("accessModule", AccessContext.getAccessModuleOnThread());
-        assertNotNull(AccessContext.getAccessDateOnThread());
-        assertNotNull(AccessContext.getAccessTimestampOnThread());
         assertEquals("bar", AccessContext.getAccessValueOnThread("foo"));
+    }
+
+    public void test_getValue_whenAccessContextProvider_Tx() throws Exception {
+        // ## Arrange ##
+        AccessContext accessContext = new AccessContext();
+        final String dateExp = "2013-02-02 12:34:56";
+        accessContext.setAccessDateProvider(new AccessDateProvider() {
+            public Date getAccessDate() {
+                return toDate(dateExp);
+            }
+        });
+        final String timestampExp = "2013-02-02 12:34:56";
+        accessContext.setAccessTimestampProvider(new AccessTimestampProvider() {
+            public Timestamp getAccessTimestamp() {
+                return toTimestamp(timestampExp);
+            }
+        });
+        accessContext.setAccessUserProvider(new AccessUserProvider() {
+            public String getAccessUser() {
+                return "foo";
+            }
+        });
+        accessContext.setAccessProcessProvider(new AccessProcessProvider() {
+            public String getAccessProcess() {
+                return "bar";
+            }
+        });
+        accessContext.setAccessModuleProvider(new AccessModuleProvider() {
+            public String getAccessModule() {
+                return "qux";
+            }
+        });
+        AccessContext.setAccessContextOnThread(accessContext);
+
+        // ## Act & Assert ##
+        assertNotNull(dateExp, AccessContext.getAccessDateOnThread());
+        assertNotNull(timestampExp, AccessContext.getAccessTimestampOnThread());
+        assertEquals("foo", AccessContext.getAccessUserOnThread());
+        assertEquals("bar", AccessContext.getAccessProcessOnThread());
+        assertEquals("qux", AccessContext.getAccessModuleOnThread());
     }
 
     public void test_getValue_whenAccessContextNotFound_Tx() throws Exception {
