@@ -167,8 +167,9 @@ cd ../../dbflute-sqlite-example/dbflute_exampledb
 . bhvap-sql2entity.sh
 . bhvap-outside-sql-test.sh
 
-cd ../../dbflute-basic-example/
+cd ..
+cd ../dbflute-basic-example/
 ant
 
-cd ../../dbflute-spring-example/
+cd ../dbflute-spring-example/
 ant
