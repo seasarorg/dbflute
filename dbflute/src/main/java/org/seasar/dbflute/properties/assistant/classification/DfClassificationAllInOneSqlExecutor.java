@@ -88,7 +88,7 @@ public class DfClassificationAllInOneSqlExecutor {
         } catch (SQLException e) {
             throw new SQLFailureException("Failed to execute the SQL:" + ln() + sql, e);
         } finally {
-            new DfClassificationSqlResourceCloser().closeSqlResource(conn, st, rs);
+            new DfClassificationSqlResourceCloser().closeStatement(st, rs);
         }
         return elementList;
     }

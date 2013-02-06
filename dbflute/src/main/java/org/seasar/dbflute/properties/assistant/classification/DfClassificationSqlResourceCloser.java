@@ -38,13 +38,20 @@ public class DfClassificationSqlResourceCloser {
     // ===================================================================================
     //                                                                               Close
     //                                                                               =====
-    public void closeSqlResource(Connection conn, Statement stmt, ResultSet rs) {
+    public void closeConnection(Connection conn) {
         try {
             if (conn != null) {
                 conn.close();
             }
-            if (stmt != null) {
-                stmt.close();
+        } catch (SQLException ignored) {
+            _log.warn("The close() threw the exception: ", ignored);
+        }
+    }
+
+    public void closeStatement(Statement st, ResultSet rs) {
+        try {
+            if (st != null) {
+                st.close();
             }
             if (rs != null) {
                 rs.close();
