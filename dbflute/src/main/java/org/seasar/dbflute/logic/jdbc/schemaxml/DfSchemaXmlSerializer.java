@@ -87,6 +87,7 @@ import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -578,6 +579,7 @@ public class DfSchemaXmlSerializer {
             final DfForeignKeyMeta fkMetaInfo = foreignKeyMap.get(foreignKeyName);
             final Element fkElement = _doc.createElement("foreign-key");
             fkElement.setAttribute("foreignTable", fkMetaInfo.getForeignTableName());
+            fkElement.setAttribute("foreignSchema", fkMetaInfo.getForeignSchema().getCatalogSchema());
             fkElement.setAttribute("name", fkMetaInfo.getForeignKeyName());
             final Map<String, String> columnNameMap = fkMetaInfo.getColumnNameMap();
             final Set<String> columnNameKeySet = columnNameMap.keySet();
@@ -896,6 +898,9 @@ public class DfSchemaXmlSerializer {
     }
 
     protected void assertDuplicateTable(List<DfTableMeta> tableList) {
+        if (getLittleAdjustmentProperties().isSuppressOtherSchemaSameNameTableLimiter()) {
+            return;
+        }
         final Set<String> tableNameSet = StringSet.createAsCaseInsensitive();
         final Set<String> duplicateTableSet = StringSet.createAsCaseInsensitive();
         for (DfTableMeta info : tableList) {
@@ -906,7 +911,6 @@ public class DfSchemaXmlSerializer {
                 tableNameSet.add(tableName);
             }
         }
-        // obviously unsupported
         if (!duplicateTableSet.isEmpty()) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -1442,6 +1446,10 @@ public class DfSchemaXmlSerializer {
 
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

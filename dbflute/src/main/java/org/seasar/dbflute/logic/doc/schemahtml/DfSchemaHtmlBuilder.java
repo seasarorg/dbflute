@@ -16,6 +16,7 @@
 package org.seasar.dbflute.logic.doc.schemahtml;
 
 import org.apache.torque.engine.database.model.ForeignKey;
+import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
 
@@ -31,8 +32,9 @@ public class DfSchemaHtmlBuilder {
         _documentProperties = documentProperties;
     }
 
-    public String buildRelatedTableLink(ForeignKey fk, String name, String delimiter) {
-        final String lowerName = name.toLowerCase();
+    public String buildRelatedTableLink(ForeignKey fk, Table table, String delimiter) {
+        final String tableName = table.getName();
+        final String tableId = table.getTableIdForSchemaHtml();
         final StringBuilder sb = new StringBuilder();
         sb.append(delimiter);
         final String baseTitle = fk.getName();
@@ -55,8 +57,8 @@ public class DfSchemaHtmlBuilder {
                 comma = true;
             }
             final String title = resolveTitle(titleSb.toString());
-            sb.append("<a href=\"#" + lowerName + "\" class=\"additionalfk\" title=\"" + title + "\">");
-            contentName = name + (fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
+            sb.append("<a href=\"#" + tableId + "\" class=\"additionalfk\" title=\"" + title + "\">");
+            contentName = tableName + (fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
         } else {
             final StringBuilder titleSb = new StringBuilder();
             titleSb.append(baseTitle);
@@ -64,8 +66,8 @@ public class DfSchemaHtmlBuilder {
                 titleSb.append(": comment=").append(comment);
             }
             final String title = resolveTitle(titleSb.toString());
-            sb.append("<a href=\"#" + lowerName + "\" title=\"" + title + "\">");
-            contentName = name;
+            sb.append("<a href=\"#" + tableId + "\" title=\"" + title + "\">");
+            contentName = tableName;
         }
         sb.append(contentName).append("</a>");
         return sb.toString();

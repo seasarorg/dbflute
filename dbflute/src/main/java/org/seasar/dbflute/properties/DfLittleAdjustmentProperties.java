@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTableColumnNameNonCompilableConnectorException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -63,14 +64,25 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                     Adding Schema to Table SQL Name
-    //                                                     ===============================
+    //                                                                       Schema Driven
+    //                                                                       =============
     public boolean isAvailableAddingSchemaToTableSqlName() {
+        if (isAvailableSchemaDrivenTable()) {
+            return true; // forcedly true because schema-driven needs adding schema
+        }
         return isProperty("isAvailableAddingSchemaToTableSqlName", false);
     }
 
     public boolean isAvailableAddingCatalogToTableSqlName() {
         return isProperty("isAvailableAddingCatalogToTableSqlName", false);
+    }
+
+    public boolean isAvailableSchemaDrivenTable() { // closet
+        return isProperty("isAvailableSchemaDrivenTable", false);
+    }
+
+    public boolean isSuppressOtherSchemaSameNameTableLimiter() { // closet
+        return isProperty("isSuppressOtherSchemaSameNameTableLimiter", false);
     }
 
     // ===================================================================================
@@ -168,8 +180,14 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isTableDispNameUpperCase", false);
     }
 
-    public String filterTableDispNameIfNeeds(String tableDbName) {
+    public String filterTableDispNameIfNeeds(String tableDbName) { // basically for TableDiff
         return isTableDispNameUpperCase() ? tableDbName.toUpperCase() : tableDbName;
+    }
+
+    public String filterTableDispNameIfNeeds(UnifiedSchema unifiedSchema, String tableDbName) {
+        final String name = filterTableDispNameIfNeeds(tableDbName);
+        final String drivenSchema = unifiedSchema.getDrivenSchema();
+        return (drivenSchema != null ? drivenSchema + "." : "") + name;
     }
 
     // ===================================================================================

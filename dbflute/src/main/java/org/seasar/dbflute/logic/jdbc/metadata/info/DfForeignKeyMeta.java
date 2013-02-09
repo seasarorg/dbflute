@@ -17,6 +17,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -32,6 +33,8 @@ public class DfForeignKeyMeta {
     protected String _localTableName;
 
     protected String _foreignTableName;
+
+    protected UnifiedSchema _foreignSchema;
 
     protected Map<String, String> _columnNameMap = DfCollectionUtil.newLinkedHashMap();
 
@@ -68,6 +71,14 @@ public class DfForeignKeyMeta {
 
     public void setForeignTableName(String foreignTableName) {
         this._foreignTableName = foreignTableName;
+    }
+
+    public UnifiedSchema getForeignSchema() {
+        return _foreignSchema;
+    }
+
+    public void setForeignSchema(UnifiedSchema foreignSchema) {
+        this._foreignSchema = foreignSchema;
     }
 
     public Map<String, String> getColumnNameMap() {

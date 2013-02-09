@@ -106,6 +106,7 @@ Java class or method name.
 <!ELEMENT foreign-key (reference+)>
 <!ATTLIST foreign-key
   foreignTable CDATA #REQUIRED
+  foreignSchema CDATA #IMPLIED
   name CDATA #IMPLIED
   onUpdate (cascade|setnull|restrict|none) "none"
   onDelete (cascade|setnull|restrict|none) "none"

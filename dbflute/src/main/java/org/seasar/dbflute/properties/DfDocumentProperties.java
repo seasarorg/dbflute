@@ -285,6 +285,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isSuppressSchemaHtmlOutsideSql", false, getDocumentDefinitionMap());
     }
 
+    public boolean isSuppressSchemaHtmlProcedure() {
+        return isProperty("isSuppressSchemaHtmlProcedure", false, getDocumentDefinitionMap());
+    }
+
     // -----------------------------------------------------
     //                                           Style Sheet
     //                                           -----------

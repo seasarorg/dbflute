@@ -74,10 +74,7 @@
  */
 package org.apache.torque.engine.database.model;
 
-import java.util.List;
-
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -262,7 +259,7 @@ public class UnifiedSchema {
     }
 
     protected String getSqlPrefixSchema() {
-        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         if (prop.isAvailableAddingSchemaToTableSqlName()) {
             if (prop.isAvailableAddingCatalogToTableSqlName()) {
                 return getCatalogSchema();
@@ -285,25 +282,14 @@ public class UnifiedSchema {
         return getCatalogSchema(); // as default
     }
 
-    protected void throwUnknownSchemaCannotUseSQLPrefixException() {
-        final DfDatabaseProperties databaseProp = getDatabaseProperties();
-        final UnifiedSchema databaseSchema = databaseProp.getDatabaseSchema();
-        final List<UnifiedSchema> additionalSchemaList = databaseProp.getAdditionalSchemaList();
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Unknown schema is NOT supported to use SQL prefix.");
-        br.addItem("Advice");
-        br.addElement("The schema is NOT recognized as main and additional schema.");
-        br.addElement("Please confirm your database settings.");
-        br.addElement("(the schema must match any schema in target schemas)");
-        br.addItem("Unknown Schema");
-        br.addElement(toString());
-        br.addItem("Target Schema");
-        br.addElement(databaseSchema);
-        for (UnifiedSchema additionalSchema : additionalSchemaList) {
-            br.addElement(additionalSchema);
+    public String getDrivenSchema() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (prop.isAvailableSchemaDrivenTable()) {
+            return getPureSchema();
+        } else {
+            // #hope CatalogDrivenTable
+            return null;
         }
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================
@@ -393,12 +379,20 @@ public class UnifiedSchema {
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
     protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
+        return getProperties().getBasicProperties();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {
-        return DfBuildProperties.getInstance().getDatabaseProperties();
+        return getProperties().getDatabaseProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

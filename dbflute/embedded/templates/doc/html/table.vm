@@ -13,13 +13,13 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-<h2 id="${table.lowerName}"${table.titleForSchemaHtml}>
+<h2 id="${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>
 ${table.aliasExpression}${table.tableDispName}
 #if ($database.hasAdditionalSchema() && $table.hasSchema())
 &nbsp;<span class="tableschema">on ${table.documentSchema}</span>
 #end
 #if ($database.isSchemaHtmlOutsideSqlValid() && $table.hasBehaviorQueryPath())
-&nbsp;<span class="bqpcount"><a href="${database.sharp}${table.javaName}Sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>
+&nbsp;<span class="bqpcount"><a href="${database.sharp}${table.tableIdForSchemaHtml}sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>
 #end
 </h2>
 #if ($table.hasComment())

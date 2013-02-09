@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -345,16 +346,15 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
 
     protected void translateFKTable(Map<String, DfSynonymMeta> synonymMap) {
         final Collection<DfSynonymMeta> synonymList = synonymMap.values();
-        final Map<String, List<String>> referredTableSynonymListMap = new LinkedHashMap<String, List<String>>();
+        final Map<String, List<DfSynonymMeta>> referredTableSynonymListMap = DfCollectionUtil.newLinkedHashMap();
         for (DfSynonymMeta synonym : synonymList) {
-            final String synonymName = synonym.getSynonymName();
             final String tableName = synonym.getTableName();
-            final List<String> foreignSynonymList = referredTableSynonymListMap.get(tableName);
+            final List<DfSynonymMeta> foreignSynonymList = referredTableSynonymListMap.get(tableName);
             if (foreignSynonymList != null) {
-                foreignSynonymList.add(synonymName);
+                foreignSynonymList.add(synonym);
             } else {
-                final List<String> foreignNewSynonymList = new ArrayList<String>();
-                foreignNewSynonymList.add(synonymName);
+                final List<DfSynonymMeta> foreignNewSynonymList = DfCollectionUtil.newArrayList();
+                foreignNewSynonymList.add(synonym);
                 referredTableSynonymListMap.put(tableName, foreignNewSynonymList);
             }
         }
@@ -363,17 +363,17 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
             if (fkMap == null || fkMap.isEmpty()) {
                 continue;
             }
-            final Set<String> fkNameSet = fkMap.keySet();
             final Map<String, DfForeignKeyMeta> additionalFKMap = DfCollectionUtil.newLinkedHashMap();
             final Map<String, String> removedFKMap = DfCollectionUtil.newLinkedHashMap();
-            for (String fkName : fkNameSet) {
-                final DfForeignKeyMeta fk = fkMap.get(fkName);
+            for (Entry<String, DfForeignKeyMeta> entry : fkMap.entrySet()) {
+                final String fkName = entry.getKey();
+                final DfForeignKeyMeta fk = entry.getValue();
 
                 // at first translate a local table name
                 fk.setLocalTableName(synonym.getSynonymName());
 
                 final String orignalForeignTableName = fk.getForeignTableName();
-                final List<String> foreignSynonymList = referredTableSynonymListMap.get(orignalForeignTableName);
+                final List<DfSynonymMeta> foreignSynonymList = referredTableSynonymListMap.get(orignalForeignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
                     final UnifiedSchema tableOwner = synonym.getTableOwner();
                     if (_tableExtractor.isTableExcept(tableOwner, orignalForeignTableName)) {
@@ -387,11 +387,14 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 boolean firstDone = false;
                 for (int i = 0; i < foreignSynonymList.size(); i++) {
                     final String newForeignKeyName = originalForeignKeyName + "_SYNONYM" + (i + 1);
-                    final String newForeignTableName = foreignSynonymList.get(i);
+                    final DfSynonymMeta newForeignSynonym = foreignSynonymList.get(i);
+                    final String newForeignTableName = newForeignSynonym.getSynonymName();
+                    final UnifiedSchema newForeignSchema = newForeignSynonym.getSynonymOwner();
                     if (!firstDone) {
                         // first (switching FK informations)
                         fk.setForeignKeyName(newForeignKeyName);
                         fk.setForeignTableName(newForeignTableName);
+                        fk.setForeignSchema(newForeignSchema);
                         firstDone = true;
                         continue;
                     }
@@ -401,6 +404,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                     additionalFK.setForeignKeyName(newForeignKeyName);
                     additionalFK.setLocalTableName(fk.getLocalTableName());
                     additionalFK.setForeignTableName(newForeignTableName);
+                    additionalFK.setForeignSchema(newForeignSchema);
                     additionalFK.setColumnNameMap(fk.getColumnNameMap());
                     additionalFKMap.put(additionalFK.getForeignKeyName(), additionalFK);
                 }

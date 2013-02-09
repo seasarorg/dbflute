@@ -8,6 +8,7 @@
 # o isEntityDBMetaDbCommentValid (NotRequired - Default false)
 # o schemaHtmlFileName (NotRequired - Default 'schema-[project-name].html')
 # o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)
+# o isSuppressSchemaHtmlProcedure (NotRequired - Default false)
 # o historyHtmlFileName (NotRequired - Default 'history-[project-name].html')
 # o isCheckColumnDefOrderDiff (NotRequired - Default false)
 # o isCheckDbCommentDiff (NotRequired - Default false)
@@ -25,6 +26,7 @@
 #     ; isEntityDBMetaDbCommentValid = true
 #     ; schemaHtmlFileName = xxx.html
 #     ; isSuppressSchemaHtmlOutsideSql = false
+#     ; isSuppressSchemaHtmlProcedure = false
 #     ; historyHtmlFileName = xxx.html
 #     ; isCheckColumnDefOrderDiff = true
 #     ; isCheckDbCommentDiff = true
@@ -110,6 +112,15 @@ map:{
     #  OutsideSql information (related to tables) is very useful.
     #
     #; isSuppressSchemaHtmlOutsideSql = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSuppressSchemaHtmlProcedure (NotRequired - Default false)
+    #  Does it remove procedure information from SchemaHtml?
+    #  Basically you don't need this.
+    #  Procedure information is very useful.
+    #
+    #; isSuppressSchemaHtmlProcedure = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

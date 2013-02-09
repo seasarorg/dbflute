@@ -167,6 +167,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.assistant.DfTableDeterminator;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.DfTableListProvider;
@@ -177,6 +178,7 @@ import org.seasar.dbflute.properties.initializer.DfAdditionalForeignKeyInitializ
 import org.seasar.dbflute.properties.initializer.DfAdditionalPrimaryKeyInitializer;
 import org.seasar.dbflute.properties.initializer.DfAdditionalUniqueKeyInitializer;
 import org.seasar.dbflute.properties.initializer.DfIncludeQueryInitializer;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
@@ -295,7 +297,15 @@ public class Database {
     }
 
     public Table getTable(String name) {
-        return _tableMap.get(name);
+        final Table byName = _tableMap.get(name);
+        if (byName != null) {
+            return byName;
+        }
+        if (name.contains(".")) {
+            final String pureName = Srl.substringLastRear(name, ".");
+            return _tableMap.get(pureName);
+        }
+        return null;
     }
 
     /**
@@ -317,7 +327,8 @@ public class Database {
     public void addTable(Table tbl) {
         tbl.setDatabase(this);
         _tableList.add(tbl);
-        _tableMap.put(tbl.getName(), tbl);
+        final String tableKey = Table.generateTableKey(tbl.getUnifiedSchema(), tbl.getName());
+        _tableMap.put(tableKey, tbl);
     }
 
     /**
@@ -331,8 +342,7 @@ public class Database {
             // setup reverse relations and check existences
             final List<ForeignKey> fkList = table.getForeignKeyList();
             for (ForeignKey fk : fkList) {
-                final String foreignTableName = fk.getForeignTableName();
-                final Table foreignTable = getTable(foreignTableName);
+                final Table foreignTable = fk.getForeignTable();
 
                 // check an existence of foreign table
                 if (foreignTable == null) { // may be except table generate-only
@@ -1806,60 +1816,64 @@ public class Database {
     // ===================================================================================
     //                                                        Little Adjustment Properties
     //                                                        ============================
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
+    }
+
     public boolean isAvailableDatabaseDependency() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseDependency();
+        return getLittleAdjustmentProperties().isAvailableDatabaseDependency();
     }
 
     public boolean isAvailableNonPrimaryKeyWritable() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
+        return getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
     public boolean isCheckSelectedClassification() {
-        return getProperties().getLittleAdjustmentProperties().isCheckSelectedClassification();
+        return getLittleAdjustmentProperties().isCheckSelectedClassification();
     }
 
     public boolean isForceClassificationSetting() {
-        return getProperties().getLittleAdjustmentProperties().isForceClassificationSetting();
+        return getLittleAdjustmentProperties().isForceClassificationSetting();
     }
 
     public boolean isCDefToStringReturnsName() {
-        return getProperties().getLittleAdjustmentProperties().isCDefToStringReturnsName();
+        return getLittleAdjustmentProperties().isCDefToStringReturnsName();
     }
 
     public boolean isMakeEntityOldStyleClassify() {
-        return getProperties().getLittleAdjustmentProperties().isMakeEntityOldStyleClassify();
+        return getLittleAdjustmentProperties().isMakeEntityOldStyleClassify();
     }
 
     public boolean isMakeEntityChaseRelation() {
-        return getProperties().getLittleAdjustmentProperties().isMakeEntityChaseRelation();
+        return getLittleAdjustmentProperties().isMakeEntityChaseRelation();
     }
 
     public boolean isEntityConvertEmptyStringToNull() {
-        return getProperties().getLittleAdjustmentProperties().isEntityConvertEmptyStringToNull();
+        return getLittleAdjustmentProperties().isEntityConvertEmptyStringToNull();
     }
 
     public boolean isMakeConditionQueryEqualEmptyString() {
-        return getProperties().getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString();
+        return getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString();
     }
 
     public String getConditionQueryNotEqualDefinitionName() {
-        return getProperties().getLittleAdjustmentProperties().getConditionQueryNotEqualDefinitionName();
+        return getLittleAdjustmentProperties().getConditionQueryNotEqualDefinitionName();
     }
 
     public boolean isPagingCountLater() {
-        return getProperties().getLittleAdjustmentProperties().isPagingCountLater();
+        return getLittleAdjustmentProperties().isPagingCountLater();
     }
 
     public boolean isPagingCountLeastJoin() {
-        return getProperties().getLittleAdjustmentProperties().isPagingCountLeastJoin();
+        return getLittleAdjustmentProperties().isPagingCountLeastJoin();
     }
 
     public boolean isInnerJoinAutoDetect() {
-        return getProperties().getLittleAdjustmentProperties().isInnerJoinAutoDetect();
+        return getLittleAdjustmentProperties().isInnerJoinAutoDetect();
     }
 
     public boolean isAvailableDatabaseNativeJDBC() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC();
+        return getLittleAdjustmentProperties().isAvailableDatabaseNativeJDBC();
     }
 
     public boolean isAvailableOracleNativeJDBC() { // Oracle facade
@@ -1867,75 +1881,75 @@ public class Database {
     }
 
     public boolean isMakeDeprecated() {
-        return getProperties().getLittleAdjustmentProperties().isMakeDeprecated();
+        return getLittleAdjustmentProperties().isMakeDeprecated();
     }
 
     public boolean isMakeRecentlyDeprecated() {
-        return getProperties().getLittleAdjustmentProperties().isMakeRecentlyDeprecated();
+        return getLittleAdjustmentProperties().isMakeRecentlyDeprecated();
     }
 
     public String getDBFluteInitializerClass() {
-        return getProperties().getLittleAdjustmentProperties().getDBFluteInitializerClass();
+        return getLittleAdjustmentProperties().getDBFluteInitializerClass();
     }
 
     public String getImplementedInvokerAssistantClass() {
-        return getProperties().getLittleAdjustmentProperties().getImplementedInvokerAssistantClass();
+        return getLittleAdjustmentProperties().getImplementedInvokerAssistantClass();
     }
 
     public String getImplementedCommonColumnAutoSetupperClass() {
-        return getProperties().getLittleAdjustmentProperties().getImplementedCommonColumnAutoSetupperClass();
+        return getLittleAdjustmentProperties().getImplementedCommonColumnAutoSetupperClass();
     }
 
     public String getS2DaoSettingClass() {
-        return getProperties().getLittleAdjustmentProperties().getS2DaoSettingClass();
+        return getLittleAdjustmentProperties().getS2DaoSettingClass();
     }
 
     public boolean isShortCharHandlingValid() {
-        return getProperties().getLittleAdjustmentProperties().isShortCharHandlingValid();
+        return getLittleAdjustmentProperties().isShortCharHandlingValid();
     }
 
     public String getShortCharHandlingMode() {
-        return getProperties().getLittleAdjustmentProperties().getShortCharHandlingMode();
+        return getLittleAdjustmentProperties().getShortCharHandlingMode();
     }
 
     public String getShortCharHandlingModeCode() {
-        return getProperties().getLittleAdjustmentProperties().getShortCharHandlingModeCode();
+        return getLittleAdjustmentProperties().getShortCharHandlingModeCode();
     }
 
     public boolean isCursorSelectFetchSizeValid() {
-        return getProperties().getLittleAdjustmentProperties().isCursorSelectFetchSizeValid();
+        return getLittleAdjustmentProperties().isCursorSelectFetchSizeValid();
     }
 
     public String getCursorSelectFetchSize() {
-        return getProperties().getLittleAdjustmentProperties().getCursorSelectFetchSize();
+        return getLittleAdjustmentProperties().getCursorSelectFetchSize();
     }
 
     public boolean isCheckCountBeforeQueryUpdate() {
-        return getProperties().getLittleAdjustmentProperties().isCheckCountBeforeQueryUpdate();
+        return getLittleAdjustmentProperties().isCheckCountBeforeQueryUpdate();
     }
 
     public boolean isStopGenerateExtendedBhv() {
-        return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedBhv();
+        return getLittleAdjustmentProperties().isStopGenerateExtendedBhv();
     }
 
     public boolean isStopGenerateExtendedDao() {
-        return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedDao();
+        return getLittleAdjustmentProperties().isStopGenerateExtendedDao();
     }
 
     public boolean isStopGenerateExtendedEntity() {
-        return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedEntity();
+        return getLittleAdjustmentProperties().isStopGenerateExtendedEntity();
     }
 
     public boolean isMakeFlatExpansion() {
-        return getProperties().getLittleAdjustmentProperties().isMakeFlatExpansion();
+        return getLittleAdjustmentProperties().isMakeFlatExpansion();
     }
 
     public boolean isMakeDaoInterface() {
-        return getProperties().getLittleAdjustmentProperties().isMakeDaoInterface();
+        return getLittleAdjustmentProperties().isMakeDaoInterface();
     }
 
     public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
+        return getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
 
     // ===================================================================================
@@ -2076,7 +2090,14 @@ public class Database {
         if (getProperties().getDocumentProperties().isSuppressSchemaHtmlOutsideSql()) {
             return false;
         }
-        return hasTableBqpMap() || isGenerateProcedureParameterBean();
+        return hasTableBqpMap();
+    }
+
+    public boolean isSchemaHtmlProcedureValid() {
+        if (getProperties().getDocumentProperties().isSuppressSchemaHtmlProcedure()) {
+            return false;
+        }
+        return isGenerateProcedureParameterBean();
     }
 
     public boolean isSchemaHtmlStyleSheetEmbedded() {
@@ -2559,6 +2580,11 @@ public class Database {
     //                                                                  Procedure Document
     //                                                                  ==================
     protected List<DfProcedureMeta> _procedureMetaInfoList;
+    protected Map<String, List<DfProcedureMeta>> _schemaProcedureMap;
+
+    public boolean hasSeveralProcedureSchema() throws SQLException {
+        return getAvailableSchemaProcedureMap().size() >= 2;
+    }
 
     public List<DfProcedureMeta> getAvailableProcedureList() throws SQLException {
         if (_procedureMetaInfoList != null) {
@@ -2570,8 +2596,39 @@ public class Database {
         final DfSchemaSource dataSource = getDataSource();
         handler.includeProcedureSynonym(dataSource);
         handler.includeProcedureToDBLink(dataSource);
-        _procedureMetaInfoList = handler.getAvailableProcedureList(dataSource);
+        _procedureMetaInfoList = handler.getAvailableProcedureList(dataSource); // ordered by schema
         return _procedureMetaInfoList;
+    }
+
+    public Map<String, List<DfProcedureMeta>> getAvailableSchemaProcedureMap() throws SQLException {
+        if (_schemaProcedureMap != null) {
+            return _schemaProcedureMap;
+        }
+        final List<DfProcedureMeta> procedureList = getAvailableProcedureList();
+        final Map<String, List<DfProcedureMeta>> schemaProcedureListMap = DfCollectionUtil.newLinkedHashMap();
+        final String mainName = "(main schema)";
+        for (DfProcedureMeta meta : procedureList) {
+            final UnifiedSchema procedureSchema = meta.getProcedureSchema();
+            final String schemaName;
+            if (procedureSchema != null) {
+                final String drivenSchema = procedureSchema.getDrivenSchema();
+                if (drivenSchema != null) {
+                    schemaName = drivenSchema;
+                } else {
+                    schemaName = procedureSchema.isMainSchema() ? mainName : procedureSchema.getSqlPrefixSchema();
+                }
+            } else {
+                schemaName = "(no schema)";
+            }
+            List<DfProcedureMeta> metaList = schemaProcedureListMap.get(schemaName);
+            if (metaList == null) {
+                metaList = DfCollectionUtil.newArrayList();
+                schemaProcedureListMap.put(schemaName, metaList);
+            }
+            metaList.add(meta);
+        }
+        _schemaProcedureMap = schemaProcedureListMap;
+        return _schemaProcedureMap;
     }
 
     // ===================================================================================

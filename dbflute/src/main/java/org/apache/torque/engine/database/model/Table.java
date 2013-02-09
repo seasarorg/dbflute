@@ -301,6 +301,27 @@ public class Table {
     //                                                                               Table
     //                                                                               =====
     // -----------------------------------------------------
+    //                                             Table Key
+    //                                             ---------
+    public String getTableKey() {
+        return generateTableKey(_unifiedSchema, _name);
+    }
+
+    public static String generateTableKey(UnifiedSchema unifiedSchema, String tableName) {
+        final StringBuilder sb = new StringBuilder();
+        final String drivenSchema = unifiedSchema != null ? unifiedSchema.getDrivenSchema() : null;
+        if (drivenSchema != null) {
+            sb.append(drivenSchema).append(".");
+        }
+        sb.append(tableName);
+        return sb.toString();
+    }
+
+    public String getTableIdForSchemaHtml() {
+        return Srl.replace(getTableKey(), ".", "");
+    }
+
+    // -----------------------------------------------------
     //                                            Table Name
     //                                            ----------
     /**
@@ -317,17 +338,6 @@ public class Table {
      */
     public void setName(String name) {
         this._name = name;
-    }
-
-    // -----------------------------------------------------
-    //                                            Lower Name
-    //                                            ----------
-    /**
-     * Get the lower DB name of the Table, which is basically for SchemaHTML.
-     * @return The table lower name as String. (NotNull)
-     */
-    public String getLowerName() {
-        return _name != null ? _name.toLowerCase() : null;
     }
 
     // -----------------------------------------------------
@@ -540,7 +550,7 @@ public class Table {
 
     protected String filterTableDispNameIfNeeds(String tableName) {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        return prop.filterTableDispNameIfNeeds(tableName);
+        return prop.filterTableDispNameIfNeeds(_unifiedSchema, tableName);
     }
 
     public String getBasicInfoDispString() {
@@ -1113,7 +1123,7 @@ public class Table {
      */
     public ForeignKey addForeignKey(Attributes attrib) {
         final ForeignKey fk = new ForeignKey();
-        fk.loadFromXML(attrib);
+        fk.loadFromXML(this, attrib);
         addForeignKey(fk);
         return fk;
     }
@@ -1184,8 +1194,8 @@ public class Table {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
-            final String foreignTableName = fk.getForeignTable().getTableDispName();
-            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTableName, delimiter));
+            final Table foreignTable = fk.getForeignTable();
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTable, delimiter));
         }
         sb.delete(0, delimiter.length());
         return sb.toString();
@@ -1566,8 +1576,8 @@ public class Table {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = referrerList.get(i);
-            final String referrerTableName = fk.getTable().getTableDispName();
-            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTableName, delimiter));
+            final Table referrerTable = fk.getTable();
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTable, delimiter));
         }
         sb.delete(0, delimiter.length());
         return sb.toString();

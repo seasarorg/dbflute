@@ -174,6 +174,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 metaInfo.setForeignKeyName(fkName);
                 metaInfo.setLocalTableName(localTableName);
                 metaInfo.setForeignTableName(foreignTableName);
+                metaInfo.setForeignSchema(foreignSchema);
                 metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
             }
         } finally {

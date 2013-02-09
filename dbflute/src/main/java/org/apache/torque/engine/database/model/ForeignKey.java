@@ -168,6 +168,7 @@ public class ForeignKey implements Constraint {
     protected String _name; // constraint name (no change because it's used by templates)
 
     protected Table _localTable;
+    protected UnifiedSchema _foreignSchema; // #hope additional FK support
     protected String _foreignTableName; // may be user input (if additional FK)
 
     protected String _fixedCondition;
@@ -209,10 +210,17 @@ public class ForeignKey implements Constraint {
     //                                                                       =============
     /**
      * Imports foreign key from an XML specification
+     * @param localTable The local table to provide its schema. (NotNull)
      * @param attrib the XML attributes
      */
-    public void loadFromXML(Attributes attrib) {
+    public void loadFromXML(Table localTable, Attributes attrib) {
         _foreignTableName = attrib.getValue("foreignTable");
+        final String schemaExp = attrib.getValue("foreignSchema");
+        if (schemaExp != null) {
+            _foreignSchema = UnifiedSchema.createAsDynamicSchema(schemaExp);
+        } else { // for compatible
+            _foreignSchema = localTable.getUnifiedSchema();
+        }
         _name = attrib.getValue("name"); // constraint name for this FK
     }
 
@@ -264,12 +272,33 @@ public class ForeignKey implements Constraint {
      * @return Foreign table.
      */
     public Table getForeignTable() {
-        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
+        final String foreignTableKey = getForeignTableKey();
+        final Table foreignTable = findTable(foreignTableKey);
         if (foreignTable == null) {
-            String msg = "The database does not contain the foreign table name: " + getForeignTableName();
-            throw new IllegalStateException(msg);
+            throwForeignTableNotFoundException(foreignTableKey);
         }
         return foreignTable;
+    }
+
+    protected String getForeignTableKey() {
+        return Table.generateTableKey(_foreignSchema, getForeignTableName());
+    }
+
+    protected Table findTable(String tableKey) {
+        return getTable().getDatabase().getTable(tableKey);
+    }
+
+    protected void throwForeignTableNotFoundException(String foreignTableKey) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the foreign table in the database.");
+        br.addItem("Foreign Key");
+        br.addElement(_name);
+        br.addItem("Local Table");
+        br.addElement(getTable().getBasicInfoDispString());
+        br.addItem("ForeignTable Key");
+        br.addElement(foreignTableKey);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================
@@ -605,20 +634,44 @@ public class ForeignKey implements Constraint {
         if (_foreignColumnList != null) {
             return _foreignColumnList;
         }
-        final Table foreignTable = getTable().getDatabase().getTable(getForeignTableName());
+        final Table foreignTable = getForeignTable();
         final List<String> columnList = getForeignColumnNameList();
         if (columnList == null || columnList.isEmpty()) {
-            String msg = "The list of foreign column is null or empty." + columnList;
-            throw new IllegalStateException(msg);
+            throwForeignColumnListNullOrEmptyException(columnList);
         }
         final List<Column> resultList = new ArrayList<Column>();
         for (Iterator<String> ite = columnList.iterator(); ite.hasNext();) {
             final String name = (String) ite.next();
             final Column foreignCol = foreignTable.getColumn(name);
+            if (foreignCol == null) {
+                throwForeignColumnNotFoundException(foreignTable, name);
+            }
             resultList.add(foreignCol);
         }
         _foreignColumnList = resultList;
         return _foreignColumnList;
+    }
+
+    protected void throwForeignColumnListNullOrEmptyException(List<String> columnList) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The list of foreign column was null or empty.");
+        prepareBasicExceptionItem(br);
+        br.addItem("ForeignColumn List");
+        br.addElement(columnList);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    protected void throwForeignColumnNotFoundException(Table targetTable, String columnName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the foreign column in the table.");
+        prepareBasicExceptionItem(br);
+        br.addItem("Target Table");
+        br.addElement(targetTable.getBasicInfoDispString());
+        br.addItem("NotFound Column");
+        br.addElement(columnName);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     public List<String> getForeignColumnNameList() {
@@ -632,13 +685,19 @@ public class ForeignKey implements Constraint {
     public String getForeignColumnNameAsOne() {
         final List<String> columnNameList = getForeignColumnNameList();
         if (columnNameList.size() != 1) {
-            String msg = "This method is for only-one foreign-key:";
-            msg = msg + " getForeignColumnNameList().size()=" + columnNameList.size();
-            msg = msg + " baseTable=" + getTable().getName();
-            msg = msg + " foreignTable=" + getForeignTable().getName();
-            throw new IllegalStateException(msg);
+            throwForeignColumnCannotAsOneException(columnNameList);
         }
         return columnNameList.get(0);
+    }
+
+    protected void throwForeignColumnCannotAsOneException(List<String> columnNameList) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Cannot get the foreign column as one.");
+        prepareBasicExceptionItem(br);
+        br.addItem("Foreign Column");
+        br.addElement(columnNameList);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
     }
 
     public String getForeignColumnJavaNameAsOne() {
@@ -1478,6 +1537,18 @@ public class ForeignKey implements Constraint {
     }
 
     // ===================================================================================
+    //                                                                  Exception Handling
+    //                                                                  ==================
+    protected void prepareBasicExceptionItem(ExceptionMessageBuilder br) {
+        br.addItem("Foreign Key");
+        br.addElement(_name);
+        br.addItem("Local Table");
+        br.addElement(getTable().getBasicInfoDispString());
+        br.addItem("Foreign Table");
+        br.addElement(getForeignTable().getBasicInfoDispString());
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String replace(String text, String fromText, String toText) {
@@ -1517,6 +1588,9 @@ public class ForeignKey implements Constraint {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     /**
      * {@inheritDoc}
      */
@@ -1549,6 +1623,22 @@ public class ForeignKey implements Constraint {
     }
 
     /**
+     * Get the foreignSchema of the foreign table
+     * @return the unified schema of the foreign table
+     */
+    public UnifiedSchema getForeignSchema() {
+        return _foreignSchema;
+    }
+
+    /**
+     * Set the foreignSchema of the foreign table
+     * @param foreignSchema the unified schema of the foreign table
+     */
+    public void setForeignSchema(UnifiedSchema foreignSchema) {
+        _foreignSchema = foreignSchema;
+    }
+
+    /**
      * Set the base Table of the foreign key
      * @param baseTable the table
      */
@@ -1564,6 +1654,9 @@ public class ForeignKey implements Constraint {
         return _localTable;
     }
 
+    // -----------------------------------------------------
+    //                                            Additional
+    //                                            ----------
     public boolean isAdditionalForeignKey() {
         return _additionalForeignKey;
     }

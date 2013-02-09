@@ -97,7 +97,8 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                 Available Procedure
     //                                                                 ===================
     /**
-     * Get the list of available meta information.
+     * Get the list of available meta information. <br />
+     * The list is ordered per schema, as main schema first.
      * @param dataSource The data source for getting meta data. (NotNull)
      * @return The list of available procedure meta informations. (NotNull)
      * @throws SQLException

@@ -84,7 +84,8 @@ public class DfProcedureMeta {
     //                                            Build Name
     //                                            ----------
     public String buildProcedureKeyName() {
-        return _procedureName;
+        final String drivenSchema = _procedureSchema.getDrivenSchema();
+        return (drivenSchema != null ? drivenSchema + "." : "") + _procedureName;
     }
 
     public String buildProcedureLoggingName() {
