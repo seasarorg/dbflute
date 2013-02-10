@@ -303,11 +303,18 @@ public class Table {
     // -----------------------------------------------------
     //                                             Table Key
     //                                             ---------
+    /**
+     * Get the key of the table, used for e.g. {@link Map} key.
+     * No use this for e.g. matching with specified table in properties,
+     * instead you can use {@link #getDrivenDbName()}.
+     * @return The name of table as string, might contains dot '.'. (NotNull)
+     */
     public String getTableKey() {
         return generateTableKey(_unifiedSchema, _name);
     }
 
     public static String generateTableKey(UnifiedSchema unifiedSchema, String tableName) {
+        // same as driven DB name but no recycle for different concept
         final StringBuilder sb = new StringBuilder();
         final String drivenSchema = unifiedSchema != null ? unifiedSchema.getDrivenSchema() : null;
         if (drivenSchema != null) {
@@ -325,7 +332,8 @@ public class Table {
     //                                            Table Name
     //                                            ----------
     /**
-     * Get the DB name of the Table, which can be identity.
+     * Get the pure DB name of the Table, which cannot be identity. <br />
+     * You should use {@link #getTableKey()} for identity.
      * @return The table name as String. (NotNull)
      */
     public String getName() {
@@ -333,11 +341,28 @@ public class Table {
     }
 
     /**
-     * Set the DB name of the Table, which can be identity.
+     * Set the pure DB name of the Table, which cannot be identity. <br />
+     * You should use {@link #getTableKey()} for identity.
      * @param name The table name as String. (NotNull)
      */
     public void setName(String name) {
         this._name = name;
+    }
+
+    /**
+     * Get the DB name of the table, resolved schema-driven or table-driven. <br />
+     * You can use this for e.g. matching with specified table in properties, and use for simple display. <br />
+     * No use identity, instead you can use {@link #getTableKey()}.
+     * @return The name of table as string, might contains dot '.'. (NotNull)
+     */
+    public String getDrivenDbName() {
+        final StringBuilder sb = new StringBuilder();
+        final String drivenSchema = _unifiedSchema != null ? _unifiedSchema.getDrivenSchema() : null;
+        if (drivenSchema != null) {
+            sb.append(drivenSchema).append(".");
+        }
+        sb.append(_name);
+        return sb.toString();
     }
 
     // -----------------------------------------------------

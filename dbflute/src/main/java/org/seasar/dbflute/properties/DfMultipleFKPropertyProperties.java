@@ -58,7 +58,7 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
         return _multipleFKPropertyMap;
     }
 
-    public String getMultipleFKPropertyColumnAliasName(String tableName, java.util.List<String> multipleFKColumnNameList) {
+    public String getMultipleFKPropertyColumnAliasName(String tableName, List<String> multipleFKColumnNameList) {
         final Map<String, Map<String, String>> foreignKeyMap = asFlexible().get(tableName);
         if (foreignKeyMap == null) {
             return "";

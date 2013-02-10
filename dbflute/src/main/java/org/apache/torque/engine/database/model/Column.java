@@ -1369,7 +1369,7 @@ public class Column {
             }
 
             public String disp() {
-                return getTable().getName() + "." + getName() + ": " + getColumnDefinitionLineDisp();
+                return getTable().getDrivenDbName() + "." + getName() + ": " + getColumnDefinitionLineDisp();
             }
         });
     }

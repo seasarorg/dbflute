@@ -351,8 +351,8 @@ public class ForeignKey implements Constraint {
                 }
             }
             if (name.trim().length() > 0) { // means multiple FK columns exist
-                final String aliasName = getMultipleFKPropertyColumnAliasName(getTable().getName(),
-                        multipleFKColumnNameList);
+                final String drivenDbName = getTable().getDrivenDbName();
+                final String aliasName = getMultipleFKPropertyColumnAliasName(drivenDbName, multipleFKColumnNameList);
                 if (aliasName != null && aliasName.trim().length() > 0) { // my young code
                     final String firstUpper = aliasName.substring(0, 1).toUpperCase();
                     if (aliasName.trim().length() == 1) {
@@ -381,8 +381,7 @@ public class ForeignKey implements Constraint {
 
     protected String getMultipleFKPropertyColumnAliasName(String tableName, List<String> multipleFKColumnNameList) {
         final DfMultipleFKPropertyProperties prop = DfBuildProperties.getInstance().getMultipleFKPropertyProperties();
-        final String columnAliasName = prop.getMultipleFKPropertyColumnAliasName(getTable().getName(),
-                multipleFKColumnNameList);
+        final String columnAliasName = prop.getMultipleFKPropertyColumnAliasName(tableName, multipleFKColumnNameList);
         return columnAliasName;
     }
 
@@ -465,8 +464,8 @@ public class ForeignKey implements Constraint {
                 }
             }
             if (result.trim().length() != 0) { // isMultipleFK()==true
-                final String aliasName = getMultipleFKPropertyColumnAliasName(getForeignTable().getName(),
-                        columnNameList);
+                String foreignDrivenDbName = getForeignTable().getDrivenDbName();
+                final String aliasName = getMultipleFKPropertyColumnAliasName(foreignDrivenDbName, columnNameList);
                 if (aliasName != null && aliasName.trim().length() != 0) {
                     final String firstUpper = aliasName.substring(0, 1).toUpperCase();
                     if (aliasName.trim().length() == 1) {
