@@ -1204,10 +1204,6 @@ public class ForeignKey implements Constraint {
         return getForeignTable().getNestSelectSetupperClassName();
     }
 
-    public String getForeignTableNestSelectSetupperTerminalClassName() {
-        return getForeignTable().getNestSelectSetupperTerminalClassName();
-    }
-
     public String getForeignTableExtendedSimpleDtoClassName() {
         return getForeignTable().getSimpleDtoExtendedDtoClassName();
     }
@@ -1237,10 +1233,6 @@ public class ForeignKey implements Constraint {
 
     public String getReferrerTableNestSelectSetupperClassName() {
         return getTable().getNestSelectSetupperClassName();
-    }
-
-    public String getReferrerTableNestSelectSetupperTerminalClassName() {
-        return getTable().getNestSelectSetupperTerminalClassName();
     }
 
     public String getReferrerTableExtendedSimpleDtoClassName() {

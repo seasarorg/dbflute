@@ -133,8 +133,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     public static DBMeta findDBMeta(String tableFlexibleName) {
         DBMeta dbmeta = byTableFlexibleName(tableFlexibleName);
         if (dbmeta == null) {
-            String msg = "The DB meta was not found by the table flexible name:";
-            msg = msg + " key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap.keySet();
+            String msg = "The DB meta was not found by the table flexible name: key=" + tableFlexibleName;
             throw new DBMetaNotFoundException(msg);
         }
         return dbmeta;
@@ -149,8 +148,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     public static DBMeta findDBMeta(Class<?> entityType) {
         DBMeta dbmeta = byEntityType(entityType);
         if (dbmeta == null) {
-            String msg = "The DB meta was not found by the entity type:";
-            msg = msg + " key=" + entityType + " instanceMap=" + _entityTypeInstanceMap.keySet();
+            String msg = "The DB meta was not found by the entity type: key=" + entityType;
             throw new DBMetaNotFoundException(msg);
         }
         return dbmeta;
@@ -165,24 +163,20 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
      */
     protected static DBMeta byTableFlexibleName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        final String name = normalizeTableFlexibleName(tableFlexibleName);
-        final String tableDbName = _tableDbNameFlexibleMap.get(name);
-        if (tableDbName != null) {
-            return byTableDbName(tableDbName);
+        final String pureName = normalizeTableFlexibleName(tableFlexibleName);
+        final String schema = extractSchemaIfExists(tableFlexibleName);
+        String tableDbName = null;
+        if (schema != null) { // at first, find by qualified name
+            tableDbName = _tableDbNameFlexibleMap.get(schema + "." + pureName);
         }
-        return null;
+        if (tableDbName == null) { // and next, find by pure name
+            tableDbName = _tableDbNameFlexibleMap.get(pureName);
+        }
+        return tableDbName != null ? byTableDbName(tableDbName) : null;
     }
 
-    protected static String normalizeTableFlexibleName(final String tableFlexibleName) {
+    protected static String normalizeTableFlexibleName(String tableFlexibleName) {
         return removeQuoteIfExists(removeSchemaIfExists(tableFlexibleName));
-    }
-
-    protected static String removeSchemaIfExists(String name) {
-        final int dotLastIndex = name.lastIndexOf(".");
-        if (dotLastIndex >= 0) {
-            return name.substring(dotLastIndex + ".".length());
-        }
-        return name; 
     }
 
     protected static String removeQuoteIfExists(String name) {
@@ -192,6 +186,16 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
             return strip(name);
         }
         return name;
+    }
+
+    protected static String removeSchemaIfExists(String name) {
+        final int dotLastIndex = name.lastIndexOf(".");
+        return dotLastIndex >= 0 ? name.substring(dotLastIndex + ".".length()) : name; 
+    }
+
+    protected static String extractSchemaIfExists(String name) {
+        final int dotLastIndex = name.lastIndexOf(".");
+        return dotLastIndex >= 0 ? name.substring(0, dotLastIndex) : null; 
     }
 
     protected static String strip(String name) {

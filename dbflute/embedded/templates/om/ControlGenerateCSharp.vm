@@ -1611,7 +1611,6 @@ $database.info("public void parseTableClass() {")
   #set ($myConditionQueryClassName = "${table.extendedConditionQueryClassName}")
   #set ($myConditionInlineQueryClassName = "${table.extendedConditionInlineQueryClassName}")
   #set ($myNestSelectSetupperClassName = "${table.nestSelectSetupperClassName}")
-  #set ($myNestSelectSetupperTerminalClassName = "${table.nestSelectSetupperTerminalClassName}")
 
   #set ($myDBMetaClassName = "${table.DBMetaClassName}")
   #set ($myDBMetaPackageName = "${glPackageBaseDBMeta}")

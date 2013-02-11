@@ -1956,29 +1956,31 @@ public class Table {
         return getExtendedEntityClassName() + "Nss";
     }
 
-    public String getNestSelectSetupperTerminalClassName() {
-        return getExtendedEntityClassName() + "Nsst";
-    }
-
+    // -----------------------------------------------------
+    //                                   Schema Class Prefix
+    //                                   -------------------
     protected String getSchemaClassPrefix() {
         // *however same-name tables between different schemas are unsupported at 0.9.6.8
-        if (hasSchema() && existsSameNameTable()) {
-            // schema of DB2 may have space either size
+        // *and the limiter can be removed by DBFlute property at 1.0.3
+        if (hasSchema() && isAdditionalSchema() && existsSameNameTable()) { // additional schema only
+            // schema of DB2 may have space either size so needs to trim it
             final String prefix;
             if (isCatalogAdditionalSchema()) {
-                String pureCatalog = getPureCatalog();
-                pureCatalog = pureCatalog != null ? Srl.initCapTrimmed(pureCatalog.trim().toLowerCase()) : "";
-                String pureSchema = getPureSchema();
-                pureSchema = pureSchema != null ? Srl.initCapTrimmed(pureSchema.trim().toLowerCase()) : "";
+                final String pureCatalog = filterSchemaForClassPrefix(getPureCatalog());
+                final String pureSchema = filterSchemaForClassPrefix(getPureSchema());
                 prefix = pureCatalog + pureSchema;
             } else {
-                String pureSchema = getPureSchema();
-                pureSchema = pureSchema != null ? Srl.initCapTrimmed(pureSchema.trim().toLowerCase()) : "";
+                final String pureSchema = filterSchemaForClassPrefix(getPureSchema());
                 prefix = pureSchema;
             }
             return prefix;
         }
         return "";
+    }
+
+    protected String filterSchemaForClassPrefix(String name) {
+        // suppose that schema (or catalog) name is only e.g. 'EXAMPLEDB' (no delimiter, one word)
+        return name != null ? Srl.initCapTrimmed(name.trim().toLowerCase()) : "";
     }
 
     protected boolean _alreadyCheckedExistingSameNameTable;
@@ -1990,8 +1992,10 @@ public class Table {
         _alreadyCheckedExistingSameNameTable = true;
         final List<Table> tableList = getDatabase().getTableList();
         int count = 0;
+        final String myPureName = getName();
         for (Table table : tableList) {
-            if (getName().equalsIgnoreCase(table.getName())) {
+            final String yourPureName = table.getName();
+            if (myPureName.equalsIgnoreCase(yourPureName)) {
                 ++count;
                 if (count > 1) {
                     _existSameNameTable = true;
