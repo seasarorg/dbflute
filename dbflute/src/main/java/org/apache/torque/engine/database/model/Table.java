@@ -304,6 +304,10 @@ public class Table {
         return _name;
     }
 
+    /**
+     * Set the pure name of the table, no prefix even if schema-driven.
+     * @param name The table name as String. (NotNull)
+     */
     public void setName(String name) {
         this._name = name;
     }
@@ -383,6 +387,10 @@ public class Table {
     // -----------------------------------------------------
     //                                               HTML ID
     //                                               -------
+    /**
+     * Get the value for HTML (SchemaHTML) ID attribute of the table.
+     * @return The table ID for SchemaHTML. (NotNull)
+     */
     public String getTableIdForSchemaHtml() {
         return Srl.replace(getTableDbName().toLowerCase(), ".", "_");
     }
@@ -391,8 +399,8 @@ public class Table {
     //                                           Custom Name
     //                                           -----------
     /**
-     * Get annotation table name. (for S2Dao)
-     * @return Annotation table name. (NotNull)
+     * Get the table name for annotation. (for S2Dao, DBFlute.NET only)
+     * @return The table name for annotation. (NotNull)
      */
     public String getAnnotationTableName() {
         return getTableSqlName();
@@ -406,6 +414,10 @@ public class Table {
         return alias != null && alias.trim().length() > 0;
     }
 
+    /**
+     * Get the alias of the table.
+     * @return The table alias as String. (NotNull, EmptyAllowed: when no alias)
+     */
     public String getAlias() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = _plainComment;

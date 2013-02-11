@@ -325,8 +325,12 @@ public class Column {
         return _name;
     }
 
-    public void setName(String newName) {
-        _name = newName;
+    /**
+     * Set the DB name (pure name) of the column, which can be used for identity.
+     * @param name The column name as String. (NotNull)
+     */
+    public void setName(String name) {
+        _name = name;
     }
 
     // -----------------------------------------------------
@@ -374,6 +378,11 @@ public class Column {
     // -----------------------------------------------------
     //                                               HTML ID
     //                                               -------
+    /**
+     * Get the value for HTML (SchemaHTML) ID attribute of the column. <br />
+     * This contains the table's ID value.
+     * @return The column ID for SchemaHTML. (NotNull)
+     */
     public String getColumnIdForSchemaHtml() {
         final String tableId = getTable().getTableIdForSchemaHtml();
         return tableId + "_" + getName().toLowerCase();
@@ -397,6 +406,10 @@ public class Column {
         return Srl.is_NotNull_and_NotTrimmedEmpty(getAlias());
     }
 
+    /**
+     * Get the alias of the column.
+     * @return The column alias as String. (NotNull, EmptyAllowed: when no alias)
+     */
     public String getAlias() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String comment = _plainComment;
