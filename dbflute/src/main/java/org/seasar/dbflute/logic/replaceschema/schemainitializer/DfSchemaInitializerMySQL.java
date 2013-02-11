@@ -34,7 +34,7 @@ public class DfSchemaInitializerMySQL extends DfSchemaInitializerJdbc {
         final DfDropForeignKeyByJdbcCallback callback = new DfDropForeignKeyByJdbcCallback() {
             public String buildDropForeignKeySql(DfForeignKeyMeta metaInfo) {
                 final String foreignKeyName = metaInfo.getForeignKeyName();
-                final String localTableName = filterTableName(metaInfo.getLocalTableName());
+                final String localTableName = metaInfo.getLocalTableSqlName();
                 final StringBuilder sb = new StringBuilder();
                 sb.append("alter table ").append(localTableName).append(" drop foreign key ").append(foreignKeyName);
                 return sb.toString();

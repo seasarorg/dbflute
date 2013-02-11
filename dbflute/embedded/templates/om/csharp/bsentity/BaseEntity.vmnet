@@ -58,7 +58,7 @@ namespace ${myExtendedEntityPackageName} {
     /// ]]>
     /// Author: ${database.classAuthor}
     /// </summary>
-    [Seasar.Dao.Attrs.Table("${table.AnnotationTableName}")]
+    [Seasar.Dao.Attrs.Table("${table.annotationTableName}")]
 #if ($table.isUseUpdateDate())
     [Seasar.Dao.Attrs.TimestampProperty("${table.updateDatePropertyName}")]
 #end
@@ -87,7 +87,7 @@ namespace ${myExtendedEntityPackageName} {
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        public String TableDbName { get { return "${table.name}"; } }
+        public String TableDbName { get { return "${table.tableDbName}"; } }
         public String TablePropertyName { get { return "${table.javaName}"; } }
 
 #if ($isSql2Entity)
@@ -235,7 +235,7 @@ namespace ${myExtendedEntityPackageName} {
 #set ($foreignVariableName = "_${fk.foreignPropertyName}")
         protected ${foreignEntityClassName} ${foreignVariableName};
 
-        /// <summary>${foreignTable.aliasExpression}${foreignTable.name} as '${fk.foreignPropertyNameInitCap}'.</summary>
+        /// <summary>${foreignTable.aliasExpression}${foreignTable.tableDbName} as '${fk.foreignPropertyNameInitCap}'.</summary>
         [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$fk.relationKeysCommaString")]
         public ${foreignEntityClassName} ${fk.foreignPropertyNameInitCap} {
             get { return ${foreignVariableName}; }
@@ -256,7 +256,7 @@ namespace ${myExtendedEntityPackageName} {
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
         protected ${referrerEntityClassName} ${referrerVariableName};
 
-        /// <summary>${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerPropertyNameInitCapAsOne}'.</summary>
+        /// <summary>${referrerTable.aliasExpression}${referrerTable.tableDbName} as '${referrer.referrerPropertyNameInitCapAsOne}'.</summary>
         [Seasar.Dao.Attrs.Relno(${foreignKeyIndex}), Seasar.Dao.Attrs.Relkeys("$referrer.relationKeysCommaStringForOneToOneReferrer")]
         public ${referrerEntityClassName} ${referrer.referrerPropertyNameInitCapAsOne} {
             get { return ${referrerVariableName}; }
@@ -283,7 +283,7 @@ namespace ${myExtendedEntityPackageName} {
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         protected IList<${referrerEntityClassName}> $referrerVariableName;
 
-        /// <summary>${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerPropertyNameInitCap}'.</summary>
+        /// <summary>${referrerTable.aliasExpression}${referrerTable.tableDbName} as '${referrer.referrerPropertyNameInitCap}'.</summary>
         public IList<${referrerEntityClassName}> ${referrer.referrerPropertyNameInitCap} {
             get { if (${referrerVariableName} == null) { ${referrerVariableName} = new List<${referrerEntityClassName}>(); } return ${referrerVariableName}; }
             set { ${referrerVariableName} = value; }

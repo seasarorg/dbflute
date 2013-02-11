@@ -18,6 +18,8 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -29,21 +31,61 @@ public class DfForeignKeyMeta {
     //                                                                           Attribute
     //                                                                           =========
     protected String _foreignKeyName;
-
-    protected String _localTableName;
-
-    protected String _foreignTableName;
-
+    protected UnifiedSchema _localSchema;
+    protected String _localTablePureName;
     protected UnifiedSchema _foreignSchema;
-
+    protected String _foreignTablePureName;
     protected Map<String, String> _columnNameMap = DfCollectionUtil.newLinkedHashMap();
+
+    // ===================================================================================
+    //                                                                       Name Building
+    //                                                                       =============
+    public String getLocalTableDbName() {
+        if (_localSchema == null) {
+            return _localTablePureName;
+        }
+        final String drivenSchema = _localSchema.getDrivenSchema();
+        if (drivenSchema == null) {
+            return _localTablePureName;
+        }
+        return drivenSchema + "." + _localTablePureName;
+    }
+
+    public String getForeignTableDbName() {
+        if (_foreignSchema == null) {
+            return _foreignTablePureName;
+        }
+        final String drivenSchema = _foreignSchema.getDrivenSchema();
+        if (drivenSchema == null) {
+            return _foreignTablePureName;
+        }
+        return drivenSchema + "." + _foreignTablePureName;
+    }
+
+    public String getLocalTableSqlName() {
+        if (_localSchema == null) {
+            return _localTablePureName;
+        }
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        final String quotedName = prop.quoteTableNameIfNeedsDirectUse(_localTablePureName);
+        return _localSchema.buildSqlName(quotedName); // driven is resolved here so it uses pure name here
+    }
+
+    public String getForeignTableSqlName() {
+        if (_foreignSchema == null) {
+            return _foreignTablePureName;
+        }
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        final String quotedName = prop.quoteTableNameIfNeedsDirectUse(_foreignTablePureName);
+        return _foreignSchema.buildSqlName(quotedName); // driven is resolved here so it uses pure name here
+    }
 
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return _foreignKeyName + "-{" + _localTableName + ":" + _foreignTableName + "--" + _columnNameMap + "}";
+        return _foreignKeyName + ":{" + _localTablePureName + ":" + _foreignTablePureName + ":" + _columnNameMap + "}";
     }
 
     // ===================================================================================
@@ -57,20 +99,20 @@ public class DfForeignKeyMeta {
         this._foreignKeyName = foreignKeyName;
     }
 
-    public String getLocalTableName() {
-        return _localTableName;
+    public UnifiedSchema getLocalSchema() {
+        return _localSchema;
     }
 
-    public void setLocalTableName(String localtableName) {
-        this._localTableName = localtableName;
+    public void setLocalSchema(UnifiedSchema localSchema) {
+        this._localSchema = localSchema;
     }
 
-    public String getForeignTableName() {
-        return _foreignTableName;
+    public String getLocalTablePureName() {
+        return _localTablePureName;
     }
 
-    public void setForeignTableName(String foreignTableName) {
-        this._foreignTableName = foreignTableName;
+    public void setLocalTablePureName(String localTablePureName) {
+        this._localTablePureName = localTablePureName;
     }
 
     public UnifiedSchema getForeignSchema() {
@@ -79,6 +121,14 @@ public class DfForeignKeyMeta {
 
     public void setForeignSchema(UnifiedSchema foreignSchema) {
         this._foreignSchema = foreignSchema;
+    }
+
+    public String getForeignTablePureName() {
+        return _foreignTablePureName;
+    }
+
+    public void setForeignTablePureName(String foreignTablePureName) {
+        this._foreignTablePureName = foreignTablePureName;
     }
 
     public Map<String, String> getColumnNameMap() {

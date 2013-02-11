@@ -29,7 +29,7 @@ import ${glPackageBaseCommon}.*;
 import ${myExtendedEntityPackageName}.*;
 
 /**
- * The DB meta of ${table.name}. (Singleton)
+ * The DB meta of ${table.tableDbName}. (Singleton)
  * @author ${database.classAuthor}
  */
 public class ${myClassName} extends AbstractDBMeta {
@@ -104,7 +104,7 @@ public class ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                          Table Info
     //                                                                          ==========
-    protected final String _tableDbName = "${table.name}";
+    protected final String _tableDbName = "${table.tableDbName}";
     protected final String _tablePropertyName = "${table.javaBeansRulePropertyName}";
     protected final TableSqlName _tableSqlName = new TableSqlName("${table.tableSqlName}", _tableDbName);
     { _tableSqlName.xacceptFilter(${glDBFluteConfig}.getInstance().getTableSqlNameFilter()); }

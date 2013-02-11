@@ -407,7 +407,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         for (Table table : tableList) {
             final Table found = findPreviousTable(table);
             if (found == null || !isSameTableName(table, found)) { // added
-                addTableDiff(DfTableDiff.createAdded(table.getName()));
+                addTableDiff(DfTableDiff.createAdded(table.getTableDbName()));
             }
         }
     }
@@ -423,7 +423,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
                 continue;
             }
             // found
-            final DfTableDiff tableDiff = DfTableDiff.createChanged(next.getName());
+            final DfTableDiff tableDiff = DfTableDiff.createChanged(next.getTableDbName());
 
             // direct attributes
             processUnifiedSchema(next, previous, tableDiff);
@@ -624,7 +624,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
         for (Table table : tableList) {
             final Table found = findNextTable(table);
             if (found == null || !isSameTableName(table, found)) { // deleted
-                addTableDiff(DfTableDiff.createDeleted(table.getName()));
+                addTableDiff(DfTableDiff.createDeleted(table.getTableDbName()));
             }
         }
     }
@@ -639,7 +639,7 @@ public class DfSchemaDiff extends DfAbstractDiff {
      * @return The object of found table. (NullAllowed: if null, not found)
      */
     protected Table findNextTable(Table table) {
-        return _nextDb.getTable(table.getName());
+        return _nextDb.getTable(table.getTableDbName());
     }
 
     /**
@@ -649,21 +649,21 @@ public class DfSchemaDiff extends DfAbstractDiff {
      * @return The object of found table. (NullAllowed: if null, not found)
      */
     protected Table findPreviousTable(Table table) {
-        return findPreviousTable(table.getName());
+        return findPreviousTable(table.getTableDbName());
     }
 
     /**
      * Find the table from previous schema by table name. <br />
      * This method can be used after {@link #loadPreviousSchema()}.
-     * @param tableName The name of target table. (NotNull)
+     * @param tableDbName The DB name of target table. (NotNull)
      * @return The object of found table. (NullAllowed: if null, not found)
      */
-    public Table findPreviousTable(String tableName) { // public to glance previous world
-        return _previousDb.getTable(tableName);
+    public Table findPreviousTable(String tableDbName) { // public to glance previous world
+        return _previousDb.getTable(tableDbName);
     }
 
     protected boolean isSameTableName(Table next, Table previous) {
-        return isSame(next.getName(), previous.getName());
+        return isSame(next.getTableDbName(), previous.getTableDbName());
     }
 
     // ===================================================================================

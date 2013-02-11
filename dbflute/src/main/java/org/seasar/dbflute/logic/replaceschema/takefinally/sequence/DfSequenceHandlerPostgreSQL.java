@@ -124,7 +124,7 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                 if (doneSequenceSet.contains(sequenceName)) {
                     continue; // already done
                 }
-                tableSqlName = tableInfo.buildTableSqlName();
+                tableSqlName = tableInfo.getTableSqlName();
                 final Integer count = selectCount(st, tableSqlName);
                 if (count == null || count == 0) {
                     // It is not necessary to increment because the table has no data.

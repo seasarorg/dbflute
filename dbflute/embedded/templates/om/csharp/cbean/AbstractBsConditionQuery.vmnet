@@ -18,7 +18,7 @@ namespace ${glPackageBaseCQ} {
         public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel)
             : base(childQuery, sqlClause, aliasName, nestLevel) {}
 
-        public override String getTableDbName() { return "${table.name}"; }
+        public override String getTableDbName() { return "${table.tableDbName}"; }
         public override String getTableSqlName() { return "${table.tableSqlName}"; }
 #foreach ($col in $table.columns)
 #set ($tmpJavaName = "${col.javaName}")

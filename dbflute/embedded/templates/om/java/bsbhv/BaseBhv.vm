@@ -101,7 +101,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                          Table name
     //                                                                          ==========
     /** @return The name on database of table. (NotNull) */
-    public String getTableDbName() { return "${table.name}"; }
+    public String getTableDbName() { return "${table.tableDbName}"; }
 
     // ===================================================================================
     //                                                                              DBMeta

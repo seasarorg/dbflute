@@ -54,7 +54,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     @Override
     protected void setupDropTable(StringBuilder sb, DfTableMeta metaInfo) {
         if (metaInfo.isTableTypeSynonym()) {
-            final String tableName = filterTableName(metaInfo.getTableName());
+            final String tableName = metaInfo.getTableSqlName();
             sb.append("drop synonym ").append(tableName);
         } else {
             super.setupDropTable(sb, metaInfo);

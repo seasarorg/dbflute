@@ -51,7 +51,7 @@ public class DfTableOrderAnalyzer {
             final TreeSet<Table> allTableSet = new TreeSet<Table>(new Comparator<Table>() {
                 public int compare(Table o1, Table o2) {
                     // e.g. order, order_detail, order_detail_more, ...
-                    return o1.getName().compareTo(o2.getName());
+                    return o1.getTableDbName().compareTo(o2.getTableDbName());
                 }
             });
             allTableSet.addAll(allTableList);
@@ -96,7 +96,7 @@ public class DfTableOrderAnalyzer {
             final List<ForeignKey> foreignKeyList = table.getForeignKeyList();
             boolean independent = true;
             for (ForeignKey fk : foreignKeyList) {
-                final String foreignTableName = fk.getForeignTableName();
+                final String foreignTableName = fk.getForeignTablePureName();
                 if (level == 1 && fk.hasFixedCondition()) {
                     continue;
                 }
@@ -194,7 +194,7 @@ public class DfTableOrderAnalyzer {
                     final Set<String> foreignTableSet = new HashSet<String>();
                     for (ForeignKey fk : foreignKeyList) {
                         if (!fk.hasFixedCondition()) { // ignore fixed condition
-                            foreignTableSet.add(fk.getForeignTableName());
+                            foreignTableSet.add(fk.getForeignTablePureName());
                         }
                     }
                     List<Table> candidatePreviousList = null;

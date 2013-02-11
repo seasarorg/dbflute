@@ -168,8 +168,8 @@ public class ForeignKey implements Constraint {
     protected String _name; // constraint name (no change because it's used by templates)
 
     protected Table _localTable;
-    protected UnifiedSchema _foreignSchema; // #hope additional FK support
-    protected String _foreignTableName; // may be user input (if additional FK)
+    protected UnifiedSchema _foreignSchema;
+    protected String _foreignTablePureName; // as table DB name, may be user input (if additional FK)
 
     protected String _fixedCondition;
     protected String _fixedSuffix;
@@ -214,7 +214,7 @@ public class ForeignKey implements Constraint {
      * @param attrib the XML attributes
      */
     public void loadFromXML(Table localTable, Attributes attrib) {
-        _foreignTableName = attrib.getValue("foreignTable");
+        _foreignTablePureName = attrib.getValue("foreignTable");
         final String schemaExp = attrib.getValue("foreignSchema");
         if (schemaExp != null) {
             _foreignSchema = UnifiedSchema.createAsDynamicSchema(schemaExp);
@@ -272,31 +272,39 @@ public class ForeignKey implements Constraint {
      * @return Foreign table.
      */
     public Table getForeignTable() {
-        final String foreignTableKey = getForeignTableKey();
-        final Table foreignTable = findTable(foreignTableKey);
+        final String foreignTableDbName = getForeignTableDbName();
+        final Table foreignTable = findTable(foreignTableDbName);
         if (foreignTable == null) {
-            throwForeignTableNotFoundException(foreignTableKey);
+            throwForeignTableNotFoundException(foreignTableDbName);
         }
         return foreignTable;
     }
 
-    protected String getForeignTableKey() {
-        return Table.generateTableKey(_foreignSchema, getForeignTableName());
+    public String getForeignTableDbName() {
+        final String foreignTableName = getForeignTablePureName();
+        if (_foreignSchema == null) {
+            return foreignTableName;
+        }
+        final String drivenSchema = _foreignSchema.getDrivenSchema();
+        if (drivenSchema == null) {
+            return _foreignTablePureName;
+        }
+        return drivenSchema + "." + foreignTableName;
     }
 
-    protected Table findTable(String tableKey) {
-        return getTable().getDatabase().getTable(tableKey);
+    protected Table findTable(String tableDbName) {
+        return getTable().getDatabase().getTable(tableDbName);
     }
 
-    protected void throwForeignTableNotFoundException(String foreignTableKey) {
+    protected void throwForeignTableNotFoundException(String foreignTableName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Not found the foreign table in the database.");
         br.addItem("Foreign Key");
         br.addElement(_name);
         br.addItem("Local Table");
         br.addElement(getTable().getBasicInfoDispString());
-        br.addItem("ForeignTable Key");
-        br.addElement(foreignTableKey);
+        br.addItem("ForeignTable Name");
+        br.addElement(foreignTableName);
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
     }
@@ -351,8 +359,9 @@ public class ForeignKey implements Constraint {
                 }
             }
             if (name.trim().length() > 0) { // means multiple FK columns exist
-                final String drivenDbName = getTable().getDrivenDbName();
-                final String aliasName = getMultipleFKPropertyColumnAliasName(drivenDbName, multipleFKColumnNameList);
+                final String localTableDbName = getTable().getTableDbName();
+                final String aliasName = getMultipleFKPropertyColumnAliasName(localTableDbName,
+                        multipleFKColumnNameList);
                 if (aliasName != null && aliasName.trim().length() > 0) { // my young code
                     final String firstUpper = aliasName.substring(0, 1).toUpperCase();
                     if (aliasName.trim().length() == 1) {
@@ -365,7 +374,7 @@ public class ForeignKey implements Constraint {
                 }
             }
         }
-        if (getForeignTable().getName().equals(getTable().getName())) {
+        if (getForeignTable().getTableDbName().equals(getTable().getTableDbName())) {
             name = name + "Self";
         }
         if (isJavaBeansRule) {
@@ -451,40 +460,40 @@ public class ForeignKey implements Constraint {
 
         final List<String> columnNameList = new ArrayList<String>();
 
-        String result = "";
+        String name = "";
         if (hasFixedSuffix()) {
-            result = getFixedSuffix();
+            name = getFixedSuffix();
         } else {
             for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
                 final Column col = (Column) ite.next();
 
                 if (col.isMultipleFK()) {
                     columnNameList.add(col.getName());
-                    result = result + col.getJavaName();
+                    name = name + col.getJavaName();
                 }
             }
-            if (result.trim().length() != 0) { // isMultipleFK()==true
-                String foreignDrivenDbName = getForeignTable().getDrivenDbName();
-                final String aliasName = getMultipleFKPropertyColumnAliasName(foreignDrivenDbName, columnNameList);
+            if (name.trim().length() != 0) { // isMultipleFK()==true
+                final String foreignTableDbName = getForeignTable().getTableDbName();
+                final String aliasName = getMultipleFKPropertyColumnAliasName(foreignTableDbName, columnNameList);
                 if (aliasName != null && aliasName.trim().length() != 0) {
                     final String firstUpper = aliasName.substring(0, 1).toUpperCase();
                     if (aliasName.trim().length() == 1) {
-                        result = "By" + firstUpper;
+                        name = "By" + firstUpper;
                     } else {
-                        result = "By" + firstUpper + aliasName.substring(1, aliasName.length());
+                        name = "By" + firstUpper + aliasName.substring(1, aliasName.length());
                     }
                 } else {
-                    result = "By" + result;
+                    name = "By" + name;
                 }
             }
         }
-        if (getTable().getName().equals(getForeignTable().getName())) {
-            result = result + "Self";
+        if (getTable().getTableDbName().equals(getForeignTable().getTableDbName())) {
+            name = name + "Self";
         }
         if (isJavaBeansRule) {
-            return getTable().getJavaBeansRulePropertyName() + result + "List";
+            return getTable().getJavaBeansRulePropertyName() + name + "List";
         } else {
-            return getTable().getUncapitalisedJavaName() + result + "List";
+            return getTable().getUncapitalisedJavaName() + name + "List";
         }
     }
 
@@ -510,25 +519,24 @@ public class ForeignKey implements Constraint {
 
     protected String getReferrerPropertyNameAsOne(boolean isJavaBeansRule) {
         final List<Column> localColumnList = getLocalColumnList();
-
-        String result = "";
+        String name = "";
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column col = (Column) ite.next();
 
             if (col.isMultipleFK()) {
-                result = result + col.getJavaName();
+                name = name + col.getJavaName();
             }
         }
-        if (result.trim().length() != 0) {
-            result = "By" + result;
+        if (name.trim().length() != 0) {
+            name = "By" + name;
         }
-        if (getTable().getName().equals(getForeignTable().getName())) {
-            result = result + "Self";
+        if (getTable().getTableDbName().equals(getForeignTable().getTableDbName())) {
+            name = name + "Self";
         }
         if (isJavaBeansRule) {
-            return getTable().getJavaBeansRulePropertyName() + result + "AsOne";
+            return getTable().getJavaBeansRulePropertyName() + name + "AsOne";
         } else {
-            return getTable().getUncapitalisedJavaName() + result + "AsOne";
+            return getTable().getUncapitalisedJavaName() + name + "AsOne";
         }
     }
 
@@ -570,7 +578,7 @@ public class ForeignKey implements Constraint {
             final Column col = getTable().getColumn(name);
             if (col == null) {
                 String msg = "The columnName is not existing at the table: ";
-                msg = msg + "columnName=" + name + " tableName=" + getTable().getName();
+                msg = msg + "columnName=" + name + " tableName=" + getTable().getTableDbName();
                 throw new IllegalStateException(msg);
             }
             resultList.add(col);
@@ -601,7 +609,8 @@ public class ForeignKey implements Constraint {
         if (columnNameList.size() != 1) {
             String msg = "This method is for only-one foreign-key:";
             msg = msg + " getLocalColumnNameList().size()=" + columnNameList.size();
-            msg = msg + " baseTable=" + getTable().getName() + " foreignTable=" + getForeignTable().getName();
+            msg = msg + " baseTable=" + getTable().getTableDbName();
+            msg = msg + " foreignTable=" + getForeignTable().getTableDbName();
             throw new IllegalStateException(msg);
         }
         return columnNameList.get(0);
@@ -888,22 +897,21 @@ public class ForeignKey implements Constraint {
     //                                            ----------
     public String getReferrerPropertyNameAsOneS2Jdbc() { // for S2JDBC
         final List<Column> localColumnList = getLocalColumnList();
-
-        String result = "";
+        String name = "";
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column col = (Column) ite.next();
 
             if (col.isMultipleFK()) {
-                result = result + col.getJavaName();
+                name = name + col.getJavaName();
             }
         }
-        if (result.trim().length() != 0) {
-            result = "By" + result;
+        if (name.trim().length() != 0) {
+            name = "By" + name;
         }
-        if (getTable().getName().equals(getForeignTable().getName())) {
-            result = result + "Self";
+        if (getTable().getTableDbName().equals(getForeignTable().getTableDbName())) {
+            name = name + "Self";
         }
-        return getTable().getUncapitalisedJavaName() + result;
+        return getTable().getUncapitalisedJavaName() + name;
     }
 
     // ===================================================================================
@@ -1288,7 +1296,7 @@ public class ForeignKey implements Constraint {
     }
 
     public boolean isSelfReference() {
-        return _localTable.getName().equals(_foreignTableName);
+        return _localTable.getTableDbName().equals(getForeignTable().getTableDbName());
     }
 
     public boolean canBeReferrer() {
@@ -1374,7 +1382,7 @@ public class ForeignKey implements Constraint {
         final StringBuilder sb = new StringBuilder();
         final Table foreignTable = getForeignTable();
         sb.append(foreignTable.getAliasExpression());
-        sb.append(foreignTable.getName());
+        sb.append(foreignTable.getTableDbName());
         sb.append(" by my ").append(getLocalColumnNameCommaString());
         sb.append(", named '").append(getForeignJavaBeansRulePropertyName()).append("'");
         return sb.toString();
@@ -1406,7 +1414,7 @@ public class ForeignKey implements Constraint {
     public String getReferrerSimpleDispAsOne() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getTable().getAliasExpression());
-        sb.append(getTable().getName());
+        sb.append(getTable().getTableDbName());
         sb.append(" by your ").append(getLocalColumnNameCommaString());
         sb.append(", named '").append(getReferrerJavaBeansRulePropertyNameAsOne()).append("'");
         return sb.toString();
@@ -1438,7 +1446,7 @@ public class ForeignKey implements Constraint {
     public String getReferrerSimpleDisp() {
         final StringBuilder sb = new StringBuilder();
         sb.append(getTable().getAliasExpression());
-        sb.append(getTable().getName());
+        sb.append(getTable().getTableDbName());
         sb.append(" by your ").append(getLocalColumnNameCommaString());
         sb.append(", named '").append(getReferrerJavaBeansRulePropertyName()).append("'");
         return sb.toString();
@@ -1572,7 +1580,7 @@ public class ForeignKey implements Constraint {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("    <foreign-key");
-        sb.append(" foreignTable=\"").append(getForeignTableName()).append("\"");
+        sb.append(" foreignTable=\"").append(getForeignTablePureName()).append("\"");
         sb.append(" name=\"").append(getName()).append("\"");
         sb.append(">\n");
 
@@ -1606,19 +1614,19 @@ public class ForeignKey implements Constraint {
     }
 
     /**
-     * Get the foreignTableName of the FK
-     * @return the name of the foreign table
+     * Get the pure name of the table for the FK.
+     * @return the pure name of the foreign table. (NotNull)
      */
-    public String getForeignTableName() {
-        return _foreignTableName;
+    public String getForeignTablePureName() {
+        return _foreignTablePureName;
     }
 
     /**
-     * Set the foreignTableName of the FK
-     * @param tableName the name of the foreign table
+     * Set the pure name of the table for the FK.
+     * @param tablePureName the pure name of the foreign table. (NotNull)
      */
-    public void setForeignTableName(String tableName) {
-        _foreignTableName = tableName;
+    public void setForeignTablePureName(String tablePureName) {
+        _foreignTablePureName = tablePureName;
     }
 
     /**

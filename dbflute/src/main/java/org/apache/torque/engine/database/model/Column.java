@@ -217,15 +217,6 @@ public class Column {
      * Creates a new instance with a <code>null</code> name.
      */
     public Column() {
-        this(null);
-    }
-
-    /**
-     * Creates a new column and set the name
-     * @param name column name
-     */
-    public Column(String name) {
-        _name = name;
     }
 
     // -----------------------------------------------------
@@ -237,7 +228,7 @@ public class Column {
         _javaName = attrib.getValue("javaName");
 
         final UnifiedSchema unifiedSchema = getTable().getUnifiedSchema();
-        final String tableName = getTable().getName();
+        final String tableName = getTable().getTableDbName();
         if (readingFilter != null && readingFilter.isColumnExcept(unifiedSchema, tableName, _name)) {
             return false;
         }
@@ -284,7 +275,7 @@ public class Column {
     }
 
     public String getFullyQualifiedName() {
-        return (_table.getName() + '.' + _name);
+        return (_table.getTableDbName() + '.' + _name);
     }
 
     // ===================================================================================
@@ -320,20 +311,17 @@ public class Column {
         return db;
     }
 
-    /**
-     * Returns the Name of the table the column is in
-     */
-    public String getTableName() {
-        return _table.getName();
-    }
-
     // ===================================================================================
     //                                                                   Column Definition
     //                                                                   =================
     // -----------------------------------------------------
     //                                           Column Name
     //                                           -----------
-    public String getName() {
+    /**
+     * Get the DB name (pure name) of the column, which can be used for identity.
+     * @return The column name as String. (NotNull)
+     */
+    public String getName() { // Torque-traditional method
         return _name;
     }
 
@@ -344,11 +332,21 @@ public class Column {
     // -----------------------------------------------------
     //                                              SQL Name
     //                                              --------
-    public String getColumnSqlName() {
+    /**
+     * Get the SQL name of the column, which is used in your SQL after generated world. (for templates) <br />
+     * This might be quoted with fitting to template.
+     * @return The column name as String. (NotNull)
+     */
+    public String getColumnSqlName() { // new face for DBFlute
         return quoteColumnNameIfNeeds(getResourceNameForSqlName());
     }
 
-    public String getColumnSqlNameDirectUse() {
+    /**
+     * Get the SQL name of the column, which is used in your SQL on the Java process. (for direct use) <br />
+     * This might be quoted for direct use or has its schema prefix.
+     * @return The column name as String. (NotNull)
+     */
+    public String getColumnSqlNameDirectUse() { // new face for DBFlute
         return quoteColumnNameIfNeedsDirectUse(getResourceNameForSqlName());
     }
 
@@ -371,6 +369,14 @@ public class Column {
     protected String quoteColumnNameIfNeedsDirectUse(String columnName) {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
         return prop.quoteColumnNameIfNeedsDirectUse(columnName);
+    }
+
+    // -----------------------------------------------------
+    //                                               HTML ID
+    //                                               -------
+    public String getColumnIdForSchemaHtml() {
+        final String tableId = getTable().getTableIdForSchemaHtml();
+        return tableId + "_" + getName().toLowerCase();
     }
 
     // -----------------------------------------------------
@@ -719,7 +725,7 @@ public class Column {
         }
         if (hasSql2EntityRelatedTable()) {
             plugDelimiterIfNeeds(sb);
-            sb.append("refers to ").append(getSql2EntityRelatedTable().getName());
+            sb.append("refers to ").append(getSql2EntityRelatedTable().getTableDbName());
             if (hasSql2EntityRelatedColumn()) {
                 sb.append(".").append(getSql2EntityRelatedColumn().getName());
             }
@@ -849,11 +855,11 @@ public class Column {
         if (fk == null) {
             return false;
         }
-        final String myForeignTableName = fk.getForeignTableName();
+        final String myForeignTableName = fk.getForeignTableDbName();
         final ForeignKey[] fks = _table.getForeignKeys();
         final String myColumnName = _name;
         for (int i = 0; i < fks.length; i++) {
-            final String foreignTableName = fks[i].getForeignTableName();
+            final String foreignTableName = fks[i].getForeignTableDbName();
             if (!myForeignTableName.equalsIgnoreCase(foreignTableName)) {
                 continue;
             }
@@ -942,7 +948,7 @@ public class Column {
      */
     public String getRelatedTableName() {
         ForeignKey fk = getForeignKey();
-        return (fk == null ? null : fk.getForeignTableName());
+        return (fk == null ? null : fk.getForeignTablePureName());
     }
 
     /**
@@ -951,12 +957,11 @@ public class Column {
      */
     public String getForeignTableName() {
         final ForeignKey fk = getForeignKey();
-        return (fk == null ? "" : fk.getForeignTableName());
+        return (fk == null ? "" : fk.getForeignTablePureName());
     }
 
     /**
      * Adds the foreign key from another table that refers to this column.
-     * 
      * @return The determination, true or false.
      */
     public boolean isSingleKeyForeignKey() {
@@ -1065,7 +1070,7 @@ public class Column {
         final StringBuffer sb = new StringBuffer();
         for (ForeignKey fk : _referrerList) {
             final Table reffererTable = fk.getTable();
-            final String name = reffererTable.getName();
+            final String name = reffererTable.getTableDbName();
             sb.append(", ").append(name);
         }
         sb.delete(0, ", ".length());
@@ -1369,7 +1374,7 @@ public class Column {
             }
 
             public String disp() {
-                return getTable().getDrivenDbName() + "." + getName() + ": " + getColumnDefinitionLineDisp();
+                return getTable().getTableDbName() + "." + getName() + ": " + getColumnDefinitionLineDisp();
             }
         });
     }
@@ -1462,7 +1467,7 @@ public class Column {
             ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Not found JDBC type of the column.");
             br.addItem("Column");
-            br.addElement(getTable().getName() + "." + getName());
+            br.addElement(getTable().getTableDbName() + "." + getName());
             String msg = br.buildExceptionMessage();
             throw new IllegalStateException(msg);
         }
@@ -1643,6 +1648,7 @@ public class Column {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    // *not override equals() because column comparing process is so complex
     /**
      * String representation of the column. This is an xml representation.
      * @return string representation in xml
@@ -1943,7 +1949,7 @@ public class Column {
         if (hasSql2EntityRelatedTableClassification()) {
             return true;
         }
-        return getClassificationProperties().hasClassification(getTableName(), getName());
+        return getClassificationProperties().hasClassification(getTable().getTableDbName(), getName());
     }
 
     public boolean isTableClassification() {
@@ -1957,14 +1963,14 @@ public class Column {
         if (hasSql2EntityRelatedTableClassificationName()) {
             return true;
         }
-        return getClassificationProperties().hasClassificationName(getTableName(), getName());
+        return getClassificationProperties().hasClassificationName(getTable().getTableDbName(), getName());
     }
 
     public boolean hasClassificationAlias() {
         if (hasSql2EntityRelatedTableClassificationAlias()) {
             return true;
         }
-        return getClassificationProperties().hasClassificationAlias(getTableName(), getName());
+        return getClassificationProperties().hasClassificationAlias(getTable().getTableDbName(), getName());
     }
 
     public String getClassificationName() {
@@ -1972,7 +1978,7 @@ public class Column {
         if (classificationName != null) {
             return classificationName;
         }
-        return getClassificationProperties().getClassificationName(getTableName(), getName());
+        return getClassificationProperties().getClassificationName(getTable().getTableDbName(), getName());
     }
 
     public String getClassificationMetaSettingExpression() { // for DBMeta
@@ -2030,7 +2036,7 @@ public class Column {
         if (!hasSql2EntityRelatedTable()) {
             return false;
         }
-        final String tableName = getSql2EntityRelatedTable().getName();
+        final String tableName = getSql2EntityRelatedTable().getTableDbName();
         return getClassificationProperties().hasClassification(tableName, getName());
     }
 
@@ -2038,7 +2044,7 @@ public class Column {
         if (!hasSql2EntityRelatedTable()) {
             return false;
         }
-        final String tableName = getSql2EntityRelatedTable().getName();
+        final String tableName = getSql2EntityRelatedTable().getTableDbName();
         return getClassificationProperties().hasClassificationName(tableName, getName());
     }
 
@@ -2046,7 +2052,7 @@ public class Column {
         if (!hasSql2EntityRelatedTable()) {
             return false;
         }
-        final String tableName = getSql2EntityRelatedTable().getName();
+        final String tableName = getSql2EntityRelatedTable().getTableDbName();
         return getClassificationProperties().hasClassificationAlias(tableName, getName());
     }
 
@@ -2054,7 +2060,7 @@ public class Column {
         if (!hasSql2EntityRelatedTable()) {
             return null;
         }
-        final String tableName = getSql2EntityRelatedTable().getName();
+        final String tableName = getSql2EntityRelatedTable().getTableDbName();
         return getClassificationProperties().getClassificationName(tableName, getName());
     }
 
@@ -2085,7 +2091,7 @@ public class Column {
 
     public String getSubColumnSequenceName() {
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
-        return prop.getSubColumnSequenceName(getTableName(), getName());
+        return prop.getSubColumnSequenceName(getTable().getTableDbName(), getName());
     }
 
     // ===================================================================================

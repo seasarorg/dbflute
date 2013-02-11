@@ -136,7 +136,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * {@inheritDoc}
      */
     public String getTableDbName() {
-        return "${table.name}";
+        return "${table.tableDbName}";
     }
 
     /**

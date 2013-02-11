@@ -279,7 +279,7 @@ public abstract class $myClassName implements Serializable {
 
     public int hashCode() {
         int result = 17;
-        result = xCH(result, "${table.name}");
+        result = xCH(result, "${table.tableDbName}");
 #foreach ($col in $table.equalsHashcodeColumnList)
         result = xCH(result, get${col.JavaName}());
 #end

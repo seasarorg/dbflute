@@ -479,6 +479,7 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
 
     protected void setupProcedureMetaInfo(List<DfProcedureMeta> procedureMetaInfoList, ResultSet procedureRs,
             UnifiedSchema unifiedSchema) throws SQLException {
+        boolean skippedPgCatalog = false;
         while (procedureRs.next()) {
             // /- - - - - - - - - - - - - - - - - - - - - - - -
             // same policy as table process about JDBC handling
@@ -486,6 +487,14 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             // - - - - - - - - - -/
 
             final String procedureSchema = procedureRs.getString("PROCEDURE_SCHEM");
+            if (isDatabasePostgreSQL()) {
+                if (procedureSchema != null && procedureSchema.equals("pg_catalog")) {
+                    // skip pg_catalog's procedures, that are embedded in PostgreSQL
+                    // (they can be here when the user is 'postgres')
+                    skippedPgCatalog = true;
+                    continue;
+                }
+            }
             final String procedurePackage;
             final String procedureCatalog;
             final String procedureName;
@@ -536,6 +545,9 @@ public class DfProcedureExtractor extends DfAbstractMetaDataBasicExtractor {
             metaInfo.setProcedureFullQualifiedName(buildProcedureFullQualifiedName(metaInfo));
             metaInfo.setProcedureSchemaQualifiedName(buildProcedureSchemaQualifiedName(metaInfo));
             procedureMetaInfoList.add(metaInfo);
+        }
+        if (skippedPgCatalog) {
+            _log.info("*Skipped pg_catalog's procedures");
         }
     }
 

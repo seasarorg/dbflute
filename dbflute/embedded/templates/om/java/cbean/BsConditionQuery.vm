@@ -27,7 +27,7 @@ import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
 
 /**
- * The base condition-query of ${table.name}.
+ * The base condition-query of ${table.tableDbName}.
  * @author ${database.classAuthor}
  */
 public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
@@ -49,7 +49,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                 ===================
     /**
      * Prepare InlineView query. <br />
-     * {select ... from ... left outer join (select * from ${table.name}) where FOO = [value] ...}
+     * {select ... from ... left outer join (select * from ${table.tableDbName}) where FOO = [value] ...}
      * <pre>
      * cb.query().queryMemberStatus().<span style="color: #FD4747">inline()</span>.setFoo...;
      * </pre>
@@ -72,7 +72,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     /**
      * Prepare OnClause query. <br />
-     * {select ... from ... left outer join ${table.name} on ... and FOO = [value] ...}
+     * {select ... from ... left outer join ${table.tableDbName} on ... and FOO = [value] ...}
      * <pre>
      * cb.query().queryMemberStatus().<span style="color: #FD4747">on()</span>.setFoo...;
      * </pre>
@@ -539,7 +539,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 #end
     protected ${foreignCQClassName} xcreateQuery${fk.foreignPropertyNameInitCap}() {
-        String nrp = resolveNextRelationPath("${table.name}", "${fk.foreignPropertyName}");
+        String nrp = resolveNextRelationPath("${table.tableDbName}", "${fk.foreignPropertyName}");
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
         ${foreignCQClassName} cq = new ${foreignCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
         cq.xsetBaseCB(_baseCB);
@@ -580,7 +580,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne};
     }
     protected ${relatedCQClassName} xcreateQuery${referrer.referrerPropertyNameInitCapAsOne}() {
-        String nrp = resolveNextRelationPath("${table.name}", "${referrer.referrerPropertyNameAsOne}");
+        String nrp = resolveNextRelationPath("${table.tableDbName}", "${referrer.referrerPropertyNameAsOne}");
         String jan = resolveJoinAliasName(nrp, xgetNextNestLevel());
         ${relatedCQClassName} cq = new ${relatedCQClassName}(this, xgetSqlClause(), jan, xgetNextNestLevel());
         cq.xsetBaseCB(_baseCB);
@@ -686,7 +686,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
     /**
      * Set up 'exists-referrer' (co-related sub-query). <br />
-     * {exists (select ... from ${referrer.table.name} where ...)}
+     * {exists (select ... from ${referrer.table.tableDbName} where ...)}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
     public void exists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {

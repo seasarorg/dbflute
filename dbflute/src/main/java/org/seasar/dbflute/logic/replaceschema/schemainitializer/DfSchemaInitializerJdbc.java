@@ -30,7 +30,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
@@ -40,7 +39,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
  * The schema initializer with JDBC.
@@ -193,7 +191,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final DfTruncateTableByJdbcCallback callback = new DfTruncateTableByJdbcCallback() {
             public String buildTruncateTableSql(DfTableMeta metaInfo) {
                 final StringBuilder sb = new StringBuilder();
-                sb.append("truncate table ").append(filterTableName(metaInfo.getTableName()));
+                sb.append("truncate table ").append(metaInfo.getTableSqlName());
                 return sb.toString();
             }
         };
@@ -228,7 +226,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final DfDropForeignKeyByJdbcCallback callback = new DfDropForeignKeyByJdbcCallback() {
             public String buildDropForeignKeySql(DfForeignKeyMeta metaInfo) {
                 final String foreignKeyName = metaInfo.getForeignKeyName();
-                final String localTableName = filterTableName(metaInfo.getLocalTableName());
+                final String localTableName = metaInfo.getLocalTableSqlName();
                 final StringBuilder sb = new StringBuilder();
                 sb.append("alter table ").append(localTableName).append(" drop constraint ").append(foreignKeyName);
                 return sb.toString();
@@ -311,7 +309,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     protected void setupDropTable(StringBuilder sb, DfTableMeta tableMeta) {
-        final String tableName = filterTableName(tableMeta.getTableName());
+        final String tableName = tableMeta.getTableSqlName();
         if (tableMeta.isTableTypeView()) {
             sb.append("drop view ").append(tableName);
         } else {
@@ -496,21 +494,6 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected String filterTableName(String tableName) { // not used when procedure
-        // because additional drop uses an own connection
-        // so it does not need to qualify names
-        //if (_useFullQualifiedTableName && _unifiedSchema.hasSchema()) {
-        //    tableName = _unifiedSchema.buildFullQualifiedName(tableName);
-        //}
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        tableName = prop.quoteTableNameIfNeedsDirectUse(tableName);
-        return tableName;
-    }
-
-    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
-        return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-    }
-
     protected void closeResource(ResultSet rs, Statement st) {
         closeResultSet(rs);
         closeStatement(st);

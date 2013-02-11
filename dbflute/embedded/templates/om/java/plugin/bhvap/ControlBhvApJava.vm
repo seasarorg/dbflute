@@ -154,7 +154,7 @@ $database.deleteOldTableClass()
 $database.info("public void parseTableClass() {")
 #foreach ($table in $database.tables)
 
-  $database.info("    parse('${table.name}');")
+  $database.info("    parse('${table.tableDbName}');")
 
   #set ($myBaseBhvApClassName = "${table.baseBehaviorApClassName}")
   #set ($myExtendedBhvApClassName = "${table.extendedBehaviorApClassName}")

@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTableColumnNameNonCompilableConnectorException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -182,12 +181,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public String filterTableDispNameIfNeeds(String tableDbName) { // basically for TableDiff
         return isTableDispNameUpperCase() ? tableDbName.toUpperCase() : tableDbName;
-    }
-
-    public String filterTableDispNameIfNeeds(UnifiedSchema unifiedSchema, String tableDbName) {
-        final String name = filterTableDispNameIfNeeds(tableDbName);
-        final String drivenSchema = unifiedSchema.getDrivenSchema();
-        return (drivenSchema != null ? drivenSchema + "." : "") + name;
     }
 
     // ===================================================================================

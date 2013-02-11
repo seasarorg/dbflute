@@ -25,7 +25,7 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
-        public override String TableDbName { get { return "${table.name}"; } }
+        public override String TableDbName { get { return "${table.tableDbName}"; } }
 
         // ===============================================================================
         //                                                             PrimaryKey Handling
@@ -285,7 +285,7 @@ namespace ${glPackageBaseCB} {
 #end
 #end
         }
-        protected override String getTableDbName() { return "$table.name"; }
+        protected override String getTableDbName() { return "${table.tableDbName}"; }
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")

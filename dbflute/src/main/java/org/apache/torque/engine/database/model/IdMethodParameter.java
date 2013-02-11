@@ -193,7 +193,7 @@ public class IdMethodParameter {
      * Returns the Name of the table the id method is in
      */
     public String getTableName() {
-        return parentTable.getName();
+        return parentTable.getTableDbName();
     }
 
     /**

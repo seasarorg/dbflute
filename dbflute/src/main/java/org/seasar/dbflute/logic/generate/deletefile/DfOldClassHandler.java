@@ -907,7 +907,7 @@ public class DfOldClassHandler {
                 elementMap = new LinkedHashMap<String, Table>();
                 cmentityLocationMap.put(outputDirectory, elementMap);
             }
-            elementMap.put(table.getTableKey(), table);
+            elementMap.put(table.getTableDbName(), table);
         }
         _cmentityLocationMap = cmentityLocationMap;
     }

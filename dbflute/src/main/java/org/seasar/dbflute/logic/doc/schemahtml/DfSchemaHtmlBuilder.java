@@ -33,7 +33,7 @@ public class DfSchemaHtmlBuilder {
     }
 
     public String buildRelatedTableLink(ForeignKey fk, Table table, String delimiter) {
-        final String tableName = table.getName();
+        final String tableDbName = table.getTableDbName();
         final String tableId = table.getTableIdForSchemaHtml();
         final StringBuilder sb = new StringBuilder();
         sb.append(delimiter);
@@ -58,7 +58,7 @@ public class DfSchemaHtmlBuilder {
             }
             final String title = resolveTitle(titleSb.toString());
             sb.append("<a href=\"#" + tableId + "\" class=\"additionalfk\" title=\"" + title + "\">");
-            contentName = tableName + (fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
+            contentName = tableDbName + (fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
         } else {
             final StringBuilder titleSb = new StringBuilder();
             titleSb.append(baseTitle);
@@ -67,7 +67,7 @@ public class DfSchemaHtmlBuilder {
             }
             final String title = resolveTitle(titleSb.toString());
             sb.append("<a href=\"#" + tableId + "\" title=\"" + title + "\">");
-            contentName = tableName;
+            contentName = tableDbName;
         }
         sb.append(contentName).append("</a>");
         return sb.toString();

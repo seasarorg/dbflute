@@ -36,7 +36,7 @@ namespace ${myDBMetaPackageName} {
         // ===============================================================================
         //                                                                      Table Info
         //                                                                      ==========
-        public override String TableDbName { get { return "$table.name"; } }
+        public override String TableDbName { get { return "${table.tableDbName}"; } }
         public override String TablePropertyName { get { return "$table.javaName"; } }
         public override String TableSqlName { get { return "$table.tableSqlName"; } }
 #if ($table.hasAlias())
@@ -169,7 +169,7 @@ namespace ${myDBMetaPackageName} {
         // -------------------------------------------------
         //                                             Table
         //                                             -----
-        public static readonly String TABLE_DB_NAME = "$table.name";
+        public static readonly String TABLE_DB_NAME = "${table.tableDbName}";
         public static readonly String TABLE_PROPERTY_NAME = "$table.javaName";
 
         // -------------------------------------------------

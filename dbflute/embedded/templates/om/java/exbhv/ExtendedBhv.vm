@@ -19,7 +19,7 @@ ${database.allClassCopyright}package ${glPackageExtendedBhv};
 import ${glPackageBaseBhv}.${myBaseBhvClassName};
 
 /**
- * The behavior of ${table.name}.
+ * The behavior of ${table.tableDbName}.
  * <p>
  * You can implement your original methods here.
  * This class remains when re-generating.

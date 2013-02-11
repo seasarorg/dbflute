@@ -48,7 +48,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     static {
         final Map<String, String> tmpMap = newHashMap();
 #foreach ($table in $database.tables)
-        tmpMap.put("${table.name}", "${table.DBMetaFullClassName}");
+        tmpMap.put("${table.tableDbName}", "${table.DBMetaFullClassName}");
 #end
         _tableDbNameClassNameMap = Collections.unmodifiableMap(tmpMap);
     }

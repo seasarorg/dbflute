@@ -19,7 +19,7 @@ ${database.allClassCopyright}package ${glPackageBaseBhvAp};
 import ${glPackageExtendedBhvLib}.${myExtendedBhvLibClassName};
 
 /**
- * The base behavior of ${table.name} as implementation of an application.
+ * The base behavior of ${table.tableDbName} as implementation of an application.
  * <p>
  * You can NOT implement your original methods here.
  * This class is overridden when re-generating.

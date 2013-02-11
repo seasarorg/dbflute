@@ -70,7 +70,7 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
 
     protected boolean analyzeByResultSetMeta(Connection conn, DfTableMeta tableInfo, String primaryKeyColumnName)
             throws SQLException {
-        final String tableSqlName = tableInfo.buildTableSqlName();
+        final String tableSqlName = tableInfo.getTableSqlName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableSqlName);
         Statement st = null;
         ResultSet rs = null;
@@ -97,7 +97,7 @@ public class DfAutoIncrementExtractor extends DfAbstractMetaDataBasicExtractor {
             br.addElement("(and other points can be causes, for example, authentication)");
             br.addElement("So check your settings and environments.");
             br.addItem("Table");
-            br.addElement(tableInfo.buildTableFullQualifiedName());
+            br.addElement(tableInfo.getTableFullQualifiedName());
             br.addItem("PrimaryKey");
             br.addElement(primaryKeyColumnName);
             br.addItem("SQL for getting");

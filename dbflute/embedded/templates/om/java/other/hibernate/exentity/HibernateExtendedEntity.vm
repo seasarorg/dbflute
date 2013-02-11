@@ -21,7 +21,7 @@ import javax.persistence.*;
 import ${myBaseEntityPackageName}.${myBaseObjectClassName};
 
 /**
- * The entity of ${table.name}.
+ * The entity of ${table.tableDbName}.
  * <p>
  * You can implement your original methods here.
  * This class remains when re-generating.
@@ -29,7 +29,7 @@ import ${myBaseEntityPackageName}.${myBaseObjectClassName};
  * @author ${database.classAuthor}
  */
 @Entity
-@Table(name="${table.name}")
+@Table(name="${table.tableDbName}")
 public class ${myClassName} extends ${myBaseObjectClassName} {
 
     /** Serial version UID. (Default) */

@@ -22,7 +22,7 @@ import org.seasar.dbflute.cbean.ConditionQuery;
 import ${glPackageCQ}.${myConditionQueryClassName};
 
 /**
- * The nest select set-upper of ${table.name}.
+ * The nest select set-upper of ${table.tableDbName}.
  * @author ${database.classAuthor}
  */
 public class ${myClassName} {

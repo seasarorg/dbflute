@@ -264,7 +264,7 @@ public class DfCraftDiffAssertProvider {
         final DfOptimisticLockProperties optimisticLockProp = getOptimisticLockProperties();
         final StringBuilder sb = new StringBuilder();
         sb.append("select ");
-        final String tableSqlName = tableMeta.buildTableSqlName();
+        final String tableSqlName = tableMeta.getTableSqlName();
         final List<DfColumnMeta> columnMetaList = tableMeta.getLazyColumnMetaList();
         int columnIndex = 0;
         for (DfColumnMeta columnMeta : columnMetaList) {

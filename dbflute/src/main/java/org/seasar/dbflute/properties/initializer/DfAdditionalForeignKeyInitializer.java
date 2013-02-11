@@ -25,6 +25,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfPropertySettingColumnNotFoundException;
@@ -98,7 +99,7 @@ public class DfAdditionalForeignKeyInitializer {
         foreignColumnSet.addAll(foreignColumnNameList);
 
         for (final Table localTable : getTableList()) {
-            final String localTableName = localTable.getName();
+            final String localTableName = localTable.getTableDbName();
             final List<String> localColumnNameList = getLocalColumnNameList(foreignKeyName, foreignTableName,
                     foreignColumnNameList, localTableName, false);
             if (!localTable.containsColumn(localColumnNameList)) {
@@ -108,7 +109,7 @@ public class DfAdditionalForeignKeyInitializer {
             // check same-column self reference
             final StringSet localColumnSet = StringSet.createAsFlexible();
             localColumnSet.addAll(localColumnNameList);
-            final boolean selfReference = localTable.getName().equals(foreignTable.getName());
+            final boolean selfReference = localTable.getTableDbName().equals(foreignTable.getTableDbName());
             if (selfReference && localColumnSet.equalsUnderCharOption(foreignColumnSet)) {
                 continue;
             }
@@ -120,11 +121,15 @@ public class DfAdditionalForeignKeyInitializer {
                 continue;
             }
 
-            final String currentForeignKeyName = foreignKeyName + "_" + localTableName;
+            final String currentForeignKeyName = foreignKeyName + "_" + toConstraintPart(localTableName);
             setupForeignKeyToTable(currentForeignKeyName, foreignTableName, foreignColumnNameList, fixedCondition,
                     localTable, localColumnNameList, fixedSuffix, fixedInline, fixedReferrer, comment);
             showResult(foreignTableName, foreignColumnNameList, fixedCondition, localTable, localColumnNameList);
         }
+    }
+
+    protected String toConstraintPart(String tableDbName) {
+        return Srl.replace(tableDbName, ".", "_");
     }
 
     protected void processOneTableFK(String foreignKeyName, String localTableName, String foreignTableName,
@@ -179,9 +184,11 @@ public class DfAdditionalForeignKeyInitializer {
     }
 
     protected void processImplicitReverseForeignKey(Table table, Table foreignTable, List<String> localColumnNameList,
-            List<String> foreignColumnNameList) { // called only when a fixed condition exists 
+            List<String> foreignColumnNameList) { // called only when a fixed condition exists
         // name is "FK_ + foreign + local" because it's reversed
-        final String reverseName = "FK_" + foreignTable.getName() + "_" + table.getName() + "_IMPLICIT";
+        final String localTableName = table.getTableDbName();
+        final String foreignTableName = foreignTable.getTableDbName();
+        final String reverseName = buildReverseFKName(localTableName, foreignTableName);
         final String comment = "This relation is auto-detected as implicit reverse FK.";
         final List<Column> primaryKey = table.getPrimaryKey();
         if (localColumnNameList.size() != primaryKey.size()) {
@@ -195,11 +202,11 @@ public class DfAdditionalForeignKeyInitializer {
             }
         }
         // here all local columns are elements of primary key
-        if (foreignTable.existsForeignKey(table.getName(), foreignColumnNameList, localColumnNameList, null)) {
+        if (foreignTable.existsForeignKey(localTableName, foreignColumnNameList, localColumnNameList, null)) {
             return;
         }
         String fixedSuffix = null;
-        if (foreignTable.hasForeignTableContainsOne(foreignTable)) {
+        if (foreignTable.hasForeignTableContainsOne(table)) {
             final StringBuilder sb = new StringBuilder();
             sb.append("By");
             for (String foreignColumnName : foreignColumnNameList) {
@@ -207,7 +214,7 @@ public class DfAdditionalForeignKeyInitializer {
             }
             fixedSuffix = sb.toString();
         }
-        final ForeignKey fk = createAdditionalForeignKey(reverseName, table.getName(), foreignColumnNameList,
+        final ForeignKey fk = createAdditionalForeignKey(reverseName, localTableName, foreignColumnNameList,
                 localColumnNameList, null, fixedSuffix, null, null, comment);
         foreignTable.addForeignKey(fk);
         final boolean canBeReferrer = table.addReferrer(fk);
@@ -220,12 +227,24 @@ public class DfAdditionalForeignKeyInitializer {
         }
     }
 
+    protected String buildReverseFKName(String localTableName, String foreignTableName) {
+        return "FK_" + toConstraintPart(foreignTableName) + "_" + toConstraintPart(localTableName) + "_IMPLICIT";
+    }
+
     protected ForeignKey createAdditionalForeignKey(String foreignKeyName, String foreignTableName,
             List<String> localColumnNameList, List<String> foreignColumnNameList, String fixedCondition,
             String fixedSuffix, String fixedInline, String fixedReferrer, String comment) {
         final ForeignKey fk = new ForeignKey();
         fk.setName(foreignKeyName);
-        fk.setForeignTableName(foreignTableName);
+        if (foreignTableName.contains(".")) {
+            final String foreignSchema = Srl.substringLastFront(foreignTableName, ".");
+            final String foreignTablePureName = Srl.substringLastRear(foreignTableName, ".");
+            fk.setForeignSchema(UnifiedSchema.createAsDynamicSchema(foreignSchema));
+            fk.setForeignTablePureName(foreignTablePureName);
+        } else {
+            fk.setForeignSchema(getDatabase().getDatabaseSchema()); // main schema
+            fk.setForeignTablePureName(foreignTableName);
+        }
         fk.addReference(localColumnNameList, foreignColumnNameList);
         fk.setAdditionalForeignKey(true);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(fixedCondition)) {
@@ -248,7 +267,7 @@ public class DfAdditionalForeignKeyInitializer {
 
     protected void showResult(String foreignTableName, List<String> foreignColumnNameList, String fixedCondition,
             Table table, List<String> localColumnNameList) {
-        String msg = "  Add foreign key " + table.getName() + "." + localColumnNameList;
+        String msg = "  Add foreign key " + table.getTableDbName() + "." + localColumnNameList;
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
             msg = msg + " to " + foreignTableName + "." + foreignColumnNameList;
             _log.info(msg);

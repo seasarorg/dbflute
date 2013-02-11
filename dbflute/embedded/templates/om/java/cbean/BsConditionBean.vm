@@ -44,7 +44,7 @@ import ${glPackageNss}.*;
 #end
 
 /**
- * The base condition-bean of ${table.name}.
+ * The base condition-bean of ${table.tableDbName}.
  * @author ${database.classAuthor}
  */
 public class ${myClassName} extends AbstractConditionBean {
@@ -90,7 +90,7 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                          Table Name
     //                                                                          ==========
     public String getTableDbName() {
-        return "${table.name}";
+        return "${table.tableDbName}";
     }
 
     // ===================================================================================
@@ -500,7 +500,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
         }
         @Override
-        protected String getTableDbName() { return "$table.name"; }
+        protected String getTableDbName() { return "$table.tableDbName"; }
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
@@ -572,7 +572,7 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
         /**
          * Prepare for (Specify)DerivedReferrer. <br />
-         * {select max(FOO) from ${referrer.table.name} where ...) as FOO_MAX} <br />
+         * {select max(FOO) from ${referrer.table.tableDbName} where ...) as FOO_MAX} <br />
          * ${referrer.referrerDispForJavaDocNest}
          * <pre>
          * cb.specify().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {

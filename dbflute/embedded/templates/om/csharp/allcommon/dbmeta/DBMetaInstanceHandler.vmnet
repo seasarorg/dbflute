@@ -28,7 +28,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             {
                 Map<String, String> tmpMap = new HashMap<String, String>();
 #foreach ($table in $database.tables)
-                tmpMap.put("${table.name}", "${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm");
+                tmpMap.put("${table.tableDbName}", "${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm");
 #end
                 _tableDbNameClassNameMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
@@ -36,7 +36,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             {
                 Map<String, String> tmpMap = new HashMap<String, String>();
 #foreach ($table in $database.tables)
-                tmpMap.put("${table.name}".ToLower(), "${table.javaBeansRulePropertyName}");
+                tmpMap.put("${table.tableDbName}".ToLower(), "${table.javaBeansRulePropertyName}");
 #end
                 _tableDbNamePropertyNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }
@@ -44,7 +44,7 @@ namespace ${glPackageBaseCommonDBMeta} {
             {
                 Map<String, String> tmpMap = new HashMap<String, String>();
 #foreach ($table in $database.tables)
-                tmpMap.put("${table.javaName}".ToLower(), "${table.name}");
+                tmpMap.put("${table.javaName}".ToLower(), "${table.tableDbName}");
 #end
                 _tablePropertyNameDbNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
             }

@@ -478,7 +478,7 @@ namespace ${glPackageBaseCQ} {
 #end
         }
         protected String resolveNextRelationPath${fk.foreignPropertyNameInitCap}() {
-            return resolveNextRelationPath("${table.name}", "${fk.foreignPropertyName}");
+            return resolveNextRelationPath("${table.tableDbName}", "${fk.foreignPropertyName}");
         }
         public bool hasConditionQuery${fk.ForeignPropertyNameInitCap}() {
             return _conditionQuery${fk.ForeignPropertyNameInitCap} != null;
@@ -519,7 +519,7 @@ namespace ${glPackageBaseCQ} {
             registerOuterJoin(cq, joinOnMap);
         }
         protected String resolveNextRelationPath${referrer.referrerPropertyNameInitCapAsOne}() {
-            return resolveNextRelationPath("${table.name}", "${referrer.referrerPropertyNameAsOne}");
+            return resolveNextRelationPath("${table.tableDbName}", "${referrer.referrerPropertyNameAsOne}");
         }
         public bool hasConditionQuery${referrer.referrerPropertyNameInitCapAsOne}() {
             return _conditionQuery${referrer.referrerPropertyNameInitCapAsOne} != null;

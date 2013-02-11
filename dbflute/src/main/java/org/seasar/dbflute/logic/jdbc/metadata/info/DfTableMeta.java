@@ -71,18 +71,29 @@ public class DfTableMeta {
     // ===================================================================================
     //                                                                       Name Building
     //                                                                       =============
-    public String buildTableFullQualifiedName() {
+    public String getTableDbName() {
+        if (_unifiedSchema == null) {
+            return _tableName;
+        }
+        final String drivenSchema = _unifiedSchema.getDrivenSchema();
+        if (drivenSchema == null) {
+            return _tableName;
+        }
+        return drivenSchema + "." + _tableName;
+    }
+
+    public String getTableFullQualifiedName() {
         return _unifiedSchema.buildFullQualifiedName(_tableName);
     }
 
-    public String buildSchemaQualifiedName() {
+    public String getSchemaQualifiedName() {
         return _unifiedSchema.buildSchemaQualifiedName(_tableName);
     }
 
-    public String buildTableSqlName() {
+    public String getTableSqlName() {
         final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         final String quotedName = prop.quoteTableNameIfNeedsDirectUse(_tableName);
-        return _unifiedSchema.buildSqlName(quotedName);
+        return _unifiedSchema.buildSqlName(quotedName); // driven is resolved here so it uses pure name here
     }
 
     // ===================================================================================
@@ -104,14 +115,14 @@ public class DfTableMeta {
     @Override
     public boolean equals(Object obj) {
         if (obj != null && obj instanceof DfTableMeta) {
-            return buildTableFullQualifiedName().equals(((DfTableMeta) obj).buildTableFullQualifiedName());
+            return getTableFullQualifiedName().equals(((DfTableMeta) obj).getTableFullQualifiedName());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return buildTableFullQualifiedName().hashCode();
+        return getTableFullQualifiedName().hashCode();
     }
 
     @Override
@@ -125,7 +136,7 @@ public class DfTableMeta {
                 comment = _tableComment;
             }
         }
-        return buildTableFullQualifiedName() + "(" + _tableType + ")"
+        return getTableFullQualifiedName() + "(" + _tableType + ")"
                 + (comment.trim().length() > 0 ? " // " + comment : "");
     }
 

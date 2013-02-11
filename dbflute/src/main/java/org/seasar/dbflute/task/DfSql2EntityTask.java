@@ -781,7 +781,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 br.addItem("Unknown Column");
                 br.addElement(column.getName());
                 br.addItem("Domain Table");
-                br.addElement(domainTable.getName());
+                br.addElement(domainTable.getTableDbName());
                 final String msg = br.buildExceptionMessage();
                 throw new DfCustomizeEntityMarkInvalidException(msg);
             }
@@ -880,7 +880,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             sb.append("(").append(columnSize).append(")");
         }
         if (relatedColumn != null) {
-            sb.append(" related to ").append(relatedTable.getName());
+            sb.append(" related to ").append(relatedTable.getTableDbName());
             sb.append(".").append(relatedColumn.getName());
         }
         if (Srl.is_NotNull_and_NotTrimmedEmpty(forcedJavaNatice)) {

@@ -113,6 +113,8 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 final String foreignSchemaName = rs.getString(2);
                 final String foreignTableName = rs.getString(3);
                 final String foreignColumnName = rs.getString(4);
+                final String localCatalogName = rs.getString(5);
+                final String localSchemaName = rs.getString(6);
                 final String localColumnName = rs.getString(8);
                 final String fkName;
                 {
@@ -144,17 +146,13 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 if (metaInfo == null) { // basically here
                     metaInfo = new DfForeignKeyMeta();
                     fkMap.put(fkName, metaInfo);
-                } else {
-                    // /- - - - - - - - - - - -
-                    // same-name FK was found!
-                    // - - - - - - - - - -/
-                    final String firstName = metaInfo.getForeignTableName();
+                } else { // same-name FK was found!
+                    final String firstName = metaInfo.getForeignTablePureName(); // pure name is enough for check
                     final String secondName = foreignTableName;
-                    if (firstName.equalsIgnoreCase(secondName)) { // multiple FK
+                    if (firstName.equalsIgnoreCase(secondName)) { // means compound FK
                         metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
                         continue; // putting columns only
-                    } else {
-                        // here: same-name FK and same different foreign table.
+                    } else { // here: same-name FK and same different foreign table.
                         // Basically no way!
                         // But DB2 returns to-ALIAS foreign key as same-name FK.
                         // Same type as local's type is prior
@@ -172,9 +170,10 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 }
                 // first or override
                 metaInfo.setForeignKeyName(fkName);
-                metaInfo.setLocalTableName(localTableName);
-                metaInfo.setForeignTableName(foreignTableName);
+                metaInfo.setLocalSchema(createAsDynamicSchema(localCatalogName, localSchemaName));
+                metaInfo.setLocalTablePureName(localTableName);
                 metaInfo.setForeignSchema(foreignSchema);
+                metaInfo.setForeignTablePureName(foreignTableName);
                 metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
             }
         } finally {
@@ -265,7 +264,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             final String foreinKeyName = entry.getKey();
             final DfForeignKeyMeta metaInfo = entry.getValue();
             final Map<String, Object> checkKey = newLinkedHashMap();
-            checkKey.put(metaInfo.getForeignTableName(), dummyObj);
+            checkKey.put(metaInfo.getForeignTableDbName(), dummyObj);
             checkKey.put("columnNameMap:" + metaInfo.getColumnNameMap(), dummyObj);
             if (checkMap.containsKey(checkKey)) { // basically no way
                 String msg = "*The same-structural foreign key was found:";

@@ -370,9 +370,10 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                 final DfForeignKeyMeta fk = entry.getValue();
 
                 // at first translate a local table name
-                fk.setLocalTableName(synonym.getSynonymName());
+                fk.setLocalSchema(synonym.getSynonymOwner());
+                fk.setLocalTablePureName(synonym.getSynonymName());
 
-                final String orignalForeignTableName = fk.getForeignTableName();
+                final String orignalForeignTableName = fk.getForeignTablePureName();
                 final List<DfSynonymMeta> foreignSynonymList = referredTableSynonymListMap.get(orignalForeignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
                     final UnifiedSchema tableOwner = synonym.getTableOwner();
@@ -393,7 +394,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                     if (!firstDone) {
                         // first (switching FK informations)
                         fk.setForeignKeyName(newForeignKeyName);
-                        fk.setForeignTableName(newForeignTableName);
+                        fk.setForeignTablePureName(newForeignTableName);
                         fk.setForeignSchema(newForeignSchema);
                         firstDone = true;
                         continue;
@@ -402,9 +403,10 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
                     // second or more (creating new FK instance)
                     final DfForeignKeyMeta additionalFK = new DfForeignKeyMeta();
                     additionalFK.setForeignKeyName(newForeignKeyName);
-                    additionalFK.setLocalTableName(fk.getLocalTableName());
-                    additionalFK.setForeignTableName(newForeignTableName);
+                    additionalFK.setLocalSchema(fk.getLocalSchema());
+                    additionalFK.setLocalTablePureName(fk.getLocalTablePureName());
                     additionalFK.setForeignSchema(newForeignSchema);
+                    additionalFK.setForeignTablePureName(newForeignTableName);
                     additionalFK.setColumnNameMap(fk.getColumnNameMap());
                     additionalFKMap.put(additionalFK.getForeignKeyName(), additionalFK);
                 }

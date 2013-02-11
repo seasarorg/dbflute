@@ -879,7 +879,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (allColumnClassificationMap != null) {
             final List<Table> tableList = database.getTableList();
             for (Table table : tableList) {
-                final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, table.getName());
+                final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, table.getTableDbName());
                 for (Entry<String, String> entry : allColumnClassificationMap.entrySet()) {
                     columnClsMap.put(entry.getKey(), entry.getValue());
                 }
@@ -905,7 +905,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                     continue;
                 }
                 final Table referrerTable = referrer.getTable();
-                final Map<String, String> referrerClsMap = getColumnClsMap(deploymentMap, referrerTable.getName());
+                final String referrerTableDbName = referrerTable.getTableDbName();
+                final Map<String, String> referrerClsMap = getColumnClsMap(deploymentMap, referrerTableDbName);
                 final Column localColumnAsOne = referrer.getLocalColumnAsOne();
                 registerColumnClsIfNeeds(referrerClsMap, localColumnAsOne.getName(), classificationName);
             }

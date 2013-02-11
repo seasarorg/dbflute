@@ -359,7 +359,7 @@ $database.deleteOldTableClass()
 ##
 $database.info("public void parseTableClass() {")
 #foreach ($table in $database.tableList)
-  $database.info("    parse('${table.name}');")
+  $database.info("    parse('${table.tableDbName}');")
 
   ##
   ## The name of objects

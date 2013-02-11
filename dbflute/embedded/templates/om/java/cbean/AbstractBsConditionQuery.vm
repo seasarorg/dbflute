@@ -30,7 +30,7 @@ import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
 
 /**
- * The abstract condition-query of ${table.name}.
+ * The abstract condition-query of ${table.tableDbName}.
  * @author ${database.classAuthor}
  */
 public abstract class ${myClassName} extends AbstractConditionQuery {
@@ -54,7 +54,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     //                                                                          Table Name
     //                                                                          ==========
     public String getTableDbName() {
-        return "${table.name}";
+        return "${table.tableDbName}";
     }
 
     // ===================================================================================
@@ -354,7 +354,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up ExistsReferrer (co-related sub-query). <br />
-     * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
+     * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
@@ -392,7 +392,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up NotExistsReferrer (co-related sub-query). <br />
-     * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
+     * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
@@ -420,7 +420,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up InScopeRelation (sub-query). <br />
-     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
+     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
@@ -450,7 +450,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up InScopeRelation (sub-query). <br />
-     * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
+     * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
@@ -471,7 +471,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up NotInScopeRelation (sub-query). <br />
-     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
+     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
@@ -501,7 +501,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up NotInScopeRelation (sub-query). <br />
-     * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
+     * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
@@ -542,7 +542,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Prepare for (Query)DerivedReferrer. <br />
-     * {FOO &lt;= (select max(BAR) from ${referrer.table.name} where ...)} <br />
+     * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
@@ -818,7 +818,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up ExistsReferrer (co-related sub-query). <br />
-     * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
+     * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
@@ -856,7 +856,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up NotExistsReferrer (co-related sub-query). <br />
-     * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
+     * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
@@ -884,7 +884,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up InScopeRelation (sub-query). <br />
-     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
+     * {in (select ${fk.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
@@ -914,7 +914,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up InScopeRelation (sub-query). <br />
-     * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
+     * {in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'in-scope'. (NotNull)
      */
@@ -935,7 +935,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up NotInScopeRelation (sub-query). <br />
-     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.name} where ...)} <br />
+     * {not in (select ${col.foreignKey.firstLocalColumnName} from ${fk.foreignTable.tableDbName} where ...)} <br />
      * ${fk.foreignDispForJavaDoc}
      * @param subQuery The sub-query of ${fk.foreignPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
@@ -965,7 +965,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Set up NotInScopeRelation (sub-query). <br />
-     * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)} <br />
+     * {not in (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not in-scope'. (NotNull)
      */
@@ -1006,7 +1006,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Prepare for (Query)DerivedReferrer. <br />
-     * {FOO &lt;= (select max(BAR) from ${referrer.table.name} where ...)} <br />
+     * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {

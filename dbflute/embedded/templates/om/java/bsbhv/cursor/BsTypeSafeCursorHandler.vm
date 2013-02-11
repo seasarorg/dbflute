@@ -22,7 +22,7 @@ import org.seasar.dbflute.jdbc.CursorHandler;
 import ${myExtendedCursorPackageName}.${myExtendedTypeSafeCursorClassName};
 
 /**
- * The cursor handler of ${table.name}.
+ * The cursor handler of ${table.tableDbName}.
  * @author ${database.classAuthor}
  */
 public abstract class ${myClassName} implements CursorHandler {

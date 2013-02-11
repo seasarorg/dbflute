@@ -280,6 +280,10 @@ public class Database {
     // ===================================================================================
     //                                                                               Table
     //                                                                               =====
+    /**
+     * Get the list of all tables.
+     * @return The list of table object. (NotNull, NotEmpty)
+     */
     public List<Table> getTableList() {
         return _tableList;
     }
@@ -296,13 +300,21 @@ public class Database {
         return new ArrayList<Table>(tableSet);
     }
 
-    public Table getTable(String name) {
-        final Table byName = _tableMap.get(name);
+    /**
+     * Get the table by the table DB name.
+     * @param tableDbName The DB name of the table to find. (NullAllowed: when e.g. Sql2Entity's related table)
+     * @return The found table object. (NullAllowed: when not found)
+     */
+    public Table getTable(String tableDbName) {
+        if (tableDbName == null) {
+            return null;
+        }
+        final Table byName = _tableMap.get(tableDbName);
         if (byName != null) {
             return byName;
         }
-        if (name.contains(".")) {
-            final String pureName = Srl.substringLastRear(name, ".");
+        if (tableDbName.contains(".")) {
+            final String pureName = Srl.substringLastRear(tableDbName, ".");
             return _tableMap.get(pureName);
         }
         return null;
@@ -327,8 +339,7 @@ public class Database {
     public void addTable(Table tbl) {
         tbl.setDatabase(this);
         _tableList.add(tbl);
-        final String tableKey = Table.generateTableKey(tbl.getUnifiedSchema(), tbl.getName());
-        _tableMap.put(tableKey, tbl);
+        _tableMap.put(tbl.getTableDbName(), tbl);
     }
 
     /**
@@ -391,9 +402,9 @@ public class Database {
         br.addItem("Foreign Key");
         br.addElement(fk.getName());
         br.addItem("Local Table");
-        br.addElement(table.getName());
+        br.addElement(table.getTableDbName());
         br.addItem("Foreign Table");
-        br.addElement(fk.getForeignTableName());
+        br.addElement(fk.getForeignTableDbName());
         br.addItem("Local Column");
         br.addElement(localColumn.getName());
         final String msg = br.buildExceptionMessage();
@@ -406,9 +417,9 @@ public class Database {
         br.addItem("Foreign Key");
         br.addElement(fk.getName());
         br.addItem("Local Table");
-        br.addElement(table.getName());
+        br.addElement(table.getTableDbName());
         br.addItem("Foreign Table");
-        br.addElement(fk.getForeignTableName());
+        br.addElement(fk.getForeignTableDbName());
         br.addItem("Foreign Column");
         br.addElement(foreignColumn.getName());
         final String msg = br.buildExceptionMessage();

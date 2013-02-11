@@ -59,7 +59,7 @@ public class DfForeignKeyDiffer extends DfBasicConstraintKeyDiffer<ForeignKey, D
     @Override
     public boolean isSameStructure(ForeignKey next, ForeignKey previous) {
         if (isSame(column(next), column(previous))) {
-            if (isSame(next.getForeignTable().getName(), previous.getForeignTable().getName())) {
+            if (isSame(next.getForeignTable().getTableDbName(), previous.getForeignTable().getTableDbName())) {
                 return true;
             }
         }
@@ -69,8 +69,8 @@ public class DfForeignKeyDiffer extends DfBasicConstraintKeyDiffer<ForeignKey, D
     public void diff(DfForeignKeyDiff diff, ForeignKey nextKey, ForeignKey previousKey) {
         // foreignTable
         if (nextKey != null && previousKey != null) { // means change
-            final String nextFKTable = nextKey.getForeignTableName();
-            final String previousFKTable = previousKey.getForeignTableName();
+            final String nextFKTable = nextKey.getForeignTableDbName();
+            final String previousFKTable = previousKey.getForeignTableDbName();
             if (!isSame(nextFKTable, previousFKTable)) {
                 final DfNextPreviousDiff fkTableDiff = createNextPreviousDiff(nextFKTable, previousFKTable);
                 diff.setForeignTableDiff(fkTableDiff);

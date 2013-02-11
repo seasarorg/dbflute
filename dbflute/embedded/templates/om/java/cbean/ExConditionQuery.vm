@@ -21,7 +21,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import ${glPackageBaseCQ}.${myBaseConditionQueryClassName};
 
 /**
- * The condition-query of ${table.name}.
+ * The condition-query of ${table.tableDbName}.
  * <p>
  * You can implement your original methods here.
  * This class remains when re-generating.

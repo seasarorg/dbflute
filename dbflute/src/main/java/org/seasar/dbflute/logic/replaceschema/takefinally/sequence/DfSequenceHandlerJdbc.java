@@ -120,7 +120,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                     continue;
                 }
                 final String primaryKeyColumnName = pkList.get(0);
-                tableSqlName = tableInfo.buildTableSqlName();
+                tableSqlName = tableInfo.getTableSqlName();
                 final Integer count = selectCount(st, tableSqlName);
                 if (count == null || count == 0) {
                     // It is not necessary to increment because the table has no data.
@@ -228,7 +228,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
 
     protected Integer selectDataMax(Statement statement, DfTableMeta tableInfo, String primaryKeyColumnName)
             throws SQLException {
-        final String tableSqlName = tableInfo.buildTableSqlName();
+        final String tableSqlName = tableInfo.getTableSqlName();
         final String sql = "select max(" + primaryKeyColumnName + ") as MAX_VALUE from " + tableSqlName;
         ResultSet rs = null;
         try {

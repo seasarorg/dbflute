@@ -268,17 +268,17 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             msg = msg + " " + queryMap;
             throw new IllegalStateException(msg);
         }
-        final String tableName = column.getTableName();
+        final String tableDbName = column.getTable().getTableDbName();
         final String columnName = column.getName();
         final Map<String, List<String>> map = queryMap.get(propType).get(ckey);
         final Map<String, List<String>> tableFlexibleMap = StringKeyMap.createAsFlexible();
         tableFlexibleMap.putAll(map);
-        if (!tableFlexibleMap.containsKey(tableName) && !tableFlexibleMap.containsKey(ALL_MARK)) {
+        if (!tableFlexibleMap.containsKey(tableDbName) && !tableFlexibleMap.containsKey(ALL_MARK)) {
             return false;
         }
         // either has a list element
         final Set<String> columnSet = new HashSet<String>();
-        final List<String> pinpointList = tableFlexibleMap.get(tableName);
+        final List<String> pinpointList = tableFlexibleMap.get(tableDbName);
         if (pinpointList != null) {
             columnSet.addAll(pinpointList);
         }

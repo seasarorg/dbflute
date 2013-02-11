@@ -246,15 +246,6 @@ public class Table {
      * Default Constructor
      */
     public Table() {
-        this(null);
-    }
-
-    /**
-     * Constructs a table object with a name
-     * @param name table name
-     */
-    public Table(String name) {
-        _name = name;
     }
 
     // -----------------------------------------------------
@@ -282,69 +273,37 @@ public class Table {
     //                                                                            Database
     //                                                                            ========
     /**
-     * Set the parent of the table
-     * @param parent the parant database
-     */
-    public void setDatabase(Database parent) {
-        _database = parent;
-    }
-
-    /**
-     * Get the parent of the table
-     * @return the parant database
+     * Get the parent of the table.
+     * @return the parent database.
      */
     public Database getDatabase() {
         return _database;
+    }
+
+    /**
+     * Set the parent of the table.
+     * @param parent the parent database.
+     */
+    public void setDatabase(Database parent) {
+        _database = parent;
     }
 
     // ===================================================================================
     //                                                                               Table
     //                                                                               =====
     // -----------------------------------------------------
-    //                                             Table Key
-    //                                             ---------
-    /**
-     * Get the key of the table, used for e.g. {@link Map} key.
-     * No use this for e.g. matching with specified table in properties,
-     * instead you can use {@link #getDrivenDbName()}.
-     * @return The name of table as string, might contains dot '.'. (NotNull)
-     */
-    public String getTableKey() {
-        return generateTableKey(_unifiedSchema, _name);
-    }
-
-    public static String generateTableKey(UnifiedSchema unifiedSchema, String tableName) {
-        // same as driven DB name but no recycle for different concept
-        final StringBuilder sb = new StringBuilder();
-        final String drivenSchema = unifiedSchema != null ? unifiedSchema.getDrivenSchema() : null;
-        if (drivenSchema != null) {
-            sb.append(drivenSchema).append(".");
-        }
-        sb.append(tableName);
-        return sb.toString();
-    }
-
-    public String getTableIdForSchemaHtml() {
-        return Srl.replace(getTableKey(), ".", "");
-    }
-
-    // -----------------------------------------------------
     //                                            Table Name
     //                                            ----------
     /**
-     * Get the pure DB name of the Table, which cannot be identity. <br />
-     * You should use {@link #getTableKey()} for identity.
+     * Get the pure name of the table, no prefix even if schema-driven. <br />
+     * You cannot use for identity, instead you should use {@link #getTableDbName()}. <br />
+     * Basically no referred from velocity templates because of no necessary.
      * @return The table name as String. (NotNull)
      */
-    public String getName() {
+    public String getName() { // Torque-traditional method
         return _name;
     }
 
-    /**
-     * Set the pure DB name of the Table, which cannot be identity. <br />
-     * You should use {@link #getTableKey()} for identity.
-     * @param name The table name as String. (NotNull)
-     */
     public void setName(String name) {
         this._name = name;
     }
@@ -352,16 +311,20 @@ public class Table {
     /**
      * Get the DB name of the table, resolved schema-driven or table-driven. <br />
      * You can use this for e.g. matching with specified table in properties, and use for simple display. <br />
-     * No use identity, instead you can use {@link #getTableKey()}.
-     * @return The name of table as string, might contains dot '.'. (NotNull)
+     * And you can use as identity for e.g. map key.
+     * @return The table name as String, might contains dot '.'. (NotNull)
      */
-    public String getDrivenDbName() {
-        final StringBuilder sb = new StringBuilder();
-        final String drivenSchema = _unifiedSchema != null ? _unifiedSchema.getDrivenSchema() : null;
-        if (drivenSchema != null) {
-            sb.append(drivenSchema).append(".");
+    public String getTableDbName() { // new face for DBFlute
+        final String pureName = getName();
+        if (_unifiedSchema == null) {
+            return pureName;
         }
-        sb.append(_name);
+        final String drivenSchema = _unifiedSchema.getDrivenSchema();
+        if (drivenSchema == null) {
+            return pureName;
+        }
+        final StringBuilder sb = new StringBuilder();
+        sb.append(drivenSchema).append(".").append(pureName);
         return sb.toString();
     }
 
@@ -369,21 +332,28 @@ public class Table {
     //                                              SQL Name
     //                                              --------
     /**
-     * Get table SQL name.
-     * @return Table SQL name. (NotNull)
+     * Get the SQL name of the table, which is used in your SQL after generated world. (for templates) <br />
+     * This might be quoted with fitting to template or has its schema prefix.
+     * @return The table name as String. (NotNull)
      */
-    public String getTableSqlName() {
+    public String getTableSqlName() { // new face for DBFlute
         final String tableName = quoteTableNameIfNeeds(getResourceNameForSqlName());
         return filterSchemaSqlPrefix(tableName);
     }
 
-    public String getTableSqlNameDirectUse() {
+    /**
+     * Get the SQL name of the table, which is used in your SQL on the Java process. (for direct use) <br />
+     * This might be quoted for direct use or has its schema prefix.
+     * @return The table name as String. (NotNull)
+     */
+    public String getTableSqlNameDirectUse() { // new face for DBFlute
         final String tableName = quoteTableNameIfNeedsDirectUse(getResourceNameForSqlName());
         return filterSchemaSqlPrefix(tableName);
     }
 
     protected String getResourceNameForSqlName() {
-        return isSqlNameUpperCase() ? getName().toUpperCase() : getName();
+        final String pureName = getName();
+        return isSqlNameUpperCase() ? pureName.toUpperCase() : pureName;
     }
 
     protected boolean isSqlNameUpperCase() {
@@ -408,6 +378,13 @@ public class Table {
     protected String quoteTableNameIfNeedsDirectUse(String tableName) {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
         return prop.quoteTableNameIfNeedsDirectUse(tableName);
+    }
+
+    // -----------------------------------------------------
+    //                                               HTML ID
+    //                                               -------
+    public String getTableIdForSchemaHtml() {
+        return Srl.replace(getTableDbName().toLowerCase(), ".", "_");
     }
 
     // -----------------------------------------------------
@@ -478,7 +455,7 @@ public class Table {
     //                                          Table Schema
     //                                          ------------
     public UnifiedSchema getUnifiedSchema() {
-        return _unifiedSchema != null ? _unifiedSchema : null;
+        return _unifiedSchema;
     }
 
     public void setUnifiedSchema(UnifiedSchema unifiedSchema) { // basically for Sql2Entity
@@ -570,12 +547,12 @@ public class Table {
     //                                               Display
     //                                               -------
     public String getTableDispName() {
-        return filterTableDispNameIfNeeds(getName());
+        return filterTableDispNameIfNeeds(getTableDbName());
     }
 
     protected String filterTableDispNameIfNeeds(String tableName) {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        return prop.filterTableDispNameIfNeeds(_unifiedSchema, tableName);
+        return prop.filterTableDispNameIfNeeds(tableName);
     }
 
     public String getBasicInfoDispString() {
@@ -590,7 +567,7 @@ public class Table {
             sb.append(", schema=").append(getDocumentSchema());
         }
         sb.append(", primaryKey={").append(getPrimaryKeyNameCommaString()).append("}");
-        sb.append(", nameLength=").append(getName().length());
+        sb.append(", nameLength=").append(getTableDbName().length());
         sb.append(", columnCount=").append(getColumns().length);
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         return " title=\"" + prop.resolveAttributeForSchemaHtml(sb.toString()) + "\"";
@@ -791,7 +768,7 @@ public class Table {
         if (getPrimaryKey().size() != 1) {
             String msg = "This method is for only-one primary-key:";
             msg = msg + " getPrimaryKey().size()=" + getPrimaryKey().size();
-            msg = msg + " table=" + getName();
+            msg = msg + " table=" + getTableDbName();
             throw new IllegalStateException(msg);
         }
         return getPrimaryKey().get(0);
@@ -917,26 +894,6 @@ public class Table {
      */
     public String getPrimaryKeyArgsCallingString() {
         return getPrimaryKeyUncapitalisedJavaNameCommaString();
-    }
-
-    // -----------------------------------------------------
-    //                               ParameterComment String
-    //                               -----------------------
-    /**
-     * Returns primaryKeyWhereStringWithSqlComment. [BigDecimal rcvlcqNo, String sprlptTp]
-     * @return The value of primaryKeyWhereStringWithSqlComment. (NotNull)
-     */
-    public String getPrimaryKeyWhereStringWithSqlComment() {
-        final StringBuilder sb = new StringBuilder();
-        final List<Column> pk = getPrimaryKey();
-        for (Column column : pk) {
-            sb.append(" and ");
-            sb.append(getName()).append(".").append(column.getName()).append(" = /*");
-            sb.append(column.getUncapitalisedJavaName()).append("*/null");
-        }
-        sb.delete(0, " and ".length());
-
-        return sb.toString();
     }
 
     // -----------------------------------------------------
@@ -1185,7 +1142,7 @@ public class Table {
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
         for (int i = 0; i < foreignKeyList.size(); i++) {
             final ForeignKey fk = foreignKeyList.get(i);
-            final String name = fk.getForeignTableName();
+            final String name = fk.getForeignTablePureName();
             if (tableSet.contains(name)) {
                 continue;
             }
@@ -1196,7 +1153,7 @@ public class Table {
             if (!referrer.isOneToOne()) {
                 continue;
             }
-            final String name = referrer.getTable().getName();
+            final String name = referrer.getTable().getTableDbName();
             if (tableSet.contains(name)) {
                 continue;
             }
@@ -1260,7 +1217,7 @@ public class Table {
 
         final ForeignKey[] fks = getForeignKeys();
         for (final ForeignKey key : fks) {
-            if (!Srl.equalsFlexible(foreignTableName, key.getForeignTableName())) {
+            if (!Srl.equalsFlexible(foreignTableName, key.getForeignTablePureName())) {
                 continue;
             }
             if (!Srl.equalsFlexible(fixedSuffix, key.getFixedSuffix())) {
@@ -1306,13 +1263,13 @@ public class Table {
     public boolean hasForeignTableContainsOne(Table foreignTable) {
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
         for (ForeignKey foreignKey : foreignKeyList) {
-            if (foreignKey.getForeignTable().getName().equals(foreignTable.getName())) {
+            if (foreignKey.getForeignTableDbName().equals(foreignTable.getTableDbName())) {
                 return true;
             }
         }
         final List<ForeignKey> referrerAsOneList = getReferrerAsOneList();
         for (ForeignKey referrer : referrerAsOneList) {
-            if (referrer.getTable().getName().equals(foreignTable.getName())) {
+            if (referrer.getTable().getTableDbName().equals(foreignTable.getTableDbName())) {
                 return true;
             }
         }
@@ -1566,7 +1523,7 @@ public class Table {
             if (fk.isOneToOne()) {
                 continue;
             }
-            final String name = fk.getTable().getName();
+            final String name = fk.getTable().getTableDbName();
             if (tableSet.contains(name)) {
                 continue;
             }
@@ -1578,7 +1535,7 @@ public class Table {
             if (!fk.isOneToOne()) {
                 continue;
             }
-            final String name = fk.getTable().getName();
+            final String name = fk.getTable().getTableDbName();
             if (tableSet.contains(name)) {
                 continue;
             }
@@ -1815,10 +1772,11 @@ public class Table {
         if (_javaName != null) {
             return _javaName;
         }
+        final String pureName = getName();
         if (needsJavaNameConvert()) {
-            _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(getName());
+            _javaName = getDatabase().convertJavaNameByJdbcNameAsTable(pureName);
         } else {
-            _javaName = getName(); // for sql2entity mainly
+            _javaName = pureName; // for sql2entity mainly
         }
         _javaName = filterBuriJavaNameIfNeeds(_javaName);
         _javaName = filterJavaNameNonCompilableConnector(_javaName);
@@ -1840,7 +1798,7 @@ public class Table {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
         return prop.filterJavaNameNonCompilableConnector(javaName, new NonCompilableChecker() {
             public String name() {
-                return getName();
+                return getName(); // pure name here to convert it to Java name
             }
 
             public String disp() {
@@ -1992,7 +1950,7 @@ public class Table {
 
     protected String getSchemaClassPrefix() {
         // *however same-name tables between different schemas are unsupported at 0.9.6.8
-        if (hasSchema() && isExistSameNameTable()) {
+        if (hasSchema() && existsSameNameTable()) {
             // schema of DB2 may have space either size
             final String prefix;
             if (isCatalogAdditionalSchema()) {
@@ -2013,7 +1971,7 @@ public class Table {
 
     protected boolean _alreadyCheckedExistingSameNameTable;
 
-    protected boolean isExistSameNameTable() {
+    protected boolean existsSameNameTable() {
         if (_alreadyCheckedExistingSameNameTable) {
             return _existSameNameTable;
         }
@@ -2021,8 +1979,7 @@ public class Table {
         final List<Table> tableList = getDatabase().getTableList();
         int count = 0;
         for (Table table : tableList) {
-            final String name = table.getName();
-            if (_name.equalsIgnoreCase(name)) {
+            if (getName().equalsIgnoreCase(table.getName())) {
                 ++count;
                 if (count > 1) {
                     _existSameNameTable = true;
@@ -2311,7 +2268,7 @@ public class Table {
      * @return The determination, true or false.
      */
     public boolean isUseSequence() {
-        final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
+        final String sequenceName = getSequenceIdentityProperties().getSequenceName(getTableDbName());
         if (sequenceName == null || sequenceName.trim().length() == 0) {
             if (hasPostgreSQLSerialSequenceName()) {
                 return true;
@@ -2330,7 +2287,7 @@ public class Table {
         if (!isUseSequence()) {
             return "";
         }
-        final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
+        final String sequenceName = getSequenceIdentityProperties().getSequenceName(getTableDbName());
         if (Srl.is_Null_or_TrimmedEmpty(sequenceName)) {
             final String serialSequenceName = extractPostgreSQLSerialSequenceName();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(serialSequenceName)) {
@@ -2349,7 +2306,7 @@ public class Table {
         if (!isUseSequence()) {
             return "";
         }
-        final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
+        final String sequenceName = getSequenceIdentityProperties().getSequenceName(getTableDbName());
         if (Srl.is_Null_or_TrimmedEmpty(sequenceName)) {
             final String serialSequenceName = extractPostgreSQLSerialSequenceName();
             if (Srl.is_Null_or_TrimmedEmpty(serialSequenceName)) {
@@ -2383,7 +2340,7 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DfSchemaSource ds = getDatabase().getDataSource();
-        BigDecimal value = prop.getSequenceMinimumValueByTableName(ds, getUnifiedSchema(), getName());
+        BigDecimal value = prop.getSequenceMinimumValueByTableName(ds, getUnifiedSchema(), getTableDbName());
         if (value == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
             if (sequenceName != null && sequenceName.trim().length() > 0) {
@@ -2404,7 +2361,7 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DfSchemaSource ds = getDatabase().getDataSource();
-        BigDecimal value = prop.getSequenceMaximumValueByTableName(ds, getUnifiedSchema(), getName());
+        BigDecimal value = prop.getSequenceMaximumValueByTableName(ds, getUnifiedSchema(), getTableDbName());
         if (value == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
             if (sequenceName != null && sequenceName.trim().length() > 0) {
@@ -2425,7 +2382,7 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DfSchemaSource ds = getDatabase().getDataSource();
-        Integer size = prop.getSequenceIncrementSizeByTableName(ds, getUnifiedSchema(), getName());
+        Integer size = prop.getSequenceIncrementSizeByTableName(ds, getUnifiedSchema(), getTableDbName());
         if (size == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
             if (sequenceName != null && sequenceName.trim().length() > 0) {
@@ -2446,7 +2403,7 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DfSchemaSource ds = getDatabase().getDataSource();
-        return prop.getSequenceCacheSize(ds, getUnifiedSchema(), getName());
+        return prop.getSequenceCacheSize(ds, getUnifiedSchema(), getTableDbName());
     }
 
     public String getSequenceCacheSizeExpression() {
@@ -2545,7 +2502,7 @@ public class Table {
         }
         final List<Column> columnList = getColumnList();
         for (Column column : columnList) {
-            final String sequenceName = prop.getSubColumnSequenceName(getName(), column.getName());
+            final String sequenceName = prop.getSubColumnSequenceName(getTableDbName(), column.getName());
             if (sequenceName != null) {
                 _subColumnSequenceColumnList.add(column);
             }
@@ -2573,7 +2530,7 @@ public class Table {
             return true;
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
-        return prop.getIdentityColumnName(getName()) != null;
+        return prop.getIdentityColumnName(getTableDbName()) != null;
     }
 
     public String getIdentityColumnName() {
@@ -2597,11 +2554,11 @@ public class Table {
             return autoIncrementColumn;
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
-        final String columnName = prop.getIdentityColumnName(getName());
+        final String columnName = prop.getIdentityColumnName(getTableDbName());
         final Column column = getColumn(columnName);
         if (column == null) {
             String msg = "The columnName does not exist in the table: ";
-            msg = msg + " tableName=" + getName() + " columnName=" + columnName;
+            msg = msg + " tableName=" + getTableDbName() + " columnName=" + columnName;
             msg = msg + " columnList=" + getColumnNameCommaString();
             throw new IllegalStateException(msg);
         }
@@ -2909,10 +2866,12 @@ public class Table {
 
     protected String convertCommonColumnName(String commonColumnName) {
         String filteredCommonColumn = getCommonColumnProperties().filterCommonColumn(commonColumnName);
-        filteredCommonColumn = Srl.replace(filteredCommonColumn, "TABLE_NAME", getName());
-        filteredCommonColumn = Srl.replace(filteredCommonColumn, "table_name", getName());
-        filteredCommonColumn = Srl.replace(filteredCommonColumn, "TableName", getJavaName());
-        filteredCommonColumn = Srl.replace(filteredCommonColumn, "tablename", getJavaName());
+        final String pureName = getName();
+        filteredCommonColumn = Srl.replace(filteredCommonColumn, "TABLE_NAME", pureName);
+        filteredCommonColumn = Srl.replace(filteredCommonColumn, "table_name", pureName);
+        final String javaName = getJavaName();
+        filteredCommonColumn = Srl.replace(filteredCommonColumn, "TableName", javaName);
+        filteredCommonColumn = Srl.replace(filteredCommonColumn, "tablename", javaName);
         return filteredCommonColumn;
     }
 
@@ -2954,12 +2913,12 @@ public class Table {
     //                                                              Relational Null Object
     //                                                              ======================
     public boolean canBeRelationalNullObjectForeign() {
-        return getLittleAdjustmentProperties().hasRelationalNullObjectForeign(getName());
+        return getLittleAdjustmentProperties().hasRelationalNullObjectForeign(getTableDbName());
     }
 
     public String getRelationalNullObjectProviderForeignExp() {
         final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        return prop.getRelationalNullObjectProviderForeignExp(getName());
+        return prop.getRelationalNullObjectProviderForeignExp(getTableDbName());
     }
 
     public boolean hasRelationalNullObjectProviderImport() {
@@ -3043,7 +3002,7 @@ public class Table {
     //                                                                            Flex DTO
     //                                                                            ========
     public boolean isFlexDtoBindable() {
-        return getProperties().getFlexDtoProperties().isBindable(getName());
+        return getProperties().getFlexDtoProperties().isBindable(getTableDbName());
     }
 
     // ===================================================================================
@@ -3054,7 +3013,7 @@ public class Table {
             return false;
         }
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.isUseBuri() && buriProperties.isTargetTable(getName()) && hasTableProcess();
+        return buriProperties.isUseBuri() && buriProperties.isTargetTable(getTableDbName()) && hasTableProcess();
     }
 
     protected boolean hasTableProcess() {
@@ -3068,12 +3027,12 @@ public class Table {
 
     public List<String> getTableProcessForMethodNameList() {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.getTableProcessForMethodNameList(getName());
+        return buriProperties.getTableProcessForMethodNameList(getTableDbName());
     }
 
     public boolean isBuriAllRoundStateHistory() {
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.isBuriAllRoundStateHistory(getName());
+        return buriProperties.isBuriAllRoundStateHistory(getTableDbName());
     }
 
     // ===================================================================================
@@ -3317,13 +3276,15 @@ public class Table {
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
+    // *not override equals() because table comparing process is so complex
     /**
      * Returns a XML representation of this table.
      * @return XML representation of this table
      */
+    @Override
     public String toString() {
         final StringBuilder result = new StringBuilder();
-        result.append("<table name=\"").append(getName()).append('\"');
+        result.append("<table name=\"").append(getTableDbName()).append('\"');
         if (_javaName != null) {
             result.append(" javaName=\"").append(_javaName).append('\"');
         }

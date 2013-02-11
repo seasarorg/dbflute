@@ -426,7 +426,7 @@ public class DfSchemaXmlSerializer {
             throws SQLException {
         if (tableMeta.isOutOfGenerateTarget()) {
             // for example, sequence synonym and so on...
-            _log.info("$ " + tableMeta.buildTableFullQualifiedName() + " is out of generation target!");
+            _log.info("$ " + tableMeta.getTableFullQualifiedName() + " is out of generation target!");
             return false;
         }
         _log.info("$ " + tableMeta.toString());
@@ -578,8 +578,8 @@ public class DfSchemaXmlSerializer {
         for (String foreignKeyName : foreignKeyNameSet) {
             final DfForeignKeyMeta fkMetaInfo = foreignKeyMap.get(foreignKeyName);
             final Element fkElement = _doc.createElement("foreign-key");
-            fkElement.setAttribute("foreignTable", fkMetaInfo.getForeignTableName());
-            fkElement.setAttribute("foreignSchema", fkMetaInfo.getForeignSchema().getCatalogSchema());
+            fkElement.setAttribute("foreignTable", fkMetaInfo.getForeignTablePureName());
+            fkElement.setAttribute("foreignSchema", fkMetaInfo.getForeignSchema().getIdentifiedSchema());
             fkElement.setAttribute("name", fkMetaInfo.getForeignKeyName());
             final Map<String, String> columnNameMap = fkMetaInfo.getColumnNameMap();
             final Set<String> columnNameKeySet = columnNameMap.keySet();
@@ -1250,12 +1250,12 @@ public class DfSchemaXmlSerializer {
             String msg = "The table meta information should be for synonym: " + tableInfo;
             throw new IllegalStateException(msg);
         }
-        String key = tableInfo.buildTableFullQualifiedName();
+        String key = tableInfo.getTableFullQualifiedName();
         DfSynonymMeta info = _supplementarySynonymInfoMap.get(key);
         if (info != null) {
             return info;
         }
-        key = tableInfo.buildSchemaQualifiedName();
+        key = tableInfo.getSchemaQualifiedName();
         info = _supplementarySynonymInfoMap.get(key);
         if (info != null) {
             return info;
