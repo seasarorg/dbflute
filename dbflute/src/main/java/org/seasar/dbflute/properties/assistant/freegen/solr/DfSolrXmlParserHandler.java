@@ -200,6 +200,7 @@ public class DfSolrXmlParserHandler extends DefaultHandler {
         if (multiValued != null && multiValued instanceof Boolean && (Boolean) multiValued) {
             final Object type = columnMap.get("type");
             columnMap.put("type", type + "[]");
+            columnMap.put("elementType", type);
         }
         _columnList.add(columnMap);
     }
