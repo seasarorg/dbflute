@@ -16,6 +16,7 @@
 package org.seasar.dbflute.cbean.chelper;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.ConditionBean;
@@ -44,6 +45,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     protected CQ _query; // lazy-loaded
     protected boolean _alreadySpecifiedRequiredColumn; // also means specification existence
     protected Map<String, HpSpecifiedColumn> _specifiedColumnMap; // saves specified columns (lazy-loaded)
+    protected boolean _alreadySpecifiedExceptColumn;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -66,6 +68,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                Column Specification
     //                                                                ====================
     protected HpSpecifiedColumn doColumn(String columnName) {
+        if (_alreadySpecifiedExceptColumn) {
+            throwSpecifyColumnAlreadySpecifiedExceptColumnException(columnName);
+        }
         if (isSpecifiedColumn(columnName)) {
             // returns the same instance as the specified before
             return getSpecifiedColumn(columnName);
@@ -121,8 +126,15 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         return new HpSpecifiedColumn(tableAliasName, columnInfo, _baseCB);
     }
 
+    // -----------------------------------------------------
+    //                             Specified Column Handling
+    //                             -------------------------
     protected HpSpecifiedColumn getSpecifiedColumn(String columnName) {
         return _specifiedColumnMap != null ? _specifiedColumnMap.get(columnName) : null;
+    }
+
+    protected boolean hasSpecifiedColumn() {
+        return _specifiedColumnMap != null && !_specifiedColumnMap.isEmpty();
     }
 
     protected boolean isSpecifiedColumn(String columnName) {
@@ -136,11 +148,31 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         _specifiedColumnMap.put(columnName, specifiedColumn);
     }
 
+    // -----------------------------------------------------
+    //                                          Dream Cruise
+    //                                          ------------
     protected void keepDreamCruiseJourneyLogBookIfNeeds(String relationPath) {
         if (!_baseCB.xisDreamCruiseShip()) {
             return;
         }
         _baseCB.xkeepDreamCruiseJourneyLogBook(relationPath);
+    }
+
+    // ===================================================================================
+    //                                                                       Except Column
+    //                                                                       =============
+    protected void doExceptRecordMetaColumn() {
+        if (hasSpecifiedColumn()) {
+            throwSpecifyColumnExceptColumnAfterSpecifiedException();
+        }
+        final DBMeta dbmeta = _baseCB.getDBMeta();
+        final List<ColumnInfo> allColumnList = dbmeta.getColumnInfoList();
+        for (ColumnInfo columnInfo : allColumnList) {
+            if (!columnInfo.isCommonColumn() && !columnInfo.isOptimisticLock()) {
+                doColumn(columnInfo.getColumnDbName());
+            }
+        }
+        _alreadySpecifiedExceptColumn = true;
     }
 
     // ===================================================================================
@@ -231,6 +263,16 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
 
     protected void throwSpecifyColumnWithDerivedReferrerException(String columnName, String referrerName) {
         createCBExThrower().throwSpecifyColumnWithDerivedReferrerException(_purpose, _baseCB, columnName, referrerName);
+    }
+
+    protected void throwSpecifyColumnAlreadySpecifiedExceptColumnException(String columnName) {
+        final String tableDbName = _baseCB.getTableDbName();
+        createCBExThrower().throwSpecifyColumnAlreadySpecifiedExceptColumnException(tableDbName, columnName);
+    }
+
+    protected void throwSpecifyColumnExceptColumnAfterSpecifiedException() {
+        final String tableDbName = _baseCB.getTableDbName();
+        createCBExThrower().throwSpecifyColumnExceptColumnAfterSpecifiedException(tableDbName, _specifiedColumnMap);
     }
 
     protected void throwSpecifyRelationIllegalPurposeException(String relationName) {
