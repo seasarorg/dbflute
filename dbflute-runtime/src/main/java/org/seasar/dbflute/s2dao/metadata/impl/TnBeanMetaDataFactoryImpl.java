@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.s2dao.metadata.impl;
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
@@ -23,6 +22,7 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.exception.handler.SQLExceptionHandler;
 import org.seasar.dbflute.exception.handler.SQLExceptionResource;
+import org.seasar.dbflute.jdbc.LazyDatabaseMetaDataWrapper;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
@@ -76,28 +76,21 @@ public abstract class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory
         if (beanClass == null) {
             throw new IllegalArgumentException("The argument 'beanClass' should not be null.");
         }
-        Connection conn = null;
+        final LazyDatabaseMetaDataWrapper metaDataWrapper = createLazyDatabaseMetaDataWrapper(beanClass);
         try {
-            conn = _dataSource.getConnection(); // for meta data
-            final DatabaseMetaData metaData = conn.getMetaData();
-            return createBeanMetaData(metaData, beanClass, relationNestLevel);
-        } catch (SQLException e) {
-            final SQLExceptionResource resource = createSQLExceptionResource();
-            resource.setNotice("Failed to get the database meta data.");
-            handleSQLException(e, resource);
-            return null; // unreachable
+            return createBeanMetaData(metaDataWrapper, beanClass, relationNestLevel);
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    final SQLExceptionResource resource = createSQLExceptionResource();
-                    resource.setNotice("Failed to close the database connection.");
-                    handleSQLException(e, resource);
-                }
+            try {
+                metaDataWrapper.closeActualReally();
+            } catch (SQLException e) {
+                final SQLExceptionResource resource = createSQLExceptionResource();
+                resource.setNotice("Failed to close the database connection.");
+                handleSQLException(e, resource);
             }
         }
     }
+
+    protected abstract LazyDatabaseMetaDataWrapper createLazyDatabaseMetaDataWrapper(Class<?> beanClass);
 
     protected void handleSQLException(SQLException e, SQLExceptionResource resource) {
         createSQLExceptionHandler().handleSQLException(e, resource);
@@ -163,12 +156,12 @@ public abstract class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory
     //                                                                       Property Type
     //                                                                       =============
     protected TnPropertyTypeFactory createPropertyTypeFactory(Class<?> beanClass,
-            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData databaseMetaData) {
-        return createPropertyTypeFactoryBuilder().build(beanClass, beanAnnotationReader);
+            TnBeanAnnotationReader beanAnnotationReader, DatabaseMetaData dbMetaData) {
+        return createPropertyTypeFactoryBuilder(dbMetaData).build(beanClass, beanAnnotationReader);
     }
 
-    protected TnPropertyTypeFactoryBuilder createPropertyTypeFactoryBuilder() {
-        return new TnPropertyTypeFactoryBuilderImpl(); // is already customized for DBFlute
+    protected TnPropertyTypeFactoryBuilder createPropertyTypeFactoryBuilder(DatabaseMetaData dbMetaData) {
+        return new TnPropertyTypeFactoryBuilderImpl(); // is already customized for DBFlute (no use dynamic meta data)
     }
 
     protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> beanClass,

@@ -15,7 +15,9 @@
  */
 package org.seasar.dbflute.s2dao.extension;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +32,9 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.seasar.dbflute.jdbc.LazyDatabaseMetaDataWrapper;
+import org.seasar.dbflute.jdbc.MetaDataConnectionProvider;
+import org.seasar.dbflute.resource.ManualThreadDataSourceHandler;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
@@ -84,6 +89,39 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
         } else {
             return super.createBeanMetaData(beanClass, relationNestLevel);
         }
+    }
+
+    @Override
+    protected LazyDatabaseMetaDataWrapper createLazyDatabaseMetaDataWrapper(Class<?> beanClass) {
+        final MetaDataConnectionProvider connectionProvider = createMetaDataConnectionProvider();
+        final LazyDatabaseMetaDataWrapper metaDataWrapper = new LazyDatabaseMetaDataWrapper(connectionProvider);
+        metaDataWrapper.restrictMetaData(); // because DBFlute completely does not use dynamic meta data
+        return metaDataWrapper;
+    }
+
+    /**
+     * Create the provider of connection for database meta data. <br />
+     * The provider might provide connection from manual thread.
+     * @return The instance of the connection provider. (NotNull)
+     */
+    protected MetaDataConnectionProvider createMetaDataConnectionProvider() {
+        return new MetaDataConnectionProvider() {
+            public Connection getConnection() throws SQLException {
+                final ManualThreadDataSourceHandler handler = getManualThreadDataSourceHandler();
+                if (handler != null) {
+                    return handler.getConnection(_dataSource);
+                }
+                return _dataSource.getConnection();
+            }
+        };
+    }
+
+    /**
+     * Get the data source handler of manual thread.
+     * @return The instance of the data source handler. (NullAllowed: if null, no manual thread handling)
+     */
+    protected ManualThreadDataSourceHandler getManualThreadDataSourceHandler() {
+        return ManualThreadDataSourceHandler.getDataSourceHandler();
     }
 
     @Override

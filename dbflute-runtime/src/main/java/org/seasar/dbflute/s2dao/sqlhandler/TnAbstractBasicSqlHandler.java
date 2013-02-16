@@ -421,7 +421,7 @@ public abstract class TnAbstractBasicSqlHandler {
 
     /**
      * Get the data source handler of manual thread.
-     * @return (NullAllowed: if null, no manual thread handling)
+     * @return The instance of the data source handler. (NullAllowed: if null, no manual thread handling)
      */
     protected ManualThreadDataSourceHandler getManualThreadDataSourceHandler() {
         return ManualThreadDataSourceHandler.getDataSourceHandler();
