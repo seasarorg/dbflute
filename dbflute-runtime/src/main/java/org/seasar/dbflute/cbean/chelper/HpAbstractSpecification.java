@@ -76,9 +76,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             return getSpecifiedColumn(columnName);
         }
         assertColumn(columnName);
-        if (_query == null) {
-            _query = qyCall().qy();
-        }
+        callQuery();
         if (isRequiredColumnSpecificationEnabled()) {
             _alreadySpecifiedRequiredColumn = true;
             doSpecifyRequiredColumn();
@@ -97,6 +95,12 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         sqlClause.specifySelectColumn(specifiedColumn);
         saveSpecifiedColumn(columnName, specifiedColumn);
         return specifiedColumn;
+    }
+
+    protected void callQuery() {
+        if (_query == null) {
+            _query = qyCall().qy();
+        }
     }
 
     /**
@@ -165,14 +169,20 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         if (hasSpecifiedColumn()) {
             throwSpecifyColumnExceptColumnAfterSpecifiedException();
         }
-        final DBMeta dbmeta = _baseCB.getDBMeta();
-        final List<ColumnInfo> allColumnList = dbmeta.getColumnInfoList();
-        for (ColumnInfo columnInfo : allColumnList) {
-            if (!columnInfo.isCommonColumn() && !columnInfo.isOptimisticLock()) {
+        callQuery();
+        final String tableDbName = _query.getTableDbName();
+        final DBMeta dbmeta = _dbmetaProvider.provideDBMeta(tableDbName);
+        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+        for (ColumnInfo columnInfo : columnInfoList) {
+            if (!isRecordMetaColumn(columnInfo)) {
                 doColumn(columnInfo.getColumnDbName());
             }
         }
         _alreadySpecifiedExceptColumn = true;
+    }
+
+    protected boolean isRecordMetaColumn(ColumnInfo columnInfo) {
+        return columnInfo.isCommonColumn() || columnInfo.isOptimisticLock();
     }
 
     // ===================================================================================
