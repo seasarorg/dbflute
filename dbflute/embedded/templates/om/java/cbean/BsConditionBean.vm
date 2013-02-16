@@ -472,6 +472,11 @@ public class ${myClassName} extends AbstractConditionBean {
          */
         public HpSpecifiedColumn column${col.javaName}() { return doColumn("${col.name}"); }
 #end
+        /**
+         * Specify columns except record meta columns. <br />
+         * You cannot use normal SpecifyColumn with this method.
+         */
+        public void exceptRecordMetaColumn() { doExceptRecordMetaColumn(); }
         @Override
         protected void doSpecifyRequiredColumn() {
 #foreach ($col in $table.primaryKey)
