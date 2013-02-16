@@ -167,7 +167,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                       =============
     protected void doExceptRecordMetaColumn() {
         if (hasSpecifiedColumn()) {
-            throwSpecifyColumnExceptColumnAfterSpecifiedException();
+            throwSpecifyExceptColumnAlreadySpecifiedColumnException();
         }
         callQuery();
         final String tableDbName = _query.getTableDbName();
@@ -280,9 +280,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         createCBExThrower().throwSpecifyColumnAlreadySpecifiedExceptColumnException(tableDbName, columnName);
     }
 
-    protected void throwSpecifyColumnExceptColumnAfterSpecifiedException() {
+    protected void throwSpecifyExceptColumnAlreadySpecifiedColumnException() {
         final String tableDbName = _baseCB.getTableDbName();
-        createCBExThrower().throwSpecifyColumnExceptColumnAfterSpecifiedException(tableDbName, _specifiedColumnMap);
+        createCBExThrower().throwSpecifyExceptColumnAlreadySpecifiedColumnException(tableDbName, _specifiedColumnMap);
     }
 
     protected void throwSpecifyRelationIllegalPurposeException(String relationName) {

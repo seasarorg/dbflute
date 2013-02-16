@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the SpecifyColumn have already specified when you specify except columns.
+ * The exception of when the SpecifyExceptColumn is specified after SpecifyColumn.
  * @author jflute
  */
-public class SpecifyColumnExceptColumnAfterSpecifiedException extends RuntimeException {
+public class SpecifyExceptColumnAlreadySpecifiedColumnException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class SpecifyColumnExceptColumnAfterSpecifiedException extends RuntimeExc
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public SpecifyColumnExceptColumnAfterSpecifiedException(String msg) {
+    public SpecifyExceptColumnAlreadySpecifiedColumnException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class SpecifyColumnExceptColumnAfterSpecifiedException extends RuntimeExc
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public SpecifyColumnExceptColumnAfterSpecifiedException(String msg, Throwable cause) {
+    public SpecifyExceptColumnAlreadySpecifiedColumnException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

@@ -41,7 +41,6 @@ import org.seasar.dbflute.exception.ScalarSelectInvalidColumnSpecificationExcept
 import org.seasar.dbflute.exception.SetupSelectIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifiedDerivedOrderByAliasNameNotFoundException;
 import org.seasar.dbflute.exception.SpecifyColumnAlreadySpecifiedExceptColumnException;
-import org.seasar.dbflute.exception.SpecifyColumnExceptColumnAfterSpecifiedException;
 import org.seasar.dbflute.exception.SpecifyColumnNotSetupSelectColumnException;
 import org.seasar.dbflute.exception.SpecifyColumnTwoOrMoreColumnException;
 import org.seasar.dbflute.exception.SpecifyColumnWithDerivedReferrerException;
@@ -52,6 +51,7 @@ import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecifica
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerSelectAllPossibleException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerTwoOrMoreException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
+import org.seasar.dbflute.exception.SpecifyExceptColumnAlreadySpecifiedColumnException;
 import org.seasar.dbflute.exception.SpecifyIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifyRelationIllegalPurposeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -265,7 +265,7 @@ public class ConditionBeanExceptionThrower {
 
     public void throwSpecifyColumnAlreadySpecifiedExceptColumnException(String tableDbName, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The except column has already specified in your SpecifyColumn.");
+        br.addNotice("The SpecifyColumn is specified after SpecifyExceptColumn.");
         br.addItem("Advice");
         br.addElement("You cannot specify columns with except columns.");
         br.addElement("For example:");
@@ -287,16 +287,16 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnAlreadySpecifiedExceptColumnException(msg);
     }
 
-    public void throwSpecifyColumnExceptColumnAfterSpecifiedException(String tableDbName,
+    public void throwSpecifyExceptColumnAlreadySpecifiedColumnException(String tableDbName,
             Map<String, HpSpecifiedColumn> specifiedColumnMap) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The SpecifyColumn is specified after except column specification.");
+        br.addNotice("The SpecifyExceptColumn is specified after SpecifyColumn.");
         br.addItem("Advice");
         br.addElement("You cannot specify columns with except columns.");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    cb.specify().exceptRecordMetaColumn();");
-        br.addElement("    cb.specify().columnMemberName(); // *No");
+        br.addElement("    cb.specify().columnMemberName();");
+        br.addElement("    cb.specify().exceptRecordMetaColumn(); // *No");
         br.addElement("    ... = memberBhv.selectList(cb);");
         br.addElement("  (o):");
         br.addElement("    cb.specify().exceptRecordMetaColumn();");
@@ -314,7 +314,7 @@ public class ConditionBeanExceptionThrower {
             }
         }
         final String msg = br.buildExceptionMessage();
-        throw new SpecifyColumnExceptColumnAfterSpecifiedException(msg);
+        throw new SpecifyExceptColumnAlreadySpecifiedColumnException(msg);
     }
 
     public void throwSpecifyRelationIllegalPurposeException(HpCBPurpose purpose, ConditionBean baseCB,

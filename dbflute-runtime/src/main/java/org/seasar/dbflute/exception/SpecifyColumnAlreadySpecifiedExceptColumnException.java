@@ -16,7 +16,7 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the except columns have already specified when you use SpecifyColumn.
+ * The exception of when the SpecifyColumn is specified after SpecifyExceptColumn.
  * @author jflute
  */
 public class SpecifyColumnAlreadySpecifiedExceptColumnException extends RuntimeException {
