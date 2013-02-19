@@ -24,6 +24,7 @@ import org.apache.velocity.texen.Generator;
 /**
  * @author jflute
  * @since 0.7.6 (2008/07/01 Tuesday)
+ * @deprecated no use now in DBFlute
  */
 public class DfVelocityGenerator extends DfGenerator {
 

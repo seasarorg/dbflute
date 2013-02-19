@@ -646,12 +646,28 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
     }
 
-    public String getTemplateFileEncoding() { // It's closet!
-        return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
+    protected String _sourceLineSeparator;
+
+    public String getSourceLineSeparator() { // closet
+        if (_sourceLineSeparator != null) {
+            return _sourceLineSeparator;
+        }
+        final String prop = getProperty("sourceLineSeparator", null);
+        if ("LF".equalsIgnoreCase(prop)) {
+            _sourceLineSeparator = "\n";
+        } else {
+            // Source Code uses CR + LF. (since 0.9.5.4)
+            _sourceLineSeparator = "\r\n"; // Source Code uses CR + LF. (since 0.9.5.4)
+        }
+        return _sourceLineSeparator;
     }
 
-    public String getSourceCodeLineSeparator() {
-        return "\r\n"; // Source Code uses CR + LF. (since 0.9.5.4)
+    public boolean isSourceLineSeparatorLf() {
+        return "\n".equals(getSourceLineSeparator());
+    }
+
+    public String getTemplateFileEncoding() { // closet
+        return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
     }
 
     // ===================================================================================

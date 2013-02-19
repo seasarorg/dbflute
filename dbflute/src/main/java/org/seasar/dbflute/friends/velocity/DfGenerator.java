@@ -20,7 +20,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.DfBuildProperties;
 
 /**
  * @author jflute
@@ -54,17 +53,11 @@ public abstract class DfGenerator {
             if (_instance != null) {
                 return _instance;
             }
-            if (isSkipGenerateIfSameFile()) {
-                _instance = DfFlutistGenerator.getInstance();
-            } else {
-                _instance = new DfVelocityGenerator();
-            }
+            // use flutist generator fixedly @since 1.0.3
+            // (not use Velocity's generator in DBFlute)
+            _instance = DfFlutistGenerator.getInstance();
         }
         return _instance;
-    }
-
-    protected static boolean isSkipGenerateIfSameFile() {
-        return DfBuildProperties.getInstance().getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
     }
 
     // ===================================================================================

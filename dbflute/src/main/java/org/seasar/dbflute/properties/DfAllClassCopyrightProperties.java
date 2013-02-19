@@ -39,7 +39,7 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
         }
         String prop = stringProp("torque.allClassCopyright", "");
 
-        final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
+        final String sourceCodeLn = getBasicProperties().getSourceLineSeparator();
         prop = DfStringUtil.replace(prop, "\r\n", "\n");
         prop = DfStringUtil.replace(prop, "\n", sourceCodeLn);
 

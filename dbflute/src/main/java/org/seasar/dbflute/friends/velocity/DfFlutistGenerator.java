@@ -38,6 +38,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.exception.MethodInvocationException;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfTemplateParsingException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 
@@ -206,60 +207,61 @@ public class DfFlutistGenerator extends DfGenerator {
         if (specifiedOutputEncoding == null || specifiedOutputEncoding.trim().length() == 0) {
             specifiedOutputEncoding = this.outputEncoding;
         }
-
         try {
-            Template template = getTemplate(inputTemplate, specifiedInputEncoding);
+            final Template template = getTemplate(inputTemplate, specifiedInputEncoding);
             parseFileNameList.add(outputFile);
 
-            if (outputFile == null || outputFile.equals("")) {
-                StringWriter sw = new StringWriter();
-                template.merge(controlContext, sw);
-                return sw.toString();
+            final VelocityContext vc = new VelocityContext(controlContext);
+            final StringWriter sw = new StringWriter();
+            template.merge(vc, sw);
+            final String newContent = resolveLineSeparatorIfNeeds(sw.toString());
+
+            // return the contents as string if no output
+            if (outputFile == null || outputFile.isEmpty()) {
+                return newContent;
             }
 
-            // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-            // [Extension]
-            // If the old file is same as the new file, it does not override it.
-            // * * * * * * * * * */
             final File oldFile = new File(getOutputPath() + "/" + outputFile);
-            if (oldFile.exists()) {
-                StringWriter sw = new StringWriter();
-                VelocityContext vc = new VelocityContext(controlContext);
-                template.merge(vc, sw);
-                String newContent = sw.toString();
-                String oldContent = new String(getBytes(oldFile), specifiedOutputEncoding);
+            if (oldFile.exists()) { // then it might skip to generate if it's completely same
+                final String oldContent = new String(getBytes(oldFile), specifiedOutputEncoding);
                 if (newContent.equals(oldContent)) {
                     skipFileNameList.add(oldFile.getName());
                     return "";
                 }
             }
 
-            Writer writer = null;
-            if (writers.get(outputFile) == null) {
-                /*
-                 * We have never seen this file before so create
-                 * a new file writer for it.
-                 */
-                writer = getWriter(getOutputPath() + File.separator + outputFile, specifiedOutputEncoding);
-
-                /*
-                 * Place the file writer in our collection
-                 * of file writers.
-                 */
-                writers.put(outputFile, writer);
-            } else {
-                writer = (Writer) writers.get(outputFile);
-            }
-
-            VelocityContext vc = new VelocityContext(controlContext);
-            template.merge(vc, writer);
+            final Writer writer = findOutputWriter(outputFile, specifiedOutputEncoding);
+            writer.write(newContent);
 
             // this is commented out because it is closed in shutdown();
-            //fw.close();
+            //writer.close();
         } catch (Throwable e) {
             throwTemplateParsingException(inputTemplate, specifiedInputEncoding, e);
         }
         return "";
+    }
+
+    protected Writer findOutputWriter(String outputFile, String specifiedOutputEncoding) throws Exception {
+        Writer writer = null;
+        if (writers.get(outputFile) == null) {
+            // We have never seen this file before so create a new file writer for it.
+            writer = getWriter(getOutputPath() + File.separator + outputFile, specifiedOutputEncoding);
+
+            // Place the file writer in our collection of file writers.
+            writers.put(outputFile, writer);
+        } else {
+            writer = (Writer) writers.get(outputFile);
+        }
+        return writer;
+    }
+
+    protected String resolveLineSeparatorIfNeeds(String contents) {
+        // default is CR+LF so it replaces only when LF
+        if (isSourceLineSeparatorLf()) {
+            final String ln = getSourceLineSeparator();
+            return contents.replaceAll("\r\n", ln);
+        }
+        return contents;
     }
 
     protected void throwTemplateParsingException(String inputTemplate, String specifiedInputEncoding, Throwable e) {
@@ -546,6 +548,21 @@ public class DfFlutistGenerator extends DfGenerator {
 
     public void setSkipFileNameList(List<String> skipFileNameList) {
         this.skipFileNameList = skipFileNameList;
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected String getSourceLineSeparator() {
+        return DfBuildProperties.getInstance().getBasicProperties().getSourceLineSeparator();
+    }
+
+    protected boolean isSourceLineSeparatorLf() {
+        return DfBuildProperties.getInstance().getBasicProperties().isSourceLineSeparatorLf();
+    }
+
+    protected boolean isSkipGenerateIfSameFile() {
+        return DfBuildProperties.getInstance().getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
     }
 
     // ===================================================================================

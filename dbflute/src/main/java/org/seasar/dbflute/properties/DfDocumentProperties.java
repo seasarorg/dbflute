@@ -44,7 +44,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                                                          Definition
     //                                                                          ==========
     // here fixed line separator (simplified)
-    protected static final String NORMAL_LINE_SEPARATOR = "\n";
+    protected static final String BASIC_LINE_SEPARATOR = "\n";
     protected static final String SPECIAL_LINE_SEPARATOR = "&#xa;";
 
     protected static final String STYLE_SHEET_EMBEDDED_MARK = "$";
@@ -168,8 +168,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         // line separator
         text = removeCR(text);
         final String htmlLineSeparator = "<br />";
-        if (text.contains(NORMAL_LINE_SEPARATOR)) {
-            text = text.replaceAll(NORMAL_LINE_SEPARATOR, htmlLineSeparator);
+        if (text.contains(BASIC_LINE_SEPARATOR)) {
+            text = text.replaceAll(BASIC_LINE_SEPARATOR, htmlLineSeparator);
         }
         if (text.contains(SPECIAL_LINE_SEPARATOR)) {
             text = text.replaceAll(SPECIAL_LINE_SEPARATOR, htmlLineSeparator);
@@ -214,9 +214,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         text = Srl.replace(text, "<", "&lt;");
         text = Srl.replace(text, ">", "&gt;");
         text = removeCR(text);
-        final String javaDocLineSeparator = "<br />" + NORMAL_LINE_SEPARATOR + indent + " * ";
-        if (text.contains(NORMAL_LINE_SEPARATOR)) {
-            text = text.replaceAll(NORMAL_LINE_SEPARATOR, javaDocLineSeparator);
+        final String sourceLineSeparator = getBasicProperties().getSourceLineSeparator();
+        final String javaDocLineSeparator = "<br />" + sourceLineSeparator + indent + " * ";
+        if (text.contains(BASIC_LINE_SEPARATOR)) {
+            text = text.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
         }
         if (text.contains(SPECIAL_LINE_SEPARATOR)) {
             text = text.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
@@ -229,9 +230,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return null;
         }
         comment = removeCR(comment);
-        final String javaDocLineSeparator = NORMAL_LINE_SEPARATOR + indent + "/// ";
-        if (comment.contains(NORMAL_LINE_SEPARATOR)) {
-            comment = comment.replaceAll(NORMAL_LINE_SEPARATOR, javaDocLineSeparator);
+        final String sourceLineSeparator = getBasicProperties().getSourceLineSeparator();
+        final String javaDocLineSeparator = sourceLineSeparator + indent + "/// ";
+        if (comment.contains(BASIC_LINE_SEPARATOR)) {
+            comment = comment.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
         }
         if (comment.contains(SPECIAL_LINE_SEPARATOR)) {
             comment = comment.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
@@ -264,8 +266,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         text = Srl.replace(text, "\"", "\\\""); // escape double quotation
 
         final String literalLineSeparator = "\\\\n";
-        if (text.contains(NORMAL_LINE_SEPARATOR)) {
-            text = text.replaceAll(NORMAL_LINE_SEPARATOR, literalLineSeparator);
+        if (text.contains(BASIC_LINE_SEPARATOR)) {
+            text = text.replaceAll(BASIC_LINE_SEPARATOR, literalLineSeparator);
         }
         if (text.contains(SPECIAL_LINE_SEPARATOR)) {
             text = text.replaceAll(SPECIAL_LINE_SEPARATOR, literalLineSeparator);
@@ -316,7 +318,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         BufferedReader br = null;
         try {
             final String encoding = getBasicProperties().getTemplateFileEncoding();
-            final String separator = getBasicProperties().getSourceCodeLineSeparator();
+            final String separator = getBasicProperties().getSourceLineSeparator();
             br = new BufferedReader(new InputStreamReader(new FileInputStream(cssFile), encoding));
             final StringBuilder sb = new StringBuilder();
             while (true) {
@@ -372,7 +374,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         BufferedReader br = null;
         try {
             final String encoding = getBasicProperties().getTemplateFileEncoding();
-            final String separator = getBasicProperties().getSourceCodeLineSeparator();
+            final String separator = getBasicProperties().getSourceLineSeparator();
             br = new BufferedReader(new InputStreamReader(new FileInputStream(cssFile), encoding));
             final StringBuilder sb = new StringBuilder();
             while (true) {
