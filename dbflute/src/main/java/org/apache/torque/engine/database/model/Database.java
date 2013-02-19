@@ -1341,7 +1341,7 @@ public class Database {
         final String outputPath = DfGenerator.getInstance().getOutputPath();
         final String absolutePath = outputPath + "/" + path;
         final String sourceCodeEncoding = getTemplateFileEncoding();
-        final String sourceCodeLn = getBasicProperties().getSourceLineSeparator();
+        final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
         final DfCopyrightResolver resolver = new DfCopyrightResolver(sourceCodeEncoding, sourceCodeLn);
         final String copyright = getProperties().getAllClassCopyrightProperties().getAllClassCopyright();
         resolver.reflectAllExCopyright(absolutePath, copyright);
@@ -1486,7 +1486,7 @@ public class Database {
         final String outputPath = DfGenerator.getInstance().getOutputPath();
         final String absolutePath = outputPath + "/" + path;
         final String sourceCodeEncoding = getTemplateFileEncoding();
-        final String sourceCodeLn = getBasicProperties().getSourceLineSeparator();
+        final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
         final DfSerialVersionUIDResolver resolver = new DfSerialVersionUIDResolver(sourceCodeEncoding, sourceCodeLn);
         resolver.reflectAllExSerialUID(absolutePath);
     }

@@ -214,7 +214,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         text = Srl.replace(text, "<", "&lt;");
         text = Srl.replace(text, ">", "&gt;");
         text = removeCR(text);
-        final String sourceLineSeparator = getBasicProperties().getSourceLineSeparator();
+        final String sourceLineSeparator = getBasicProperties().getSourceCodeLineSeparator();
         final String javaDocLineSeparator = "<br />" + sourceLineSeparator + indent + " * ";
         if (text.contains(BASIC_LINE_SEPARATOR)) {
             text = text.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
@@ -230,7 +230,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return null;
         }
         comment = removeCR(comment);
-        final String sourceLineSeparator = getBasicProperties().getSourceLineSeparator();
+        final String sourceLineSeparator = getBasicProperties().getSourceCodeLineSeparator();
         final String javaDocLineSeparator = sourceLineSeparator + indent + "/// ";
         if (comment.contains(BASIC_LINE_SEPARATOR)) {
             comment = comment.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
@@ -318,7 +318,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         BufferedReader br = null;
         try {
             final String encoding = getBasicProperties().getTemplateFileEncoding();
-            final String separator = getBasicProperties().getSourceLineSeparator();
+            final String separator = getBasicProperties().getSourceCodeLineSeparator();
             br = new BufferedReader(new InputStreamReader(new FileInputStream(cssFile), encoding));
             final StringBuilder sb = new StringBuilder();
             while (true) {
@@ -374,7 +374,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         BufferedReader br = null;
         try {
             final String encoding = getBasicProperties().getTemplateFileEncoding();
-            final String separator = getBasicProperties().getSourceLineSeparator();
+            final String separator = getBasicProperties().getSourceCodeLineSeparator();
             br = new BufferedReader(new InputStreamReader(new FileInputStream(cssFile), encoding));
             final StringBuilder sb = new StringBuilder();
             while (true) {

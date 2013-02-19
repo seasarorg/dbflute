@@ -830,7 +830,7 @@ public class Table {
      * @return The value of primaryKeyArgsJavaDocString. (NotNull)
      */
     public String getPrimaryKeyArgsJavaDocString() {
-        final String ln = getBasicProperties().getSourceLineSeparator();
+        final String ln = getBasicProperties().getSourceCodeLineSeparator();
         return DfColumnListToStringUtil.getColumnArgsJavaDocString(getPrimaryKey(), ln);
     }
 

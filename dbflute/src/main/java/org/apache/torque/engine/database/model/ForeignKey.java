@@ -1048,7 +1048,7 @@ public class ForeignKey implements Constraint {
             }
             sb.append("@param ").append(parameterName).append(" ");
             sb.append("The bind parameter of fixed condition for ").append(parameterName).append(". (NotNull)");
-            sb.append(getBasicProperties().getSourceLineSeparator());
+            sb.append(getBasicProperties().getSourceCodeLineSeparator());
             ++count;
         }
         final String result = Srl.rtrim(sb.toString()); // trim last line separator
@@ -1363,7 +1363,7 @@ public class ForeignKey implements Constraint {
         sb.append(getForeignSimpleDisp()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
             final String comment = resolveCommentForJavaDoc(_comment, indent);
-            final String sourceCodeLn = getBasicProperties().getSourceLineSeparator();
+            final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
             sb.append(" <br />").append(sourceCodeLn);
             sb.append(indent).append(" * ").append(comment);
         }
@@ -1396,7 +1396,7 @@ public class ForeignKey implements Constraint {
         sb.append(getReferrerSimpleDispAsOne()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
             final String comment = resolveCommentForJavaDoc(_comment, indent);
-            final String sourceCodeLn = getBasicProperties().getSourceLineSeparator();
+            final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
             sb.append(" <br />").append(sourceCodeLn);
             sb.append(indent).append(" * ").append(comment);
         }
@@ -1428,7 +1428,7 @@ public class ForeignKey implements Constraint {
         sb.append(getReferrerSimpleDisp()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {
             final String comment = resolveCommentForJavaDoc(_comment, indent);
-            final String sourceCodeLn = getBasicProperties().getSourceLineSeparator();
+            final String sourceCodeLn = getBasicProperties().getSourceCodeLineSeparator();
             sb.append(" <br />").append(sourceCodeLn);
             sb.append(indent).append(" * ").append(comment);
         }

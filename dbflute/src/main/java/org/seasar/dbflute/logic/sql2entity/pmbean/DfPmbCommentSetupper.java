@@ -91,7 +91,7 @@ public class DfPmbCommentSetupper {
 
     protected void reflectExtendedClassDescription(DfPmbMetaData pmbMetaData, File pmbeanFile) {
         final String encoding = getBasicProperties().getSourceFileEncoding();
-        final String lineSep = getBasicProperties().getSourceLineSeparator();
+        final String lineSep = getBasicProperties().getSourceCodeLineSeparator();
         final String beginMark = getBasicProperties().getExtendedClassDescriptionBeginMark();
         final String endMark = getBasicProperties().getExtendedClassDescriptionEndMark();
         String lineString = null;

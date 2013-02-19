@@ -646,24 +646,35 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
     }
 
-    protected String _sourceLineSeparator;
+    protected String _sourceCodeLineSeparator;
+    protected boolean _convertSourceCodeLineSeparator;
 
-    public String getSourceLineSeparator() { // closet
-        if (_sourceLineSeparator != null) {
-            return _sourceLineSeparator;
+    public String getSourceCodeLineSeparator() { // closet
+        if (_sourceCodeLineSeparator != null) {
+            return _sourceCodeLineSeparator;
         }
-        final String prop = getProperty("sourceLineSeparator", null);
+        final String prop = getProperty("sourceCodeLineSeparator", null);
+        if (prop != null) {
+            _convertSourceCodeLineSeparator = true; // convert if specified
+        }
         if ("LF".equalsIgnoreCase(prop)) {
-            _sourceLineSeparator = "\n";
-        } else {
-            // Source Code uses CR + LF. (since 0.9.5.4)
-            _sourceLineSeparator = "\r\n"; // Source Code uses CR + LF. (since 0.9.5.4)
+            _sourceCodeLineSeparator = "\n";
+        } else { // CR+LF fixedly
+            _sourceCodeLineSeparator = "\r\n"; // Source Code uses CR+LF. (since 0.9.5.4)
         }
-        return _sourceLineSeparator;
+        return _sourceCodeLineSeparator;
     }
 
-    public boolean isSourceLineSeparatorLf() {
-        return "\n".equals(getSourceLineSeparator());
+    public boolean isConvertSourceCodeLineSeparator() {
+        return _convertSourceCodeLineSeparator;
+    }
+
+    public boolean isSourceCodeLineSeparatorLf() {
+        return "\n".equals(getSourceCodeLineSeparator());
+    }
+
+    public boolean isSourceCodeLineSeparatorCrLf() {
+        return "\r\n".equals(getSourceCodeLineSeparator());
     }
 
     public String getTemplateFileEncoding() { // closet

@@ -41,6 +41,7 @@ import org.apache.velocity.exception.MethodInvocationException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfTemplateParsingException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
  * The Velocity generator for DBFlute.
@@ -256,10 +257,15 @@ public class DfFlutistGenerator extends DfGenerator {
     }
 
     protected String resolveLineSeparatorIfNeeds(String contents) {
-        // default is CR+LF so it replaces only when LF
-        if (isSourceLineSeparatorLf()) {
-            final String ln = getSourceLineSeparator();
-            return contents.replaceAll("\r\n", ln);
+        if (isConvertSourceCodeLineSeparator()) {
+            if (isSourceLineSeparatorLf()) {
+                final String sourceLineSeparator = getSourceLineSeparator();
+                return contents.replaceAll("\r\n", sourceLineSeparator);
+            } else if (isSourceLineSeparatorCrLf()) {
+                final String sourceLineSeparator = getSourceLineSeparator();
+                return contents.replaceAll("\r\n", "\n").replaceAll("\n", sourceLineSeparator);
+            }
+            // basically LF or CR+LF
         }
         return contents;
     }
@@ -553,16 +559,32 @@ public class DfFlutistGenerator extends DfGenerator {
     // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
     protected String getSourceLineSeparator() {
-        return DfBuildProperties.getInstance().getBasicProperties().getSourceLineSeparator();
+        return getBasicProperties().getSourceCodeLineSeparator();
+    }
+
+    protected boolean isConvertSourceCodeLineSeparator() {
+        return getBasicProperties().isConvertSourceCodeLineSeparator();
     }
 
     protected boolean isSourceLineSeparatorLf() {
-        return DfBuildProperties.getInstance().getBasicProperties().isSourceLineSeparatorLf();
+        return getBasicProperties().isSourceCodeLineSeparatorLf();
+    }
+
+    protected boolean isSourceLineSeparatorCrLf() {
+        return getBasicProperties().isSourceCodeLineSeparatorCrLf();
     }
 
     protected boolean isSkipGenerateIfSameFile() {
-        return DfBuildProperties.getInstance().getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
+        return getProperties().getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
     }
 
     // ===================================================================================

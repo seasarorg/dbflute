@@ -134,7 +134,8 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
             fixedCondition = Srl.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
             fixedCondition = Srl.replace(fixedCondition, "$$ForeignAlias$$", foreignAliasMark);
             fixedCondition = Srl.replace(fixedCondition, "$$LocalAlias$$", localAliasMark);
-            fixedCondition = Srl.replace(fixedCondition, "\n", "\\n");
+            fixedCondition = Srl.replace(fixedCondition, "\r\n", "\n"); // remove CR
+            fixedCondition = Srl.replace(fixedCondition, "\n", "\\n"); // LF to "LF on Java"
         }
         return fixedCondition;
     }

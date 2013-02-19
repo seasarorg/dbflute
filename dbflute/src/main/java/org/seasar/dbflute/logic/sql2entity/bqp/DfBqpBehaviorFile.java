@@ -110,7 +110,7 @@ public class DfBqpBehaviorFile {
      */
     protected void writeBehaviorQueryPath(Map<String, Map<String, String>> resourceElementMap) {
         final String encoding = getBasicProperties().getSourceFileEncoding();
-        final String lineSep = getBasicProperties().getSourceLineSeparator();
+        final String lineSep = getBasicProperties().getSourceCodeLineSeparator();
         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
         final String behaviorQueryPathBeginMark = getBasicProperties().getBehaviorQueryPathBeginMark();
         final String behaviorQueryPathEndMark = getBasicProperties().getBehaviorQueryPathEndMark();
