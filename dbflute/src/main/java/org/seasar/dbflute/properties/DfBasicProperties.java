@@ -21,6 +21,7 @@ import java.util.Properties;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.config.DfDatabaseNameMapping;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
@@ -656,11 +657,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         final String prop = getProperty("sourceCodeLineSeparator", null);
         if (prop != null) {
             _convertSourceCodeLineSeparator = true; // convert if specified
-        }
-        if ("LF".equalsIgnoreCase(prop)) {
-            _sourceCodeLineSeparator = "\n";
-        } else { // CR+LF fixedly
-            _sourceCodeLineSeparator = "\r\n"; // Source Code uses CR+LF. (since 0.9.5.4)
+            if ("LF".equalsIgnoreCase(prop)) {
+                _sourceCodeLineSeparator = "\n";
+            } else if ("CRLF".equalsIgnoreCase(prop)) {
+                _sourceCodeLineSeparator = "\r\n";
+            } else {
+                String msg = "Unknown line separator (only supported LF or CRLF): " + prop;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+        } else { // null
+            _sourceCodeLineSeparator = "\r\n"; // as default but no convert
         }
         return _sourceCodeLineSeparator;
     }
