@@ -147,6 +147,7 @@ import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseNameMapping;
 import org.seasar.dbflute.exception.DfColumnNotFoundException;
+import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -353,10 +354,11 @@ public class Database {
             // setup reverse relations and check existences
             final List<ForeignKey> fkList = table.getForeignKeyList();
             for (ForeignKey fk : fkList) {
-                final Table foreignTable = fk.getForeignTable();
-
-                // check an existence of foreign table
-                if (foreignTable == null) { // may be except table generate-only
+                final Table foreignTable;
+                try {
+                    // check an existence of foreign table
+                    foreignTable = fk.getForeignTable();
+                } catch (DfTableNotFoundException e) { // may be except table generate-only
                     table.removeForeignKey(fk);
                     continue;
                 }

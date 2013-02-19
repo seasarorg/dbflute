@@ -139,6 +139,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
 import org.seasar.dbflute.exception.DfFixedConditionOptionConstraintFailureException;
+import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
@@ -270,6 +271,7 @@ public class ForeignKey implements Constraint {
     /**
      * Get foreign table.
      * @return Foreign table.
+     * @throws DfTableNotFoundException When the foreign table is not found.
      */
     public Table getForeignTable() {
         final String foreignTableDbName = getForeignTableDbName();
@@ -306,7 +308,7 @@ public class ForeignKey implements Constraint {
         br.addItem("ForeignTable Name");
         br.addElement(foreignTableName);
         final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
+        throw new DfTableNotFoundException(msg);
     }
 
     // ===================================================================================
