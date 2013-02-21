@@ -75,6 +75,9 @@ public class AccessContext {
     // ===================================================================================
     //                                                                  Access Information
     //                                                                  ==================
+    // -----------------------------------------------------
+    //                                           Access Date
+    //                                           -----------
     /**
      * Get access date on thread. <br />
      * If it couldn't get access date from access-context, it returns current date of {@link DBFluteSystem}.
@@ -82,12 +85,12 @@ public class AccessContext {
      */
     public static Date getAccessDateOnThread() {
         if (isExistAccessContextOnThread()) {
-            final AccessContext userContextOnThread = getAccessContextOnThread();
-            final java.util.Date accessDate = userContextOnThread.getAccessDate();
+            final AccessContext context = getAccessContextOnThread();
+            final java.util.Date accessDate = context.getAccessDate();
             if (accessDate != null) {
                 return accessDate;
             }
-            final AccessDateProvider provider = userContextOnThread.getAccessDateProvider();
+            final AccessDateProvider provider = context.getAccessDateProvider();
             if (provider != null) {
                 final Date provided = provider.getAccessDate();
                 if (provided != null) {
@@ -98,6 +101,9 @@ public class AccessContext {
         return DBFluteSystem.currentDate();
     }
 
+    // -----------------------------------------------------
+    //                                      Access Timestamp
+    //                                      ----------------
     /**
      * Get access time-stamp on thread. <br />
      * If it couldn't get access time-stamp from access-context, it returns current time-stamp of {@link DBFluteSystem}.
@@ -105,12 +111,12 @@ public class AccessContext {
      */
     public static Timestamp getAccessTimestampOnThread() {
         if (isExistAccessContextOnThread()) {
-            final AccessContext userContextOnThread = getAccessContextOnThread();
-            final Timestamp accessTimestamp = userContextOnThread.getAccessTimestamp();
+            final AccessContext context = getAccessContextOnThread();
+            final Timestamp accessTimestamp = context.getAccessTimestamp();
             if (accessTimestamp != null) {
                 return accessTimestamp;
             }
-            final AccessTimestampProvider provider = userContextOnThread.getAccessTimestampProvider();
+            final AccessTimestampProvider provider = context.getAccessTimestampProvider();
             if (provider != null) {
                 final Timestamp provided = provider.getAccessTimestamp();
                 if (provided != null) {
@@ -121,18 +127,21 @@ public class AccessContext {
         return DBFluteSystem.currentTimestamp();
     }
 
+    // -----------------------------------------------------
+    //                                           Access User
+    //                                           -----------
     /**
      * Get access user on thread.
      * @return The expression for access user. (NotNull)
      */
     public static String getAccessUserOnThread() {
         if (isExistAccessContextOnThread()) {
-            final AccessContext userContextOnThread = getAccessContextOnThread();
-            final String accessUser = userContextOnThread.getAccessUser();
+            final AccessContext context = getAccessContextOnThread();
+            final String accessUser = context.getAccessUser();
             if (accessUser != null) {
                 return accessUser;
             }
-            final AccessUserProvider provider = userContextOnThread.getAccessUserProvider();
+            final AccessUserProvider provider = context.getAccessUserProvider();
             if (provider != null) {
                 final String user = provider.getAccessUser();
                 if (user != null) {
@@ -149,18 +158,21 @@ public class AccessContext {
         return null; // unreachable
     }
 
+    // -----------------------------------------------------
+    //                                        Access Process
+    //                                        --------------
     /**
      * Get access process on thread.
      * @return The expression for access module. (NotNull)
      */
     public static String getAccessProcessOnThread() {
         if (isExistAccessContextOnThread()) {
-            final AccessContext userContextOnThread = getAccessContextOnThread();
-            final String accessProcess = userContextOnThread.getAccessProcess();
+            final AccessContext context = getAccessContextOnThread();
+            final String accessProcess = context.getAccessProcess();
             if (accessProcess != null) {
                 return accessProcess;
             }
-            final AccessProcessProvider provider = userContextOnThread.getAccessProcessProvider();
+            final AccessProcessProvider provider = context.getAccessProcessProvider();
             if (provider != null) {
                 final String provided = provider.getAccessProcess();
                 if (provided != null) {
@@ -177,18 +189,21 @@ public class AccessContext {
         return null; // unreachable
     }
 
+    // -----------------------------------------------------
+    //                                         Access Module
+    //                                         -------------
     /**
      * Get access module on thread.
      * @return The expression for access module. (NotNull)
      */
     public static String getAccessModuleOnThread() {
         if (isExistAccessContextOnThread()) {
-            final AccessContext userContextOnThread = getAccessContextOnThread();
-            final String accessModule = userContextOnThread.getAccessModule();
+            final AccessContext context = getAccessContextOnThread();
+            final String accessModule = context.getAccessModule();
             if (accessModule != null) {
                 return accessModule;
             }
-            final AccessModuleProvider provider = userContextOnThread.getAccessModuleProvider();
+            final AccessModuleProvider provider = context.getAccessModuleProvider();
             if (provider != null) {
                 final String provided = provider.getAccessModule();
                 if (provided != null) {
@@ -205,6 +220,9 @@ public class AccessContext {
         return null; // unreachable
     }
 
+    // -----------------------------------------------------
+    //                                          Access Value
+    //                                          ------------
     /**
      * Get access value on thread.
      * @param key Key. (NotNull)
@@ -212,8 +230,8 @@ public class AccessContext {
      */
     public static Object getAccessValueOnThread(String key) {
         if (isExistAccessContextOnThread()) {
-            final AccessContext userContextOnThread = getAccessContextOnThread();
-            final Map<String, Object> accessValueMap = userContextOnThread.getAccessValueMap();
+            final AccessContext context = getAccessContextOnThread();
+            final Map<String, Object> accessValueMap = context.getAccessValueMap();
             if (accessValueMap != null) {
                 final Object value = accessValueMap.get(key);
                 if (value != null) {
@@ -230,6 +248,9 @@ public class AccessContext {
         return null; // unreachable
     }
 
+    // -----------------------------------------------------
+    //                                             Exception
+    //                                             ---------
     protected static void throwAccessContextNotFoundException(String methodName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The access context was not found on thread.");
@@ -297,6 +318,7 @@ public class AccessContext {
     protected String _accessModule;
     protected AccessModuleProvider _accessModuleProvider;
 
+    /** The map of access value, you can freely add your item value. */
     protected Map<String, Object> _accessValueMap;
 
     // ===================================================================================
@@ -311,6 +333,9 @@ public class AccessContext {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                           Access Date
+    //                                           -----------
     public Date getAccessDate() {
         return _accessDate;
     }
@@ -327,6 +352,9 @@ public class AccessContext {
         this._accessDateProvider = accessDateProvider;
     }
 
+    // -----------------------------------------------------
+    //                                      Access Timestamp
+    //                                      ----------------
     public Timestamp getAccessTimestamp() {
         return _accessTimestamp;
     }
@@ -343,6 +371,9 @@ public class AccessContext {
         this._accessTimestampProvider = accessTimestampProvider;
     }
 
+    // -----------------------------------------------------
+    //                                           Access User
+    //                                           -----------
     public String getAccessUser() {
         return _accessUser;
     }
@@ -359,6 +390,9 @@ public class AccessContext {
         this._accessUserProvider = accessUserProvider;
     }
 
+    // -----------------------------------------------------
+    //                                        Access Process
+    //                                        --------------
     public String getAccessProcess() {
         return _accessProcess;
     }
@@ -375,6 +409,9 @@ public class AccessContext {
         this._accessProcessProvider = accessProcessProvider;
     }
 
+    // -----------------------------------------------------
+    //                                         Access Module
+    //                                         -------------
     public String getAccessModule() {
         return _accessModule;
     }
@@ -391,10 +428,18 @@ public class AccessContext {
         this._accessModuleProvider = accessModuleProvider;
     }
 
+    // -----------------------------------------------------
+    //                                          Access Value
+    //                                          ------------
     public Map<String, Object> getAccessValueMap() {
         return _accessValueMap;
     }
 
+    /**
+     * Register the access value by the key.
+     * @param key The key of the access value. (NotNull)
+     * @param value The value as object. (NullAllowed)
+     */
     public void registerAccessValue(String key, Object value) {
         if (_accessValueMap == null) {
             _accessValueMap = new HashMap<String, Object>();
