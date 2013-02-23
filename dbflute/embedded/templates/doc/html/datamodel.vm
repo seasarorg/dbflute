@@ -359,7 +359,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #end
 				<th>Comment</th>
 #foreach ($group in $classificationTop.groupList)
-				<th><span class="clsgroup">${group.groupName}</span></th>
+				<th><span class="clsgroup"${group.groupTitleForSchemaHtml}>${group.groupName}</span></th>
 #end
 #if ($classificationTop.hasSisterCode())
 				<th>Sisters</th>

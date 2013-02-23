@@ -23,7 +23,6 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop.DfClassificationGroup;
 import org.seasar.dbflute.util.Srl;
 
 /**
