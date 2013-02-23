@@ -112,8 +112,8 @@ public class DfClassificationTop {
     }
 
     // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
+    //                                                                           Top Basic
+    //                                                                           =========
     public boolean hasTopComment() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_topComment);
     }
@@ -122,6 +122,9 @@ public class DfClassificationTop {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_codeType);
     }
 
+    // ===================================================================================
+    //                                                                         Sister Code
+    //                                                                         ===========
     public boolean isSisterBooleanHandling() {
         if (_elementList.size() != 2) {
             return false;
@@ -142,6 +145,17 @@ public class DfClassificationTop {
         }
         return (firstSet.contains("true") && secondSet.contains("false") // first true
         || firstSet.contains("false") && secondSet.contains("true")); // first false
+    }
+
+    public boolean hasSisterCode() {
+        final List<DfClassificationElement> elementList = getClassificationElementList();
+        for (DfClassificationElement element : elementList) {
+            final String[] sisters = element.getSisters();
+            if (sisters != null && sisters.length > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================

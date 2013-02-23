@@ -175,6 +175,11 @@ table.child, table.child td, table.child th {
 	border-bottom: 1px solid #aaa;
 	border-right: 1px solid #aaa;
 }
+.clsgroup {
+	font-size: 1.2em;
+	padding-left: 4px;
+	padding-right: 4px;
+}
 
 /* table supplementary info */
 span.tableschema {
@@ -353,11 +358,14 @@ ${database.schemaHtmlJavaScriptEmbedded}
 				<th>Alias</th>
 #end
 				<th>Comment</th>
+#foreach ($group in $classificationTop.groupList)
+				<th><span class="clsgroup">${group.groupName}</span></th>
+#end
+#if ($classificationTop.hasSisterCode())
+				<th>Sisters</th>
+#end
 #if ($classificationTop.hasSubItem())
 				<th>SubItem</th>
-#end
-#foreach ($group in $classificationTop.groupList)
-				<th>${group.groupName}</th>
 #end
 			</tr>
 #foreach ($classificationElement in $classificationTop.classificationElementList)
@@ -368,11 +376,14 @@ ${database.schemaHtmlJavaScriptEmbedded}
 				<td>#if ($classificationElement.hasAlias())${classificationElement.alias}#else &nbsp;#end</td>
 #end
 				<td class="commentcell">#if ($classificationElement.hasComment())${classificationElement.comment}#else &nbsp;#end</td>
-#if ($classificationTop.hasSubItem())
-				<td>${classificationElement.buildSubItemExpForSchemaHtml()}</td>
-#end
 #foreach ($group in $classificationTop.groupList)
 				<td class="flgcell">#if ($classificationElement.isGroup($group.groupName))o#else &nbsp;#end</td>
+#end
+#if ($classificationTop.hasSisterCode())
+				<td>${classificationElement.buildSisterCodeExpForSchemaHtml()}</td>
+#end
+#if ($classificationTop.hasSubItem())
+				<td>${classificationElement.buildSubItemExpForSchemaHtml()}</td>
 #end
 			</tr>
 #end

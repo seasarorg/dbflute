@@ -130,6 +130,25 @@ public class DfClassificationElement {
     }
 
     // ===================================================================================
+    //                                                                         Sister Code
+    //                                                                         ===========
+    public String buildSisterCodeExpForSchemaHtml() {
+        if (_sisters == null || _sisters.length == 0) {
+            return "&nbsp;";
+        }
+        final StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (String sister : _sisters) {
+            if (index > 0) {
+                sb.append(", ");
+            }
+            sb.append(sister);
+            ++index;
+        }
+        return sb.toString();
+    }
+
+    // ===================================================================================
     //                                                                         SubItem Map
     //                                                                         ===========
     public String buildSubItemExpForSchemaHtml() {
