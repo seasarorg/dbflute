@@ -650,7 +650,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     protected String _sourceCodeLineSeparator;
     protected boolean _convertSourceCodeLineSeparator;
 
-    public String getSourceCodeLineSeparator() { // closet
+    public String getSourceCodeLineSeparator() {
         if (_sourceCodeLineSeparator != null) {
             return _sourceCodeLineSeparator;
         }

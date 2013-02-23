@@ -18,6 +18,7 @@
 # o projectPrefix: (NotRequired - Default '')
 # o classAuthor: (NotRequired - Default 'DBFlute(AutoGenerator)')
 # o sourceFileEncoding: (NotRequired - Default 'UTF-8')
+# o sourceCodeLineSeparator: (NotRequired - Default no setting)
 # o applicationBehaviorMap: (NotRequired - Default map:{})
 # o outputPackageAdjustmentMap: (NotRequired - Default map:{})
 #
@@ -169,6 +170,16 @@ map:{
     #  If source files of your project are not UTF-8, specify your encoding here.
     #
     #; sourceFileEncoding = UTF-8
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o sourceCodeLineSeparator: (NotRequired - Default no setting)
+    #  The line separator setting for source code of generated classes.
+    #   LF   -> converted to LF
+    #   CRLF -> converted to CRLF
+    #   (no setting) -> no convert (template default is CRLF)
+    #
+    #; sourceCodeLineSeparator = LF
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -265,7 +265,7 @@ public class DfFlutistGenerator extends DfGenerator {
                 final String sourceLineSeparator = getSourceLineSeparator();
                 return contents.replaceAll("\r\n", "\n").replaceAll("\n", sourceLineSeparator);
             }
-            // basically LF or CR+LF
+            // basically LF or CRLF
         }
         return contents;
     }
