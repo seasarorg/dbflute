@@ -110,4 +110,8 @@ public class MockBehaviorCommand implements BehaviorCommand<Object> {
     public boolean isDelete() {
         return false;
     }
+
+    public String getInvokePath() {
+        return null;
+    }
 }

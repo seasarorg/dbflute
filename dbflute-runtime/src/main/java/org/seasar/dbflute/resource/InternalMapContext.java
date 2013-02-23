@@ -85,11 +85,16 @@ public class InternalMapContext {
     protected static final String KEY_BEHAVIOR_INVOKE_NAME = "df:BehaviorInvokeName";
     protected static final String KEY_CLIENT_INVOKE_NAME = "df:ClientInvokeName";
     protected static final String KEY_BYPASS_INVOKE_NAME = "df:ByPassInvokeName";
+    protected static final String KEY_SAVED_INVOKE_PATH = "df:SavedInvokePath";
+    protected static final String KEY_INVOKE_PATH_PROVIDER = "df:InvokePathProvider";
     protected static final String KEY_HOOK_SQL_LOG_INFO = "df:HookSqlLogInfo";
     protected static final String KEY_RESULT_SQL_LOG_INFO = "df:ResultSqlLogInfo";
     protected static final String KEY_SQL_BEFORE_TIME_MILLIS = "df:SqlBeforeTimeMillis";
     protected static final String KEY_SQL_AFTER_TIME_MILLIS = "df:SqlAfterTimeMillis";
 
+    // -----------------------------------------------------
+    //                                           Invoke Name
+    //                                           -----------
     public static String getBehaviorInvokeName() {
         return (String) getObject(KEY_BEHAVIOR_INVOKE_NAME);
     }
@@ -114,6 +119,32 @@ public class InternalMapContext {
         setObject(KEY_BYPASS_INVOKE_NAME, byPassInvokeName);
     }
 
+    // -----------------------------------------------------
+    //                                           Invoke Path
+    //                                           -----------
+    public static String getSavedInvokePath() { // basically only called by provider
+        return (String) getObject(KEY_SAVED_INVOKE_PATH);
+    }
+
+    public static void setSavedInvokePath(String invokePath) {
+        setObject(KEY_SAVED_INVOKE_PATH, invokePath);
+    }
+
+    public static InvokePathProvider getInvokePathProvider() { // you can get it lazily
+        return (InvokePathProvider) getObject(KEY_INVOKE_PATH_PROVIDER);
+    }
+
+    public static void setInvokePathProvider(InvokePathProvider invokePathProvider) {
+        setObject(KEY_INVOKE_PATH_PROVIDER, invokePathProvider);
+    }
+
+    public static interface InvokePathProvider {
+        String provide();
+    }
+
+    // -----------------------------------------------------
+    //                                            SqlLogInfo
+    //                                            ----------
     public static SqlLogInfo getHookSqlLogInfo() {
         return (SqlLogInfo) getObject(KEY_HOOK_SQL_LOG_INFO);
     }

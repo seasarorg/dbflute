@@ -50,6 +50,7 @@ import org.seasar.dbflute.outsidesql.executor.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.outsidesql.factory.OutsideSqlExecutorFactory;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.InternalMapContext;
+import org.seasar.dbflute.resource.InternalMapContext.InvokePathProvider;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.util.DfTraceViewUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -333,7 +334,7 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                       SQL Execution
     //                                                                       =============
-    protected <RESULT> SqlExecution findSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+    protected <RESULT> SqlExecution findSqlExecution(final BehaviorCommand<RESULT> behaviorCommand) {
         final boolean logEnabled = isLogEnabled();
         SqlExecution execution = null;
         try {
@@ -356,8 +357,9 @@ public class BehaviorCommandInvoker {
             return execution;
         } finally {
             if (logEnabled) {
-                logInvocation(behaviorCommand);
+                logInvocation(behaviorCommand, false);
             }
+            readyInvokePath(behaviorCommand);
         }
     }
 
@@ -426,7 +428,7 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      Log Invocation
     //                                                                      ==============
-    protected <RESULT> void logInvocation(BehaviorCommand<RESULT> behaviorCommand) {
+    protected <RESULT> void logInvocation(BehaviorCommand<RESULT> behaviorCommand, boolean saveOnly) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
         final List<InvokeNameResult> behaviorResultList = extractBehaviorInvoke(stackTrace);
         filterBehaviorResult(behaviorCommand, behaviorResultList);
@@ -452,12 +454,18 @@ public class BehaviorCommandInvoker {
         final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
         final String callerExpression = expWithoutKakko + "()";
 
+        final String invokePath = buildInvokePath(behaviorCommand, stackTrace, headBehaviorResult);
+        InternalMapContext.setSavedInvokePath(invokePath);
+
+        if (saveOnly) { // e.g. log level is INFO and invocation path ready
+            return;
+        }
+
         final String frameBase = "/=====================================================";
         final String spaceBase = "                                                      ";
         log(frameBase + equalBorder + "==");
         log(spaceBase + callerExpression);
         log(spaceBase + equalBorder + "=/");
-        final String invokePath = buildInvokePath(behaviorCommand, stackTrace, headBehaviorResult);
         if (Srl.is_NotNull_and_NotTrimmedEmpty(invokePath)) {
             log(invokePath);
         }
@@ -872,6 +880,25 @@ public class BehaviorCommandInvoker {
         } else {
             return obj != null ? obj.toString() : "null";
         }
+    }
+
+    // ===================================================================================
+    //                                                                    InvokePath Ready
+    //                                                                    ================
+    protected <RESULT> void readyInvokePath(final BehaviorCommand<RESULT> behaviorCommand) {
+        if (!CallbackContext.isInvokePathReadyOnThread()) {
+            return;
+        }
+        InternalMapContext.setInvokePathProvider(new InvokePathProvider() {
+            public String provide() { // lazily
+                final String invokePath = InternalMapContext.getSavedInvokePath();
+                if (invokePath != null) {
+                    return invokePath;
+                }
+                logInvocation(behaviorCommand, true); // save only
+                return InternalMapContext.getSavedInvokePath();
+            }
+        });
     }
 
     // ===================================================================================

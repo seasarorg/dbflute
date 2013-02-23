@@ -16,6 +16,7 @@
 package org.seasar.dbflute.bhv.core;
 
 /**
+ * The command of behavior.
  * @author jflute
  * @param <RESULT> The type of result.
  */

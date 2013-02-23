@@ -25,6 +25,8 @@ import org.seasar.dbflute.bhv.core.BehaviorCommandComponentSetup;
 import org.seasar.dbflute.bhv.core.execution.OutsideSqlExecuteExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.resource.InternalMapContext;
+import org.seasar.dbflute.resource.InternalMapContext.InvokePathProvider;
 import org.seasar.dbflute.s2dao.extension.TnRelationRowCreatorExtension;
 import org.seasar.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
@@ -141,6 +143,14 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
 
     protected TnRelationRowCreatorExtension createRelationRowCreator(TnBeanMetaData bmd) {
         return TnRelationRowCreatorExtension.createRelationRowCreator();
+    }
+
+    // ===================================================================================
+    //                                                                 Runtime Information
+    //                                                                 ===================
+    public String getInvokePath() {
+        final InvokePathProvider provider = InternalMapContext.getInvokePathProvider();
+        return provider != null ? provider.provide() : null;
     }
 
     // ===================================================================================

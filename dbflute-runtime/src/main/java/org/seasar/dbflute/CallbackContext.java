@@ -17,6 +17,7 @@ package org.seasar.dbflute;
 
 import org.seasar.dbflute.bhv.SqlStringFilter;
 import org.seasar.dbflute.bhv.core.BehaviorCommandHook;
+import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
 import org.seasar.dbflute.bhv.core.SqlFireHook;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
@@ -107,15 +108,13 @@ public class CallbackContext {
 
     /**
      * Clear the hook interface of behavior commands from call-back context on thread. <br />
-     * If the call-back context has had the interface only, the context will also removed from thread.
+     * If the call-back context does not have other interfaces, the context is removed from thread.
      */
     public static void clearBehaviorCommandHookOnThread() {
         if (isExistCallbackContextOnThread()) {
             final CallbackContext context = getCallbackContextOnThread();
             context.setBehaviorCommandHook(null);
-            if (!context.hasAnyInterface()) {
-                clearCallbackContextOnThread();
-            }
+            clearIfNoInterface(context);
         }
     }
 
@@ -154,15 +153,13 @@ public class CallbackContext {
 
     /**
      * Clear the hook interface of behavior commands from call-back context on thread. <br />
-     * If the call-back context has had the interface only, the context will also removed from thread.
+     * If the call-back context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlFireHookOnThread() {
         if (isExistCallbackContextOnThread()) {
             final CallbackContext context = getCallbackContextOnThread();
             context.setSqlFireHook(null);
-            if (!context.hasAnyInterface()) {
-                clearCallbackContextOnThread();
-            }
+            clearIfNoInterface(context);
         }
     }
 
@@ -196,15 +193,13 @@ public class CallbackContext {
 
     /**
      * Clear the handler of SQL log from call-back context on thread. <br />
-     * If the call-back context has had the interface only, the context will also removed from thread.
+     * If the call-back context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlLogHandlerOnThread() {
         if (isExistCallbackContextOnThread()) {
             final CallbackContext context = getCallbackContextOnThread();
             context.setSqlLogHandler(null);
-            if (!context.hasAnyInterface()) {
-                clearCallbackContextOnThread();
-            }
+            clearIfNoInterface(context);
         }
     }
 
@@ -238,15 +233,13 @@ public class CallbackContext {
 
     /**
      * Clear the handler of SQL result from call-back context on thread. <br />
-     * If the call-back context has had the interface only, the context will also removed from thread.
+     * If the call-back context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlResultHandlerOnThread() {
         if (isExistCallbackContextOnThread()) {
             final CallbackContext context = getCallbackContextOnThread();
             context.setSqlResultHandler(null);
-            if (!context.hasAnyInterface()) {
-                clearCallbackContextOnThread();
-            }
+            clearIfNoInterface(context);
         }
     }
 
@@ -280,15 +273,45 @@ public class CallbackContext {
 
     /**
      * Clear the filter of SQL string from call-back context on thread. <br />
-     * If the call-back context has had the interface only, the context will also removed from thread.
+     * If the call-back context does not have other interfaces, the context is removed from thread.
      */
     public static void clearSqlStringFilterOnThread() {
         if (isExistCallbackContextOnThread()) {
             final CallbackContext context = getCallbackContextOnThread();
             context.setSqlStringFilter(null);
-            if (!context.hasAnyInterface()) {
-                clearCallbackContextOnThread();
-            }
+            clearIfNoInterface(context);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                      InvokePath Ready
+    //                                      ----------------
+    /**
+     * Enable invoke path ready on thread. <br />
+     * You can use {@link BehaviorCommandMeta#getInvokePath()} in callback processes.
+     */
+    public static void enableInvokePathReadyOnThread() {
+        final CallbackContext context = getOrCreateContext();
+        context.setInvokePathReady(true);
+    }
+
+    /**
+     * Is invoke path ready?
+     * @return The determination, true or false.
+     */
+    public static boolean isInvokePathReadyOnThread() {
+        return isExistCallbackContextOnThread() && getCallbackContextOnThread().isInvokePathReady();
+    }
+
+    /**
+     * Clear the invoke path ready on thread. <br />
+     * If the call-back context has no interface, the context is removed from thread.
+     */
+    public static void clearInvokePathReadyOnThread() {
+        if (isExistCallbackContextOnThread()) {
+            final CallbackContext context = getCallbackContextOnThread();
+            context.setInvokePathReady(false);
+            clearIfNoInterface(context);
         }
     }
 
@@ -305,6 +328,12 @@ public class CallbackContext {
         }
     }
 
+    protected static void clearIfNoInterface(final CallbackContext context) {
+        if (!context.hasAnyInterface()) {
+            clearCallbackContextOnThread();
+        }
+    }
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -313,6 +342,7 @@ public class CallbackContext {
     protected SqlLogHandler _sqlLogHandler;
     protected SqlResultHandler _sqlResultHandler;
     protected SqlStringFilter _sqlStringFilter;
+    protected boolean _invokePathReady;
 
     // ===================================================================================
     //                                                                       Determination
@@ -450,5 +480,24 @@ public class CallbackContext {
      */
     public void setSqlStringFilter(SqlStringFilter sqlStringFilter) {
         this._sqlStringFilter = sqlStringFilter;
+    }
+
+    // -----------------------------------------------------
+    //                                      InvokePath Ready
+    //                                      ----------------
+    /**
+     * Is invoke path ready?
+     * @return The determination, true or false.
+     */
+    public boolean isInvokePathReady() {
+        return _invokePathReady;
+    }
+
+    /**
+     * Set the determination of invoke path ready.
+     * @param invokePathReady Is the invoke path ready?
+     */
+    public void setInvokePathReady(boolean invokePathReady) {
+        _invokePathReady = invokePathReady;
     }
 }

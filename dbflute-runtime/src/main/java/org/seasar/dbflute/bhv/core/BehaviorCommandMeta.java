@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.bhv.core;
 
+import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
@@ -152,4 +153,16 @@ public interface BehaviorCommandMeta {
      * @return The option of outside-SQL. (NullAllowed)
      */
     OutsideSqlOption getOutsideSqlOption();
+
+    // ===================================================================================
+    //                                                                 Runtime Information
+    //                                                                 ===================
+    /**
+     * Get the invoke path of behavior command lazily. <br />
+     * Invoke path is e.g. FooAction.index():38 -&gt; BarLogic.selectQux():127 -&gt; ... <br />
+     * To create this path needs stack trace (from exception instance) so lazily. <br />
+     * The setting you need to do is to use {@link CallbackContext#enableInvokePathReadyOnThread()}.
+     * @return The display string of invoke path. (NotNull)
+     */
+    String getInvokePath();
 }
