@@ -131,6 +131,9 @@ td {
 	font-size: 0.8em;
 	font-weight: bold;
 }
+.floatleftcell {
+	font-size: 0.8em;
+}
 .sizecell {
 	text-align: center;
 	font-size: 0.8em;
@@ -146,6 +149,11 @@ td {
 .freecomment {
 	color: green;
 	font-size: 0.6em;
+	font-weight: normal;
+}
+.diffprop {
+	color: #CC3311;
+	font-size: 1.1em;
 }
 
 /* inner table */
@@ -223,7 +231,7 @@ ${manager.javaScriptEmbedded}
 #if ($attribute.hasDuplicateKey())
 			<td class="keylistcell">
 #foreach ($duplicateKey in $attribute.duplicateKeyList)
-				<p>${duplicateKey}</p>
+				<p class="diffprop">${duplicateKey}</p>
 #end
 			</td>
 #else
@@ -236,7 +244,7 @@ ${manager.javaScriptEmbedded}
 #if ($overKey.isOverride())
 				<p>${overKey.propertyKey} <span class="freecomment">(override)</span></p>
 #else
-				<p>${overKey.propertyKey}</p>
+				<p class="diffprop">${overKey.propertyKey}</p>
 #end
 #end
 			</td>
@@ -257,7 +265,7 @@ ${manager.javaScriptEmbedded}
 #if ($shortKey.isOverride())
 				<p>${shortKey.propertyKey} <span class="freecomment">(extends)</span></p>
 #else
-				<p>${shortKey.propertyKey}</p>
+				<p class="diffprop">${shortKey.propertyKey}</p>
 #end
 #end
 			</td>
@@ -295,6 +303,34 @@ ${manager.javaScriptEmbedded}
 		<td class="rownumcell">${rownum}</td>
 		<td class="keycell">${propertyKey}</td>
 		<td>
+#if ($request.isEnvOnlyFloatLeft())
+##
+## float-left pattern
+##
+			<table class="child">
+				<tr>
+#foreach ($envElement in $property.envElementList)
+#set ($envType = $envElement.envType)
+#foreach ($langElement in $envElement.langElementList)
+					<th>${envType} #if ($langElement.isOverride())<span class="freecomment">(override)</span>#else &nbsp;#end</th>
+#end
+#end
+				</tr>
+				<tr>
+#foreach ($envElement in $property.envElementList)
+#foreach ($langElement in $envElement.langElementList)
+					<td class="floatleftcell">
+						#if ($langElement.hasComment())<span class="commentcell">${langElement.commentHtmlEncodedFloatLeft}</span><br />#else #end
+						#if ($langElement.hasPropertyValue())<span class="valuecell">${langElement.propertyValueHtmlEncoded}</span>#else &nbsp;#end
+					</td>
+#end
+#end
+				</tr>
+			</table>
+#else
+##
+## normal pattern
+##
 			<table class="child">
 				<tr>
 					<th>Env</th>
@@ -325,6 +361,7 @@ ${manager.javaScriptEmbedded}
 #end
 #end
 			</table>
+#end
 		</td>
 	</tr>
 #set ($rownum = $rownum + 1)

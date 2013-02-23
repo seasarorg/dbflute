@@ -96,6 +96,11 @@ public class DfPropHtmlPropertyLangElement {
         return resolved != null ? resolved : "";
     }
 
+    public String getCommentHtmlEncodedFloatLeft() {
+        final String encoded = getCommentHtmlEncoded();
+        return Srl.is_NotNull_and_NotTrimmedEmpty(encoded) ? "# " + encoded : "";
+    }
+
     public boolean isOverride() {
         return _override;
     }

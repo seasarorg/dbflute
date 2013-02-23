@@ -106,10 +106,11 @@ public class DfPropHtmlManager {
 
     protected DfPropHtmlRequest createPropHtmlRequest(Map<String, Object> requestMap, String requestName) {
         final DfDocumentProperties prop = getDocumentProperties();
-        final List<String> diffIgnoredKeyList = prop.getPropertiesHtmlDiffIgnoredKeyList(requestMap);
-        final List<String> maskedKeyList = prop.getPropertiesHtmlMaskedKeyList(requestMap);
-        final String extendsPropRequest = prop.getPropertiesHtmlExtendsPropRequest(requestMap);
-        return new DfPropHtmlRequest(requestName, diffIgnoredKeyList, maskedKeyList, extendsPropRequest);
+        final List<String> diffIgnored = prop.getPropertiesHtmlDiffIgnoredKeyList(requestMap);
+        final List<String> masked = prop.getPropertiesHtmlMaskedKeyList(requestMap);
+        final boolean envOnly = prop.isPropertiesHtmlEnvOnlyFloatLeft(requestMap);
+        final String extendsProp = prop.getPropertiesHtmlExtendsPropRequest(requestMap);
+        return new DfPropHtmlRequest(requestName, diffIgnored, masked, envOnly, extendsProp);
     }
 
     protected void assertPropHtmlRootFileExists(Map<String, DfPropHtmlFileAttribute> defaultEnvMap, String requestName,

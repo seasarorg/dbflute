@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
@@ -41,22 +43,24 @@ public class DfPropHtmlRequest {
     protected final Map<String, DfPropHtmlProperty> _propertyMap = DfCollectionUtil.newLinkedHashMap();
     protected final Set<String> _diffIgnoredKeySet = DfCollectionUtil.newLinkedHashSet();
     protected final Set<String> _maskedKeySet = DfCollectionUtil.newLinkedHashSet();
+    protected final boolean _envOnlyFloatLeft;
     protected final String _extendsPropRequest;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfPropHtmlRequest(String requestName, List<String> diffIgnoredKeyList, List<String> maskedKeyList,
-            String extendsPropRequest) {
+            boolean envOnlyFloatLeft, String extendsPropRequest) {
         _requestName = requestName;
         addDiffIgnoredKeyAll(diffIgnoredKeyList);
         addMaskedKeyAll(maskedKeyList);
+        _envOnlyFloatLeft = envOnlyFloatLeft;
         _extendsPropRequest = extendsPropRequest;
     }
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
+    //                                                                        Request Name
+    //                                                                        ============
     public String getRequestName() {
         return _requestName;
     }
@@ -65,6 +69,9 @@ public class DfPropHtmlRequest {
         return _requestName.toLowerCase();
     }
 
+    // ===================================================================================
+    //                                                                      File Attribute
+    //                                                                      ==============
     public DfPropHtmlFileAttribute getFileAttribute(String envType, String langType) {
         return _fileAttributeMap.get(generateFileAttributeKey(envType, langType));
     }
@@ -83,6 +90,9 @@ public class DfPropHtmlRequest {
         return envType + ":" + langType;
     }
 
+    // ===================================================================================
+    //                                                                   Property Handling
+    //                                                                   =================
     public DfPropHtmlProperty getProperty(String propertyKey) {
         return _propertyMap.get(propertyKey);
     }
@@ -105,6 +115,7 @@ public class DfPropHtmlRequest {
         final DfPropHtmlProperty property = prepareManagedProperty(propertyKey);
         final String registeredValue = filterRegisteredValue(propertyKey, propertyValue, secure);
         property.setPropertyValue(envType, langType, registeredValue, comment, override, secure);
+        checkEnvOnlyNoLang(propertyKey, property);
     }
 
     protected DfPropHtmlProperty prepareManagedProperty(String propertyKey) {
@@ -126,6 +137,9 @@ public class DfPropHtmlRequest {
         return registeredValue;
     }
 
+    // ===================================================================================
+    //                                                                     Option Handling
+    //                                                                     ===============
     public Set<String> getDiffIgnoredKeySet() {
         return _diffIgnoredKeySet;
     }
@@ -140,6 +154,28 @@ public class DfPropHtmlRequest {
 
     protected void addMaskedKeyAll(List<String> maskedKeyList) {
         _maskedKeySet.addAll(maskedKeyList);
+    }
+
+    public boolean isEnvOnlyFloatLeft() {
+        return _envOnlyFloatLeft;
+    }
+
+    protected void checkEnvOnlyNoLang(String propertyKey, DfPropHtmlProperty property) {
+        if (_envOnlyFloatLeft && property.getLangTypeSet().size() >= 2) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Env only mode but two lang types exist.");
+            br.addItem("Advice");
+            br.addElement("You cannot use isEnvOnlyFloatLeft if lang type is plural");
+            br.addElement("in request of PropertiesHtml.");
+            br.addItem("Request");
+            br.addElement(_requestName);
+            br.addItem("Property");
+            br.addElement(propertyKey);
+            br.addItem("Lang Types");
+            br.addElement(property.getLangTypeSet());
+            final String msg = br.buildExceptionMessage();
+            throw new DfIllegalPropertySettingException(msg);
+        }
     }
 
     public boolean hasExtendsPropRequest() {
