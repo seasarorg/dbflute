@@ -37,6 +37,9 @@ public class DfPropHtmlPropertyLangElement {
     /** The value of the property. e.g. ja, en (NotNull, EmptyAllowed) */
     protected final String _propertyValue;
 
+    /** The unique No of the property value in this property. */
+    protected final int _uniqueNo;
+
     /** The comment of the property. (NotNull, EmptyAllowed) */
     protected final String _comment;
 
@@ -46,13 +49,14 @@ public class DfPropHtmlPropertyLangElement {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropHtmlPropertyLangElement(String propertyKey, String langType, String propertyValue, String comment,
-            boolean override) {
+    public DfPropHtmlPropertyLangElement(String propertyKey, String langType, String propertyValue, int uniqueNo,
+            String comment, boolean override) {
         _propertyKey = propertyKey;
         _langType = langType;
 
         // empty string for velocity template
         _propertyValue = propertyValue != null ? propertyValue : "";
+        _uniqueNo = uniqueNo;
         _comment = comment != null ? comment : "";
         _override = override;
     }
@@ -80,6 +84,10 @@ public class DfPropHtmlPropertyLangElement {
         final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
         final String resolved = prop.resolveTextForSchemaHtml(_propertyValue);
         return resolved != null ? resolved : "";
+    }
+
+    public int getUniqueNo() {
+        return _uniqueNo;
     }
 
     public boolean hasComment() {

@@ -52,11 +52,60 @@ public class DfPropHtmlProperty {
     /** Is the property secure? */
     protected boolean _secure;
 
+    /** The map of property value and unique No. map:{property value = unique No} (NotNull) */
+    protected final Map<String, Integer> _valueUniqueNoMap = DfCollectionUtil.newHashMap();
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfPropHtmlProperty(String propertyKey) {
         _propertyKey = propertyKey;
+    }
+
+    // ===================================================================================
+    //                                                                       Value Setting
+    //                                                                       =============
+    public void setPropertyValue(String envType, String langType, String propertyValue, String comment,
+            boolean override, boolean secure) {
+        DfPropHtmlPropertyEnvElement envElement = _envElementMap.get(envType);
+        if (envElement == null) {
+            envElement = createEnvElement(envType);
+            _envElementMap.put(envType, envElement);
+        }
+        final int uniqueNo = calculateUniqueNo(propertyValue);
+        envElement.setPropertyValue(langType, propertyValue, uniqueNo, comment, override);
+        _envTypeSet.add(envType);
+        _langTypeSet.add(langType);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
+            _hasComment = true;
+        }
+        if (override) {
+            _hasOverride = true;
+        }
+        _secure = secure;
+    }
+
+    protected DfPropHtmlPropertyEnvElement createEnvElement(String envType) {
+        return new DfPropHtmlPropertyEnvElement(_propertyKey, envType);
+    }
+
+    protected int calculateUniqueNo(String propertyValue) {
+        Integer uniqueNo = _valueUniqueNoMap.get(propertyValue);
+        if (uniqueNo == null) {
+            uniqueNo = extractUniqueNoMax() + 1;
+            _valueUniqueNoMap.put(propertyValue, uniqueNo);
+        }
+        return uniqueNo;
+    }
+
+    protected int extractUniqueNoMax() {
+        int max = 0;
+        for (Integer current : _valueUniqueNoMap.values()) {
+            if (max < current) {
+                max = current;
+            }
+        }
+        return max;
     }
 
     // ===================================================================================
@@ -80,29 +129,6 @@ public class DfPropHtmlProperty {
 
     public List<DfPropHtmlPropertyEnvElement> getEnvElementList() {
         return DfCollectionUtil.newArrayList(_envElementMap.values());
-    }
-
-    public void setPropertyValue(String envType, String langType, String propertyValue, String comment,
-            boolean override, boolean secure) {
-        DfPropHtmlPropertyEnvElement envElement = _envElementMap.get(envType);
-        if (envElement == null) {
-            envElement = createEnvElement(envType);
-            _envElementMap.put(envType, envElement);
-        }
-        envElement.setPropertyValue(langType, propertyValue, comment, override);
-        _envTypeSet.add(envType);
-        _langTypeSet.add(langType);
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) {
-            _hasComment = true;
-        }
-        if (override) {
-            _hasOverride = true;
-        }
-        _secure = secure;
-    }
-
-    protected DfPropHtmlPropertyEnvElement createEnvElement(String envType) {
-        return new DfPropHtmlPropertyEnvElement(_propertyKey, envType);
     }
 
     public boolean hasComment() {

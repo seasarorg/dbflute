@@ -123,6 +123,15 @@ td {
 	text-align: center;
 	font-size: 0.6em;
 }
+.envonlytitle {
+	text-align: center;
+	font-size: 1.0em;
+}
+.envonlycomment {
+	color: green;
+	font-size: 0.6em;
+	font-weight: normal;
+}
 .langtypecell {
 	text-align: center;
 	font-size: 0.6em;
@@ -130,6 +139,11 @@ td {
 .valuecell {
 	font-size: 0.8em;
 	font-weight: bold;
+}
+.uniquenocell {
+	color: #555555;
+	text-align: center;
+	font-size: 0.7em;
 }
 .floatleftcell {
 	font-size: 0.8em;
@@ -154,6 +168,10 @@ td {
 .diffprop {
 	color: #CC3311;
 	font-size: 1.1em;
+}
+.tablesupplement {
+	color: green;
+	font-size: 0.7em;
 }
 
 /* inner table */
@@ -304,15 +322,15 @@ ${manager.javaScriptEmbedded}
 		<td class="keycell">${propertyKey}</td>
 		<td>
 #if ($request.isEnvOnlyFloatLeft())
-##
+## = = = = = = = = = =
 ## float-left pattern
-##
+## = = = = = = = = = =
 			<table class="child">
 				<tr>
 #foreach ($envElement in $property.envElementList)
 #set ($envType = $envElement.envType)
 #foreach ($langElement in $envElement.langElementList)
-					<th>${envType} #if ($langElement.isOverride())<span class="freecomment">(override)</span>#else &nbsp;#end</th>
+					<th><span class="envonlytitle">${envType}</span> <span class="envonlycomment">uq.${langElement.uniqueNo} #if ($langElement.isOverride())(override)#end</span></th>
 #end
 #end
 				</tr>
@@ -328,14 +346,15 @@ ${manager.javaScriptEmbedded}
 				</tr>
 			</table>
 #else
-##
+## = = = = = = = =
 ## normal pattern
-##
+## = = = = = = = =
 			<table class="child">
 				<tr>
 					<th>Env</th>
 					<th>Lang</th>
 					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
 #if ($property.hasComment())
 					<th>Comment</th>
 #end
@@ -351,6 +370,7 @@ ${manager.javaScriptEmbedded}
 					<td class="envtypecell">${envType}</td>
 					<td class="langtypecell">${langType}</td>
 					<td class="valuecell">#if ($langElement.hasPropertyValue())${langElement.propertyValueHtmlEncoded}#else &nbsp;#end</td>
+					<td class="uniquenocell">${langElement.uniqueNo}</td>
 #if ($property.hasComment())
 					<td class="commentcell">#if ($langElement.hasComment())${langElement.commentHtmlEncoded}#else &nbsp;#end</td>
 #end
@@ -368,6 +388,7 @@ ${manager.javaScriptEmbedded}
 #end
 	</tbody>
 </table>
+<p class="tablesupplement">*uq: Unique No (same value, same No)</p>
 #end
 </body>
 </html>
