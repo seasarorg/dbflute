@@ -27,7 +27,7 @@
 	<style type="text/css">
 ${manager.styleSheetEmbedded}
 	</style>
-#elseif ($manager.isstyleSheetLink())
+#elseif ($manager.isStyleSheetLink())
 	${manager.styleSheetLink}
 #else
 	<style type="text/css">

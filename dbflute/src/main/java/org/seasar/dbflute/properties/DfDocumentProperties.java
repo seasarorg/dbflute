@@ -845,6 +845,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //         ; diffIgnoredKeyList = list:{ errors.ignored.key }
     //         ; maskedKeyList = list:{ errors.masked.key }
     //         ; extendsPropRequest = CommonApplicationProp
+    //         ; isCheckImplicitOverride = false
     //     }
     // }
     protected Map<String, Object> _propertiesHtmlHeaderMap;
