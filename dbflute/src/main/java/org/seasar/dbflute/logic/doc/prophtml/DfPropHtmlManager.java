@@ -110,7 +110,8 @@ public class DfPropHtmlManager {
         final List<String> masked = prop.getPropertiesHtmlMaskedKeyList(requestMap);
         final boolean envOnly = prop.isPropertiesHtmlEnvOnlyFloatLeft(requestMap);
         final String extendsProp = prop.getPropertiesHtmlExtendsPropRequest(requestMap);
-        return new DfPropHtmlRequest(requestName, diffIgnored, masked, envOnly, extendsProp);
+        final boolean checkImpOver = prop.isPropertiesHtmlCheckImplicitOverride(requestMap);
+        return new DfPropHtmlRequest(requestName, diffIgnored, masked, envOnly, extendsProp, checkImpOver);
     }
 
     protected void assertPropHtmlRootFileExists(Map<String, DfPropHtmlFileAttribute> defaultEnvMap, String requestName,
@@ -163,10 +164,10 @@ public class DfPropHtmlManager {
             final String fileKey = buildFileKey(familyFile, envType);
             _log.info("...Reading properties file: " + fileKey);
             final String title = fileKey + ":" + familyFile.getPath();
-            final JavaPropertiesReader reader = createReader(title, familyFile);
+            final JavaPropertiesReader reader = createReader(request, title, familyFile);
             final DfPropHtmlFileAttribute extendsAttribute = findExtendsAttribute(extendsRequest, envType, langType);
             if (extendsAttribute != null) {
-                prepareExtendsProperties(reader, extendsAttribute);
+                prepareExtendsProperties(request, reader, extendsAttribute);
             }
             final JavaPropertiesResult jpropResult = reader.read();
 
@@ -283,7 +284,7 @@ public class DfPropHtmlManager {
     // ===================================================================================
     //                                                                   Properties Reader
     //                                                                   =================
-    protected JavaPropertiesReader createReader(String title, final File familyFile) {
+    protected JavaPropertiesReader createReader(DfPropHtmlRequest request, String title, final File familyFile) {
         return new JavaPropertiesReader(title, new JavaPropertiesStreamProvider() {
             public InputStream provideStream() throws IOException {
                 return new FileInputStream(familyFile);
@@ -291,7 +292,8 @@ public class DfPropHtmlManager {
         });
     }
 
-    protected void prepareExtendsProperties(JavaPropertiesReader reader, DfPropHtmlFileAttribute extendsAttribute) {
+    protected void prepareExtendsProperties(DfPropHtmlRequest request, JavaPropertiesReader reader,
+            DfPropHtmlFileAttribute extendsAttribute) {
         final File extendsFile = extendsAttribute.getPropertiesFile();
         final String extendsFileKey = buildFileKey(extendsFile, extendsAttribute.getEnvType());
         final String extendsTitle = extendsFileKey + ":" + extendsFile.getPath();
@@ -300,6 +302,9 @@ public class DfPropHtmlManager {
                 return new FileInputStream(extendsFile);
             }
         });
+        if (request.isCheckImplicitOverride()) {
+            reader.checkImplicitOverride();
+        }
     }
 
     // ===================================================================================

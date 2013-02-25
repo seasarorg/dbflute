@@ -200,6 +200,7 @@ map:{
     #   o maskedKeyList: list of masked keys for security (NotRequired)
     #   o isEnvOnlyFloatLeft: is it environment only? (and show as float-left?) (NotRequired)
     #   o extendsPropRequest: other request name of exnteds-properties (NotRequired)
+    #   o isCheckImplicitOverride: does it check implicit override? (NotRequired)
     #
     #; propertiesHtmlMap = map:{
     #    ; ApplicationProperties = map:{
@@ -213,6 +214,7 @@ map:{
     #        ; maskedKeyList = list:{}
     #        ; isEnvOnlyFloatLeft = false
     #        ; extendsPropRequest = null
+    #        ; isCheckImplicitOverride = false
     #    }
     #}
     # - - - - - - - - - -/

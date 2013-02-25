@@ -45,17 +45,19 @@ public class DfPropHtmlRequest {
     protected final Set<String> _maskedKeySet = DfCollectionUtil.newLinkedHashSet();
     protected final boolean _envOnlyFloatLeft;
     protected final String _extendsPropRequest;
+    protected final boolean _checkImplicitOverride;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfPropHtmlRequest(String requestName, List<String> diffIgnoredKeyList, List<String> maskedKeyList,
-            boolean envOnlyFloatLeft, String extendsPropRequest) {
+            boolean envOnlyFloatLeft, String extendsPropRequest, boolean checkImplicitOverride) {
         _requestName = requestName;
         addDiffIgnoredKeyAll(diffIgnoredKeyList);
         addMaskedKeyAll(maskedKeyList);
         _envOnlyFloatLeft = envOnlyFloatLeft;
         _extendsPropRequest = extendsPropRequest;
+        _checkImplicitOverride = checkImplicitOverride;
     }
 
     // ===================================================================================
@@ -184,5 +186,9 @@ public class DfPropHtmlRequest {
 
     public String getExtendsPropRequest() {
         return _extendsPropRequest;
+    }
+
+    public boolean isCheckImplicitOverride() {
+        return _checkImplicitOverride;
     }
 }

@@ -972,13 +972,17 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         return DfCollectionUtil.emptyList();
     }
-    
+
     public boolean isPropertiesHtmlEnvOnlyFloatLeft(Map<String, Object> requestMap) {
         return isProperty("isEnvOnlyFloatLeft", false, requestMap);
     }
 
     public String getPropertiesHtmlExtendsPropRequest(Map<String, Object> requestMap) {
         return (String) requestMap.get("extendsPropRequest");
+    }
+
+    public boolean isPropertiesHtmlCheckImplicitOverride(Map<String, Object> requestMap) {
+        return isProperty("isCheckImplicitOverride", false, requestMap);
     }
 
     // -----------------------------------------------------
