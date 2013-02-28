@@ -169,7 +169,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                          Inner Join
     //                                                                          ==========
     public boolean isInnerJoinAutoDetect() {
-        return isProperty("isInnerJoinAutoDetect", false);
+        return isProperty("isInnerJoinAutoDetect", true); // default true @since 1.0.3
     }
 
     // ===================================================================================
