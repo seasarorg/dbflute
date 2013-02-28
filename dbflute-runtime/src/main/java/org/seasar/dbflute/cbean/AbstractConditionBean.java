@@ -237,6 +237,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().allowInnerJoinAutoDetect();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void suppressInnerJoinAutoDetect() {
+        getSqlClause().suppressInnerJoinAutoDetect();
+    }
+
     // [DBFlute-0.9.5.3]
     // ===================================================================================
     //                                                                         ColumnQuery

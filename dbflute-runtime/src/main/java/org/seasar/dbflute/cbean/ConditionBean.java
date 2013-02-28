@@ -98,6 +98,12 @@ public interface ConditionBean extends PagingBean {
      */
     void allowInnerJoinAutoDetect();
 
+    /**
+     * Suppress auto-detecting inner-join. <br />
+     * You should call this before registrations of where clause.
+     */
+    void suppressInnerJoinAutoDetect();
+
     // ===================================================================================
     //                                                                        Dream Cruise
     //                                                                        ============
