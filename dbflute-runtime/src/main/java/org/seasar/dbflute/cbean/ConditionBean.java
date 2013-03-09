@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -243,6 +244,18 @@ public interface ConditionBean extends PagingBean {
     boolean isSelectCountIgnoreFetchScope();
 
     // ===================================================================================
+    //                                                                       Cursor Select
+    //                                                                       =============
+    /**
+     * Get the option of cursor select.
+     * @return The option of cursor select. (NullAllowed: when no option)
+     */
+    CursorSelectOption getCursorSelectOption();
+
+    // the customizeCursorSelect() method is generated at sub-class
+    // because the method is generated only when allowed DBMS
+
+    // ===================================================================================
     //                                                                       Scalar Select
     //                                                                       =============
     /**
@@ -349,6 +362,9 @@ public interface ConditionBean extends PagingBean {
      * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
     void invokeSetupSelect(String foreignPropertyNamePath);
+
+    // TODO jflute
+    HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath);
 
     // ===================================================================================
     //                                                                  Query Synchronizer

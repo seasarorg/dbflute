@@ -25,6 +25,7 @@ import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
+import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
@@ -234,6 +235,10 @@ public class MockConditionBean implements ConditionBean {
     public void invokeSetupSelect(String foreignPropertyNamePath) {
     }
 
+    public HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
+        return null;
+    }
+
     public Map<String, Object> getFreeParameterMap() {
         return null;
     }
@@ -333,5 +338,9 @@ public class MockConditionBean implements ConditionBean {
     }
 
     public void xsetupSelectDreamCruiseJourneyLogBookIfUnionExists() {
+    }
+
+    public CursorSelectOption getCursorSelectOption() {
+        return null;
     }
 }

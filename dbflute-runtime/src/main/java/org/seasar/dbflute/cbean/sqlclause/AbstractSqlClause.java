@@ -3164,6 +3164,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         option.acceptGearedCipherManager(getGearedCipherManager()); // come together!
     }
 
+    // [DBFlute-1.0.3.1]
+    // ===================================================================================
+    //                                                                 CursorSelect Option
+    //                                                                 ===================
+    public boolean isCursorSelectByPagingAllowed() {
+        return false; // not allowed as default (e.g. MySQL overrides this)
+    }
+
     // ===================================================================================
     //                                                                       DBMeta Helper
     //                                                                       =============

@@ -290,6 +290,16 @@ public class SqlClauseMySql extends AbstractSqlClause {
         }
     }
 
+    // [DBFlute-1.0.3.1]
+    // ===================================================================================
+    //                                                                 CursorSelect Option
+    //                                                                 ===================
+    public boolean isCursorSelectByPagingAllowed() {
+        // MySQL's cursor select has problems so allowed
+        // (RepeatableRead is default on MySQL so safety relatively)
+        return true;
+    }
+
     // [DBFlute-0.9.8.4]
     // ===================================================================================
     //                                                                               DBWay

@@ -48,8 +48,11 @@ import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
+import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
+import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
@@ -124,14 +127,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                       Internal Helper
     //                                       ---------------
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
-            InternalSelectEntityCallback<ENTITY, CB> callback) {
+            Class<ENTITY> entityType, InternalSelectEntityCallback<ENTITY, CB> callback) {
         if (cb.hasSelectAllPossible() && cb.getFetchSize() != 1) { // if no condition for one
             throwSelectEntityConditionNotFoundException(cb);
         }
         final int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);
         final List<ENTITY> ls;
         try {
-            ls = callback.callbackSelectList(cb);
+            ls = callback.callbackSelectList(cb, entityType);
         } catch (DangerousResultSizeException e) {
             throwSelectEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
             return null; // unreachable
@@ -146,22 +149,23 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected static interface InternalSelectEntityCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        public List<ENTITY> callbackSelectList(CB cb);
+        public List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
     }
 
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityWithDeletedCheckInternally(
-            CB cb, final InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
-        final ENTITY entity = helpSelectEntityInternally(cb, new InternalSelectEntityCallback<ENTITY, CB>() {
-            public List<ENTITY> callbackSelectList(CB cb) {
-                return callback.callbackSelectList(cb);
-            }
-        });
+            CB cb, Class<ENTITY> entityType, final InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
+        final ENTITY entity = helpSelectEntityInternally(cb, entityType,
+                new InternalSelectEntityCallback<ENTITY, CB>() {
+                    public List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType) {
+                        return callback.callbackSelectList(cb, entityType);
+                    }
+                });
         assertEntityNotDeleted(entity, cb);
         return entity;
     }
 
     protected static interface InternalSelectEntityWithDeletedCheckCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        public List<ENTITY> callbackSelectList(CB cb);
+        public List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
     }
 
     protected int xcheckSafetyResultAsOne(ConditionBean cb) {
@@ -174,140 +178,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         cb.checkSafetyResult(preSafetyMaxResultSize);
     }
 
-    // ===================================================================================
-    //                                                                           List Read
-    //                                                                           =========
-    /**
-     * {@inheritDoc}
-     */
-    public <ENTITY extends Entity> ListResultBean<ENTITY> readList(ConditionBean cb) {
-        assertCBStateValid(cb);
-        @SuppressWarnings("unchecked")
-        final ListResultBean<ENTITY> entityList = (ListResultBean<ENTITY>) doReadList(cb);
-        return entityList;
-    }
-
-    protected abstract ListResultBean<? extends Entity> doReadList(ConditionBean cb);
-
-    // for selectList() and selectCursor() (on sub class)
-    protected <ENTITY extends Entity> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
-            Class<ENTITY> entityType) {
-        final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
-        for (String alias : aliasList) { // if derived referrer does not exist, empty loop
-            final Method[] methods = entityType.getMethods();
-            final String expectedName = "set" + Srl.replace(alias, "_", "");
-            boolean exists = false;
-            for (Method method : methods) {
-                final String methodName = method.getName();
-                if (methodName.startsWith("set") && expectedName.equalsIgnoreCase(methodName)) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
-                throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
-            }
-        }
-    }
-
-    protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String alias, Class<?> entityType) {
-        createCBExThrower().throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
-    }
-
     // -----------------------------------------------------
-    //                                       Internal Helper
+    //                                       Result Handling
     //                                       ---------------
-    protected static interface InternalSelectListCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
-    }
-
-    protected <ENTITY extends Entity, CB extends ConditionBean> ListResultBean<ENTITY> helpSelectListInternally(CB cb,
-            Class<ENTITY> entityType, InternalSelectListCallback<ENTITY, CB> callback) {
-        assertCBNotDreamCruise(cb);
-        try {
-            return createListResultBean(cb, callback.callbackSelectList(cb, entityType));
-        } catch (FetchingOverSafetySizeException e) {
-            createBhvExThrower().throwDangerousResultSizeException(cb, e);
-            return null; // unreachable
-        }
-    }
-
-    protected <ENTITY extends Entity> ListResultBean<ENTITY> createListResultBean(ConditionBean cb,
-            List<ENTITY> selectedList) {
-        return new ResultBeanBuilder<ENTITY>(getTableDbName()).buildListResultBean(cb, selectedList);
-    }
-
-    // ===================================================================================
-    //                                                                           Page Read
-    //                                                                           =========
-    /**
-     * {@inheritDoc}
-     */
-    public <ENTITY extends Entity> PagingResultBean<ENTITY> readPage(final ConditionBean cb) {
-        assertCBStateValid(cb);
-        @SuppressWarnings("unchecked")
-        final PagingResultBean<ENTITY> entityList = (PagingResultBean<ENTITY>) doReadPage(cb);
-        return entityList;
-    }
-
-    protected abstract PagingResultBean<? extends Entity> doReadPage(ConditionBean cb);
-
-    // -----------------------------------------------------
-    //                                       Internal Helper
-    //                                       ---------------
-    protected static interface InternalSelectPageCallback<ENTITY extends Entity, CB extends ConditionBean> {
-        int callbackSelectCount(CB cb);
-
-        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
-    }
-
-    protected <ENTITY extends Entity, CB extends ConditionBean> PagingResultBean<ENTITY> helpSelectPageInternally(
-            CB cb, Class<ENTITY> entityType, InternalSelectPageCallback<ENTITY, CB> callback) {
-        assertCBNotDreamCruise(cb);
-        try {
-            final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType, callback);
-            final PagingInvoker<ENTITY> invoker = createPagingInvoker(cb);
-            return invoker.invokePaging(handler);
-        } catch (PagingOverSafetySizeException e) {
-            createBhvExThrower().throwDangerousResultSizeException(cb, e);
-            return null; // unreachable
-        }
-    }
-
-    protected <ENTITY extends Entity, CB extends ConditionBean> PagingHandler<ENTITY> createPagingHandler(final CB cb,
-            final Class<ENTITY> entityType, final InternalSelectPageCallback<ENTITY, CB> callback) {
-        return new PagingHandler<ENTITY>() {
-            public PagingBean getPagingBean() {
-                return cb;
-            }
-
-            public int count() {
-                try {
-                    cb.getSqlClause().makePagingAdjustmentEffective();
-                    return callback.callbackSelectCount(cb);
-                } finally {
-                    cb.getSqlClause().ignorePagingAdjustment();
-                }
-            }
-
-            public List<ENTITY> paging() {
-                try {
-                    cb.getSqlClause().makePagingAdjustmentEffective();
-                    return callback.callbackSelectList(cb, entityType);
-                } finally {
-                    cb.getSqlClause().ignorePagingAdjustment();
-                }
-            }
-        };
-    }
-
-    protected <ENTITY extends Entity, CB extends ConditionBean> PagingInvoker<ENTITY> createPagingInvoker(CB cb) {
-        return cb.createPagingInvoker(getTableDbName());
-    }
-
-    // ===================================================================================
-    //                                                              Entity Result Handling
-    //                                                              ======================
     /**
      * Assert that the entity is not deleted.
      * @param entity Selected entity. (NullAllowed)
@@ -361,8 +234,198 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     // ===================================================================================
-    //                                                                       Scalar Select
-    //                                                                       =============
+    //                                                                           List Read
+    //                                                                           =========
+    /**
+     * {@inheritDoc}
+     */
+    public <ENTITY extends Entity> ListResultBean<ENTITY> readList(ConditionBean cb) {
+        assertCBStateValid(cb);
+        @SuppressWarnings("unchecked")
+        final ListResultBean<ENTITY> entityList = (ListResultBean<ENTITY>) doReadList(cb);
+        return entityList;
+    }
+
+    protected abstract ListResultBean<? extends Entity> doReadList(ConditionBean cb);
+
+    // for selectList() and selectCursor() (on sub class)
+    protected <ENTITY extends Entity> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
+            Class<ENTITY> entityType) {
+        final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
+        for (String alias : aliasList) { // if derived referrer does not exist, empty loop
+            final Method[] methods = entityType.getMethods();
+            final String expectedName = "set" + Srl.replace(alias, "_", "");
+            boolean exists = false;
+            for (Method method : methods) {
+                final String methodName = method.getName();
+                if (methodName.startsWith("set") && expectedName.equalsIgnoreCase(methodName)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
+            }
+        }
+    }
+
+    protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String alias, Class<?> entityType) {
+        createCBExThrower().throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
+    }
+
+    // -----------------------------------------------------
+    //                                       Internal Helper
+    //                                       ---------------
+    protected <ENTITY extends Entity, CB extends ConditionBean> ListResultBean<ENTITY> helpSelectListInternally(CB cb,
+            Class<ENTITY> entityType, InternalSelectListCallback<ENTITY, CB> callback) {
+        assertCBNotDreamCruise(cb);
+        try {
+            return createListResultBean(cb, callback.callbackSelectList(cb, entityType));
+        } catch (FetchingOverSafetySizeException e) {
+            createBhvExThrower().throwDangerousResultSizeException(cb, e);
+            return null; // unreachable
+        }
+    }
+
+    protected static interface InternalSelectListCallback<ENTITY extends Entity, CB extends ConditionBean> {
+        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
+    }
+
+    protected <ENTITY extends Entity> ListResultBean<ENTITY> createListResultBean(ConditionBean cb,
+            List<ENTITY> selectedList) {
+        return new ResultBeanBuilder<ENTITY>(getTableDbName()).buildListResultBean(cb, selectedList);
+    }
+
+    // ===================================================================================
+    //                                                                           Page Read
+    //                                                                           =========
+    /**
+     * {@inheritDoc}
+     */
+    public <ENTITY extends Entity> PagingResultBean<ENTITY> readPage(final ConditionBean cb) {
+        assertCBStateValid(cb);
+        @SuppressWarnings("unchecked")
+        final PagingResultBean<ENTITY> entityList = (PagingResultBean<ENTITY>) doReadPage(cb);
+        return entityList;
+    }
+
+    protected abstract PagingResultBean<? extends Entity> doReadPage(ConditionBean cb);
+
+    // -----------------------------------------------------
+    //                                       Internal Helper
+    //                                       ---------------
+    protected <ENTITY extends Entity, CB extends ConditionBean> PagingResultBean<ENTITY> helpSelectPageInternally(
+            CB cb, Class<ENTITY> entityType, InternalSelectPageCallback<ENTITY, CB> callback) {
+        assertCBNotDreamCruise(cb);
+        try {
+            final PagingHandler<ENTITY> handler = createPagingHandler(cb, entityType, callback);
+            final PagingInvoker<ENTITY> invoker = createPagingInvoker(cb);
+            return invoker.invokePaging(handler);
+        } catch (PagingOverSafetySizeException e) {
+            createBhvExThrower().throwDangerousResultSizeException(cb, e);
+            return null; // unreachable
+        }
+    }
+
+    protected static interface InternalSelectPageCallback<ENTITY extends Entity, CB extends ConditionBean> {
+        int callbackSelectCount(CB cb);
+
+        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
+    }
+
+    protected <ENTITY extends Entity, CB extends ConditionBean> PagingHandler<ENTITY> createPagingHandler(final CB cb,
+            final Class<ENTITY> entityType, final InternalSelectPageCallback<ENTITY, CB> callback) {
+        return new PagingHandler<ENTITY>() {
+            public PagingBean getPagingBean() {
+                return cb;
+            }
+
+            public int count() {
+                try {
+                    cb.getSqlClause().makePagingAdjustmentEffective();
+                    return callback.callbackSelectCount(cb);
+                } finally {
+                    cb.getSqlClause().ignorePagingAdjustment();
+                }
+            }
+
+            public List<ENTITY> paging() {
+                try {
+                    cb.getSqlClause().makePagingAdjustmentEffective();
+                    return callback.callbackSelectList(cb, entityType);
+                } finally {
+                    cb.getSqlClause().ignorePagingAdjustment();
+                }
+            }
+        };
+    }
+
+    protected <ENTITY extends Entity, CB extends ConditionBean> PagingInvoker<ENTITY> createPagingInvoker(CB cb) {
+        return cb.createPagingInvoker(getTableDbName());
+    }
+
+    // ===================================================================================
+    //                                                                         Cursor Read
+    //                                                                         ===========
+    protected <ENTITY extends Entity, CB extends ConditionBean> void helpSelectCursorInternally(CB cb,
+            EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType,
+            InternalSelectCursorCallback<ENTITY, CB> callback) {
+        assertCBNotDreamCruise(cb);
+        final CursorSelectOption option = cb.getCursorSelectOption();
+        if (option != null && option.isByPaging()) {
+            helpSelectCursorHandlingByPaging(cb, entityRowHandler, entityType, callback, option);
+        } else { // basically here
+            callback.callbackSelectCursor(cb, entityRowHandler, entityType);
+        }
+    }
+
+    protected static interface InternalSelectCursorCallback<ENTITY extends Entity, CB extends ConditionBean> {
+        void callbackSelectCursor(CB cb, EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType);
+
+        List<ENTITY> callbackSelectList(CB cb, Class<ENTITY> entityType);
+    }
+
+    protected <ENTITY extends Entity, CB extends ConditionBean> void helpSelectCursorHandlingByPaging(CB cb,
+            EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType,
+            InternalSelectCursorCallback<ENTITY, CB> callback, CursorSelectOption option) {
+        helpSelectCursorCheckingByPagingAllowed(cb, option);
+        helpSelectCursorCheckingOrderByPK(cb, option);
+        final int pageSize = option.getPageSize();
+        int pageNumber = 1;
+        while (true) {
+            cb.paging(pageSize, pageNumber);
+            List<ENTITY> pageList = callback.callbackSelectList(cb, entityType);
+            if (pageList.size() < pageSize) { // means last page
+                break;
+            }
+            for (ENTITY entity : pageList) {
+                entityRowHandler.handle(entity);
+            }
+            ++pageNumber;
+        }
+    }
+
+    protected <CB extends ConditionBean> void helpSelectCursorCheckingByPagingAllowed(CB cb, CursorSelectOption option) {
+        if (!cb.getSqlClause().isCursorSelectByPagingAllowed()) {
+            String msg = "The cursor select by paging is not allowed at the DBMS.";
+            throw new IllegalConditionBeanOperationException(msg);
+        }
+    }
+
+    protected <CB extends ConditionBean> void helpSelectCursorCheckingOrderByPK(CB cb, CursorSelectOption option) {
+        if (option.isOrderByPK()) {
+            final OrderByClause orderByClause = cb.getOrderByComponent();
+            final OrderByElement orderByFirstElement = orderByClause.getOrderByFirstElement();
+            if (orderByFirstElement == null || !orderByFirstElement.getColumnInfo().isPrimary()) {
+                String msg = "The cursor select by paging needs order by primary key: " + cb.getTableDbName();
+                throw new IllegalConditionBeanOperationException(msg);
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                         Scalar Read
+    //                                                                         ===========
     /**
      * The scalar function. <br />
      * This is not static class because this uses the method 'invoke(BehaviorCommand)'

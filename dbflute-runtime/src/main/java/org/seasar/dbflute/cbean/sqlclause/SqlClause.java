@@ -1082,6 +1082,12 @@ public interface SqlClause {
     //                                                               =====================
     void adjustLikeSearchDBWay(LikeSearchOption option);
 
+    // [DBFlute-1.0.3.1]
+    // ===================================================================================
+    //                                                                 CursorSelect Option
+    //                                                                 ===================
+    boolean isCursorSelectByPagingAllowed();
+
     // [DBFlute-0.9.8.4]
     // ===================================================================================
     //                                                                               DBWay

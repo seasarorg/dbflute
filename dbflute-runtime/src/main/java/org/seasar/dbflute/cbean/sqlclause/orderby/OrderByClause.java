@@ -110,18 +110,33 @@ public class OrderByClause implements Serializable {
         getOrderByLastElement().setManualOrderBean(manumalOrderBean);
     }
 
-    public OrderByElement getOrderByLastElement() {
-        if (_orderByList.isEmpty()) {
-            return null;
-        }
-        return _orderByList.get(_orderByList.size() - 1);
-    }
-
     // ===================================================================================
     //                                                                 Order-By Expression
     //                                                                 ===================
     public List<OrderByElement> getOrderByList() {
         return _orderByList;
+    }
+
+    /**
+     * Get the first element of order-by.
+     * @return The order-by element object. (NullAllowed: when no order-by)
+     */
+    public OrderByElement getOrderByFirstElement() {
+        if (_orderByList.isEmpty()) {
+            return null;
+        }
+        return _orderByList.get(0);
+    }
+
+    /**
+     * Get the last element of order-by.
+     * @return The order-by element object. (NullAllowed: when no order-by)
+     */
+    public OrderByElement getOrderByLastElement() {
+        if (_orderByList.isEmpty()) {
+            return null;
+        }
+        return _orderByList.get(_orderByList.size() - 1);
     }
 
     public String getOrderByClause() {
@@ -146,6 +161,9 @@ public class OrderByClause implements Serializable {
         return sb.toString();
     }
 
+    // ===================================================================================
+    //                                                              Order-By Determination
+    //                                                              ======================
     public boolean isSameOrderByColumn(String orderByProperty) {
         final List<String> orderByList = new ArrayList<String>();
         {
@@ -169,9 +187,6 @@ public class OrderByClause implements Serializable {
         return true;
     }
 
-    // ===================================================================================
-    //                                                                       First Element
-    //                                                                       =============
     public boolean isFirstElementAsc() {
         if (isEmpty()) {
             String msg = "This order-by clause is empty: " + toString();

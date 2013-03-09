@@ -29,6 +29,7 @@ import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
+import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
@@ -121,6 +122,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** Does it cache of relation entity instance? {Internal} */
     private boolean _relationMappingCache = true;
+
+    /** The option of cursor select. {Internal} (NullAllowed) */
+    protected CursorSelectOption _cursorSelectOption; // set by sub-class so protected
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -1006,6 +1010,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // ===================================================================================
+    //                                                                       Cursor Select
+    //                                                                       =============
+    /**
+     * {@inheritDoc}
+     */
+    public CursorSelectOption getCursorSelectOption() {
+        return _cursorSelectOption;
+    }
+
+    // ===================================================================================
     //                                                                       Scalar Select
     //                                                                       =============
     /**
@@ -1154,7 +1168,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return getSqlClause().hasOrderByClause();
     }
 
-    // [DBFlute-0.9.6.7]
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
@@ -1202,6 +1215,51 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 break;
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
+        final HpAbstractSpecification<? extends ConditionQuery> localSp = localSp();
+        final String delimiter = ".";
+        Object currentObj = localSp;
+        String remainder = columnNamePath;
+        Class<?> targetType = currentObj.getClass();
+        boolean last = false;
+        while (true) {
+            final int deimiterIndex = remainder.indexOf(delimiter);
+            final String propertyName;
+            if (deimiterIndex < 0) {
+                propertyName = remainder;
+                last = true;
+            } else {
+                propertyName = remainder.substring(0, deimiterIndex);
+                remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
+            }
+            final String methodName = (last ? "column" : "specify") + initCap(propertyName);
+            final Method method = DfReflectionUtil.getPublicMethod(targetType, methodName, new Class<?>[] {});
+            if (method == null) {
+                String msg = "Not found the method for SpecifyColumn:";
+                msg = msg + " columnNamePath=" + columnNamePath;
+                msg = msg + " targetType=" + targetType;
+                msg = msg + " methodName=" + methodName;
+                throw new ConditionInvokingFailureException(msg);
+            }
+            try {
+                currentObj = DfReflectionUtil.invoke(method, currentObj, new Object[] {});
+            } catch (ReflectionFailureException e) {
+                String msg = "Failed to invoke the method:";
+                msg = msg + " columnNamePath=" + columnNamePath;
+                msg = msg + " targetType=" + targetType;
+                msg = msg + " methodName=" + methodName;
+                throw new ConditionInvokingFailureException(msg, e);
+            }
+            if (last) {
+                break;
+            }
+        }
+        return (HpSpecifiedColumn) currentObj;
     }
 
     // ===================================================================================

@@ -21,7 +21,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfTypeUtil.ParseDateException;
 
 /**
  * The date which provides you handy manipulations for Date.
@@ -83,28 +85,56 @@ public class HandyDate implements Serializable {
      * o new HandyDate("date 20010101"): 2001-01-01
      * </pre>
      * @param exp The string expression of the date. (NotNull)
+     * @throws ParseDateExpressionFailureException When it fails to parse the expression.
      */
     public HandyDate(String exp) {
         assertConstructorArgumentNotNull("exp", exp);
-        _cal.setTime(DfTypeUtil.toDate(exp));
+        try {
+            _cal.setTime(DfTypeUtil.toDate(exp));
+        } catch (ParseDateException e) {
+            throwParseDateExpressionFailureException(exp, e);
+        }
     }
 
     /**
      * Construct the handy date by the string expression. <br />
      * e.g. new HandyDate("20010101", "yyyyMMdd"): 2001-01-01 00:00:00.000
      * @param exp The string expression of the date. (NotNull)
-     * @param pattern
+     * @param pattern The pattern to parse as date. (NotNull)
+     * @throws ParseDateExpressionFailureException When it fails to parse the expression.
      */
     public HandyDate(String exp, String pattern) {
         assertConstructorArgumentNotNull("exp", exp);
         assertConstructorArgumentNotNull("pattern", pattern);
-        _cal.setTime(DfTypeUtil.toDate(exp, pattern));
+        try {
+            _cal.setTime(DfTypeUtil.toDate(exp, pattern));
+        } catch (ParseDateException e) {
+            throwParseDateExpressionFailureException(exp, e);
+        }
     }
 
     protected void assertConstructorArgumentNotNull(String name, Object value) {
         if (value == null) {
             String msg = "The argument '" + name + "' should not be null.";
             throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected void throwParseDateExpressionFailureException(String exp, ParseDateException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to parse the expression as date.");
+        br.addItem("Expression");
+        br.addElement(exp);
+        final String msg = br.buildExceptionMessage();
+        throw new ParseDateExpressionFailureException(msg, e);
+    }
+
+    public static class ParseDateExpressionFailureException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public ParseDateExpressionFailureException(String msg, Throwable cause) {
+            super(msg, cause);
         }
     }
 
