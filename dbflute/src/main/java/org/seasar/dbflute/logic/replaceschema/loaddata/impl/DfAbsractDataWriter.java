@@ -40,7 +40,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueException;
 import org.seasar.dbflute.exception.DfLoadDataRegistrationFailureException;
@@ -49,10 +48,12 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlMap;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlMap.LoggingInsertType;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
-import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -126,6 +127,12 @@ public abstract class DfAbsractDataWriter {
     /** The cache map of null type. The key is table name. (ordered for display) */
     protected final Map<String, Map<String, Integer>> _nullTypeCacheMap = StringKeyMap.createAsFlexibleOrdered();
 
+    /** The data-prop of loading control map. (NotNull) */
+    protected final DfLoadingControlMap _loadingControlMap = new DfLoadingControlMap();
+
+    /** The resolver of relative date. (NotNull) */
+    protected final DfRelativeDateResolver _relativeDateResolver = new DfRelativeDateResolver();
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -139,8 +146,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                            Null Value
     //                                            ----------
-    protected boolean processNull(String tableName, String columnName, Object value, PreparedStatement ps,
-            int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+    protected boolean processNull(String dataDirectory, String tableName, String columnName, Object value,
+            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
         if (!isNullValue(value)) {
             return false;
         }
@@ -224,8 +231,9 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                     NotNull NotString
     //                                     -----------------
-    protected boolean processNotNullNotString(String tableName, String columnName, Object obj, Connection conn,
-            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+    protected boolean processNotNullNotString(String dataDirectory, String tableName, String columnName, Object obj,
+            Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+            throws SQLException {
         if (!isNotNullNotString(obj)) {
             return false;
         }
@@ -248,8 +256,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                        NotNull String
     //                                        --------------
-    protected void processNotNullString(File dataFile, String tableName, String columnName, String value,
-            Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+    protected void processNotNullString(String dataDirectory, File dataFile, String tableName, String columnName,
+            String value, Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
             throws SQLException {
         if (value == null) {
             String msg = "This method is only for NotNull and StringExpression:";
@@ -264,8 +272,8 @@ public abstract class DfAbsractDataWriter {
         }
         final StringProcessor processor = cacheMap.get(columnName);
         if (processor != null) { // cache hit
-            final boolean processed = processor.process(dataFile, tableName, columnName, value, conn, ps, bindCount,
-                    columnInfoMap);
+            final boolean processed = processor.process(dataDirectory, dataFile, tableName, columnName, value, conn,
+                    ps, bindCount, columnInfoMap);
             if (!processed) {
                 throwColumnValueProcessingFailureException(processor, tableName, columnName, value);
             }
@@ -273,7 +281,8 @@ public abstract class DfAbsractDataWriter {
         }
         for (StringProcessor tryProcessor : _stringProcessorList) {
             // processing and searching target processor
-            if (tryProcessor.process(dataFile, tableName, columnName, value, conn, ps, bindCount, columnInfoMap)) {
+            if (tryProcessor.process(dataDirectory, dataFile, tableName, columnName, value, conn, ps, bindCount,
+                    columnInfoMap)) {
                 cacheMap.put(columnName, tryProcessor); // use cache next times
                 break;
             }
@@ -304,15 +313,17 @@ public abstract class DfAbsractDataWriter {
     }
 
     public static interface StringProcessor {
-        boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException;
+        boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+                Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+                throws SQLException;
     }
 
     protected class DateStringProcessor implements StringProcessor {
 
-        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
-            return processDate(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
+        public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+                Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+                throws SQLException {
+            return processDate(dataDirectory, tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
 
         @Override
@@ -323,8 +334,9 @@ public abstract class DfAbsractDataWriter {
 
     protected class BooleanStringProcessor implements StringProcessor {
 
-        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+        public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+                Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+                throws SQLException {
             return processBoolean(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
 
@@ -336,8 +348,9 @@ public abstract class DfAbsractDataWriter {
 
     protected class NumberStringProcessor implements StringProcessor {
 
-        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+        public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+                Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+                throws SQLException {
             return processNumber(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
 
@@ -349,8 +362,9 @@ public abstract class DfAbsractDataWriter {
 
     protected class UUIDStringProcessor implements StringProcessor {
 
-        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+        public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+                Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+                throws SQLException {
             return processUUID(tableName, columnName, value, conn, ps, bindCount, columnInfoMap);
         }
 
@@ -362,8 +376,9 @@ public abstract class DfAbsractDataWriter {
 
     protected class ArrayStringProcessor implements StringProcessor {
 
-        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+        public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+                Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+                throws SQLException {
             return processArray(tableName, columnName, value, ps, bindCount, columnInfoMap);
         }
 
@@ -375,8 +390,9 @@ public abstract class DfAbsractDataWriter {
 
     protected class XmlStringProcessor implements StringProcessor {
 
-        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+        public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+                Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+                throws SQLException {
             return processXml(tableName, columnName, value, ps, bindCount, columnInfoMap);
         }
 
@@ -388,8 +404,9 @@ public abstract class DfAbsractDataWriter {
 
     protected class BinaryFileStringProcessor implements StringProcessor {
 
-        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+        public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+                Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+                throws SQLException {
             return processBinary(dataFile, tableName, columnName, value, ps, bindCount, columnInfoMap);
         }
 
@@ -401,8 +418,9 @@ public abstract class DfAbsractDataWriter {
 
     protected class RealStringProcessor implements StringProcessor {
 
-        public boolean process(File dataFile, String tableName, String columnName, String value, Connection conn,
-                PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+        public boolean process(String dataDirectory, File dataFile, String tableName, String columnName, String value,
+                Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+                throws SQLException {
             ps.setString(bindCount, value);
             return true;
         }
@@ -421,26 +439,27 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                                  Date
     //                                                  ----
-    protected boolean processDate(String tableName, String columnName, String value, Connection conn,
-            PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap) throws SQLException {
+    protected boolean processDate(String dataDirectory, String tableName, String columnName, String value,
+            Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap)
+            throws SQLException {
         if (value == null) {
             return false; // basically no way
         }
-        final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
-        if (columnInfo != null) {
-            final Class<?> columnType = getBindType(tableName, columnInfo);
+        final DfColumnMeta columnMeta = columnInfoMap.get(columnName);
+        if (columnMeta != null) {
+            final Class<?> columnType = getBindType(tableName, columnMeta);
             if (columnType != null) {
                 if (!java.util.Date.class.isAssignableFrom(columnType)) {
                     return false;
                 }
-                final String resolved = resolveRelativeDate(tableName, columnName, value); // only when column type specified
+                final String resolved = resolveRelativeSysdate(dataDirectory, tableName, columnName, value); // only when column type specified
                 bindNotNullValueByColumnType(tableName, columnName, conn, ps, bindCount, resolved, columnType);
                 return true;
             }
         }
         // if meta data is not found (basically no way)
         try {
-            Timestamp timestamp = DfTypeUtil.toTimestamp(value);
+            final Timestamp timestamp = DfTypeUtil.toTimestamp(value);
             ps.setTimestamp(bindCount, timestamp);
             return true;
         } catch (ParseTimestampException ignored) {
@@ -455,12 +474,11 @@ public abstract class DfAbsractDataWriter {
         }
     }
 
-    protected String resolveRelativeDate(String tableName, String columnName, String value) {
-        if (!value.startsWith(DfRelativeDateResolver.CURRENT_MARK)) {
-            return value;
+    protected String resolveRelativeSysdate(String dataDirectory, String tableName, String columnName, String value) {
+        if (value.startsWith(DfRelativeDateResolver.CURRENT_MARK)) {
+            return _relativeDateResolver.resolveRelativeSysdate(tableName, columnName, value);
         }
-        final DfRelativeDateResolver resolver = new DfRelativeDateResolver(tableName, columnName);
-        return resolver.resolveRelativeDate(value);
+        return value;
     }
 
     // -----------------------------------------------------
@@ -976,63 +994,8 @@ public abstract class DfAbsractDataWriter {
     }
 
     // ===================================================================================
-    //                                                                    Directory Option
-    //                                                                    ================
-    protected LoggingInsertType getLoggingInsertType(String dataDirectory) {
-        final Map<String, String> loadingControlMap = getLoadingControlMap(dataDirectory);
-        final String prop = loadingControlMap.get("loggingInsertType");
-        if (isSpecifiedValieProperty(prop)) {
-            final String trimmed = prop.trim();
-            if (trimmed.equalsIgnoreCase("all")) {
-                return LoggingInsertType.ALL;
-            } else if (trimmed.equalsIgnoreCase("none")) {
-                return LoggingInsertType.NONE;
-            } else if (trimmed.equalsIgnoreCase("part")) {
-                return LoggingInsertType.PART;
-            } else {
-                String msg = "Unknown property value for loggingInsertType:";
-                msg = msg + " value=" + trimmed + " dataDirectory=" + dataDirectory;
-                throw new DfIllegalPropertySettingException(msg);
-            }
-        }
-        return _loggingInsertSql ? LoggingInsertType.ALL : LoggingInsertType.NONE;
-    }
-
-    protected static enum LoggingInsertType {
-        ALL, NONE, PART
-    }
-
-    protected boolean isMergedSuppressBatchUpdate(String dataDirectory) {
-        final Map<String, String> loadingControlMap = getLoadingControlMap(dataDirectory);
-        final String prop = loadingControlMap.get("isSuppressBatchUpdate");
-        if (isSpecifiedValieProperty(prop)) {
-            return prop.trim().equalsIgnoreCase("true");
-        }
-        return _suppressBatchUpdate;
-    }
-
-    protected Map<String, Map<String, String>> _loadingControlMapMap = DfCollectionUtil.newHashMap();
-
-    protected Map<String, String> getLoadingControlMap(String dataDirectory) {
-        final Map<String, String> cachedMap = _loadingControlMapMap.get(dataDirectory);
-        if (cachedMap != null) {
-            return cachedMap;
-        }
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectory + "/loadingControlMap.dataprop";
-        final Map<String, String> resultMap = reader.readMapAsStringValue(path);
-        final StringKeyMap<String> flmap = StringKeyMap.createAsFlexible();
-        if (resultMap != null && !resultMap.isEmpty()) {
-            flmap.putAll(resultMap);
-        }
-        _loadingControlMapMap.put(dataDirectory, flmap);
-        return _loadingControlMapMap.get(dataDirectory);
-    }
-
-    protected boolean isSpecifiedValieProperty(String prop) {
-        return prop != null && prop.trim().length() > 0 && !prop.trim().equalsIgnoreCase("null");
-    }
-
+    //                                                             Implicit Classification
+    //                                                             =======================
     protected void checkImplicitClassification(File file, String tableDbName, List<String> columnDbNameList,
             Connection conn) throws SQLException {
         if (_suppressCheckImplicitSet) {
@@ -1116,6 +1079,31 @@ public abstract class DfAbsractDataWriter {
         br.addElement(illegalCodeList);
         final String msg = br.buildExceptionMessage();
         throw new DfLoadDataIllegalImplicitClassificationValueException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                    Directory Option
+    //                                                                    ================
+    protected LoggingInsertType getLoggingInsertType(String dataDirectory) {
+        return _loadingControlMap.getLoggingInsertType(dataDirectory, _loggingInsertSql);
+    }
+
+    protected boolean isMergedSuppressBatchUpdate(String dataDirectory) {
+        return _loadingControlMap.isMergedSuppressBatchUpdate(dataDirectory, _suppressBatchUpdate);
+    }
+
+    protected void resolveRelativeDate(String dataDirectory, String tableName, Map<String, Object> columnValueMap,
+            Map<String, DfColumnMeta> columnMetaMap) {
+        final DfColumnBindTypeProvider provider = createBindTypeProvider();
+        _loadingControlMap.resolveRelativeDate(dataDirectory, tableName, columnValueMap, columnMetaMap, provider);
+    }
+
+    protected DfColumnBindTypeProvider createBindTypeProvider() {
+        return new DfColumnBindTypeProvider() {
+            public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
+                return getBindType(tableName, columnMeta);
+            }
+        };
     }
 
     // ===================================================================================

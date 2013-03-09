@@ -63,6 +63,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlMap.LoggingInsertType;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -394,17 +395,16 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final String tableDbName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
-        final Map<String, Object> columnValueMap;
-        {
-            final Map<String, Object> plainMap = columnContainer.getColumnValueMap();
-            if (plainMap.isEmpty()) {
-                throwXlsDataColumnDefFailureException(file, dataTable);
-            }
-            if (isColumnValueAllNull(plainMap)) { // against Excel Devil
-                return false;
-            }
-            columnValueMap = convertColumnValue(tableDbName, resource.getDataDirectory(), plainMap, columnMetaMap);
+        final String dataDirectory = resource.getDataDirectory();
+        final Map<String, Object> columnValueMap = columnContainer.getColumnValueMap();
+        if (columnValueMap.isEmpty()) {
+            throwXlsDataColumnDefFailureException(file, dataTable);
         }
+        if (isColumnValueAllNull(columnValueMap)) { // against Excel Devil
+            return false;
+        }
+        convertColumnValue(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
+        resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
 
         final int rowNumber = dataRow.getRowNumber();
         handleLoggingInsert(tableDbName, columnNameList, columnValueMap, loggingInsertType, rowNumber);
@@ -418,7 +418,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // - - - - - - - - - - - - - - - - - - -
             // Process Null (against Null Headache)
             // - - - - - - - - - - - - - - - - - - -
-            if (processNull(tableDbName, columnName, obj, ps, bindCount, columnMetaMap)) {
+            if (processNull(dataDirectory, tableDbName, columnName, obj, ps, bindCount, columnMetaMap)) {
                 bindCount++;
                 continue;
             }
@@ -428,7 +428,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // - - - - - - - - - - - - - - -
             // If the value is not null and the value has the own type except string,
             // It registers the value to statement by the type.
-            if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap)) {
+            if (processNotNullNotString(dataDirectory, tableDbName, columnName, obj, conn, ps, bindCount, columnMetaMap)) {
                 bindCount++;
                 continue;
             }
@@ -437,7 +437,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             // Process NotNull and StringExpression
             // - - - - - - - - - - - - - - - - - - -
             final String value = (String) obj;
-            processNotNullString(file, tableDbName, columnName, value, conn, ps, bindCount, columnMetaMap);
+            processNotNullString(dataDirectory, file, tableDbName, columnName, value, conn, ps, bindCount,
+                    columnMetaMap);
             bindCount++;
         }
         if (suppressBatchUpdate) {
@@ -534,19 +535,19 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     // ===================================================================================
-    //                                                                Column Value Convert
-    //                                                                ====================
-    protected Map<String, Object> convertColumnValue(String tableName, String dataDirectory,
-            Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap) {
+    //                                                                 Column Value Filter
+    //                                                                 ===================
+    protected void convertColumnValue(String dataDirectory, String tableName, Map<String, Object> columnValueMap,
+            Map<String, DfColumnMeta> columnMetaMap) {
         final Map<String, Map<String, String>> convertValueMap = getConvertValueMap(dataDirectory);
         final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectory);
         final DfColumnValueConverter converter = new DfColumnValueConverter(convertValueMap, defaultValueMap,
                 new DfColumnBindTypeProvider() {
-                    public Class<?> provideBindType(String tableName, DfColumnMeta columnMeta) {
+                    public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
                         return getBindType(tableName, columnMeta);
                     }
                 });
-        return converter.convert(tableName, columnValueMap, columnMetaMap);
+        converter.convert(tableName, columnValueMap, columnMetaMap);
     }
 
     protected void setupDefaultValue(String dataDirectory, final DfDataSet dataSet) {

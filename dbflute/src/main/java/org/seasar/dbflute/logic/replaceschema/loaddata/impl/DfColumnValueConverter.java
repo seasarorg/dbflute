@@ -48,12 +48,10 @@ public class DfColumnValueConverter {
         _bindTypeProvider = bindTypeProvider;
     }
 
-    public Map<String, Object> convert(String tableName, Map<String, Object> columnValueMap,
-            Map<String, DfColumnMeta> columnMetaMap) {
-        final Map<String, Object> resolvedColumnValueMap = new LinkedHashMap<String, Object>();
-        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
+    public void convert(String tableName, Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap) {
+        final Map<String, Object> resolvedMap = new LinkedHashMap<String, Object>();
         final Set<String> convertedSet = new HashSet<String>(1);
-        for (Entry<String, Object> entry : entrySet) {
+        for (Entry<String, Object> entry : columnValueMap.entrySet()) {
             final String columnName = entry.getKey();
             final Object plainValue = entry.getValue();
             Object resolvedValue = resolveConvertValue(tableName, columnName, plainValue, convertedSet, columnMetaMap);
@@ -63,9 +61,11 @@ public class DfColumnValueConverter {
             } else {
                 convertedSet.clear(); // recycle
             }
-            resolvedColumnValueMap.put(columnName, resolvedValue);
+            resolvedMap.put(columnName, resolvedValue);
         }
-        return resolvedColumnValueMap;
+        for (Entry<String, Object> entry : resolvedMap.entrySet()) { // to keep original map instance
+            columnValueMap.put(entry.getKey(), entry.getValue());
+        }
     }
 
     protected Object filterEmptyAsNull(Object value) {
@@ -156,7 +156,7 @@ public class DfColumnValueConverter {
             return null;
         }
         final DfColumnMeta columnMeta = columnMetaMap.get(columnName);
-        final Class<?> boundType = _bindTypeProvider.provideBindType(tableName, columnMeta);
+        final Class<?> boundType = _bindTypeProvider.provide(tableName, columnMeta);
         if (!Timestamp.class.isAssignableFrom(boundType)) {
             return null;
         }

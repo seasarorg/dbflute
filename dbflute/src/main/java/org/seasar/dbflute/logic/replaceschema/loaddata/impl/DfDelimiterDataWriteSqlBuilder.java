@@ -66,15 +66,19 @@ public class DfDelimiterDataWriteSqlBuilder {
     }
 
     public Map<String, Object> setupParameter() {
-        return convertColumnValue(createBasicColumnValueMap());
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> columnValueMap = (Map<String, Object>) ((Object) createBasicColumnValueMap());
+        convertColumnValue(columnValueMap);
+        return columnValueMap;
     }
 
-    protected Map<String, Object> convertColumnValue(Map<String, String> columnValueMap) {
-        final DfColumnValueConverter converter = new DfColumnValueConverter(_convertValueMap, _defaultValueMap,
-                _bindTypeProvider);
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> castMap = (Map<String, Object>) ((Object) columnValueMap); // Oops
-        return converter.convert(_tableDbName, castMap, _columnMetaMap);
+    protected void convertColumnValue(Map<String, Object> columnValueMap) {
+        final DfColumnValueConverter converter = createColumnValueConverter();
+        converter.convert(_tableDbName, columnValueMap, _columnMetaMap);
+    }
+
+    protected DfColumnValueConverter createColumnValueConverter() {
+        return new DfColumnValueConverter(_convertValueMap, _defaultValueMap, _bindTypeProvider);
     }
 
     protected String quoteTableNameIfNeeds(String tableDbName) {
@@ -147,7 +151,7 @@ public class DfDelimiterDataWriteSqlBuilder {
         return _columnMetaMap;
     }
 
-    public void setColumnInfoMap(Map<String, DfColumnMeta> columnMetaMap) {
+    public void setColumnMetaMap(Map<String, DfColumnMeta> columnMetaMap) {
         this._columnMetaMap = columnMetaMap;
     }
 

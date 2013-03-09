@@ -44,6 +44,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlMap.LoggingInsertType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -98,13 +99,13 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
             }
             tableDbName = tmp;
         }
-        final Map<String, DfColumnMeta> columnInfoMap = getColumnMetaMap(tableDbName);
-        if (columnInfoMap.isEmpty()) {
+        final Map<String, DfColumnMeta> columnMetaMap = getColumnMetaMap(tableDbName);
+        if (columnMetaMap.isEmpty()) {
             throwTableNotFoundException(_fileName, tableDbName);
         }
 
         // process before handling table
-        beforeHandlingTable(tableDbName, columnInfoMap);
+        beforeHandlingTable(tableDbName, columnMetaMap);
 
         String lineString = null;
         String preContinueString = null;
@@ -196,14 +197,14 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 // - - - - - - - - - -/
                 final DfDelimiterDataWriteSqlBuilder sqlBuilder = new DfDelimiterDataWriteSqlBuilder();
                 sqlBuilder.setTableDbName(tableDbName);
-                sqlBuilder.setColumnInfoMap(columnInfoMap);
+                sqlBuilder.setColumnMetaMap(columnMetaMap);
                 sqlBuilder.setColumnNameList(columnNameList);
                 sqlBuilder.setValueList(valueList);
                 sqlBuilder.setNotFoundColumnMap(resultInfo.getNotFoundColumnMap());
                 sqlBuilder.setConvertValueMap(_convertValueMap);
                 sqlBuilder.setDefaultValueMap(_defaultValueMap);
                 sqlBuilder.setBindTypeProvider(new DfColumnBindTypeProvider() {
-                    public Class<?> provideBindType(String tableName, DfColumnMeta columnMeta) {
+                    public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
                         return getBindType(tableName, columnMeta);
                     }
                 });
@@ -215,6 +216,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     ps = conn.prepareStatement(executedSql);
                 }
                 final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
+                resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
                 handleLoggingInsert(tableDbName, columnNameList, columnValueMap, loggingInsertType, rowNumber);
 
                 int bindCount = 1;
@@ -226,7 +228,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // /- - - - - - - - - - - - - - - - - -
                     // process Null (against Null Headache)
                     // - - - - - - - - - -/
-                    if (processNull(tableDbName, columnName, obj, ps, bindCount, columnInfoMap)) {
+                    if (processNull(dataDirectory, tableDbName, columnName, obj, ps, bindCount, columnMetaMap)) {
                         bindCount++;
                         continue;
                     }
@@ -236,7 +238,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // - - - - - - - - - -/
                     // If the value is not null and the value has the own type except string,
                     // It registers the value to statement by the type.
-                    if (processNotNullNotString(tableDbName, columnName, obj, conn, ps, bindCount, columnInfoMap)) {
+                    if (processNotNullNotString(dataDirectory, tableDbName, columnName, obj, conn, ps, bindCount,
+                            columnMetaMap)) {
                         bindCount++;
                         continue;
                     }
@@ -245,7 +248,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // process NotNull and StringExpression
                     // - - - - - - - - - -/
                     final String value = (String) obj;
-                    processNotNullString(dataFile, tableDbName, columnName, value, conn, ps, bindCount, columnInfoMap);
+                    processNotNullString(dataDirectory, dataFile, tableDbName, columnName, value, conn, ps, bindCount,
+                            columnMetaMap);
                     bindCount++;
                 }
                 if (isMergedSuppressBatchUpdate(dataDirectory)) {
@@ -320,7 +324,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 }
             }
             // process after (finally) handling table
-            finallyHandlingTable(tableDbName, columnInfoMap);
+            finallyHandlingTable(tableDbName, columnMetaMap);
         }
     }
 

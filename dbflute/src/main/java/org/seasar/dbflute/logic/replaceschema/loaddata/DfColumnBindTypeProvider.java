@@ -23,5 +23,5 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
  */
 public interface DfColumnBindTypeProvider {
 
-    Class<?> provideBindType(String tableName, DfColumnMeta columnMeta);
+    Class<?> provide(String tableName, DfColumnMeta columnMeta);
 }
