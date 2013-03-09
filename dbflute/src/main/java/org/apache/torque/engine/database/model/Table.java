@@ -2962,6 +2962,13 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                                 CursorSelect Option
+    //                                                                 ===================
+    public boolean isCursorSelectOptionAllowed() {
+        return getLittleAdjustmentProperties().isCursorSelectOptionAllowed();
+    }
+
+    // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
     public String getSimpleDtoBaseDtoClassName() {

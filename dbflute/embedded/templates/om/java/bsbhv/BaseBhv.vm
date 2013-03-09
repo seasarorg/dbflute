@@ -161,33 +161,6 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     // ===================================================================================
-    //                                                                       Cursor Select
-    //                                                                       =============
-    /**
-     * Select the cursor by the condition-bean.
-     * <pre>
-     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-     * cb.query().setFoo...(value);
-     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">selectCursor</span>(cb, new EntityRowHandler&lt;${myExtendedObjectClassName}&gt;() {
-     *     public void handle(${myExtendedObjectClassName} entity) {
-     *         ... = entity.getFoo...();
-     *     }
-     * });
-     * </pre>
-     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @param entityRowHandler The handler of entity row of ${myExtendedObjectClassName}. (NotNull)
-     */
-    public void selectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler) {
-        doSelectCursor(cb, entityRowHandler, ${myExtendedObjectClassName}.class);
-    }
-
-    protected <ENTITY extends ${myExtendedObjectClassName}> void doSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
-        assertCBStateValid(cb); assertObjectNotNull("entityRowHandler<${myExtendedObjectClassName}>", entityRowHandler); assertObjectNotNull("entityType", entityType);
-        assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
-        delegateSelectCursor(cb, entityRowHandler, entityType);
-    }
-
-    // ===================================================================================
     //                                                                       Entity Select
     //                                                                       =============
     /**
@@ -211,10 +184,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectEntity(cb, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntity(final ${myConditionBeanClassName} cb, final Class<ENTITY> entityType) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntity(final ${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
         assertCBStateValid(cb);
-        return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb) { return doSelectList(cb, entityType); } });
+        return helpSelectEntityInternally(cb, entityType, new InternalSelectEntityCallback<ENTITY, ${myConditionBeanClassName}>() {
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return doSelectList(cb, entityType); } });
     }
 
     @Override
@@ -240,10 +213,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectEntityWithDeletedCheck(cb, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb, final Class<ENTITY> entityType) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
         assertCBStateValid(cb);
-        return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb) { return doSelectList(cb, entityType); } });
+        return helpSelectEntityWithDeletedCheckInternally(cb, entityType, new InternalSelectEntityWithDeletedCheckCallback<ENTITY, ${myConditionBeanClassName}>() {
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return doSelectList(cb, entityType); } });
     }
 
     @Override
@@ -365,6 +338,36 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     @Override
     protected PagingResultBean<? extends Entity> doReadPage(ConditionBean cb) {
         return selectPage(downcast(cb));
+    }
+
+    // ===================================================================================
+    //                                                                       Cursor Select
+    //                                                                       =============
+    /**
+     * Select the cursor by the condition-bean.
+     * <pre>
+     * ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+     * cb.query().setFoo...(value);
+     * ${myEntityVariableName}Bhv.<span style="color: #FD4747">selectCursor</span>(cb, new EntityRowHandler&lt;${myExtendedObjectClassName}&gt;() {
+     *     public void handle(${myExtendedObjectClassName} entity) {
+     *         ... = entity.getFoo...();
+     *     }
+     * });
+     * </pre>
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @param entityRowHandler The handler of entity row of ${myExtendedObjectClassName}. (NotNull)
+     */
+    public void selectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler) {
+        doSelectCursor(cb, entityRowHandler, ${myExtendedObjectClassName}.class);
+    }
+
+    protected <ENTITY extends ${myExtendedObjectClassName}> void doSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
+        assertCBStateValid(cb); assertObjectNotNull("entityRowHandler<${myExtendedObjectClassName}>", entityRowHandler); assertObjectNotNull("entityType", entityType);
+        assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
+        helpSelectCursorInternally(cb, entityRowHandler, entityType, new InternalSelectCursorCallback<ENTITY, ${myConditionBeanClassName}>() {
+            public void callbackSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) { delegateSelectCursor(cb, entityRowHandler, entityType); }
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return doSelectList(cb, entityType); }
+        });
     }
 
     // ===================================================================================

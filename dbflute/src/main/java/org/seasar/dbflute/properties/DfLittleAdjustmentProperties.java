@@ -453,6 +453,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getProperty("cursorSelectFetchSize", null);
     }
 
+    public boolean isCursorSelectOptionAllowed() {
+        // because this option is patch for MySQL's poor cursor select
+        return getBasicProperties().isDatabaseMySQL() && isCursorSelectFetchSizeIntegerMinValue();
+    }
+
+    protected boolean isCursorSelectFetchSizeIntegerMinValue() {
+        if (!isCursorSelectFetchSizeValid()) {
+            return false;
+        }
+        return "Integer.MIN_VALUE".equals(getCursorSelectFetchSize());
+    }
+
     // ===================================================================================
     //                                                                        Query Update
     //                                                                        ============

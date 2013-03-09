@@ -708,6 +708,15 @@ public class ${myClassName} extends AbstractConditionBean {
     public void orScopeQueryAndPart(AndQuery<${myConditionBeanClassName}> andQuery) {
         xorSQAP((${myConditionBeanClassName})this, andQuery);
     }
+#if ($table.isCursorSelectOptionAllowed())
+
+    // ===================================================================================
+    //                                                                       Cursor Select
+    //                                                                       =============
+    public void customizeCursorSelect(CursorSelectOption cursorSelectOption) {
+        _cursorSelectOption = cursorSelectOption;
+    }
+#end
 
     // ===================================================================================
     //                                                                          DisplaySQL
