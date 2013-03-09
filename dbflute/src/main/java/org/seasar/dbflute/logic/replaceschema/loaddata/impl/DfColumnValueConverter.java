@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
+import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
@@ -240,7 +241,7 @@ public class DfColumnValueConverter {
             return null; // empty is treated as null
         }
         if (defaultValue.equalsIgnoreCase("sysdate")) {
-            resolvedValue = new Timestamp(System.currentTimeMillis());
+            resolvedValue = DBFluteSystem.currentTimestamp();
         } else {
             resolvedValue = defaultValue;
         }

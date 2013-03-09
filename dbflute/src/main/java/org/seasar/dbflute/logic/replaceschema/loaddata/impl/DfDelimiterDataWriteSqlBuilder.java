@@ -25,6 +25,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfDefaultValueProp;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
@@ -45,6 +46,8 @@ public class DfDelimiterDataWriteSqlBuilder {
     protected DfColumnBindTypeProvider _bindTypeProvider;
     protected Map<String, String> _basicColumnValueMap;
     protected Map<String, String> _allColumnConvertMap;
+    protected DfDefaultValueProp _defaultValueProp;
+    protected Set<String> _sysdateColumnSet;
 
     // ===================================================================================
     //                                                                           Build SQL
@@ -68,8 +71,13 @@ public class DfDelimiterDataWriteSqlBuilder {
     public Map<String, Object> setupParameter() {
         @SuppressWarnings("unchecked")
         final Map<String, Object> columnValueMap = (Map<String, Object>) ((Object) createBasicColumnValueMap());
+        saveSysdateColumnSet(columnValueMap); // for relative date
         convertColumnValue(columnValueMap);
         return columnValueMap;
+    }
+
+    protected void saveSysdateColumnSet(Map<String, Object> columnValueMap) { // should be called before convert
+        _sysdateColumnSet = _defaultValueProp.extractSysdateColumnSet(columnValueMap, _defaultValueMap);
     }
 
     protected void convertColumnValue(Map<String, Object> columnValueMap) {
@@ -209,5 +217,17 @@ public class DfDelimiterDataWriteSqlBuilder {
 
     public void setBindTypeProvider(DfColumnBindTypeProvider bindTypeProvider) {
         this._bindTypeProvider = bindTypeProvider;
+    }
+
+    public DfDefaultValueProp getDefaultValueProp() {
+        return _defaultValueProp;
+    }
+
+    public void setDefaultValueProp(DfDefaultValueProp defaultValueProp) {
+        this._defaultValueProp = defaultValueProp;
+    }
+
+    public Set<String> getSysdateColumnSet() {
+        return _sysdateColumnSet;
     }
 }

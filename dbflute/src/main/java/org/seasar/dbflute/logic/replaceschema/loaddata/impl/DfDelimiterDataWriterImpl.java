@@ -44,7 +44,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataWriter;
-import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlMap.LoggingInsertType;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -211,6 +211,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         return getBindType(tableName, columnMeta);
                     }
                 });
+                sqlBuilder.setDefaultValueProp(_defaultValueProp);
                 if (conn == null) {
                     conn = _dataSource.getConnection();
                 }
@@ -219,7 +220,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     ps = conn.prepareStatement(executedSql);
                 }
                 final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
-                resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
+                final Set<String> sysdateColumnSet = sqlBuilder.getSysdateColumnSet();
+                resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap, sysdateColumnSet);
                 handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
 
                 int bindCount = 1;

@@ -63,7 +63,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
-import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlMap.LoggingInsertType;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -426,8 +426,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         if (isColumnValueAllNull(columnValueMap)) { // against Excel Devil
             return false;
         }
+        final Set<String> sysdateColumnSet = extractSysdateColumnSet(dataDirectory, columnValueMap);
         convertColumnValue(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
-        resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
+        resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap, sysdateColumnSet);
 
         final int rowNumber = dataRow.getRowNumber();
         handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
@@ -494,6 +495,11 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
         final String msg = br.buildExceptionMessage();
         throw new DfXlsDataEmptyColumnDefException(msg);
+    }
+
+    protected Set<String> extractSysdateColumnSet(String dataDirectory, Map<String, Object> columnValueMap) { // should be called before convert
+        final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectory);
+        return _defaultValueProp.extractSysdateColumnSet(columnValueMap, defaultValueMap);
     }
 
     protected boolean isColumnValueAllNull(Map<String, Object> plainMap) { // default columns should not be contained

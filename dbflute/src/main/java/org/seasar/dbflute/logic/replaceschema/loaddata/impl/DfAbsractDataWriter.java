@@ -31,6 +31,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.sql.DataSource;
@@ -49,8 +50,9 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
-import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlMap;
-import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlMap.LoggingInsertType;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfDefaultValueProp;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
@@ -127,8 +129,11 @@ public abstract class DfAbsractDataWriter {
     /** The cache map of null type. The key is table name. (ordered for display) */
     protected final Map<String, Map<String, Integer>> _nullTypeCacheMap = StringKeyMap.createAsFlexibleOrdered();
 
+    /** The data-prop of default value map. (NotNull) */
+    protected final DfDefaultValueProp _defaultValueProp = new DfDefaultValueProp();
+
     /** The data-prop of loading control map. (NotNull) */
-    protected final DfLoadingControlMap _loadingControlMap = new DfLoadingControlMap();
+    protected final DfLoadingControlProp _loadingControlProp = new DfLoadingControlProp();
 
     /** The resolver of relative date. (NotNull) */
     protected final DfRelativeDateResolver _relativeDateResolver = new DfRelativeDateResolver();
@@ -1084,27 +1089,27 @@ public abstract class DfAbsractDataWriter {
     //                                                                     Loading Control
     //                                                                     ===============
     protected LoggingInsertType getLoggingInsertType(String dataDirectory) {
-        return _loadingControlMap.getLoggingInsertType(dataDirectory, _loggingInsertSql);
+        return _loadingControlProp.getLoggingInsertType(dataDirectory, _loggingInsertSql);
     }
 
     protected boolean isMergedSuppressBatchUpdate(String dataDirectory) {
-        return _loadingControlMap.isMergedSuppressBatchUpdate(dataDirectory, _suppressBatchUpdate);
+        return _loadingControlProp.isMergedSuppressBatchUpdate(dataDirectory, _suppressBatchUpdate);
     }
 
     protected boolean isCheckColumnDefExistence(String dataDirectory) {
-        return _loadingControlMap.isCheckColumnDefExistence(dataDirectory);
+        return _loadingControlProp.isCheckColumnDefExistence(dataDirectory);
     }
 
     protected void checkColumnDefExistence(String dataDirectory, File dataFile, String tableName,
             List<String> columnDefNameList, Map<String, DfColumnMeta> columnMetaMap) {
-        _loadingControlMap
-                .checkColumnDefExistence(dataDirectory, dataFile, tableName, columnDefNameList, columnMetaMap);
+        _loadingControlProp.checkColumnDefExistence(dataDirectory, dataFile, tableName, columnDefNameList,
+                columnMetaMap);
     }
 
     protected void resolveRelativeDate(String dataDirectory, String tableName, Map<String, Object> columnValueMap,
-            Map<String, DfColumnMeta> columnMetaMap) {
-        final DfColumnBindTypeProvider provider = createBindTypeProvider();
-        _loadingControlMap.resolveRelativeDate(dataDirectory, tableName, columnValueMap, columnMetaMap, provider);
+            Map<String, DfColumnMeta> columnMetaMap, Set<String> sysdateColumnSet) {
+        _loadingControlProp.resolveRelativeDate(dataDirectory, tableName, columnValueMap, columnMetaMap,
+                sysdateColumnSet, createBindTypeProvider());
     }
 
     protected DfColumnBindTypeProvider createBindTypeProvider() {

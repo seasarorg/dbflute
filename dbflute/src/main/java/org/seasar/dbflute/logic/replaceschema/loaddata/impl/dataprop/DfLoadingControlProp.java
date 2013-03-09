@@ -1,3 +1,18 @@
+/*
+ * Copyright 2004-2013 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop;
 
 import java.io.File;
@@ -8,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,13 +44,14 @@ import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
+ * @since 1.0.4 (2013/03/09 Saturday)
  */
-public class DfLoadingControlMap {
+public class DfLoadingControlProp {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfLoadingControlMap.class);
+    private static final Log _log = LogFactory.getLog(DfLoadingControlProp.class);
     protected static final String PROP_DATE_ADJUSTMENT_MAP = "dateAdjustmentMap";
     protected static final String KEY_ALL_MARK = "$$ALL$$";
     protected static final String KEY_ORIGIN_DATE = "df:originDate";
@@ -134,15 +151,19 @@ public class DfLoadingControlMap {
     //                                                                     Date Adjustment
     //                                                                     ===============
     public void resolveRelativeDate(String dataDirectory, String tableName, Map<String, Object> columnValueMap,
-            Map<String, DfColumnMeta> columnMetaMap, DfColumnBindTypeProvider bindTypeProvider) {
+            Map<String, DfColumnMeta> columnMetaMap, Set<String> sysdateColumnSet,
+            DfColumnBindTypeProvider bindTypeProvider) {
         if (!hasDateAdjustment(dataDirectory, tableName)) {
             return;
         }
         final Map<String, Object> resolvedMap = new HashMap<String, Object>();
         for (Entry<String, Object> entry : columnValueMap.entrySet()) {
             final String columnName = entry.getKey();
+            if (isSysdateColumn(sysdateColumnSet, columnName)) { // keep sysdate as default value
+                continue;
+            }
             final Object value = entry.getValue();
-            if (!(value instanceof String) && !(value instanceof java.util.Date)) {
+            if (isNotDateValue(value)) {
                 continue;
             }
             if (!hasDateAdjustmentExp(dataDirectory, tableName, columnName)) {
@@ -150,7 +171,7 @@ public class DfLoadingControlMap {
             }
             final DfColumnMeta columnMeta = columnMetaMap.get(columnName);
             final Class<?> bindType = bindTypeProvider.provide(tableName, columnMeta);
-            if (bindType == null || !java.util.Date.class.isAssignableFrom(bindType)) {
+            if (isUnknownOrNotDateBindType(bindType)) {
                 continue;
             }
             final String strValue = DfTypeUtil.toString(value, DfRelativeDateResolver.RESOLVED_PATTERN);
@@ -170,15 +191,33 @@ public class DfLoadingControlMap {
         return adjustmentMap.containsKey(tableName) || adjustmentMap.containsKey(KEY_ALL_MARK);
     }
 
+    protected boolean isSysdateColumn(Set<String> sysdateColumnSet, String columnName) {
+        return sysdateColumnSet != null && sysdateColumnSet.contains(columnName);
+    }
+
+    protected boolean isNotDateValue(Object value) {
+        return !(value instanceof String) && !(value instanceof java.util.Date);
+    }
+
     protected boolean hasDateAdjustmentExp(String dataDirectory, String tableName, String columnName) { // second check
         return getDateAdjustmentExp(dataDirectory, tableName, columnName) != null;
     }
 
+    protected boolean isUnknownOrNotDateBindType(Class<?> bindType) {
+        return bindType == null || !java.util.Date.class.isAssignableFrom(bindType);
+    }
+
+    // -----------------------------------------------------
+    //                                           Adjust Date
+    //                                           -----------
     protected String adjustDateIfNeeds(String dataDirectory, String tableName, String columnName, String value) {
         if (value == null || value.trim().length() == 0) { // basically no way (already checked)
             return value;
         }
         if (value.startsWith(DfRelativeDateResolver.CURRENT_MARK)) { // resolved later
+            return value;
+        }
+        if (value.equals("sysdate")) { // basically no way (might be default value!?)
             return value;
         }
         final Map<String, Object> dateAdjustmentMap = getDateAdjustmentMap(dataDirectory);
@@ -363,17 +402,17 @@ public class DfLoadingControlMap {
         _log.info("map:{");
         for (Entry<String, Object> entry : analyzedMap.entrySet()) {
             if (PROP_DATE_ADJUSTMENT_MAP.equals(entry.getKey())) {
-                _log.info("  " + entry.getKey() + " = map:{");
+                _log.info("    " + entry.getKey() + " = map:{");
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> adjustmentMap = (Map<String, Object>) entry.getValue();
                 for (Entry<String, Object> adjustmentEntry : adjustmentMap.entrySet()) {
                     final String filteredValue = filterLoggingValue(adjustmentEntry.getValue());
-                    _log.info("    " + adjustmentEntry.getKey() + " = " + filteredValue);
+                    _log.info("        " + adjustmentEntry.getKey() + " = " + filteredValue);
                 }
-                _log.info("  }");
+                _log.info("    }");
             } else {
                 final String filteredValue = filterLoggingValue(entry.getValue());
-                _log.info("  " + entry.getKey() + " = " + filteredValue);
+                _log.info("    " + entry.getKey() + " = " + filteredValue);
             }
         }
         _log.info("}");
