@@ -70,6 +70,10 @@ public class HandyDateTest extends PlainTestCase {
         assertEquals(handy("2011/11/17 12:34:56.999"), handy(targetExp).moveToSecondTerminal());
         assertEquals(handy("2011/11/17 12:34:56.000"), handy(targetExp).moveToMillisecond(0));
         assertEquals(handy("2011/11/17 12:34:56.999"), handy(targetExp).moveToMillisecond(999));
+
+        assertEquals(handy("2013/06/03 00:00:00.000"), handy("2013/06/15 23:59:59.999").moveToMonthFirstWeekdayJust());
+        assertEquals(handy("2013/03/29 23:59:59.999"), handy("2013/03/015 12:13:59.123")
+                .moveToMonthLastWeekdayTerminal());
     }
 
     public void test_moveTo_begin() throws Exception {
@@ -348,9 +352,12 @@ public class HandyDateTest extends PlainTestCase {
     //                                          ------------
     public void test_isYear_basic() throws Exception {
         assertTrue(handy("2011/01/01 00:00:00").isYear(2011));
+        assertFalse(handy("2011/01/01 00:00:00").isYear(2012));
         assertTrue(handy("BC2011/01/01 00:00:00").isYear(-2011));
         assertTrue(handy("AD2011/01/01 00:00:00").isYear_AnnoDomini());
         assertTrue(handy("BC2011/01/01 00:00:00").isYear_BeforeChrist());
+        assertTrue(handy("2011/01/01 00:00:00").isYearSameAs(toDate("2011/03/03 12:34:45")));
+        assertFalse(handy("2011/01/01 00:00:00").isYearSameAs(toDate("2012/03/03 12:34:45")));
     }
 
     // -----------------------------------------------------
@@ -360,6 +367,10 @@ public class HandyDateTest extends PlainTestCase {
         assertTrue(handy("2011/01/01 00:00:00").isMonth(1));
         assertTrue(handy("2011/02/01 00:00:00").isMonth(2));
         assertTrue(handy("2011/03/01 00:00:00").isMonth(3));
+        assertFalse(handy("2011/03/01 00:00:00").isMonth(1));
+        assertTrue(handy("2011/01/01 00:00:00").isMonthSameAs(toDate("2011/01/03 12:34:45")));
+        assertTrue(handy("2011/01/01 00:00:00").isMonthSameAs(toDate("2013/01/03 12:34:45")));
+        assertFalse(handy("2011/01/01 00:00:00").isMonthSameAs(toDate("2012/03/03 12:34:45")));
     }
 
     // -----------------------------------------------------
@@ -377,6 +388,55 @@ public class HandyDateTest extends PlainTestCase {
         assertFalse(handy("2011/03/14 00:00:00").isDay_MonthLastDay());
         assertFalse(handy("2011/03/30 00:00:00").isDay_MonthLastDay());
         assertTrue(handy("2011/03/31 00:00:00").isDay_MonthLastDay());
+        assertTrue(handy("2011/01/01 00:00:00").isDaySameAs(toDate("2011/01/01 12:34:45")));
+        assertTrue(handy("2011/01/01 00:00:00").isDaySameAs(toDate("2012/04/01 12:34:45")));
+        assertFalse(handy("2011/01/01 00:00:00").isDaySameAs(toDate("2011/01/03 12:34:45")));
+    }
+
+    // -----------------------------------------------------
+    //                                          Confirm Week
+    //                                          ------------
+    public void test_isWeek_basic() throws Exception {
+        assertTrue(handy("2013/03/01 00:00:00").isWeek_DayOfWeek6th_Friday());
+        assertTrue(handy("2013/03/02 00:00:00").isWeek_DayOfWeek7th_Saturday());
+        assertTrue(handy("2013/03/03 00:00:00").isWeek_DayOfWeek1st_Sunday());
+        assertTrue(handy("2013/03/04 00:00:00").isWeek_DayOfWeek2nd_Monday());
+        assertTrue(handy("2013/03/05 00:00:00").isWeek_DayOfWeek3rd_Tuesday());
+        assertTrue(handy("2013/03/06 00:00:00").isWeek_DayOfWeek4th_Wednesday());
+        assertTrue(handy("2013/03/07 00:00:00").isWeek_DayOfWeek5th_Thursday());
+        assertTrue(handy("2013/03/08 00:00:00").isWeek_DayOfWeek6th_Friday());
+        assertTrue(handy("2013/03/09 00:00:00").isWeek_DayOfWeek7th_Saturday());
+    }
+
+    // ===================================================================================
+    //                                                                     Calculate Parts
+    //                                                                     ===============
+    public void test_calculateDistanceYears() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateDistanceYears(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/07").calculateDistanceYears(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/07").calculateDistanceYears(toDate("2013/04/03")));
+        assertEquals(-1, handy("2013/03/07").calculateDistanceYears(toDate("2012/01/03")));
+        assertEquals(1, handy("2013/03/07").calculateDistanceYears(toDate("2014/01/03")));
+        assertEquals(7, handy("2013/03/07").calculateDistanceYears(toDate("2020/01/03")));
+    }
+
+    public void test_calculateDistanceMonths() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateDistanceMonths(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/07").calculateDistanceMonths(toDate("2013/03/03")));
+        assertEquals(1, handy("2013/03/07").calculateDistanceMonths(toDate("2013/04/03")));
+        assertEquals(-2, handy("2013/03/07").calculateDistanceMonths(toDate("2013/01/03")));
+        assertEquals(10, handy("2013/03/07").calculateDistanceMonths(toDate("2014/01/03")));
+    }
+
+    public void test_calculateDistanceDays() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateDistanceDays(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/03").calculateDistanceDays(toDate("2013/03/03 12:34:56")));
+        assertEquals(-4, handy("2013/03/07").calculateDistanceDays(toDate("2013/03/03")));
+        assertEquals(-35, handy("2013/04/07").calculateDistanceDays(toDate("2013/03/03")));
+        assertEquals(4, handy("2013/03/03").calculateDistanceDays(toDate("2013/03/07")));
+        assertEquals(35, handy("2013/03/03").calculateDistanceDays(toDate("2013/04/07")));
+        assertEquals(365, handy("2013/03/03").calculateDistanceDays(toDate("2014/03/03")));
+        assertEquals(400, handy("2013/03/03").calculateDistanceDays(toDate("2014/04/07")));
     }
 
     // ===================================================================================

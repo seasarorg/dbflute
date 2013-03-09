@@ -361,6 +361,36 @@ public class HandyDate implements Serializable {
         return this;
     }
 
+    /**
+     * Move to the first weekday just of the month. <br />
+     * e.g. moveToMonthFirstWeekdayJust(): 2013/06/10 12:34:56.789 to 2013/06/<span style="color: #FD4747">03 00:00:00:000</span>
+     * @return this. (NotNull)
+     */
+    public HandyDate moveToMonthFirstWeekdayJust() {
+        moveToMonthJust();
+        if (isWeek_DayOfWeek1st_Sunday()) {
+            addDay(1);
+        } else if (isWeek_DayOfWeek7th_Saturday()) {
+            addDay(2);
+        }
+        return this;
+    }
+
+    /**
+     * Move to the terminal of the month last weekday. <br />
+     * e.g. moveToMonthWeekdayTerminal(): 2013/03/10 12:34:56.789 to 2013/03/<span style="color: #FD4747">29 23:59:59.999</span>
+     * @return this. (NotNull)
+     */
+    public HandyDate moveToMonthLastWeekdayTerminal() {
+        moveToMonthTerminal();
+        if (isWeek_DayOfWeek1st_Sunday()) {
+            addDay(-2);
+        } else if (isWeek_DayOfWeek7th_Saturday()) {
+            addDay(-1);
+        }
+        return this;
+    }
+
     // -----------------------------------------------------
     //                                           Move-to Day
     //                                           -----------
@@ -1140,6 +1170,28 @@ public class HandyDate implements Serializable {
     }
 
     /**
+     * Is the year of this date same as the year of the specified date? <br />
+     * e.g. if 2011/11/27, isYearSameAs(toDate("2011/01/01")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isYearSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        return getYear() == new HandyDate(date).getYear();
+    }
+
+    /**
+     * Is the year of this date same as the year of the specified date? <br />
+     * e.g. if 2011/11/27, isYearSameAs(new HandyDate("2011/01/01")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isYearSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return getYear() == handyDate.getYear();
+    }
+
+    /**
      * Is the year of this date Anno Domini? <br />
      * e.g. 2011/11/27: true, BC982/11/27: false
      * @return The determination, true or false.
@@ -1170,50 +1222,143 @@ public class HandyDate implements Serializable {
         return getMonthAsOneOrigin() == month; // zero origin headache
     }
 
+    /**
+     * Is the year and month of this date same as the year and month of the specified date? <br />
+     * e.g. if 2011/11/27, isMonthOfYearSameAs(toDate("2011/11/01")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthOfYearSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        final HandyDate handyDate = new HandyDate(date);
+        return getYear() == handyDate.getYear() && getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
+    }
+
+    /**
+     * Is the year and month of this date same as the year and month of the specified date? <br />
+     * e.g. if 2011/11/27, isMonthOfYearSameAs(new HandyDate("2011/11/01")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthOfYearSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return getYear() == handyDate.getYear() && getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
+    }
+
+    /**
+     * Is the month of this date same as the month of the specified date? <br />
+     * e.g. if 2011/11/27, isMonthSameAs(toDate("2013/11/01")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        return getMonthAsOneOrigin() == new HandyDate(date).getMonthAsOneOrigin();
+    }
+
+    /**
+     * Is the month of this date same as the month of the specified date? <br />
+     * e.g. if 2011/11/27, isMonthSameAs(new HandyDate("2013/11/01")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
+    }
+
+    /**
+     * Is the month January?
+     * @return The determination, true or false.
+     */
     public boolean isMonth01_January() {
         return isMonth(1);
     }
 
+    /**
+     * Is the month February?
+     * @return The determination, true or false.
+     */
     public boolean isMonth02_February() {
         return isMonth(2);
     }
 
+    /**
+     * Is the month March?
+     * @return The determination, true or false.
+     */
     public boolean isMonth03_March() {
         return isMonth(3);
     }
 
+    /**
+     * Is the month April?
+     * @return The determination, true or false.
+     */
     public boolean isMonth04_April() {
         return isMonth(4);
     }
 
+    /**
+     * Is the month May?
+     * @return The determination, true or false.
+     */
     public boolean isMonth05_May() {
         return isMonth(5);
     }
 
+    /**
+     * Is the month June?
+     * @return The determination, true or false.
+     */
     public boolean isMonth06_June() {
         return isMonth(6);
     }
 
+    /**
+     * Is the month July?
+     * @return The determination, true or false.
+     */
     public boolean isMonth07_July() {
         return isMonth(7);
     }
 
+    /**
+     * Is the month August?
+     * @return The determination, true or false.
+     */
     public boolean isMonth08_August() {
         return isMonth(8);
     }
 
+    /**
+     * Is the month September?
+     * @return The determination, true or false.
+     */
     public boolean isMonth09_September() {
         return isMonth(9);
     }
 
+    /**
+     * Is the month October?
+     * @return The determination, true or false.
+     */
     public boolean isMonth10_October() {
         return isMonth(10);
     }
 
+    /**
+     * Is the month November?
+     * @return The determination, true or false.
+     */
     public boolean isMonth11_November() {
         return isMonth(11);
     }
 
+    /**
+     * Is the month December?
+     * @return The determination, true or false.
+     */
     public boolean isMonth12_December() {
         return isMonth(12);
     }
@@ -1229,6 +1374,57 @@ public class HandyDate implements Serializable {
      */
     public boolean isDay(int day) {
         return getDay() == day;
+    }
+
+    /**
+     * Is the date of this date same as the date of the specified date? <br />
+     * e.g. if 2011/11/27 00:00:00, isDaySameAs(toDate("2011/11/27 12:34:56")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDayOfDateSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        final HandyDate handyDate = new HandyDate(date);
+        final int year = handyDate.getYear();
+        final int month = handyDate.getMonthAsOneOrigin();
+        final int day = handyDate.getDay();
+        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day;
+    }
+
+    /**
+     * Is the date of this date same as the date of the specified date? <br />
+     * e.g. if 2011/11/27 00:00:00, isDaySameAs(new HandyDate("2011/11/27 12:34:56")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDayOfDateSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        final int year = handyDate.getYear();
+        final int month = handyDate.getMonthAsOneOrigin();
+        final int day = handyDate.getDay();
+        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day;
+    }
+
+    /**
+     * Is the day of this date same as the day of the specified date? <br />
+     * e.g. if 2011/11/27, isDaySameAs(toDate("2013/09/27")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDaySameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        return getDay() == new HandyDate(date).getDay();
+    }
+
+    /**
+     * Is the day of this date same as the day of the specified date? <br />
+     * e.g. if 2011/11/27, isDaySameAs(new HandyDate("2013/09/27")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDaySameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return getDay() == handyDate.getDay();
     }
 
     /**
@@ -1259,6 +1455,154 @@ public class HandyDate implements Serializable {
      */
     public boolean isDay_MonthLastDay() {
         return isDay(_cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+    }
+
+    // -----------------------------------------------------
+    //                                          Confirm Week
+    //                                          ------------
+    /**
+     * Is the day of week Sunday?
+     * @return The determination, true or false.
+     */
+    public boolean isWeek_DayOfWeek1st_Sunday() {
+        return getDayOfWeek() == Calendar.SUNDAY;
+    }
+
+    /**
+     * Is the day of week Monday?
+     * @return The determination, true or false.
+     */
+    public boolean isWeek_DayOfWeek2nd_Monday() {
+        return getDayOfWeek() == Calendar.MONDAY;
+    }
+
+    /**
+     * Is the day of week Tuesday?
+     * @return The determination, true or false.
+     */
+    public boolean isWeek_DayOfWeek3rd_Tuesday() {
+        return getDayOfWeek() == Calendar.TUESDAY;
+    }
+
+    /**
+     * Is the day of week Wednesday?
+     * @return The determination, true or false.
+     */
+    public boolean isWeek_DayOfWeek4th_Wednesday() {
+        return getDayOfWeek() == Calendar.WEDNESDAY;
+    }
+
+    /**
+     * Is the day of week Thursday?
+     * @return The determination, true or false.
+     */
+    public boolean isWeek_DayOfWeek5th_Thursday() {
+        return getDayOfWeek() == Calendar.THURSDAY;
+    }
+
+    /**
+     * Is the day of week Friday?
+     * @return The determination, true or false.
+     */
+    public boolean isWeek_DayOfWeek6th_Friday() {
+        return getDayOfWeek() == Calendar.FRIDAY;
+    }
+
+    /**
+     * Is the day of week Saturday?
+     * @return The determination, true or false.
+     */
+    public boolean isWeek_DayOfWeek7th_Saturday() {
+        return getDayOfWeek() == Calendar.SATURDAY;
+    }
+
+    // ===================================================================================
+    //                                                                     Calculate Parts
+    //                                                                     ===============
+    /**
+     * Calculate year distance between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/03/03(this) and 2014/03/03(argument): 1
+     *  2014/03/03(this) and 2012/03/03(argument): -2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of year as distance between the two date. (MinusAllowed)
+     */
+    public int calculateDistanceYears(Date date) {
+        assertArgumentNotNull("date", date);
+        if (isYearSameAs(date)) {
+            return 0;
+        }
+        final HandyDate you = new HandyDate(date);
+        return you.getYear() - getYear();
+    }
+
+    /**
+     * Calculate month distance between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/03/03(this) and 2013/04/03(argument): 1
+     *  2013/03/03(this) and 2013/01/03(argument): -2
+     *  2013/03/03(this) and 2014/01/03(argument): 10
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of month as distance between the two date. (MinusAllowed)
+     */
+    public int calculateDistanceMonths(Date date) {
+        assertArgumentNotNull("date", date);
+        if (isMonthOfYearSameAs(date)) {
+            return 0;
+        }
+        final HandyDate you = new HandyDate(date);
+        final boolean greater = isGreaterThan(date);
+        int countMonths = 0;
+        while (true) {
+            if (isMonthOfYearSameAs(you)) {
+                break;
+            }
+            final boolean sameAs = isYearSameAs(you);
+            final int baseMonths = sameAs ? getMonthAsOneOrigin() : (greater ? 12 : 1);
+            final int adjustmentMonths = sameAs ? 0 : (greater ? 1 : -1);
+            final int plusMonths = baseMonths - you.getMonthAsOneOrigin() + adjustmentMonths;
+            you.addMonth(plusMonths);
+            countMonths = countMonths + plusMonths;
+        }
+        return -1 * countMonths; // -1 for greater: plus, less: minus
+    }
+
+    /**
+     * Calculate day distance between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03(this) and 2013/03/07(argument): 4
+     *  2013/03/03(this) and 2013/04/07(argument): 35
+     *  2013/04/07(this) and 2013/03/03(argument): -35
+     *  2013/03/03(this) and 2014/03/03(argument): 365
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of day as distance between the two date. (MinusAllowed)
+     */
+    public int calculateDistanceDays(Date date) {
+        assertArgumentNotNull("date", date);
+        if (isDayOfDateSameAs(date)) {
+            return 0;
+        }
+        final HandyDate you = new HandyDate(date);
+        final boolean greater = isGreaterThan(date);
+        int countDays = 0;
+        while (true) {
+            if (isDayOfDateSameAs(you)) {
+                break;
+            }
+            final boolean sameAs = isMonthOfYearSameAs(you);
+            final int baseDays = sameAs ? getDay() : (greater ? you.getLastDayOfMonth() : you.getFirstDayOfMonth());
+            final int adjustmentDays = sameAs ? 0 : (greater ? 1 : -1);
+            final int plusDays = baseDays - you.getDay() + adjustmentDays;
+            you.addDay(plusDays);
+            countDays = countDays + plusDays;
+        }
+        return -1 * countDays; // -1 for greater: plus, less: minus
     }
 
     // ===================================================================================
@@ -1714,6 +2058,10 @@ public class HandyDate implements Serializable {
 
     public int getMillisecond() {
         return _cal.get(Calendar.MILLISECOND);
+    }
+
+    public int getDayOfWeek() {
+        return _cal.get(Calendar.DAY_OF_WEEK);
     }
 
     public int getFirstDayOfMonth() {
