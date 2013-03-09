@@ -152,6 +152,9 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         additionalColumnList.add(defaultColumn);
                     }
                     columnNameList.addAll(additionalColumnList);
+                    if (isCheckColumnDefExistence(dataDirectory)) {
+                        checkColumnDefExistence(dataDirectory, dataFile, tableDbName, columnNameList, columnMetaMap);
+                    }
                     continue;
                 }
 
@@ -217,7 +220,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 }
                 final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
                 resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
-                handleLoggingInsert(tableDbName, columnNameList, columnValueMap, loggingInsertType, rowNumber);
+                handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
 
                 int bindCount = 1;
                 final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();

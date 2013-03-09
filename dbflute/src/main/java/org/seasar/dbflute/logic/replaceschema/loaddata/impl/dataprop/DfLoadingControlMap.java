@@ -1,8 +1,11 @@
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -33,7 +36,7 @@ public class DfLoadingControlMap {
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfLoadingControlMap.class);
     protected static final String PROP_DATE_ADJUSTMENT_MAP = "dateAdjustmentMap";
-    protected static final String KEY_ALL_TABLE = "$$ALL$$";
+    protected static final String KEY_ALL_MARK = "$$ALL$$";
     protected static final String KEY_ORIGIN_DATE = "df:originDate";
     protected static final String KEY_DISTANCE_YEARS = "df:distanceYears";
     protected static final String KEY_DISTANCE_MONTHS = "df:distanceMonths";
@@ -84,8 +87,47 @@ public class DfLoadingControlMap {
         return suppressBatchUpdate;
     }
 
-    protected boolean isSpecifiedValieProperty(String prop) {
-        return prop != null && prop.trim().length() > 0 && !prop.trim().equalsIgnoreCase("null");
+    // ===================================================================================
+    //                                                                 ColumnDef Existence
+    //                                                                 ===================
+    public boolean isCheckColumnDefExistence(String dataDirectory) {
+        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final String prop = (String) loadingControlMap.get("isCheckColumnDefExistence");
+        if (isSpecifiedValieProperty(prop)) {
+            return prop.trim().equalsIgnoreCase("true");
+        }
+        return false;
+    }
+
+    public void checkColumnDefExistence(String dataDirectory, File dataFile, String tableName,
+            List<String> columnDefNameList, Map<String, DfColumnMeta> columnMetaMap) {
+        final List<String> unneededList = new ArrayList<String>();
+        for (String columnName : columnDefNameList) {
+            if (!columnMetaMap.containsKey(columnName)) {
+                unneededList.add(columnName);
+            }
+        }
+        if (!unneededList.isEmpty()) {
+            throwLoadingControlNoExistenceColumnFoundException(dataDirectory, dataFile, tableName, unneededList);
+        }
+    }
+
+    protected void throwLoadingControlNoExistenceColumnFoundException(String dataDirectory, File dataFile,
+            String tableName, List<String> unneededList) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Found the no-existence column in your data file.");
+        br.addItem("Data Directory");
+        br.addElement(dataDirectory);
+        br.addItem("Data File");
+        br.addElement(dataFile);
+        br.addItem("Table Name");
+        br.addElement(tableName);
+        br.addItem("Found Column");
+        for (String columnName : unneededList) {
+            br.addElement(columnName);
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfLoadDataRegistrationFailureException(msg);
     }
 
     // ===================================================================================
@@ -125,7 +167,7 @@ public class DfLoadingControlMap {
         if (adjustmentMap == null) {
             return false;
         }
-        return adjustmentMap.containsKey(tableName) || adjustmentMap.containsKey(KEY_ALL_TABLE);
+        return adjustmentMap.containsKey(tableName) || adjustmentMap.containsKey(KEY_ALL_MARK);
     }
 
     protected boolean hasDateAdjustmentExp(String dataDirectory, String tableName, String columnName) { // second check
@@ -201,10 +243,14 @@ public class DfLoadingControlMap {
             return null;
         }
         final Map<String, String> columnMap = (Map<String, String>) dateAdjustmentMap.get(tableName);
+        String exp = null;
         if (columnMap != null) {
-            return columnMap.get(columnName);
+            exp = columnMap.get(columnName);
         }
-        return (String) dateAdjustmentMap.get(KEY_ALL_TABLE);
+        if (exp != null) {
+            return exp;
+        }
+        return (String) dateAdjustmentMap.get(KEY_ALL_MARK);
     }
 
     @SuppressWarnings("unchecked")
@@ -264,7 +310,7 @@ public class DfLoadingControlMap {
             final Object elementTableValue = elementTableEntry.getValue();
             final Object registeredTableValue;
             if (elementTableValue != null) {
-                if (KEY_ALL_TABLE.equalsIgnoreCase(tableName)) {
+                if (KEY_ALL_MARK.equalsIgnoreCase(tableName)) {
                     registeredTableValue = elementTableValue;
                 } else if (KEY_ORIGIN_DATE.equalsIgnoreCase(tableName)) {
                     final String originExp = elementTableValue.toString();
@@ -341,5 +387,12 @@ public class DfLoadingControlMap {
             return DfTypeUtil.toString(value, "yyyy/MM/dd");
         }
         return value.toString();
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected boolean isSpecifiedValieProperty(String prop) {
+        return prop != null && prop.trim().length() > 0 && !prop.trim().equalsIgnoreCase("null");
     }
 }

@@ -959,8 +959,8 @@ public abstract class DfAbsractDataWriter {
     // ===================================================================================
     //                                                                        Log Handling
     //                                                                        ============
-    protected void handleLoggingInsert(String tableDbName, List<String> columnNameList,
-            Map<String, Object> columnValueMap, LoggingInsertType loggingInsertType, int recordCount) {
+    protected void handleLoggingInsert(String tableDbName, Map<String, Object> columnValueMap,
+            LoggingInsertType loggingInsertType, int recordCount) {
         boolean logging = false;
         if (LoggingInsertType.ALL.equals(loggingInsertType)) {
             logging = true;
@@ -973,12 +973,11 @@ public abstract class DfAbsractDataWriter {
         }
         if (logging) {
             final List<Object> valueList = new ArrayList<Object>(columnValueMap.values());
-            _log.info(buildLoggingInsert(tableDbName, columnNameList, valueList));
+            _log.info(buildLoggingInsert(tableDbName, valueList));
         }
     }
 
-    protected String buildLoggingInsert(String tableName, List<String> columnNameList,
-            final List<? extends Object> bindParameters) {
+    protected String buildLoggingInsert(String tableName, final List<? extends Object> bindParameters) {
         final StringBuilder sb = new StringBuilder();
         for (Object parameter : bindParameters) {
             if (sb.length() > 0) {
@@ -996,7 +995,7 @@ public abstract class DfAbsractDataWriter {
     // ===================================================================================
     //                                                             Implicit Classification
     //                                                             =======================
-    protected void checkImplicitClassification(File file, String tableDbName, List<String> columnDbNameList,
+    protected void checkImplicitClassification(File file, String tableDbName, List<String> columnNameList,
             Connection conn) throws SQLException {
         if (_suppressCheckImplicitSet) {
             return;
@@ -1005,9 +1004,9 @@ public abstract class DfAbsractDataWriter {
         if (!prop.hasImplicitSetCheck()) {
             return;
         }
-        for (String columnDbName : columnDbNameList) {
-            if (prop.hasImplicitClassification(tableDbName, columnDbName)) {
-                doCheckImplicitClassification(file, tableDbName, columnDbName, conn);
+        for (String columnName : columnNameList) {
+            if (prop.hasImplicitClassification(tableDbName, columnName)) {
+                doCheckImplicitClassification(file, tableDbName, columnName, conn);
             }
         }
     }
@@ -1082,14 +1081,24 @@ public abstract class DfAbsractDataWriter {
     }
 
     // ===================================================================================
-    //                                                                    Directory Option
-    //                                                                    ================
+    //                                                                     Loading Control
+    //                                                                     ===============
     protected LoggingInsertType getLoggingInsertType(String dataDirectory) {
         return _loadingControlMap.getLoggingInsertType(dataDirectory, _loggingInsertSql);
     }
 
     protected boolean isMergedSuppressBatchUpdate(String dataDirectory) {
         return _loadingControlMap.isMergedSuppressBatchUpdate(dataDirectory, _suppressBatchUpdate);
+    }
+
+    protected boolean isCheckColumnDefExistence(String dataDirectory) {
+        return _loadingControlMap.isCheckColumnDefExistence(dataDirectory);
+    }
+
+    protected void checkColumnDefExistence(String dataDirectory, File dataFile, String tableName,
+            List<String> columnDefNameList, Map<String, DfColumnMeta> columnMetaMap) {
+        _loadingControlMap
+                .checkColumnDefExistence(dataDirectory, dataFile, tableName, columnDefNameList, columnMetaMap);
     }
 
     protected void resolveRelativeDate(String dataDirectory, String tableName, Map<String, Object> columnValueMap,

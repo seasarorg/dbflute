@@ -157,22 +157,14 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             return 0;
         }
 
-        // set up columnMetaInfo
         final Map<String, DfColumnMeta> columnMetaMap = getColumnMetaMap(tableDbName);
         if (columnMetaMap.isEmpty()) {
             throwTableNotFoundException(file, tableDbName);
         }
 
-        // process before handling table
         beforeHandlingTable(tableDbName, columnMetaMap);
-
-        // set up columnNameList
-        final List<String> columnNameList = new ArrayList<String>();
-        for (int j = 0; j < dataTable.getColumnSize(); j++) {
-            final DfDataColumn dataColumn = dataTable.getColumn(j);
-            final String columnName = dataColumn.getColumnDbName();
-            columnNameList.add(columnName);
-        }
+        checkHeaderColumnIfNeeds(resource, file, dataTable, columnMetaMap);
+        final List<String> columnNameList = extractColumnNameList(dataTable);
 
         final String dataDirectory = resource.getDataDirectory();
         final LoggingInsertType loggingInsertType = getLoggingInsertType(dataDirectory);
@@ -195,7 +187,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     ps = conn.prepareStatement(preparedSql);
                 }
                 if (doWriteDataRow(resource, file, dataTable, dataRow // basic resources
-                        , columnMetaMap, columnNameList // meta data
+                        , columnMetaMap // meta data
                         , conn, ps // JDBC resources
                         , loggingInsertType, suppressBatchUpdate)) { // option
                     ++loadedRowCount;
@@ -229,7 +221,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                         final DfDataRow dataRow = dataTable.getRow(i);
                         try {
                             doWriteDataRow(resource, file, dataTable, dataRow // basic resources
-                                    , columnMetaMap, columnNameList // meta data
+                                    , columnMetaMap // meta data
                                     , conn, retryPs // JDBC resources
                                     , LoggingInsertType.NONE, true); // option (no logging and suppress batch)
                         } catch (SQLException rowEx) {
@@ -275,6 +267,37 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         br.addElement(tableDbName);
         final String msg = br.buildExceptionMessage();
         throw new DfXlsDataTableNotFoundException(msg);
+    }
+
+    protected List<String> extractColumnNameList(DfDataTable dataTable) {
+        final List<String> columnNameList = new ArrayList<String>(); // for small function
+        for (int i = 0; i < dataTable.getColumnSize(); i++) {
+            final DfDataColumn dataColumn = dataTable.getColumn(i);
+            if (!dataColumn.isWritable()) {
+                continue;
+            }
+            final String columnName = dataColumn.getColumnDbName();
+            columnNameList.add(columnName);
+        }
+        return columnNameList;
+    }
+
+    protected void checkHeaderColumnIfNeeds(DfXlsDataResource resource, File file, DfDataTable dataTable,
+            Map<String, DfColumnMeta> columnMetaMap) {
+        final String dataDirectory = resource.getDataDirectory();
+        if (!isCheckColumnDefExistence(dataDirectory)) {
+            return;
+        }
+        final List<String> columnDefNameList = new ArrayList<String>();
+        for (int i = 0; i < dataTable.getColumnSize(); i++) { // all columns are target
+            final DfDataColumn dataColumn = dataTable.getColumn(i);
+            final String columnName = dataColumn.getColumnDbName();
+            columnDefNameList.add(columnName);
+        }
+        // use columnMetaMap to check (not use DataTable's meta data here)
+        // at old age, columnMetaMap is not required but required now
+        final String tableDbName = dataTable.getTableDbName();
+        checkColumnDefExistence(dataDirectory, file, tableDbName, columnDefNameList, columnMetaMap);
     }
 
     protected void beforeHandlingTable(String tableDbName, Map<String, DfColumnMeta> columnInfoMap) {
@@ -390,8 +413,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     //                                               DataRow
     //                                               -------
     protected boolean doWriteDataRow(DfXlsDataResource resource, File file, DfDataTable dataTable, DfDataRow dataRow,
-            Map<String, DfColumnMeta> columnMetaMap, List<String> columnNameList, Connection conn,
-            PreparedStatement ps, LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
+            Map<String, DfColumnMeta> columnMetaMap, Connection conn, PreparedStatement ps,
+            LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
         // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
@@ -407,7 +430,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
 
         final int rowNumber = dataRow.getRowNumber();
-        handleLoggingInsert(tableDbName, columnNameList, columnValueMap, loggingInsertType, rowNumber);
+        handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
 
         int bindCount = 1;
         final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
