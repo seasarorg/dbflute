@@ -81,10 +81,10 @@ public abstract class DfAbsractDataWriter {
     //                                                                           Attribute
     //                                                                           =========
     /** The data source. (NotNull) */
-    protected DataSource _dataSource;
+    protected final DataSource _dataSource;
 
-    /** The unified schema (for getting database meta data). (NullAllowed) */
-    protected UnifiedSchema _unifiedSchema;
+    /** The unified schema (for getting database meta data). (NotNull) */
+    protected final UnifiedSchema _unifiedSchema;
 
     /** Does it output the insert SQLs as logging? */
     protected boolean _loggingInsertSql;
@@ -129,20 +129,21 @@ public abstract class DfAbsractDataWriter {
     /** The cache map of null type. The key is table name. (ordered for display) */
     protected final Map<String, Map<String, Integer>> _nullTypeCacheMap = StringKeyMap.createAsFlexibleOrdered();
 
-    /** The data-prop of default value map. (NotNull) */
-    protected final DfDefaultValueProp _defaultValueProp = new DfDefaultValueProp();
-
-    /** The data-prop of loading control map. (NotNull) */
-    protected final DfLoadingControlProp _loadingControlProp = new DfLoadingControlProp();
-
     /** The resolver of relative date. (NotNull) */
     protected final DfRelativeDateResolver _relativeDateResolver = new DfRelativeDateResolver();
+
+    /** The data-prop of default value map. (NotNull: after initialization) */
+    protected DfDefaultValueProp _defaultValueProp;
+
+    /** The data-prop of loading control map. (NotNull: after initialization) */
+    protected DfLoadingControlProp _loadingControlProp;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfAbsractDataWriter(DataSource dataSource) {
+    public DfAbsractDataWriter(DataSource dataSource, UnifiedSchema unifiedSchema) {
         _dataSource = dataSource;
+        _unifiedSchema = unifiedSchema;
     }
 
     // ===================================================================================
@@ -1145,14 +1146,6 @@ public abstract class DfAbsractDataWriter {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public UnifiedSchema getUnifiedSchema() {
-        return _unifiedSchema;
-    }
-
-    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
-        _unifiedSchema = unifiedSchema;
-    }
-
     public boolean isLoggingInsertSql() {
         return _loggingInsertSql;
     }
@@ -1183,5 +1176,21 @@ public abstract class DfAbsractDataWriter {
 
     public void setDataWritingInterceptor(DfDataWritingInterceptor dataWritingInterceptor) {
         this._dataWritingInterceptor = dataWritingInterceptor;
+    }
+
+    public DfDefaultValueProp getDefaultValueProp() {
+        return _defaultValueProp;
+    }
+
+    public void setDefaultValueProp(DfDefaultValueProp defaultValueProp) {
+        this._defaultValueProp = defaultValueProp;
+    }
+
+    public DfLoadingControlProp getLoadingControlProp() {
+        return _loadingControlProp;
+    }
+
+    public void setLoadingControlProp(DfLoadingControlProp loadingControlProp) {
+        this._loadingControlProp = loadingControlProp;
     }
 }

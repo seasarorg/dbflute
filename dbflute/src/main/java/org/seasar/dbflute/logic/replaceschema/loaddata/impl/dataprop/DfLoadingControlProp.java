@@ -44,7 +44,7 @@ import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
- * @since 1.0.4 (2013/03/09 Saturday)
+ * @since 1.0.4A (2013/03/09 Saturday)
  */
 public class DfLoadingControlProp {
 
@@ -282,14 +282,32 @@ public class DfLoadingControlProp {
             return null;
         }
         final Map<String, String> columnMap = (Map<String, String>) dateAdjustmentMap.get(tableName);
-        String exp = null;
-        if (columnMap != null) {
-            exp = columnMap.get(columnName);
-        }
+        String exp = findAdjustmentExp(tableName, columnName, columnMap);
         if (exp != null) {
             return exp;
         }
-        return (String) dateAdjustmentMap.get(KEY_ALL_MARK);
+        final Object tableAll = dateAdjustmentMap.get(KEY_ALL_MARK);
+        if (tableAll == null) {
+            return null;
+        }
+        if (tableAll instanceof Map<?, ?>) {
+            final Map<String, String> allColumnMap = (Map<String, String>) tableAll;
+            exp = findAdjustmentExp(tableName, columnName, allColumnMap);
+        } else {
+            exp = (String) tableAll;
+        }
+        return exp;
+    }
+
+    protected String findAdjustmentExp(String tableName, String columnName, Map<String, String> columnMap) {
+        if (columnMap != null) {
+            final String exp = columnMap.get(columnName);
+            if (exp != null) {
+                return exp;
+            }
+            return columnMap.get(KEY_ALL_MARK);
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")

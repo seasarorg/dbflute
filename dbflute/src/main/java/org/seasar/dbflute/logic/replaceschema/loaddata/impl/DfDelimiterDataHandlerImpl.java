@@ -34,6 +34,8 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResource;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResultInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfDefaultValueProp;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
 
 /**
@@ -56,6 +58,12 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
     protected boolean _suppressBatchUpdate;
     protected boolean _suppressCheckImplicitSet;
     protected DfDataWritingInterceptor _dataWritingInterceptor;
+
+    /** The data-prop of default value map. (NotNull: after initialization) */
+    protected DfDefaultValueProp _defaultValueProp;
+
+    /** The data-prop of loading control map. (NotNull: after initialization) */
+    protected DfLoadingControlProp _loadingControlProp;
 
     // ===================================================================================
     //                                                                                Main
@@ -98,8 +106,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                 final Map<String, String> defaultValueMap = getDefaultValueMap(resource, encoding);
                 for (String fileName : sortedFileNameSet) {
                     final String fileNamePath = basePath + "/" + encoding + "/" + fileName;
-                    final DfDelimiterDataWriterImpl writer = new DfDelimiterDataWriterImpl(_dataSource);
-                    writer.setUnifiedSchema(_unifiedSchema);
+                    final DfDelimiterDataWriterImpl writer = new DfDelimiterDataWriterImpl(_dataSource, _unifiedSchema);
                     writer.setLoggingInsertSql(isLoggingInsertSql());
                     writer.setFileName(fileNamePath);
                     writer.setEncoding(encoding);
@@ -109,6 +116,8 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     writer.setSuppressBatchUpdate(isSuppressBatchUpdate());
                     writer.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
                     writer.setDataWritingInterceptor(_dataWritingInterceptor);
+                    writer.setDefaultValueProp(_defaultValueProp);
+                    writer.setLoadingControlProp(_loadingControlProp);
                     writer.writeData(resultInfo);
 
                     final String loadType = resource.getLoadType();
@@ -201,5 +210,21 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
 
     public void setDataWritingInterceptor(DfDataWritingInterceptor dataWritingInterceptor) {
         this._dataWritingInterceptor = dataWritingInterceptor;
+    }
+
+    public DfDefaultValueProp getDefaultValueProp() {
+        return _defaultValueProp;
+    }
+
+    public void setDefaultValueProp(DfDefaultValueProp defaultValueProp) {
+        this._defaultValueProp = defaultValueProp;
+    }
+
+    public DfLoadingControlProp getLoadingControlProp() {
+        return _loadingControlProp;
+    }
+
+    public void setLoadingControlProp(DfLoadingControlProp loadingControlProp) {
+        this._loadingControlProp = loadingControlProp;
     }
 }

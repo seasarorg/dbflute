@@ -34,6 +34,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfDelimiterDataColumnDefNotFoundException;
 import org.seasar.dbflute.exception.DfDelimiterDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfDelimiterDataTableNotFoundException;
@@ -74,8 +75,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDelimiterDataWriterImpl(DataSource dataSource) {
-        super(dataSource);
+    public DfDelimiterDataWriterImpl(DataSource dataSource, UnifiedSchema unifiedSchema) {
+        super(dataSource, unifiedSchema);
     }
 
     // ===================================================================================

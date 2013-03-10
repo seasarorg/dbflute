@@ -53,7 +53,7 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
     //                                               -------
     public void test_processBoolean() throws Exception {
         // ## Arrange ##
-        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl(null) {
+        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl(null, null) {
             @Override
             protected Class<?> getBindType(String tableName, DfColumnMeta columnMetaInfo) {
                 return BigDecimal.class;
@@ -95,6 +95,6 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
     }
 
     protected DfXlsDataHandlerImpl createHandler() {
-        return new DfXlsDataHandlerImpl(null);
+        return new DfXlsDataHandlerImpl(null, null);
     }
 }

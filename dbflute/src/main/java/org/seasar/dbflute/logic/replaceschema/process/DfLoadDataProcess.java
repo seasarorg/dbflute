@@ -37,6 +37,8 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfDefaultValueProp;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptor;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSQLServer;
 import org.seasar.dbflute.logic.replaceschema.loaddata.interceptor.DfDataWritingInterceptorSybase;
@@ -86,6 +88,12 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     //                                                Option
     //                                                ------
     protected boolean _suppressCheckImplicitSet;
+
+    /** The data-prop of default value map. (NotNull) */
+    protected final DfDefaultValueProp _defaultValueProp = new DfDefaultValueProp();
+
+    /** The data-prop of loading control map. (NotNull) */
+    protected final DfLoadingControlProp _loadingControlProp = new DfLoadingControlProp();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -196,6 +204,8 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
         handler.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
         handler.setDataWritingInterceptor(getDataWritingInterceptor());
+        handler.setDefaultValueProp(_defaultValueProp);
+        handler.setLoadingControlProp(_loadingControlProp);
         _delimiterDataHandlerImpl = handler;
         return _delimiterDataHandlerImpl;
     }
@@ -324,13 +334,14 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         if (_xlsDataHandlerImpl != null) {
             return _xlsDataHandlerImpl;
         }
-        final DfXlsDataHandlerImpl handler = new DfXlsDataHandlerImpl(_dataSource);
-        handler.setUnifiedSchema(_mainSchema); // for getting database meta data
+        final DfXlsDataHandlerImpl handler = new DfXlsDataHandlerImpl(_dataSource, _mainSchema);
         handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
         handler.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
         handler.setSkipSheet(getReplaceSchemaProperties().getSkipSheet());
         handler.setDataWritingInterceptor(getDataWritingInterceptor());
+        handler.setDefaultValueProp(_defaultValueProp);
+        handler.setLoadingControlProp(_loadingControlProp);
         _xlsDataHandlerImpl = handler;
         return _xlsDataHandlerImpl;
     }

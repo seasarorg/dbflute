@@ -22,7 +22,7 @@ import java.util.Set;
 
 /**
  * @author jflute
- * @since 1.0.4 (2013/03/09 Saturday)
+ * @since 1.0.4A (2013/03/09 Saturday)
  */
 public class DfDefaultValueProp {
 

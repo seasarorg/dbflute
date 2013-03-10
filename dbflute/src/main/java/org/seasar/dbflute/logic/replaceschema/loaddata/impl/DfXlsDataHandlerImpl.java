@@ -41,6 +41,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.exception.DfXlsDataEmptyColumnDefException;
 import org.seasar.dbflute.exception.DfXlsDataEmptyRowDataException;
@@ -92,8 +93,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfXlsDataHandlerImpl(DataSource dataSource) {
-        super(dataSource); // use database only when writing
+    public DfXlsDataHandlerImpl(DataSource dataSource, UnifiedSchema unifiedSchema) {
+        super(dataSource, unifiedSchema);
     }
 
     // ===================================================================================
