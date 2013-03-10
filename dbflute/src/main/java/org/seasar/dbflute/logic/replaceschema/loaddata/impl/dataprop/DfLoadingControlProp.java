@@ -282,21 +282,12 @@ public class DfLoadingControlProp {
             return null;
         }
         final Map<String, String> columnMap = (Map<String, String>) dateAdjustmentMap.get(tableName);
-        String exp = findAdjustmentExp(tableName, columnName, columnMap);
-        if (exp != null) {
-            return exp;
+        final String foundExp = findAdjustmentExp(tableName, columnName, columnMap);
+        if (foundExp != null) {
+            return foundExp;
         }
-        final Object tableAll = dateAdjustmentMap.get(KEY_ALL_MARK);
-        if (tableAll == null) {
-            return null;
-        }
-        if (tableAll instanceof Map<?, ?>) {
-            final Map<String, String> allColumnMap = (Map<String, String>) tableAll;
-            exp = findAdjustmentExp(tableName, columnName, allColumnMap);
-        } else {
-            exp = (String) tableAll;
-        }
-        return exp;
+        final Map<String, String> allTableColumnMap = (Map<String, String>) dateAdjustmentMap.get(KEY_ALL_MARK);
+        return findAdjustmentExp(tableName, columnName, allTableColumnMap);
     }
 
     protected String findAdjustmentExp(String tableName, String columnName, Map<String, String> columnMap) {
@@ -367,9 +358,7 @@ public class DfLoadingControlProp {
             final Object elementTableValue = elementTableEntry.getValue();
             final Object registeredTableValue;
             if (elementTableValue != null) {
-                if (KEY_ALL_MARK.equalsIgnoreCase(tableName)) {
-                    registeredTableValue = elementTableValue;
-                } else if (KEY_ORIGIN_DATE.equalsIgnoreCase(tableName)) {
+                if (KEY_ORIGIN_DATE.equalsIgnoreCase(tableName)) {
                     final String originExp = elementTableValue.toString();
                     final HandyDate originDate;
                     try {
@@ -386,7 +375,7 @@ public class DfLoadingControlProp {
                 } else {
                     @SuppressWarnings("unchecked")
                     final Map<String, Object> elementColumnMap = (Map<String, Object>) elementTableValue;
-                    final Map<String, Object> flColumnMap = StringKeyMap.createAsFlexible();
+                    final Map<String, Object> flColumnMap = StringKeyMap.createAsFlexibleOrdered();
                     flColumnMap.putAll(elementColumnMap);
                     registeredTableValue = flColumnMap;
                 }
