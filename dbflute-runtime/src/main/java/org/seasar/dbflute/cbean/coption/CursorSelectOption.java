@@ -18,7 +18,7 @@ package org.seasar.dbflute.cbean.coption;
 /**
  * The option for CursorSelect.
  * @author jflute
- * @since 1.0.3.1 (2013/03/07 Wednesday)
+ * @since 1.0.4A (2013/03/07 Wednesday)
  */
 public class CursorSelectOption {
 
