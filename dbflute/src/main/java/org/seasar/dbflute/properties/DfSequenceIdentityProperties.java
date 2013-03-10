@@ -33,7 +33,7 @@ import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.factory.DfSequenceExtractorFactory;
-import org.seasar.dbflute.properties.assistant.DfTableDeterminator;
+import org.seasar.dbflute.properties.assistant.DfTableDeterminer;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -168,16 +168,16 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //                                      Check Definition
     //                                      ----------------
     /**
-     * @param determinator The checker for call-back. (NotNull)
+     * @param determiner The checker for call-back. (NotNull)
      */
-    public void checkDefinition(DfTableDeterminator determinator) {
+    public void checkDefinition(DfTableDeterminer determiner) {
         final List<String> notFoundTableNameList = new ArrayList<String>();
         {
             final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
             final Set<Entry<String, String>> entrySet = sequenceDefinitionMap.entrySet();
             for (Entry<String, String> entry : entrySet) {
                 final String tableName = entry.getKey();
-                if (!determinator.hasTable(tableName)) {
+                if (!determiner.hasTable(tableName)) {
                     notFoundTableNameList.add(tableName);
                 }
             }
@@ -189,7 +189,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
                 final String key = entry.getKey();
                 final String tableName = Srl.substringFirstFront(key, ".");
                 final String columnName = Srl.substringFirstRear(key, ".");
-                if (!determinator.hasTableColumn(tableName, columnName)) {
+                if (!determiner.hasTableColumn(tableName, columnName)) {
                     notFoundTableNameList.add(key);
                 }
             }

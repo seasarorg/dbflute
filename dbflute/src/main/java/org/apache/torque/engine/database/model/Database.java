@@ -169,7 +169,7 @@ import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.assistant.DfTableDeterminator;
+import org.seasar.dbflute.properties.assistant.DfTableDeterminer;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.DfTableListProvider;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
@@ -968,7 +968,7 @@ public class Database {
                 return getTableList();
             }
         });
-        getProperties().getSequenceIdentityProperties().checkDefinition(new DfTableDeterminator() {
+        getProperties().getSequenceIdentityProperties().checkDefinition(new DfTableDeterminer() {
             public boolean hasTable(String tableName) {
                 return getTable(tableName) != null;
             }

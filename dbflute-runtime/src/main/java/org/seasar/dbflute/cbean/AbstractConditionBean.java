@@ -1191,7 +1191,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 propertyName = remainder.substring(0, deimiterIndex);
                 remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
             }
-            Class<?> targetType = currentObj.getClass();
+            final Class<?> targetType = currentObj.getClass();
             final String methodName = (count == 0 ? "setupSelect_" : "with") + initCap(propertyName);
             final Method method = DfReflectionUtil.getPublicMethod(targetType, methodName, new Class<?>[] {});
             if (method == null) {
@@ -1225,7 +1225,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
         final String delimiter = ".";
         Object currentObj = localSp;
         String remainder = columnNamePath;
-        Class<?> targetType = currentObj.getClass();
         boolean last = false;
         while (true) {
             final int deimiterIndex = remainder.indexOf(delimiter);
@@ -1237,6 +1236,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 propertyName = remainder.substring(0, deimiterIndex);
                 remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
             }
+            final Class<?> targetType = currentObj.getClass();
             final String methodName = (last ? "column" : "specify") + initCap(propertyName);
             final Method method = DfReflectionUtil.getPublicMethod(targetType, methodName, new Class<?>[] {});
             if (method == null) {
