@@ -363,7 +363,22 @@ public interface ConditionBean extends PagingBean {
      */
     void invokeSetupSelect(String foreignPropertyNamePath);
 
-    // TODO jflute
+    /**
+     * Invoke the method 'specify().columnXxx()' by the path of column name. <br />
+     * For example, if this is based on PURCHASE, 'purchaseDatetime' means as follows:
+     * <pre>
+     * PurchaseCB cb = new PurchaseCB();
+     * cb.specify().columnPurchaseDatetime();
+     * </pre>
+     * And if this is based on PURCHASE, 'member.birthdate' means as follows:
+     * <pre>
+     * PurchaseCB cb = new PurchaseCB();
+     * cb.specify().specifyMember().columnBirthdate();
+     * </pre>
+     * @param columnNamePath The path string. (NotNull, NotTrimmedEmpty)
+     * @return The info of specified column. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
+     */
     HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath);
 
     // ===================================================================================

@@ -200,7 +200,7 @@ public class IfCommentEvaluator {
                     if (rightResult == null) {
                         return true;
                     }
-                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminater() {
+                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminer() {
                         public boolean compare(int compareResult) {
                             return compareResult > 0;
                         }
@@ -216,7 +216,7 @@ public class IfCommentEvaluator {
                     if (rightResult == null) {
                         return false;
                     }
-                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminater() {
+                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminer() {
                         public boolean compare(int compareResult) {
                             return compareResult < 0;
                         }
@@ -232,7 +232,7 @@ public class IfCommentEvaluator {
                     if (rightResult == null) {
                         return true;
                     }
-                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminater() {
+                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminer() {
                         public boolean compare(int compareResult) {
                             return compareResult >= 0;
                         }
@@ -248,7 +248,7 @@ public class IfCommentEvaluator {
                     if (rightResult == null) {
                         return false;
                     }
-                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminater() {
+                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminer() {
                         public boolean compare(int compareResult) {
                             return compareResult <= 0;
                         }
@@ -260,19 +260,19 @@ public class IfCommentEvaluator {
         }
     }
 
-    protected boolean compareLeftRight(Object leftResult, Object rightResult, ComparaDeterminater determinater,
+    protected boolean compareLeftRight(Object leftResult, Object rightResult, ComparaDeterminer determiner,
             String booleanClause) {
         assertCompareType(leftResult, rightResult, booleanClause);
         if (leftResult instanceof Date) {
             final Date leftDate = (Date) leftResult;
             final Date rightDate = (Date) rightResult;
-            return determinater.compare(leftDate.compareTo(rightDate));
+            return determiner.compare(leftDate.compareTo(rightDate));
         } else if (leftResult instanceof Number) {
             final Number leftNumber = (Number) leftResult;
             final BigDecimal leftDecimal = new BigDecimal(leftNumber.toString());
             final Number rightNumber = (Number) rightResult;
             final BigDecimal rightDecimal = new BigDecimal(rightNumber.toString());
-            return determinater.compare(leftDecimal.compareTo(rightDecimal));
+            return determiner.compare(leftDecimal.compareTo(rightDecimal));
         } else {
             throwIfCommentUnsupportedTypeComparisonException(leftResult, rightResult, booleanClause);
             return false; // unreachable
@@ -291,7 +291,7 @@ public class IfCommentEvaluator {
         }
     }
 
-    protected static interface ComparaDeterminater {
+    protected static interface ComparaDeterminer {
         boolean compare(int compareResult);
     }
 

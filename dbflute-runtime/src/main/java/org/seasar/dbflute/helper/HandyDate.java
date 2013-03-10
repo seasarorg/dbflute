@@ -34,11 +34,13 @@ import org.seasar.dbflute.util.DfTypeUtil.ParseDateException;
  * date.addMonth(1); // 2011/<span style="color: #FD4747">12</span>/28 12:34:56.789
  * date.moveToDayJust(); // 2011/12/28 <span style="color: #FD4747">00:00:00.000</span>
  * date.moveToMonthTerminal(); // 2011/12/<span style="color: #FD4747">31 23:59:59.999</span>
+ * date.isYear(2011); // true
  * if (date.isGreaterThan(toDate("2011/12/30"))) { // true
  *     // 2011/12/31 23:59:59.999
  *     java.util.Date movedDate = date.getDate();
  *     java.sql.Timestamp movedTimestamp = date.getTimestampDate();
  * }
+ * calculateDistanceDays(toDate("2011/11/30")); // 3
  * </pre>
  * @author jflute
  * @since 0.9.9.2A (2011/11/17 Thursday)
@@ -136,6 +138,16 @@ public class HandyDate implements Serializable {
         public ParseDateExpressionFailureException(String msg, Throwable cause) {
             super(msg, cause);
         }
+    }
+
+    public static interface BusinessDayDeterminer {
+
+        /**
+         * Does the (handy) date specify business day?
+         * @param handyDate The handy date to determine. (NotNull)
+         * @return The determination, true or false.
+         */
+        boolean isBusinessDay(HandyDate handyDate);
     }
 
     // ===================================================================================
@@ -416,6 +428,38 @@ public class HandyDate implements Serializable {
         if (isWeek_DayOfWeek1st_Sunday()) {
             addDay(-2);
         } else if (isWeek_DayOfWeek7th_Saturday()) {
+            addDay(-1);
+        }
+        return this;
+    }
+
+    /**
+     * Move to the first weekend just of the month. <br />
+     * e.g. moveToMonthFirstWeekendJust(): 2013/03/10 12:34:56.789 to 2013/03/<span style="color: #FD4747">02 00:00:00:000</span>
+     * @return this. (NotNull)
+     */
+    public HandyDate moveToMonthFirstWeekendJust() {
+        moveToMonthJust();
+        while (true) {
+            if (isWeek_DayOfWeekWeekend()) {
+                break;
+            }
+            addDay(1);
+        }
+        return this;
+    }
+
+    /**
+     * Move to the terminal of the month last weekend. <br />
+     * e.g. moveToMonthWeekdayTerminal(): 2013/04/10 12:34:56.789 to 2013/04/<span style="color: #FD4747">28 23:59:59.999</span>
+     * @return this. (NotNull)
+     */
+    public HandyDate moveToMonthLastWeekendTerminal() {
+        moveToMonthTerminal();
+        while (true) {
+            if (isWeek_DayOfWeekWeekend()) {
+                break;
+            }
             addDay(-1);
         }
         return this;
@@ -841,6 +885,50 @@ public class HandyDate implements Serializable {
     public HandyDate moveToQuarterOfYearTerminalFor(int quarterOfYear) {
         DfTypeUtil.moveToCalendarQuarterOfYearTerminalFor(_cal, quarterOfYear, _yearBeginMonth);
         moveToMonthTerminal(); // just for others
+        return this;
+    }
+
+    // -----------------------------------------------------
+    //                                          Move-to Next
+    //                                          ------------
+    /**
+     * Move to the next business day (only added days).
+     * @param determiner The determiner of business day. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate moveToNextBusinessDay(BusinessDayDeterminer determiner) {
+        assertArgumentNotNull("determiner", determiner);
+        final int addedLimit = 1000;
+        int addedCount = 0;
+        while (true) {
+            addDay(1);
+            ++addedCount;
+            if (determiner.isBusinessDay(this)) {
+                break;
+            }
+            if (addedCount > addedLimit) {
+                String msg = "Business day is so far: limit=" + addedLimit;
+                throw new IllegalStateException(msg);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Move to the next business day (only added days).
+     * @param movedDays The moved count of business days. (NotMinus)
+     * @param determiner The determiner of business day. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate moveToNextBusinessDay(int movedDays, BusinessDayDeterminer determiner) {
+        assertArgumentNotNull("determiner", determiner);
+        if (movedDays < 0) {
+            String msg = "The argument 'movedDays' should not be minus: " + movedDays;
+            throw new IllegalArgumentException(msg);
+        }
+        for (int i = 0; i < movedDays; i++) {
+            moveToNextBusinessDay(determiner);
+        }
         return this;
     }
 
@@ -1546,6 +1634,22 @@ public class HandyDate implements Serializable {
         return getDayOfWeek() == Calendar.SATURDAY;
     }
 
+    /**
+     * Is the day of week usual weekday (not Sunday and Saturday)?
+     * @return The determination, true or false.
+     */
+    public boolean isWeek_DayOfWeekWeekday() {
+        return !isWeek_DayOfWeek1st_Sunday() && !isWeek_DayOfWeek7th_Saturday();
+    }
+
+    /**
+     * Is the day of week usual holiday (Sunday or Saturday)?
+     * @return The determination, true or false.
+     */
+    public boolean isWeek_DayOfWeekWeekend() {
+        return isWeek_DayOfWeek1st_Sunday() || isWeek_DayOfWeek7th_Saturday();
+    }
+
     // ===================================================================================
     //                                                                     Calculate Parts
     //                                                                     ===============
@@ -1633,6 +1737,175 @@ public class HandyDate implements Serializable {
             countDays = countDays + plusDays;
         }
         return -1 * countDays; // -1 for greater: plus, less: minus
+    }
+
+    /**
+     * Calculate business-day size between two date.
+     * <pre>
+     * e.g. when Sunday and Saturday is false
+     *  2013/03/03(this) and 2013/03/07(argument): 4
+     *  2013/03/07(this) and 2013/03/13(argument): 5
+     *  2013/03/07(this) and 2013/03/16(argument): 7
+     *  2013/03/16(this) and 2013/03/07(argument): 7
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @param determiner The determiner of business day. (NotNull)
+     * @return The count of weekday as size between the two date. (NotMinus)
+     */
+    public int calculateSizeBusinessDays(Date date, BusinessDayDeterminer determiner) {
+        assertArgumentNotNull("date", date);
+        if (isDayOfDateSameAs(date)) {
+            return 0;
+        }
+        int countDays = 0;
+        final HandyDate you = new HandyDate(date);
+        if (determiner.isBusinessDay(you)) {
+            ++countDays;
+        }
+        final boolean greater = isGreaterThan(date);
+        while (true) {
+            if (isDayOfDateSameAs(you)) {
+                break;
+            }
+            you.addDay(greater ? 1 : -1);
+            if (determiner.isBusinessDay(you)) {
+                ++countDays;
+            }
+        }
+        return countDays > 0 ? countDays : (countDays * -1);
+    }
+
+    /**
+     * Calculate weekday size between two date.
+     * <pre>
+     * e.g. 2013/03/03 is Sunday
+     *  2013/03/03(this) and 2013/03/07(argument): 4
+     *  2013/03/07(this) and 2013/03/13(argument): 5
+     *  2013/03/07(this) and 2013/03/16(argument): 7
+     *  2013/03/16(this) and 2013/03/07(argument): 7
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of weekday as size between the two date. (NotMinus)
+     */
+    public int calculateSizeWeekdays(Date date) {
+        assertArgumentNotNull("date", date);
+        return calculateSizeBusinessDays(date, new BusinessDayDeterminer() {
+            public boolean isBusinessDay(HandyDate handyDate) {
+                return handyDate.isWeek_DayOfWeekWeekday();
+            }
+        });
+    }
+
+    /**
+     * Calculate weekend-day size between two date.
+     * <pre>
+     * e.g. 2013/03/03 is Sunday
+     *  2013/03/03(this) and 2013/03/07(argument): 1
+     *  2013/03/07(this) and 2013/03/13(argument): 2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of weekday as size between the two date. (NotMinus)
+     */
+    public int calculateSizeWeekendDays(Date date) {
+        assertArgumentNotNull("date", date);
+        return calculateSizeBusinessDays(date, new BusinessDayDeterminer() {
+            public boolean isBusinessDay(HandyDate handyDate) {
+                return handyDate.isWeek_DayOfWeekWeekend();
+            }
+        });
+    }
+
+    // ===================================================================================
+    //                                                                        Choose Parts
+    //                                                                        ============
+    /**
+     * Choose the nearest date to this date. <br />
+     * If the same distance is found, it returns the future date.
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.chooseNearestDate(2011/11/24, 2011/11/26): 2011/11/26
+     *  date.chooseNearestDate(2011/11/25, 2011/11/28): 2011/11/28
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public Date chooseNearestDate(Date... dates) {
+        assertCompareDateArrayValid(dates);
+        Long nearestMillis = null;
+        Date nearestDate = null;
+        final long standardMillis = _cal.getTimeInMillis();
+        for (Date date : dates) {
+            long distanceMillis = date.getTime() - standardMillis;
+            boolean past = false;
+            if (distanceMillis < 0) { // contains past
+                distanceMillis = distanceMillis * -1L;
+                past = true;
+            }
+            if (nearestMillis == null || nearestMillis > distanceMillis) {
+                nearestMillis = distanceMillis;
+                nearestDate = date;
+            } else if (nearestMillis == distanceMillis && !past) {
+                nearestDate = date; // future is prior
+            }
+        }
+        return nearestDate;
+    }
+
+    /**
+     * Choose the nearest future date to this date.
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.chooseNearestFutureDate(2011/11/29, 2011/11/28): 2011/11/28
+     *  date.chooseNearestFutureDate(2011/11/26, 2011/11/29): 2011/11/29
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public Date chooseNearestFutureDate(Date... dates) {
+        assertCompareDateArrayValid(dates);
+        Long nearestMillis = null;
+        Date nearestDate = null;
+        final long standardMillis = _cal.getTimeInMillis();
+        for (Date date : dates) {
+            long distanceMillis = date.getTime() - standardMillis;
+            if (distanceMillis < 0) { // ignore past
+                continue;
+            }
+            if (nearestMillis == null || nearestMillis > distanceMillis) {
+                nearestMillis = distanceMillis;
+                nearestDate = date;
+            }
+        }
+        return nearestDate;
+    }
+
+    /**
+     * Choose the nearest past date to this date.
+     * <pre>
+     * e.g. date: 2011/11/27
+     *  date.chooseNearestPastDate(2011/11/26, 2011/11/25): 2011/11/26
+     *  date.chooseNearestPastDate(2011/11/25, 2011/11/28): 2011/11/25
+     * </pre>
+     * @param dates The array of comparison target date. (NotNull)
+     * @return The determination, true or false.
+     */
+    public Date chooseNearestPastDate(Date... dates) {
+        assertCompareDateArrayValid(dates);
+        Long nearestMillis = null;
+        Date nearestDate = null;
+        final long standardMillis = _cal.getTimeInMillis();
+        for (Date date : dates) {
+            long distanceMillis = date.getTime() - standardMillis;
+            if (distanceMillis > 0) { // ignore future
+                continue;
+            }
+            distanceMillis = distanceMillis * -1L;
+            if (nearestMillis == null || nearestMillis > distanceMillis) {
+                nearestMillis = distanceMillis;
+                nearestDate = date;
+            }
+        }
+        return nearestDate;
     }
 
     // ===================================================================================

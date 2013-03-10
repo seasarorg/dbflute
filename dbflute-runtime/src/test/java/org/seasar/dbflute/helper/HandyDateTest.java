@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.helper;
 
+import org.seasar.dbflute.helper.HandyDate.BusinessDayDeterminer;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
@@ -72,8 +73,11 @@ public class HandyDateTest extends PlainTestCase {
         assertEquals(handy("2011/11/17 12:34:56.999"), handy(targetExp).moveToMillisecond(999));
 
         assertEquals(handy("2013/06/03 00:00:00.000"), handy("2013/06/15 23:59:59.999").moveToMonthFirstWeekdayJust());
-        assertEquals(handy("2013/03/29 23:59:59.999"), handy("2013/03/015 12:13:59.123")
+        assertEquals(handy("2013/03/29 23:59:59.999"), handy("2013/03/15 12:13:59.123")
                 .moveToMonthLastWeekdayTerminal());
+        assertEquals(handy("2013/03/02 00:00:00.000"), handy("2013/03/13 23:59:59.999").moveToMonthFirstWeekendJust());
+        assertEquals(handy("2013/04/28 23:59:59.999"), handy("2013/04/13 12:13:59.123")
+                .moveToMonthLastWeekendTerminal());
     }
 
     public void test_moveTo_begin() throws Exception {
@@ -169,6 +173,42 @@ public class HandyDateTest extends PlainTestCase {
             // OK
             log(e.getMessage());
         }
+    }
+
+    // -----------------------------------------------------
+    //                                          Move-to Next
+    //                                          ------------
+    public void test_moveTo_next_businessDay() throws Exception {
+        assertEquals(handy("2013/03/04"), handy("2013/03/02").moveToNextBusinessDay(new BusinessDayDeterminer() {
+            public boolean isBusinessDay(HandyDate movedDate) {
+                return !movedDate.isWeek_DayOfWeek1st_Sunday() && !movedDate.isWeek_DayOfWeek7th_Saturday();
+            }
+        }));
+        assertEquals(handy("2013/03/05"), handy("2013/03/02").moveToNextBusinessDay(new BusinessDayDeterminer() {
+            public boolean isBusinessDay(HandyDate movedDate) {
+                return !movedDate.isWeek_DayOfWeekWeekend() && movedDate.getDay() != 4;
+            }
+        }));
+        try {
+            handy("2013/03/02").moveToNextBusinessDay(new BusinessDayDeterminer() {
+                public boolean isBusinessDay(HandyDate movedDate) {
+                    return false;
+                }
+            });
+        } catch (IllegalStateException e) {
+            // OK
+            log(e.getMessage());
+        }
+        assertEquals(handy("2013/03/08"), handy("2013/03/02").moveToNextBusinessDay(5, new BusinessDayDeterminer() {
+            public boolean isBusinessDay(HandyDate movedDate) {
+                return !movedDate.isWeek_DayOfWeek1st_Sunday() && !movedDate.isWeek_DayOfWeek7th_Saturday();
+            }
+        }));
+        assertEquals(handy("2013/03/11"), handy("2013/03/01").moveToNextBusinessDay(6, new BusinessDayDeterminer() {
+            public boolean isBusinessDay(HandyDate movedDate) {
+                return movedDate.isWeek_DayOfWeekWeekday();
+            }
+        }));
     }
 
     // -----------------------------------------------------
@@ -406,6 +446,13 @@ public class HandyDateTest extends PlainTestCase {
         assertTrue(handy("2013/03/07 00:00:00").isWeek_DayOfWeek5th_Thursday());
         assertTrue(handy("2013/03/08 00:00:00").isWeek_DayOfWeek6th_Friday());
         assertTrue(handy("2013/03/09 00:00:00").isWeek_DayOfWeek7th_Saturday());
+        assertTrue(handy("2013/03/09 00:00:00").isWeek_DayOfWeekWeekend());
+        assertTrue(handy("2013/03/02 00:00:00").isWeek_DayOfWeekWeekend());
+        assertFalse(handy("2013/03/01 00:00:00").isWeek_DayOfWeekWeekend());
+        assertTrue(handy("2013/03/04 00:00:00").isWeek_DayOfWeekWeekday());
+        assertTrue(handy("2013/03/08 00:00:00").isWeek_DayOfWeekWeekday());
+        assertFalse(handy("2013/03/02 00:00:00").isWeek_DayOfWeekWeekday());
+        assertFalse(handy("2013/03/03 00:00:00").isWeek_DayOfWeekWeekday());
     }
 
     // ===================================================================================
@@ -431,12 +478,96 @@ public class HandyDateTest extends PlainTestCase {
     public void test_calculateDistanceDays() throws Exception {
         assertEquals(0, handy("2013/03/03").calculateDistanceDays(toDate("2013/03/03")));
         assertEquals(0, handy("2013/03/03").calculateDistanceDays(toDate("2013/03/03 12:34:56")));
-        assertEquals(-4, handy("2013/03/07").calculateDistanceDays(toDate("2013/03/03")));
-        assertEquals(-35, handy("2013/04/07").calculateDistanceDays(toDate("2013/03/03")));
         assertEquals(4, handy("2013/03/03").calculateDistanceDays(toDate("2013/03/07")));
         assertEquals(35, handy("2013/03/03").calculateDistanceDays(toDate("2013/04/07")));
+        assertEquals(-4, handy("2013/03/07").calculateDistanceDays(toDate("2013/03/03")));
+        assertEquals(-35, handy("2013/04/07").calculateDistanceDays(toDate("2013/03/03")));
         assertEquals(365, handy("2013/03/03").calculateDistanceDays(toDate("2014/03/03")));
         assertEquals(400, handy("2013/03/03").calculateDistanceDays(toDate("2014/04/07")));
+    }
+
+    public void test_calculateSizeBusinessDays() throws Exception {
+        assertEquals(5,
+                handy("2013/03/14").calculateSizeBusinessDays(toDate("2013/03/21"), new BusinessDayDeterminer() {
+                    public boolean isBusinessDay(HandyDate handyDate) {
+                        return handyDate.isWeek_DayOfWeekWeekday() && !handyDate.isDaySameAs(toDate("2013/03/20"));
+                    }
+                }));
+        assertEquals(4,
+                handy("2013/03/07").calculateSizeBusinessDays(toDate("2013/03/03"), new BusinessDayDeterminer() {
+                    public boolean isBusinessDay(HandyDate handyDate) {
+                        return handyDate.isWeek_DayOfWeekWeekday();
+                    }
+                }));
+        assertEquals(7,
+                handy("2013/03/07").calculateSizeBusinessDays(toDate("2013/03/16"), new BusinessDayDeterminer() {
+                    public boolean isBusinessDay(HandyDate handyDate) {
+                        return handyDate.isWeek_DayOfWeekWeekday();
+                    }
+                }));
+    }
+
+    public void test_calculateSizeWeekdays() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateSizeWeekdays(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/03").calculateSizeWeekdays(toDate("2013/03/03 12:34:56")));
+        assertEquals(4, handy("2013/03/03").calculateSizeWeekdays(toDate("2013/03/07")));
+        assertEquals(4, handy("2013/03/07").calculateSizeWeekdays(toDate("2013/03/03")));
+        assertEquals(5, handy("2013/03/07").calculateSizeWeekdays(toDate("2013/03/13")));
+        assertEquals(5, handy("2013/03/13").calculateSizeWeekdays(toDate("2013/03/07")));
+        assertEquals(7, handy("2013/03/07").calculateSizeWeekdays(toDate("2013/03/16")));
+        assertEquals(7, handy("2013/03/16").calculateSizeWeekdays(toDate("2013/03/07")));
+        assertEquals(0, handy("2013/03/16").calculateSizeWeekdays(toDate("2013/03/17")));
+        assertEquals(1, handy("2013/03/16").calculateSizeWeekdays(toDate("2013/03/18")));
+    }
+
+    public void test_calculateSizeWeekendDays() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateSizeWeekendDays(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/03").calculateSizeWeekendDays(toDate("2013/03/03 12:34:56")));
+        assertEquals(1, handy("2013/03/03").calculateSizeWeekendDays(toDate("2013/03/07")));
+        assertEquals(1, handy("2013/03/07").calculateSizeWeekendDays(toDate("2013/03/03")));
+        assertEquals(2, handy("2013/03/07").calculateSizeWeekendDays(toDate("2013/03/13")));
+        assertEquals(2, handy("2013/03/13").calculateSizeWeekendDays(toDate("2013/03/07")));
+        assertEquals(6, handy("2013/03/07").calculateSizeWeekendDays(toDate("2013/03/28")));
+    }
+
+    // ===================================================================================
+    //                                                                        Choose Parts
+    //                                                                        ============
+    public void test_chooseNearestFDate() throws Exception {
+        HandyDate date = handy("2013/03/03");
+        assertEquals(toDate("2013/03/03"), date.chooseNearestDate(toDate("2013/03/03"), toDate("2013/03/04")));
+        assertEquals(toDate("2013/03/04"), date.chooseNearestDate(toDate("2013/03/02"), toDate("2013/03/04")));
+        assertEquals(toDate("2013/03/02"), date.chooseNearestDate(toDate("2013/03/02"), toDate("2013/03/06")));
+        assertEquals(toDate("2013/03/05"), date.chooseNearestDate(toDate("2013/03/06"), toDate("2013/03/05")));
+        assertEquals(toDate("2013/03/04 12:34:55"),
+                date.chooseNearestDate(toDate("2013/03/04 12:34:56"), toDate("2013/03/04 12:34:55")));
+        assertEquals(toDate("2013/03/05"),
+                date.chooseNearestDate(toDate("2013/03/05"), toDate("2013/03/12"), toDate("2013/03/01")));
+    }
+
+    public void test_chooseNearestFutureDate() throws Exception {
+        HandyDate date = handy("2013/03/03");
+        assertEquals(toDate("2013/03/03"), date.chooseNearestFutureDate(toDate("2013/03/03"), toDate("2013/03/04")));
+        assertEquals(toDate("2013/03/04"), date.chooseNearestFutureDate(toDate("2013/03/02"), toDate("2013/03/04")));
+        assertEquals(toDate("2013/03/06"), date.chooseNearestFutureDate(toDate("2013/03/02"), toDate("2013/03/06")));
+        assertEquals(toDate("2013/03/05"), date.chooseNearestFutureDate(toDate("2013/03/06"), toDate("2013/03/05")));
+        assertEquals(toDate("2013/03/04 12:34:55"),
+                date.chooseNearestFutureDate(toDate("2013/03/04 12:34:56"), toDate("2013/03/04 12:34:55")));
+        assertEquals(toDate("2013/03/05"),
+                date.chooseNearestFutureDate(toDate("2013/03/05"), toDate("2013/03/12"), toDate("2013/03/02")));
+
+    }
+
+    public void test_chooseNearestPastDate() throws Exception {
+        HandyDate date = handy("2013/03/03");
+        assertEquals(toDate("2013/03/03"), date.chooseNearestPastDate(toDate("2013/03/03"), toDate("2013/03/04")));
+        assertEquals(toDate("2013/03/02"), date.chooseNearestPastDate(toDate("2013/03/02"), toDate("2013/03/04")));
+        assertEquals(toDate("2013/03/01"), date.chooseNearestPastDate(toDate("2013/03/01"), toDate("2013/03/04")));
+        assertEquals(toDate("2013/03/02"), date.chooseNearestPastDate(toDate("2013/03/02"), toDate("2013/03/01")));
+        assertEquals(toDate("2013/03/02 12:34:56"),
+                date.chooseNearestPastDate(toDate("2013/03/02 12:34:56"), toDate("2013/03/02 12:34:55")));
+        assertEquals(toDate("2013/03/01"),
+                date.chooseNearestPastDate(toDate("2013/03/03 00:00:01"), toDate("2013/02/28"), toDate("2013/03/01")));
     }
 
     // ===================================================================================
