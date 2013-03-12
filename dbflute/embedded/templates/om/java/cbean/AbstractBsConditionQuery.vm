@@ -254,7 +254,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * InScope {in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topComment} <br />
 #end
 #if ($group.hasGroupComment())
      * ${group.groupComment}
@@ -313,9 +313,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringLikeSearch()})
 
     /**
-     * LikeSearch with various options. (versatile) {like '%xxx%' escape ...} <br />
-     * And NullOrEmptyIgnored, SeveralRegistered. <br />
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * LikeSearch with various options. (versatile) {like '%xxx%' escape ...}. And NullOrEmptyIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * <pre>e.g. set${tmpJavaName}_LikeSearch("xxx", new <span style="color: #FD4747">LikeSearchOption</span>().likeContain());</pre>
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch. (NullAllowed: if null (or empty), no condition)
      * @param likeSearchOption The option of like-search. (NotNull)
      */
@@ -754,7 +754,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * InScope {in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topComment} <br />
 #end
 #if ($group.hasGroupComment())
      * ${group.groupComment} <br />
@@ -1109,10 +1109,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateFromTo()})
 
     /**
-     * FromTo with various options. (versatile) <br />
-     * {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
+     * FromTo with various options. (versatile) {(default) fromDatetime &lt;= column &lt;= toDatetime} <br />
      * And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
+     * <pre>e.g. set${tmpJavaName}_FromTo(fromDate, toDate, new <span style="color: #FD4747">FromToOption</span>().compareAsDate());</pre>
      * @param fromDatetime The from-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
      * @param toDatetime The to-datetime(yyyy/MM/dd HH:mm:ss.SSS) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      * @param fromToOption The option of from-to. (NotNull)
@@ -1128,14 +1128,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateDateFromTo()})
 
     /**
-     * DateFromTo. (Date means yyyy/MM/dd) <br />
-     * {fromDate &lt;= column &lt; toDate + 1 day} <br />
+     * DateFromTo. (Date means yyyy/MM/dd) {fromDate &lt;= column &lt; toDate + 1 day} <br />
      * And NullIgnored, OnlyOnceRegistered. <br />
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}}
      * <pre>
      * e.g. from:{2007/04/10 08:24:53} to:{2007/04/16 14:36:29}
-     *  --&gt; column &gt;= '2007/04/10 00:00:00'
-     *  and column <span style="color: #FD4747">&lt; '2007/04/17 00:00:00'</span>
+     *  column &gt;= '2007/04/10 00:00:00' and column <span style="color: #FD4747">&lt; '2007/04/17 00:00:00'</span>
      * </pre>
      * @param fromDate The from-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no from-condition)
      * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
