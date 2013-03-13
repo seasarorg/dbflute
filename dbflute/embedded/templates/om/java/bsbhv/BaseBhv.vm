@@ -139,7 +139,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * int count = ${myEntityVariableName}Bhv.<span style="color: #FD4747">selectCount</span>(cb);
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @return The selected count.
+     * @return The count for the condition. (NotMinus)
      */
     public int selectCount(${myConditionBeanClassName} cb) {
         return doSelectCountUniquely(cb);
@@ -176,7 +176,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * }
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @return The selected entity. (NullAllowed: If the condition has no data, it returns null)
+     * @return The entity selected by the condition. (NullAllowed: if no data, it returns null)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
@@ -204,7 +204,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * ... = ${myEntityVariableName}.get...(); <span style="color: #3F7E5E">// the entity always be not null</span>
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @return The selected entity. (NotNull)
+     * @return The entity selected by the condition. (NotNull: if no data, throws exception)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
@@ -228,7 +228,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     /**
      * Select the entity by the primary-key value.
      * ${table.primaryKeyArgsJavaDocString}
-     * @return The selected entity. (NullAllowed: If the primary-key value has no data, it returns null)
+     * @return The entity selected by the PK. (NullAllowed: if no data, it returns null)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
      */
@@ -243,7 +243,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     /**
      * Select the entity by the primary-key value with deleted check.
      * ${table.primaryKeyArgsJavaDocString}
-     * @return The selected entity. (NotNull)
+     * @return The entity selected by the PK. (NotNull: if no data, throws exception)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.SelectEntityConditionNotFoundException When the condition for selecting an entity is not found.
@@ -279,7 +279,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * }
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @return The result bean of selected list. (NotNull)
+     * @return The result bean of selected list. (NotNull: if no data, returns empty list)
      * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public ListResultBean<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
@@ -320,7 +320,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * }
      * </pre>
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @return The result bean of selected page. (NotNull)
+     * @return The result bean of selected page. (NotNull: if no data, returns bean as empty list)
      * @exception org.seasar.dbflute.exception.DangerousResultSizeException When the result size is over the specified safety size.
      */
     public PagingResultBean<${myExtendedObjectClassName}> selectPage(${myConditionBeanClassName} cb) {
