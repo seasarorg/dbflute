@@ -109,11 +109,11 @@ public class DfLoadingControlProp {
     //                                                                 ===================
     public boolean isCheckColumnDefExistence(String dataDirectory) {
         final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
-        final String prop = (String) loadingControlMap.get("isCheckColumnDefExistence");
-        if (isSpecifiedValieProperty(prop)) {
-            return prop.trim().equalsIgnoreCase("true");
+        final String prop = (String) loadingControlMap.get("isSuppressColumnDefCheck");
+        if (isSpecifiedValieProperty(prop) && prop.trim().equalsIgnoreCase("true")) {
+            return false; // suppress
         }
-        return false;
+        return true; // default is checked
     }
 
     public void checkColumnDefExistence(String dataDirectory, File dataFile, String tableName,
@@ -132,7 +132,7 @@ public class DfLoadingControlProp {
     protected void throwLoadingControlNoExistenceColumnFoundException(String dataDirectory, File dataFile,
             String tableName, List<String> unneededList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Found the no-existence column in your data file.");
+        br.addNotice("Found the no-exist column in your data file.");
         br.addItem("Data Directory");
         br.addElement(dataDirectory);
         br.addItem("Data File");

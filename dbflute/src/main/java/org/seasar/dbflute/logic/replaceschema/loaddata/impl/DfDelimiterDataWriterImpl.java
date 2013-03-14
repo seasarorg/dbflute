@@ -144,6 +144,9 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     if (columnNameList.isEmpty()) {
                         throwDelimiterDataColumnDefNotFoundException(_fileName, tableDbName);
                     }
+                    if (isCheckColumnDefExistence(dataDirectory)) { // should be before default process
+                        checkColumnDefExistence(dataDirectory, dataFile, tableDbName, columnNameList, columnMetaMap);
+                    }
                     final StringSet columnSet = StringSet.createAsFlexible();
                     columnSet.addAll(columnNameList);
                     for (String defaultColumn : _defaultValueMap.keySet()) {
@@ -152,10 +155,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                         }
                         additionalColumnList.add(defaultColumn);
                     }
-                    columnNameList.addAll(additionalColumnList);
-                    if (isCheckColumnDefExistence(dataDirectory)) {
-                        checkColumnDefExistence(dataDirectory, dataFile, tableDbName, columnNameList, columnMetaMap);
-                    }
+                    columnNameList.addAll(additionalColumnList); // no DB column is ignored later
                     continue;
                 }
 
