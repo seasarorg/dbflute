@@ -115,8 +115,8 @@ public class LeftOuterJoinInfo implements Serializable {
             return false;
         }
         // pure structural-possible inner-join here
-        // but check all relations from base point are inner-join or not
-        // (lonely structural-possible is out of target for safety and simplicity)
+        // and check all relations from base point are inner-join or not
+        // (separated structural-possible should not be inner-join)
         LeftOuterJoinInfo current = _localJoinInfo;
         while (true) {
             if (current == null) { // means first level (not nested) join

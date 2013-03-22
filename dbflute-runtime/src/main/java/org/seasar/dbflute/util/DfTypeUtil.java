@@ -843,24 +843,22 @@ public final class DfTypeUtil {
     }
 
     protected static String filterDateStringValueFlexibly(final String pureStr, boolean includeMilli) {
-        final String dateLiteralPrefix = "date ";
-        final String bcSymbolPrefix = "-";
-        final String adLatinPrefix = "AD";
-        final String adLatinDotPrefix = "A.D.";
-        final String bcLatinPrefix = "BC";
-        final String bcLatinDotPrefix = "B.C.";
-        final String dateDlm = "-";
-        final String dateTimeDlm = " ";
-        final String timeDlm = ":";
-        final String timeMilliDlm = ".";
         String value = pureStr;
         value = value.trim();
+
+        final String dateLiteralPrefix = "date ";
 
         final boolean dateLiteral = value.startsWith(dateLiteralPrefix);
         if (dateLiteral) {
             value = value.substring(dateLiteralPrefix.length());
             value = value.trim();
         }
+
+        final String adLatinPrefix = "AD";
+        final String adLatinDotPrefix = "A.D.";
+        final String bcLatinPrefix = "BC";
+        final String bcLatinDotPrefix = "B.C.";
+        final String bcSymbolPrefix = "-";
 
         // handling AD/BC prefix
         final boolean bc;
@@ -885,6 +883,8 @@ public final class DfTypeUtil {
             }
             value = value.trim();
         }
+
+        final String dateDlm = "-";
 
         // handling slash delimiter for yyyyMMdd
         value = value.replaceAll("/", dateDlm);
@@ -924,6 +924,10 @@ public final class DfTypeUtil {
         String mm = startsMon.substring(0, monthEndIndex);
         mm = resolveDateElementZeroPrefix(mm, 2 - mm.length());
         formatDateElementAsNumber(mm, "MM", pureStr); // check only
+
+        final String dateTimeDlm = " ";
+        final String timeDlm = ":";
+        final String timeMilliDlm = ".";
 
         final String startsDay = startsMon.substring(monthEndIndex + dateDlm.length());
         final int dayEndIndex = startsDay.indexOf(dateTimeDlm);

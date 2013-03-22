@@ -202,7 +202,7 @@ public class SqlAnalyzer {
         }
     }
 
-    protected static boolean isTargetComment(String comment) {
+    protected boolean isTargetComment(String comment) {
         if (Srl.is_Null_or_TrimmedEmpty(comment)) {
             return false;
         }
@@ -217,7 +217,7 @@ public class SqlAnalyzer {
     // -----------------------------------------------------
     //                                                 BEGIN
     //                                                 -----
-    protected static boolean isBeginComment(String comment) {
+    protected boolean isBeginComment(String comment) {
         return BeginNode.MARK.equals(comment);
     }
 
@@ -254,7 +254,7 @@ public class SqlAnalyzer {
     // -----------------------------------------------------
     //                                                    IF
     //                                                    --
-    private static boolean isIfComment(String comment) {
+    protected boolean isIfComment(String comment) {
         return comment.startsWith(IfNode.PREFIX);
     }
 
@@ -310,7 +310,7 @@ public class SqlAnalyzer {
     // -----------------------------------------------------
     //                                                   FOR
     //                                                   ---
-    private static boolean isForComment(String comment) {
+    protected boolean isForComment(String comment) {
         return comment.startsWith(ForNode.PREFIX);
     }
 
@@ -331,7 +331,7 @@ public class SqlAnalyzer {
         return new ForNode(expr, _specifiedSql);
     }
 
-    private static boolean isLoopVariableComment(String comment) {
+    protected boolean isLoopVariableComment(String comment) {
         return comment.startsWith(LoopFirstNode.MARK) || comment.startsWith(LoopNextNode.MARK)
                 || comment.startsWith(LoopLastNode.MARK);
     }
@@ -381,7 +381,7 @@ public class SqlAnalyzer {
     // -----------------------------------------------------
     //                                                   END
     //                                                   ---
-    private static boolean isEndComment(String content) {
+    protected boolean isEndComment(String content) {
         return content != null && "END".equals(content);
     }
 
@@ -398,19 +398,17 @@ public class SqlAnalyzer {
     }
 
     protected void throwEndCommentNotFoundException() {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The end comment was not found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the parameter comment logic." + ln();
-        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + ln();
-        msg = msg + "For example:" + ln();
-        msg = msg + "  (x) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
-        msg = msg + "  (o) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The end comment was not found!");
+        br.addItem("Advice");
+        br.addElement("Please confirm the parameter comment logic.");
+        br.addElement("It may exist the parameter comment that DOESN'T have an end comment.");
+        br.addElement("For example:");
+        br.addElement("  (x): /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3");
+        br.addElement("  (o): /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/");
+        br.addItem("Specified SQL");
+        br.addElement(_specifiedSql);
+        final String msg = br.buildExceptionMessage();
         throw new EndCommentNotFoundException(msg);
     }
 
