@@ -73,6 +73,48 @@ public class MapListStringTest extends PlainTestCase {
         assertEquals(map, generateMap);
     }
 
+    public void test_buildMapString_escape() {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("k=ey1", "val{ue1");
+        map.put("ke;y2", "va=lu}e2");
+        {
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("k}ey3-1", "va;lue3-1");
+            valueMap.put("key3-2", "value3-2");
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value3-3-1");
+            valueList.add("value3-3-2");
+            valueMap.put("key3-3", valueList);
+            map.put("key3", valueMap);
+        }
+        {
+            List<Object> valueList = new ArrayList<Object>();
+            valueList.add("value4-1");
+            valueList.add("value4-2");
+            Map<String, Object> valueMap = new LinkedHashMap<String, Object>();
+            valueMap.put("key=4-3-1", "value4-3-1");
+            valueMap.put("key@4-3-2", "val{ue4=-3-2");
+            valueList.add(valueMap);
+            map.put("key4", valueList);
+        }
+
+        // ## Act ##
+        String actual = maplist.buildMapString(map);
+
+        // ## Assert ##
+        log(ln() + actual);
+        assertTrue(actual.contains("; k\\=ey1 = val\\{ue1" + ln()));
+        assertTrue(actual.contains("; ke\\;y2 = va\\=lu\\}e2" + ln()));
+        assertTrue(actual.contains("; key3 = map:{" + ln()));
+        assertTrue(actual.contains("; k\\}ey3-1 = va\\;lue3-1" + ln()));
+        assertTrue(actual.contains("; key@4-3-2 = val\\{ue4\\=-3-2" + ln()));
+        Map<String, Object> generateMap = maplist.generateMap(actual);
+        log(ln() + generateMap);
+        assertEquals(map, generateMap);
+    }
+
     // ===================================================================================
     //                                                                            Generate
     //                                                                            ========
@@ -86,9 +128,9 @@ public class MapListStringTest extends PlainTestCase {
 
         // ## Assert ##
         showGeneratedMap(resultMap);
-        assertEquals(resultMap.get("key1"), "value1");
-        assertEquals(resultMap.get("key2"), Arrays.asList(new String[] { "value2-1", "value2-2", "value2-3" }));
-        assertEquals(resultMap.get("key3"), "value3");
+        assertEquals("value1", resultMap.get("key1"));
+        assertEquals(Arrays.asList(new String[] { "value2-1", "value2-2", "value2-3" }), resultMap.get("key2"));
+        assertEquals("value3", resultMap.get("key3"));
     }
 
     public void test_generateMap_contains_EmptyString_and_Null() throws Exception {
@@ -117,10 +159,10 @@ public class MapListStringTest extends PlainTestCase {
 
         // ## Assert ##
         showGeneratedMap(generatedMap);
-        assertEquals(generatedMap.get("key1"), "value1");
-        assertEquals(generatedMap.get("key2"), "value2");
-        assertEquals(generatedMap.get("key3"), "val\nue3");
-        assertEquals(generatedMap.get("key4"), "value4");
+        assertEquals("value1", generatedMap.get("key1"));
+        assertEquals("value2", generatedMap.get("key2"));
+        assertEquals("val\nue3", generatedMap.get("key3"));
+        assertEquals("value4", generatedMap.get("key4"));
     }
 
     public void test_generateMap_contains_DoubleByte() throws Exception {
@@ -135,13 +177,49 @@ public class MapListStringTest extends PlainTestCase {
         showGeneratedMap(generatedMap);
     }
 
+    public void test_generateMap_escape_basic() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+        final String mapString = "map:{ke\\{y1\"=v\\;\\}al\\}u\\=e\\\\\\}1\\\\}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = maplist.generateMap(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("v;}al}u=e\\}1\\", resultMap.get("ke{y1\""));
+    }
+
+    public void test_generateMap_escape_border() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+        final String mapString = "map:{\\{key1\\;=\\\\\\{v\\;al\\}u\\=e\\}1\\;\\}}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = maplist.generateMap(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("\\{v;al}u=e}1;}", resultMap.get("{key1;"));
+    }
+
+    public void test_generateMap_quoted_basic() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+        final String mapString = "map:{key1=\"value1\"}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = maplist.generateMap(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("\"value1\"", resultMap.get("key1")); // keep quoted
+    }
+
     protected void showGeneratedMap(Map<String, Object> generatedMap) {
         final String targetString = generatedMap.toString();
         final StringBuilder sb = new StringBuilder();
-        sb.append(ln());
-        sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * * * ").append(ln());
-        sb.append(targetString).append(ln());
-        sb.append("* * * * * * * * * */");
+        sb.append(ln()).append(targetString);
         log(sb);
     }
 }
