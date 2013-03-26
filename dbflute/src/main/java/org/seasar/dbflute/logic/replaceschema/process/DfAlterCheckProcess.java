@@ -117,7 +117,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected void throwAlterCheckDataSourceNotFoundException() {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Not found the data source for AlterCheck (or ChangeOutput).");
+        br.addNotice("Not found the data source for AlterCheck.");
         br.addItem("Advice");
         br.addElement("Make sure your database process works");
         br.addElement("or your connection settings are correct.");
@@ -427,7 +427,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         br.addItem("Advice");
         br.addElement("Make sure your DDL and data for ReplaceSchema,");
         br.addElement("resources just below 'playsql' directory, are correct.");
-        br.addElement("and after that, execute ReplaceSchema again to save previous");
+        br.addElement("and after that, execute SavePrevious again.");
         String msg = br.buildExceptionMessage();
         finalInfo.setSavePreviousFailureEx(new DfAlterCheckSavePreviousFailureException(msg, threwLater));
         finalInfo.setFailure(true);
@@ -485,7 +485,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         br.addItem("Advice");
         br.addElement("Make sure your NextDDL or data for ReplaceSchema are correct,");
         br.addElement("resources just below 'playsql' directory, are correct.");
-        br.addElement("and after that, execute ReplaceSchema again to check AlterDDL");
+        br.addElement("and after that, execute AlterCheck again.");
         String msg = br.buildExceptionMessage();
         finalInfo.setReplaceSchemaFailureEx(new DfAlterCheckReplaceSchemaFailureException(msg, e));
         finalInfo.setFailure(true);
@@ -945,7 +945,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
 
     protected void setupFixedAlterAdviceMessage(ExceptionMessageBuilder br) {
         br.addElement("Make sure your AlterDDL are correct,");
-        br.addElement("and after that, execute ReplaceSchema again.");
+        br.addElement("and after that, execute AlterCheck again.");
     }
 
     // ===================================================================================
