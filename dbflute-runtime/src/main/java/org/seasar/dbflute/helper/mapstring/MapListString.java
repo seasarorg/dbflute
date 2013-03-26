@@ -178,7 +178,7 @@ public class MapListString {
                 final List<Object> valueList = (List<Object>) value;
                 doBuildListString(sb, valueList, curIndent, calculateNextIndent(preIndent, curIndent));
             } else {
-                sb.append(value);
+                sb.append(escapeControlMark(value));
             }
         }
         sb.append(ln()).append(preIndent).append(_endBrace);
