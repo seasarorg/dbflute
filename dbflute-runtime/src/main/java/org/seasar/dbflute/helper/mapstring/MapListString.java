@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.seasar.dbflute.exception.MapListStringParseFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+
 /**
  * The string for map and list.
  * <pre>
@@ -213,13 +216,23 @@ public class MapListString {
         final Map<String, Object> generatedMap = newStringObjectMap();
         parseRemainderMapString(generatedMap);
         if (!"".equals(_remainderString)) {
-            String msg = "Final remainderString must be empty string:";
-            msg = msg + lnd() + " # remainderString --> " + _remainderString;
-            msg = msg + lnd() + " # mapString --> " + mapString;
-            msg = msg + lnd() + " # generatedMap --> " + generatedMap;
-            throw new IllegalStateException(msg);
+            throwMapStringUnneededStringFoundException(mapString, generatedMap);
         }
         return generatedMap;
+    }
+
+    protected void throwMapStringUnneededStringFoundException(String mapString, Map<String, Object> generatedMap) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Final remainderString should be empty string but ...");
+        br.addItem("Remainder String");
+        br.addElement(_remainderString);
+        br.addItem("Map String");
+        br.addElement(mapString);
+        br.addItem("Generated Map");
+        br.addElement(generatedMap);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
     }
 
     /**
@@ -239,13 +252,23 @@ public class MapListString {
         final List<Object> generatedList = newObjectList();
         parseRemainderListString(generatedList);
         if (!"".equals(_remainderString)) {
-            String msg = "Final remainderString must be empty string:";
-            msg = msg + lnd() + " # remainderString --> " + _remainderString;
-            msg = msg + lnd() + " # listString --> " + listString;
-            msg = msg + lnd() + " # generatedList --> " + generatedList;
-            throw new IllegalStateException(msg);
+            throwListStringUnneededStringFoundException(listString, generatedList);
         }
         return generatedList;
+    }
+
+    protected void throwListStringUnneededStringFoundException(String listString, List<Object> generatedList) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Final remainderString should be empty string but ...");
+        br.addItem("Remainder String");
+        br.addElement(_remainderString);
+        br.addItem("List String");
+        br.addElement(listString);
+        br.addItem("Generated List");
+        br.addElement(generatedList);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
     }
 
     // ===================================================================================
@@ -264,7 +287,7 @@ public class MapListString {
             // *** now, _remainderString should starts with the key of the map ***
 
             final int equalIndex = indexOfEqual();
-            assertEqualIndex(_remainderString, equalIndex, _topString, currentMap);
+            assertMapStringEqualIndex(_remainderString, equalIndex, _topString, currentMap);
             final String mapKey = _remainderString.substring(0, equalIndex).trim();
             removePrefixTargetIndexPlus(equalIndex, _equal.length());
             removeBothSideSpaceAndTabAndNewLine();
@@ -291,7 +314,7 @@ public class MapListString {
 
             final int delimiterIndex = indexOfDelimiter();
             final int endBraceIndex = indexOfEndBrace();
-            assertEndBracekIndex(_remainderString, endBraceIndex, _topString, currentMap);
+            assertMapStringEndBraceIndex(_remainderString, endBraceIndex, _topString, currentMap);
 
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) { // delimiter exists
                 // e.g. value1 ; key2=value2}
@@ -346,7 +369,7 @@ public class MapListString {
 
             final int delimiterIndex = indexOfDelimiter();
             final int endBraceIndex = indexOfEndBrace();
-            assertEndBraceIndex(_remainderString, endBraceIndex, _topString, currentList);
+            assertListStringEndBraceIndex(_remainderString, endBraceIndex, _topString, currentList);
 
             if (delimiterIndex >= 0 && delimiterIndex < endBraceIndex) { // delimiter exists
                 // e.g. value1 ; value2 ; value3}
@@ -494,31 +517,42 @@ public class MapListString {
      */
     protected void removePrefix(String prefixString) {
         if (_remainderString == null) {
-            String msg = "The remainderString must not be null: " + _remainderString;
-            throw new IllegalArgumentException(msg);
+            final String notice = "The remainderString should not be null.";
+            throwMapListStringPrefixFailureException(notice, prefixString, _topString);
         }
         if (prefixString == null) {
-            String msg = "The argument 'prefixString' must not be null!";
-            throw new IllegalArgumentException(msg);
+            final String notice = "The prefixString should not be null.";
+            throwMapListStringPrefixFailureException(notice, prefixString, _topString);
         }
 
         removeBothSideSpaceAndTabAndNewLine();
 
+        // deep (or unneeded?) check
         if (_remainderString.length() < prefixString.length()) {
-            String msg = "The remainderString length must be larger than the argument 'prefixString' length:";
-            msg = msg + lnd() + " # remainderString --> " + _remainderString;
-            msg = msg + lnd() + " # prefixString=" + prefixString;
-            throw new IllegalArgumentException(msg);
+            final String notice = "The remainderString length shuold be greater than the prefixString length.";
+            throwMapListStringPrefixFailureException(notice, prefixString, _topString);
         }
         if (!_remainderString.startsWith(prefixString)) {
-            String msg = "The remainderString must start with The argument 'prefixString':";
-            msg = msg + lnd() + " # remainderString --> " + _remainderString;
-            msg = msg + lnd() + " # prefixString --> " + prefixString;
-            throw new IllegalArgumentException(msg);
+            final String notice = "The remainderString shuold start with the prefixString.";
+            throwMapListStringPrefixFailureException(notice, prefixString, _topString);
         }
 
         _remainderString = _remainderString.substring(prefixString.length());
         removeBothSideSpaceAndTabAndNewLine();
+    }
+
+    protected void throwMapListStringPrefixFailureException(String notice, String prefixString, String mapString) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Remainder String");
+        br.addElement(_remainderString);
+        br.addItem("Prefix String");
+        br.addElement(prefixString);
+        br.addItem("MapList String");
+        br.addElement(mapString);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
     }
 
     /**
@@ -586,11 +620,15 @@ public class MapListString {
      */
     protected boolean isStartsWithMapPrefix(String targetString) {
         if (targetString == null) {
-            String msg = "The argument 'targetString' must not be null.";
+            String msg = "The argument 'targetString' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();
-        return targetString.startsWith(_mapMark + _startBrace);
+        return targetString.startsWith(getMapPrefix());
+    }
+
+    protected String getMapPrefix() {
+        return _mapMark + _startBrace;
     }
 
     /**
@@ -600,11 +638,15 @@ public class MapListString {
      */
     protected boolean isStartsWithListPrefix(String targetString) {
         if (targetString == null) {
-            String msg = "The argument 'targetString' must not be null.";
+            String msg = "The argument 'targetString' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();
         return targetString.startsWith(_listMark + _startBrace);
+    }
+
+    protected String getListPrefix() {
+        return _listMark + _startBrace;
     }
 
     /**
@@ -614,7 +656,7 @@ public class MapListString {
      */
     protected boolean isStartsWithDelimiter(String targetString) {
         if (targetString == null) {
-            String msg = "The argument 'targetString' must not be null.";
+            String msg = "The argument 'targetString' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();
@@ -628,7 +670,7 @@ public class MapListString {
      */
     protected boolean isStartsWithEndBrace(String targetString) {
         if (targetString == null) {
-            String msg = "The argument 'targetString' must not be null.";
+            String msg = "The argument 'targetString' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();
@@ -642,7 +684,7 @@ public class MapListString {
      */
     protected boolean isEndsWithEndBrace(String targetString) {
         if (targetString == null) {
-            String msg = "The argument 'targetString' must not be null.";
+            String msg = "The argument 'targetString' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();
@@ -774,63 +816,113 @@ public class MapListString {
         //  the escape char is plain value, e.g. "\ ;"
         //
         return false;
-
     }
 
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
-    // *these codes, written by younger jflute, should be improved but it's very hard...
     protected void assertMapString(String mapString) {
         if (mapString == null) {
-            String msg = "Argument[mapString] must not be null: ";
-            throw new IllegalArgumentException(msg + "mapString=null");
+            final String notice = "The map string should not be null.";
+            throwMapStringBasicFailureException(notice, mapString);
         }
         mapString = mapString.trim();
         if (!isStartsWithMapPrefix(mapString)) {
-            String msg = "Argument[mapString] must start with '" + _mapMark + _startBrace + "': ";
-            throw new IllegalArgumentException(msg + "mapString=" + mapString);
+            final String notice = "The map string should start with '" + getMapPrefix() + "'.";
+            throwMapStringBasicFailureException(notice, mapString);
         }
         if (!isEndsWithEndBrace(mapString)) {
-            String msg = "Argument[mapString] must end with '" + _endBrace + "': ";
-            throw new IllegalArgumentException(msg + "mapString=" + mapString);
+            final String notice = "The map string should end with '" + _endBrace + "'.";
+            throwMapStringBasicFailureException(notice, mapString);
         }
-
         final int startBraceCount = getControlMarkCount(mapString, _startBrace);
         final int endBraceCount = getControlMarkCount(mapString, _endBrace);
         if (startBraceCount != endBraceCount) {
-            String msg = "The count of start braces should be the same as the one of end braces:";
-            msg = msg + lnd() + " # mapString --> " + mapString;
-            msg = msg + lnd() + " # startBraceCount --> " + startBraceCount;
-            msg = msg + lnd() + " # endBraceCount --> " + endBraceCount;
-            throw new IllegalArgumentException(msg);
+            throwMapStringDifferentCountBracesException(mapString, startBraceCount, endBraceCount);
         }
+    }
+
+    protected void throwMapStringBasicFailureException(String notice, String mapString) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Remainder String");
+        br.addElement(_remainderString);
+        br.addItem("Map String");
+        br.addElement(mapString);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
+    }
+
+    protected void throwMapStringDifferentCountBracesException(String mapString, int startCount, int endCount) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Different count between start braces and end braces.");
+        br.addItem("Advice");
+        br.addElement("Make sure braces on your map-list string.");
+        br.addElement("For example:");
+        br.addElement("  (o): map:{ foo = bar }");
+        br.addElement("  (o): map:{ foo = map:{ bar = qux } }");
+        br.addElement("  (x): map:{ foo = ");
+        br.addElement("  (x): map:{ foo = map:{ }");
+        br.addElement("");
+        br.addElement("map-list string can escape control marks");
+        br.addElement("so pay attention to last char of value like this:");
+        br.addElement("  (x): map:{ foo = C:\\foo\\bar\\}  // last '}' escaped by escape char");
+        br.addElement("  (o): map:{ foo = C:\\foo\\bar\\ } // space helps you at the case");
+        br.addItem("Map String");
+        br.addElement(mapString);
+        br.addItem("Brace Count");
+        br.addElement("start: " + startCount);
+        br.addElement("end: " + endCount);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
     }
 
     protected void assertListString(String listString) {
         if (listString == null) {
-            String msg = "Argument[listString] must not be null: ";
-            throw new IllegalArgumentException(msg + "listString=null");
+            final String notice = "The list string should not be null.";
+            throwListStringBasicFailureException(notice, listString);
         }
         listString = listString.trim();
         if (!isStartsWithListPrefix(listString)) {
-            String msg = "Argument[listString] must start with '" + _mapMark + "': ";
-            throw new IllegalArgumentException(msg + "listString=" + listString);
+            final String notice = "The list string should start with '" + getListPrefix() + "'.";
+            throwListStringBasicFailureException(notice, listString);
         }
         if (!isEndsWithEndBrace(listString)) {
-            String msg = "Argument[listString] must end with '" + _endBrace + "': ";
-            throw new IllegalArgumentException(msg + "listString=" + listString);
+            final String notice = "The list string should end with '" + _endBrace + "'.";
+            throwListStringBasicFailureException(notice, listString);
         }
-
         final int startBraceCount = getControlMarkCount(listString, _startBrace);
         final int endBraceCount = getControlMarkCount(listString, _endBrace);
         if (startBraceCount != endBraceCount) {
-            String msg = "The count of start braces should be the same as the one of end braces:";
-            msg = msg + lnd() + " # listString --> " + listString;
-            msg = msg + lnd() + " # startBraceCount --> " + startBraceCount;
-            msg = msg + lnd() + " # endBraceCount --> " + endBraceCount;
-            throw new IllegalArgumentException(msg);
+            throwListStringDifferentCountBracesException(listString, startBraceCount, endBraceCount);
         }
+    }
+
+    protected void throwListStringBasicFailureException(String notice, String listString) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Remainder String");
+        br.addElement(_remainderString);
+        br.addItem("List String");
+        br.addElement(listString);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
+    }
+
+    protected void throwListStringDifferentCountBracesException(String listString, int startCount, int endCount) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Different count between start braces and end braces.");
+        br.addItem("List String");
+        br.addElement(listString);
+        br.addItem("Brace Count");
+        br.addElement("Start: " + startCount);
+        br.addElement("End: " + endCount);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
     }
 
     protected int getControlMarkCount(String targetString, String controlMark) {
@@ -850,177 +942,126 @@ public class MapListString {
         return result;
     }
 
-    protected void assertEqualIndex(String remainderMapString, int equalIndex, String mapString4Log,
-            Map<String, Object> currentMap4Log) {
-        if (remainderMapString == null) {
-            String msg = "Argument[remainderMapString] must not be null:";
-            msg = msg + lnd() + " # remainderMapString --> null";
-            msg = msg + lnd() + " # equalIndex --> " + equalIndex;
-            msg = msg + lnd() + " # mapString4Log --> " + mapString4Log;
-            msg = msg + lnd() + " # currentMap4Log --> " + currentMap4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
+    protected void assertMapStringEqualIndex(String remainderString, int equalIndex, String mapString,
+            Map<String, Object> currentMap) {
+        if (remainderString == null) {
+            final String notice = "The remainderString should not be null:";
+            throwMapStringEqualFailureException(notice, remainderString, equalIndex, mapString, currentMap);
         }
-
         if (equalIndex < 0) {
-            String msg = "Argument[equalIndex] must be plus or zero:";
-            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + lnd() + " # equalIndex --> " + equalIndex;
-            msg = msg + lnd() + " # mapString4Log --> " + mapString4Log;
-            msg = msg + lnd() + " # currentMap4Log --> " + currentMap4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
+            final String notice = "Not found the equal mark in the map.";
+            throwMapStringEqualFailureException(notice, remainderString, equalIndex, mapString, currentMap);
         }
-
-        if (remainderMapString.length() < equalIndex) {
-            String msg = "Argument[remainderMapString] length must be larger than equalIndex value:";
-            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + lnd() + " # equalIndex --> " + equalIndex;
-            msg = msg + lnd() + " # mapString4Log --> " + mapString4Log;
-            msg = msg + lnd() + " # currentMap4Log --> " + currentMap4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
+        // deep (or unneeded?) check (written by younger jflute)
+        if (remainderString.length() < equalIndex) {
+            final String notice = "The remainderString length should be greater than equalIndex:";
+            throwMapStringEqualFailureException(notice, remainderString, equalIndex, mapString, currentMap);
         }
-
-        final String expectedAsEndMark = remainderMapString.substring(equalIndex, equalIndex + _equal.length());
-        if (!expectedAsEndMark.equals(_equal)) {
-            String msg = "Argument[remainderMapString] must have '" + _equal + "' at Argument[equalIndex]:";
-            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + lnd() + " # equalIndex --> " + equalIndex;
-            msg = msg + lnd() + " # expectedAsEndMark --> " + expectedAsEndMark;
-            msg = msg + lnd() + " # mapString --> " + mapString4Log;
-            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
+        final String extractedMark = remainderString.substring(equalIndex, equalIndex + _equal.length());
+        if (!extractedMark.equals(_equal)) {
+            final String notice = "The remainderString should have equal mark at equalIndex:";
+            throwMapStringEqualFailureException(notice, remainderString, equalIndex, mapString, currentMap);
         }
     }
 
-    protected void assertEndBracekIndex(String remainderMapString, int endBraceIndex, String mapString4Log,
-            Map<String, Object> currentMap4Log) {
-        if (remainderMapString == null) {
-            String msg = "Argument[remainderMapString] must not be null:";
-            msg = msg + lnd() + " # remainderMapString --> null";
-            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + lnd() + " # mapString --> " + mapString4Log;
-            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
-        }
+    protected void throwMapStringEqualFailureException(String notice, String remainderMapString, int equalIndex,
+            String mapString, Map<String, Object> currentMap) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Remainder String");
+        br.addElement(remainderMapString);
+        br.addItem("Equal Index");
+        br.addElement(equalIndex);
+        br.addItem("Whole Map String");
+        br.addElement(mapString);
+        br.addItem("Making Map");
+        br.addElement(currentMap);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
+    }
 
+    protected void assertMapStringEndBraceIndex(String remainderString, int endBraceIndex, String mapString,
+            Map<String, Object> currentMap) {
+        if (remainderString == null) {
+            final String notice = "The remainderString should not be null:";
+            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
+        }
         if (endBraceIndex < 0) {
-            String msg = "Argument[endMarkIndex] must be plus or zero:";
-            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + lnd() + " # mapString --> =" + mapString4Log;
-            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
+            final String notice = "Not found the end brace.";
+            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
         }
-
-        if (remainderMapString.length() < endBraceIndex) {
-            String msg = "Argument[remainderMapString] length must be larger than endMarkIndex value:";
-            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + lnd() + " # mapString --> " + mapString4Log;
-            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
+        // deep (or unneeded?) check (written by younger jflute)
+        if (remainderString.length() < endBraceIndex) {
+            final String notice = "The remainderString length should be greater than endMarkIndex:";
+            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
         }
-
-        final String expectedAsEndMark = remainderMapString
-                .substring(endBraceIndex, endBraceIndex + _endBrace.length());
-        if (!expectedAsEndMark.equals(_endBrace)) {
-            String msg = "Argument[remainderMapString] must have '" + _endBrace + "' at Argument[endBraceIndex]:";
-            msg = msg + lnd() + " # remainderMapString --> " + remainderMapString;
-            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + lnd() + " # expectedAsEndMark --> " + expectedAsEndMark;
-            msg = msg + lnd() + " # mapString --> " + mapString4Log;
-            msg = msg + lnd() + " # currentMap --> " + currentMap4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
+        final String extractedMark = remainderString.substring(endBraceIndex, endBraceIndex + _endBrace.length());
+        if (!extractedMark.equals(_endBrace)) {
+            final String notice = "The remainderString should have end brace at the endMarkIndex:";
+            throwMapStringEndBraceFailureException(notice, remainderString, endBraceIndex, mapString, currentMap);
         }
     }
 
-    protected void assertEndBraceIndex(String remainderListString, int endBraceIndex, String listString4Log,
-            List<?> currentList4Log) {
-        if (remainderListString == null) {
-            String msg = "Argument[remainderListString] must not be null:";
-            msg = msg + lnd() + " # remainderListString --> null";
-            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + lnd() + " # listString --> " + listString4Log;
-            msg = msg + lnd() + " # currentList --> " + currentList4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
+    protected void assertListStringEndBraceIndex(String remainderString, int endBraceIndex, String listString,
+            List<?> currentList) {
+        if (remainderString == null) {
+            final String notice = "The remainderString should not be null:";
+            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
         }
-
         if (endBraceIndex < 0) {
-            String msg = "Argument[endMarkIndex] must be plus or zero:";
-            msg = msg + lnd() + " # remainderListString --> " + remainderListString;
-            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + lnd() + " # listString --> " + listString4Log;
-            msg = msg + lnd() + " # currentList --> " + currentList4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
+            final String notice = "Not found the end brace.";
+            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
         }
+        // deep (or unneeded?) check (written by younger jflute)
+        if (remainderString.length() < endBraceIndex) {
+            final String notice = "The remainderString length should be greater than endMarkIndex:";
+            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
+        }
+        final String extractedMark = remainderString.substring(endBraceIndex, endBraceIndex + _endBrace.length());
+        if (!extractedMark.equals(_endBrace)) {
+            final String notice = "The remainderString should have end brace at the endMarkIndex:";
+            throwListStringEndBraceFailureException(notice, remainderString, endBraceIndex, listString, currentList);
+        }
+    }
 
-        if (remainderListString.length() < endBraceIndex) {
-            String msg = "Argument[remainderListString] length must be larger than endMarkIndex value:";
-            msg = msg + lnd() + " # remainderListString --> " + remainderListString;
-            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + lnd() + " # listString --> " + listString4Log;
-            msg = msg + lnd() + " # currentList --> " + currentList4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
-        }
+    protected void throwMapStringEndBraceFailureException(String notice, String remainderMapString, int equalIndex,
+            String mapString, Map<String, Object> currentMap) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Remainder Map String");
+        br.addElement(remainderMapString);
+        br.addItem("EndBrace Index");
+        br.addElement(equalIndex);
+        br.addItem("Whole Map String");
+        br.addElement(mapString);
+        br.addItem("Making Map");
+        br.addElement(currentMap);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
+    }
 
-        final String expectedAsEndBrace = remainderListString.substring(endBraceIndex,
-                endBraceIndex + _endBrace.length());
-        if (!expectedAsEndBrace.equals(_endBrace)) {
-            String msg = "Argument[remainderListString] must have '" + _endBrace + "' at Argument[endBraceIndex]:";
-            msg = msg + lnd() + " # remainderListString --> " + remainderListString;
-            msg = msg + lnd() + " # endBraceIndex --> " + endBraceIndex;
-            msg = msg + lnd() + " # expectedAsEndBrace --> " + expectedAsEndBrace;
-            msg = msg + lnd() + " # listString --> " + listString4Log;
-            msg = msg + lnd() + " # currentList --> " + currentList4Log;
-            msg = msg + lnd() + " # _startBrace --> " + _startBrace;
-            msg = msg + lnd() + " # _endBrace --> " + _endBrace;
-            msg = msg + lnd() + " # _delimiter --> " + _delimiter;
-            msg = msg + lnd() + " # _equal --> " + _equal;
-            throw new IllegalArgumentException(msg);
-        }
+    protected void throwListStringEndBraceFailureException(String notice, String remainderMapString, int equalIndex,
+            String listString, List<?> currentList) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(notice);
+        br.addItem("Remainder List String");
+        br.addElement(remainderMapString);
+        br.addItem("EndBrace Index");
+        br.addElement(equalIndex);
+        br.addItem("Whole List String");
+        br.addElement(listString);
+        br.addItem("Making List");
+        br.addElement(currentList);
+        prepareControlMarkMessage(br);
+        final String msg = br.buildExceptionMessage();
+        throw new MapListStringParseFailureException(msg);
+    }
+
+    protected void prepareControlMarkMessage(final ExceptionMessageBuilder br) {
+        br.addItem("Control Marks");
+        br.addElement(_startBrace + " " + _endBrace + " " + _delimiter + " " + _equal);
     }
 
     // ===================================================================================
@@ -1056,7 +1097,7 @@ public class MapListString {
         return ln() + "    ";
     }
 
-    protected final String ln() {
+    protected String ln() {
         return "\n";
     }
 

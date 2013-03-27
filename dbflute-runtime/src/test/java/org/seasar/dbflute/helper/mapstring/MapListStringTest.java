@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.exception.MapListStringParseFailureException;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
@@ -177,6 +178,9 @@ public class MapListStringTest extends PlainTestCase {
         showGeneratedMap(generatedMap);
     }
 
+    // -----------------------------------------------------
+    //                                                Escape
+    //                                                ------
     public void test_generateMap_escape_basic() throws Exception {
         // ## Arrange ##
         final MapListString maplist = new MapListString();
@@ -203,6 +207,9 @@ public class MapListStringTest extends PlainTestCase {
         assertEquals("\\{v;al}u=e}1;}", resultMap.get("{key1;"));
     }
 
+    // -----------------------------------------------------
+    //                                                Quoted
+    //                                                ------
     public void test_generateMap_quoted_basic() throws Exception {
         // ## Arrange ##
         final MapListString maplist = new MapListString();
@@ -216,10 +223,58 @@ public class MapListStringTest extends PlainTestCase {
         assertEquals("\"value1\"", resultMap.get("key1")); // keep quoted
     }
 
+    // -----------------------------------------------------
+    //                                              Surprise
+    //                                              --------
+    public void test_generateMap_surprise_two_equal() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+        final String mapString = "map:{key1=value1=value2}";
+
+        // ## Act ##
+        final Map<String, Object> resultMap = maplist.generateMap(mapString);
+
+        // ## Assert ##
+        showGeneratedMap(resultMap);
+        assertEquals("value1=value2", resultMap.get("key1"));
+    }
+
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
     protected void showGeneratedMap(Map<String, Object> generatedMap) {
         final String targetString = generatedMap.toString();
         final StringBuilder sb = new StringBuilder();
         sb.append(ln()).append(targetString);
         log(sb);
+    }
+
+    // -----------------------------------------------------
+    //                                               Illegal
+    //                                               -------
+    public void test_generateMap_parse_failure() throws Exception {
+        // ## Arrange ##
+        final MapListString maplist = new MapListString();
+
+        // ## Act ##
+        // ## Assert ##
+        try {
+            maplist.generateMap("map:{ foo = bar");
+            fail();
+        } catch (MapListStringParseFailureException e) {
+            log(e.getMessage());
+        }
+        try {
+            maplist.generateMap("map:{ foo = map:{ }");
+            fail();
+        } catch (MapListStringParseFailureException e) {
+            log(e.getMessage());
+        }
+        try {
+            maplist.generateMap("map:{ foo }");
+            fail();
+        } catch (MapListStringParseFailureException e) {
+            log(e.getMessage());
+        }
     }
 }
