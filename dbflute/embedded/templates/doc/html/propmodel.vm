@@ -236,15 +236,15 @@ ${manager.javaScriptEmbedded}
 #set ($envType = $attribute.envType)
 #set ($langType = $attribute.langType)
 #if ($attribute.isRootFile())
-			<td class="filecell"><strong>${attribute.propertiesFile}</strong></td>
+			<td class="filecell"><strong>${attribute.propertiesPath}</strong></td>
 #else
-			<td class="filecell">${attribute.propertiesFile}</td>
+			<td class="filecell">${attribute.propertiesPath}</td>
 #end
 			<td class="envtypecell">${envType}</td>
 			<td class="langtypecell">${langType}</td>
 			<td class="sizecell">${attribute.keyCount}</td>
 #if ($request.hasExtendsPropRequest())
-			<td class="extendsfilecell">#if ($attribute.hasExtendsAttribute())${attribute.extendsAttribute.propertiesFile}#else &nbsp;#end</td>
+			<td class="extendsfilecell">#if ($attribute.hasExtendsAttribute())${attribute.extendsAttribute.propertiesPath}#else &nbsp;#end</td>
 #end
 #if ($attribute.hasDuplicateKey())
 			<td class="keylistcell">

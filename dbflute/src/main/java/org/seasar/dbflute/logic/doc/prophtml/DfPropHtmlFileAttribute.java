@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -58,6 +59,10 @@ public class DfPropHtmlFileAttribute {
     //                                                                            ========
     public File getPropertiesFile() {
         return _propertiesFile;
+    }
+
+    public String getPropertiesPath() {
+        return Srl.replace(_propertiesFile.getPath(), "\\", "/");
     }
 
     public String getEnvType() {
