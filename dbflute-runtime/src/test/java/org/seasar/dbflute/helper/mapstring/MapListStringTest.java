@@ -180,7 +180,7 @@ public class MapListStringTest extends PlainTestCase {
     public void test_generateMap_escape_basic() throws Exception {
         // ## Arrange ##
         final MapListString maplist = new MapListString();
-        final String mapString = "map:{ke\\{y1\"=v\\;\\}al\\}u\\=e\\\\\\}1\\\\}";
+        final String mapString = "map:{ke\\{y1\"=v\\;\\}al\\}u\\=e\\\\}1\\ }"; // needs space
 
         // ## Act ##
         final Map<String, Object> resultMap = maplist.generateMap(mapString);
@@ -193,7 +193,7 @@ public class MapListStringTest extends PlainTestCase {
     public void test_generateMap_escape_border() throws Exception {
         // ## Arrange ##
         final MapListString maplist = new MapListString();
-        final String mapString = "map:{\\{key1\\;=\\\\\\{v\\;al\\}u\\=e\\}1\\;\\}}";
+        final String mapString = "map:{\\{key1\\;=\\\\{v\\;al\\}u\\=e\\}1\\;\\}}";
 
         // ## Act ##
         final Map<String, Object> resultMap = maplist.generateMap(mapString);

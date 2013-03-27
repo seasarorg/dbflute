@@ -425,9 +425,11 @@ public class MapListString {
     }
 
     protected int findIndexOfControlMark(String remainderString, String controlMark) {
-        final String escapedEscapeChar = toEscapedMark(_escapeChar);
         String current = remainderString;
-        current = replace(current, escapedEscapeChar, buildLengthSpace(escapedEscapeChar));
+        if (isEscapeCharEscape()) {
+            final String escapedEscapeChar = toEscapedMark(_escapeChar);
+            current = replace(current, escapedEscapeChar, buildLengthSpace(escapedEscapeChar));
+        }
         int baseIndex = 0;
         while (true) {
             final int index = current.indexOf(controlMark);
@@ -720,7 +722,9 @@ public class MapListString {
             return null;
         }
         String filtered = value.toString();
-        filtered = replace(filtered, _escapeChar, toEscapedMark(_escapeChar));
+        if (isEscapeCharEscape()) {
+            filtered = replace(filtered, _escapeChar, toEscapedMark(_escapeChar));
+        }
         filtered = replace(filtered, _startBrace, toEscapedMark(_startBrace));
         filtered = replace(filtered, _endBrace, toEscapedMark(_endBrace));
         filtered = replace(filtered, _delimiter, toEscapedMark(_delimiter));
@@ -734,17 +738,43 @@ public class MapListString {
         }
         String filtered = value;
         final String escapedEscapeMark = ESCAPED_ESCAPE_MARK;
-        filtered = replace(filtered, toEscapedMark(_escapeChar), escapedEscapeMark);
+        if (isEscapeCharEscape()) {
+            filtered = replace(filtered, toEscapedMark(_escapeChar), escapedEscapeMark);
+        }
         filtered = replace(filtered, toEscapedMark(_startBrace), _startBrace);
         filtered = replace(filtered, toEscapedMark(_endBrace), _endBrace);
         filtered = replace(filtered, toEscapedMark(_delimiter), _delimiter);
         filtered = replace(filtered, toEscapedMark(_equal), _equal);
-        filtered = replace(filtered, escapedEscapeMark, _escapeChar);
+        if (isEscapeCharEscape()) {
+            filtered = replace(filtered, escapedEscapeMark, _escapeChar);
+        }
         return filtered;
     }
 
     protected String toEscapedMark(String mark) {
         return _escapeChar + mark;
+    }
+
+    protected boolean isEscapeCharEscape() {
+        // escape for escape char is unsupported (unneeded)
+        // so fixedly returns false
+        //
+        // compatibility is treated as important here
+        //  o "\\n = \n" in convertValueMap.dfprop can directly work
+        //  o plain "\" is can directly work
+        //
+        // [specification]
+        // escape char without control mark is treated as plain value
+        //  e.g. "a\b\c"
+        // 
+        // previous escape char of control mark is always treated as escape char
+        //  e.g. "\;"
+        //
+        // if any spaces between the escape char and the control mark exist,
+        //  the escape char is plain value, e.g. "\ ;"
+        //
+        return false;
+
     }
 
     // ===================================================================================
