@@ -89,7 +89,7 @@ map:{
     #  by this property changing. Because it is possible that
     #  the BatchUpdateException information is very short for debug.
     #
-    ; isSuppressBatchUpdate = false
+    #; isSuppressBatchUpdate = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
