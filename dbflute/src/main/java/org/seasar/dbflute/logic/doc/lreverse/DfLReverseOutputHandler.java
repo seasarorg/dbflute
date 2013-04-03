@@ -147,11 +147,10 @@ public class DfLReverseOutputHandler {
     //                                                                            ========
     protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList,
             int index, List<String> sectionInfoList) {
-        final String tableDbName = table.getName();
         final int xlsLimit = _xlsLimit;
         final List<Map<String, String>> recordList;
         {
-            final String tableInfo = "  " + tableDbName + " (" + extractedList.size() + ")";
+            final String tableInfo = "  " + table.getTableDispName() + " (" + extractedList.size() + ")";
             _log.info(tableInfo);
             sectionInfoList.add(tableInfo);
             if (extractedList.size() > xlsLimit) {
@@ -234,7 +233,7 @@ public class DfLReverseOutputHandler {
     // ===================================================================================
     //                                                                      Delimiter Data
     //                                                                      ==============
-    protected void outputDelimiterData(Table table, DfLReverseDataResult templateDataResult, final int limit,
+    protected void outputDelimiterData(final Table table, DfLReverseDataResult templateDataResult, final int limit,
             final List<String> sectionInfoList) {
         if (_delimiterDataDir == null) {
             return;
@@ -243,15 +242,15 @@ public class DfLReverseOutputHandler {
         final String ext = "tsv"; // fixed
         final FileMakingOption option = new FileMakingOption().encodeAsUTF8().separateLf();
         option.delimitateByTab();
-        final String tableDbName = table.getName();
-        final String outputInfo = "...Outputting the over-xls-limit table: " + tableDbName;
+        final String outputInfo = "...Outputting the over-xls-limit table: " + table.getTableDispName();
         _log.info(outputInfo);
         sectionInfoList.add(outputInfo);
         if (!delimiterDir.exists()) {
             delimiterDir.mkdirs();
         }
         final FileToken fileToken = new FileToken();
-        final String delimiterFilePath = delimiterDir.getPath() + "/" + tableDbName + "." + ext;
+        // file name uses DB name (no display name) just in case
+        final String delimiterFilePath = delimiterDir.getPath() + "/" + table.getTableDbName() + "." + ext;
         final List<String> columnNameList = new ArrayList<String>();
         for (Column column : table.getColumnList()) {
             if (!_containsCommonColumn && column.isCommonColumn()) {
@@ -290,7 +289,7 @@ public class DfLReverseOutputHandler {
                     }, option);
                 } catch (IOException e) {
                     String msg = "Failed to output delimiter data:";
-                    msg = msg + " table=" + tableDbName + " file=" + delimiterFilePath;
+                    msg = msg + " table=" + table.getTableDispName() + " file=" + delimiterFilePath;
                     throw new IllegalStateException(msg, e);
                 }
                 final String delimiterInfo = " -> " + delimiterFilePath + " (" + count + ")";

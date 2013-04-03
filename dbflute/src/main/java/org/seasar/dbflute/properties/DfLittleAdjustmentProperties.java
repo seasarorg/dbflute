@@ -179,7 +179,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isTableDispNameUpperCase", false);
     }
 
-    public String filterTableDispNameIfNeeds(String tableDbName) { // basically for TableDiff
+    public String filterTableDispNameIfNeeds(String tableDbName) {
         return isTableDispNameUpperCase() ? tableDbName.toUpperCase() : tableDbName;
     }
 

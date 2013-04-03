@@ -597,7 +597,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     protected void assertVariousPropertyList(String name, Object value) {
         if (!(value instanceof List<?>)) {
             String msg = "The property '" + name + "' should be List: " + value;
-            throw new IllegalStateException(msg);
+            throw new DfIllegalPropertyTypeException(msg);
         }
     }
 

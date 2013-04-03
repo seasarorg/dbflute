@@ -32,6 +32,7 @@ import org.seasar.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -582,15 +583,15 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                     LoadDataReverse
     //                                                                     ===============
-    protected Map<String, String> _loadDataReverseMap;
+    protected Map<String, Object> _loadDataReverseMap;
 
-    protected Map<String, String> getLoadDataReverseMap() {
+    protected Map<String, Object> getLoadDataReverseMap() {
         if (_loadDataReverseMap != null) {
             return _loadDataReverseMap;
         }
         final String key = "loadDataReverseMap";
         @SuppressWarnings("unchecked")
-        final Map<String, String> map = (Map<String, String>) getDocumentDefinitionMap().get(key);
+        final Map<String, Object> map = (Map<String, Object>) getDocumentDefinitionMap().get(key);
         if (map != null) {
             _loadDataReverseMap = map;
         } else {
@@ -604,10 +605,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public Integer getLoadDataReverseRecordLimit() {
-        final Map<String, String> loadDataReverseMap = getLoadDataReverseMap();
+        final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
         String limitExp = null;
         if (!loadDataReverseMap.isEmpty()) {
-            limitExp = loadDataReverseMap.get("recordLimit");
+            limitExp = (String) loadDataReverseMap.get("recordLimit");
         }
         if (limitExp == null) {
             return null;
@@ -630,10 +631,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public Integer getLoadDataReverseXlsLimit() {
-        final Map<String, String> loadDataReverseMap = getLoadDataReverseMap();
+        final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
         String limitExp = null;
         if (!loadDataReverseMap.isEmpty()) {
-            limitExp = loadDataReverseMap.get("xlsLimit");
+            limitExp = (String) loadDataReverseMap.get("xlsLimit");
         }
         if (limitExp == null) {
             return null; // if null, default limit
@@ -671,6 +672,40 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public boolean isLoadDataReverseOutputToPlaySql() {
         return isProperty("isOutputToPlaySql", false, getLoadDataReverseMap());
+    }
+
+    // -----------------------------------------------------
+    //                                     Table Except List
+    //                                     -----------------
+    protected List<String> _tableExceptList;
+
+    @SuppressWarnings("unchecked")
+    protected List<String> getLoadDataReverseTableExceptList() { // for main schema
+        if (_tableExceptList != null) {
+            return _tableExceptList;
+        }
+        final Object tableExceptObj = getLoadDataReverseMap().get("tableExceptList");
+        if (tableExceptObj != null && !(tableExceptObj instanceof List<?>)) {
+            String msg = "loadDataReverseMap.tableExceptList should be list: " + tableExceptObj;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        final List<String> tableExceptList;
+        if (tableExceptObj != null) {
+            tableExceptList = (List<String>) tableExceptObj;
+        } else {
+            tableExceptList = DfCollectionUtil.emptyList();
+        }
+        _tableExceptList = tableExceptList;
+        return _tableExceptList;
+    }
+
+    public boolean isLoadDataReverseTableTarget(String name) {
+        final List<String> targetList = DfCollectionUtil.emptyList();
+        return isTargetByHint(name, targetList, getLoadDataReverseTableExceptList());
+    }
+
+    public boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
+        return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
     }
 
     // ===================================================================================
@@ -1044,5 +1079,4 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     protected String getPropertiesHtmlJavaScript() { // closet
         return getPropertiesHtmlHeaderJavaScript();
     }
-
 }

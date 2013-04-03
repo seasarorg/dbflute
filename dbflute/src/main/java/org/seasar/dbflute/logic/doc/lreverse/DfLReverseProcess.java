@@ -32,8 +32,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.mapstring.MapListString;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -70,24 +73,25 @@ public class DfLReverseProcess {
     //                                                                             Execute
     //                                                                             =======
     public void execute(Database database) {
+        final List<Table> tableList = filterTableList(database);
         final List<String> sectionInfoList = new ArrayList<String>();
-        final String beginTitle = "...Outputting load data: tables=" + database.getTableList().size();
+        final String beginTitle = "...Outputting load data: tables=" + tableList.size();
         _log.info(beginTitle);
         sectionInfoList.add(beginTitle);
-        final List<List<Table>> orderedList = analyzeOrder(database);
+        final List<List<Table>> orderedList = analyzeOrder(tableList);
         int sectionNo = 1;
         final File baseDir = new File(_outputDir);
         if (!baseDir.exists()) {
             baseDir.mkdirs();
         }
         deletePreviousDataFile(baseDir);
-        for (List<Table> tableList : orderedList) {
+        for (List<Table> nestedList : orderedList) {
             final Map<String, Table> tableInfoMap = new LinkedHashMap<String, Table>();
-            for (Table table : tableList) {
+            for (Table table : nestedList) {
                 tableInfoMap.put(table.getName(), table);
             }
             final String number = (sectionNo < 10 ? "0" + sectionNo : String.valueOf(sectionNo));
-            final String mainName = extractMainName(tableList);
+            final String mainName = extractMainName(nestedList);
             final String sectionTitle = "[Section " + sectionNo + "]: " + mainName;
             _log.info(sectionTitle);
             sectionInfoList.add(sectionTitle);
@@ -132,11 +136,29 @@ public class DfLReverseProcess {
     }
 
     // ===================================================================================
+    //                                                                          Table List
+    //                                                                          ==========
+    protected List<Table> filterTableList(Database database) {
+        final List<Table> tableList = database.getTableList();
+        final List<Table> filteredList = DfCollectionUtil.newArrayListSized(tableList.size());
+        for (Table table : tableList) {
+            if (isTargetTable(table)) {
+                filteredList.add(table);
+            }
+        }
+        return filteredList;
+    }
+
+    protected boolean isTargetTable(Table table) {
+        return getDocumentProperties().isLoadDataReverseTableTarget(table.getTableDbName());
+    }
+
+    // ===================================================================================
     //                                                                       Analyze Order
     //                                                                       =============
-    protected List<List<Table>> analyzeOrder(Database database) {
+    protected List<List<Table>> analyzeOrder(List<Table> tableList) {
         final DfTableOrderAnalyzer analyzer = new DfTableOrderAnalyzer();
-        return analyzer.analyzeOrder(database);
+        return analyzer.analyzeOrder(tableList);
     }
 
     protected String extractMainName(List<Table> tableList) {
@@ -212,6 +234,20 @@ public class DfLReverseProcess {
         }
     }
 
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return getProperties().getDocumentProperties();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     protected String ln() {
         return DBFluteSystem.getBasicLn();
     }

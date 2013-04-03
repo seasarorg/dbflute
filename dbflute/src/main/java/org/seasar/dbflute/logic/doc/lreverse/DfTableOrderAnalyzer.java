@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.util.Srl;
@@ -41,20 +40,19 @@ public class DfTableOrderAnalyzer {
     // ===================================================================================
     //                                                                      Analyzer Order
     //                                                                      ==============
-    public List<List<Table>> analyzeOrder(Database database) {
+    public List<List<Table>> analyzeOrder(List<Table> tableList) {
         final Set<String> alreadyRegisteredSet = new HashSet<String>();
         final List<List<Table>> outputOrderedList = new ArrayList<List<Table>>();
 
         List<Table> workTableList;
         {
-            final List<Table> allTableList = database.getTableList();
             final TreeSet<Table> allTableSet = new TreeSet<Table>(new Comparator<Table>() {
                 public int compare(Table o1, Table o2) {
                     // e.g. order, order_detail, order_detail_more, ...
                     return o1.getTableDbName().compareTo(o2.getTableDbName());
                 }
             });
-            allTableSet.addAll(allTableList);
+            allTableSet.addAll(tableList);
             workTableList = new ArrayList<Table>(allTableSet);
         }
         int level = 1;

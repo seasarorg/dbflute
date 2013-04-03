@@ -303,8 +303,6 @@
 		</copy>
 		<replace file="${mysql.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}" />
 		<replace file="${mysql.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}" />
-		<replace file="${mysql.example.dir}/dbflute_nextexampledb/_project.bat" token="-${pre.version}" value="-${version}" />
-		<replace file="${mysql.example.dir}/dbflute_nextexampledb/_project.sh" token="-${pre.version}" value="-${version}" />
 		<delete dir="${mysql.example.dir}/mydbflute/dbflute-${pre.version}" />
 		<delete dir="${extraction.dir}" />
 	</target>
