@@ -267,6 +267,16 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void outputLoadDataReverse(Database database) {
+        final DfLReverseProcess process = createLReverseProcess();
+        process.execute(database);
+    }
+
+    protected DfLReverseProcess createLReverseProcess() {
+        final DfLReverseOutputHandler handler = createLReverseOutputHandler();
+        return new DfLReverseProcess(handler);
+    }
+
+    protected DfLReverseOutputHandler createLReverseOutputHandler() {
         final DfLReverseOutputHandler handler = new DfLReverseOutputHandler(getDataSource());
         handler.setContainsCommonColumn(isLoadDataReverseContainsCommonColumn());
         handler.setManagedTableOnly(isLoadDataReverseManagedTableOnly());
@@ -277,8 +287,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         handler.setDelimiterDataDir(getLoadDataReverseDelimiterDataDir());
         // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
         //handler.setDelimiterDataTypeCsv(true);
-        final DfLReverseProcess process = new DfLReverseProcess(handler);
-        process.execute(database);
+        return handler;
     }
 
     protected void throwLoadDataReversePropertyNotFoundException() {

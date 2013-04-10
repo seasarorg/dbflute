@@ -58,7 +58,9 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
 
     protected static final String COMMON_LOAD_TYPE = DfLoadedDataInfo.COMMON_LOAD_TYPE;
     protected static final String FIRSTXLS_FILE_TYPE = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;
+    protected static final String FIRSTTSV_FILE_TYPE = DfLoadedDataInfo.FIRSTTSV_FILE_TYPE;
     protected static final String REVERSEXLS_FILE_TYPE = DfLoadedDataInfo.REVERSEXLS_FILE_TYPE;
+    protected static final String REVERSETSV_FILE_TYPE = DfLoadedDataInfo.REVERSETSV_FILE_TYPE;
     protected static final String TSV_FILE_TYPE = DfLoadedDataInfo.TSV_FILE_TYPE;
     protected static final String CSV_FILE_TYPE = DfLoadedDataInfo.CSV_FILE_TYPE;
     protected static final String XLS_FILE_TYPE = DfLoadedDataInfo.XLS_FILE_TYPE;
@@ -129,23 +131,25 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
             // applicationPlaySql is used only for xls,
             // which is the fixed specification
 
-            // common (firstxls -> reversexls -> tsv -> csv -> xls)
+            // common (firstxls -> reversexls -> reversetsv -> tsv -> csv -> xls)
             writeDbFromXlsAsCommonDataFirst();
             writeDbFromXlsAsCommonDataAppFirst();
             writeDbFromXlsAsCommonDataReverse();
             writeDbFromXlsAsCommonDataAppReverse();
-            writeDbFromDelimiterFileAsCommonData(TSV_FILE_TYPE, TSV_DELIMITER);
-            writeDbFromDelimiterFileAsCommonData(CSV_FILE_TYPE, CSV_DELIMITER);
+            writeDbFromDelimiterFileAsCommonData(REVERSETSV_FILE_TYPE, TSV_FILE_TYPE, TSV_DELIMITER);
+            writeDbFromDelimiterFileAsCommonData(TSV_FILE_TYPE, TSV_FILE_TYPE, TSV_DELIMITER);
+            writeDbFromDelimiterFileAsCommonData(CSV_FILE_TYPE, CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsCommonData();
             writeDbFromXlsAsCommonDataApp();
 
-            // specified environment (firstxls -> reversexls -> tsv -> csv -> xls)
+            // specified environment (firstxls -> reversexls -> reversetsv -> tsv -> csv -> xls)
             writeDbFromXlsAsLoadingTypeDataFirst();
             writeDbFromXlsAsLoadingTypeDataAppFirst();
             writeDbFromXlsAsLoadingTypeDataReverse();
             writeDbFromXlsAsLoadingTypeDataAppReverse();
-            writeDbFromDelimiterFileAsLoadingTypeData(TSV_FILE_TYPE, TSV_DELIMITER);
-            writeDbFromDelimiterFileAsLoadingTypeData(CSV_FILE_TYPE, CSV_DELIMITER);
+            writeDbFromDelimiterFileAsLoadingTypeData(REVERSETSV_FILE_TYPE, TSV_FILE_TYPE, TSV_DELIMITER);
+            writeDbFromDelimiterFileAsLoadingTypeData(TSV_FILE_TYPE, TSV_FILE_TYPE, TSV_DELIMITER);
+            writeDbFromDelimiterFileAsLoadingTypeData(CSV_FILE_TYPE, CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsLoadingTypeData();
             writeDbFromXlsAsLoadingTypeDataApp();
             _success = true; // means no exception
@@ -174,16 +178,16 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     // --------------------------------------------
     //                               Delimiter Data
     //                               --------------
-    protected void writeDbFromDelimiterFileAsCommonData(String fileType, String delimter) {
+    protected void writeDbFromDelimiterFileAsCommonData(String typeName, String fileType, String delimter) {
         final String dir = _sqlRootDir;
-        final String path = doGetCommonDataDirectoryPath(dir, fileType);
+        final String path = doGetCommonDataDirectoryPath(dir, typeName);
         writeDbFromDelimiterFile(COMMON_LOAD_TYPE, path, fileType, delimter);
     }
 
-    protected void writeDbFromDelimiterFileAsLoadingTypeData(String fileType, String delimter) {
+    protected void writeDbFromDelimiterFileAsLoadingTypeData(String typeName, String fileType, String delimter) {
         final String dir = _sqlRootDir;
         final String loadType = getRepsEnvType();
-        final String path = doGetLoadingTypeDataDirectoryPath(dir, loadType, fileType);
+        final String path = doGetLoadingTypeDataDirectoryPath(dir, loadType, typeName);
         writeDbFromDelimiterFile(loadType, path, fileType, delimter);
     }
 

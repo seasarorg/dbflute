@@ -659,7 +659,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public String getLoadDataReverseDelimiterDataDir() { // for large data
         if (isLoadDataReverseReplaceSchemaDirectUse()) {
-            return getReplaceSchemaProperties().getMainCurrentLoadTypeTsvUTF8DataDir();
+            return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseTsvUTF8DataDir();
         } else {
             final String templateDir = getLoadDataReverseXlsDataDir();
             return templateDir + "/large-data";

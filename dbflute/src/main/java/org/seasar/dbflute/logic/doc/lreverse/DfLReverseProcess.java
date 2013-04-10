@@ -254,15 +254,13 @@ public class DfLReverseProcess {
                 return targetPrefix && name.endsWith(".xls");
             }
         });
-        if (!isReplaceSchemaDirectUse()) { // not to remove non-related TSV files
-            final String delimiterDataDir = _outputHandler.getDelimiterDataDir();
-            if (delimiterDataDir != null) {
-                doDeletePreviousDataFile(new File(delimiterDataDir), new FileFilter() {
-                    public boolean accept(File file) {
-                        return file.getName().endsWith(".tsv");
-                    }
-                });
-            }
+        final String delimiterDataDir = _outputHandler.getDelimiterDataDir();
+        if (delimiterDataDir != null) {
+            doDeletePreviousDataFile(new File(delimiterDataDir), new FileFilter() {
+                public boolean accept(File file) {
+                    return file.getName().endsWith(".tsv");
+                }
+            });
         }
     }
 

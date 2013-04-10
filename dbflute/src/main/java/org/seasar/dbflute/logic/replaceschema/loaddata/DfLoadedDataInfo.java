@@ -30,7 +30,9 @@ public class DfLoadedDataInfo {
     //                                                                          ==========
     public static final String COMMON_LOAD_TYPE = "common";
     public static final String FIRSTXLS_FILE_TYPE = "firstxls";
+    public static final String FIRSTTSV_FILE_TYPE = "firsttsv";
     public static final String REVERSEXLS_FILE_TYPE = "reversexls";
+    public static final String REVERSETSV_FILE_TYPE = "reversetsv";
     public static final String TSV_FILE_TYPE = "tsv";
     public static final String CSV_FILE_TYPE = "csv";
     public static final String XLS_FILE_TYPE = "xls";

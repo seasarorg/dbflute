@@ -36,9 +36,7 @@ import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.process.SystemScript;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
-import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
-import org.seasar.dbflute.properties.assistant.DfSchemaResourceFinder;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.Srl;
@@ -156,36 +154,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return getSchemaDataDir(baseDir) + "/" + loadType + "/" + typeName;
     }
 
-    protected List<File> doGetCommonDataFileList(String baseDir, String typeName) { // contains data-prop
-        return doGetAnyTypeDataFileList(baseDir, DfLoadedDataInfo.COMMON_LOAD_TYPE, typeName);
-    }
-
-    protected List<File> doGetLoadTypeDataFileList(String baseDir, String typeName) { // contains data-prop
-        return doGetAnyTypeDataFileList(baseDir, getRepsEnvType(), typeName);
-    }
-
-    protected List<File> doGetAnyTypeDataFileList(String baseDir, String loadType, String typeName) { // contains data-prop
-        final String targetDir = getLoadTypeDataDir(baseDir, loadType, typeName);
-        final String firstxlsFileType = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;
-        final String xlsFileType = DfLoadedDataInfo.XLS_FILE_TYPE;
-        final String suffix = "." + (typeName.equals(firstxlsFileType) ? xlsFileType : typeName);
-        if (Srl.equalsPlain(typeName, firstxlsFileType, xlsFileType)) {
-            return doGetDataFileList(targetDir, suffix, false);
-        } else { // delimiter data (contains one level nested)
-            return doGetDataFileList(targetDir, suffix, true);
-        }
-    }
-
-    protected List<File> doGetDataFileList(String targetDir, String suffix, boolean oneLevelNested) {
-        final DfSchemaResourceFinder finder = new DfSchemaResourceFinder();
-        finder.addSuffix(suffix);
-        finder.addSuffix(".dataprop"); // contains data-prop
-        if (oneLevelNested) {
-            finder.containsOneLevelNested();
-        }
-        return finder.findResourceFileList(targetDir);
-    }
-
     // non-ApplicationPlaySql below
 
     public String getMainCommonDataDir() {
@@ -221,6 +189,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public String getMainCurrentLoadTypeReverseXlsDataDir() {
         return getMainCurrentLoadTypeDataDir() + "/reversexls";
+    }
+
+    public String getMainCurrentLoadTypeReverseTsvDataDir() {
+        return getMainCurrentLoadTypeDataDir() + "/reversetsv";
+    }
+
+    public String getMainCurrentLoadTypeReverseTsvUTF8DataDir() {
+        return getMainCurrentLoadTypeReverseTsvDataDir() + "/UTF-8";
     }
 
     public String getMainCurrentLoadTypeTsvDataDir() {
