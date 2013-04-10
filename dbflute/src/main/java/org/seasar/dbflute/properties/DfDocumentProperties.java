@@ -622,12 +622,12 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
     }
 
-    public boolean isLoadDataReverseContainsCommonColumn() {
-        return isProperty("isContainsCommonColumn", false, getLoadDataReverseMap());
+    public boolean isLoadDataReverseContainsCommonColumn() { // closet
+        return isProperty("isContainsCommonColumn", true, getLoadDataReverseMap());
     }
 
     public boolean isLoadDataReverseManagedTableOnly() {
-        return isLoadDataReverseOutputToPlaySql();
+        return isLoadDataReverseReplaceSchemaDirectUse();
     }
 
     public Integer getLoadDataReverseXlsLimit() {
@@ -649,8 +649,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String getLoadDataReverseXlsDataDir() {
-        if (isLoadDataReverseOutputToPlaySql()) {
-            return getReplaceSchemaProperties().getMainCurrentLoadTypeFirstXlsDataDir();
+        if (isLoadDataReverseReplaceSchemaDirectUse()) {
+            return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseXlsDataDir();
         } else {
             final String outputDirectory = getDocumentOutputDirectory();
             return outputDirectory + "/data";
@@ -658,7 +658,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String getLoadDataReverseDelimiterDataDir() { // for large data
-        if (isLoadDataReverseOutputToPlaySql()) {
+        if (isLoadDataReverseReplaceSchemaDirectUse()) {
             return getReplaceSchemaProperties().getMainCurrentLoadTypeTsvUTF8DataDir();
         } else {
             final String templateDir = getLoadDataReverseXlsDataDir();
@@ -667,11 +667,20 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String getLoadDataReverseFileTitle() {
-        return "load-data";
+        return isLoadDataReverseReplaceSchemaDirectUse() ? "cyclic-data" : "reverse-data";
     }
 
-    public boolean isLoadDataReverseOutputToPlaySql() {
+    public boolean isLoadDataReverseReplaceSchemaDirectUse() {
+        final boolean defaultValue = isLoadDataReverseOutputToPlaySql(); // for compatible
+        return isProperty("isReplaceSchemaDirectUse", defaultValue, getLoadDataReverseMap());
+    }
+
+    protected boolean isLoadDataReverseOutputToPlaySql() { // old style
         return isProperty("isOutputToPlaySql", false, getLoadDataReverseMap());
+    }
+
+    public boolean isLoadDataReverseOverrideExistingDataFile() {
+        return isProperty("isOverrideExistingDataFile", false, getLoadDataReverseMap());
     }
 
     // -----------------------------------------------------

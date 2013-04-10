@@ -58,6 +58,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
 
     protected static final String COMMON_LOAD_TYPE = DfLoadedDataInfo.COMMON_LOAD_TYPE;
     protected static final String FIRSTXLS_FILE_TYPE = DfLoadedDataInfo.FIRSTXLS_FILE_TYPE;
+    protected static final String REVERSEXLS_FILE_TYPE = DfLoadedDataInfo.REVERSEXLS_FILE_TYPE;
     protected static final String TSV_FILE_TYPE = DfLoadedDataInfo.TSV_FILE_TYPE;
     protected static final String CSV_FILE_TYPE = DfLoadedDataInfo.CSV_FILE_TYPE;
     protected static final String XLS_FILE_TYPE = DfLoadedDataInfo.XLS_FILE_TYPE;
@@ -128,17 +129,21 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
             // applicationPlaySql is used only for xls,
             // which is the fixed specification
 
-            // common (firstxls -> tsv -> csv -> xls)
+            // common (firstxls -> reversexls -> tsv -> csv -> xls)
             writeDbFromXlsAsCommonDataFirst();
             writeDbFromXlsAsCommonDataAppFirst();
+            writeDbFromXlsAsCommonDataReverse();
+            writeDbFromXlsAsCommonDataAppReverse();
             writeDbFromDelimiterFileAsCommonData(TSV_FILE_TYPE, TSV_DELIMITER);
             writeDbFromDelimiterFileAsCommonData(CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsCommonData();
             writeDbFromXlsAsCommonDataApp();
 
-            // specified environment (firstxls -> tsv -> csv -> xls)
+            // specified environment (firstxls -> reversexls -> tsv -> csv -> xls)
             writeDbFromXlsAsLoadingTypeDataFirst();
             writeDbFromXlsAsLoadingTypeDataAppFirst();
+            writeDbFromXlsAsLoadingTypeDataReverse();
+            writeDbFromXlsAsLoadingTypeDataAppReverse();
             writeDbFromDelimiterFileAsLoadingTypeData(TSV_FILE_TYPE, TSV_DELIMITER);
             writeDbFromDelimiterFileAsLoadingTypeData(CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsLoadingTypeData();
@@ -253,6 +258,14 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         writeDbFromXls(new XlsWritingResource().application().commonType().firstXls());
     }
 
+    protected void writeDbFromXlsAsCommonDataReverse() {
+        writeDbFromXls(new XlsWritingResource().commonType().reverseXls());
+    }
+
+    protected void writeDbFromXlsAsCommonDataAppReverse() {
+        writeDbFromXls(new XlsWritingResource().application().commonType().reverseXls());
+    }
+
     protected void writeDbFromXlsAsCommonData() {
         writeDbFromXls(new XlsWritingResource().commonType());
     }
@@ -269,6 +282,14 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         writeDbFromXls(new XlsWritingResource().application().firstXls());
     }
 
+    protected void writeDbFromXlsAsLoadingTypeDataReverse() {
+        writeDbFromXls(new XlsWritingResource().reverseXls());
+    }
+
+    protected void writeDbFromXlsAsLoadingTypeDataAppReverse() {
+        writeDbFromXls(new XlsWritingResource().application().reverseXls());
+    }
+
     protected void writeDbFromXlsAsLoadingTypeData() {
         writeDbFromXls(new XlsWritingResource());
     }
@@ -281,6 +302,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         protected boolean _application;
         protected boolean _commonType;
         protected boolean _firstXls;
+        protected boolean _reverseXls;
 
         public boolean isApplication() {
             return _application;
@@ -306,6 +328,15 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
 
         public XlsWritingResource firstXls() {
             _firstXls = true;
+            return this;
+        }
+
+        public boolean isReverseXls() {
+            return _reverseXls;
+        }
+
+        public XlsWritingResource reverseXls() {
+            _reverseXls = true;
             return this;
         }
     }

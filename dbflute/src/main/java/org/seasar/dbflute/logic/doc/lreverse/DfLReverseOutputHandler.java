@@ -84,7 +84,7 @@ public class DfLReverseOutputHandler {
     //                                                                          ==========
     /**
      * Output data excel templates. (using dataSource)
-     * @param tableInfoMap The map of table. (NotNull)
+     * @param tableInfoMap The map of table to extract. (NotNull)
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
      * @param xlsFile The file of xls. (NotNull)
      * @param sectionInfoList The list of section info. (NotNull)
@@ -102,10 +102,10 @@ public class DfLReverseOutputHandler {
         // additional tables are unsupported here
         // because it's not an important function
         final Map<String, Object> additionalTableMap = getAdditionalTableProperties().getAdditionalTableMap();
-        final Set<String> keySet = additionalTableMap.keySet();
-        for (String key : keySet) {
-            if (tableInfoMap.containsKey(key)) {
-                tableInfoMap.remove(key);
+        for (String tableDbName : additionalTableMap.keySet()) {
+            if (tableInfoMap.containsKey(tableDbName)) {
+                _log.info("...Skipping additional table: " + tableDbName);
+                tableInfoMap.remove(tableDbName);
             }
         }
     }

@@ -35,6 +35,9 @@ import org.seasar.dbflute.util.Srl;
  */
 public class DfTableOrderAnalyzer {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     public static final int STANDARD_SIZE = 9;
 
     // ===================================================================================

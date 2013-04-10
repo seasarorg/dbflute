@@ -78,16 +78,12 @@ public class DfXlsReader {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfXlsReader(File file) {
-        this(file, null, null, null, null);
-    }
-
     public DfXlsReader(File file, Map<String, String> tableNameMap, Map<String, List<String>> notTrimTableColumnMap,
             Map<String, List<String>> emptyStringTableColumnMap, Pattern skipSheetPattern) {
         this(create(file), tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, skipSheetPattern);
     }
 
-    protected DfXlsReader(InputStream in, Map<String, String> tableNameMap,
+    protected DfXlsReader(InputStream ins, Map<String, String> tableNameMap,
             Map<String, List<String>> notTrimTableColumnMap, Map<String, List<String>> emptyStringTableColumnMap,
             Pattern skipSheetPattern) {
         if (tableNameMap != null) {
@@ -106,7 +102,7 @@ public class DfXlsReader {
             this._emptyStringTableColumnMap = StringKeyMap.createAsFlexible();
         }
         this._skipSheetPattern = skipSheetPattern;
-        setupWorkbook(in);
+        setupWorkbook(ins);
     }
 
     protected static InputStream create(File file) {

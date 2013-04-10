@@ -188,6 +188,23 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     // non-ApplicationPlaySql below
 
+    public String getMainCommonDataDir() {
+        final String playSqlDirectory = getPlaySqlDir();
+        return playSqlDirectory + "/data/common";
+    }
+
+    public String getMainCommonFirstXlsDataDir() {
+        return getMainCommonDataDir() + "/firstxls";
+    }
+
+    public String getMainCommonReverseXlsDataDir() {
+        return getMainCommonDataDir() + "/reversexls";
+    }
+
+    public String getMainCommonXlsDataDir() {
+        return getMainCommonDataDir() + "/xls";
+    }
+
     protected String getMainCurrentLoadTypeDataDir() {
         final String playSqlDirectory = getPlaySqlDir();
         final String dataLoadingType = getRepsEnvType();
@@ -200,6 +217,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public String getMainCurrentLoadTypeFirstXlsDataDir() {
         return getMainCurrentLoadTypeDataDir() + "/firstxls";
+    }
+
+    public String getMainCurrentLoadTypeReverseXlsDataDir() {
+        return getMainCurrentLoadTypeDataDir() + "/reversexls";
     }
 
     public String getMainCurrentLoadTypeTsvDataDir() {

@@ -65,6 +65,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -706,24 +707,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                 Table Name Property
     //                                                                 ===================
-    protected Map<String, Map<String, String>> _tableNameMapMap = DfCollectionUtil.newHashMap();
+    protected final DfTableNameProp _tableNameProp = new DfTableNameProp();
 
     protected Map<String, String> getTableNameMap(String dataDirectory) {
-        final Map<String, String> cachedMap = _tableNameMapMap.get(dataDirectory);
-        if (cachedMap != null) {
-            return cachedMap;
-        }
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectory + "/tableNameMap.dataprop";
-        Map<String, String> resultMap = reader.readMapAsStringValue(path);
-        if (resultMap == null || resultMap.isEmpty()) {
-            path = dataDirectory + "/table-name.txt"; // old style
-            resultMap = reader.readMapAsStringValue(path);
-        }
-        final StringKeyMap<String> flmap = StringKeyMap.createAsFlexible();
-        flmap.putAll(resultMap);
-        _tableNameMapMap.put(dataDirectory, flmap);
-        return _tableNameMapMap.get(dataDirectory);
+        return _tableNameProp.getTableNameMap(dataDirectory);
     }
 
     // ===================================================================================

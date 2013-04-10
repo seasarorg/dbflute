@@ -277,10 +277,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         handler.setDelimiterDataDir(getLoadDataReverseDelimiterDataDir());
         // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
         //handler.setDelimiterDataTypeCsv(true);
-        final String xlsDataDir = getLoadDataReverseXlsDataDir();
-        final String fileTitle = getLoadDataReverseFileTitle();
-        final int limit = getLoadDataReverseRecordLimit(); // not null here
-        final DfLReverseProcess process = new DfLReverseProcess(handler, xlsDataDir, fileTitle, limit);
+        final DfLReverseProcess process = new DfLReverseProcess(handler);
         process.execute(database);
     }
 
@@ -292,8 +289,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         br.addElement("[documentDefinitionMap.dfprop]");
         br.addElement("  ; loadDataReverseMap = map:{");
         br.addElement("      ; recordLimit = -1");
-        br.addElement("      ; isContainsCommonColumn = true");
-        br.addElement("      ; isOutputToPlaySql = true");
+        br.addElement("      ; isReplaceSchemaDirectUse = true");
+        br.addElement("      ; isOverrideExistingDataFile = false");
         br.addElement("  }");
         final String msg = br.buildExceptionMessage();
         throw new DfRequiredPropertyNotFoundException(msg);
@@ -378,10 +375,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().isLoadDataReverseValid();
     }
 
-    protected Integer getLoadDataReverseRecordLimit() {
-        return getDocumentProperties().getLoadDataReverseRecordLimit();
-    }
-
     protected boolean isLoadDataReverseContainsCommonColumn() {
         return getDocumentProperties().isLoadDataReverseContainsCommonColumn();
     }
@@ -394,20 +387,8 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().getLoadDataReverseXlsLimit();
     }
 
-    protected String getLoadDataReverseXlsDataDir() {
-        return getDocumentProperties().getLoadDataReverseXlsDataDir();
-    }
-
     protected String getLoadDataReverseDelimiterDataDir() {
         return getDocumentProperties().getLoadDataReverseDelimiterDataDir();
-    }
-
-    protected String getLoadDataReverseFileTitle() {
-        return getDocumentProperties().getLoadDataReverseFileTitle();
-    }
-
-    protected boolean isLoadDataReverseLoadDataReverse() {
-        return getDocumentProperties().isLoadDataReverseOutputToPlaySql();
     }
 
     protected boolean isSchemaSyncCheckValid() {
