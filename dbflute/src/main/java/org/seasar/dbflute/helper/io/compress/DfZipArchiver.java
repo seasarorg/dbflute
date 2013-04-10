@@ -53,12 +53,23 @@ public class DfZipArchiver {
     // ===================================================================================
     //                                                                            Compress
     //                                                                            ========
-    public void compress(File targetFile, FileFilter filter) {
-        if (targetFile == null) {
-            throw new IllegalArgumentException("The argument 'targetFile' should not be null.");
+    /**
+     * Compress the directory's elements to archive file.
+     * @param baseDir The base directory to compress. (NotNull)
+     * @param filter The file filter, which doesn't need to accept the base directory. (NotNull)
+     */
+    public void compress(File baseDir, FileFilter filter) {
+        if (baseDir == null) {
+            String msg = "The argument 'baseDir' should not be null.";
+            throw new IllegalArgumentException(msg);
         }
-        if (!targetFile.exists()) {
-            throw new IllegalArgumentException("The targetFile was not found in the file system: " + targetFile);
+        if (!baseDir.isDirectory()) {
+            String msg = "The baseDir should be directory but not: " + baseDir;
+            throw new IllegalArgumentException(msg);
+        }
+        if (!baseDir.exists()) {
+            String msg = "Not found the baseDir in the file system: " + baseDir;
+            throw new IllegalArgumentException(msg);
         }
         OutputStream out = null;
         ZipArchiveOutputStream archive = null;
@@ -67,8 +78,7 @@ public class DfZipArchiver {
             archive = new ZipArchiveOutputStream(out);
             archive.setEncoding("UTF-8");
 
-            final File topDir = targetFile.isDirectory() ? targetFile : targetFile.getParentFile();
-            addAll(archive, topDir, targetFile, filter);
+            addAll(archive, baseDir, baseDir, filter);
 
             archive.finish();
             archive.flush();
@@ -95,10 +105,10 @@ public class DfZipArchiver {
     protected void addAll(ArchiveOutputStream archive, File topDir, File targetFile, FileFilter filter)
             throws IOException {
         if (_suppressCompressSubDir && isSubDir(topDir, targetFile)) {
-            return;
+            return; // sub directory
         }
-        if (!filter.accept(targetFile)) {
-            return;
+        if (!isTopDir(topDir, targetFile) && !filter.accept(targetFile)) {
+            return; // not top directory and cannot accept it
         }
         if (targetFile.isDirectory()) {
             final File[] listFiles = targetFile.listFiles();
@@ -114,8 +124,12 @@ public class DfZipArchiver {
         }
     }
 
-    protected boolean isSubDir(File topFile, File targetFile) {
-        return targetFile.isDirectory() && !topFile.equals(targetFile);
+    protected boolean isSubDir(File topDir, File targetFile) {
+        return targetFile.isDirectory() && !topDir.equals(targetFile);
+    }
+
+    protected boolean isTopDir(File topDir, File targetFile) {
+        return targetFile.isDirectory() && topDir.equals(targetFile);
     }
 
     protected void addDir(ArchiveOutputStream archive, File topDir, File targetDir) throws IOException {
@@ -157,12 +171,19 @@ public class DfZipArchiver {
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
+    /**
+     * Extract the archive file to the directory.
+     * @param baseDir The base directory to compress. (NotNull)
+     * @param filter The file filter, which doesn't need to accept the base directory. (NotNull)
+     */
     public void extract(File baseDir, FileFilter filter) {
         if (baseDir == null) {
-            throw new IllegalArgumentException("The argument 'baseDir' should not be null.");
+            String msg = "The argument 'baseDir' should not be null.";
+            throw new IllegalArgumentException(msg);
         }
         if (baseDir.exists() && !baseDir.isDirectory()) {
-            throw new IllegalArgumentException("The baseDir was not directory: " + baseDir);
+            String msg = "The baseDir should be directory but not: " + baseDir;
+            throw new IllegalArgumentException(msg);
         }
         baseDir.mkdirs();
         final String baseDirPath = resolvePath(baseDir);

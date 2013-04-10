@@ -187,6 +187,9 @@ public class DfLReverseProcess {
         final File existingXls = existingXlsMap.get(tableDbName);
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Duplicate table in the existing xls file.");
+        br.addItem("Advice");
+        br.addElement("The existing xls files should have unique table sheet");
+        br.addElement("if you use override-reverse mode of LoadDataReverse.");
         br.addItem("Xls File");
         br.addElement(existingXls);
         br.addItem("Table");
@@ -278,6 +281,9 @@ public class DfLReverseProcess {
         }
         final String backupFilePath = backupDirPath + "/latest-data.zip";
         final File backupFile = new File(backupFilePath);
+        if (backupFile.exists()) {
+            backupFile.delete();
+        }
         _log.info("...Compressing latest data as zip: " + backupFilePath);
         final DfZipArchiver zipArchiver = new DfZipArchiver(backupFile);
         zipArchiver.compress(baseDir, filter);
@@ -341,13 +347,14 @@ public class DfLReverseProcess {
             return DfCollectionUtil.emptySet();
         }
         final Set<String> tableSet = StringSet.createAsFlexible();
-        final Map<String, File> firstXlsMap = extractExistingXlsMap(new File(getMainCommonFirstXlsDataDir()));
-        tableSet.addAll(firstXlsMap.keySet());
-        final Map<String, File> reverseXlsMap = extractExistingXlsMap(new File(getMainCommonReverseXlsDataDir()));
-        tableSet.addAll(reverseXlsMap.keySet());
-        final Map<String, File> xlsMap = extractExistingXlsMap(new File(getMainCommonXlsDataDir()));
-        tableSet.addAll(xlsMap.keySet());
+        tableSet.addAll(extractExistingXlsTableSet(getMainCommonFirstXlsDataDir()));
+        tableSet.addAll(extractExistingXlsTableSet(getMainCommonReverseXlsDataDir()));
+        tableSet.addAll(extractExistingXlsTableSet(getMainCommonXlsDataDir()));
         return tableSet;
+    }
+
+    protected Set<String> extractExistingXlsTableSet(String dir) {
+        return extractExistingXlsMap(new File(dir)).keySet();
     }
 
     protected boolean isTargetTable(Table table) {
