@@ -251,106 +251,67 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     //                                     Xls Data
     //                                     --------
     protected void writeDbFromXlsAsCommonDataFirst() {
-        writeDbFromXls(new XlsWritingResource().commonType().firstXls());
+        writeDbFromXls(new DfXlsWritingResource().commonType().firstXls());
     }
 
     protected void writeDbFromXlsAsCommonDataAppFirst() {
-        writeDbFromXls(new XlsWritingResource().application().commonType().firstXls());
+        writeDbFromXls(new DfXlsWritingResource().application().commonType().firstXls());
     }
 
     protected void writeDbFromXlsAsCommonDataReverse() {
-        writeDbFromXls(new XlsWritingResource().commonType().reverseXls());
+        writeDbFromXls(new DfXlsWritingResource().commonType().reverseXls());
     }
 
     protected void writeDbFromXlsAsCommonDataAppReverse() {
-        writeDbFromXls(new XlsWritingResource().application().commonType().reverseXls());
+        writeDbFromXls(new DfXlsWritingResource().application().commonType().reverseXls());
     }
 
     protected void writeDbFromXlsAsCommonData() {
-        writeDbFromXls(new XlsWritingResource().commonType());
+        writeDbFromXls(new DfXlsWritingResource().commonType());
     }
 
     protected void writeDbFromXlsAsCommonDataApp() {
-        writeDbFromXls(new XlsWritingResource().application().commonType());
+        writeDbFromXls(new DfXlsWritingResource().application().commonType());
     }
 
     protected void writeDbFromXlsAsLoadingTypeDataFirst() {
-        writeDbFromXls(new XlsWritingResource().firstXls());
+        writeDbFromXls(new DfXlsWritingResource().firstXls());
     }
 
     protected void writeDbFromXlsAsLoadingTypeDataAppFirst() {
-        writeDbFromXls(new XlsWritingResource().application().firstXls());
+        writeDbFromXls(new DfXlsWritingResource().application().firstXls());
     }
 
     protected void writeDbFromXlsAsLoadingTypeDataReverse() {
-        writeDbFromXls(new XlsWritingResource().reverseXls());
+        writeDbFromXls(new DfXlsWritingResource().reverseXls());
     }
 
     protected void writeDbFromXlsAsLoadingTypeDataAppReverse() {
-        writeDbFromXls(new XlsWritingResource().application().reverseXls());
+        writeDbFromXls(new DfXlsWritingResource().application().reverseXls());
     }
 
     protected void writeDbFromXlsAsLoadingTypeData() {
-        writeDbFromXls(new XlsWritingResource());
+        writeDbFromXls(new DfXlsWritingResource());
     }
 
     protected void writeDbFromXlsAsLoadingTypeDataApp() {
-        writeDbFromXls(new XlsWritingResource().application());
+        writeDbFromXls(new DfXlsWritingResource().application());
     }
 
-    protected static class XlsWritingResource {
-        protected boolean _application;
-        protected boolean _commonType;
-        protected boolean _firstXls;
-        protected boolean _reverseXls;
-
-        public boolean isApplication() {
-            return _application;
-        }
-
-        public XlsWritingResource application() {
-            _application = true;
-            return this;
-        }
-
-        public boolean isCommonType() {
-            return _commonType;
-        }
-
-        public XlsWritingResource commonType() {
-            _commonType = true;
-            return this;
-        }
-
-        public boolean isFirstXls() {
-            return _firstXls;
-        }
-
-        public XlsWritingResource firstXls() {
-            _firstXls = true;
-            return this;
-        }
-
-        public boolean isReverseXls() {
-            return _reverseXls;
-        }
-
-        public XlsWritingResource reverseXls() {
-            _reverseXls = true;
-            return this;
-        }
-    }
-
-    protected void writeDbFromXls(XlsWritingResource res) {
+    protected void writeDbFromXls(DfXlsWritingResource res) {
         final String appPlaySqlDir = getReplaceSchemaProperties().getApplicationPlaySqlDirectory();
         final String dir = res.isApplication() ? appPlaySqlDir : _sqlRootDir;
         if (Srl.is_Null_or_TrimmedEmpty(dir)) {
             return;
         }
         final String loadType = res.isCommonType() ? COMMON_LOAD_TYPE : getRepsEnvType();
-        final String typeName = res.isFirstXls() ? FIRSTXLS_FILE_TYPE : XLS_FILE_TYPE;
+        final String typeName = chooseXlsFileType(res);
         final String dataDirectory = doGetLoadingTypeDataDirectoryPath(dir, loadType, typeName);
         writeDbFromXls(loadType, dataDirectory);
+    }
+
+    protected String chooseXlsFileType(DfXlsWritingResource res) {
+        return res.isFirstXls() ? FIRSTXLS_FILE_TYPE : (res.isReverseXls() ? REVERSEXLS_FILE_TYPE : XLS_FILE_TYPE);
     }
 
     protected void writeDbFromXls(String envType, String dataDirectory) {
@@ -459,6 +420,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         }
         detailMessageList.add("(" + envType + ")");
         doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(FIRSTXLS_FILE_TYPE), 10);
+        doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(REVERSEXLS_FILE_TYPE), 10);
         doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(TSV_FILE_TYPE), 3);
         doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(CSV_FILE_TYPE), 3);
         doSetupDetailMessageFileType(detailMessageList, fileTypeKeyListMap.get(XLS_FILE_TYPE), 10);

@@ -78,14 +78,19 @@ public class DfXlsReader {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfXlsReader(File file, Map<String, String> tableNameMap, Map<String, List<String>> notTrimTableColumnMap,
-            Map<String, List<String>> emptyStringTableColumnMap, Pattern skipSheetPattern) {
+    public DfXlsReader(File file // xls file to read
+            , Map<String, String> tableNameMap // map for long table name
+            , Map<String, List<String>> notTrimTableColumnMap // map for not-trim column
+            , Map<String, List<String>> emptyStringTableColumnMap // map for empty-string-allowed column
+            , Pattern skipSheetPattern) { // pattern of skipped sheet
         this(create(file), tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, skipSheetPattern);
     }
 
-    protected DfXlsReader(InputStream ins, Map<String, String> tableNameMap,
-            Map<String, List<String>> notTrimTableColumnMap, Map<String, List<String>> emptyStringTableColumnMap,
-            Pattern skipSheetPattern) {
+    protected DfXlsReader(InputStream ins // stream for xls file to read
+            , Map<String, String> tableNameMap // map for long table name
+            , Map<String, List<String>> notTrimTableColumnMap // map for not-trim column
+            , Map<String, List<String>> emptyStringTableColumnMap // map for empty-string-allowed column
+            , Pattern skipSheetPattern) { // pattern of skipped sheet
         if (tableNameMap != null) {
             this._tableNameMap = tableNameMap;
         } else {
