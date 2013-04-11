@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
@@ -34,6 +35,8 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.seasar.dbflute.exception.DfXlsReaderReadFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.DfDataColumn;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
@@ -150,8 +153,7 @@ public class DfXlsReader {
             if (realTableName == null) {
                 realTableName = _tableNameMap.get(sheetName.substring("$".length()));
                 if (realTableName == null) {
-                    String msg = "The sheetName[" + sheetName + "] was not found in the tableNameMap: " + _tableNameMap;
-                    throw new IllegalStateException(msg);
+                    throwXlsReaderMappingTableNotFoundException(sheetName);
                 }
             }
             tableName = realTableName;
@@ -160,9 +162,7 @@ public class DfXlsReader {
         final int rowCount = sheet.getLastRowNum();
         final HSSFRow nameRow = sheet.getRow(0);
         if (nameRow == null) {
-            String msg = "The first row of the sheet should be column definition but it is null:";
-            msg = msg + " sheet=" + tableName;
-            throw new IllegalStateException(msg);
+            throwXlsReaderFirstRowNotColumnDefinitionException(tableName);
         }
         if (rowCount > 0) {
             setupColumns(table, nameRow, sheet.getRow(1));
@@ -171,6 +171,32 @@ public class DfXlsReader {
             setupColumns(table, nameRow, null);
         }
         return table;
+    }
+
+    protected void throwXlsReaderMappingTableNotFoundException(String sheetName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The sheetName was not found in the tableNameMap.");
+        br.addItem("TableName Map");
+        if (!_tableNameMap.isEmpty()) {
+            for (Entry<String, String> entry : _tableNameMap.entrySet()) {
+                br.addElement(entry.getKey() + " = " + entry.getValue());
+            }
+        } else {
+            br.addElement("*empty");
+        }
+        br.addItem("Sheet Name");
+        br.addElement(sheetName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfXlsReaderReadFailureException(msg);
+    }
+
+    protected void throwXlsReaderFirstRowNotColumnDefinitionException(String tableName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The first row of the sheet was not column definition.");
+        br.addItem("Table");
+        br.addElement(tableName);
+        final String msg = br.buildExceptionMessage();
+        throw new DfXlsReaderReadFailureException(msg);
     }
 
     protected void setupColumns(DfDataTable table, HSSFRow nameRow, HSSFRow valueRow) {

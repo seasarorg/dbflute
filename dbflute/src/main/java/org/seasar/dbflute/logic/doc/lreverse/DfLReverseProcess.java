@@ -23,17 +23,21 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfLReverseProcessFailureException;
+import org.seasar.dbflute.exception.DfXlsReaderReadFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
@@ -47,6 +51,7 @@ import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -120,7 +125,12 @@ public class DfLReverseProcess {
     protected Map<File, DfLReverseOutputResource> toOverrideReverseOrderedMap(List<List<Table>> orderedList,
             File baseDir) {
         final Map<String, File> existingXlsMap = extractExistingXlsMap(baseDir);
-        final Map<File, DfLReverseOutputResource> orderedMap = DfCollectionUtil.newLinkedHashMap();
+        final Map<File, DfLReverseOutputResource> orderedMap = new TreeMap<File, DfLReverseOutputResource>(
+                new Comparator<File>() { // ordered by existing file name
+                    public int compare(File o1, File o2) {
+                        return o1.getName().compareTo(o2.getName());
+                    }
+                });
         final List<Table> addedTableList = DfCollectionUtil.newArrayList();
         int sectionNo = 1;
         for (List<Table> nestedList : orderedList) {
@@ -162,10 +172,10 @@ public class DfLReverseProcess {
     protected Map<String, File> extractExistingXlsMap(File baseDir) {
         final List<File> existingXlsList = extractExistingXlsList(baseDir);
         final Map<String, File> existingXlsMap = StringKeyMap.createAsFlexible();
-        final String reverseXlsDataDir = getReverseXlsDataDir();
-        final Map<String, String> tableNameMap = _tableNameProp.getTableNameMap(reverseXlsDataDir);
+        final String dataDirPath = resolvePath(baseDir);
+        final Map<String, String> tableNameMap = _tableNameProp.getTableNameMap(dataDirPath);
         for (File existingXls : existingXlsList) {
-            final DfXlsReader reader = createXlsReader(tableNameMap, existingXls);
+            final DfXlsReader reader = createXlsReader(baseDir, existingXls, tableNameMap);
             final DfDataSet dataSet = reader.read();
             for (int i = 0; i < dataSet.getTableSize(); i++) {
                 final DfDataTable dataTable = dataSet.getTable(i);
@@ -179,8 +189,19 @@ public class DfLReverseProcess {
         return existingXlsMap;
     }
 
-    protected DfXlsReader createXlsReader(Map<String, String> tableNameMap, File existingXls) {
-        return new DfXlsReader(existingXls, tableNameMap, null, null, null);
+    protected DfXlsReader createXlsReader(File baseDir, File existingXls, Map<String, String> tableNameMap) {
+        try {
+            return new DfXlsReader(existingXls, tableNameMap, null, null, null);
+        } catch (DfXlsReaderReadFailureException e) {
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to create xls reader for LoadDataReverse.");
+            br.addItem("Base Dir");
+            br.addElement(resolvePath(baseDir));
+            br.addItem("Xls File");
+            br.addElement(resolvePath(existingXls));
+            final String msg = br.buildExceptionMessage();
+            throw new DfLReverseProcessFailureException(msg, e);
+        }
     }
 
     protected void throwLoadDataReverseDuplicateTableException(Map<String, File> existingXlsMap, String tableDbName) {
@@ -191,11 +212,11 @@ public class DfLReverseProcess {
         br.addElement("The existing xls files should have unique table sheet");
         br.addElement("if you use override-reverse mode of LoadDataReverse.");
         br.addItem("Xls File");
-        br.addElement(existingXls);
+        br.addElement(resolvePath(existingXls));
         br.addItem("Table");
         br.addElement(tableDbName);
         final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
+        throw new DfLReverseProcessFailureException(msg);
     }
 
     protected List<File> extractExistingXlsList(File baseDir) {
@@ -245,31 +266,16 @@ public class DfLReverseProcess {
     }
 
     protected void deletePreviousDataFile(File baseDir) {
-        final String fileTitle = getLoadDataReverseFileTitle();
         backupExistingXlsFile(baseDir);
-        doDeletePreviousDataFile(baseDir, new FileFilter() {
-            public boolean accept(File file) {
-                final String name = file.getName();
-                final boolean targetPrefix = name.startsWith(fileTitle);
-                return targetPrefix && name.endsWith(".xls");
-            }
-        });
+        doDeletePreviousDataFile(baseDir, createXlsFileFilter());
         final String delimiterDataDir = _outputHandler.getDelimiterDataDir();
         if (delimiterDataDir != null) {
-            doDeletePreviousDataFile(new File(delimiterDataDir), new FileFilter() {
-                public boolean accept(File file) {
-                    return file.getName().endsWith(".tsv");
-                }
-            });
+            doDeletePreviousDataFile(new File(delimiterDataDir), createTsvFileFilter());
         }
     }
 
     protected void backupExistingXlsFile(File baseDir) {
-        final FileFilter filter = new FileFilter() {
-            public boolean accept(File file) {
-                return file.getName().endsWith(".xls");
-            }
-        };
+        final FileFilter filter = createXlsFileFilter();
         final File[] listFiles = baseDir.listFiles(filter);
         if (listFiles == null || listFiles.length == 0) {
             return;
@@ -299,6 +305,22 @@ public class DfLReverseProcess {
                 previousFile.delete();
             }
         }
+    }
+
+    protected FileFilter createXlsFileFilter() {
+        return new FileFilter() {
+            public boolean accept(File file) {
+                return file.getName().endsWith(".xls");
+            }
+        };
+    }
+
+    protected FileFilter createTsvFileFilter() {
+        return new FileFilter() {
+            public boolean accept(File file) {
+                return file.getName().endsWith(".tsv");
+            }
+        };
     }
 
     protected String buildXlsFilePath(String number, String mainName) {
@@ -347,14 +369,14 @@ public class DfLReverseProcess {
             return DfCollectionUtil.emptySet();
         }
         final Set<String> tableSet = StringSet.createAsFlexible();
-        tableSet.addAll(extractExistingXlsTableSet(getMainCommonFirstXlsDataDir()));
-        tableSet.addAll(extractExistingXlsTableSet(getMainCommonReverseXlsDataDir()));
-        tableSet.addAll(extractExistingXlsTableSet(getMainCommonXlsDataDir()));
+        tableSet.addAll(extractCommonExistingXlsTableSet(getMainCommonFirstXlsDataDir()));
+        tableSet.addAll(extractCommonExistingXlsTableSet(getMainCommonReverseXlsDataDir()));
+        tableSet.addAll(extractCommonExistingXlsTableSet(getMainCommonXlsDataDir()));
         return tableSet;
     }
 
-    protected Set<String> extractExistingXlsTableSet(String dir) {
-        return extractExistingXlsMap(new File(dir)).keySet();
+    protected Set<String> extractCommonExistingXlsTableSet(String dataDir) {
+        return extractExistingXlsMap(new File(dataDir)).keySet();
     }
 
     protected boolean isTargetTable(Table table) {
@@ -408,7 +430,7 @@ public class DfLReverseProcess {
             bw.flush();
         } catch (IOException e) {
             String msg = "Failed to write reverse-data-result.dfmark: " + dataPropFile;
-            throw new IllegalStateException(msg, e);
+            throw new DfLReverseProcessFailureException(msg, e);
         } finally {
             if (bw != null) {
                 try {
@@ -481,5 +503,9 @@ public class DfLReverseProcess {
     //                                                                      ==============
     protected String ln() {
         return DBFluteSystem.getBasicLn();
+    }
+
+    protected String resolvePath(File file) {
+        return Srl.replace(file.getPath(), "\\", "/");
     }
 }
