@@ -174,6 +174,9 @@ public class DfLoadingControlProp {
             if (isUnknownOrNotDateBindType(bindType)) {
                 continue;
             }
+            if (isCertainlyTimeType(bindType)) {
+                continue;
+            }
             final String strValue = DfTypeUtil.toString(value, DfRelativeDateResolver.RESOLVED_PATTERN);
             final String adjusted = adjustDateIfNeeds(dataDirectory, tableName, columnName, strValue);
             resolvedMap.put(columnName, adjusted);
@@ -207,6 +210,10 @@ public class DfLoadingControlProp {
         return bindType == null || !java.util.Date.class.isAssignableFrom(bindType);
     }
 
+    protected boolean isCertainlyTimeType(Class<?> bindType) {
+        return bindType != null && java.sql.Time.class.isAssignableFrom(bindType);
+    }
+
     // -----------------------------------------------------
     //                                           Adjust Date
     //                                           -----------
@@ -232,17 +239,20 @@ public class DfLoadingControlProp {
         try {
             date = new HandyDate(value).getDate(); // might be ParseDateException
         } catch (ParseDateExpressionFailureException e) {
-            throwLoadingControlColumnValueParseFailureException(dataDirectory, tableName, columnName, value, e);
+            throwLoadingControlColumnValueParseFailureException(adjustmentExp, dataDirectory, tableName, columnName,
+                    value, e);
             return null; // unreachable
         }
         final String filteredExp = filterAdjustmentExp(dateAdjustmentMap, adjustmentExp);
         return _relativeDateResolver.resolveRelativeDate(tableName, columnName, filteredExp, date);
     }
 
-    protected void throwLoadingControlColumnValueParseFailureException(String dataDirectory, String tableName,
-            String columnName, String value, ParseDateExpressionFailureException e) {
+    protected void throwLoadingControlColumnValueParseFailureException(String adjustmentExp, String dataDirectory,
+            String tableName, String columnName, String value, ParseDateExpressionFailureException e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to parse the value of the column.");
+        br.addNotice("Failed to parse the value of the column for date adjustment.");
+        br.addItem("Adjustment Expression");
+        br.addElement(adjustmentExp);
         br.addItem("Data Directory");
         br.addElement(dataDirectory);
         br.addItem("Table Name");

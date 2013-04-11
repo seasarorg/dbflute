@@ -1,9 +1,13 @@
 package org.seasar.dbflute.logic.doc.lreverse;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderIdExtractor;
+import org.seasar.dbflute.util.DfCollectionUtil.AccordingToOrderResource;
 
 /**
  * @author jflute
@@ -20,6 +24,20 @@ public class DfLReverseOutputResource {
         _tableList = tableList;
         _sectionNo = sectionNo;
         _mainName = mainName;
+    }
+
+    public void acceptTableOrder(List<String> tableNameList) {
+        final List<String> lowerList = new ArrayList<String>();
+        for (String tableName : tableNameList) {
+            lowerList.add(tableName.toLowerCase());
+        }
+        final AccordingToOrderResource<Table, String> resource = new AccordingToOrderResource<Table, String>();
+        resource.setupResource(lowerList, new AccordingToOrderIdExtractor<Table, String>() {
+            public String extractId(Table element) {
+                return element.getTableDbName().toLowerCase();
+            }
+        });
+        DfCollectionUtil.orderAccordingTo(_tableList, resource);
     }
 
     public File getXlsFile() {
