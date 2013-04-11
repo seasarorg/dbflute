@@ -391,7 +391,26 @@ public class DfCollectionUtilTest extends PlainTestCase {
     // ===================================================================================
     //                                                                               Order
     //                                                                               =====
-    public void test_orderAccordingTo() throws Exception {
+    public void test_orderAccordingTo_basic() throws Exception {
+        // ## Arrange ##
+        List<Integer> unorderedList = newArrayList(4, 2, 8, 5, 1111, 9);
+        AccordingToOrderResource<Integer, Integer> resource = new AccordingToOrderResource<Integer, Integer>();
+        resource.setIdExtractor(new AccordingToOrderIdExtractor<Integer, Integer>() {
+            public Integer extractId(Integer element) {
+                return element;
+            }
+        });
+        resource.setOrderedUniqueIdList(newArrayList(2, 1111, 4, 5, 9, 8));
+
+        // ## Act ##
+        DfCollectionUtil.orderAccordingTo(unorderedList, resource);
+
+        // ## Assert ##
+        log(unorderedList);
+        assertEquals(newArrayList(2, 1111, 4, 5, 9, 8), unorderedList);
+    }
+
+    public void test_orderAccordingTo_overElement() throws Exception {
         // ## Arrange ##
         List<Integer> unorderedList = newArrayList(4, 2, 8, 5, 1111, 9);
         AccordingToOrderResource<Integer, Integer> resource = new AccordingToOrderResource<Integer, Integer>();
@@ -408,5 +427,24 @@ public class DfCollectionUtilTest extends PlainTestCase {
         // ## Assert ##
         log(unorderedList);
         assertEquals(newArrayList(5, 2, 8, 4, 1111, 9), unorderedList);
+    }
+
+    public void test_orderAccordingTo_shortElement() throws Exception {
+        // ## Arrange ##
+        List<Integer> unorderedList = newArrayList(2, 8, 5);
+        AccordingToOrderResource<Integer, Integer> resource = new AccordingToOrderResource<Integer, Integer>();
+        resource.setIdExtractor(new AccordingToOrderIdExtractor<Integer, Integer>() {
+            public Integer extractId(Integer element) {
+                return element;
+            }
+        });
+        resource.setOrderedUniqueIdList(newArrayList(5, 9, 2, 1111, 8));
+
+        // ## Act ##
+        DfCollectionUtil.orderAccordingTo(unorderedList, resource);
+
+        // ## Assert ##
+        log(unorderedList);
+        assertEquals(newArrayList(5, 2, 8), unorderedList);
     }
 }
