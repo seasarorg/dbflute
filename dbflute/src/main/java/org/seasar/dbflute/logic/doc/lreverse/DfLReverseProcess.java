@@ -254,7 +254,7 @@ public class DfLReverseProcess {
             final List<Table> tableList = resource.getTableList();
             final Map<String, Table> tableInfoMap = DfCollectionUtil.newLinkedHashMap();
             for (Table table : tableList) {
-                tableInfoMap.put(table.getName(), table);
+                tableInfoMap.put(table.getTableDbName(), table);
             }
             final String sectionTitle = "[" + xlsFile.getName() + "]: tables=" + tableList.size();
             _log.info("");

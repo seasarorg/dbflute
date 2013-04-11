@@ -175,7 +175,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                              Display Name UpperCase
     //                                                              ======================
-    protected boolean isTableDispNameUpperCase() {
+    public boolean isTableDispNameUpperCase() {
         return isProperty("isTableDispNameUpperCase", false);
     }
 

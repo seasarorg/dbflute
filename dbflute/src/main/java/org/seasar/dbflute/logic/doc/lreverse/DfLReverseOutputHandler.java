@@ -45,7 +45,7 @@ import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
-import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
  * @author jflute
@@ -182,8 +182,7 @@ public class DfLReverseOutputHandler {
     }
 
     protected String resolveSheetName(Table table, int index) {
-        final String tableDbName = table.getName();
-        String sheetName = Srl.substringLastRear(tableDbName, "."); // just in case
+        String sheetName = deriveSheetName(table);
         if (sheetName.length() > 30) { // restriction of excel
             final String middleParts = sheetName.substring(0, 25);
             boolean resolved = false;
@@ -208,6 +207,17 @@ public class DfLReverseOutputHandler {
             _tableNameMap.put(sheetName, table);
         }
         return sheetName;
+    }
+
+    protected String deriveSheetName(Table table) {
+        // if schema-driven, output with table name with schema as sheet name
+        // it depends on ReplaceSchema specification whether the data file can be loaded or not
+        final String tableDbName = table.getTableDbName();
+
+        // sheet name's case is depends on table display name's case
+        // because sheet name (as table name) is also display name
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isTableDispNameUpperCase() ? tableDbName.toUpperCase() : tableDbName;
     }
 
     protected boolean isExceptCommonColumn(Column column) {
@@ -304,6 +314,10 @@ public class DfLReverseOutputHandler {
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     protected DfAdditionalTableProperties getAdditionalTableProperties() {

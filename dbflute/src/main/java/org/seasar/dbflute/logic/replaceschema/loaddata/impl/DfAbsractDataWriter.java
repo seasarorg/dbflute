@@ -934,23 +934,23 @@ public abstract class DfAbsractDataWriter {
     // ===================================================================================
     //                                                                         Column Meta
     //                                                                         ===========
-    protected Map<String, DfColumnMeta> getColumnMetaMap(String tableName) {
-        if (_columnInfoCacheMap.containsKey(tableName)) {
-            return _columnInfoCacheMap.get(tableName);
+    protected Map<String, DfColumnMeta> getColumnMetaMap(String tableDbName) {
+        if (_columnInfoCacheMap.containsKey(tableDbName)) {
+            return _columnInfoCacheMap.get(tableDbName);
         }
         final Map<String, DfColumnMeta> columnMetaMap = StringKeyMap.createAsFlexible();
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final List<DfColumnMeta> columnList = _columnHandler.getColumnList(metaData, _unifiedSchema, tableName);
+            final List<DfColumnMeta> columnList = _columnHandler.getColumnList(metaData, _unifiedSchema, tableDbName);
             for (DfColumnMeta columnInfo : columnList) {
                 columnMetaMap.put(columnInfo.getColumnName(), columnInfo);
             }
-            _columnInfoCacheMap.put(tableName, columnMetaMap);
+            _columnInfoCacheMap.put(tableDbName, columnMetaMap);
             return columnMetaMap;
         } catch (SQLException e) {
-            String msg = "Failed to get column meta informations: table=" + tableName;
+            String msg = "Failed to get column meta informations: table=" + tableDbName;
             throw new IllegalStateException(msg, e);
         } finally {
             if (conn != null) {

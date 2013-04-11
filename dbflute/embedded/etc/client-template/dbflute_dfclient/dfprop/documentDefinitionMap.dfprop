@@ -33,8 +33,8 @@
 #     ; isCheckProcedureDiff = true
 #     ; loadDataReverseMap = map:{
 #         ; recordLimit = -1
-#         ; isContainsCommonColumn = true
-#         ; isOutputToPlaySql = true
+#         ; isReplaceSchemaDirectUse = true
+#         ; isOverrideExistingDataFile = false
 #     }
 #     ; schemaSyncCheckMap = map:{
 #         ; url = jdbc:...
@@ -160,13 +160,13 @@ map:{
     #  This property is valid when the property 'recordLimit' is set.
     #  Elements of this map are as below:
     #   o recordLimit: The limit of records to output. Minus means no limit. (NotRequired - Default '')
-    #   o isContainsCommonColumn: Does the data contain common columns? (NotRequired - Default false)
-    #   o isOutputToPlaySql: Does it output the data to playsql? (NotRequired - Default false)
+    #   o isReplaceSchemaDirectUse: Does it output the data to playsql directly? (NotRequired - Default false)
+    #   o isOverrideExistingDataFile: Does it output to existing files? (NotRequired - Default false)
     #
     #; loadDataReverseMap = map:{
     #    ; recordLimit = -1
-    #    ; isContainsCommonColumn = false
-    #    ; isOutputToPlaySql = false
+    #    ; isReplaceSchemaDirectUse = false
+    #    ; isOverrideExistingDataFile = false
     #}
     # - - - - - - - - - -/
 
