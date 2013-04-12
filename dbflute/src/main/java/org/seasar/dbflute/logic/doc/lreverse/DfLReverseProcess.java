@@ -456,10 +456,14 @@ public class DfLReverseProcess {
         final String dataDir = getReverseXlsDataDir();
         final DfLoadingControlProp prop = new DfLoadingControlProp();
         final String syncResult = prop.synchronizeOriginDate(dataDir);
-        _log.info("  df:originDate: " + syncResult);
-        sectionInfoList.add("");
-        sectionInfoList.add("[loadingControlMap.dataprop]");
-        sectionInfoList.add("df:originDate: " + syncResult);
+        if (syncResult != null) {
+            _log.info("  df:originDate: " + syncResult);
+            sectionInfoList.add("");
+            sectionInfoList.add("[loadingControlMap.dataprop]");
+            sectionInfoList.add("df:originDate: " + syncResult);
+        } else {
+            _log.info("  *no need to synchronize");
+        }
     }
 
     // ===================================================================================
