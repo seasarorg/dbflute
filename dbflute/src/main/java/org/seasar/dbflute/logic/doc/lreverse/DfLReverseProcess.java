@@ -45,6 +45,7 @@ import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.io.compress.DfZipArchiver;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -97,6 +98,7 @@ public class DfLReverseProcess {
         if (!tableNameMap.isEmpty()) {
             outputTableNameMap(tableNameMap);
         }
+        synchronizeOriginDateIfNeeds(sectionInfoList);
         outputResultMark(sectionInfoList);
     }
 
@@ -439,13 +441,32 @@ public class DfLReverseProcess {
     //                                                                      Table Name Map
     //                                                                      ==============
     protected void outputTableNameMap(Map<String, Table> tableNameMap) {
+        _log.info("...Outputting table name map for reversed tables");
         _tableNameProp.outputTableNameMap(getReverseXlsDataDir(), tableNameMap);
+    }
+
+    // ===================================================================================
+    //                                                              Synchronize OriginDate
+    //                                                              ======================
+    protected void synchronizeOriginDateIfNeeds(List<String> sectionInfoList) {
+        if (!isSynchronizeOriginDate()) {
+            return;
+        }
+        _log.info("...Synchronizing origin date for date adjustment");
+        final String dataDir = getReverseXlsDataDir();
+        final DfLoadingControlProp prop = new DfLoadingControlProp();
+        final String syncResult = prop.synchronizeOriginDate(dataDir);
+        _log.info("  df:originDate: " + syncResult);
+        sectionInfoList.add("");
+        sectionInfoList.add("[loadingControlMap.dataprop]");
+        sectionInfoList.add("df:originDate: " + syncResult);
     }
 
     // ===================================================================================
     //                                                                         Result Mark
     //                                                                         ===========
     protected void outputResultMark(List<String> sectionInfoList) {
+        _log.info("...Outputting result mark for reversed data");
         final StringBuilder sb = new StringBuilder();
         sb.append(ln()).append("* * * * * * * * * * *");
         sb.append(ln()).append("*                   *");
@@ -516,6 +537,10 @@ public class DfLReverseProcess {
 
     protected boolean isOverrideExistingDataFile() {
         return getDocumentProperties().isLoadDataReverseOverrideExistingDataFile();
+    }
+
+    protected boolean isSynchronizeOriginDate() {
+        return getDocumentProperties().isLoadDataReverseSynchronizeOriginDate();
     }
 
     protected boolean isReverseTableTarget(String name) {

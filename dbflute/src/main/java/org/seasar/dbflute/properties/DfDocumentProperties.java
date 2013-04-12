@@ -683,6 +683,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isOverrideExistingDataFile", false, getLoadDataReverseMap());
     }
 
+    public boolean isLoadDataReverseSynchronizeOriginDate() {
+        return isProperty("isSynchronizeOriginDate", false, getLoadDataReverseMap());
+    }
+
     // -----------------------------------------------------
     //                                     Table Except List
     //                                     -----------------

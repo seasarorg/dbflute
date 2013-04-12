@@ -35,6 +35,7 @@
 #         ; recordLimit = -1
 #         ; isReplaceSchemaDirectUse = true
 #         ; isOverrideExistingDataFile = false
+#         ; isSynchronizeOriginDate = false
 #     }
 #     ; schemaSyncCheckMap = map:{
 #         ; url = jdbc:...
@@ -162,11 +163,13 @@ map:{
     #   o recordLimit: The limit of records to output. Minus means no limit. (NotRequired - Default '')
     #   o isReplaceSchemaDirectUse: Does it output the data to playsql directly? (NotRequired - Default false)
     #   o isOverrideExistingDataFile: Does it output to existing files? (NotRequired - Default false)
+    #   o isSynchronizeOriginDate: Does it synchronize origin date for date adjustment? (NotRequired - Default false)
     #
     #; loadDataReverseMap = map:{
     #    ; recordLimit = -1
     #    ; isReplaceSchemaDirectUse = false
     #    ; isOverrideExistingDataFile = false
+    #    ; isSynchronizeOriginDate = false
     #}
     # - - - - - - - - - -/
 
