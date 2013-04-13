@@ -15,14 +15,7 @@
  */
 package org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,9 +53,9 @@ public class DfLoadingControlProp {
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfLoadingControlProp.class);
     public static final String LOADING_CONTROL_MAP_NAME = "loadingControlMap.dataprop";
-    protected static final String PROP_DATE_ADJUSTMENT_MAP = "dateAdjustmentMap";
+    public static final String PROP_DATE_ADJUSTMENT_MAP = "dateAdjustmentMap";
+    public static final String KEY_ORIGIN_DATE = "df:originDate";
     protected static final String KEY_ALL_MARK = "$$ALL$$";
-    protected static final String KEY_ORIGIN_DATE = "df:originDate";
     protected static final String KEY_DISTANCE_YEARS = "df:distanceYears";
     protected static final String KEY_DISTANCE_MONTHS = "df:distanceMonths";
     protected static final String KEY_DISTANCE_DAYS = "df:distanceDays";
@@ -323,144 +316,6 @@ public class DfLoadingControlProp {
     protected Map<String, Object> getDateAdjustmentMap(String dataDirectory) {
         final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
         return (Map<String, Object>) loadingControlMap.get(PROP_DATE_ADJUSTMENT_MAP);
-    }
-
-    // ===================================================================================
-    //                                                              Synchronize OriginDate
-    //                                                              ======================
-    public String synchronizeOriginDate(String dataDir) {
-        final String mapPath = dataDir + "/" + LOADING_CONTROL_MAP_NAME;
-        final File mapFile = new File(mapPath);
-        if (!mapFile.exists()) {
-            return null;
-        }
-        final StringBuilder resultSb = new StringBuilder();
-        final String mapString = prepareSynchronizedOriginDateMapString(mapFile, resultSb);
-        final String result;
-        if (mapString != null) {
-            writeMapStringToLoadingControlMap(mapFile, mapString);
-            result = resultSb.toString();
-        } else {
-            result = null;
-        }
-        return result;
-    }
-
-    protected String prepareSynchronizedOriginDateMapString(File mapFile, StringBuilder resultSb) {
-        boolean prepared = false;
-        final StringBuilder sb = new StringBuilder();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(mapFile), "UTF-8"));
-            while (true) {
-                final String line = br.readLine();
-                if (line == null) {
-                    break;
-                }
-                final boolean handled = handleOriginDateSyncLine(mapFile, sb, line, resultSb);
-                if (handled) {
-                    prepared = true;
-                }
-            }
-        } catch (IOException e) {
-            throwLoadingControlMapReadFailureException(mapFile, e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-        return prepared ? sb.toString() : null;
-    }
-
-    protected void throwLoadingControlMapReadFailureException(File mapFile, IOException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to read the loading control map.");
-        br.addItem("Map File");
-        br.addElement(mapFile);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg, e);
-    }
-
-    protected boolean handleOriginDateSyncLine(File mapFile, StringBuilder sb, String line, StringBuilder resultSb) {
-        final String keyOriginDate = KEY_ORIGIN_DATE;
-        boolean handled = false;
-        if (!line.trim().startsWith("#") && line.contains(keyOriginDate)) {
-            final String frontStr = Srl.substringFirstFront(line, keyOriginDate);
-            final String rearStr = Srl.substringFirstRear(line, keyOriginDate).trim();
-            if (!rearStr.startsWith("=")) {
-                throwLoadingControlMapOriginDateParseFailureException(mapFile, line);
-            }
-            final String equalRear = Srl.substringFirstRear(rearStr, "="); // keep space e.g. 2013/04/12 ...
-            final String originDate = Srl.substringFirstFront(equalRear, ";", "}").trim(); // e.g. 2013/04/12
-            final String lastRearStr = Srl.substringFirstRear(equalRear, originDate); // keep space e.g. "; ...", "}"
-            if (originDate.trim().length() == 0) {
-                throwLoadingControlMapOriginDateParseFailureException(mapFile, line);
-            }
-            // can be synchronized here
-            final Date currentDate = DBFluteSystem.currentDate();
-            final String newDateExp = new HandyDate(currentDate).toDisp("yyyy/MM/dd");
-            sb.append(frontStr).append(keyOriginDate).append(" = ").append(newDateExp);
-            sb.append(lastRearStr);
-            handled = true;
-            resultSb.append(originDate).append(" -> ").append(newDateExp);
-        } else {
-            sb.append(line);
-        }
-        sb.append("\n");
-        return handled;
-    }
-
-    protected void throwLoadingControlMapOriginDateParseFailureException(File mapFile, String line) {
-        final String keyOriginDate = KEY_ORIGIN_DATE;
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to parse the origin date of loading control map.");
-        br.addItem("Advice");
-        br.addElement("The origin date property setting should be like this:");
-        br.addElement("(setting cannot have linefeed)");
-        br.addElement("For example:");
-        br.addElement("  (o): " + keyOriginDate + " = 2013/04/12");
-        br.addElement("  (o): " + keyOriginDate + " = 2013/04/12 ; ...");
-        br.addElement("  (o): " + keyOriginDate + " = 2013/04/12 }");
-        br.addElement("  (x): " + keyOriginDate);
-        br.addElement("       = 2013/04/12 // *no linefeed");
-        br.addElement("  (x): " + keyOriginDate + " =");
-        br.addElement("       2013/04/12 // *no linefeed");
-        br.addItem("Current Line");
-        br.addElement(line);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg);
-    }
-
-    protected void writeMapStringToLoadingControlMap(File mapFile, String mapString) {
-        BufferedWriter bw = null;
-        try {
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mapFile), "UTF-8"));
-            bw.write(mapString);
-            bw.flush();
-        } catch (IOException e) {
-            throwLoadingControlMapWriteFailureException(mapFile, mapString, e);
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
-
-    protected void throwLoadingControlMapWriteFailureException(File mapFile, String mapString, IOException e) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("Failed to write the loading control map.");
-        br.addItem("Map File");
-        br.addElement(mapFile);
-        br.addItem("Map String");
-        br.addElement(mapString);
-        final String msg = br.buildExceptionMessage();
-        throw new IllegalStateException(msg, e);
     }
 
     // ===================================================================================

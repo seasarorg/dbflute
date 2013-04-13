@@ -45,7 +45,6 @@ import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.io.compress.DfZipArchiver;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
-import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -454,16 +453,12 @@ public class DfLReverseProcess {
         }
         _log.info("...Synchronizing origin date for date adjustment");
         final String dataDir = getReverseXlsDataDir();
-        final DfLoadingControlProp prop = new DfLoadingControlProp();
-        final String syncResult = prop.synchronizeOriginDate(dataDir);
-        if (syncResult != null) {
-            _log.info("  df:originDate: " + syncResult);
-            sectionInfoList.add("");
-            sectionInfoList.add("[loadingControlMap.dataprop]");
-            sectionInfoList.add("df:originDate: " + syncResult);
-        } else {
-            _log.info("  *no need to synchronize");
-        }
+        final DfLReverseOriginDateSynchronizer synchronizer = new DfLReverseOriginDateSynchronizer();
+        final String syncResult = synchronizer.synchronizeOriginDate(dataDir);
+        _log.info("  df:originDate: " + syncResult);
+        sectionInfoList.add("");
+        sectionInfoList.add("[loadingControlMap.dataprop]");
+        sectionInfoList.add("df:originDate: " + syncResult);
     }
 
     // ===================================================================================
