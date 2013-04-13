@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.logic.replaceschema.schemainitializer.factory;
 
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -24,6 +23,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.helper.jdbc.connection.DfCushionDataSource;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerDB2;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializerFirebird;
@@ -173,35 +173,9 @@ public class DfSchemaInitializerFactory {
     }
 
     protected DataSource getAdditionalDataSource() {
-        return new DataSource() {
-            public void setLoginTimeout(int i) throws SQLException {
-            }
-
-            public void setLogWriter(PrintWriter printwriter) throws SQLException {
-            }
-
-            public int getLoginTimeout() throws SQLException {
-                return 0;
-            }
-
-            public PrintWriter getLogWriter() throws SQLException {
-                return null;
-            }
-
-            public Connection getConnection(String s, String s1) throws SQLException {
-                return null;
-            }
-
+        return new DfCushionDataSource() {
             public Connection getConnection() throws SQLException {
                 return _replaceSchemaProperties.createAdditionalDropConnection(_additionalDropMap);
-            }
-
-            public boolean isWrapperFor(Class<?> iface) throws SQLException {
-                return false;
-            }
-
-            public <T> T unwrap(Class<T> iface) throws SQLException {
-                return null;
             }
         };
     }

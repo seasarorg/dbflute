@@ -40,8 +40,10 @@ public class LanguageMetaDataJava implements LanguageMetaData {
     protected final List<String> _booleanList = newArrayList("Boolean");
     protected final List<String> _binaryList = newArrayList("byte[]");
 
+    @SuppressWarnings("unchecked")
     protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
-        return DfCollectionUtil.newArrayList(elements);
+        final Object obj = DfCollectionUtil.newArrayList(elements);
+        return (List<ELEMENT>) obj; // to avoid the warning between JDK6 and JDK7
     }
 
     // ===================================================================================
