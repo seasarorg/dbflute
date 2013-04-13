@@ -58,6 +58,9 @@ rm ./log/*.log
 
 cd ../../dbflute-sastruts-example/dbflute_exampledb
 rm ./log/*.log
+. replace-schema.sh
+. manage.sh load-data-reverse
+. replace-schema.sh
 . jdbc.sh
 . doc.sh
 . generate.sh

@@ -19,16 +19,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesProperty;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesReader;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesResult;
 import org.seasar.dbflute.helper.jprop.JavaPropertiesStreamProvider;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenRequest;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -57,12 +61,13 @@ public class DfPropTableLoader {
     // ; tableMap = map:{
     //     ; exceptKeyList = list:{ prefix:config. }
     //     ; groupingKeyMap = map:{ label = prefix:label. }
+    //     ; extendsPropRequest = FooProp
     //     ; extendsPropFileList = list:{ ../../../bar.properties }
     //     ; isCheckImplicitOverride = false
     // }
     public DfFreeGenTable loadTable(String requestName, DfFreeGenResource resource, Map<String, Object> tableMap,
-            Map<String, Map<String, String>> mappingMap) {
-        final JavaPropertiesReader reader = createReader(requestName, resource, tableMap);
+            Map<String, Map<String, String>> mappingMap, Map<String, DfFreeGenRequest> requestMap) {
+        final JavaPropertiesReader reader = createReader(requestName, resource, tableMap, requestMap);
         final JavaPropertiesResult result = reader.read();
         final List<Map<String, Object>> columnList = toMapList(result, tableMap);
         final String resourceFile = resource.getResourceFile();
@@ -71,7 +76,7 @@ public class DfPropTableLoader {
     }
 
     protected JavaPropertiesReader createReader(String requestName, DfFreeGenResource resource,
-            Map<String, Object> tableMap) {
+            Map<String, Object> tableMap, Map<String, DfFreeGenRequest> requestMap) {
         final String resourceFile = resource.getResourceFile();
         final String title = requestName + ":" + resourceFile;
         final JavaPropertiesReader reader = new JavaPropertiesReader(title, new JavaPropertiesStreamProvider() {
@@ -79,8 +84,32 @@ public class DfPropTableLoader {
                 return new FileInputStream(new File(resourceFile));
             }
         });
-        @SuppressWarnings("unchecked")
-        final List<String> extendsPropFileList = (List<String>) tableMap.get("extendsPropFileList");
+        final String extendsPropRequestKey = "extendsPropRequest";
+        String extendsPropRequest = (String) tableMap.get(extendsPropRequestKey);
+        final List<String> extendsPropFileList;
+        if (extendsPropRequest != null) {
+            extendsPropFileList = new ArrayList<String>();
+            while (true) {
+                final DfFreeGenRequest extendsRequest = requestMap.get(extendsPropRequest);
+                if (extendsRequest == null) {
+                    throwFreeGenPropExtendsRequestNotFoundException(requestName, extendsPropRequest);
+                }
+                if (!extendsRequest.isResourceTypeProp()) {
+                    throwFreeGenPropExtendsRequestNotPropException(requestName, extendsPropRequest, extendsRequest);
+                }
+                final String extendsFile = extendsRequest.getResourceFile();
+                extendsPropFileList.add(extendsFile);
+                final Map<String, Object> extendsTableMap = extendsRequest.getTableMap();
+                extendsPropRequest = (String) extendsTableMap.get(extendsPropRequestKey);
+                if (extendsPropRequest == null) {
+                    break;
+                }
+            }
+        } else { // for compatible
+            @SuppressWarnings("unchecked")
+            final List<String> castList = (List<String>) tableMap.get("extendsPropFileList");
+            extendsPropFileList = castList;
+        }
         if (extendsPropFileList != null && !extendsPropFileList.isEmpty()) {
             for (String extendsPropFile : extendsPropFileList) {
                 final String resolvedFile = resource.resolveBaseDir(extendsPropFile);
@@ -96,6 +125,37 @@ public class DfPropTableLoader {
             reader.checkImplicitOverride();
         }
         return reader;
+    }
+
+    protected void throwFreeGenPropExtendsRequestNotFoundException(String requestName, String extendsPropRequest) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the request to be extended for properties.");
+        br.addItem("Advice");
+        br.addElement("Make sure your request name in freeGenDefinition.dfprop.");
+        br.addElement("And also check definition order of requests.");
+        br.addElement("Extends requests should be defined before the request.");
+        br.addItem("Current Request");
+        br.addElement(requestName);
+        br.addItem("Extends Request");
+        br.addElement(extendsPropRequest);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
+    }
+
+    protected void throwFreeGenPropExtendsRequestNotPropException(String requestName, String extendsPropRequest,
+            DfFreeGenRequest extendsRequest) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not PROP request to be extended for properties.");
+        br.addItem("Advice");
+        br.addElement("Make sure your request name in freeGenDefinition.dfprop.");
+        br.addElement("The extends request should be PROP type.");
+        br.addItem("Current Request");
+        br.addElement(requestName);
+        br.addItem("(Not PROP) Extends Request");
+        br.addElement(extendsPropRequest);
+        br.addElement(extendsRequest.getResourceType());
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     protected boolean isProperty(String key, Map<String, Object> tableMap) {
