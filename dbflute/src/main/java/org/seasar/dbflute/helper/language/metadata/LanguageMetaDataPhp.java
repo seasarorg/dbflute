@@ -26,17 +26,11 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  */
 public class LanguageMetaDataPhp implements LanguageMetaData {
 
-    protected final List<String> _stringList = newArrayList("string");
-    protected final List<String> _numberList = newArrayList("integer");
-    protected final List<String> _dateList = newArrayList("string");
-    protected final List<String> _booleanList = newArrayList("bool?");
-    protected final List<String> _binaryList = newArrayList("byte[]");
-
-    @SuppressWarnings("unchecked")
-    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
-        final Object obj = DfCollectionUtil.newArrayList(elements);
-        return (List<ELEMENT>) obj; // to avoid the warning between JDK6 and JDK7
-    }
+    protected final List<String> _stringList = DfCollectionUtil.newArrayList("string");
+    protected final List<String> _numberList = DfCollectionUtil.newArrayList("integer");
+    protected final List<String> _dateList = DfCollectionUtil.newArrayList("string");
+    protected final List<String> _booleanList = DfCollectionUtil.newArrayList("bool?");
+    protected final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
 
     public Map<String, Object> getJdbcToJavaNativeMap() {
         final Map<String, Object> map = new LinkedHashMap<String, Object>();

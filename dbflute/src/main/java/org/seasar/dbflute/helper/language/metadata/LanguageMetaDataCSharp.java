@@ -28,17 +28,11 @@ public class LanguageMetaDataCSharp implements LanguageMetaData {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final List<String> _stringList = newArrayList("String");
-    protected final List<String> _numberList = newArrayList("decimal?", "int?", "long?");
-    protected final List<String> _dateList = newArrayList("DateTime?");
-    protected final List<String> _booleanList = newArrayList("bool?");
-    protected final List<String> _binaryList = newArrayList("byte[]");
-
-    @SuppressWarnings("unchecked")
-    protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
-        final Object obj = DfCollectionUtil.newArrayList(elements);
-        return (List<ELEMENT>) obj; // to avoid the warning between JDK6 and JDK7
-    }
+    protected final List<String> _stringList = DfCollectionUtil.newArrayList("String");
+    protected final List<String> _numberList = DfCollectionUtil.newArrayList("decimal?", "int?", "long?");
+    protected final List<String> _dateList = DfCollectionUtil.newArrayList("DateTime?");
+    protected final List<String> _booleanList = DfCollectionUtil.newArrayList("bool?");
+    protected final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
 
     // ===================================================================================
     //                                                                             Mapping
