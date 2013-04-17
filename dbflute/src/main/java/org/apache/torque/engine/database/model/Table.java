@@ -559,6 +559,9 @@ public class Table {
     //                                               Display
     //                                               -------
     public String getTableDispName() {
+        if (isSql2EntityCustomize()) { // Sql2Entity is on the camel case basis
+            return getTableDbName();
+        }
         return filterTableDispNameIfNeeds(getTableDbName());
     }
 

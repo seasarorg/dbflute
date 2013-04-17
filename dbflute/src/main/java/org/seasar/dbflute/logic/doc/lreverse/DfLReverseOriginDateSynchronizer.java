@@ -21,9 +21,6 @@ import org.seasar.dbflute.util.Srl;
  */
 public class DfLReverseOriginDateSynchronizer {
 
-    // ===================================================================================
-    //                                                              Synchronize OriginDate
-    //                                                              ======================
     public String synchronizeOriginDate(String dataDir) {
         final String mapPath = dataDir + "/" + DfLoadingControlProp.LOADING_CONTROL_MAP_NAME;
         final File mapFile = new File(mapPath);
