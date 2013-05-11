@@ -174,12 +174,17 @@ public class SqlClauseMySql extends AbstractSqlClause {
 
     @Override
     protected boolean isUpdateDirectJoinSupported() {
-        return true;
+        return true; // MySQL can use 'update MEMBER dfloc inner join ...'
     }
 
     @Override
     protected boolean isUpdateTableAliasNameSupported() {
-        return true; // almost unsupported (unknown)
+        return true; // MySQL needs 'update MEMBER dfloc ...' when it has relation
+    }
+
+    @Override
+    protected boolean isDeleteTableAliasHintSupported() {
+        return true; // MySQL needs 'delete dfloc from MEMBER dfloc ...' when it has relation
     }
 
     // [DBFlute-0.9.9.1C]

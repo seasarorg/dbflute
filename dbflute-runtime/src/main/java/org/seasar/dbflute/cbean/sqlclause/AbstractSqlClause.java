@@ -2935,7 +2935,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         final StringBuilder sb = new StringBuilder();
         sb.append("update ").append(dbmeta.getTableSqlName());
         if (isUseQueryUpdateDirect(dbmeta)) { // direct (in-scope unsupported or compound primary keys)
-            buildQueryUpdateDirectClause(columnParameterMap, dbmeta, sb);
+            final String whereClause = processSubQueryIndent(getWhereClause());
+            buildQueryUpdateDirectClause(columnParameterMap, whereClause, dbmeta, sb);
         } else { // basically here
             buildQueryUpdateInScopeClause(columnParameterMap, dbmeta, sb);
         }
@@ -2971,11 +2972,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append(")");
     }
 
-    protected void buildQueryUpdateDirectClause(Map<String, Object> columnParameterMap, DBMeta dbmeta, StringBuilder sb) {
+    protected void buildQueryUpdateDirectClause(Map<String, Object> columnParameterMap, String whereClause,
+            DBMeta dbmeta, StringBuilder sb) {
         if (hasUnionQuery()) {
             throwQueryUpdateUnavailableFunctionException("union", dbmeta);
         }
-        final String whereClause = processSubQueryIndent(getWhereClause());
         boolean useAlias = false;
         if (isUpdateTableAliasNameSupported()) {
             if (hasQueryUpdateSubQueryPossible(whereClause)) {
@@ -2992,7 +2993,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
                 useAlias = true; // use alias forcedly if direct join
                 directJoin = true;
             }
-        } else { // queryDelete or direct join unsupported 
+        } else { // direct join unsupported 
             if (hasOuterJoin()) {
                 throwQueryUpdateUnavailableFunctionException("outer join", dbmeta);
             }
@@ -3097,18 +3098,36 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     public String getClauseQueryDelete() {
         final DBMeta dbmeta = getDBMeta();
         final StringBuilder sb = new StringBuilder();
-        sb.append("delete from ").append(dbmeta.getTableSqlName());
-        if (isUseQueryUpdateDirect(dbmeta)) { // direct (in-scope unsupported or compound primary keys)
-            buildQueryUpdateDirectClause(null, dbmeta, sb);
+        sb.append("delete");
+        final boolean useQueryUpdateDirect = isUseQueryUpdateDirect(dbmeta);
+        String whereClause = null;
+        if (useQueryUpdateDirect) { // prepare for direct case
+            whereClause = processSubQueryIndent(getWhereClause());
+            if (needsDeleteTableAliasHint(whereClause)) {
+                sb.append(" ").append(getBasePointAliasName());
+            }
+        }
+        sb.append(" from ").append(dbmeta.getTableSqlName());
+        if (useQueryUpdateDirect) { // direct (in-scope unsupported or compound primary keys)
+            buildQueryUpdateDirectClause(null, whereClause, dbmeta, sb);
         } else { // basically here
             buildQueryUpdateInScopeClause(null, dbmeta, sb);
         }
         return sb.toString();
     }
 
+    protected boolean needsDeleteTableAliasHint(String whereClause) {
+        return canUseDeleteTableAliasHint() && (hasOuterJoin() || hasQueryUpdateSubQueryPossible(whereClause));
+    }
+
+    protected boolean canUseDeleteTableAliasHint() {
+        return isUpdateDirectJoinSupported() && isDeleteTableAliasHintSupported();
+    }
+
     // -----------------------------------------------------
     //                                             Supported
     //                                             ---------
+    // 'update' on method name contains delete
     /**
      * {@inheritDoc}
      */
@@ -3121,15 +3140,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected boolean isUpdateDirectJoinSupported() {
-        // used only when QueryUpdateInScope unsupported
-        // so not need to be strict setting
+        // used only when QueryUpdateInScope unsupported so not need to be strict setting
         // (but if this returns true, it should be UpdateTableAliasNameSupported)
         return false; // almost unsupported
     }
 
     protected boolean isUpdateTableAliasNameSupported() {
-        // used only when QueryUpdateInScope unsupported
-        // so not need to be strict setting
+        // used only when QueryUpdateInScope unsupported so not need to be strict setting
+        return false; // almost unsupported? (unknown)
+    }
+
+    protected boolean isDeleteTableAliasHintSupported() { // delete only
+        // used only when QueryUpdateInScope unsupported so not need to be strict setting
+        // (alias hint means alias name immediately after 'delete' e.g. 'delete dfloc from MEMBER dfloc ...')
         return false; // almost unsupported? (unknown)
     }
 
