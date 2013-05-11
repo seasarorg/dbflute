@@ -1438,12 +1438,12 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         br.addElement("An entity should have its primary-key value when e.g. insert(), update().");
         br.addElement("For example:");
         br.addElement("  (x):");
-        br.addElement("    " + classTitle + " entiity = new " + classTitle + "();");
+        br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
         br.addElement("    entity.setFooName(...);");
         br.addElement("    entity.setFooDate(...);");
         br.addElement("    " + behaviorName + ".updateNonstrict(entity);");
         br.addElement("  (o):");
-        br.addElement("    " + classTitle + " entiity = new " + classTitle + "();");
+        br.addElement("    " + classTitle + " entity = new " + classTitle + "();");
         br.addElement("    entity.setFooId(...); // *Point");
         br.addElement("    entity.setFooName(...);");
         br.addElement("    entity.setFooDate(...);");
