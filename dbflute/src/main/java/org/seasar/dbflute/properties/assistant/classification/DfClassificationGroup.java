@@ -61,6 +61,10 @@ public class DfClassificationGroup {
         return sb.toString();
     }
 
+    public String buildCDefArgExp() {
+        return buildCDefArgExp(null);
+    }
+
     public String buildCDefArgExp(String cdefClassName) {
         final StringBuilder sb = new StringBuilder();
         int index = 0;
@@ -68,8 +72,11 @@ public class DfClassificationGroup {
             if (index > 0) {
                 sb.append(", ");
             }
-            sb.append(cdefClassName).append(".").append(_classificationName);
-            sb.append(".").append(elementName);
+            if (cdefClassName != null) {
+                sb.append(cdefClassName).append(".");
+                sb.append(_classificationName).append(".");
+            }
+            sb.append(elementName);
             ++index;
         }
         return sb.toString();

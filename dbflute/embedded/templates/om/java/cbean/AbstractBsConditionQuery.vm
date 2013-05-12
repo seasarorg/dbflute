@@ -261,7 +261,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      */
     public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
-        set${tmpJavaName}_InScope_As${col.classificationName}(Arrays.asList(${group.buildCDefArgExp($glCDef)}));
+        set${tmpJavaName}_InScope_As${col.classificationName}(${glCDef}.${col.classificationName}.listOf${group.groupNameInitCap}());
     }
 #end
 #end
@@ -762,7 +762,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
      */
     public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
-        set${tmpJavaName}_InScope_As${col.classificationName}(Arrays.asList(${group.buildCDefArgExp($glCDef)}));
+        set${tmpJavaName}_InScope_As${col.classificationName}(${glCDef}.${col.classificationName}.listOf${group.groupNameInitCap}());
     }
 #end
 #end
