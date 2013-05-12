@@ -2004,13 +2004,18 @@ public class Column {
     }
 
     public boolean isCheckSelectedClassification() {
-        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
-        return littleProp.isCheckSelectedClassification() && hasClassification();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isCheckSelectedClassification() && canBeForcedClassification();
     }
 
     public boolean isForceClassificationSetting() {
-        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
-        return littleProp.isForceClassificationSetting() && hasClassification();
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        return prop.isForceClassificationSetting() && canBeForcedClassification();
+    }
+
+    protected boolean canBeForcedClassification() {
+        // common column has interface so cannot be forced e.g. DEL_FLG in all tables
+        return hasClassification() && !isCommonColumn();
     }
 
     public String getPropertySettingModifier() {
