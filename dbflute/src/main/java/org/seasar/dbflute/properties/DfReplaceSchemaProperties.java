@@ -1051,6 +1051,51 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
+    //                                                              Drop Table Except List
+    //                                                              ======================
+    protected List<String> _dropTableExceptList;
+
+    @SuppressWarnings("unchecked")
+    public List<String> getDropTableExceptList() { // closet
+        if (_dropTableExceptList != null) {
+            return _dropTableExceptList;
+        }
+        _dropTableExceptList = (List<String>) getReplaceSchemaDefinitionMap().get("dropTableExceptList");
+        if (_dropTableExceptList == null) {
+            _dropTableExceptList = new ArrayList<String>();
+        }
+        return _dropTableExceptList;
+    }
+
+    protected List<String> _dropSequenceExceptList;
+
+    @SuppressWarnings("unchecked")
+    public List<String> getDropSequenceExceptList() { // closet
+        if (_dropSequenceExceptList != null) {
+            return _dropSequenceExceptList;
+        }
+        _dropSequenceExceptList = (List<String>) getReplaceSchemaDefinitionMap().get("dropSequenceExceptList");
+        if (_dropSequenceExceptList == null) {
+            _dropSequenceExceptList = new ArrayList<String>();
+        }
+        return _dropSequenceExceptList;
+    }
+
+    protected List<String> _dropProcedureExceptList;
+
+    @SuppressWarnings("unchecked")
+    public List<String> getDropProcedureExceptList() { // closet
+        if (_dropProcedureExceptList != null) {
+            return _dropProcedureExceptList;
+        }
+        _dropProcedureExceptList = (List<String>) getReplaceSchemaDefinitionMap().get("dropProcedureExceptList");
+        if (_dropProcedureExceptList == null) {
+            _dropProcedureExceptList = new ArrayList<String>();
+        }
+        return _dropProcedureExceptList;
+    }
+
+    // ===================================================================================
     //                                                                     Tool Terminator
     //                                                                     ===============
     public String resolveTerminator4Tool() {

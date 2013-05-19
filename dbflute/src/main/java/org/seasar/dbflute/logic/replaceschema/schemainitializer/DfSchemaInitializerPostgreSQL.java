@@ -50,12 +50,16 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
             sb.append("sequence_catalog = '").append(catalog).append("'").append(" and ");
         }
         sb.append("sequence_schema = '").append(schema).append("'");
-        final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(),
-                Arrays.asList(sequenceColumnName));
+        final String sql = sb.toString();
+        final List<String> sequenceColumnList = Arrays.asList(sequenceColumnName);
+        final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sql, sequenceColumnList);
         for (Map<String, String> recordMap : resultList) {
             sequenceNameList.add(recordMap.get(sequenceColumnName));
         }
         for (String sequenceName : sequenceNameList) {
+            if (isSequenceExcept(sequenceName)) {
+                continue;
+            }
             final String sequenceSqlName = _unifiedSchema.buildSqlName(sequenceName);
             final String dropSequenceSql = "drop sequence " + sequenceSqlName;
             logReplaceSql(dropSequenceSql);

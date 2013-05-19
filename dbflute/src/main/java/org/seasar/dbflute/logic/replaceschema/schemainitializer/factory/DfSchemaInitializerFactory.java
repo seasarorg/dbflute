@@ -150,6 +150,9 @@ public class DfSchemaInitializerFactory {
             initializer.setUnifiedSchema(_databaseProperties.getDatabaseSchema());
             initializer.setDropObjectTypeList(_replaceSchemaProperties.getObjectTypeTargetList());
             initializer.setInitializeFirstSqlList(_replaceSchemaProperties.getInitializeFirstSqlList());
+            initializer.setDropTableExceptList(_replaceSchemaProperties.getDropTableExceptList());
+            initializer.setDropSequenceExceptList(_replaceSchemaProperties.getDropSequenceExceptList());
+            initializer.setDropProcedureExceptList(_replaceSchemaProperties.getDropProcedureExceptList());
             return;
         }
 
@@ -165,6 +168,9 @@ public class DfSchemaInitializerFactory {
             initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(_additionalDropMap));
             // unsupported for additional
             //initializer.setInitializeFirstSqlList(null);
+            //initializer.setDropTableExceptList(null);
+            //initializer.setDropSequenceExceptList(null);
+            //initializer.setDropProcedureExceptList(null);
             return;
         }
 

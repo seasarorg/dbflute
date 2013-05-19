@@ -67,12 +67,16 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
         final StringBuilder sb = new StringBuilder();
         sb.append("select SEQNAME as ").append(sequenceColumnName).append(" from SYSCAT.SEQUENCES");
         sb.append(" where SEQSCHEMA = '").append(schema).append("'");
-        final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(),
-                Arrays.asList(sequenceColumnName));
+        final String sql = sb.toString();
+        final List<String> sequenceColumnList = Arrays.asList(sequenceColumnName);
+        final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sql, sequenceColumnList);
         for (Map<String, String> recordMap : resultList) {
             sequenceNameList.add(recordMap.get(sequenceColumnName));
         }
         for (String sequenceName : sequenceNameList) {
+            if (isSequenceExcept(sequenceName)) {
+                continue;
+            }
             final String dropSequenceSql = "drop sequence " + schema + "." + sequenceName;
             logReplaceSql(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);

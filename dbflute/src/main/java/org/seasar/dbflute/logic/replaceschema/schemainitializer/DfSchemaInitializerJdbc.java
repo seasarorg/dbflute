@@ -39,6 +39,8 @@ import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**
  * The schema initializer with JDBC.
@@ -50,6 +52,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfSchemaInitializerJdbc.class);
+    protected static final List<String> EMPTY_LIST = DfCollectionUtil.emptyList();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -59,6 +62,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected boolean _useFullQualifiedTableName;
     protected List<String> _dropObjectTypeList;
     protected List<String> _initializeFirstSqlList;
+    protected List<String> _dropTableExceptList;
+    protected List<String> _dropSequenceExceptList;
+    protected List<String> _dropProcedureExceptList;
     protected final StringSet _droppedPackageSet = StringSet.createAsCaseInsensitive();
 
     // /= = = = = = = = = = = = =
@@ -82,17 +88,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             final List<DfTableMeta> tableMetaList;
             try {
                 final DatabaseMetaData metaData = conn.getMetaData();
-                final DfTableExtractor tableExtractor = new DfTableExtractor() {
-                    @Override
-                    protected String[] getRealObjectTypeTargetArray(UnifiedSchema unifiedSchema) {
-                        if (_dropObjectTypeList != null) {
-                            return _dropObjectTypeList.toArray(new String[] {});
-                        } else {
-                            return super.getRealObjectTypeTargetArray(unifiedSchema);
-                        }
-                    }
-                };
-                tableExtractor.suppressExceptTarget();
+                final DfTableExtractor tableExtractor = createDropTableExtractor();
                 tableMetaList = tableExtractor.getTableList(metaData, _unifiedSchema);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -110,6 +106,35 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 }
             }
         }
+    }
+
+    protected DfTableExtractor createDropTableExtractor() {
+        return new DfTableExtractor() {
+            @Override
+            protected String[] getRealObjectTypeTargetArray(UnifiedSchema unifiedSchema) {
+                // you can override from generation's settings
+                if (_dropObjectTypeList != null) {
+                    return _dropObjectTypeList.toArray(new String[] {});
+                } else {
+                    return super.getRealObjectTypeTargetArray(unifiedSchema);
+                }
+            }
+
+            @Override
+            protected List<String> getRealTableExceptList(UnifiedSchema unifiedSchema) {
+                // always be independent from generation's settings
+                if (_dropTableExceptList != null) {
+                    return _dropTableExceptList;
+                }
+                return EMPTY_LIST;
+            }
+
+            @Override
+            protected List<String> getRealTableTargetList(UnifiedSchema unifiedSchema) {
+                // target list is unsupported
+                return EMPTY_LIST;
+            }
+        };
     }
 
     protected void executeObject(Connection conn, List<DfTableMeta> tableMetaList) {
@@ -420,6 +445,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         try {
             st = conn.createStatement();
             for (DfProcedureMeta procedureMeta : procedureMetaList) {
+                if (isProcedureExcept(procedureMeta.getProcedureName())) {
+                    continue;
+                }
                 if (procedureMeta.isPackageProcdure()) {
                     currentSql = callback.buildDropPackageSql(procedureMeta);
                     handlePackageProcedure(procedureMeta, st, currentSql);
@@ -492,6 +520,27 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     // ===================================================================================
+    //                                                                       Except Helper
+    //                                                                       =============
+    protected boolean isSequenceExcept(String sequenceName) {
+        if (_dropSequenceExceptList == null || _dropSequenceExceptList.isEmpty()) {
+            return false;
+        }
+        return !isTargetByHint(sequenceName, EMPTY_LIST, _dropSequenceExceptList);
+    }
+
+    protected boolean isProcedureExcept(String procedureName) {
+        if (_dropProcedureExceptList == null || _dropProcedureExceptList.isEmpty()) {
+            return false;
+        }
+        return !isTargetByHint(procedureName, EMPTY_LIST, _dropProcedureExceptList);
+    }
+
+    protected boolean isTargetByHint(String name, List<String> targetList, List<String> exceptList) {
+        return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
+    }
+
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected void closeResource(ResultSet rs, Statement st) {
@@ -552,6 +601,18 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setInitializeFirstSqlList(List<String> initializeFirstSqlList) {
         _initializeFirstSqlList = initializeFirstSqlList;
+    }
+
+    public void setDropTableExceptList(List<String> dropTableExceptList) {
+        _dropTableExceptList = dropTableExceptList;
+    }
+
+    public void setDropSequenceExceptList(List<String> dropSequenceExceptList) {
+        _dropSequenceExceptList = dropSequenceExceptList;
+    }
+
+    public void setDropProcedureExceptList(List<String> dropProcedureExceptList) {
+        _dropProcedureExceptList = dropProcedureExceptList;
     }
 
     // /= = = = = = = = = = = = =

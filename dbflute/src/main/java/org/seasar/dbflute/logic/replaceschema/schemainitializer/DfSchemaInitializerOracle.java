@@ -71,7 +71,12 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
 
     protected void doDropSequence(Connection conn) {
         final String tableName = "ALL_SEQUENCES";
-        dropDicObject(conn, "sequences", "sequence", tableName, "SEQUENCE_OWNER", "SEQUENCE_NAME", null, true, false);
+        dropDicObject(conn, "sequences", "sequence", tableName, "SEQUENCE_OWNER", "SEQUENCE_NAME", null, true, false,
+                new ObjectExceptCallback() {
+                    public boolean isExcept(String objectName) {
+                        return isSequenceExcept(objectName);
+                    }
+                });
     }
 
     // ===================================================================================
@@ -88,7 +93,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
      */
     protected void doDropDBLink(Connection conn) {
         final String tableName = "ALL_DB_LINKS";
-        dropDicObject(conn, "DB links", "database link", tableName, "OWNER", "DB_LINK", null, false, false);
+        dropDicObject(conn, "DB links", "database link", tableName, "OWNER", "DB_LINK", null, false, false, null);
     }
 
     // ===================================================================================
@@ -111,14 +116,15 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
 
     protected boolean doDropTypeObject(Connection conn, String orderBy, boolean errorContinue) {
         return dropDicObject(conn, "type objects", "type", "ALL_TYPES", "OWNER", "TYPE_NAME", orderBy, false,
-                errorContinue);
+                errorContinue, null);
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected boolean dropDicObject(Connection conn, String titleName, String sqlName, String tableName,
-            String ownerColumnName, String targetColumnName, String orderBy, boolean schemaPrefix, boolean errorContinue) {
+            String ownerColumnName, String targetColumnName, String orderBy, boolean schemaPrefix,
+            boolean errorContinue, ObjectExceptCallback callback) {
         if (!_unifiedSchema.hasSchema()) {
             return true;
         }
@@ -156,6 +162,9 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             boolean complete = true;
             st = conn.createStatement();
             for (String objectName : objectNameList) {
+                if (callback != null && callback.isExcept(objectName)) {
+                    continue;
+                }
                 final String prefix = schemaPrefix ? schema + "." : "";
                 final String dropSql = "drop " + sqlName + " " + prefix + objectName;
                 logReplaceSql(dropSql);
@@ -176,5 +185,9 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         } finally {
             closeStatement(st);
         }
+    }
+
+    protected static interface ObjectExceptCallback {
+        boolean isExcept(String objectName);
     }
 }
