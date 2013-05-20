@@ -64,7 +64,6 @@ public class DfLReverseOutputHandler {
     //                                                                           =========
     protected final DataSource _dataSource;
     protected boolean _containsCommonColumn;
-    protected boolean _managedTableOnly;
     protected int _xlsLimit = 65000; // as default
 
     // option for large data
@@ -126,9 +125,6 @@ public class DfLReverseOutputHandler {
             ++index;
             final String tableDbName = entry.getKey();
             final Table table = entry.getValue();
-            if (_managedTableOnly && (table.isAdditionalSchema() || table.isTypeView())) {
-                continue;
-            }
             final DfLReverseDataResult dataResult = loadDataMap.get(tableDbName);
             if (dataResult.isLargeData()) {
                 outputDelimiterData(table, dataResult, limit, sectionInfoList);
@@ -329,10 +325,6 @@ public class DfLReverseOutputHandler {
     //                                                                            ========
     public void setContainsCommonColumn(boolean containsCommonColumn) {
         _containsCommonColumn = containsCommonColumn;
-    }
-
-    public void setManagedTableOnly(boolean managedTableOnly) {
-        _managedTableOnly = managedTableOnly;
     }
 
     public void setXlsLimit(int xlsLimit) {

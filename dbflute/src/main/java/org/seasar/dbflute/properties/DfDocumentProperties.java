@@ -626,28 +626,6 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isContainsCommonColumn", true, getLoadDataReverseMap());
     }
 
-    public boolean isLoadDataReverseManagedTableOnly() {
-        return isLoadDataReverseReplaceSchemaDirectUse();
-    }
-
-    public Integer getLoadDataReverseXlsLimit() {
-        final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
-        String limitExp = null;
-        if (!loadDataReverseMap.isEmpty()) {
-            limitExp = (String) loadDataReverseMap.get("xlsLimit");
-        }
-        if (limitExp == null) {
-            return null; // if null, default limit
-        }
-        try {
-            return Integer.valueOf(limitExp);
-        } catch (NumberFormatException e) {
-            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_documentDefinitionMap;
-            msg = msg + " should be number but: value=" + limitExp;
-            throw new DfIllegalPropertyTypeException(msg, e);
-        }
-    }
-
     public String getLoadDataReverseXlsDataDir() {
         if (isLoadDataReverseReplaceSchemaDirectUse()) {
             return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseXlsDataDir();
@@ -685,6 +663,24 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     public boolean isLoadDataReverseSynchronizeOriginDate() {
         return isProperty("isSynchronizeOriginDate", false, getLoadDataReverseMap());
+    }
+
+    public Integer getLoadDataReverseXlsLimit() {
+        final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
+        String limitExp = null;
+        if (!loadDataReverseMap.isEmpty()) {
+            limitExp = (String) loadDataReverseMap.get("xlsLimit");
+        }
+        if (limitExp == null) {
+            return null; // if null, default limit
+        }
+        try {
+            return Integer.valueOf(limitExp);
+        } catch (NumberFormatException e) {
+            String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_documentDefinitionMap;
+            msg = msg + " should be number but: value=" + limitExp;
+            throw new DfIllegalPropertyTypeException(msg, e);
+        }
     }
 
     // -----------------------------------------------------

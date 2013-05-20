@@ -109,6 +109,7 @@ public class DfLReverseProcess {
         sectionInfoList.add("...Outputting load data: tables=" + tableList.size());
         sectionInfoList.add("  isReplaceSchemaDirectUse = " + isReplaceSchemaDirectUse());
         sectionInfoList.add("  isOverrideExistingDataFile = " + isOverrideExistingDataFile());
+        sectionInfoList.add("  isSynchronizeOriginDate = " + isSynchronizeOriginDate());
         for (String sectionInfo : sectionInfoList) {
             _log.info(sectionInfo);
         }
@@ -377,8 +378,14 @@ public class DfLReverseProcess {
         final List<Table> filteredList = DfCollectionUtil.newArrayListSized(tableList.size());
         final List<Table> commonSkippedList = DfCollectionUtil.newArrayList();
         final List<Table> exceptSkippedList = DfCollectionUtil.newArrayList();
-        _log.info("...Filtering reversed table");
+        _log.info("...Filtering reversed table: " + tableList.size());
         for (Table table : tableList) {
+            if (table.isTypeView() || table.isAdditionalSchema()) {
+                // fixedly out of target
+                //   view object - view is not an object which has own data
+                //   additional schema - tables on main schema only are target
+                continue;
+            }
             if (commonExistingTableSet.contains(table.getTableDbName())) {
                 commonSkippedList.add(table);
                 continue;

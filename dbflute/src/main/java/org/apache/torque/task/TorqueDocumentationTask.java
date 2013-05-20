@@ -279,7 +279,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     protected DfLReverseOutputHandler createLReverseOutputHandler() {
         final DfLReverseOutputHandler handler = new DfLReverseOutputHandler(getDataSource());
         handler.setContainsCommonColumn(isLoadDataReverseContainsCommonColumn());
-        handler.setManagedTableOnly(isLoadDataReverseManagedTableOnly());
         final Integer xlsLimit = getLoadDataReverseXlsLimit(); // if null, default limit
         if (xlsLimit != null) {
             handler.setXlsLimit(xlsLimit);
@@ -386,10 +385,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected boolean isLoadDataReverseContainsCommonColumn() {
         return getDocumentProperties().isLoadDataReverseContainsCommonColumn();
-    }
-
-    protected boolean isLoadDataReverseManagedTableOnly() {
-        return getDocumentProperties().isLoadDataReverseManagedTableOnly();
     }
 
     protected Integer getLoadDataReverseXlsLimit() {

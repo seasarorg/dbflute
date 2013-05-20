@@ -89,11 +89,6 @@ public class DfTableOrderAnalyzer {
         final List<Table> unregisteredTableList = new ArrayList<Table>();
         final List<Table> elementList = new ArrayList<Table>();
         for (Table table : tableList) {
-            if (table.isTypeView() || table.isAdditionalSchema()) {
-                // view object - view is not an object which has own data
-                // additional schema - tables on main schema only are target
-                continue;
-            }
             final List<ForeignKey> foreignKeyList = table.getForeignKeyList();
             boolean independent = true;
             for (ForeignKey fk : foreignKeyList) {
