@@ -18,7 +18,7 @@ package org.seasar.dbflute.cbean;
 import java.util.Date;
 import java.util.List;
 
-import org.seasar.dbflute.cbean.ManualOrderBean.FreeParameterManualOrderThemeListHandler;
+import org.seasar.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
 import org.seasar.dbflute.cbean.chelper.HpMobCaseWhenElement;
 import org.seasar.dbflute.cbean.chelper.HpMobConnectionMode;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
@@ -59,7 +59,7 @@ public class ManualOrderBeanTest extends PlainTestCase {
         }
 
         // ## Act ##
-        mob.bind(new FreeParameterManualOrderThemeListHandler() {
+        mob.bind(new HpManualOrderThemeListHandler() {
             int index = 0;
 
             public String register(String themeKey, Object orderValue) {

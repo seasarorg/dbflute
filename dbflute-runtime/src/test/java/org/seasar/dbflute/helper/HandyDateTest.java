@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.helper;
 
-import org.seasar.dbflute.helper.HandyDate.BusinessDayDeterminer;
+import org.seasar.dbflute.helper.secretary.BusinessDayDeterminer;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**

@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.seasar.dbflute.cbean.ManualOrderBean.FreeParameterManualOrderThemeListHandler;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
+import org.seasar.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
 import org.seasar.dbflute.cbean.chelper.HpQDRParameter;
 import org.seasar.dbflute.cbean.chelper.HpSSQOption;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
@@ -1577,7 +1577,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     public void withManualOrder(ManualOrderBean manualOrderBean) { // is user public!
         assertObjectNotNull("withManualOrder(manualOrderBean)", manualOrderBean);
-        manualOrderBean.bind(new FreeParameterManualOrderThemeListHandler() {
+        manualOrderBean.bind(new HpManualOrderThemeListHandler() {
             public String register(String themeKey, Object orderValue) {
                 return xregisterManualOrderParameterToThemeList(themeKey, orderValue);
             }

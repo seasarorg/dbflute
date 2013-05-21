@@ -21,7 +21,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.seasar.dbflute.exception.ParseDateExpressionFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.secretary.BusinessDayDeterminer;
+import org.seasar.dbflute.helper.secretary.DateCompareCallback;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.DfTypeUtil.ParseDateException;
 
@@ -129,25 +132,6 @@ public class HandyDate implements Serializable {
         br.addElement(exp);
         final String msg = br.buildExceptionMessage();
         throw new ParseDateExpressionFailureException(msg, e);
-    }
-
-    public static class ParseDateExpressionFailureException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public ParseDateExpressionFailureException(String msg, Throwable cause) {
-            super(msg, cause);
-        }
-    }
-
-    public static interface BusinessDayDeterminer {
-
-        /**
-         * Does the (handy) date specify business day?
-         * @param handyDate The handy date to determine. (NotNull)
-         * @return The determination, true or false.
-         */
-        boolean isBusinessDay(HandyDate handyDate);
     }
 
     // ===================================================================================
@@ -1050,8 +1034,8 @@ public class HandyDate implements Serializable {
         return doCompareAny(createGreaterThanCompareCallback(), dates);
     }
 
-    protected CompareCallback createGreaterThanCompareCallback() {
-        return new CompareCallback() {
+    protected DateCompareCallback createGreaterThanCompareCallback() {
+        return new DateCompareCallback() {
             public boolean isTarget(Date current, Date date) {
                 return current.after(date);
             }
@@ -1108,8 +1092,8 @@ public class HandyDate implements Serializable {
         return doCompareAny(createGreaterEqualCompareCallback(), dates);
     }
 
-    protected CompareCallback createGreaterEqualCompareCallback() {
-        return new CompareCallback() {
+    protected DateCompareCallback createGreaterEqualCompareCallback() {
+        return new DateCompareCallback() {
             public boolean isTarget(Date current, Date date) {
                 return current.after(date) || current.equals(date);
             }
@@ -1169,8 +1153,8 @@ public class HandyDate implements Serializable {
         return doCompareAny(createLessThanCompareCallback(), dates);
     }
 
-    protected CompareCallback createLessThanCompareCallback() {
-        return new CompareCallback() {
+    protected DateCompareCallback createLessThanCompareCallback() {
+        return new DateCompareCallback() {
             public boolean isTarget(Date current, Date date) {
                 return current.before(date);
             }
@@ -1227,8 +1211,8 @@ public class HandyDate implements Serializable {
         return doCompareAny(createLessEqualCompareCallback(), dates);
     }
 
-    protected CompareCallback createLessEqualCompareCallback() {
-        return new CompareCallback() {
+    protected DateCompareCallback createLessEqualCompareCallback() {
+        return new DateCompareCallback() {
             public boolean isTarget(Date current, Date date) {
                 return current.before(date) || current.equals(date);
             }
@@ -1238,7 +1222,7 @@ public class HandyDate implements Serializable {
     // -----------------------------------------------------
     //                                        Compare Helper
     //                                        --------------
-    protected boolean doCompareAll(CompareCallback callback, Date... dates) {
+    protected boolean doCompareAll(DateCompareCallback callback, Date... dates) {
         assertCompareDateArrayValid(dates);
         final Date current = getDate();
         for (Date date : dates) {
@@ -1249,7 +1233,7 @@ public class HandyDate implements Serializable {
         return true;
     }
 
-    protected boolean doCompareAny(CompareCallback callback, Date... dates) {
+    protected boolean doCompareAny(DateCompareCallback callback, Date... dates) {
         assertCompareDateArrayValid(dates);
         final Date current = getDate();
         for (Date date : dates) {
@@ -1265,10 +1249,6 @@ public class HandyDate implements Serializable {
             String msg = "The argument 'dates' should not be null or empty.";
             throw new IllegalArgumentException(msg);
         }
-    }
-
-    protected static interface CompareCallback {
-        boolean isTarget(Date current, Date date);
     }
 
     // ===================================================================================

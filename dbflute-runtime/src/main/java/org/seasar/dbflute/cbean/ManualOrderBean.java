@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
+import org.seasar.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
 import org.seasar.dbflute.cbean.chelper.HpMobCaseWhenElement;
 import org.seasar.dbflute.cbean.chelper.HpMobConnectedBean;
 import org.seasar.dbflute.cbean.chelper.HpMobConnectionMode;
@@ -520,7 +521,7 @@ public class ManualOrderBean implements HpCalculator {
      * It is called from DBFlute runtime internally.
      * @param handler The handler for free parameters. (NotNull)
      */
-    public void bind(FreeParameterManualOrderThemeListHandler handler) { // called when set to query
+    public void bind(HpManualOrderThemeListHandler handler) { // called when set to query
         if (!hasManualOrder()) {
             return;
         }
@@ -536,8 +537,7 @@ public class ManualOrderBean implements HpCalculator {
         doBindElseEnd(handler);
     }
 
-    protected HpMobCaseWhenElement doBindCaseWhen(FreeParameterManualOrderThemeListHandler handler,
-            HpMobCaseWhenElement element) {
+    protected HpMobCaseWhenElement doBindCaseWhen(HpManualOrderThemeListHandler handler, HpMobCaseWhenElement element) {
         final ConditionKey conditionKey = element.getConditionKey();
         final Object orderValue = resolveBoundValue(handler, element.getOrderValue(), false);
         final HpMobCaseWhenElement boundElement = createElement(conditionKey, orderValue);
@@ -546,14 +546,13 @@ public class ManualOrderBean implements HpCalculator {
         return boundElement;
     }
 
-    protected void doBindElseEnd(FreeParameterManualOrderThemeListHandler handler) {
+    protected void doBindElseEnd(HpManualOrderThemeListHandler handler) {
         if (_elseAcceptedValue != null) {
             _elseBoundValue = resolveBoundValue(handler, _elseAcceptedValue, _suppressElseBinding);
         }
     }
 
-    protected Object resolveBoundValue(FreeParameterManualOrderThemeListHandler handler, Object plainValue,
-            boolean suppressBinding) {
+    protected Object resolveBoundValue(HpManualOrderThemeListHandler handler, Object plainValue, boolean suppressBinding) {
         if (plainValue == null) {
             return null;
         }
@@ -642,19 +641,6 @@ public class ManualOrderBean implements HpCalculator {
         br.addElement(plainValue);
         final String msg = br.buildExceptionMessage();
         throw new IllegalConditionBeanOperationException(msg);
-    }
-
-    /**
-     * The handler of theme list of free parameter for manual order. 
-     */
-    public static interface FreeParameterManualOrderThemeListHandler {
-
-        /**
-         * @param themeKey The theme key of free parameter. (NotNull)
-         * @param orderValue The registered order value. (NotNull)
-         * @return The bound expression for registered order value. (NotNull)
-         */
-        String register(String themeKey, Object orderValue);
     }
 
     public ManualOrderBean suppressThenBinding() {
