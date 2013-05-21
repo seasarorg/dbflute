@@ -1,6 +1,6 @@
 cd ..
 ant -f build.xml reflect-to-all-regulars
-export answer = y
+export answer=y
 
 cd ../dbflute-basic-example
 . sync-lib.sh
@@ -22,6 +22,7 @@ rm ./log/*.log
 
 cd ../../dbflute-guice-example/dbflute_exampledb
 rm ./log/*.log
+. replace-schema.sh
 . jdbc.sh
 . doc.sh
 . generate.sh
@@ -43,6 +44,8 @@ rm ./log/*.log
 
 cd ../../dbflute-mysql-example/dbflute_exampledb
 rm ./log/*.log
+. replace-schema.sh
+. manage.sh load-data-reverse
 . jdbc.sh
 . doc.sh
 . generate.sh
@@ -51,29 +54,27 @@ rm ./log/*.log
 
 cd ../../dbflute-postgresql-example/dbflute_exampledb
 rm ./log/*.log
+. replace-schema.sh
 . jdbc.sh
 . doc.sh
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
 
-cd ../../dbflute-oracle-example/dbflute_exampledb
-rm ./log/*.log
+# needs environment set up so kick by yourself (refresh only here)
+#cd ../../dbflute-oracle-example/dbflute_exampledb
+#rm ./log/*.log
 # needs environment set up so kick by yourself (refresh only here)
 #. jdbc.sh
 #. doc.sh
 #. generate.sh
 #. sql2entity.sh
 #. outside-sql-test.sh
-. manage.sh refresh
+#. manage.sh refresh
 
 cd ../../dbflute-db2-example/dbflute_exampledb
 rm ./log/*.log
-. jdbc.sh
-. doc.sh
-. generate.sh
-. sql2entity.sh
-. outside-sql-test.sh
+. manage.sh renewal
 
 # needs environment set up so kick by yourself (refresh only here)
 #cd ../../dbflute-sqlserver-example/dbflute_exampledb
@@ -83,7 +84,7 @@ rm ./log/*.log
 #. generate.sh
 #. sql2entity.sh
 #. outside-sql-test.sh
-. manage.sh refresh
+#. manage.sh refresh
 
 # cannot do on Mac
 #cd ../../dbflute-msaccess-example/dbflute_exampledb
@@ -152,7 +153,6 @@ rm ./log/*.log
 . doc.sh
 . generate.sh
 . sql2entity.sh
-. manage.sh freegen
 
 cd ../../dbflute-sqlite-example/dbflute_exampledb
 rm ./log/*.log

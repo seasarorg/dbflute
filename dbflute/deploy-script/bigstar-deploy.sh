@@ -5,7 +5,7 @@ ant -f build.xml reflect-to-guice
 ant -f build.xml reflect-to-mysql
 ant -f build.xml reflect-to-postgresql
 ant -f build.xml reflect-to-saflute
-export answer = y
+export answer=y
 
 cd ../dbflute-basic-example
 mvn -e eclipath:sync eclipath:clean
