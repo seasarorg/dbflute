@@ -4,7 +4,7 @@ ant -f build.xml reflect-to-spring
 ant -f build.xml reflect-to-guice
 ant -f build.xml reflect-to-mysql
 ant -f build.xml reflect-to-postgresql
-ant -f build.xml reflect-to-sastruts
+ant -f build.xml reflect-to-saflute
 export answer = y
 
 cd ../dbflute-basic-example
@@ -56,7 +56,7 @@ rm ./log/*.log
 . outside-sql-test.sh
 . manage.sh load-data-reverse
 
-cd ../../dbflute-sastruts-example/dbflute_exampledb
+cd ../../dbflute-saflute-example/dbflute_exampledb
 rm ./log/*.log
 . replace-schema.sh
 . manage.sh load-data-reverse

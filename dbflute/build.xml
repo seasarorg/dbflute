@@ -54,6 +54,7 @@
 
 	<!-- Friendly Examples -->
 	<property name="ymir.example.dir" value="${workspace.base}/dbflute-ymir-example" />
+	<property name="saflute.example.dir" value="${workspace.base}/dbflute-saflute-example" />
 	<property name="sastruts.example.dir" value="${workspace.base}/dbflute-sastruts-example" />
 	<property name="teeda.example.dir" value="${workspace.base}/dbflute-teeda-example" />
 	<property name="buri.example.dir" value="${workspace.base}/dbflute-buri-example" />
@@ -388,6 +389,16 @@
 		<replace file="${ymir.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}" />
 		<replace file="${ymir.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}" />
 		<delete dir="${ymir.example.dir}/mydbflute/dbflute-${pre.version}" />
+		<delete dir="${extraction.dir}" />
+	</target>
+
+	<target name="reflect-to-saflute" depends="prepare-reflection" description="==> reflect to saflute example">
+		<copy todir="${saflute.example.dir}/mydbflute/dbflute-${version}" overwrite="true">
+			<fileset dir="${extraction.dir}" />
+		</copy>
+		<replace file="${saflute.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}" />
+		<replace file="${saflute.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}" />
+		<delete dir="${saflute.example.dir}/mydbflute/dbflute-${pre.version}" />
 		<delete dir="${extraction.dir}" />
 	</target>
 

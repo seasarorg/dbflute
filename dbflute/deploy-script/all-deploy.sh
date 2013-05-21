@@ -133,6 +133,18 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
+cd ../../dbflute-saflute-example/dbflute_exampledb
+rm ./log/*.log
+. replace-schema.sh
+. manage.sh load-data-reverse
+. replace-schema.sh
+. jdbc.sh
+. doc.sh
+. generate.sh
+. sql2entity.sh
+. outside-sql-test.sh
+. manage.sh freegen
+
 cd ../../dbflute-sastruts-example
 cd dbflute_exampledb
 rm ./log/*.log
