@@ -17,6 +17,8 @@ package org.seasar.dbflute.properties.assistant.freegen.filepath;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -136,6 +138,7 @@ public class DfFilePathTableLoader {
                 }
             });
             if (listFiles != null) {
+                orderListFiles(listFiles); // to be same order between Windows and MacOSX
                 for (File currentFile : listFiles) {
                     collectFile(fileList, targetExt, targetKeyword, exceptPathList, currentFile);
                 }
@@ -168,6 +171,14 @@ public class DfFilePathTableLoader {
             result = true;
         }
         return result;
+    }
+
+    protected void orderListFiles(File[] listFiles) {
+        Arrays.sort(listFiles, new Comparator<File>() {
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
     }
 
     // ===================================================================================
