@@ -90,6 +90,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     // -----------------------------------------------------
     //                                                Option
     //                                                ------
+    protected boolean _suppressCheckColumnDef;
     protected boolean _suppressCheckImplicitSet;
 
     /** The data-prop of default value map. (NotNull) */
@@ -111,6 +112,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         final UnifiedSchema mainSchema = getDatabaseProperties().getDatabaseSchema();
         DfLoadDataProcess process = new DfLoadDataProcess(sqlRootDir, dataSource, mainSchema);
         if (previous) {
+            process.suppressCheckColumnDef();
             process.suppressCheckImplicitSet();
         }
         return process;
@@ -159,22 +161,6 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         return createFinalInfo(loadEx);
     }
 
-    protected String getRepsEnvType() {
-        return getReplaceSchemaProperties().getRepsEnvType();
-    }
-
-    public boolean isLoggingInsertSql() {
-        return getReplaceSchemaProperties().isLoggingInsertSql();
-    }
-
-    public boolean isSuppressBatchUpdate() {
-        return getReplaceSchemaProperties().isSuppressBatchUpdate();
-    }
-
-    public boolean isSuppressCheckImplicitSet() {
-        return _suppressCheckImplicitSet;
-    }
-
     // --------------------------------------------
     //                               Delimiter Data
     //                               --------------
@@ -211,6 +197,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         handler.setDataSource(_dataSource);
         handler.setUnifiedSchema(_mainSchema);
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
+        handler.setSuppressCheckColumnDef(isSuppressCheckColumnDef());
         handler.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
         handler.setDataWritingInterceptor(getDataWritingInterceptor());
         handler.setDefaultValueProp(_defaultValueProp);
@@ -333,6 +320,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         final DfXlsDataHandlerImpl handler = new DfXlsDataHandlerImpl(_dataSource, _mainSchema);
         handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setSuppressBatchUpdate(isSuppressBatchUpdate());
+        handler.setSuppressCheckColumnDef(isSuppressCheckColumnDef());
         handler.setSuppressCheckImplicitSet(isSuppressCheckImplicitSet());
         handler.setSkipSheet(getReplaceSchemaProperties().getSkipSheet());
         handler.setDataWritingInterceptor(getDataWritingInterceptor());
@@ -474,7 +462,31 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    protected String getRepsEnvType() {
+        return getReplaceSchemaProperties().getRepsEnvType();
+    }
+
+    public boolean isLoggingInsertSql() {
+        return getReplaceSchemaProperties().isLoggingInsertSql();
+    }
+
+    public boolean isSuppressBatchUpdate() {
+        return getReplaceSchemaProperties().isSuppressBatchUpdate();
+    }
+
+    public boolean isSuppressCheckColumnDef() {
+        return _suppressCheckColumnDef;
+    }
+
+    public void suppressCheckColumnDef() {
+        _suppressCheckColumnDef = true;
+    }
+
+    public boolean isSuppressCheckImplicitSet() {
+        return _suppressCheckImplicitSet;
+    }
+
     public void suppressCheckImplicitSet() {
-        this._suppressCheckImplicitSet = true;
+        _suppressCheckImplicitSet = true;
     }
 }

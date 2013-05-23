@@ -92,6 +92,9 @@ public abstract class DfAbsractDataWriter {
     /** Does it suppress batch updates? */
     protected boolean _suppressBatchUpdate;
 
+    /** Does it suppress check for column definition? */
+    protected boolean _suppressCheckColumnDef;
+
     /** Does it suppress check for classification implicit set? */
     protected boolean _suppressCheckImplicitSet;
 
@@ -1098,6 +1101,9 @@ public abstract class DfAbsractDataWriter {
     }
 
     protected boolean isCheckColumnDefExistence(String dataDirectory) {
+        if (isSuppressCheckColumnDef()) { // basically for SavePrevious
+            return false;
+        }
         return _loadingControlProp.isCheckColumnDefExistence(dataDirectory);
     }
 
@@ -1160,6 +1166,14 @@ public abstract class DfAbsractDataWriter {
 
     public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
         this._suppressBatchUpdate = suppressBatchUpdate;
+    }
+
+    public boolean isSuppressCheckColumnDef() {
+        return _suppressCheckColumnDef;
+    }
+
+    public void setSuppressCheckColumnDef(boolean suppressCheckColumnDef) {
+        this._suppressCheckColumnDef = suppressCheckColumnDef;
     }
 
     public boolean isSuppressCheckImplicitSet() {
