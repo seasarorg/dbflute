@@ -1115,7 +1115,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Batch-update the entity list. (AllColumnsUpdated, NonExclusiveControl) <br />
 #end
      * This method uses executeBatch() of java.sql.PreparedStatement. <br />
-     * <span style="color: #FD4747">All columns are update target. {NOT modified only}</span>
+     * <span style="color: #FD4747">All columns are update target. {NOT modified only}</span> <br />
      * So you should the other batchUpdate() method, which you can specify update columns like this:
      * <pre>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">batchUpdate</span>(${myEntityListVariableName}, new SpecifyQuery<${myConditionBeanClassName}>() {
