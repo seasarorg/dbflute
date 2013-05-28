@@ -94,9 +94,14 @@ public class DfSql2EntityMarkAnalyzer {
      * @return The name of parameter-bean. (NullAllowed: If it's not found, this returns null)
      */
     public String getParameterBeanName(final String sql) {
-        return getMarkString(sql, "!");
+        final String filtered = Srl.replace(sql, "!!", ""); // remove (confusing) property mark
+        return getMarkString(filtered, "!");
     }
 
+    /**
+     * @param sql The string of SQL. (NotNull)
+     * @return The list of Sql2Entity mark of parameter-bean. (NotNull)
+     */
     public List<DfSql2EntityMark> getParameterBeanPropertyTypeList(final String sql) {
         return getMarkList(sql, "!!");
     }
