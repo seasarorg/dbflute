@@ -21,6 +21,7 @@ import org.seasar.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.seasar.dbflute.exception.DfParameterBeanMarkInvalidException;
 import org.seasar.dbflute.exception.DfRequiredOutsideSqlDescriptionNotFoundException;
 import org.seasar.dbflute.exception.DfRequiredOutsideSqlTitleNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfSql2EntityMarkAnalyzer;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.node.IfCommentEvaluator;
@@ -33,6 +34,12 @@ import org.seasar.dbflute.util.Srl;
  * @since 0.9.5 (2009/04/10 Friday)
  */
 public class DfOutsideSqlChecker {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final String EMECHA_DEFAULT_TITLE = "SQL title here.";
+    private static final String EMECHA_DEFAULT_DESCRIPTION = "SQL Description here.";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -91,46 +98,42 @@ public class DfOutsideSqlChecker {
     }
 
     protected void throwCustomizeEntityMarkInvalidException(String line, String fileName, String sql) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The customize entity mark was invalid!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your mark." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x) - -- #df;entity#  *NOT semicolon" + ln();
-        msg = msg + "    (x) - -- #df:pmb#     *NOT parameter bean" + ln();
-        msg = msg + "    (x) - -- #df;emtity#  *NOT emtity ('entity' is right)" + ln();
-        msg = msg + "    (o) - -- #df:entity#" + ln();
-        msg = msg + ln();
-        msg = msg + "[Customize Entity Mark]" + ln() + line + ln();
-        msg = msg + ln();
-        msg = msg + "[File]" + ln() + fileName + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL]" + ln() + sql + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The CustomizeEntity mark was invalid.");
+        br.addItem("Advice");
+        br.addElement("Please confirm your CustomizeEntity mark.");
+        br.addElement("For example:");
+        br.addElement("  (x): -- #df;entity#  *NOT semicolun");
+        br.addElement("  (x): -- #df:pmb#     *NOT parameter bean");
+        br.addElement("  (x): -- #df:emtity#  *NOT emtity ('entity' is right)");
+        br.addElement("  (o): -- #df:entity#");
+        br.addItem("CustomizeEntity Mark");
+        br.addElement(line);
+        br.addItem("SQL File");
+        br.addElement(fileName);
+        br.addItem("Your SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
         throw new DfCustomizeEntityMarkInvalidException(msg);
     }
 
     protected void throwParameterBeanMarkInvalidException(String line, String fileName, String sql) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The parameter bean mark was invalid!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your mark." + ln();
-        msg = msg + "  For example:" + ln();
-        msg = msg + "    (x) - -- !df;pmb!     *NOT semicolun" + ln();
-        msg = msg + "    (x) - -- !df:entity!  *NOT customize entity" + ln();
-        msg = msg + "    (x) - -- !df;pnb!     *NOT pnb ('pmb' is right)" + ln();
-        msg = msg + "    (o) - -- !df:pmb!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Parameter Bean Mark]" + ln() + line + ln();
-        msg = msg + ln();
-        msg = msg + "[File]" + ln() + fileName + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL]" + ln() + sql + ln();
-        msg = msg + "* * * * * * * * * */";
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The ParameterBean mark was invalid.");
+        br.addItem("Advice");
+        br.addElement("Please confirm your ParameterBean mark.");
+        br.addElement("For example:");
+        br.addElement("  (x): -- !df;pmb!     *NOT semicolun");
+        br.addElement("  (x): -- !df:entity!  *NOT customize entity");
+        br.addElement("  (x): -- !df:pnb!     *NOT pnb ('pmb' is right)");
+        br.addElement("  (o): -- !df:pmb!");
+        br.addItem("ParameterBean Mark");
+        br.addElement(line);
+        br.addItem("SQL File");
+        br.addElement(fileName);
+        br.addItem("Your SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
         throw new DfParameterBeanMarkInvalidException(msg);
     }
 
@@ -140,32 +143,41 @@ public class DfOutsideSqlChecker {
         }
         final DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
         final String title = analyzer.getTitle(sql);
-        if (Srl.is_Null_or_TrimmedEmpty(title)) {
-            throwRequiredOutsideSqlTitleNotFoundException(fileName, sql);
+        if (isInvalidTitle(title)) {
+            throwRequiredOutsideSqlTitleNotFoundException(title, fileName, sql);
         }
     }
 
-    protected void throwRequiredOutsideSqlTitleNotFoundException(String fileName, String sql) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The outsideSql title was NOT found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "A outsideSql title is required at this project." + ln();
-        msg = msg + "(The property 'isRequiredSqlTitle' of outsideSqlDefinition is true)" + ln();
-        msg = msg + "  For example: @OutsideSql" + ln();
-        msg = msg + "    (o):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    /*" + ln();
-        msg = msg + "     [df:title]" + ln();
-        msg = msg + "     Simple Member Select" + ln();
-        msg = msg + "    */" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "[File]" + ln() + fileName + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL]" + ln() + sql + ln();
-        msg = msg + "* * * * * * * * * */";
+    protected boolean isInvalidTitle(String title) {
+        return Srl.is_Null_or_TrimmedEmpty(title) || EMECHA_DEFAULT_TITLE.equalsIgnoreCase(title.trim());
+    }
+
+    protected void throwRequiredOutsideSqlTitleNotFoundException(String title, String fileName, String sql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The outsideSql title was NOT found!");
+        br.addItem("Advice");
+        br.addElement("A outsideSql title is required in this project.");
+        br.addElement("(The property 'isRequiredSqlTitle' of outsideSqlDefinition is true)");
+        br.addElement("You should add title comment in your outside-SQL like this:");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     [df:title]");
+        br.addElement("     Simple Member Select");
+        br.addElement("");
+        br.addElement("     [df:description]");
+        br.addElement("     This SQL is ...");
+        br.addElement("    */");
+        br.addElement("    -- #df:entity#");
+        br.addElement("    -- !df:pmb!");
+        br.addElement("    -- !!AutoDetect!!");
+        br.addElement("    select ...");
+        br.addItem("Title");
+        br.addElement(title);
+        br.addItem("SQL File");
+        br.addElement(fileName);
+        br.addItem("Your SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
         throw new DfRequiredOutsideSqlTitleNotFoundException(msg);
     }
 
@@ -174,34 +186,42 @@ public class DfOutsideSqlChecker {
             return;
         }
         final DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
-        final String description = analyzer.getDescription(sql);
-        if (Srl.is_Null_or_TrimmedEmpty(description)) {
-            throwRequiredOutsideSqlDescriptionNotFoundException(fileName, sql);
+        final String desc = analyzer.getDescription(sql);
+        if (isInvalidDescription(desc)) {
+            throwRequiredOutsideSqlDescriptionNotFoundException(desc, fileName, sql);
         }
     }
 
-    protected void throwRequiredOutsideSqlDescriptionNotFoundException(String fileName, String sql) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The outsideSql description was NOT found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "A outsideSql description is required at this project." + ln();
-        msg = msg + "(The property 'isRequiredSqlDescription' of outsideSqlDefinition is true)" + ln();
-        msg = msg + "  For example: @OutsideSql" + ln();
-        msg = msg + "    (o):" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    /*" + ln();
-        msg = msg + "     [df:description]" + ln();
-        msg = msg + "     This SQL is ..." + ln();
-        msg = msg + "     It uses 'union all' for performance ..." + ln();
-        msg = msg + "    */" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "[File]" + ln() + fileName + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL]" + ln() + sql + ln();
-        msg = msg + "* * * * * * * * * */";
+    protected boolean isInvalidDescription(String desc) {
+        return Srl.is_Null_or_TrimmedEmpty(desc) || EMECHA_DEFAULT_DESCRIPTION.equalsIgnoreCase(desc.trim());
+    }
+
+    protected void throwRequiredOutsideSqlDescriptionNotFoundException(String desc, String fileName, String sql) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The outsideSql description was NOT found.");
+        br.addItem("Advice");
+        br.addElement("A outsideSql description is required in this project.");
+        br.addElement("(The property 'isRequiredSqlDescription' of outsideSqlDefinition is true)");
+        br.addElement("You should add description comment in your outside-SQL like this:");
+        br.addElement("  (o):");
+        br.addElement("    /*");
+        br.addElement("     [df:title]");
+        br.addElement("     Simple Member Select");
+        br.addElement("");
+        br.addElement("     [df:description]");
+        br.addElement("     This SQL is ...");
+        br.addElement("    */");
+        br.addElement("    -- #df:entity#");
+        br.addElement("    -- !df:pmb!");
+        br.addElement("    -- !!AutoDetect!!");
+        br.addElement("    select ...");
+        br.addItem("SQL File");
+        br.addElement(fileName);
+        br.addItem("Description");
+        br.addElement(desc);
+        br.addItem("Your SQL");
+        br.addElement(sql);
+        final String msg = br.buildExceptionMessage();
         throw new DfRequiredOutsideSqlDescriptionNotFoundException(msg);
     }
 
