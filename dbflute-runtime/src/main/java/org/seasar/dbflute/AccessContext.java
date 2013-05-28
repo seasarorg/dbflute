@@ -256,7 +256,7 @@ public class AccessContext {
         br.addNotice("The access context was not found on thread.");
         br.addItem("Advice");
         br.addElement("Set up the value before DB access (using common column auto set-up)");
-        br.addElement("You should set up it at your application's interceptor or filter.");
+        br.addElement("You should set it up at your application's interceptor or filter.");
         br.addElement("For example:");
         br.addElement("  try {");
         br.addElement("      AccessContext context = new AccessContext();");
@@ -277,7 +277,7 @@ public class AccessContext {
         br.addNotice("Failed to get the access " + aliasName + " in access context on thread.");
         br.addItem("Advice");
         br.addElement("Set up the value before DB access (using common column auto set-up)");
-        br.addElement("You should set up it at your application's interceptor or filter.");
+        br.addElement("You should set it up at your application's interceptor or filter.");
         br.addElement("For example:");
         br.addElement("  try {");
         br.addElement("      AccessContext context = new AccessContext();");
