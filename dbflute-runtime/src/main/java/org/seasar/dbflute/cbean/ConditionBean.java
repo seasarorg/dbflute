@@ -265,6 +265,27 @@ public interface ConditionBean extends PagingBean {
     void xacceptScalarSelectOption(ScalarSelectOption option);
 
     // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    /**
+     * Enable checking record count before QueryUpdate (contains QueryDelete). <br />
+     * No query update if zero count. (basically for MySQL's deadlock by next-key lock)
+     */
+    void enableCheckCountBeforeQueryUpdate();
+
+    /**
+     * Disable checking record count before QueryUpdate (contains QueryDelete).
+     * Executes query update even if zero count. (normal specification)
+     */
+    void disableCheckCountBeforeQueryUpdate();
+
+    /**
+     * Does it check record count before QueryUpdate (contains QueryDelete)?
+     * @return The determination, true or false.
+     */
+    boolean isCheckCountBeforeQueryUpdate();
+
+    // ===================================================================================
     //                                                                    Statement Config
     //                                                                    ================
     /**

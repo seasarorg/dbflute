@@ -64,6 +64,9 @@ public class ${myClassName} extends AbstractConditionBean {
         if (${glDBFluteConfig}.getInstance().isPagingCountLeastJoin()) {
             enablePagingCountLeastJoin();
         }
+        if (${glDBFluteConfig}.getInstance().isCheckCountBeforeQueryUpdate()) {
+            enableCheckCountBeforeQueryUpdate();
+        }
     }
 
     // ===================================================================================

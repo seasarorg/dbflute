@@ -64,22 +64,6 @@ public class ${glDBFluteConfig} {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(${glDBFluteConfig}.class);
 
-#if ($database.isOutsideSqlPackageValid())
-    /** The default package of outside SQL. The default value is '${database.outsideSqlPackage}'. */
-    private static final String DEFAULT_OUTSIDE_SQL_PACKAGE = "${database.outsideSqlPackage}";
-#else
-    /** The default package of outside SQL. */
-    private static final String DEFAULT_OUTSIDE_SQL_PACKAGE = null;
-#end
-
-#if ($database.isSqlLogRegistryValid())
-    /** The default value of whether it uses SQL Log Registry. The default value is true. */
-    private static final boolean DEFAULT_USE_SQL_LOG_REGISTRY = true;
-#else
-    /** The default value of whether it uses SQL Log Registry. The default value is false. */
-    private static final boolean DEFAULT_USE_SQL_LOG_REGISTRY = false;
-#end
-
     /** Singleton instance. */
     private static final ${glDBFluteConfig} _instance = new ${glDBFluteConfig}();
 
@@ -97,6 +81,7 @@ public class ${glDBFluteConfig} {
     protected boolean _emptyStringParameterAllowed;
     protected boolean _invalidQueryChecked;
     protected boolean _disableSelectIndex;
+    protected boolean _checkCountBeforeQueryUpdate = ${database.isCheckCountBeforeQueryUpdate()};
 
     // logging
     protected boolean _queryLogLevelInfo;
@@ -114,8 +99,12 @@ public class ${glDBFluteConfig} {
     protected DataSourceHandler _dataSourceHandler;
     protected PhysicalConnectionDigger _physicalConnectionDigger;
     protected SQLExceptionDigger _sqlExceptionDigger;
-    protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
-    protected boolean _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
+#if ($database.isOutsideSqlPackageValid())
+    protected String _outsideSqlPackage = "${database.outsideSqlPackage}";
+#else
+    protected String _outsideSqlPackage;
+#end
+    protected boolean _useSqlLogRegistry = ${database.isSqlLogRegistryValid()};
 
     // extension
     protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
@@ -286,6 +275,21 @@ public class ${glDBFluteConfig} {
             _log.info("...Setting disableSelectIndex: " + disableSelectIndex);
         }
         _disableSelectIndex = disableSelectIndex;
+    }
+
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    public boolean isCheckCountBeforeQueryUpdate() {
+        return _checkCountBeforeQueryUpdate;
+    }
+
+    public void setCheckCountBeforeQueryUpdate(boolean checkCountBeforeQueryUpdate) {
+        assertNotLocked();
+        if (_log.isInfoEnabled()) {
+            _log.info("...Setting checkCountBeforeQueryUpdate: " + checkCountBeforeQueryUpdate);
+        }
+        _checkCountBeforeQueryUpdate = checkCountBeforeQueryUpdate;
     }
 
     // ===================================================================================

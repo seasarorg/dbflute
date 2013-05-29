@@ -343,4 +343,14 @@ public class MockConditionBean implements ConditionBean {
     public CursorSelectOption getCursorSelectOption() {
         return null;
     }
+
+    public void enableCheckCountBeforeQueryUpdate() {
+    }
+
+    public void disableCheckCountBeforeQueryUpdate() {
+    }
+
+    public boolean isCheckCountBeforeQueryUpdate() {
+        return false;
+    }
 }

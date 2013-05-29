@@ -79,19 +79,19 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                Paging
     //                                                ------
     /** Is the count executed later? {Internal} */
-    private boolean _pagingCountLater; // the default value is on the DBFlute generator (true @since 0.9...)
+    protected boolean _pagingCountLater; // the default value is on the DBFlute generator (true @since 0.9...)
 
     /** Can the paging re-select? {Internal} */
-    private boolean _pagingReSelect = true;
+    protected boolean _pagingReSelect = true;
 
     // -----------------------------------------------------
     //                                                 Union
     //                                                 -----
     /** The list of condition-bean for union. {Internal} (NullAllowed) */
-    private List<ConditionBean> _unionCBeanList;
+    protected List<ConditionBean> _unionCBeanList;
 
     /** The synchronizer of union query. {Internal} (NullAllowed) */
-    private UnionQuery<ConditionBean> _unionQuerySynchronizer;
+    protected UnionQuery<ConditionBean> _unionQuerySynchronizer;
 
     // -----------------------------------------------------
     //                                          Purpose Type
@@ -114,17 +114,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // -----------------------------------------------------
     //                                        Various Option
     //                                        --------------
-    /** Safety max result size. {Internal} */
-    private int _safetyMaxResultSize;
+    /** The max result size of safety select. {Internal} */
+    protected int _safetyMaxResultSize;
+
+    /** Does it check record count before QueryUpdate? (contains QueryDelete) {Internal} */
+    protected boolean _checkCountBeforeQueryUpdate;
 
     /** The configuration of statement. {Internal} (NullAllowed) */
-    private StatementConfig _statementConfig;
+    protected StatementConfig _statementConfig;
 
     /** Does it cache of relation entity instance? {Internal} */
-    private boolean _relationMappingCache = true;
+    protected boolean _relationMappingCache = true;
 
     /** The option of cursor select. {Internal} (NullAllowed) */
-    protected CursorSelectOption _cursorSelectOption; // set by sub-class so protected
+    protected CursorSelectOption _cursorSelectOption; // set by sub-class
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -851,7 +854,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void checkSafetyResult(int safetyMaxResultSize) {
-        this._safetyMaxResultSize = safetyMaxResultSize;
+        _safetyMaxResultSize = safetyMaxResultSize;
     }
 
     /**
@@ -1027,6 +1030,30 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void xacceptScalarSelectOption(ScalarSelectOption option) {
         getSqlClause().acceptScalarSelectOption(option);
+    }
+
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    /**
+     * {@inheritDoc}
+     */
+    public void enableCheckCountBeforeQueryUpdate() {
+        _checkCountBeforeQueryUpdate = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void disableCheckCountBeforeQueryUpdate() {
+        _checkCountBeforeQueryUpdate = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isCheckCountBeforeQueryUpdate() {
+        return _checkCountBeforeQueryUpdate;
     }
 
     // ===================================================================================

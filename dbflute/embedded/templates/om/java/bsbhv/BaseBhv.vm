@@ -1385,11 +1385,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     protected int doQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> option) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertCBStateValid(cb);
         prepareUpdateOption(option);
-#if ($database.isCheckCountBeforeQueryUpdate())
-        return checkCountBeforeQueryUpdate(cb) ? delegateQueryUpdate(${myEntityVariableName}, cb, option) : 0;
-#else
-        return delegateQueryUpdate(${myEntityVariableName}, cb, option);
-#end
+        return checkCountBeforeQueryUpdateIfNeeds(cb) ? delegateQueryUpdate(${myEntityVariableName}, cb, option) : 0;
     }
 
     @Override
@@ -1416,11 +1412,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     protected int doQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> option) {
         assertCBStateValid(cb);
         prepareDeleteOption(option);
-#if ($database.isCheckCountBeforeQueryUpdate())
-        return checkCountBeforeQueryUpdate(cb) ? delegateQueryDelete(cb, option) : 0;
-#else
-        return delegateQueryDelete(cb, option);
-#end
+        return checkCountBeforeQueryUpdateIfNeeds(cb) ? delegateQueryDelete(cb, option) : 0;
     }
 
     @Override

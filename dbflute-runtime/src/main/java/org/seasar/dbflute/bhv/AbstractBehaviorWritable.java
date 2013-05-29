@@ -380,12 +380,18 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     protected abstract int doRangeRemove(ConditionBean cb, DeleteOption<? extends ConditionBean> option);
 
     /**
-     * Check record count before query-update. (against NextKeyLock of MySQL)
-     * @param cb The condition-bean for query-update. (NotNull)
-     * @return true if record count exists.
+     * Check record count before QueryUpdate if it needs. (against MySQL's deadlock of next-key lock)
+     * @param cb The condition-bean for QueryUpdate. (NotNull)
+     * @return true if record count exists or no check.
      */
-    protected boolean checkCountBeforeQueryUpdate(ConditionBean cb) {
-        return readCount(cb) > 0;
+    protected boolean checkCountBeforeQueryUpdateIfNeeds(ConditionBean cb) {
+        final boolean countExists;
+        if (cb.isCheckCountBeforeQueryUpdate()) {
+            countExists = readCount(cb) > 0;
+        } else {
+            countExists = true; // means no check
+        }
+        return countExists;
     }
 
     // =====================================================================================
