@@ -153,10 +153,21 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                            Entity JavaDoc DbComment
     //                                                            ========================
-    public boolean isEntityJavaDocDbCommentValid() {
-        return isProperty("isEntityJavaDocDbCommentValid", false, getDocumentDefinitionMap());
+    public boolean isEntityJavaDocDbCommentValid() { // default true since 1.0.4D
+        return isProperty("isEntityJavaDocDbCommentValid", true, getDocumentDefinitionMap());
     }
 
+    // ===================================================================================
+    //                                                             Entity DBMeta DbComment
+    //                                                             =======================
+    public boolean isEntityDBMetaDbCommentValid() {
+        return isProperty("isEntityDBMetaDbCommentValid", false, getDocumentDefinitionMap());
+    }
+
+    // ===================================================================================
+    //                                                                     Escape Resolver
+    //                                                                     ===============
+    // these are utilities (needs to refactor)
     public String resolveTextForSchemaHtml(String text) {
         if (text == null || text.trim().length() == 0) {
             return null;
@@ -214,6 +225,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
         text = Srl.replace(text, "<", "&lt;");
         text = Srl.replace(text, ">", "&gt;");
+        text = Srl.replace(text, "*/", "&#42;/"); // avoid JavaDoc breaker
         text = removeCR(text);
         final String sourceLineSeparator = getBasicProperties().getSourceCodeLineSeparator();
         final String javaDocLineSeparator = "<br />" + sourceLineSeparator + indent + " * ";
@@ -250,13 +262,6 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         text = Srl.replace(text, "<", "&lt;");
         text = Srl.replace(text, ">", "&gt;");
         return text;
-    }
-
-    // ===================================================================================
-    //                                                             Entity DBMeta DbComment
-    //                                                             =======================
-    public boolean isEntityDBMetaDbCommentValid() {
-        return isProperty("isEntityDBMetaDbCommentValid", false, getDocumentDefinitionMap());
     }
 
     public String resolveTextForDBMeta(String text) { // C# same as Java
