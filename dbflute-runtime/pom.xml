@@ -16,7 +16,7 @@
 		<junit.version>3.8.2</junit.version>
 	</properties>
 
-	<url>http://dbflute.sandbox.seasar.org/</url>
+	<url>http://dbflute.seasar.org/</url>
 	<inceptionYear>2006</inceptionYear>
 	<licenses>
 		<license>
@@ -52,9 +52,9 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:svn:https://www.seasar.org/svn/sandbox/dbflute/trunk/dbflute-runtime/</connection>
-		<developerConnection>scm:svn:https://www.seasar.org/svn/sandbox/dbflute/trunk/dbflute-runtime/</developerConnection>
-		<url>http://svn.seasar.org/browse/?root=sandbox.dbflute</url>
+		<connection>scm:svn:https://www.seasar.org/svn/dbflute/trunk/dbflute-runtime/</connection>
+		<developerConnection>scm:svn:https://www.seasar.org/svn/dbflute/trunk/dbflute-runtime/</developerConnection>
+		<url>http://svn.seasar.org/browse/?root=dbflute</url>
 	</scm>
 
 	<build>
