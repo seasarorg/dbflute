@@ -27,6 +27,7 @@ import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
+import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.NonQueryDeleteNotAllowedException;
 import org.seasar.dbflute.exception.NonQueryUpdateNotAllowedException;
 import org.seasar.dbflute.exception.OptimisticLockColumnValueNullException;
@@ -132,6 +133,13 @@ public class BehaviorExceptionThrower {
         } else {
             br.addItem("Fetch Bean");
             br.addElement(fetchBean);
+            if (cause instanceof FetchingOverSafetySizeException) {
+                final String sql = ((FetchingOverSafetySizeException) cause).getDangerousDisplaySql();
+                if (sql != null) {
+                    br.addItem("Dangerous SQL");
+                    br.addElement(sql);
+                }
+            }
         }
         final String msg = br.buildExceptionMessage();
         throw new DangerousResultSizeException(msg, cause, safetyMaxResultSize);

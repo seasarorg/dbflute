@@ -25,27 +25,27 @@ public class DangerousResultSizeException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     /** The max size of safety result. */
-    protected int _safetyMaxResultSize;
+    protected final int _safetyMaxResultSize;
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The exception message. (NotNull)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
     public DangerousResultSizeException(String msg, int safetyMaxResultSize) {
         super(msg);
-        this._safetyMaxResultSize = safetyMaxResultSize;
+        _safetyMaxResultSize = safetyMaxResultSize;
     }
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NullAllowed)
+     * @param msg The exception message. (NotNull)
+     * @param cause The exception as cause. (NullAllowed)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
     public DangerousResultSizeException(String msg, Throwable cause, int safetyMaxResultSize) {
         super(msg, cause);
-        this._safetyMaxResultSize = safetyMaxResultSize;
+        _safetyMaxResultSize = safetyMaxResultSize;
     }
 
     /**

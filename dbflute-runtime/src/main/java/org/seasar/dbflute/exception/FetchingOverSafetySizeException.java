@@ -27,6 +27,9 @@ public class FetchingOverSafetySizeException extends RuntimeException {
     /** The max size of safety result. */
     protected int _safetyMaxResultSize;
 
+    /** The executed dangerous SQL as displaySql. (NullAllowed: might be set in catch statement so writable) */
+    protected String _dangerousDisplaySql;
+
     /**
      * Constructor.
      * @param msg Exception message. (NotNull)
@@ -54,5 +57,21 @@ public class FetchingOverSafetySizeException extends RuntimeException {
      */
     public int getSafetyMaxResultSize() {
         return _safetyMaxResultSize;
+    }
+
+    /**
+     * Get the executed dangerous SQL as displaySql.
+     * @return The string for SQL. (NullAllowed)
+     */
+    public String getDangerousDisplaySql() {
+        return _dangerousDisplaySql;
+    }
+
+    /**
+     * Get the executed dangerous SQL as displaySql.
+     * @param dangerousDisplaySql The string for SQL. (NullAllowed)
+     */
+    public void setDangerousDisplaySql(String dangerousDisplaySql) {
+        this._dangerousDisplaySql = dangerousDisplaySql;
     }
 }

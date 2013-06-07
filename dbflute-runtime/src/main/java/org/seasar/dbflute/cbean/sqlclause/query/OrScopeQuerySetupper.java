@@ -67,14 +67,14 @@ public class OrScopeQuerySetupper {
                         beginAndPart = false;
                         secondAndPart = true;
                     } else { // other and-part
-                        sb.append(")"); // closing a previous and-part
+                        sb.append(")"); // closing previous and-part
                         preAndPartIdentity = identity;
                         beginAndPart = true;
                         secondAndPart = false;
                     }
                 } else {
                     if (preAndPartIdentity != null) {
-                        sb.append(")"); // closing an and-part
+                        sb.append(")"); // closing and-part
                         preAndPartIdentity = null;
                     }
                     beginAndPart = false;
@@ -109,11 +109,11 @@ public class OrScopeQuerySetupper {
                 ++listIndex;
             }
             if (preAndPartIdentity != null) {
-                sb.append(")"); // closing an and-part
+                sb.append(")"); // closing and-part
                 preAndPartIdentity = null;
             }
             if (groupListIndex > 0) { // second or more list
-                sb.append(")"); // closing an or-scope
+                sb.append(")"); // closing or-scope
             }
             ++groupListIndex;
         }

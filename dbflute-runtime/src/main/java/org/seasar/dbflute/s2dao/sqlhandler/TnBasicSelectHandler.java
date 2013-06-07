@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
+import org.seasar.dbflute.exception.FetchingOverSafetySizeException;
 import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.jdbc.FetchBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
@@ -84,6 +85,13 @@ public class TnBasicSelectHandler extends TnBasicParameterHandler {
         try {
             rs = doQueryResult(ps);
             return _resultSetHandler.handle(rs);
+        } catch (FetchingOverSafetySizeException e) { // from fetch assist
+            if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
+                // OutsideSql only, ConditionBean uses its toDisplaySql()
+                // this is patch modification so less impact
+                e.setDangerousDisplaySql(buildExceptionMessageSql());
+            }
+            throw e;
         } finally {
             close(rs);
         }
