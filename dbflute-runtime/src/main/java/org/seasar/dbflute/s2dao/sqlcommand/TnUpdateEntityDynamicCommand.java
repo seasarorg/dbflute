@@ -27,7 +27,9 @@ import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.UpdateOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateEntityHandler;
 
@@ -65,6 +67,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         }
         final Object bean = args[0];
         final UpdateOption<ConditionBean> option = extractUpdateOptionChecked(args);
+        prepareStatementConfigOnThreadIfExists(option);
 
         final TnPropertyType[] propertyTypes = createUpdatePropertyTypes(bean, option);
         if (propertyTypes.length == 0) {
@@ -85,6 +88,13 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         final UpdateOption<ConditionBean> option = (UpdateOption<ConditionBean>) args[1];
         option.xcheckSpecifiedUpdateColumnPrimaryKey();
         return option;
+    }
+
+    protected void prepareStatementConfigOnThreadIfExists(UpdateOption<ConditionBean> option) {
+        final StatementConfig config = option != null ? option.getUpdateStatementConfig() : null;
+        if (config != null) {
+            InternalMapContext.setUpdateStatementConfig(config);
+        }
     }
 
     protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,

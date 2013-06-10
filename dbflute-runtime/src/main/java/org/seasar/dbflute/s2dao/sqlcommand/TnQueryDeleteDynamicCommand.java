@@ -19,7 +19,9 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.bhv.DeleteOption;
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 
@@ -42,6 +44,7 @@ public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
         // analyze arguments
         final ConditionBean cb = extractConditionBeanWithCheck(args);
         final DeleteOption<ConditionBean> option = extractUpdateOptionWithCheck(args);
+        prepareStatementConfigOnThreadIfExists(option);
 
         // arguments for execution (not contains an option)
         final String[] argNames = new String[] { "pmb" };
@@ -93,6 +96,13 @@ public class TnQueryDeleteDynamicCommand extends TnAbstractQueryDynamicCommand {
         @SuppressWarnings("unchecked")
         final DeleteOption<ConditionBean> option = (DeleteOption<ConditionBean>) secondArg;
         return option;
+    }
+
+    protected void prepareStatementConfigOnThreadIfExists(DeleteOption<ConditionBean> option) {
+        final StatementConfig config = option != null ? option.getDeleteStatementConfig() : null;
+        if (config != null) {
+            InternalMapContext.setUpdateStatementConfig(config);
+        }
     }
 
     protected void assertArgument(Object[] args) {

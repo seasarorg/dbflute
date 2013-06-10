@@ -36,6 +36,7 @@ import org.seasar.dbflute.exception.VaryingUpdateOptimisticLockSpecificationExce
 import org.seasar.dbflute.exception.VaryingUpdatePrimaryKeySpecificationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -62,6 +63,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected boolean _nonQueryUpdateAllowed;
     protected boolean _queryUpdateForcedDirectAllowed;
     protected Integer _batchLoggingUpdateLimit;
+    protected StatementConfig _updateStatementConfig;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -468,11 +470,26 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
      * @param batchLoggingUpdateLimit The limit size of batch-update logging. (NullAllowed: if null and minus, means no limit)
      */
     public void limitBatchUpdateLogging(Integer batchLoggingUpdateLimit) {
-        this._batchLoggingUpdateLimit = batchLoggingUpdateLimit;
+        _batchLoggingUpdateLimit = batchLoggingUpdateLimit;
     }
 
     public Integer getBatchUpdateLoggingLimit() {
         return _batchLoggingUpdateLimit;
+    }
+
+    // ===================================================================================
+    //                                                                           Configure
+    //                                                                           =========
+    /**
+     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
+     * @param updateStatementConfig The configuration of statement for update. (NullAllowed)
+     */
+    public void configure(StatementConfig updateStatementConfig) {
+        _updateStatementConfig = updateStatementConfig;
+    }
+
+    public StatementConfig getUpdateStatementConfig() {
+        return _updateStatementConfig;
     }
 
     // ===================================================================================

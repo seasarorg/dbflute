@@ -30,6 +30,7 @@ import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
 
 /**
@@ -94,8 +95,8 @@ public class TnStatementFactoryImpl implements StatementFactory {
         } else if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
             final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
             config = context.getStatementConfig();
-        } else {
-            config = null;
+        } else { // update or no exist
+            config = InternalMapContext.getUpdateStatementConfig();
         }
         return config;
     }

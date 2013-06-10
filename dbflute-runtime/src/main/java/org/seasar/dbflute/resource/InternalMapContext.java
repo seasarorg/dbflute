@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.seasar.dbflute.jdbc.SqlLogInfo;
+import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
  * The context of internal map.
@@ -45,8 +46,10 @@ public class InternalMapContext {
      * @return The value of the object. (NullAllowed)
      */
     public static Object getObject(String key) {
-        initializeIfNeeds();
-        return threadLocal.get().get(key);
+        // no use lazy-load to suppress waste instance
+        //initializeIfNeeds();
+        final Map<String, Object> map = threadLocal.get();
+        return map != null ? map.get(key) : null;
     }
 
     /**
@@ -91,6 +94,7 @@ public class InternalMapContext {
     protected static final String KEY_RESULT_SQL_LOG_INFO = "df:ResultSqlLogInfo";
     protected static final String KEY_SQL_BEFORE_TIME_MILLIS = "df:SqlBeforeTimeMillis";
     protected static final String KEY_SQL_AFTER_TIME_MILLIS = "df:SqlAfterTimeMillis";
+    protected static final String KEY_UPDATE_STATEMENT_CONFIG = "df:UpdateStatementConfig";
 
     // -----------------------------------------------------
     //                                           Invoke Name
@@ -175,5 +179,16 @@ public class InternalMapContext {
 
     public static void setSqlAfterTimeMillis(Long sqlAfterTimeMillis) {
         setObject(KEY_SQL_AFTER_TIME_MILLIS, sqlAfterTimeMillis);
+    }
+
+    // -----------------------------------------------------
+    //                            StatementConfig for Update
+    //                            --------------------------
+    public static StatementConfig getUpdateStatementConfig() {
+        return (StatementConfig) getObject(KEY_UPDATE_STATEMENT_CONFIG);
+    }
+
+    public static void setUpdateStatementConfig(StatementConfig updateStatementConfig) {
+        setObject(KEY_UPDATE_STATEMENT_CONFIG, updateStatementConfig);
     }
 }

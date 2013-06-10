@@ -24,7 +24,9 @@ import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -52,6 +54,7 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         }
         final Object bean = args[0];
         final InsertOption<ConditionBean> option = extractInsertOptionChecked(args);
+        prepareStatementConfigOnThreadIfExists(option);
 
         final TnBeanMetaData bmd = _beanMetaData;
         final TnPropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, _propertyNames, option);
@@ -66,6 +69,13 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         @SuppressWarnings("unchecked")
         final InsertOption<ConditionBean> option = (InsertOption<ConditionBean>) args[1];
         return option;
+    }
+
+    protected void prepareStatementConfigOnThreadIfExists(InsertOption<ConditionBean> option) {
+        final StatementConfig config = option != null ? option.getInsertStatementConfig() : null;
+        if (config != null) {
+            InternalMapContext.setUpdateStatementConfig(config);
+        }
     }
 
     protected Object doExecute(Object bean, TnPropertyType[] propertyTypes, String sql,

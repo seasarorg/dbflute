@@ -30,8 +30,10 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -64,6 +66,7 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
         final Entity entity = extractEntityWithCheck(args);
         final ConditionBean cb = extractConditionBeanWithCheck(args);
         final UpdateOption<ConditionBean> option = extractUpdateOptionWithCheck(args);
+        prepareStatementConfigOnThreadIfExists(option);
 
         // arguments for execution (not contains an option)
         final String[] argNames = new String[] { "entity", "pmb" };
@@ -131,6 +134,13 @@ public class TnQueryUpdateDynamicCommand extends TnAbstractQueryDynamicCommand {
         @SuppressWarnings("unchecked")
         final UpdateOption<ConditionBean> option = (UpdateOption<ConditionBean>) thirdArg;
         return option;
+    }
+
+    protected void prepareStatementConfigOnThreadIfExists(UpdateOption<ConditionBean> option) {
+        final StatementConfig config = option != null ? option.getUpdateStatementConfig() : null;
+        if (config != null) {
+            InternalMapContext.setUpdateStatementConfig(config);
+        }
     }
 
     protected void assertArgument(Object[] args) {

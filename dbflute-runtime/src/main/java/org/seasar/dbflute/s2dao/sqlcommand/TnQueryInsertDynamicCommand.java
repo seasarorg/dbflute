@@ -28,8 +28,10 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
@@ -57,6 +59,7 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
         final ConditionBean intoCB = extractIntoConditionBeanWithCheck(args);
         final ConditionBean resourceCB = extractResourceConditionBeanWithCheck(args);
         final InsertOption<ConditionBean> option = extractInsertOptionWithCheck(args);
+        prepareStatementConfigOnThreadIfExists(option);
 
         // arguments for execution (not contains an option)
         final String[] argNames = new String[] { "entity", "pmb" };
@@ -154,6 +157,13 @@ public class TnQueryInsertDynamicCommand extends TnAbstractQueryDynamicCommand {
         @SuppressWarnings("unchecked")
         final InsertOption<ConditionBean> option = (InsertOption<ConditionBean>) fourthArg;
         return option;
+    }
+
+    protected void prepareStatementConfigOnThreadIfExists(InsertOption<ConditionBean> option) {
+        final StatementConfig config = option != null ? option.getInsertStatementConfig() : null;
+        if (config != null) {
+            InternalMapContext.setUpdateStatementConfig(config);
+        }
     }
 
     protected void assertArgument(Object[] args) {

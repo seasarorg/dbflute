@@ -16,6 +16,7 @@
 package org.seasar.dbflute.bhv;
 
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -37,6 +38,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     protected boolean _disableCommonColumnAutoSetup;
     protected boolean _disablePrimaryKeyIdentity;
     protected Integer _batchInsertLoggingLimit;
+    protected StatementConfig _insertStatementConfig;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -128,6 +130,21 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
 
     public Integer getBatchInsertLoggingLimit() {
         return _batchInsertLoggingLimit;
+    }
+
+    // ===================================================================================
+    //                                                                           Configure
+    //                                                                           =========
+    /**
+     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
+     * @param insertStatementConfig The configuration of statement for insert. (NullAllowed)
+     */
+    public void configure(StatementConfig insertStatementConfig) {
+        _insertStatementConfig = insertStatementConfig;
+    }
+
+    public StatementConfig getInsertStatementConfig() {
+        return _insertStatementConfig;
     }
 
     // ===================================================================================

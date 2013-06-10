@@ -17,8 +17,12 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.bhv.DeleteOption;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractEntityHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnDeleteEntityHandler;
@@ -42,8 +46,17 @@ public class TnDeleteEntityStaticCommand extends TnAbstractEntityStaticCommand {
     @Override
     protected TnAbstractEntityHandler createEntityHandler(Object[] args) {
         final TnAbstractEntityHandler handler = super.createEntityHandler(args);
-        handler.setDeleteOption(extractDeleteOption(args));
+        final DeleteOption<ConditionBean> option = extractDeleteOption(args);
+        prepareStatementConfigOnThreadIfExists(option);
+        handler.setDeleteOption(option);
         return handler;
+    }
+
+    protected void prepareStatementConfigOnThreadIfExists(DeleteOption<ConditionBean> option) {
+        final StatementConfig config = option != null ? option.getDeleteStatementConfig() : null;
+        if (config != null) {
+            InternalMapContext.setUpdateStatementConfig(config);
+        }
     }
 
     @Override

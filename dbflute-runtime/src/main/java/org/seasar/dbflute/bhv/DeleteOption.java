@@ -16,6 +16,7 @@
 package org.seasar.dbflute.bhv;
 
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -32,6 +33,7 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
     protected boolean _nonQueryDeleteAllowed;
     protected boolean _queryDeleteForcedDirectAllowed;
     protected Integer _batchLoggingDeleteLimit;
+    protected StatementConfig _deleteStatementConfig;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -87,6 +89,21 @@ public class DeleteOption<CB extends ConditionBean> implements WritableOption<CB
 
     public Integer getBatchLoggingDeleteLimit() {
         return _batchLoggingDeleteLimit;
+    }
+
+    // ===================================================================================
+    //                                                                           Configure
+    //                                                                           =========
+    /**
+     * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
+     * @param deleteStatementConfig The configuration of statement for delete. (NullAllowed)
+     */
+    public void configure(StatementConfig deleteStatementConfig) {
+        _deleteStatementConfig = deleteStatementConfig;
+    }
+
+    public StatementConfig getDeleteStatementConfig() {
+        return _deleteStatementConfig;
     }
 
     // ===================================================================================
