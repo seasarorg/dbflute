@@ -24,6 +24,7 @@ import static org.seasar.dbflute.util.DfTypeUtil.toTimestamp;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -105,6 +106,7 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
     public void test_toInteger_basic() {
         assertNull(DfTypeUtil.toInteger(null));
         assertNull(DfTypeUtil.toInteger(""));
+        assertNull(DfTypeUtil.toInteger(" "));
         assertEquals(Integer.valueOf(3), DfTypeUtil.toInteger("3"));
         assertEquals(Integer.valueOf(33333), DfTypeUtil.toInteger("33333"));
         assertEquals(Integer.valueOf(-33333), DfTypeUtil.toInteger("-33333"));
@@ -133,6 +135,24 @@ public class DfTypeUtilTest extends TestCase { // because PlainTestCase uses thi
             // OK
             log(e.getMessage());
         }
+    }
+
+    public void test_toBigInteger_basic() {
+        assertNull(DfTypeUtil.toBigInteger(null));
+        assertNull(DfTypeUtil.toBigInteger(""));
+        assertNull(DfTypeUtil.toBigInteger(" "));
+        assertEquals(BigInteger.valueOf(3), DfTypeUtil.toBigInteger("3"));
+        assertEquals(BigInteger.valueOf(33333), DfTypeUtil.toBigInteger("33333"));
+        assertEquals(BigInteger.valueOf(-33333), DfTypeUtil.toBigInteger("-33333"));
+        assertEquals(BigInteger.valueOf(33333), DfTypeUtil.toBigInteger("33,333"));
+        assertEquals(new BigInteger("18446744073709551615"), DfTypeUtil.toBigInteger("18446744073709551615"));
+        assertEquals(new BigInteger("18446744073709551615"),
+                DfTypeUtil.toBigInteger(new BigDecimal("18446744073709551615")));
+        assertEquals(new BigInteger("123456789123456"), DfTypeUtil.toBigInteger("123456789123456"));
+        assertEquals(new BigInteger("18446744073709551615"), new BigInteger("18446744073709551615") {
+            private static final long serialVersionUID = 1L;
+        });
+        assertEquals(new BigInteger(String.valueOf(Long.MAX_VALUE)), DfTypeUtil.toBigInteger(Long.MAX_VALUE));
     }
 
     // -----------------------------------------------------

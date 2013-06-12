@@ -687,11 +687,11 @@ public final class DfTypeUtil {
             }
             return BigDecimal.valueOf(((java.util.Date) obj).getTime());
         } else if (obj instanceof String) {
-            String s = (String) obj;
-            if (s == null || s.trim().length() == 0) {
+            final String str = (String) obj;
+            if (str == null || str.trim().length() == 0) {
                 return null;
             }
-            return new BigDecimal(new BigDecimal(s).toPlainString());
+            return new BigDecimal(new BigDecimal(str).toPlainString());
         } else if (obj instanceof byte[]) {
             return toBigDecimal(toSerializable((byte[]) obj)); // recursive
         } else {
@@ -715,8 +715,16 @@ public final class DfTypeUtil {
                 return paramBigInteger;
             } else { // sub class
                 // because the big-integer type is not final class.
-                return BigInteger.valueOf(paramBigInteger.longValue());
+                return new BigDecimal(paramBigInteger).toBigInteger();
             }
+        } else if (obj instanceof BigDecimal) {
+            return ((BigDecimal) obj).toBigInteger();
+        } else if (obj instanceof String) {
+            final String str = (String) obj;
+            if (str.trim().length() == 0) {
+                return null;
+            }
+            return toBigDecimal(normalize(str)).toBigInteger();
         } else {
             Long l = toLong(obj, pattern);
             if (l == null) {
