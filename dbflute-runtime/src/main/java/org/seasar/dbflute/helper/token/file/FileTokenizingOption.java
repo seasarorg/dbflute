@@ -16,6 +16,11 @@
 package org.seasar.dbflute.helper.token.file;
 
 /**
+ * The option of file-tokenizing.
+ * <pre>
+ * e.g. TSV, UTF-8, empty as null
+ *  new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull()
+ * </pre>
  * @author jflute
  */
 public class FileTokenizingOption {
@@ -34,21 +39,37 @@ public class FileTokenizingOption {
     // =====================================================================================
     //                                                                           Easy-to-Use
     //                                                                           ===========
+    /**
+     * Delimitate by Comma.
+     * @return this. (NotNull)
+     */
     public FileTokenizingOption delimitateByComma() {
         _delimiter = ",";
         return this;
     }
 
+    /**
+     * Delimitate by Tab.
+     * @return this. (NotNull)
+     */
     public FileTokenizingOption delimitateByTab() {
         _delimiter = "\t";
         return this;
     }
 
+    /**
+     * Encode file as UTF-8.
+     * @return this. (NotNull)
+     */
     public FileTokenizingOption encodeAsUTF8() {
         _encoding = "UTF-8";
         return this;
     }
 
+    /**
+     * Encode file as Windows-31J.
+     * @return this. (NotNull)
+     */
     public FileTokenizingOption encodeAsWindows31J() {
         _encoding = "Windows-31J";
         return this;

@@ -18,6 +18,11 @@ package org.seasar.dbflute.helper.token.file;
 import java.util.List;
 
 /**
+ * The option of file-making.
+ * <pre>
+ * e.g. TSV, UTF-8, with header
+ *  new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList)
+ * </pre>
  * @author jflute
  */
 public class FileMakingOption {
@@ -43,31 +48,73 @@ public class FileMakingOption {
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
+    /**
+     * Delimitate by Comma.
+     * @return this. (NotNull)
+     */
     public FileMakingOption delimitateByComma() {
         _delimiter = ",";
         return this;
     }
 
+    /**
+     * Delimitate by Tab.
+     * @return this. (NotNull)
+     */
     public FileMakingOption delimitateByTab() {
         _delimiter = "\t";
         return this;
     }
 
+    /**
+     * Encode file as UTF-8.
+     * @return this. (NotNull)
+     */
     public FileMakingOption encodeAsUTF8() {
         _encoding = "UTF-8";
         return this;
     }
 
+    /**
+     * Encode file as Windows-31J.
+     * @return this. (NotNull)
+     */
     public FileMakingOption encodeAsWindows31J() {
         _encoding = "Windows-31J";
         return this;
     }
 
+    /**
+     * Separate line by CR + LF.
+     * @return this. (NotNull)
+     */
+    public FileMakingOption separateByCrLf() {
+        _lineSeparator = "\r\n";
+        return this;
+    }
+
+    /**
+     * Separate line by LF.
+     * @return this. (NotNull)
+     */
+    public FileMakingOption separateByLf() {
+        _lineSeparator = "\n";
+        return this;
+    }
+
+    /**
+     * @return this. (NotNull)
+     * @deprecated use {@link #separateByCrLf()}
+     */
     public FileMakingOption separateCrLf() {
         _lineSeparator = "\r\n";
         return this;
     }
 
+    /**
+     * @return this. (NotNull)
+     * @deprecated use {@link #separateByLf()}
+     */
     public FileMakingOption separateLf() {
         _lineSeparator = "\n";
         return this;

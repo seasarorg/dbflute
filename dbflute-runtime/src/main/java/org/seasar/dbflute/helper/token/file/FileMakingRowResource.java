@@ -25,12 +25,25 @@ import java.util.Map;
  * as list of string or map of string with header info. <br />
  * null resource or both null property means the end of data.
  * <pre>
- * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *     public FileMakingRowResource getRowResource() { // null or empty resource means end of data
- *         return new FileMakingRowResource().acceptValueListIterator(iterator); // data only here
- *         // or return new FileMakingRowResource().acceptNameValueMapIterator(iterator); // with header
- *     }
- * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+ * e.g. make()
+ *  fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
+ *      public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
+ *          return new FileMakingRowResource().<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// data only here</span>
+ *          <span style="color: #3F7E5E">// or return new FileMakingRowResource().acceptNameValueMapIterator(iterator); // with header</span>
+ *      }
+ *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+ * 
+ * e.g. makeByWriter()
+ *  fileToken.makeByWriter(new FileOutputStream(tsvFile), new FileMakingWriterCallback() {
+ *      public void make(FileMakingRowWriter writer) {
+ *          for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
+ *              FileMakingRowResource resource = new FileMakingRowResource();
+ *              resource... <span style="color: #3F7E5E">// convert the member to the row resource</span>
+ *              writer.<span style="color: #AD4747">write</span>(rowResource); <span style="color: #3F7E5E">// Yes, you write!</span>
+ *          }
+ *      }
+ *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+ * </pre>
  * </pre>
  * @author jflute
  */

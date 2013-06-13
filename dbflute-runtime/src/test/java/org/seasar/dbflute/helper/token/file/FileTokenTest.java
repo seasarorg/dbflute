@@ -153,7 +153,7 @@ public class FileTokenTest extends PlainTestCase {
                 ++index;
                 return rowResource;
             }
-        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf());
+        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf());
 
         // ## Assert ##
         String actual = ous.toString();
@@ -203,7 +203,7 @@ public class FileTokenTest extends PlainTestCase {
                 ++index;
                 return rowResource;
             }
-        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf().quoteMinimally());
+        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally());
 
         // ## Assert ##
         String actual = outputStream.toString();

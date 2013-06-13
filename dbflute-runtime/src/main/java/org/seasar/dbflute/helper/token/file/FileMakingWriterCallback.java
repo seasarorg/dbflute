@@ -15,30 +15,32 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
+import java.io.IOException;
+
 /**
- * The callback of file-making.
+ * The callback of file-making with writer.
  * <pre>
  * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
  * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
  * FileToken fileToken = new FileToken();
- * final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
- * <span style="color: #3F7E5E">// or final Iterator&lt;LinkedHashMap&lt;String, String&gt;&gt; iterator = ...</span>
- * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *     public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
- *         return new FileMakingRowResource().<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// data only here</span>
- *         <span style="color: #3F7E5E">// or return new FileMakingRowResource().acceptNameValueMapIterator(iterator); // with header</span>
+ * fileToken.makeByWriter(new FileOutputStream(tsvFile), new FileMakingWriterCallback() {
+ *     public void make(FileMakingRowWriter writer) {
+ *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
+ *             FileMakingRowResource resource = new FileMakingRowResource();
+ *             resource... <span style="color: #3F7E5E">// convert the member to the row resource</span>
+ *             writer.<span style="color: #AD4747">write</span>(rowResource); <span style="color: #3F7E5E">// Yes, you write!</span>
+ *         }
  *     }
  * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * </pre>
  * @author jflute
  */
-public interface FileMakingCallback {
+public interface FileMakingWriterCallback {
 
     /**
-     * Get the row resource of file-making. <br />
-     * You should return your row resource for file-making.
-     * It continues invoking until this method returns null.
-     * @return The row resource of file-making. (NullAllowed)
+     * Make (write) token file by row writer that accepts row resources.
+     * @param writer The row writer of file-making. (NotNull)
+     * @throws IOException When the file writing failed.
      */
-    FileMakingRowResource getRowResource();
+    void make(FileMakingRowWriter writer) throws IOException;
 }
