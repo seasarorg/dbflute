@@ -17,6 +17,7 @@ package org.seasar.dbflute.helper.token.file;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +31,10 @@ import org.seasar.dbflute.unit.core.PlainTestCase;
  */
 public class FileTokenTest extends PlainTestCase {
 
-    public void test_tokenize() throws Exception {
+    // ===================================================================================
+    //                                                                            Tokenize
+    //                                                                            ========
+    public void test_tokenize_basic() throws Exception {
         // ## Arrange ##
         FileToken impl = new FileToken();
         final String first = "\"a\",\"b,\",\"cc\",\"\"\"\",\"e\n,\n,\n\"\",,\"";
@@ -115,7 +119,10 @@ public class FileTokenTest extends PlainTestCase {
         assertTrue(markSet.contains("done"));
     }
 
-    public void test_make() throws Exception {
+    // ===================================================================================
+    //                                                                                Make
+    //                                                                                ====
+    public void test_make_basic() throws Exception {
         // ## Arrange ##
         FileToken impl = new FileToken();
         ByteArrayOutputStream ous = new ByteArrayOutputStream();
@@ -215,6 +222,61 @@ public class FileTokenTest extends PlainTestCase {
         assertEquals("\",e", split[3]);
     }
 
+    public void test_makeByWriter_basic() throws Exception {
+        // ## Arrange ##
+        final List<List<String>> valueListList = new ArrayList<List<String>>();
+        {
+            List<String> valueList = new ArrayList<String>();
+            valueList.add("a");
+            valueList.add("b");
+            valueList.add("cc");
+            valueList.add("d");
+            valueList.add("e");
+            valueListList.add(valueList);
+        }
+        {
+            List<String> valueList = new ArrayList<String>();
+            valueList.add("a");
+            valueList.add("\"");
+            valueList.add("c\"c");
+            valueList.add("d\"");
+            valueList.add("e");
+            valueListList.add(valueList);
+        }
+        {
+            List<String> valueList = new ArrayList<String>();
+            valueList.add("a");
+            valueList.add("b,b");
+            valueList.add("c\",c");
+            valueList.add("d\n");
+            valueList.add("e");
+            valueListList.add(valueList);
+        }
+        FileToken impl = new FileToken();
+        ByteArrayOutputStream ous = new ByteArrayOutputStream();
+
+        // ## Act ##
+        impl.makeByWriter(ous, new FileMakingWriterCallback() {
+            public void make(FileMakingRowWriter writer) throws IOException {
+                for (List<String> valueList : valueListList) {
+                    writer.write(new FileMakingRowResource().acceptValueList(valueList));
+                }
+            }
+        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf());
+
+        // ## Assert ##
+        String actual = ous.toString();
+        log(actual);
+        String[] split = actual.split("\n");
+        assertEquals("\"a\",\"b\",\"cc\",\"d\",\"e\"", split[0]);
+        assertEquals("\"a\",\"\"\"\",\"c\"\"c\",\"d\"\"\",\"e\"", split[1]);
+        assertEquals("\"a\",\"b,b\",\"c\"\",c\",\"d", split[2]);
+        assertEquals("\",\"e\"", split[3]);
+    }
+
+    // ===================================================================================
+    //                                                                            Pinpoint
+    //                                                                            ========
     public void test_isOddNumber() {
         // ## Arrange ##
         FileToken impl = new FileToken();
