@@ -52,7 +52,7 @@ public class DfPropFile {
      *     ; ... = ...
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map. (NotNull)
      */
     public Map<String, Object> readMap(InputStream ins) {
@@ -71,7 +71,7 @@ public class DfPropFile {
      *     ; ... = ...
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string. (NotNull)
      */
     public Map<String, String> readMapAsStringValue(InputStream ins) {
@@ -90,7 +90,7 @@ public class DfPropFile {
      *     ; ... = list:{...}
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string list. (NotNull)
      */
     public Map<String, List<String>> readMapAsStringListValue(InputStream ins) {
@@ -109,7 +109,7 @@ public class DfPropFile {
      *     ; ... = map:{...}
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string map. (NotNull)
      */
     public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) {
@@ -134,7 +134,7 @@ public class DfPropFile {
      *     ; ... = ...
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read list. (NotNull)
      */
     public List<Object> readList(InputStream ins) {
@@ -150,7 +150,7 @@ public class DfPropFile {
     /**
      * Read the string file. <br />
      * A trimmed line that starts with '#' is treated as line comment.
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read string. (NotNull)
      */
     public String readString(InputStream ins) {

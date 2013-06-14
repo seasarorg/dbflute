@@ -27,6 +27,11 @@ import org.seasar.dbflute.util.Srl;
 /**
  * The request of (Eclipse's) refresh resource. <br />
  * You can refresh automatically by this.
+ * <pre>
+ * DfRefreshResourceRequest request
+ *     = new DfRefreshResourceRequest(projectNameList, requestUrl);
+ * request.refreshResources();
+ * </pre>
  * @author jflute
  */
 public class DfRefreshResourceRequest {
@@ -60,6 +65,10 @@ public class DfRefreshResourceRequest {
     // ===================================================================================
     //                                                                             Refresh
     //                                                                             =======
+    /**
+     * Refresh resources. (request to synchronizer)
+     * @throws IOException When the refresh failed.
+     */
     public void refreshResources() throws IOException {
         for (String projectName : _projectNameList) {
             doRefreshResources(projectName);

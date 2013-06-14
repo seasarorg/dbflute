@@ -112,11 +112,11 @@ public class FileToken {
             fis = new FileInputStream(filePath);
             tokenize(fis, callback, option);
         } finally {
-            try {
-                if (fis != null) {
-                    fis.close(); // just in case
+            if (fis != null) {
+                try {
+                    fis.close(); // basically no needed but just in case
+                } catch (IOException ignored) {
                 }
-            } catch (IOException ignored) {
             }
         }
     }
@@ -451,7 +451,10 @@ public class FileToken {
             doMake(fos, callback, option);
         } finally {
             if (fos != null) {
-                fos.close();
+                try {
+                    fos.close(); // basically no needed but just in case
+                } catch (IOException ignored) {
+                }
             }
         }
     }
@@ -531,7 +534,10 @@ public class FileToken {
             doMakeByWriter(fos, callback, option);
         } finally {
             if (fos != null) {
-                fos.close();
+                try {
+                    fos.close(); // basically no needed but just in case
+                } catch (IOException ignored) {
+                }
             }
         }
     }

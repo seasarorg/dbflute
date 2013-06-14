@@ -77,7 +77,7 @@ public class MapListFile {
      *     ; ... = ...
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map. (NotNull)
      */
     public Map<String, Object> readMap(InputStream ins) {
@@ -101,7 +101,7 @@ public class MapListFile {
      *     ; ... = ...
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string. (NotNull)
      */
     public Map<String, String> readMapAsStringValue(InputStream ins) {
@@ -126,7 +126,7 @@ public class MapListFile {
      *     ; ... = list:{...}
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string list. (NotNull)
      */
     @SuppressWarnings("unchecked")
@@ -152,7 +152,7 @@ public class MapListFile {
      *     ; ... = map:{...}
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string map. (NotNull)
      */
     @SuppressWarnings("unchecked")
@@ -193,7 +193,7 @@ public class MapListFile {
      *     ; ... = ...
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file. (NotNull)
+     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read list. (NotNull)
      */
     public List<Object> readList(InputStream ins) {
