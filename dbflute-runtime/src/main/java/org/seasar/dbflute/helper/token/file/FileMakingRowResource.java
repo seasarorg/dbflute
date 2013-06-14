@@ -25,7 +25,8 @@ import java.util.Map;
  * as list of string or map of string with header info. <br />
  * null resource or both null property means the end of data.
  * <pre>
- * e.g. make()
+ * e.g. make() (using Iterator)
+ *  final Iterator&lt;List&lt;Stirng&gt;&gt; iterator = ...
  *  fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
  *      public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
  *          return new FileMakingRowResource().<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// data only here</span>

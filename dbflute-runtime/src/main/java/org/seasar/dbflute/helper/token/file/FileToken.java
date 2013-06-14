@@ -52,7 +52,7 @@ import org.seasar.dbflute.util.Srl;
  *      }
  *  }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8());
  * 
- * e.g. Writing
+ * e.g. Writing (using Iterator)
  *  File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
  *  List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
  *  FileToken fileToken = new FileToken();
@@ -62,6 +62,19 @@ import org.seasar.dbflute.util.Srl;
  *      public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
  *          return new FileMakingRowResource().<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// data only here</span>
  *          <span style="color: #3F7E5E">// or return new FileMakingRowResource().acceptNameValueMapIterator(iterator); // with header</span>
+ *      }
+ *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+ * 
+ * e.g. Writing (using Writer)
+ *  File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
+ *  List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
+ *  fileToken.makeByWriter(tsvFile, new FileMakingWriterCallback() {
+ *      public void make(FileMakingRowWriter writer) {
+ *          for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
+ *              FileMakingRowResource resource = new FileMakingRowResource();
+ *              resource... <span style="color: #3F7E5E">// convert the member to the row resource</span>
+ *              writer.<span style="color: #AD4747">write</span>(rowResource); <span style="color: #3F7E5E">// Yes, you write!</span>
+ *          }
  *      }
  *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * </pre>
