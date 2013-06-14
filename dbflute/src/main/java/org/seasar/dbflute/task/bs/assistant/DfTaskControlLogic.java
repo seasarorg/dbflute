@@ -282,8 +282,10 @@ public class DfTaskControlLogic {
     //                                                                    Refresh Resource
     //                                                                    ================
     public void refreshResources() {
-        final List<String> projectNameList = getRefreshProperties().getProjectNameList();
-        new DfRefreshResourceProcess(projectNameList).refreshResources();
+        final DfRefreshProperties prop = getRefreshProperties();
+        final List<String> projectNameList = prop.getProjectNameList();
+        final String requestUrl = prop.getRequestUrl();
+        new DfRefreshResourceProcess(projectNameList, requestUrl).refreshResources();
     }
 
     // ===================================================================================

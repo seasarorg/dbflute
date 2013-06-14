@@ -68,10 +68,15 @@ public class DfRefreshTask extends DfAbstractTask {
     protected void doExecute() {
         final List<String> refreshList = getRefreshProjectList();
         if (refreshList.isEmpty()) {
-            String msg = "No refresh project specified";
+            String msg = "No refresh project specified.";
             throw new IllegalStateException(msg);
         }
-        new DfRefreshResourceProcess(refreshList).refreshResources();
+        final String requestUrl = getRefreshRequestUrl();
+        if (requestUrl == null || requestUrl.trim().length() == 0) {
+            String msg = "No refresh request URL specified.";
+            throw new IllegalStateException(msg);
+        }
+        new DfRefreshResourceProcess(refreshList, requestUrl).refreshResources();
     }
 
     protected List<String> getRefreshProjectList() {
@@ -92,6 +97,10 @@ public class DfRefreshTask extends DfAbstractTask {
             return DfStringUtil.splitListTrimmed(_refreshProject, "/");
         }
         return DfCollectionUtil.emptyList();
+    }
+
+    protected String getRefreshRequestUrl() {
+        return getRefreshProperties().getRequestUrl();
     }
 
     // ===================================================================================

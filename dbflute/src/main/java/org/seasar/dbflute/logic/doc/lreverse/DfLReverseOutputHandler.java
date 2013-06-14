@@ -246,7 +246,7 @@ public class DfLReverseOutputHandler {
         }
         final File delimiterDir = new File(_delimiterDataDir);
         final String ext = "tsv"; // fixed
-        final FileMakingOption option = new FileMakingOption().encodeAsUTF8().separateLf();
+        final FileMakingOption option = new FileMakingOption().encodeAsUTF8().separateByLf();
         option.delimitateByTab();
         final String outputInfo = "...Outputting the over-xls-limit table: " + table.getTableDispName();
         _log.info(outputInfo);
