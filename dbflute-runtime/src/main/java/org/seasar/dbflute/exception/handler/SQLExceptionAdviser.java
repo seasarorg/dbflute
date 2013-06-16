@@ -38,6 +38,10 @@ public class SQLExceptionAdviser {
             } else if (hasMessageHint(sqlEx, "Column", "cannot be null")) {
                 return "And also check the update values to not-null columns.";
             }
+        } else if (DBDef.DB2.equals(dbdef)) {
+            if (hasMessageHint(sqlEx, "SQLCODE=-952")) {
+                return "Is it timeout?";
+            }
         }
         return null;
     }
