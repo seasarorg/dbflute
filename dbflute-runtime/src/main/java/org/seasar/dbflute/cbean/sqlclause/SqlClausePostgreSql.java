@@ -42,6 +42,15 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
+    /** The bind value for paging as 'limit'. */
+    protected Integer _pagingBindLimit;
+
+    /** The bind value for paging as 'offset'. */
+    protected Integer _pagingBindOffset;
+
+    /** Does it suppress bind variable for paging? */
+    protected boolean _suppressPagingBind;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -67,7 +76,13 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
      * {@inheritDoc}
      */
     protected void doFetchPage() {
-        _fetchScopeSqlSuffix = " offset " + getPageStartIndex() + " limit " + getFetchSize();
+        if (_suppressPagingBind) {
+            _fetchScopeSqlSuffix = " limit " + getFetchSize() + " offset " + getPageStartIndex();
+        } else { // mainly here
+            _pagingBindLimit = getFetchSize();
+            _pagingBindOffset = getPageStartIndex();
+            _fetchScopeSqlSuffix = " limit /*pmb.sqlClause.pagingBindLimit*/0 offset /*pmb.sqlClause.pagingBindOffset*/0";
+        }
     }
 
     /**
@@ -141,5 +156,22 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     //                                                                               =====
     public DBWay dbway() {
         return _dbway;
+    }
+
+    // [DBFlute-1.0.4D]
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public Integer getPagingBindLimit() { // for parameter comment
+        return _pagingBindLimit;
+    }
+
+    public Integer getPagingBindOffset() { // for parameter comment
+        return _pagingBindOffset;
+    }
+
+    public SqlClausePostgreSql suppressPagingBind() { // for compatible? anyway, just in case
+        _suppressPagingBind = true;
+        return this;
     }
 }
