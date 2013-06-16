@@ -43,8 +43,8 @@ public class InvokeNameExtractor {
     //                                                                             Extract
     //                                                                             =======
     /**
-     * @param resource the call-back resource for invoke-name-extracting. (NotNull)
-     * @return Invoke name. (NotNull: If not found, returns empty string.)
+     * @param resource the call-back resource for invoke-name extracting. (NotNull)
+     * @return The list of invoke-name result. (NotNull: if not found, returns empty list)
      */
     public List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource) {
         final List<InvokeNameResult> resultList = new ArrayList<InvokeNameResult>();
@@ -55,9 +55,13 @@ public class InvokeNameExtractor {
         int foundFirstIndex = -1; // The minus one means 'not found'.
         boolean onTarget = false;
         boolean existsDuplicate = false;
-        for (int i = resource.getStartIndex(); i < _stackTrace.length; i++) {
+        final int startIndex = resource.getStartIndex();
+        if (startIndex < 0) { // basically no way but just in case
+            return new ArrayList<InvokeNameResult>(2); // writable just in case
+        }
+        for (int i = startIndex; i < _stackTrace.length; i++) {
             final StackTraceElement element = _stackTrace[i];
-            if (i > resource.getStartIndex() + resource.getLoopSize()) {
+            if (i > startIndex + resource.getLoopSize()) {
                 break;
             }
             final String currentClassName = element.getClassName();
@@ -95,7 +99,7 @@ public class InvokeNameExtractor {
             }
         }
         if (simpleClassName == null) {
-            return new ArrayList<InvokeNameResult>();
+            return new ArrayList<InvokeNameResult>(2); // writable just in case
         }
         if (existsDuplicate) {
             resultList.add(createResult(simpleClassName, methodName, lineNumber, foundIndex, foundFirstIndex));
