@@ -39,7 +39,13 @@ public class SQLExceptionAdviser {
                 return "And also check the update values to not-null columns.";
             }
         } else if (DBDef.DB2.equals(dbdef)) {
-            if (hasMessageHint(sqlEx, "SQLCODE=-952")) {
+            if (hasMessageHint(sqlEx, "SQLCODE=-302")) {
+                return "Is it column size-over?";
+            } else if (hasMessageHint(sqlEx, "SQLCODE=-407")) {
+                return "Is it not-null constraint?";
+            } else if (hasMessageHint(sqlEx, "SQLCODE=-530")) {
+                return "Is it FK constraint?";
+            } else if (hasMessageHint(sqlEx, "SQLCODE=-952")) {
                 return "Is it timeout?";
             }
         }
