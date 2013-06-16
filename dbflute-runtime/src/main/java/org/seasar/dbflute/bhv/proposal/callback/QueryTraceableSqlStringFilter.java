@@ -24,16 +24,16 @@ import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
  * @author jflute
  * @since 1.0.4D (2013/06/16 Sunday)
  */
-public class TraceableQuerySqlStringFilter implements SqlStringFilter {
+public class QueryTraceableSqlStringFilter implements SqlStringFilter {
 
-    protected final TraceableAllSqlStringFilter _allFilter;
+    protected final SimpleTraceableSqlStringFilter _filter;
 
-    public TraceableQuerySqlStringFilter(Method actionMethod, TraceableSqlAdditionalInfoProvider additionalInfoProvider) {
-        _allFilter = new TraceableAllSqlStringFilter(actionMethod, additionalInfoProvider);
+    public QueryTraceableSqlStringFilter(Method actionMethod, TraceableSqlAdditionalInfoProvider additionalInfoProvider) {
+        _filter = new SimpleTraceableSqlStringFilter(actionMethod, additionalInfoProvider);
     }
 
     public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
-        return _allFilter.filterSelectCB(meta, executedSql);
+        return _filter.filterSelectCB(meta, executedSql);
     }
 
     public String filterEntityUpdate(BehaviorCommandMeta meta, String executedSql) {
@@ -41,7 +41,7 @@ public class TraceableQuerySqlStringFilter implements SqlStringFilter {
     }
 
     public String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql) {
-        return _allFilter.filterQueryUpdate(meta, executedSql);
+        return _filter.filterQueryUpdate(meta, executedSql);
     }
 
     public String filterOutsideSql(BehaviorCommandMeta meta, String executedSql) {
@@ -52,8 +52,8 @@ public class TraceableQuerySqlStringFilter implements SqlStringFilter {
         return null;
     }
 
-    public TraceableQuerySqlStringFilter markingAtFront() {
-        _allFilter.markingAtFront();
+    public QueryTraceableSqlStringFilter markingAtFront() {
+        _filter.markingAtFront();
         return this;
     }
 }

@@ -25,38 +25,44 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 1.0.4D (2013/06/16 Sunday)
  */
-public class TraceableAllSqlStringFilter implements SqlStringFilter {
+public class SimpleTraceableSqlStringFilter implements SqlStringFilter {
 
     protected final Method _actionMethod;
     protected final TraceableSqlAdditionalInfoProvider _additionalInfoProvider;
     protected boolean _markingAtFront;
 
-    public TraceableAllSqlStringFilter(Method actionMethod, TraceableSqlAdditionalInfoProvider additionalInfoProvider) {
+    public SimpleTraceableSqlStringFilter(Method actionMethod, TraceableSqlAdditionalInfoProvider additionalInfoProvider) {
         _actionMethod = actionMethod;
         _additionalInfoProvider = additionalInfoProvider;
     }
 
     public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
-        return filterMarkingSql(executedSql);
+        return markingSql(executedSql);
     }
 
     public String filterEntityUpdate(BehaviorCommandMeta meta, String executedSql) {
-        return filterMarkingSql(executedSql);
+        return markingSql(executedSql);
     }
 
     public String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql) {
-        return filterMarkingSql(executedSql);
-    }
-
-    public String filterProcedure(BehaviorCommandMeta meta, String executedSql) {
-        return filterMarkingSql(executedSql);
+        return markingSql(executedSql);
     }
 
     public String filterOutsideSql(BehaviorCommandMeta meta, String executedSql) {
-        return filterMarkingSql(executedSql);
+        // outside-SQL is easy to find caller by SQL
+        // and it might have unexpected SQL so no marking
+        //return markingSql(executedSql);
+        return null;
     }
 
-    protected String filterMarkingSql(String executedSql) {
+    public String filterProcedure(BehaviorCommandMeta meta, String executedSql) {
+        // procedure call uses JDBC's escape "{" and "}"
+        // so it might fail to execute the SQL (actually PostgreSQL)
+        //return markingSql(executedSql);
+        return null;
+    }
+
+    protected String markingSql(String executedSql) {
         final String filtered;
         if (_markingAtFront) {
             filtered = "-- " + buildInvokeMark() + "\n" + executedSql;
@@ -79,7 +85,7 @@ public class TraceableAllSqlStringFilter implements SqlStringFilter {
         return sb.toString();
     }
 
-    public TraceableAllSqlStringFilter markingAtFront() {
+    public SimpleTraceableSqlStringFilter markingAtFront() {
         _markingAtFront = true;
         return this;
     }
