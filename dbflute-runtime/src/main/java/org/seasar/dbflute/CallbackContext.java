@@ -17,7 +17,6 @@ package org.seasar.dbflute;
 
 import org.seasar.dbflute.bhv.SqlStringFilter;
 import org.seasar.dbflute.bhv.core.BehaviorCommandHook;
-import org.seasar.dbflute.bhv.core.BehaviorCommandMeta;
 import org.seasar.dbflute.bhv.core.SqlFireHook;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
@@ -284,38 +283,6 @@ public class CallbackContext {
     }
 
     // -----------------------------------------------------
-    //                                      InvokePath Ready
-    //                                      ----------------
-    /**
-     * Enable invoke path ready on thread. <br />
-     * You can use {@link BehaviorCommandMeta#getInvokePath()} in callback processes.
-     */
-    public static void enableInvokePathReadyOnThread() {
-        final CallbackContext context = getOrCreateContext();
-        context.setInvokePathReady(true);
-    }
-
-    /**
-     * Is invoke path ready?
-     * @return The determination, true or false.
-     */
-    public static boolean isInvokePathReadyOnThread() {
-        return isExistCallbackContextOnThread() && getCallbackContextOnThread().isInvokePathReady();
-    }
-
-    /**
-     * Clear the invoke path ready on thread. <br />
-     * If the call-back context has no interface, the context is removed from thread.
-     */
-    public static void clearInvokePathReadyOnThread() {
-        if (isExistCallbackContextOnThread()) {
-            final CallbackContext context = getCallbackContextOnThread();
-            context.setInvokePathReady(false);
-            clearIfNoInterface(context);
-        }
-    }
-
-    // -----------------------------------------------------
     //                                         Assist Helper
     //                                         -------------
     protected static CallbackContext getOrCreateContext() {
@@ -342,7 +309,6 @@ public class CallbackContext {
     protected SqlLogHandler _sqlLogHandler;
     protected SqlResultHandler _sqlResultHandler;
     protected SqlStringFilter _sqlStringFilter;
-    protected boolean _invokePathReady;
 
     // ===================================================================================
     //                                                                       Determination
@@ -480,24 +446,5 @@ public class CallbackContext {
      */
     public void setSqlStringFilter(SqlStringFilter sqlStringFilter) {
         this._sqlStringFilter = sqlStringFilter;
-    }
-
-    // -----------------------------------------------------
-    //                                      InvokePath Ready
-    //                                      ----------------
-    /**
-     * Is invoke path ready?
-     * @return The determination, true or false.
-     */
-    public boolean isInvokePathReady() {
-        return _invokePathReady;
-    }
-
-    /**
-     * Set the determination of invoke path ready.
-     * @param invokePathReady Is the invoke path ready?
-     */
-    public void setInvokePathReady(boolean invokePathReady) {
-        _invokePathReady = invokePathReady;
     }
 }

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
@@ -29,12 +31,18 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.resource.InternalMapContext;
+import org.seasar.dbflute.resource.InternalMapContext.InvokePathProvider;
 import org.seasar.dbflute.resource.ResourceContext;
 
 /**
  * @author jflute
  */
 public class SQLExceptionHandler {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(SQLExceptionHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -277,6 +285,27 @@ public class SQLExceptionHandler {
     }
 
     protected String extractBehaviorInvokeName() {
+        try {
+            final String provided = doExtractBehaviorInvokeNameFromProvider();
+            if (provided != null) { // basically not null ()
+                return provided;
+            }
+            return doExtractBehabiorInvokeNameFromSeparatedParts();
+        } catch (RuntimeException continued) {
+            // this is additional info for debug so continue
+            if (_log.isDebugEnabled()) {
+                _log.debug("Failed to extract behavior invoke name for debug.", continued);
+            }
+            return null;
+        }
+    }
+
+    protected String doExtractBehaviorInvokeNameFromProvider() {
+        final InvokePathProvider provider = InternalMapContext.getInvokePathProvider();
+        return provider != null ? provider.provide() : null;
+    }
+
+    protected String doExtractBehabiorInvokeNameFromSeparatedParts() {
         final Object behaviorInvokeName = InternalMapContext.getBehaviorInvokeName();
         if (behaviorInvokeName == null) {
             return null;

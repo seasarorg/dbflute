@@ -126,14 +126,6 @@ public class InternalMapContext {
     // -----------------------------------------------------
     //                                           Invoke Path
     //                                           -----------
-    public static String getSavedInvokePath() { // basically only called by provider
-        return (String) getObject(KEY_SAVED_INVOKE_PATH);
-    }
-
-    public static void setSavedInvokePath(String invokePath) {
-        setObject(KEY_SAVED_INVOKE_PATH, invokePath);
-    }
-
     public static InvokePathProvider getInvokePathProvider() { // you can get it lazily
         return (InvokePathProvider) getObject(KEY_INVOKE_PATH_PROVIDER);
     }
@@ -144,6 +136,14 @@ public class InternalMapContext {
 
     public static interface InvokePathProvider {
         String provide();
+    }
+
+    public static String getSavedInvokePath() { // basically only called by provider
+        return (String) getObject(KEY_SAVED_INVOKE_PATH);
+    }
+
+    public static void setSavedInvokePath(String invokePath) {
+        setObject(KEY_SAVED_INVOKE_PATH, invokePath);
     }
 
     // -----------------------------------------------------

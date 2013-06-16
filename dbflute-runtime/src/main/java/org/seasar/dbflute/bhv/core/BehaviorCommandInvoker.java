@@ -886,9 +886,7 @@ public class BehaviorCommandInvoker {
     //                                                                    InvokePath Ready
     //                                                                    ================
     protected <RESULT> void readyInvokePath(final BehaviorCommand<RESULT> behaviorCommand) {
-        if (!CallbackContext.isInvokePathReadyOnThread()) {
-            return;
-        }
+        // basically for exception message and SQL string filter
         InternalMapContext.setInvokePathProvider(new InvokePathProvider() {
             public String provide() { // lazily
                 final String invokePath = InternalMapContext.getSavedInvokePath();
