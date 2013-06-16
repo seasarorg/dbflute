@@ -43,6 +43,7 @@ import org.seasar.dbflute.exception.DfAlterCheckEmptyAlterSqlSuccessException;
 import org.seasar.dbflute.exception.DfAlterCheckReplaceSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckRollbackSchemaFailureException;
 import org.seasar.dbflute.exception.DfAlterCheckSavePreviousFailureException;
+import org.seasar.dbflute.exception.DfAlterCheckSavePreviousInvalidStatusException;
 import org.seasar.dbflute.exception.DfTakeFinallyAssertionFailureException;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -136,54 +137,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // ===================================================================================
-    //                                                                             Process
-    //                                                                             =======
-    public DfAlterCheckFinalInfo savePrevious() {
-        return doSavePrevious();
-    }
-
-    public DfAlterCheckFinalInfo checkAlter() {
-        deleteAllNGMark();
-        deleteSchemaXml();
-        deleteCraftMeta();
-
-        final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
-
-        // after AlterCheck, the database has altered schema
-        // so you can check your application on the environment
-
-        replaceSchema(finalInfo); // to be next DB
-        if (finalInfo.isFailure()) {
-            return finalInfo;
-        }
-        serializeNextSchema();
-
-        rollbackSchema(); // to be previous DB
-        alterSchema(finalInfo);
-        if (finalInfo.isFailure()) {
-            return finalInfo;
-        }
-        serializePreviousSchema();
-
-        deleteAlterCheckResultDiff(); // to replace the result file
-        final DfSchemaDiff schemaDiff = schemaDiff();
-        if (schemaDiff.hasDiff()) {
-            processDifference(finalInfo, schemaDiff);
-        } else {
-            processSuccess(finalInfo);
-            deleteAlterCheckMark();
-            deleteCraftMeta();
-        }
-
-        deleteSubmittedDraftFile(finalInfo);
-        deleteSchemaXml(); // not finally because of trace when abort
-        return finalInfo;
-    }
-
-    // ===================================================================================
-    //                                                                Save Previous Schema
+    //                                                                SavePrevious Process
     //                                                                ====================
-    protected DfAlterCheckFinalInfo doSavePrevious() {
+    public DfAlterCheckFinalInfo savePrevious() {
         _log.info("");
         _log.info("+-------------------+");
         _log.info("|                   |");
@@ -193,11 +149,14 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         deleteAllNGMark();
         final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
         finalInfo.setResultMessage("{Save Previous}");
+        if (!checkSavePreviousInvalidStatus(finalInfo)) {
+            return finalInfo;
+        }
         finishPreviousCheckedAlter();
         deleteExtractedPreviousResource();
         final List<File> copyToFileList = copyToPreviousResource();
         compressPreviousResource();
-        if (!checkSavedResource(finalInfo)) {
+        if (!checkSavedPreviousResource(finalInfo)) {
             return finalInfo; // failure
         }
         markPreviousOK(copyToFileList);
@@ -206,6 +165,40 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return finalInfo;
     }
 
+    // -----------------------------------------------------
+    //                                          Check Status
+    //                                          ------------
+    protected boolean checkSavePreviousInvalidStatus(DfAlterCheckFinalInfo finalInfo) {
+        final List<File> alterSqlFileList = getMigrationAlterSqlFileList();
+        if (!alterSqlFileList.isEmpty()) {
+            setupAlterCheckSavePreviousInvalidStatusException(finalInfo);
+        }
+        if (finalInfo.isFailure()) {
+            finalInfo.addDetailMessage("x (save failure)");
+            return false;
+        }
+        return true;
+    }
+
+    protected void setupAlterCheckSavePreviousInvalidStatusException(DfAlterCheckFinalInfo finalInfo) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(getAlterCheckSavePreviousInvalidStatusNotice());
+        br.addItem("Advice");
+        br.addElement("Make sure your 'alter' directory is empty.");
+        br.addElement("It might be miss choise if alter file exists.");
+        br.addElement("Do you want to execute SavePrevious really?");
+        String msg = br.buildExceptionMessage();
+        finalInfo.setSavePreviousFailureEx(new DfAlterCheckSavePreviousInvalidStatusException(msg));
+        finalInfo.setFailure(true);
+    }
+
+    protected String getAlterCheckSavePreviousInvalidStatusNotice() {
+        return "Invalid status for SavePrevious.";
+    }
+
+    // -----------------------------------------------------
+    //                                   Finish CheckedAlter
+    //                                   -------------------
     protected void finishPreviousCheckedAlter() {
         final String previousDate = findLatestPreviousDate();
         if (previousDate == null) {
@@ -227,8 +220,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // -----------------------------------------------------
-    //                                              Compress
-    //                                              --------
+    //                                     Compress Resource
+    //                                     -----------------
     protected void compressPreviousResource() {
         deleteExistingPreviousZip();
         final File previousZip = getCurrentTargetPreviousZip();
@@ -285,8 +278,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // -----------------------------------------------------
-    //                                                Delete
-    //                                                ------
+    //                                       Delete Resource
+    //                                       ---------------
     protected void deleteExtractedPreviousResource() {
         final List<File> previousFileList = findHierarchyFileList(getMigrationPreviousDir());
         if (previousFileList.isEmpty()) {
@@ -302,8 +295,8 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // -----------------------------------------------------
-    //                                                  Copy
-    //                                                  ----
+    //                                         Copy Resource
+    //                                         -------------
     protected List<File> copyToPreviousResource() {
         final List<File> copyToFileList = new ArrayList<File>();
         final String previousDir = getMigrationPreviousDir();
@@ -340,9 +333,9 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
     }
 
     // -----------------------------------------------------
-    //                                                 Check
-    //                                                 -----
-    protected boolean checkSavedResource(DfAlterCheckFinalInfo finalInfo) {
+    //                                        Check Resource
+    //                                        --------------
+    protected boolean checkSavedPreviousResource(DfAlterCheckFinalInfo finalInfo) {
         final boolean unzipped = extractPreviousResource();
         _log.info("...Checking the previous resources by replacing");
         try {
@@ -361,9 +354,26 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         return true;
     }
 
+    protected void setupAlterCheckSavePreviousFailureException(DfAlterCheckFinalInfo finalInfo,
+            RuntimeException threwLater) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice(getAlterCheckSavePreviousFailureNotice());
+        br.addItem("Advice");
+        br.addElement("Make sure your DDL and data for ReplaceSchema,");
+        br.addElement("resources just below 'playsql' directory, are correct.");
+        br.addElement("and after that, execute SavePrevious again.");
+        String msg = br.buildExceptionMessage();
+        finalInfo.setSavePreviousFailureEx(new DfAlterCheckSavePreviousFailureException(msg, threwLater));
+        finalInfo.setFailure(true);
+    }
+
+    protected String getAlterCheckSavePreviousFailureNotice() {
+        return "Failed to replace by saved resources for previous schema.";
+    }
+
     // -----------------------------------------------------
-    //                                               Extract
-    //                                               -------
+    //                                      Extract Resource
+    //                                      ----------------
     protected boolean extractPreviousResource() {
         final File previousZip = findLatestPreviousZip();
         if (previousZip == null) {
@@ -420,26 +430,50 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         }
     }
 
-    protected void setupAlterCheckSavePreviousFailureException(DfAlterCheckFinalInfo finalInfo,
-            RuntimeException threwLater) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice(getAlterCheckSavePreviousFailureNotice());
-        br.addItem("Advice");
-        br.addElement("Make sure your DDL and data for ReplaceSchema,");
-        br.addElement("resources just below 'playsql' directory, are correct.");
-        br.addElement("and after that, execute SavePrevious again.");
-        String msg = br.buildExceptionMessage();
-        finalInfo.setSavePreviousFailureEx(new DfAlterCheckSavePreviousFailureException(msg, threwLater));
-        finalInfo.setFailure(true);
-    }
-
-    protected String getAlterCheckSavePreviousFailureNotice() {
-        return "Failed to replace by saved resources for previous schema.";
-    }
-
     protected void deleteSavePreviousMark() {
         final String mark = getMigrationSavePreviousMark();
         deleteFile(new File(mark), "...Deleting the save-previous mark");
+    }
+
+    // ===================================================================================
+    //                                                                  AlterCheck Process
+    //                                                                  ==================
+    public DfAlterCheckFinalInfo checkAlter() {
+        deleteAllNGMark();
+        deleteSchemaXml();
+        deleteCraftMeta();
+
+        final DfAlterCheckFinalInfo finalInfo = new DfAlterCheckFinalInfo();
+
+        // after AlterCheck, the database has altered schema
+        // so you can check your application on the environment
+
+        replaceSchema(finalInfo); // to be next DB
+        if (finalInfo.isFailure()) {
+            return finalInfo;
+        }
+        serializeNextSchema();
+
+        rollbackSchema(); // to be previous DB
+        alterSchema(finalInfo);
+        if (finalInfo.isFailure()) {
+            return finalInfo;
+        }
+        serializePreviousSchema();
+
+        deleteAlterCheckResultDiff(); // to replace the result file
+        final DfSchemaDiff schemaDiff = schemaDiff();
+        if (schemaDiff.hasDiff()) {
+            processDifference(finalInfo, schemaDiff);
+        } else {
+            processSuccess(finalInfo);
+            deleteAlterCheckMark();
+            deleteCraftMeta();
+        }
+
+        deleteSubmittedDraftFile(finalInfo);
+        deleteSchemaXml(); // not finally because of trace when abort
+        return finalInfo;
     }
 
     // ===================================================================================
