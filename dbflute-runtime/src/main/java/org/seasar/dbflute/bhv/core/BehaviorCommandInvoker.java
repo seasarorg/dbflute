@@ -477,6 +477,9 @@ public class BehaviorCommandInvoker {
         }
     }
 
+    // -----------------------------------------------------
+    //                                Extract BehaviorInvoke
+    //                                ----------------------
     protected List<InvokeNameResult> extractBehaviorInvoke(StackTraceElement[] stackTrace) {
         final String readableName = DfTypeUtil.toClassTitle(BehaviorReadable.class);
         final String writableName = DfTypeUtil.toClassTitle(BehaviorWritable.class);
@@ -528,6 +531,9 @@ public class BehaviorCommandInvoker {
         return extractInvokeName(resource, stackTrace);
     }
 
+    // -----------------------------------------------------
+    //                                 Invocation Adjustment
+    //                                 ---------------------
     protected <RESULT> void filterBehaviorResult(BehaviorCommand<RESULT> behaviorCommand,
             List<InvokeNameResult> behaviorResultList) {
         for (InvokeNameResult behaviorResult : behaviorResultList) {
@@ -608,6 +614,9 @@ public class BehaviorCommandInvoker {
         return callerExpressionWithoutKakko;
     }
 
+    // -----------------------------------------------------
+    //                                      Build InvokePath
+    //                                      ----------------
     protected <RESULT> String buildInvokePath(BehaviorCommand<RESULT> behaviorCommand, StackTraceElement[] stackTrace,
             InvokeNameResult behaviorResult) {
         final int bhvNextIndex = behaviorResult != null ? behaviorResult.getNextStartIndex() : -1;
@@ -654,6 +663,9 @@ public class BehaviorCommandInvoker {
         return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                                  Extract ClientInvoke
+    //                                  --------------------
     protected List<InvokeNameResult> extractClientInvoke(StackTraceElement[] stackTrace, final int startIndex) {
         final String[] names = _invokerAssistant.assistClientInvokeNames();
         final List<String> suffixList = Arrays.asList(names);
@@ -681,6 +693,9 @@ public class BehaviorCommandInvoker {
         return extractInvokeName(resource, stackTrace);
     }
 
+    // -----------------------------------------------------
+    //                                  Extract ByPassInvoke
+    //                                  --------------------
     protected List<InvokeNameResult> extractByPassInvoke(StackTraceElement[] stackTrace, final int startIndex,
             final int loopSize) {
         final String[] names = _invokerAssistant.assistByPassInvokeNames();
@@ -709,6 +724,9 @@ public class BehaviorCommandInvoker {
         return extractInvokeName(resource, stackTrace);
     }
 
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
     protected boolean isClientResultMainExists(List<InvokeNameResult> clientResultList) {
         boolean mainExists = false;
         for (InvokeNameResult invokeNameResult : clientResultList) {
@@ -794,7 +812,7 @@ public class BehaviorCommandInvoker {
     }
 
     protected int getInvocationExtractingMaxLoopSize() {
-        return 25;
+        return 25; // should be over 20 because it might be called from SQLException handler
     }
 
     // ===================================================================================
