@@ -79,10 +79,18 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter {
         if (_additionalInfoProvider != null) {
             final String addiitonalInfo = _additionalInfoProvider.provide();
             if (addiitonalInfo != null) {
-                sb.append(": ").append(Srl.replace(addiitonalInfo, "?", "Q")); // filter bind mark
+                sb.append(": ").append(resolveUnsupportedMark(addiitonalInfo));
             }
         }
         return sb.toString();
+    }
+
+    protected String resolveUnsupportedMark(String info) {
+        String resolved = Srl.replace(info, "?", "Q"); // ? is binding mark
+        resolved = Srl.replace(resolved, "{", "("); // {} is NG mark on Oracle
+        resolved = Srl.replace(resolved, "}", ")");
+        resolved = Srl.replace(resolved, "'", "\""); // ' is NG mark when update on Oracle
+        return resolved;
     }
 
     public SimpleTraceableSqlStringFilter markingAtFront() {
