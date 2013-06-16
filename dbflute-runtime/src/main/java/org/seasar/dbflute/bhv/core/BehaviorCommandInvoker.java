@@ -447,15 +447,11 @@ public class BehaviorCommandInvoker {
         }
         final String expWithoutKakko = buildInvocationExpressionWithoutKakko(behaviorCommand, invokeClassName,
                 invokeMethodName);
-
-        // Save behavior invoke name for error message.
-        InternalMapContext.setBehaviorInvokeName(expWithoutKakko + "()");
-
-        final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
         final String callerExpression = expWithoutKakko + "()";
-
+        InternalMapContext.setBehaviorInvokeName(callerExpression);
+        final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
         final String invokePath = buildInvokePath(behaviorCommand, stackTrace, headBehaviorResult);
-        InternalMapContext.setSavedInvokePath(invokePath);
+        InternalMapContext.setSavedInvokePath(Srl.substringLastFront(invokePath, "...") + callerExpression);
 
         if (saveOnly) { // e.g. log level is INFO and invocation path ready
             return;
@@ -536,7 +532,7 @@ public class BehaviorCommandInvoker {
         sb.append(findTailInvokeName(clientResultList, useTestShortName));
         sb.append(byPassInvokeName);
         sb.append(findTailInvokeName(byPassResultList, useTestShortName));
-        sb.append("...");
+        sb.append("..."); // fixed specification (used as replace-key later)
         return sb.toString();
     }
 
@@ -656,7 +652,7 @@ public class BehaviorCommandInvoker {
             }
 
             public int getLoopSize() {
-                return 25;
+                return 30;
             }
         };
         return extractInvokeName(resource, stackTrace);
@@ -684,7 +680,7 @@ public class BehaviorCommandInvoker {
             }
 
             public int getLoopSize() {
-                return loopSize >= 0 ? loopSize : 25;
+                return loopSize >= 0 ? loopSize : 30;
             }
         };
         return extractInvokeName(resource, stackTrace);
@@ -735,7 +731,7 @@ public class BehaviorCommandInvoker {
             }
 
             public int getLoopSize() {
-                return 25;
+                return 30;
             }
         };
         return extractInvokeName(resource, stackTrace);
