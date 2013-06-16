@@ -51,14 +51,14 @@ public class SqlClauseMySql extends AbstractSqlClause {
     /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
-    /** The bind value for paging as 'limit'. */
-    protected Integer _pagingBindLimit;
+    /** The binding value for paging as 'limit'. */
+    protected Integer _pagingBindingLimit;
 
-    /** The bind value for paging as 'offset'. */
-    protected Integer _pagingBindOffset;
+    /** The binding value for paging as 'offset'. */
+    protected Integer _pagingBindingOffset;
 
     /** Does it suppress bind variable for paging? */
-    protected boolean _suppressPagingBind;
+    protected boolean _suppressPagingBinding;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -112,12 +112,12 @@ public class SqlClauseMySql extends AbstractSqlClause {
      * {@inheritDoc}
      */
     protected void doFetchPage() {
-        if (_suppressPagingBind) {
+        if (_suppressPagingBinding) {
             _fetchScopeSqlSuffix = " limit " + getPageStartIndex() + ", " + getFetchSize();
         } else { // mainly here
-            _pagingBindLimit = getFetchSize();
-            _pagingBindOffset = getPageStartIndex();
-            _fetchScopeSqlSuffix = " limit /*pmb.sqlClause.pagingBindOffset*/0, /*pmb.sqlClause.pagingBindLimit*/0";
+            _pagingBindingLimit = getFetchSize();
+            _pagingBindingOffset = getPageStartIndex();
+            _fetchScopeSqlSuffix = " limit /*pmb.sqlClause.pagingBindingOffset*/0, /*pmb.sqlClause.pagingBindingLimit*/0";
         }
     }
 
@@ -332,16 +332,16 @@ public class SqlClauseMySql extends AbstractSqlClause {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Integer getPagingBindLimit() { // for parameter comment
-        return _pagingBindLimit;
+    public Integer getPagingBindingLimit() { // for parameter comment
+        return _pagingBindingLimit;
     }
 
-    public Integer getPagingBindOffset() { // for parameter comment
-        return _pagingBindOffset;
+    public Integer getPagingBindingOffset() { // for parameter comment
+        return _pagingBindingOffset;
     }
 
-    public SqlClauseMySql suppressPagingBind() { // for compatible? anyway, just in case
-        _suppressPagingBind = true;
+    public SqlClauseMySql suppressPagingBinding() { // for compatible? anyway, just in case
+        _suppressPagingBinding = true;
         return this;
     }
 }

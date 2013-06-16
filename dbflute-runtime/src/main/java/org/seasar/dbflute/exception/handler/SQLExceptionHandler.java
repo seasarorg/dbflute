@@ -156,10 +156,10 @@ public class SQLExceptionHandler {
     }
 
     protected void setupBehaviorElement(ExceptionMessageBuilder br) {
-        final Object invokeName = extractBehaviorInvokeName();
-        if (invokeName != null) {
+        final Object invokePath = extractBehaviorInvokePath();
+        if (invokePath != null) {
             br.addItem("Behavior");
-            br.addElement(invokeName);
+            br.addElement(invokePath);
         }
     }
 
@@ -284,28 +284,28 @@ public class SQLExceptionHandler {
         return null;
     }
 
-    protected String extractBehaviorInvokeName() {
+    protected String extractBehaviorInvokePath() {
         try {
-            final String provided = doExtractBehaviorInvokeNameFromProvider();
+            final String provided = doExtractBehaviorInvokePathFromProvider();
             if (provided != null) { // basically not null ()
                 return provided;
             }
-            return doExtractBehabiorInvokeNameFromSeparatedParts();
+            return doExtractBehabiorInvokePathFromSeparatedParts();
         } catch (RuntimeException continued) {
             // this is additional info for debug so continue
             if (_log.isDebugEnabled()) {
-                _log.debug("Failed to extract behavior invoke name for debug.", continued);
+                _log.debug("Failed to extract behavior invoke path for debug.", continued);
             }
             return null;
         }
     }
 
-    protected String doExtractBehaviorInvokeNameFromProvider() {
+    protected String doExtractBehaviorInvokePathFromProvider() {
         final InvokePathProvider provider = InternalMapContext.getInvokePathProvider();
         return provider != null ? provider.provide() : null;
     }
 
-    protected String doExtractBehabiorInvokeNameFromSeparatedParts() {
+    protected String doExtractBehabiorInvokePathFromSeparatedParts() {
         final Object behaviorInvokeName = InternalMapContext.getBehaviorInvokeName();
         if (behaviorInvokeName == null) {
             return null;
