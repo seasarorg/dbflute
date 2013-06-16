@@ -6,27 +6,31 @@ cd ../dbflute-basic-example
 . sync-lib.sh
 cd dbflute_exampledb
 rm ./log/*.log
+. replace-schema.sh
 . jdbc.sh
 . doc.sh
 . generate.sh
 . sql2entity.sh
+. outside-sql-test.sh
 
 cd ../../dbflute-spring-example
 . sync-lib.sh
 cd dbflute_exampledb
-rm ./log/*.log
-. jdbc.sh
-. doc.sh
-. generate.sh
-. sql2entity.sh
-
-cd ../../dbflute-guice-example/dbflute_exampledb
 rm ./log/*.log
 . replace-schema.sh
 . jdbc.sh
 . doc.sh
 . generate.sh
 . sql2entity.sh
+. outside-sql-test.sh
+
+cd ../../dbflute-guice-example/dbflute_exampledb
+rm ./log/*.log
+. manage.sh renewal
+. manage.sh load-data-reverse
+. manage.sh schema-sync-check
+. manage.sh freegen
+. diffworld-test.sh
 
 cd ../../dbflute-cdi-example/dbflute_exampledb
 rm ./log/*.log
@@ -45,12 +49,13 @@ rm ./log/*.log
 cd ../../dbflute-mysql-example/dbflute_exampledb
 rm ./log/*.log
 . replace-schema.sh
-. manage.sh load-data-reverse
 . jdbc.sh
 . doc.sh
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
+. manage.sh load-data-reverse
+. manage.sh freegen
 
 cd ../../dbflute-postgresql-example/dbflute_exampledb
 rm ./log/*.log
@@ -60,6 +65,7 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
+. manage.sh load-data-reverse
 
 # needs environment set up so kick by yourself (refresh only here)
 #cd ../../dbflute-oracle-example/dbflute_exampledb
