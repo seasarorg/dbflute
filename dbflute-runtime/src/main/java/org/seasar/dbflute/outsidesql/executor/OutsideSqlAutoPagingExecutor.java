@@ -168,4 +168,39 @@ public class OutsideSqlAutoPagingExecutor<BEHAVIOR> extends AbstractOutsideSqlPa
     public <ENTITY> ListResultBean<ENTITY> selectList(AutoPagingHandlingPmb<BEHAVIOR, ENTITY> pmb) {
         return doSelectList(pmb.getOutsideSqlPath(), pmb, pmb.getEntityType());
     }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutsideSqlAutoPagingExecutor<BEHAVIOR> removeBlockComment() {
+        return (OutsideSqlAutoPagingExecutor<BEHAVIOR>) super.removeBlockComment();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutsideSqlAutoPagingExecutor<BEHAVIOR> removeLineComment() {
+        return (OutsideSqlAutoPagingExecutor<BEHAVIOR>) super.removeLineComment();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutsideSqlAutoPagingExecutor<BEHAVIOR> formatSql() {
+        return (OutsideSqlAutoPagingExecutor<BEHAVIOR>) super.formatSql();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutsideSqlAutoPagingExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
+        return (OutsideSqlAutoPagingExecutor<BEHAVIOR>) super.configure(statementConfig);
+    }
 }

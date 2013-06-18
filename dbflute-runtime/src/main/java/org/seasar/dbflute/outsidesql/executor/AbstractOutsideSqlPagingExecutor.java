@@ -193,7 +193,7 @@ public abstract class AbstractOutsideSqlPagingExecutor<BEHAVIOR> {
     }
 
     protected OutsideSqlEntityExecutor<BEHAVIOR> createCountExecutor() {
-        final OutsideSqlOption countOption = _outsideSqlOption.copyOptionWithoutPaging();
+        final OutsideSqlOption countOption = _outsideSqlOption.copyOptionForPagingCount();
         return _outsideSqlExecutorFactory.createEntity(_behaviorCommandInvoker, _tableDbName, _currentDBDef,
                 _defaultStatementConfig, countOption);
     }

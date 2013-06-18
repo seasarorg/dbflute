@@ -168,4 +168,39 @@ public class OutsideSqlManualPagingExecutor<BEHAVIOR> extends AbstractOutsideSql
     public <ENTITY> ListResultBean<ENTITY> selectList(ManualPagingHandlingPmb<BEHAVIOR, ENTITY> pmb) {
         return doSelectList(pmb.getOutsideSqlPath(), pmb, pmb.getEntityType());
     }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutsideSqlManualPagingExecutor<BEHAVIOR> removeBlockComment() {
+        return (OutsideSqlManualPagingExecutor<BEHAVIOR>) super.removeBlockComment();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutsideSqlManualPagingExecutor<BEHAVIOR> removeLineComment() {
+        return (OutsideSqlManualPagingExecutor<BEHAVIOR>) super.removeLineComment();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutsideSqlManualPagingExecutor<BEHAVIOR> formatSql() {
+        return (OutsideSqlManualPagingExecutor<BEHAVIOR>) super.formatSql();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public OutsideSqlManualPagingExecutor<BEHAVIOR> configure(StatementConfig statementConfig) {
+        return (OutsideSqlManualPagingExecutor<BEHAVIOR>) super.configure(statementConfig);
+    }
 }

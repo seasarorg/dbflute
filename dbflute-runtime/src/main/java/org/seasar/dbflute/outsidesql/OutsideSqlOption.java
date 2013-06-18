@@ -85,10 +85,24 @@ public class OutsideSqlOption {
     // ===================================================================================
     //                                                                                Copy
     //                                                                                ====
-    public OutsideSqlOption copyOptionWithoutPaging() {
+    public OutsideSqlOption copyOptionForPagingCount() {
         final OutsideSqlOption copyOption = new OutsideSqlOption();
         copyOption.setPagingSourceRequestType(_pagingRequestType);
         copyOption.setTableDbName(_tableDbName);
+        if (_removeBlockComment) {
+            copyOption.removeBlockComment();
+        }
+        if (_removeLineComment) {
+            copyOption.removeLineComment();
+        }
+        if (_formatSql) {
+            copyOption.formatSql();
+        }
+        // inherit only queryTimeout (others are basically not related to count select)
+        if (_statementConfig != null && _statementConfig.hasQueryTimeout()) {
+            final Integer queryTimeout = _statementConfig.getQueryTimeout();
+            copyOption.setStatementConfig(new StatementConfig().queryTimeout(queryTimeout));
+        }
         return copyOption;
     }
 
