@@ -458,6 +458,7 @@ public class FileToken {
      * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
+     * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
      */
     public void make(String filePath, FileMakingCallback callback, FileMakingOption option)
             throws FileNotFoundException, IOException {
@@ -497,6 +498,7 @@ public class FileToken {
      * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
+     * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
      */
     public void make(OutputStream ous, final FileMakingCallback callback, FileMakingOption option)
             throws FileNotFoundException, IOException {
@@ -540,6 +542,7 @@ public class FileToken {
      * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
+     * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
      */
     public void makeByWriter(String filePath, FileMakingWriterCallback callback, FileMakingOption option)
             throws FileNotFoundException, IOException {
@@ -581,6 +584,7 @@ public class FileToken {
      * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
+     * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
      */
     public void makeByWriter(OutputStream ous, FileMakingWriterCallback callback, FileMakingOption option)
             throws FileNotFoundException, IOException {
@@ -720,7 +724,7 @@ public class FileToken {
 
     protected void throwFileMakingInvalidValueCountException(List<String> columnNameList, Collection<String> valueList) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The value count or thr row does not match column count of header.");
+        br.addNotice("The value count of the row does not match column count of header.");
         br.addItem("Column List");
         br.addElement(columnNameList);
         br.addElement("column count: " + columnNameList.size());

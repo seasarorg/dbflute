@@ -39,7 +39,7 @@ public interface FileMakingRowWriter {
 
     /**
      * Write the row to token file.
-     * @param resource The resource of row for file making. (NotNull)
+     * @param resource The resource of row for file making. (NotNull, NotEmptyResource)
      * @throws IOException When the file writing failed.
      */
     void write(FileMakingRowResource resource) throws IOException;
