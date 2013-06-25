@@ -81,14 +81,4 @@ public class FileTokenizingRowResource {
     public void setLineNumber(int lineNumber) {
         _lineNumber = lineNumber;
     }
-
-    @Deprecated
-    public FileTokenizingHeaderInfo getFileTokenizingHeaderInfo() {
-        return _headerInfo;
-    }
-
-    @Deprecated
-    public void setFirstLineInfo(FileTokenizingHeaderInfo headerInfo) {
-        _headerInfo = headerInfo;
-    }
 }

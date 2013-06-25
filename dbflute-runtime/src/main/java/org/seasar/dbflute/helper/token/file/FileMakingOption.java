@@ -42,6 +42,9 @@ public class FileMakingOption {
     /** Does it quote values minimally? (NotRequired) */
     protected boolean _quoteMinimally;
 
+    /** Does it suppress value count check? (NotRequired) */
+    protected boolean _suppressValueCountCheck;
+
     /** The header info of file-making. (NotRequired) */
     protected FileMakingHeaderInfo _headerInfo;
 
@@ -120,11 +123,29 @@ public class FileMakingOption {
         return this;
     }
 
+    /**
+     * Quote values minimally (if it needs).
+     * @return this. (NotNull)
+     */
     public FileMakingOption quoteMinimally() {
         _quoteMinimally = true;
         return this;
     }
 
+    /**
+     * Suppress the value count check. (compare with header's column count)
+     * @return this. (NotNull)
+     */
+    public FileMakingOption suppressValueCountCheck() {
+        _suppressValueCountCheck = true;
+        return this;
+    }
+
+    /**
+     * Set the header info with the list of column name.
+     * @param columnNameList The list of column name. (NotNull)
+     * @return this. (NotNull)
+     */
     public FileMakingOption headerInfo(List<String> columnNameList) {
         if (columnNameList == null) {
             String msg = "The argument 'columnNameList' should not be null.";
@@ -165,6 +186,10 @@ public class FileMakingOption {
 
     public boolean isQuoteMinimally() {
         return _quoteMinimally;
+    }
+
+    public boolean isSuppressValueCountCheck() {
+        return _suppressValueCountCheck;
     }
 
     public FileMakingHeaderInfo getFileMakingHeaderInfo() {

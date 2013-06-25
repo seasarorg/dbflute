@@ -40,6 +40,7 @@ public class FileMakingSimpleFacade {
      */
     public void makeFromRowList(final String filePath, final List<List<String>> rowList, final FileMakingOption option)
             throws FileNotFoundException, IOException {
+        final FileMakingRowResource resource = new FileMakingRowResource();
         final FileMakingCallback fileMakingCallback = new FileMakingCallback() {
             protected int rowCount = 0; // old style here (you can use iterator)
 
@@ -49,9 +50,8 @@ public class FileMakingSimpleFacade {
                     return null; // the end
                 }
                 final List<String> valueList = (List<String>) rowList.get(rowCount - 1);
-                final FileMakingRowResource rowResource = new FileMakingRowResource();
-                rowResource.setValueList(valueList);
-                return rowResource;
+                resource.acceptValueList(valueList);
+                return resource;
             }
         };
         final FileToken fileToken = new FileToken();
@@ -68,6 +68,7 @@ public class FileMakingSimpleFacade {
      */
     public byte[] makeFromRowList(final List<List<String>> rowList, final FileMakingOption option)
             throws FileNotFoundException, IOException {
+        final FileMakingRowResource resource = new FileMakingRowResource();
         final FileMakingCallback fileMakingCallback = new FileMakingCallback() {
             protected int rowCount = 0; // old style here (you can use iterator)
 
@@ -77,9 +78,8 @@ public class FileMakingSimpleFacade {
                     return null;// The End!
                 }
                 final List<String> valueList = (List<String>) rowList.get(rowCount - 1);
-                final FileMakingRowResource rowResource = new FileMakingRowResource();
-                rowResource.setValueList(valueList);
-                return rowResource;
+                resource.acceptValueList(valueList);
+                return resource;
             }
         };
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();

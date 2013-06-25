@@ -27,12 +27,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.token.file.exception.FileMakingInvalidValueCountException;
 import org.seasar.dbflute.helper.token.line.LineMakingOption;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
@@ -46,34 +48,34 @@ import org.seasar.dbflute.util.Srl;
  *  File tsvFile = ... <span style="color: #3F7E5E">// input file</span>
  *  FileToken fileToken = new FileToken();
  *  fileToken.tokenize(new FileInputStream(tsvFile), new FileTokenizingCallback() {
- *      public void handleRowResource(FileTokenizingRowResource rowResource) {
- *          ... = rowResource.getFileTokenizingHeaderInfo();
- *          ... = rowResource.<span style="color: #AD4747">getValueList()</span>;
+ *      public void handleRowResource(FileTokenizingRowResource resource) {
+ *          ... = resource.getHeaderInfo();
+ *          ... = resource.<span style="color: #AD4747">getValueList()</span>;
  *      }
  *  }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8());
  * 
  * e.g. Writing (using Iterator)
  *  File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
  *  List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
- *  FileToken fileToken = new FileToken();
  *  final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
- *  <span style="color: #3F7E5E">// or final Iterator&lt;LinkedHashMap&lt;String, String&gt;&gt; iterator = ...</span>
+ *  final FileMakingRowResource resource = new FileMakingRowResource();
+ *  FileToken fileToken = new FileToken();
  *  fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
  *      public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
- *          return new FileMakingRowResource().<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// data only here</span>
- *          <span style="color: #3F7E5E">// or return new FileMakingRowResource().acceptNameValueMapIterator(iterator); // with header</span>
+ *          return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
  *      }
  *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * 
  * e.g. Writing (using Writer)
  *  File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
  *  List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
+ *  final FileMakingRowResource resource = new FileMakingRowResource();
+ *  FileToken fileToken = new FileToken();
  *  fileToken.makeByWriter(tsvFile, new FileMakingWriterCallback() {
  *      public void make(FileMakingRowWriter writer) {
  *          for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
- *              FileMakingRowResource resource = new FileMakingRowResource();
  *              resource... <span style="color: #3F7E5E">// convert the member to the row resource</span>
- *              writer.<span style="color: #AD4747">write</span>(rowResource); <span style="color: #3F7E5E">// Yes, you write!</span>
+ *              writer.<span style="color: #AD4747">write</span>(resource); <span style="color: #3F7E5E">// Yes, you write!</span>
  *          }
  *      }
  *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
@@ -87,6 +89,9 @@ public class FileToken {
     //                                                                          ==========
     /** The mark that means header done for writing process. */
     protected static final String HEADER_DONE_MARK = "headerDone";
+
+    /** The mark that means first line done for writing process. */
+    protected static final String FIRST_LINE_DONE_MARK = "firstLineDone";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -104,9 +109,9 @@ public class FileToken {
      * File tsvFile = ... <span style="color: #3F7E5E">// input file</span>
      * FileToken fileToken = new FileToken();
      * fileToken.tokenize(new FileInputStream(tsvFile), new FileTokenizingCallback() {
-     *     public void handleRowResource(FileTokenizingRowResource rowResource) {
-     *         ... = rowResource.getFileTokenizingHeaderInfo();
-     *         ... = rowResource.<span style="color: #AD4747">getValueList()</span>;
+     *     public void handleRowResource(FileTokenizingRowResource resource) {
+     *         ... = resource.getHeaderInfo();
+     *         ... = resource.<span style="color: #AD4747">getValueList()</span>;
      *     }
      * }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
      * </pre>
@@ -143,9 +148,9 @@ public class FileToken {
      * File tsvFile = ... <span style="color: #3F7E5E">// input file</span>
      * FileToken fileToken = new FileToken();
      * fileToken.tokenize(new FileInputStream(tsvFile), new FileTokenizingCallback() {
-     *     public void handleRowResource(FileTokenizingRowResource rowResource) {
-     *         ... = rowResource.getFileTokenizingHeaderInfo();
-     *         ... = rowResource.<span style="color: #AD4747">getValueList()</span>;
+     *     public void handleRowResource(FileTokenizingRowResource resource) {
+     *         ... = resource.getHeaderInfo();
+     *         ... = resource.<span style="color: #AD4747">getValueList()</span>;
      *     }
      * }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
      * </pre>
@@ -216,8 +221,8 @@ public class FileToken {
                 temporaryValueList.addAll(ls);
 
                 try {
-                    final FileTokenizingRowResource rowResource = new FileTokenizingRowResource();
-                    rowResource.setHeaderInfo(headerInfo);
+                    final FileTokenizingRowResource resource = new FileTokenizingRowResource();
+                    resource.setHeaderInfo(headerInfo);
 
                     if (option.isHandleEmptyAsNull()) {
                         for (final Iterator<String> ite = temporaryValueList.iterator(); ite.hasNext();) {
@@ -228,17 +233,17 @@ public class FileToken {
                                 filteredValueList.add(value);
                             }
                         }
-                        rowResource.setValueList(filteredValueList);
+                        resource.setValueList(filteredValueList);
                     } else {
-                        rowResource.setValueList(temporaryValueList);
+                        resource.setValueList(temporaryValueList);
                     }
 
                     final String realRowString = realRowStringSb.toString();
                     realRowStringSb.setLength(0);
-                    rowResource.setRowString(realRowString);
-                    rowResource.setRowNumber(rowNumber);
-                    rowResource.setLineNumber(lineNumber);
-                    callback.handleRowResource(rowResource);
+                    resource.setRowString(realRowString);
+                    resource.setRowNumber(rowNumber);
+                    resource.setLineNumber(lineNumber);
+                    callback.handleRowResource(resource);
                 } finally {
                     ++rowNumber;
                     temporaryValueList.clear();
@@ -439,13 +444,12 @@ public class FileToken {
      * <pre>
      * String tsvFile = ... <span style="color: #3F7E5E">// output file</span>
      * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
-     * FileToken fileToken = new FileToken();
      * final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
-     * <span style="color: #3F7E5E">// or final Iterator&lt;LinkedHashMap&lt;String, String&gt;&gt; iterator = ...</span>
+     * final FileMakingRowResource resource = new FileMakingRowResource();
+     * FileToken fileToken = new FileToken();
      * fileToken.make(tsvFile, new FileMakingCallback() {
      *     public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
-     *         return new FileMakingRowResource().<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// data only here</span>
-     *         <span style="color: #3F7E5E">// or return new FileMakingRowResource().acceptNameValueMapIterator(iterator); // with header</span>
+     *         return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
      *     }
      * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
      * </pre>
@@ -479,13 +483,12 @@ public class FileToken {
      * <pre>
      * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
      * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
-     * FileToken fileToken = new FileToken();
      * final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
-     * <span style="color: #3F7E5E">// or final Iterator&lt;LinkedHashMap&lt;String, String&gt;&gt; iterator = ...</span>
+     * final FileMakingRowResource resource = new FileMakingRowResource();
+     * FileToken fileToken = new FileToken();
      * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
      *     public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
-     *         return new FileMakingRowResource().<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// data only here</span>
-     *         <span style="color: #3F7E5E">// or return new FileMakingRowResource().acceptNameValueMapIterator(iterator); // with header</span>
+     *         return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
      *     }
      * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
      * </pre>
@@ -504,13 +507,13 @@ public class FileToken {
             throws FileNotFoundException, IOException {
         doMakeByWriter(ous, new FileMakingWriterCallback() {
             public void make(FileMakingRowWriter writer) throws IOException {
-                FileMakingRowResource rowResource = null;
+                FileMakingRowResource resource = null;
                 while (true) {
-                    rowResource = callback.getRowResource();
-                    if (rowResource == null || !rowResource.hasResource()) {
+                    resource = callback.getRowResource();
+                    if (resource == null || !resource.hasRowData()) {
                         break; // the end
                     }
-                    writer.write(rowResource);
+                    writer.write(resource);
                 }
             }
         }, option);
@@ -521,13 +524,13 @@ public class FileToken {
      * <pre>
      * String tsvFile = ... <span style="color: #3F7E5E">// output file</span>
      * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
+     * final FileMakingRowResource resource = new FileMakingRowResource();
      * FileToken fileToken = new FileToken();
      * fileToken.makeByWriter(tsvFile, new FileMakingWriterCallback() {
      *     public void make(FileMakingRowWriter writer) {
      *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
-     *             FileMakingRowResource resource = new FileMakingRowResource();
      *             resource... <span style="color: #3F7E5E">// convert the member to the row resource</span>
-     *             writer.<span style="color: #AD4747">write</span>(rowResource); <span style="color: #3F7E5E">// Yes, you write!</span>
+     *             writer.<span style="color: #AD4747">write</span>(resource); <span style="color: #3F7E5E">// Yes, you write!</span>
      *         }
      *     }
      * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
@@ -562,13 +565,13 @@ public class FileToken {
      * <pre>
      * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
      * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
+     * final FileMakingRowResource resource = new FileMakingRowResource();
      * FileToken fileToken = new FileToken();
      * fileToken.makeByWriter(new FileOutputStream(tsvFile), new FileMakingWriterCallback() {
      *     public void make(FileMakingRowWriter writer) {
      *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
-     *             FileMakingRowResource resource = new FileMakingRowResource();
      *             resource... <span style="color: #3F7E5E">// convert the member to the row resource</span>
-     *             writer.<span style="color: #AD4747">write</span>(rowResource); <span style="color: #3F7E5E">// Yes, you write!</span>
+     *             writer.<span style="color: #AD4747">write</span>(resource); <span style="color: #3F7E5E">// Yes, you write!</span>
      *         }
      *     }
      * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
@@ -590,43 +593,26 @@ public class FileToken {
         assertObjectNotNull("callback", callback);
         assertObjectNotNull("option", option);
         final String encoding = option.getEncoding();
-        final String delimiter = option.getDelimiter();
-        assertObjectNotNull("delimiter", delimiter);
         assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
-        final String lineSeparator;
-        if (option.getLineSeparator() != null && !option.getLineSeparator().equals("")) {
-            lineSeparator = option.getLineSeparator();
-        } else {
-            lineSeparator = "\n"; // default
-        }
+        assertObjectNotNull("delimiter", option.getDelimiter());
+        final String lineSep = prepareWritingLineSeparator(option);
+        final LineMakingOption lineOption = prepareWritingLineOption(option);
 
         Writer writer = null; // is interface not to use newLine() for fixed line separator
         try {
             writer = new BufferedWriter(new OutputStreamWriter(ous, encoding));
             final Set<String> headerDoneMarkSet = new HashSet<String>(1);
+            final Set<String> firstLineDoneMarkSet = new HashSet<String>(1);
 
             // write header
             final FileMakingHeaderInfo headerInfo = option.getFileMakingHeaderInfo();
             if (headerInfo != null) {
                 final List<String> columnNameList = headerInfo.getColumnNameList();
-                doWriterHeader(writer, columnNameList, option, delimiter, lineSeparator, headerDoneMarkSet);
+                doWriterHeader(writer, columnNameList, option, headerDoneMarkSet, firstLineDoneMarkSet);
             }
 
             // write data row
-            final Writer rowWriter = writer;
-            callback.make(new FileMakingRowWriter() {
-                public void write(FileMakingRowResource resource) throws IOException {
-                    assertRowResourceOfWriter(resource);
-                    doWriteDataRow(rowWriter, resource, option, delimiter, lineSeparator, headerDoneMarkSet);
-                }
-
-                protected void assertRowResourceOfWriter(FileMakingRowResource resource) {
-                    if (resource == null || !resource.hasResource()) {
-                        String msg = "The argument 'resource' of row writer should not be null.";
-                        throw new IllegalArgumentException(msg);
-                    }
-                }
-            });
+            callbackDataRowWriter(callback, option, lineSep, lineOption, writer, firstLineDoneMarkSet);
             writer.flush();
         } finally {
             if (writer != null) {
@@ -636,36 +622,73 @@ public class FileToken {
     }
 
     protected void doWriterHeader(Writer writer, List<String> columnNameList, FileMakingOption option,
-            String delimiter, String lineSeparator, Set<String> headerDoneMarkSet) throws IOException {
+            Set<String> headerDoneMarkSet, Set<String> firstLineDoneMarkSet) throws IOException {
         if (columnNameList != null && !columnNameList.isEmpty()) {
             final LineMakingOption lineMakingOption = new LineMakingOption();
-            lineMakingOption.setDelimiter(delimiter);
+            lineMakingOption.setDelimiter(option.getDelimiter());
             lineMakingOption.trimSpace(); // trimming is header only
             reflectQuoteMinimally(option, lineMakingOption);
             final String columnHeaderString = _lineToken.make(columnNameList, lineMakingOption);
-            writer.write(columnHeaderString + lineSeparator);
+            writer.write(columnHeaderString);
             headerDoneMarkSet.add(HEADER_DONE_MARK);
+            firstLineDoneMarkSet.add(FIRST_LINE_DONE_MARK);
         }
     }
 
-    protected void doWriteDataRow(Writer writer, FileMakingRowResource resource, FileMakingOption option,
-            String delimiter, String lineSeparator, Set<String> headerDoneMarkSet) throws IOException {
-        final List<String> valueList;
-        if (resource.getValueList() != null) {
-            valueList = resource.getValueList();
-        } else {
-            final Map<String, String> nameValueMap = resource.getNameValueMap(); // not null here
-            if (headerDoneMarkSet.isEmpty()) {
-                final List<String> columnNameList = new ArrayList<String>(nameValueMap.keySet());
-                doWriterHeader(writer, columnNameList, option, delimiter, lineSeparator, headerDoneMarkSet);
+    protected void callbackDataRowWriter(FileMakingWriterCallback callback, final FileMakingOption option,
+            final String lineSep, final LineMakingOption lineOption, final Writer writer,
+            final Set<String> firstLineDoneMarkSet) throws IOException {
+        callback.make(new FileMakingRowWriter() {
+            public void write(FileMakingRowResource resource) throws IOException {
+                assertRowResourceOfWriter(resource);
+                doWriteDataRow(writer, resource, option, lineOption, lineSep, firstLineDoneMarkSet);
             }
-            valueList = new ArrayList<String>(nameValueMap.values());
+
+            protected void assertRowResourceOfWriter(FileMakingRowResource resource) {
+                if (resource == null || !resource.hasRowData()) {
+                    String msg = "The argument 'resource' of row writer should not be null.";
+                    throw new IllegalArgumentException(msg);
+                }
+            }
+        });
+    }
+
+    protected void doWriteDataRow(Writer writer, FileMakingRowResource resource, FileMakingOption option,
+            LineMakingOption lineOption, String lineSep, Set<String> firstLineDoneMarkSet) throws IOException {
+        if (!resource.hasRowData()) {
+            return;
         }
-        final LineMakingOption lineMakingOption = new LineMakingOption();
-        lineMakingOption.setDelimiter(delimiter);
-        reflectQuoteMinimally(option, lineMakingOption);
-        final String lineString = _lineToken.make(valueList, lineMakingOption);
-        writer.write(lineString + lineSeparator);
+        final Collection<String> valueList = resource.getValueList(); // not null here
+        checkValueCount(option, valueList);
+        final String lineString = _lineToken.make(valueList, lineOption);
+        final String actualLine;
+        if (!firstLineDoneMarkSet.isEmpty()) { // second or more line
+            actualLine = lineSep + lineString;
+        } else {
+            actualLine = lineString;
+        }
+        writer.write(actualLine);
+        firstLineDoneMarkSet.add(FIRST_LINE_DONE_MARK);
+        resource.clear();
+    }
+
+    protected String prepareWritingLineSeparator(final FileMakingOption option) {
+        final String lineSep;
+        if (option.getLineSeparator() != null && !option.getLineSeparator().equals("")) {
+            lineSep = option.getLineSeparator();
+        } else {
+            lineSep = "\n"; // default
+        }
+        return lineSep;
+    }
+
+    protected LineMakingOption prepareWritingLineOption(FileMakingOption option) {
+        // create line option here to recycle instance only for data row
+        // (header has original line option so not use this)
+        final LineMakingOption lineOption = new LineMakingOption();
+        lineOption.setDelimiter(option.getDelimiter());
+        reflectQuoteMinimally(option, lineOption);
+        return lineOption;
     }
 
     protected void reflectQuoteMinimally(FileMakingOption fileMakingOption, LineMakingOption lineMakingOption) {
@@ -674,6 +697,38 @@ public class FileToken {
         } else {
             lineMakingOption.quoteAll(); // default
         }
+    }
+
+    protected void checkValueCount(FileMakingOption option, final Collection<String> valueList) {
+        if (option.isSuppressValueCountCheck()) {
+            return;
+        }
+        final FileMakingHeaderInfo headerInfo = option.getFileMakingHeaderInfo();
+        if (headerInfo == null) {
+            return;
+        }
+        final List<String> columnNameList = headerInfo.getColumnNameList();
+        if (columnNameList == null || columnNameList.isEmpty()) {
+            return;
+        }
+        final int columnSize = columnNameList.size();
+        final int valueSize = valueList.size();
+        if (columnSize != valueSize) {
+            throwFileMakingInvalidValueCountException(columnNameList, valueList);
+        }
+    }
+
+    protected void throwFileMakingInvalidValueCountException(List<String> columnNameList, Collection<String> valueList) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The value count or thr row does not match column count of header.");
+        br.addItem("Column List");
+        br.addElement(columnNameList);
+        br.addElement("column count: " + columnNameList.size());
+        br.addItem("Value List");
+        br.addElement(valueList);
+        br.addElement("value count: " + valueList.size());
+        final String msg = br.buildExceptionMessage();
+        throw new FileMakingInvalidValueCountException(msg);
     }
 
     // ===================================================================================

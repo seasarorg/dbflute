@@ -48,7 +48,7 @@ public class BehaviorExceptionThrower {
     //                                                                              ======
     public void throwSelectEntityAlreadyDeletedException(Object searchKey) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The entity was NOT found! it has already been deleted.");
+        br.addNotice("The selected entity was NOT found! it has already been deleted.");
         br.addItem("Advice");
         br.addElement("Please confirm the existence of your target record on your database.");
         br.addElement("Does the target record really created before this operation?");
@@ -56,15 +56,22 @@ public class BehaviorExceptionThrower {
         br.addElement("It is precondition that the record exists on your database.");
         setupSearchKeyElement(br, searchKey);
         final String msg = br.buildExceptionMessage();
-        throw new EntityAlreadyDeletedException(msg);
+        throw new EntityAlreadyDeletedException(msg); // basically treated as application exception
     }
 
     public void throwSelectEntityDuplicatedException(String resultCountExp, Object searchKey, Throwable cause) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The entity was duplicated! It should be the only one.");
+        br.addNotice("The selected entity was duplicated! It should be the only one.");
         br.addItem("Advice");
         br.addElement("Confirm your search condition. Does it really select the only one?");
         br.addElement("And confirm your database. Does it really exist the only one?");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    cb.query().setMemberName_PrefisSearch(\"S\");");
+        br.addElement("    ... = memberBhv.selectEntity(cb);");
+        br.addElement("  (o):");
+        br.addElement("    cb.query().setMemberId_Equal(3);");
+        br.addElement("    ... = memberBhv.selectEntity(cb);");
         br.addItem("Result Count");
         br.addElement(resultCountExp);
         setupSearchKeyElement(br, searchKey);
@@ -202,20 +209,20 @@ public class BehaviorExceptionThrower {
     //                                                                              ======
     public <ENTITY extends Entity> void throwUpdateEntityAlreadyDeletedException(ENTITY entity) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The entity was not found! it has already been deleted.");
+        br.addNotice("The updated entity was not found! it has already been deleted.");
         setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
-        throw new EntityAlreadyDeletedException(msg);
+        throw new EntityAlreadyDeletedException(msg); // basically treated as application exception
     }
 
     public <ENTITY extends Entity> void throwUpdateEntityDuplicatedException(ENTITY entity, int count) {
         final ExceptionMessageBuilder br = createExceptionMessageBuilder();
-        br.addNotice("The entity was duplicated. It should be the only one!");
+        br.addNotice("The updated entity was duplicated. It should be the only one!");
         br.addItem("Count");
         br.addElement(count);
         setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
-        throw new EntityDuplicatedException(msg);
+        throw new EntityDuplicatedException(msg); // basically no way if you use PK constraint
     }
 
     public void throwVersionNoValueNullException(Entity entity) {
@@ -224,8 +231,25 @@ public class BehaviorExceptionThrower {
         br.addItem("Advice");
         br.addElement("Please confirm the existence of the value of 'version no' on the entity.");
         br.addElement("You called the method in which the check for optimistic lock is indispensable.");
-        br.addElement("So 'version no' is required on the entity. In addition, please confirm");
-        br.addElement("the necessity of optimistic lock. It might possibly be unnecessary.");
+        br.addElement("So 'version no' is required on the entity.");
+        br.addElement("In addition, please confirm the necessity of optimistic lock.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    Member member = new Member();");
+        br.addElement("    member.setMemberId(3);");
+        br.addElement("    member.setMemberName(\"Pixy\");");
+        br.addElement("    memberBhv.update(member);");
+        br.addElement("  (o): (Optimistic Lock)");
+        br.addElement("    Member member = new Member();");
+        br.addElement("    member.setMemberId(3);");
+        br.addElement("    member.setMemberName(\"Pixy\");");
+        br.addElement("    member.setVersionNo(...); // *Point");
+        br.addElement("    memberBhv.update(member);");
+        br.addElement("  (o): (Nonstrict)");
+        br.addElement("    Member member = new Member();");
+        br.addElement("    member.setMemberId(3);");
+        br.addElement("    member.setMemberName(\"Pixy\");");
+        br.addElement("    memberBhv.updateNonstrict(member); // *Point");
         setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
         throw new OptimisticLockColumnValueNullException(msg);
@@ -237,8 +261,25 @@ public class BehaviorExceptionThrower {
         br.addItem("Advice");
         br.addElement("Please confirm the existence of the value of 'update date' on the entity.");
         br.addElement("You called the method in which the check for optimistic lock is indispensable.");
-        br.addElement("So 'update date' is required on the entity. In addition, please confirm");
-        br.addElement("the necessity of optimistic lock. It might possibly be unnecessary.");
+        br.addElement("So 'update date' is required on the entity.");
+        br.addElement("In addition, please confirm the necessity of optimistic lock.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    Member member = new Member();");
+        br.addElement("    member.setMemberId(3);");
+        br.addElement("    member.setMemberName(\"Pixy\");");
+        br.addElement("    memberBhv.update(member);");
+        br.addElement("  (o): (Optimistic Lock)");
+        br.addElement("    Member member = new Member();");
+        br.addElement("    member.setMemberId(3);");
+        br.addElement("    member.setMemberName(\"Pixy\");");
+        br.addElement("    member.setUpdateDatetime(updateDatetime); // *Point");
+        br.addElement("    memberBhv.update(member);");
+        br.addElement("  (o): (Nonstrict)");
+        br.addElement("    Member member = new Member();");
+        br.addElement("    member.setMemberId(3);");
+        br.addElement("    member.setMemberName(\"Pixy\");");
+        br.addElement("    memberBhv.updateNonstrict(member); // *Point");
         setupEntityElement(br, entity);
         final String msg = br.buildExceptionMessage();
         throw new OptimisticLockColumnValueNullException(msg);
@@ -251,6 +292,24 @@ public class BehaviorExceptionThrower {
         br.addItem("Advice");
         br.addElement("Confirm your condition values for queryUpdate().");
         br.addElement("If you want to update all records, use varyingQueryUpdate().");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    Member member = new Member();");
+        br.addElement("    member.setMemberStatusCode_Formalized();");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    memberBhv.queryUpdate(member, cb);");
+        br.addElement("  (o): (exists query)");
+        br.addElement("    Member member = new Member();");
+        br.addElement("    member.setMemberStatusCode_Formalized();");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.query().setBirthdate_LessThan(...); // *OK");
+        br.addElement("    memberBhv.queryUpdate(member, cb);");
+        br.addElement("  (o): (non query)");
+        br.addElement("    Member member = new Member();");
+        br.addElement("    member.setMemberStatusCode_Formalized();");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    UpdateOption<MemberCB> option = new UpdateOption<MemberCB>().allowNonQueryUpdate();");
+        br.addElement("    memberBhv.varyingQueryUpdate(member, cb, option); // *OK");
         setupEntityElement(br, entity);
         setupOptionElement(br, option);
         setupInvalidQueryElement(br, cb);
@@ -265,6 +324,18 @@ public class BehaviorExceptionThrower {
         br.addItem("Advice");
         br.addElement("Confirm your condition values for queryDelete().");
         br.addElement("If you want to delete all records, use varyingQueryDelete().");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    memberBhv.queryDelete(cb);");
+        br.addElement("  (o): (exists query)");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    cb.query().setBirthdate_LessThan(...); // *OK");
+        br.addElement("    memberBhv.queryDelete(cb);");
+        br.addElement("  (o): (non query)");
+        br.addElement("    MemberCB cb = new MemberCB();");
+        br.addElement("    DeleteOption<MemberCB> option = new DeleteOption<MemberCB>().allowNonQueryDelete();");
+        br.addElement("    memberBhv.varyingQueryDelete(cb, option); // *OK");
         setupOptionElement(br, option);
         setupInvalidQueryElement(br, cb);
         final String msg = br.buildExceptionMessage();

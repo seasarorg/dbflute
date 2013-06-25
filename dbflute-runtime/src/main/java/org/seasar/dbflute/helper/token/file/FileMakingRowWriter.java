@@ -22,13 +22,13 @@ import java.io.IOException;
  * <pre>
  * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
  * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
+ * final FileMakingRowResource resource = new FileMakingRowResource();
  * FileToken fileToken = new FileToken();
  * fileToken.makeByWriter(new FileOutputStream(tsvFile), new FileMakingWriterCallback() {
  *     public void make(FileMakingRowWriter writer) {
  *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
- *             FileMakingRowResource resource = new FileMakingRowResource();
  *             resource... <span style="color: #3F7E5E">// convert the member to the row resource</span>
- *             writer.<span style="color: #AD4747">write</span>(rowResource); <span style="color: #3F7E5E">// Yes, you write!</span>
+ *             writer.<span style="color: #AD4747">write</span>(resource); <span style="color: #3F7E5E">// Yes, you write!</span>
  *         }
  *     }
  * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));

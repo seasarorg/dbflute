@@ -19,10 +19,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.seasar.dbflute.helper.token.file.exception.FileMakingInvalidValueCountException;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
@@ -48,9 +50,9 @@ public class FileTokenTest extends PlainTestCase {
         impl.tokenize(ins, new FileTokenizingCallback() {
             int index = 0;
 
-            public void handleRowResource(FileTokenizingRowResource fileTokenizingRowResource) {
+            public void handleRowResource(FileTokenizingRowResource resource) {
                 // ## Assert ##
-                List<String> valueList = fileTokenizingRowResource.getValueList();
+                List<String> valueList = resource.getValueList();
                 log(valueList);
                 if (index == 0) {
                     assertEquals("a", valueList.get(0));
@@ -58,21 +60,21 @@ public class FileTokenTest extends PlainTestCase {
                     assertEquals("cc", valueList.get(2));
                     assertEquals("\"", valueList.get(3));
                     assertEquals("e\n,\n,\n\",,", valueList.get(4));
-                    assertEquals(first, fileTokenizingRowResource.getRowString());
+                    assertEquals(first, resource.getRowString());
                 } else if (index == 1) {
                     assertEquals("a", valueList.get(0));
                     assertEquals("", valueList.get(1));
                     assertEquals("c\"c", valueList.get(2));
                     assertEquals("d\"", valueList.get(3));
                     assertEquals("e", valueList.get(4));
-                    assertEquals(second, fileTokenizingRowResource.getRowString());
+                    assertEquals(second, resource.getRowString());
                 } else if (index == 2) {
                     assertEquals("a", valueList.get(0));
                     assertEquals("b,b", valueList.get(1));
                     assertEquals("c\",c", valueList.get(2));
                     assertEquals("d\n", valueList.get(3));
                     assertEquals("e", valueList.get(4));
-                    assertEquals(third, fileTokenizingRowResource.getRowString());
+                    assertEquals(third, resource.getRowString());
                     markSet.add("done");
                 }
                 ++index;
@@ -95,9 +97,9 @@ public class FileTokenTest extends PlainTestCase {
         impl.tokenize(inputStream, new FileTokenizingCallback() {
             int index = 0;
 
-            public void handleRowResource(FileTokenizingRowResource fileTokenizingRowResource) {
+            public void handleRowResource(FileTokenizingRowResource resource) {
                 // ## Assert ##
-                List<String> valueList = fileTokenizingRowResource.getValueList();
+                List<String> valueList = resource.getValueList();
                 log(valueList);
                 if (index == 0) {
                     assertEquals("1001", valueList.get(0));
@@ -128,14 +130,15 @@ public class FileTokenTest extends PlainTestCase {
         ByteArrayOutputStream ous = new ByteArrayOutputStream();
 
         // ## Act ##
+        List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
         impl.make(ous, new FileMakingCallback() {
-            int index = 0;
+            private final FileMakingRowResource resource = new FileMakingRowResource();
+            private int index = 0;
 
             public FileMakingRowResource getRowResource() {
                 if (index > 2) {
                     return null;
                 }
-                FileMakingRowResource rowResource = new FileMakingRowResource();
                 List<String> valueList = new ArrayList<String>();
                 if (index == 0) {
                     valueList.add("a");
@@ -156,15 +159,68 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("d\n");
                     valueList.add("e");
                 }
-                rowResource.setValueList(valueList);
+                resource.acceptValueList(valueList);
                 ++index;
-                return rowResource;
+                return resource;
+            }
+        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().headerInfo(columnNameList));
+
+        // ## Assert ##
+        String actual = ous.toString();
+        log(actual);
+        assertFalse(actual.endsWith("\n"));
+        String[] split = actual.split("\n");
+        assertEquals("\"A\",\"B\",\"C\",\"D\",\"E\"", split[0]);
+        assertEquals("\"a\",\"b\",\"cc\",\"d\",\"e\"", split[1]);
+        assertEquals("\"a\",\"\"\"\",\"c\"\"c\",\"d\"\"\",\"e\"", split[2]);
+        assertEquals("\"a\",\"b,b\",\"c\"\",c\",\"d", split[3]);
+        assertEquals("\",\"e\"", split[4]);
+    }
+
+    public void test_make_noHeader() throws Exception {
+        // ## Arrange ##
+        FileToken impl = new FileToken();
+        ByteArrayOutputStream ous = new ByteArrayOutputStream();
+
+        // ## Act ##
+        impl.make(ous, new FileMakingCallback() {
+            private final FileMakingRowResource resource = new FileMakingRowResource();
+            private int index = 0;
+
+            public FileMakingRowResource getRowResource() {
+                if (index > 2) {
+                    return null;
+                }
+                List<String> valueList = new ArrayList<String>();
+                if (index == 0) {
+                    valueList.add("a");
+                    valueList.add("b");
+                    valueList.add("cc");
+                    valueList.add("d");
+                    valueList.add("e");
+                } else if (index == 1) {
+                    valueList.add("a");
+                    valueList.add("\"");
+                    valueList.add("c\"c");
+                    valueList.add("d\"");
+                    valueList.add("e");
+                } else if (index == 2) {
+                    valueList.add("a");
+                    valueList.add("b,b");
+                    valueList.add("c\",c");
+                    valueList.add("d\n");
+                    valueList.add("e");
+                }
+                resource.acceptValueList(valueList);
+                ++index;
+                return resource;
             }
         }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf());
 
         // ## Assert ##
         String actual = ous.toString();
         log(actual);
+        assertFalse(actual.endsWith("\n"));
         String[] split = actual.split("\n");
         assertEquals("\"a\",\"b\",\"cc\",\"d\",\"e\"", split[0]);
         assertEquals("\"a\",\"\"\"\",\"c\"\"c\",\"d\"\"\",\"e\"", split[1]);
@@ -179,13 +235,13 @@ public class FileTokenTest extends PlainTestCase {
 
         // ## Act ##
         impl.make(outputStream, new FileMakingCallback() {
-            int index = 0;
+            private final FileMakingRowResource resource = new FileMakingRowResource();
+            private int index = 0;
 
             public FileMakingRowResource getRowResource() {
                 if (index > 2) {
                     return null;
                 }
-                FileMakingRowResource rowResource = new FileMakingRowResource();
                 List<String> valueList = new ArrayList<String>();
                 if (index == 0) {
                     valueList.add("a");
@@ -206,15 +262,16 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("d\n");
                     valueList.add("e");
                 }
-                rowResource.setValueList(valueList);
+                resource.acceptValueList(valueList);
                 ++index;
-                return rowResource;
+                return resource;
             }
         }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally());
 
         // ## Assert ##
         String actual = outputStream.toString();
         log(actual);
+        assertFalse(actual.endsWith("\n"));
         String[] split = actual.split("\n");
         assertEquals("a,b,cc,d,e", split[0]);
         assertEquals("a,b,\"c\"\"c\",d,e", split[1]);
@@ -222,6 +279,114 @@ public class FileTokenTest extends PlainTestCase {
         assertEquals("\",e", split[3]);
     }
 
+    public void test_make_invalidValueCount_basic() throws Exception {
+        // ## Arrange ##
+        FileToken impl = new FileToken();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // ## Act ##
+        try {
+            List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
+            FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf()
+                    .quoteMinimally().headerInfo(columnNameList);
+            impl.make(outputStream, new FileMakingCallback() {
+                private final FileMakingRowResource resource = new FileMakingRowResource();
+                private int index = 0;
+
+                public FileMakingRowResource getRowResource() {
+                    if (index > 2) {
+                        return null;
+                    }
+                    List<String> valueList = new ArrayList<String>();
+                    if (index == 0) {
+                        valueList.add("a");
+                        valueList.add("b");
+                        valueList.add("cc");
+                        valueList.add("d");
+                        valueList.add("e");
+                    } else if (index == 1) {
+                        valueList.add("a");
+                        valueList.add("b");
+                        valueList.add("c\"c");
+                        valueList.add("d");
+                    } else if (index == 2) {
+                        valueList.add("a");
+                        valueList.add("b,b");
+                        valueList.add("c\",c");
+                        valueList.add("d\n");
+                        valueList.add("e");
+                    }
+                    resource.acceptValueList(valueList);
+                    ++index;
+                    return resource;
+                }
+            }, option);
+
+            // ## Assert ##
+            fail();
+        } catch (FileMakingInvalidValueCountException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_make_invalidValueCount_suppress() throws Exception {
+        // ## Arrange ##
+        FileToken impl = new FileToken();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // ## Act ##
+        List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
+        FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf()
+                .quoteMinimally().suppressValueCountCheck().headerInfo(columnNameList);
+        impl.make(outputStream, new FileMakingCallback() {
+            private final FileMakingRowResource resource = new FileMakingRowResource();
+            private int index = 0;
+
+            public FileMakingRowResource getRowResource() {
+                if (index > 2) {
+                    return null;
+                }
+                List<String> valueList = new ArrayList<String>();
+                if (index == 0) {
+                    valueList.add("a");
+                    valueList.add("b");
+                    valueList.add("cc");
+                    valueList.add("d");
+                    valueList.add("e");
+                } else if (index == 1) {
+                    valueList.add("a");
+                    valueList.add("b");
+                    valueList.add("c\"c");
+                    valueList.add("d");
+                } else if (index == 2) {
+                    valueList.add("a");
+                    valueList.add("b,b");
+                    valueList.add("c\",c");
+                    valueList.add("d\n");
+                    valueList.add("e");
+                }
+                resource.acceptValueList(valueList);
+                ++index;
+                return resource;
+            }
+        }, option);
+
+        // ## Assert ##
+        String actual = outputStream.toString();
+        log(actual);
+        assertFalse(actual.endsWith("\n"));
+        String[] split = actual.split("\n");
+        assertEquals("A,B,C,D,E", split[0]);
+        assertEquals("a,b,cc,d,e", split[1]);
+        assertEquals("a,b,\"c\"\"c\",d", split[2]);
+        assertEquals("a,\"b,b\",\"c\"\",c\",\"d", split[3]);
+        assertEquals("\",e", split[4]);
+    }
+
+    // ===================================================================================
+    //                                                                      Make by Writer
+    //                                                                      ==============
     public void test_makeByWriter_basic() throws Exception {
         // ## Arrange ##
         final List<List<String>> valueListList = new ArrayList<List<String>>();
@@ -257,9 +422,11 @@ public class FileTokenTest extends PlainTestCase {
 
         // ## Act ##
         impl.makeByWriter(ous, new FileMakingWriterCallback() {
+            private final FileMakingRowResource resource = new FileMakingRowResource();
+
             public void make(FileMakingRowWriter writer) throws IOException {
                 for (List<String> valueList : valueListList) {
-                    writer.write(new FileMakingRowResource().acceptValueList(valueList));
+                    writer.write(resource.acceptValueList(valueList));
                 }
             }
         }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf());
@@ -267,6 +434,7 @@ public class FileTokenTest extends PlainTestCase {
         // ## Assert ##
         String actual = ous.toString();
         log(actual);
+        assertFalse(actual.endsWith("\n"));
         String[] split = actual.split("\n");
         assertEquals("\"a\",\"b\",\"cc\",\"d\",\"e\"", split[0]);
         assertEquals("\"a\",\"\"\"\",\"c\"\"c\",\"d\"\"\",\"e\"", split[1]);

@@ -16,6 +16,7 @@
 package org.seasar.dbflute.helper.token.line;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.seasar.dbflute.util.Srl;
@@ -57,7 +58,7 @@ public class LineToken {
     // ===================================================================================
     //                                                                           Make Line
     //                                                                           =========
-    public String make(List<String> valueList, LineMakingOption lineMakingOption) {
+    public String make(Collection<String> valueList, LineMakingOption lineMakingOption) {
         assertObjectNotNull("valueList", valueList);
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();
@@ -66,7 +67,7 @@ public class LineToken {
                 lineMakingOption.isQuoteMinimally(), lineMakingOption.isTrimSpace());
     }
 
-    protected String createLineString(List<String> valueList, String delimiter, boolean quoteAll,
+    protected String createLineString(Collection<String> valueList, String delimiter, boolean quoteAll,
             boolean quoteMinimamlly, boolean trimSpace) {
         final StringBuilder sb = new StringBuilder();
         for (String value : valueList) {
