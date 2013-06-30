@@ -59,6 +59,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDis
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult;
 import org.seasar.dbflute.helper.process.ProcessResult;
 import org.seasar.dbflute.helper.process.SystemScript;
+import org.seasar.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
 import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertDirection;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfNextPreviousDiff;
@@ -744,8 +745,10 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                 // script file
                 final String baseDir = Srl.substringLastFront(path, "/");
                 final String scriptName = Srl.substringLastRear(path, "/");
-                final ProcessResult processResult = script.execute(new File(baseDir), scriptName);
-                if (processResult.isSystemMismatch()) {
+                final ProcessResult processResult;
+                try {
+                    processResult = script.execute(new File(baseDir), scriptName);
+                } catch (SystemScriptUnsupportedScriptException continued) {
                     _log.info("...Skipping the script for system mismatch: " + scriptName);
                     return null;
                 }
