@@ -748,7 +748,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                 final ProcessResult processResult;
                 try {
                     processResult = script.execute(new File(baseDir), scriptName);
-                } catch (SystemScriptUnsupportedScriptException continued) {
+                } catch (SystemScriptUnsupportedScriptException ignored) {
                     _log.info("...Skipping the script for system mismatch: " + scriptName);
                     return null;
                 }
