@@ -33,7 +33,16 @@ import java.io.File;
  */
 public interface FileHierarchyTracingHandler {
 
+    /**
+     * Is the file or directory trace target?
+     * @param currentFile The object of current file, file or directory. (NotNull)
+     * @return The determination, true or false.
+     */
     boolean isTargetFileOrDir(File currentFile);
 
+    /**
+     * Handle the file found by tracing.
+     * @param currentFile The object of current file, always file (not directory). (NotNull)
+     */
     void handleFile(File currentFile);
 }

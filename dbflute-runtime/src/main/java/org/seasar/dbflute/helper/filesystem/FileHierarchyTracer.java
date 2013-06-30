@@ -17,6 +17,8 @@ package org.seasar.dbflute.helper.filesystem;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * @author jflute
@@ -51,6 +53,7 @@ public class FileHierarchyTracer {
         if (listFiles == null) {
             return;
         }
+        orderListFiles(listFiles); // to be same order between Windows and MacOSX
         for (File elementFile : listFiles) {
             if (elementFile.isDirectory()) {
                 doTrace(elementFile, handler);
@@ -58,5 +61,13 @@ public class FileHierarchyTracer {
                 handler.handleFile(elementFile);
             }
         }
+    }
+
+    protected void orderListFiles(File[] listFiles) {
+        Arrays.sort(listFiles, new Comparator<File>() {
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
     }
 }
