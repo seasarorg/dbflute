@@ -271,6 +271,7 @@ public class DfLReverseOutputHandler {
 
             public void handle(final DfJFadResultSetWrapper wrapper) {
                 try {
+                    final FileMakingRowResource resource = new FileMakingRowResource();
                     fileToken.make(delimiterFilePath, new FileMakingCallback() {
                         public FileMakingRowResource getRowResource() {
                             try {
@@ -284,7 +285,6 @@ public class DfLReverseOutputHandler {
                                 for (String columnName : columnNameList) {
                                     valueList.add(wrapper.getString(columnName));
                                 }
-                                final FileMakingRowResource resource = new FileMakingRowResource();
                                 resource.acceptValueList(valueList);
                                 ++count;
                                 return resource;
