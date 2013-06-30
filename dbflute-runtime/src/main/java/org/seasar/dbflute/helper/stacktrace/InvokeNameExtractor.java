@@ -59,9 +59,13 @@ public class InvokeNameExtractor {
         if (startIndex < 0) { // basically no way but just in case
             return new ArrayList<InvokeNameResult>(2); // writable just in case
         }
+        final int loopSize = resource.getLoopSize();
+        if (startIndex < 0) { // basically no way but just in case
+            return new ArrayList<InvokeNameResult>(2); // writable just in case
+        }
         for (int i = startIndex; i < _stackTrace.length; i++) {
             final StackTraceElement element = _stackTrace[i];
-            if (i > startIndex + resource.getLoopSize()) {
+            if (i > startIndex + loopSize) {
                 break;
             }
             final String currentClassName = element.getClassName();
@@ -98,7 +102,7 @@ public class InvokeNameExtractor {
                 break;
             }
         }
-        if (simpleClassName == null) {
+        if (simpleClassName == null) { // not found (or no loop)
             return new ArrayList<InvokeNameResult>(2); // writable just in case
         }
         if (existsDuplicate) {

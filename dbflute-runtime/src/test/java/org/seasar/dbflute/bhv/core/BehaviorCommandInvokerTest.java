@@ -95,7 +95,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
             }
 
             @Override
-            protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
                     long before, long after) {
                 markList.add("logReturn");
                 log("before=" + before + ", after=" + after);
@@ -171,7 +171,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
             }
 
             @Override
-            protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
                     long before, long after) {
                 throw new IllegalStateException("logReturn() should not be called!");
             }
@@ -247,7 +247,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
             }
 
             @Override
-            protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
                     long before, long after) {
                 throw new IllegalStateException("logReturn() should not be called!");
             }
@@ -317,7 +317,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
             }
 
             @Override
-            protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+            protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
                     long before, long after) {
                 throw new IllegalStateException("logReturn should not be called!");
             }

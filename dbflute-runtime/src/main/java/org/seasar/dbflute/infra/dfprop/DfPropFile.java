@@ -15,11 +15,17 @@
  */
 package org.seasar.dbflute.infra.dfprop;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.exception.DfPropFileReadFailureException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.mapstring.MapListFile;
+import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The file handling for DBFlute property (dfprop).
@@ -31,7 +37,7 @@ public class DfPropFile {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _saveLine;
+    protected boolean _skipLineSeparator;
 
     // ===================================================================================
     //                                                                                 Map
@@ -52,11 +58,27 @@ public class DfPropFile {
      *     ; ... = ...
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
-     * @return The read map. (NotNull)
+     * @param dfpropPath The path of DBFlute property file. (NotNull)
+     * @param env The environment type of DBFlute. (NullAllowed: if null, no environment file)
+     * @return The read map. (NotNull: if not found, returns empty map)
      */
-    public Map<String, Object> readMap(InputStream ins) {
-        return createMapListFileStructural().readMap(ins);
+    public Map<String, Object> readMap(String dfpropPath, String env) {
+        return doReadMap(dfpropPath, env, new DfPropReadingMapHandler<Object>() {
+            public Map<String, Object> readMap(String path) {
+                return actuallyReadMap(path);
+            }
+        });
+    }
+
+    protected Map<String, Object> actuallyReadMap(String path) {
+        try {
+            return createMapListFileStructural().readMap(createInputStream(path));
+        } catch (FileNotFoundException e) {
+            return DfCollectionUtil.newLinkedHashMap();
+        } catch (RuntimeException e) {
+            throwDfPropFileReadFailureException(path, e);
+            return null; // unreachable
+        }
     }
 
     /**
@@ -71,11 +93,27 @@ public class DfPropFile {
      *     ; ... = ...
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
-     * @return The read map whose values is string. (NotNull)
+     * @param dfpropPath The path of DBFlute property file. (NotNull)
+     * @param envType The environment type of DBFlute. (NullAllowed: if null, no environment file)
+     * @return The read map whose values is string. (NotNull: if not found, returns empty map)
      */
-    public Map<String, String> readMapAsStringValue(InputStream ins) {
-        return createMapListFileStructural().readMapAsStringValue(ins);
+    public Map<String, String> readMapAsStringValue(String dfpropPath, String envType) {
+        return doReadMap(dfpropPath, envType, new DfPropReadingMapHandler<String>() {
+            public Map<String, String> readMap(String path) {
+                return actuallyReadMapAsStringValue(path);
+            }
+        });
+    }
+
+    protected Map<String, String> actuallyReadMapAsStringValue(String path) {
+        try {
+            return createMapListFileStructural().readMapAsStringValue(createInputStream(path));
+        } catch (FileNotFoundException e) {
+            return DfCollectionUtil.newLinkedHashMap();
+        } catch (RuntimeException e) {
+            throwDfPropFileReadFailureException(path, e);
+            return null; // unreachable
+        }
     }
 
     /**
@@ -90,11 +128,27 @@ public class DfPropFile {
      *     ; ... = list:{...}
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
-     * @return The read map whose values is string list. (NotNull)
+     * @param dfpropPath The path of DBFlute property file. (NotNull)
+     * @param envType The environment type of DBFlute. (NullAllowed: if null, no environment file)
+     * @return The read map whose values is string list. (NotNull: if not found, returns empty map)
      */
-    public Map<String, List<String>> readMapAsStringListValue(InputStream ins) {
-        return createMapListFileStructural().readMapAsStringListValue(ins);
+    public Map<String, List<String>> readMapAsStringListValue(String dfpropPath, String envType) {
+        return doReadMap(dfpropPath, envType, new DfPropReadingMapHandler<List<String>>() {
+            public Map<String, List<String>> readMap(String path) {
+                return actuallyReadMapAsStringListValue(path);
+            }
+        });
+    }
+
+    protected Map<String, List<String>> actuallyReadMapAsStringListValue(String path) {
+        try {
+            return createMapListFileStructural().readMapAsStringListValue(createInputStream(path));
+        } catch (FileNotFoundException e) {
+            return DfCollectionUtil.newLinkedHashMap();
+        } catch (RuntimeException e) {
+            throwDfPropFileReadFailureException(path, e);
+            return null; // unreachable
+        }
     }
 
     /**
@@ -109,11 +163,27 @@ public class DfPropFile {
      *     ; ... = map:{...}
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
-     * @return The read map whose values is string map. (NotNull)
+     * @param dfpropPath The path of DBFlute property file. (NotNull)
+     * @param envType The environment type of DBFlute. (NullAllowed: if null, no environment file)
+     * @return The read map whose values is string map. (NotNull: if not found, returns empty map)
      */
-    public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) {
-        return createMapListFileStructural().readMapAsStringMapValue(ins);
+    public Map<String, Map<String, String>> readMapAsStringMapValue(String dfpropPath, String envType) {
+        return doReadMap(dfpropPath, envType, new DfPropReadingMapHandler<Map<String, String>>() {
+            public Map<String, Map<String, String>> readMap(String path) {
+                return actuallyReadMapAsStringMapValue(path);
+            }
+        });
+    }
+
+    protected Map<String, Map<String, String>> actuallyReadMapAsStringMapValue(String path) {
+        try {
+            return createMapListFileStructural().readMapAsStringMapValue(createInputStream(path));
+        } catch (FileNotFoundException e) {
+            return DfCollectionUtil.newLinkedHashMap();
+        } catch (RuntimeException e) {
+            throwDfPropFileReadFailureException(path, e);
+            return null; // unreachable
+        }
     }
 
     // ===================================================================================
@@ -134,11 +204,27 @@ public class DfPropFile {
      *     ; ... = ...
      * }
      * </pre>
-     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
-     * @return The read list. (NotNull)
+     * @param dfpropPath The path of DBFlute property file. (NotNull)
+     * @param envType The environment type of DBFlute. (NullAllowed: if null, no environment file)
+     * @return The read list of object. (NotNull: if not found, returns empty list)
      */
-    public List<Object> readList(InputStream ins) {
-        return createMapListFileStructural().readList(ins);
+    public List<Object> readList(String dfpropPath, String envType) {
+        return doReadList(dfpropPath, envType, new DfPropReadingListHandler<Object>() {
+            public List<Object> readList(String path) {
+                return actuallyReadList(path);
+            }
+        });
+    }
+
+    protected List<Object> actuallyReadList(String path) {
+        try {
+            return createMapListFileStructural().readList(createInputStream(path));
+        } catch (FileNotFoundException e) {
+            return DfCollectionUtil.newArrayList();
+        } catch (RuntimeException e) {
+            throwDfPropFileReadFailureException(path, e);
+            return null; // unreachable
+        }
     }
 
     // ===================================================================================
@@ -150,11 +236,132 @@ public class DfPropFile {
     /**
      * Read the string file. <br />
      * A trimmed line that starts with '#' is treated as line comment.
-     * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
-     * @return The read string. (NotNull)
+     * @param dfpropPath The path of DBFlute property file. (NotNull)
+     * @param envType The environment type of DBFlute. (NullAllowed: if null, no environment file)
+     * @return The read string. (NotNull: if not found, returns empty string)
      */
-    public String readString(InputStream ins) {
-        return createMapListFilePlain().readString(ins);
+    public String readString(String dfpropPath, String envType) {
+        return doReadString(dfpropPath, envType, new DfPropReadingStringHandler() {
+            public String readString(String path) {
+                return actuallyReadString(path);
+            }
+        });
+    }
+
+    protected String actuallyReadString(String path) {
+        try {
+            return createMapListFilePlain().readString(createInputStream(path));
+        } catch (FileNotFoundException e) {
+            return "";
+        } catch (RuntimeException e) {
+            throwDfPropFileReadFailureException(path, e);
+            return null; // unreachable
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Reading Logic
+    //                                                                       =============
+    protected <ELEMENT> Map<String, ELEMENT> doReadMap(String dfpropPath, String envType,
+            DfPropReadingMapHandler<ELEMENT> handler) {
+        if (envType != null) {
+            final String envPath = deriveEnvPath(dfpropPath, envType);
+            Map<String, ELEMENT> map = handler.readMap(envPath);
+            if (map.isEmpty()) {
+                map = handler.readMap(dfpropPath);
+                resolveOutsidePropExtendedMap(map, dfpropPath, handler);
+            }
+            resolveOutsidePropExtendedMap(map, envPath, handler);
+            return map;
+        } else {
+            final Map<String, ELEMENT> map = handler.readMap(dfpropPath);
+            resolveOutsidePropExtendedMap(map, dfpropPath, handler);
+            return map;
+        }
+    }
+
+    protected <ELEMENT> void resolveOutsidePropExtendedMap(Map<String, ELEMENT> map, String path,
+            DfPropReadingMapHandler<ELEMENT> handler) {
+        final String extendedPath = deriveExtendedPath(path);
+        if (extendedPath != null) {
+            map.putAll(handler.readMap(extendedPath)); // override here
+        }
+    }
+
+    protected <ELEMENT> List<ELEMENT> doReadList(String dfpropPath, String envType,
+            DfPropReadingListHandler<ELEMENT> handler) {
+        // extended list is not supported
+        if (envType != null) {
+            final String envPath = deriveEnvPath(dfpropPath, envType);
+            List<ELEMENT> list = handler.readList(envPath);
+            if (list.isEmpty()) {
+                list = handler.readList(dfpropPath);
+            }
+            return list;
+        } else {
+            return handler.readList(dfpropPath);
+        }
+    }
+
+    protected String doReadString(String dfpropPath, String envType, DfPropReadingStringHandler handler) {
+        // extended string is not supported
+        if (envType != null) {
+            final String envPath = deriveEnvPath(dfpropPath, envType);
+            String list = handler.readString(envPath);
+            if (list.isEmpty()) {
+                list = handler.readString(dfpropPath);
+            }
+            return list;
+        } else {
+            return handler.readString(dfpropPath);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                         Derive Path
+    //                                                                         ===========
+    protected String deriveEnvPath(String dfpropPath, String envType) {
+        final String basePath;
+        final String pureFileName;
+        if (dfpropPath.contains("/")) {
+            basePath = Srl.substringLastFront(dfpropPath, "/");
+            pureFileName = Srl.substringLastRear(dfpropPath, "/");
+        } else {
+            basePath = ".";
+            pureFileName = dfpropPath;
+        }
+        return basePath + "/" + envType + "/" + pureFileName;
+    }
+
+    protected String deriveExtendedPath(String path) {
+        final String extendableExt = getExtendableExt();
+        if (!path.endsWith(extendableExt)) {
+            return null;
+        }
+        return path.substring(0, path.length() - extendableExt.length()) + "+" + extendableExt;
+    }
+
+    protected String getExtendableExt() {
+        return ".dfprop";
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected InputStream createInputStream(String path) throws FileNotFoundException {
+        return new FileInputStream(path);
+    }
+
+    protected void throwDfPropFileReadFailureException(String path, RuntimeException e) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to read the DBFlute property file.");
+        br.addItem("Advice");
+        br.addElement("Make sure the map-string is correct in the file.");
+        br.addElement("For exapmle, the number of start and end braces are the same.");
+        br.addItem("DBFlute Property");
+        br.addElement(path);
+        final String msg = br.buildExceptionMessage();
+        throw new DfPropFileReadFailureException(msg, e);
     }
 
     // ===================================================================================
@@ -165,11 +372,11 @@ public class DfPropFile {
     }
 
     protected MapListFile createMapListFileStructural() {
-        if (_saveLine) {
-            return newMapListFile();
-        } else {
-            return newMapListFile().skipLineSeparator();
+        final MapListFile file = newMapListFile();
+        if (_skipLineSeparator) {
+            file.skipLineSeparator();
         }
+        return file;
     }
 
     protected MapListFile newMapListFile() {
@@ -179,8 +386,8 @@ public class DfPropFile {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    public DfPropFile saveLine() {
-        _saveLine = true;
+    public DfPropFile skipLineSeparator() {
+        _skipLineSeparator = true;
         return this;
     }
 }

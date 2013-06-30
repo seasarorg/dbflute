@@ -47,6 +47,23 @@ public class OutsideSqlSelectListCommand<ENTITY> extends AbstractOutsideSqlSelec
     }
 
     // ===================================================================================
+    //                                                                  OutsideSql Element
+    //                                                                  ==================
+    @Override
+    protected Class<?> getResultType() {
+        return _entityType;
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    @Override
+    protected TnResultSetHandler createOutsideSqlSelectResultSetHandler() {
+        final TnBeanMetaData bmd = createBeanMetaData();
+        return createOutsideSqlBeanListResultSetHandler(bmd);
+    }
+
+    // ===================================================================================
     //                                                                             Factory
     //                                                                             =======
     // -----------------------------------------------------
@@ -66,21 +83,6 @@ public class OutsideSqlSelectListCommand<ENTITY> extends AbstractOutsideSqlSelec
             return createScalarListResultSetHandler(valueType);
         }
         return createBeanListResultSetHandler(bmd);
-    }
-
-    // ===================================================================================
-    //                                                                     Extension Point
-    //                                                                     ===============
-    @Override
-    protected TnResultSetHandler createOutsideSqlSelectResultSetHandler() {
-        final TnBeanMetaData bmd = createBeanMetaData();
-        final TnResultSetHandler handler = createOutsideSqlBeanListResultSetHandler(bmd);
-        return handler;
-    }
-
-    @Override
-    protected Class<?> getResultType() {
-        return _entityType;
     }
 
     // ===================================================================================

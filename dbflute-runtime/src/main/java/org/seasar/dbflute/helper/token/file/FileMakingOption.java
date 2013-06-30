@@ -143,17 +143,17 @@ public class FileMakingOption {
 
     /**
      * Set the header info with the list of column name.
-     * @param columnNameList The list of column name. (NotNull)
+     * @param columnNameList The list of column name. (NullAllowed: means no header)
      * @return this. (NotNull)
      */
     public FileMakingOption headerInfo(List<String> columnNameList) {
-        if (columnNameList == null) {
-            String msg = "The argument 'columnNameList' should not be null.";
-            throw new IllegalArgumentException(msg);
+        if (columnNameList != null) {
+            final FileMakingHeaderInfo headerInfo = new FileMakingHeaderInfo();
+            headerInfo.acceptColumnNameList(columnNameList);
+            _headerInfo = headerInfo;
+        } else {
+            _headerInfo = null;
         }
-        final FileMakingHeaderInfo headerInfo = new FileMakingHeaderInfo();
-        headerInfo.acceptColumnNameList(columnNameList);
-        _headerInfo = headerInfo;
         return this;
     }
 

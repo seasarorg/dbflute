@@ -16,7 +16,6 @@
 package org.seasar.dbflute.bhv.core;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,20 +24,19 @@ import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
-import org.seasar.dbflute.bhv.BehaviorReadable;
-import org.seasar.dbflute.bhv.BehaviorWritable;
 import org.seasar.dbflute.bhv.core.InvokerAssistant.DisposableProcess;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
+import org.seasar.dbflute.bhv.logging.invoke.BehaviorInvokeNameExtractor;
+import org.seasar.dbflute.bhv.logging.invoke.BehaviorInvokeNameResult;
+import org.seasar.dbflute.bhv.logging.invoke.BehaviorInvokePathBuilder;
+import org.seasar.dbflute.bhv.logging.invoke.BehaviorInvokePathResult;
+import org.seasar.dbflute.bhv.logging.result.BehaviorResultBuilder;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
-import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.handler.SQLExceptionResource;
 import org.seasar.dbflute.exception.thrower.BehaviorExceptionThrower;
-import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
-import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractor;
-import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
 import org.seasar.dbflute.jdbc.ExecutionTimeInfo;
 import org.seasar.dbflute.jdbc.SQLExceptionDigger;
 import org.seasar.dbflute.jdbc.SqlLogInfo;
@@ -239,7 +237,7 @@ public class BehaviorCommandInvoker {
 
             after = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, hasSqlResultHandler);
             if (logEnabled) {
-                logReturn(behaviorCommand, retType, ret, before, after);
+                logResult(behaviorCommand, retType, ret, before, after);
             }
 
             ret = convertReturnValueIfNeeds(ret, retType);
@@ -430,42 +428,32 @@ public class BehaviorCommandInvoker {
     //                                                                      ==============
     protected <RESULT> void logInvocation(BehaviorCommand<RESULT> behaviorCommand, boolean saveOnly) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        final List<InvokeNameResult> behaviorResultList = extractBehaviorInvoke(stackTrace);
-        filterBehaviorResult(behaviorCommand, behaviorResultList);
-
-        final InvokeNameResult headBehaviorResult;
-        final String invokeClassName;
-        final String invokeMethodName;
-        if (!behaviorResultList.isEmpty()) {
-            headBehaviorResult = findHeadInvokeResult(behaviorResultList);
-            invokeClassName = headBehaviorResult.getSimpleClassName();
-            invokeMethodName = headBehaviorResult.getMethodName();
-        } else {
-            headBehaviorResult = null;
-            invokeClassName = behaviorCommand.getTableDbName();
-            invokeMethodName = behaviorCommand.getCommandName();
-        }
-        final String expWithoutKakko = buildInvocationExpressionWithoutKakko(behaviorCommand, invokeClassName,
-                invokeMethodName);
-        final String callerExpression = expWithoutKakko + "()";
-        InternalMapContext.setBehaviorInvokeName(callerExpression);
-        final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
-        final String invokePath = buildInvokePath(behaviorCommand, stackTrace, headBehaviorResult);
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(invokePath)) {
-            InternalMapContext.setSavedInvokePath(Srl.substringLastFront(invokePath, "...") + callerExpression);
+        final BehaviorInvokeNameResult behaviorInvokeNameResult = extractBehaviorInvoke(behaviorCommand, stackTrace);
+        saveBehaviorInvokeName(behaviorInvokeNameResult);
+        final BehaviorInvokePathResult invokePathResult = buildInvokePath(behaviorCommand, stackTrace,
+                behaviorInvokeNameResult);
+        if (invokePathResult != null) {
+            saveClientInvokeName(invokePathResult);
+            saveByPassInvokeName(invokePathResult);
+            saveInvokePath(invokePathResult);
         }
 
         if (saveOnly) { // e.g. log level is INFO and invocation path ready
             return;
         }
 
+        final String expNoMethodSuffix = behaviorInvokeNameResult.getInvocationExpNoMethodSuffix();
+        final String equalBorder = buildFitBorder("", "=", expNoMethodSuffix, false);
         final String frameBase = "/=====================================================";
         final String spaceBase = "                                                      ";
         log(frameBase + equalBorder + "==");
-        log(spaceBase + callerExpression);
+        log(spaceBase + behaviorInvokeNameResult.getInvocationExp());
         log(spaceBase + equalBorder + "=/");
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(invokePath)) {
-            log(invokePath);
+        if (invokePathResult != null) {
+            final String invokePath = invokePathResult.getInvokePath();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(invokePath)) { // just in case
+                log(invokePath);
+            }
         }
 
         if (behaviorCommand.isOutsideSql() && !behaviorCommand.isProcedure()) {
@@ -480,75 +468,29 @@ public class BehaviorCommandInvoker {
     // -----------------------------------------------------
     //                                Extract BehaviorInvoke
     //                                ----------------------
-    protected List<InvokeNameResult> extractBehaviorInvoke(StackTraceElement[] stackTrace) {
-        final String readableName = DfTypeUtil.toClassTitle(BehaviorReadable.class);
-        final String writableName = DfTypeUtil.toClassTitle(BehaviorWritable.class);
-        final String pagingInvokerName = DfTypeUtil.toClassTitle(PagingInvoker.class);
-        final String[] names = new String[] { "Bhv", "BhvAp", readableName, writableName, pagingInvokerName };
-        final List<String> suffixList = Arrays.asList(names);
-        final List<String> keywordList = Arrays.asList(new String[] { "Bhv$", readableName + "$", writableName + "$" });
-        final List<String> ousideSql1List = Arrays.asList(new String[] { "OutsideSql" });
-        final List<String> ousideSql2List = Arrays.asList(new String[] { "Executor" });
-        final List<String> ousideSql3List = Arrays.asList(new String[] { "Executor$" });
-        final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
-            public boolean isTargetElement(String className, String methodName) {
-                if (isClassNameEndsWith(className, suffixList)) {
-                    return true;
-                }
-                if (isClassNameContains(className, keywordList)) {
-                    return true;
-                }
-                if (isClassNameContains(className, ousideSql1List)
-                        && (isClassNameEndsWith(className, ousideSql2List) || isClassNameContains(className,
-                                ousideSql3List))) {
-                    return true;
-                }
-                return false;
-            }
+    protected <RESULT> BehaviorInvokeNameResult extractBehaviorInvoke(BehaviorCommand<RESULT> behaviorCommand,
+            StackTraceElement[] stackTrace) {
+        final DBMeta dbmeta = ResourceContext.provideDBMeta(behaviorCommand.getTableDbName());
+        Class<?> outsideSqlResultType = null;
+        boolean outsideSqlAutoPaging = false;
+        if (behaviorCommand.isOutsideSql()) {
+            final OutsideSqlContext outsideSqlContext = getOutsideSqlContext();
+            outsideSqlResultType = outsideSqlContext.getResultType();
+            outsideSqlAutoPaging = outsideSqlContext.isAutoPagingLogging();
+        }
+        final BehaviorInvokeNameExtractor extractor = createBehaviorInvokeNameExtractor(dbmeta, outsideSqlResultType,
+                outsideSqlAutoPaging);
+        return extractor.extractBehaviorInvoke(stackTrace);
+    }
 
-            public String filterSimpleClassName(String simpleClassName) {
-                if (simpleClassName.endsWith(readableName)) {
-                    return readableName;
-                } else if (simpleClassName.endsWith(writableName)) {
-                    return writableName;
-                } else {
-                    return removeBasePrefixFromSimpleClassName(simpleClassName);
-                }
-            }
-
-            public boolean isUseAdditionalInfo() {
-                return false;
-            }
-
-            public int getStartIndex() {
-                return 0;
-            }
-
-            public int getLoopSize() {
-                return getInvocationExtractingMaxLoopSize();
-            }
-        };
-        return extractInvokeName(resource, stackTrace);
+    protected BehaviorInvokeNameExtractor createBehaviorInvokeNameExtractor(final DBMeta dbmeta,
+            Class<?> outsideSqlResultType, boolean outsideSqlAutoPaging) {
+        return new BehaviorInvokeNameExtractor(dbmeta, outsideSqlResultType, outsideSqlAutoPaging);
     }
 
     // -----------------------------------------------------
     //                                 Invocation Adjustment
     //                                 ---------------------
-    protected <RESULT> void filterBehaviorResult(BehaviorCommand<RESULT> behaviorCommand,
-            List<InvokeNameResult> behaviorResultList) {
-        for (InvokeNameResult behaviorResult : behaviorResultList) {
-            final String simpleClassName = behaviorResult.getSimpleClassName();
-            if (simpleClassName == null) {
-                return;
-            }
-            if (simpleClassName.contains("Behavior") && simpleClassName.endsWith("$SLFunction")) {
-                final String behaviorClassName = findBehaviorClassNameFromDBMeta(behaviorCommand.getTableDbName());
-                behaviorResult.setSimpleClassName(behaviorClassName);
-                behaviorResult.setMethodName("scalarSelect()." + behaviorResult.getMethodName());
-            }
-        }
-    }
-
     protected String buildFitBorder(String prefix, String element, String lengthTargetString, boolean space) {
         final int length = space ? lengthTargetString.length() / 2 : lengthTargetString.length();
         final StringBuffer sb = new StringBuffer();
@@ -565,341 +507,61 @@ public class BehaviorCommandInvoker {
         return sb.toString();
     }
 
-    protected <RESULT> String buildInvocationExpressionWithoutKakko(BehaviorCommand<RESULT> behaviorCommand,
-            String invokeClassName, String invokeMethodName) {
-        if (invokeClassName.contains("OutsideSql") && invokeClassName.endsWith("Executor")) { // OutsideSql Executor Handling
-            try {
-                final String originalName = invokeClassName;
-                if (behaviorCommand.isOutsideSql()) {
-                    final OutsideSqlContext outsideSqlContext = getOutsideSqlContext();
-                    final String tableDbName = outsideSqlContext.getTableDbName();
-                    final String behaviorClassName = findBehaviorClassNameFromDBMeta(tableDbName);
-                    invokeClassName = behaviorClassName + ".outsideSql()";
-                    if (originalName.contains("Entity")) {
-                        invokeClassName = invokeClassName + ".entityHandling()";
-                    } else if (originalName.contains("Paging")) {
-                        if (outsideSqlContext.isAutoPagingLogging()) {
-                            invokeClassName = invokeClassName + ".autoPaging()";
-                        } else {
-                            invokeClassName = invokeClassName + ".manualPaging()";
-                        }
-                    } else if (originalName.contains("Cursor")) {
-                        invokeClassName = invokeClassName + ".cursorHandling()";
-                    }
-                } else {
-                    invokeClassName = "OutsideSql";
-                }
-            } catch (RuntimeException ignored) {
-                log("Ignored exception occurred: msg=" + ignored.getMessage());
-            }
-        }
-        String callerExpressionWithoutKakko = invokeClassName + "." + invokeMethodName;
-        if ("selectPage".equals(invokeMethodName)) { // Special Handling!
-            boolean resultTypeInteger = false;
-            if (behaviorCommand.isOutsideSql()) {
-                final OutsideSqlContext outsideSqlContext = getOutsideSqlContext();
-                final Class<?> resultType = outsideSqlContext.getResultType();
-                if (resultType != null) {
-                    if (Integer.class.isAssignableFrom(resultType)) {
-                        resultTypeInteger = true;
-                    }
-                }
-            }
-            if (resultTypeInteger || behaviorCommand.isSelectCount()) {
-                callerExpressionWithoutKakko = callerExpressionWithoutKakko + "():count";
-            } else {
-                callerExpressionWithoutKakko = callerExpressionWithoutKakko + "():paging";
-            }
-        }
-        return callerExpressionWithoutKakko;
-    }
-
     // -----------------------------------------------------
     //                                      Build InvokePath
     //                                      ----------------
-    protected <RESULT> String buildInvokePath(BehaviorCommand<RESULT> behaviorCommand, StackTraceElement[] stackTrace,
-            InvokeNameResult behaviorResult) {
-        final int bhvNextIndex = behaviorResult != null ? behaviorResult.getNextStartIndex() : -1;
+    protected <RESULT> BehaviorInvokePathResult buildInvokePath(BehaviorCommand<RESULT> behaviorCommand,
+            StackTraceElement[] stackTrace, BehaviorInvokeNameResult behaviorInvokeNameResult) {
+        final String[] clientNames = _invokerAssistant.assistClientInvokeNames();
+        final String[] byPassNames = _invokerAssistant.assistByPassInvokeNames();
+        final BehaviorInvokePathBuilder invokePathBuilder = new BehaviorInvokePathBuilder(clientNames, byPassNames);
+        return invokePathBuilder.buildInvokePath(stackTrace, behaviorInvokeNameResult);
+    }
 
-        // Extract client result
-        final List<InvokeNameResult> clientResultList = extractClientInvoke(stackTrace, bhvNextIndex);
-        final InvokeNameResult headClientResult = findHeadInvokeResult(clientResultList);
+    // -----------------------------------------------------
+    //                                       Save Invocation
+    //                                       ---------------
+    // basically for error message
+    protected void saveBehaviorInvokeName(BehaviorInvokeNameResult behaviorInvokeNameResult) {
+        final String behaviorInvokeName = behaviorInvokeNameResult.getInvocationExp();
+        InternalMapContext.setBehaviorInvokeName(behaviorInvokeName);
+    }
 
-        // Extract by-pass result
-        final int clientFirstIndex = headClientResult != null ? headClientResult.getFoundFirstIndex() : -1;
-        final int byPassLoopSize = clientFirstIndex - bhvNextIndex;
-        final List<InvokeNameResult> byPassResultList = extractByPassInvoke(stackTrace, bhvNextIndex, byPassLoopSize);
-        final InvokeNameResult headByPassResult = findHeadInvokeResult(byPassResultList);
-
-        if (headClientResult == null && headByPassResult == null) { // when both are not found
-            return null;
-        }
-        final boolean useTestShortName;
-        if (isClientResultMainExists(clientResultList)) {
-            useTestShortName = true;
-        } else {
-            useTestShortName = headClientResult != null && headByPassResult != null;
-        }
-
-        final String clientInvokeName = buildInvokeName(headClientResult, useTestShortName);
-        final String byPassInvokeName = buildInvokeName(headByPassResult, useTestShortName);
-
-        // Save client invoke name for error message.
-        if (clientInvokeName.trim().length() > 0) {
+    protected void saveClientInvokeName(BehaviorInvokePathResult invokePathResult) {
+        final String clientInvokeName = invokePathResult != null ? invokePathResult.getClientInvokeName() : null;
+        if (clientInvokeName != null && clientInvokeName.trim().length() > 0) {
             InternalMapContext.setClientInvokeName(clientInvokeName);
         }
+    }
 
-        // Save by-pass invoke name for error message.
-        if (byPassInvokeName.trim().length() > 0) {
+    protected void saveByPassInvokeName(BehaviorInvokePathResult invokePathResult) {
+        final String byPassInvokeName = invokePathResult != null ? invokePathResult.getByPassInvokeName() : null;
+        if (byPassInvokeName != null && byPassInvokeName.trim().length() > 0) {
             InternalMapContext.setByPassInvokeName(byPassInvokeName);
         }
-
-        final StringBuilder sb = new StringBuilder();
-        sb.append(clientInvokeName);
-        sb.append(findTailInvokeName(clientResultList, useTestShortName));
-        sb.append(byPassInvokeName);
-        sb.append(findTailInvokeName(byPassResultList, useTestShortName));
-        sb.append("..."); // fixed specification (used as replace-key later)
-        return sb.toString();
     }
 
-    // -----------------------------------------------------
-    //                                  Extract ClientInvoke
-    //                                  --------------------
-    protected List<InvokeNameResult> extractClientInvoke(StackTraceElement[] stackTrace, final int startIndex) {
-        final String[] names = _invokerAssistant.assistClientInvokeNames();
-        final List<String> suffixList = Arrays.asList(names);
-        final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
-            public boolean isTargetElement(String className, String methodName) {
-                return isClassNameEndsWith(className, suffixList);
-            }
-
-            public String filterSimpleClassName(String simpleClassName) {
-                return simpleClassName;
-            }
-
-            public boolean isUseAdditionalInfo() {
-                return true;
-            }
-
-            public int getStartIndex() {
-                return startIndex;
-            }
-
-            public int getLoopSize() {
-                return getInvocationExtractingMaxLoopSize();
-            }
-        };
-        return extractInvokeName(resource, stackTrace);
-    }
-
-    // -----------------------------------------------------
-    //                                  Extract ByPassInvoke
-    //                                  --------------------
-    protected List<InvokeNameResult> extractByPassInvoke(StackTraceElement[] stackTrace, final int startIndex,
-            final int loopSize) {
-        final String[] names = _invokerAssistant.assistByPassInvokeNames();
-        final List<String> suffixList = Arrays.asList(names);
-        final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
-            public boolean isTargetElement(String className, String methodName) {
-                return isClassNameEndsWith(className, suffixList);
-            }
-
-            public String filterSimpleClassName(String simpleClassName) {
-                return simpleClassName;
-            }
-
-            public boolean isUseAdditionalInfo() {
-                return true;
-            }
-
-            public int getStartIndex() {
-                return startIndex;
-            }
-
-            public int getLoopSize() {
-                return loopSize >= 0 ? loopSize : getInvocationExtractingMaxLoopSize();
-            }
-        };
-        return extractInvokeName(resource, stackTrace);
-    }
-
-    // -----------------------------------------------------
-    //                                         Assist Helper
-    //                                         -------------
-    protected boolean isClientResultMainExists(List<InvokeNameResult> clientResultList) {
-        boolean mainExists = false;
-        for (InvokeNameResult invokeNameResult : clientResultList) {
-            if (!invokeNameResult.hasTestSuffix()) {
-                mainExists = true;
-                break;
-            }
-        }
-        return mainExists;
-    }
-
-    protected InvokeNameResult findHeadInvokeResult(List<InvokeNameResult> resultList) {
-        if (!resultList.isEmpty()) {
-            // The latest element is the very head invoking.
-            return resultList.get(resultList.size() - 1);
-        }
-        return null;
-    }
-
-    protected String buildInvokeName(InvokeNameResult invokeNameResult, boolean useTestShortName) {
-        return invokeNameResult != null ? invokeNameResult.buildInvokeName(useTestShortName) : "";
-    }
-
-    protected String findTailInvokeName(List<InvokeNameResult> resultList, boolean hasBoth) {
-        if (resultList.size() > 1) {
-            return resultList.get(0).buildInvokeName(hasBoth);
-        }
-        return "";
-    }
-
-    protected boolean isClassNameEndsWith(String className, List<String> suffixList) {
-        for (String suffix : suffixList) {
-            if (className.endsWith(suffix)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected boolean isClassNameContains(String className, List<String> keywordList) {
-        for (String keyword : keywordList) {
-            if (className.contains(keyword)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param resource the call-back resource for invoke-name-extracting. (NotNull)
-     * @param stackTrace Stack log. (NotNull)
-     * @return The list of result of invoke name. (NotNull: If not found, returns empty string.)
-     */
-    protected List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource,
-            StackTraceElement[] stackTrace) {
-        final InvokeNameExtractor extractor = new InvokeNameExtractor(stackTrace);
-        return extractor.extractInvokeName(resource);
-    }
-
-    /**
-     * @param simpleClassName The simple class name. (NotNull)
-     * @return The simple class name removed the base prefix. (NotNull)
-     */
-    protected String removeBasePrefixFromSimpleClassName(String simpleClassName) {
-        if (!simpleClassName.startsWith("Bs")) {
-            return simpleClassName;
-        }
-        final int prefixLength = "Bs".length();
-        if (!Character.isUpperCase(simpleClassName.substring(prefixLength).charAt(0))) {
-            return simpleClassName;
-        }
-        if (simpleClassName.length() <= prefixLength) {
-            return simpleClassName;
-        }
-        return "" + simpleClassName.substring(prefixLength);
-    }
-
-    protected String findBehaviorClassNameFromDBMeta(String tableDbName) {
-        final DBMeta dbmeta = ResourceContext.provideDBMetaChecked(tableDbName);
-        final String behaviorTypeName = dbmeta.getBehaviorTypeName();
-        final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
-        return removeBasePrefixFromSimpleClassName(behaviorClassName);
-    }
-
-    protected int getInvocationExtractingMaxLoopSize() {
-        return 25; // should be over 20 because it might be called from SQLException handler
+    protected void saveInvokePath(BehaviorInvokePathResult invokePathResult) {
+        final BehaviorInvokeNameResult behaviorInvokeNameResult = invokePathResult.getBehaviorInvokeNameResult();
+        final String invokePath = invokePathResult.getInvokePath();
+        final String callerExp = behaviorInvokeNameResult.getInvocationExp();
+        final String omitMark = BehaviorInvokePathBuilder.OMIT_MARK;
+        InternalMapContext.setSavedInvokePath(Srl.substringLastFront(invokePath, omitMark) + callerExp);
     }
 
     // ===================================================================================
-    //                                                                          Log Return
+    //                                                                          Log Result
     //                                                                          ==========
-    protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+    protected <RESULT> void logResult(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
             long before, long after) {
-        try {
-            final String prefix = "===========/ [" + DfTraceViewUtil.convertToPerformanceView(after - before) + " ";
-            if (List.class.isAssignableFrom(retType)) {
-                if (ret == null) {
-                    log(prefix + "(null)]");
-                } else {
-                    final List<?> ls = (java.util.List<?>) ret;
-                    if (ls.isEmpty()) {
-                        log(prefix + "(0)]");
-                    } else if (ls.size() == 1) {
-                        log(prefix + "(1) result=" + buildResultString(ls.get(0)) + "]");
-                    } else {
-                        log(prefix + "(" + ls.size() + ") first=" + buildResultString(ls.get(0)) + "]");
-                    }
-                }
-            } else if (Entity.class.isAssignableFrom(retType)) {
-                if (ret == null) {
-                    log(prefix + "(null)" + "]");
-                } else {
-                    final Entity entity = (Entity) ret;
-                    log(prefix + "(1) result=" + buildResultString(entity) + "]");
-                }
-            } else if (int[].class.isAssignableFrom(retType)) {
-                if (ret == null) { // basically not come here
-                    log(prefix + "(null)" + "]");
-                } else {
-                    final int[] resultArray = (int[]) ret;
-                    if (resultArray.length == 0) {
-                        log(prefix + "all-updated=(0)]");
-                    } else {
-                        final StringBuilder sb = new StringBuilder();
-                        boolean resultExpressionScope = true;
-                        int resultCount = 0;
-                        int loopCount = 0;
-                        for (int element : resultArray) {
-                            resultCount = resultCount + element;
-                            if (resultExpressionScope) {
-                                if (loopCount <= 10) {
-                                    if (sb.length() == 0) {
-                                        sb.append(element);
-                                    } else {
-                                        sb.append(",").append(element);
-                                    }
-                                } else {
-                                    sb.append(",").append("...");
-                                    resultExpressionScope = false;
-                                }
-                            }
-                            ++loopCount;
-                        }
-                        sb.insert(0, "{").append("}");
-                        if (resultCount >= 0) {
-                            log(prefix + "all-updated=(" + resultCount + ") result=" + sb + "]");
-                        } else { // minus
-                            log(prefix + "result=" + sb + "]"); // for example, Oracle
-                        }
-                    }
-                }
-            } else {
-                log(prefix + "result=" + ret + "]");
-            }
-            log(" ");
-        } catch (RuntimeException e) {
-            String msg = "Result object debug threw the exception: behaviorCommand=";
-            msg = msg + behaviorCommand + " retType=" + retType;
-            msg = msg + " ret=" + ret;
-            throw e;
-        }
+        final BehaviorResultBuilder behaviorResultBuilder = createBehaviorResultBuilder();
+        final String resultExp = behaviorResultBuilder.buildResultExp(retType, ret, before, after);
+        log(resultExp);
+        log(" ");
     }
 
-    protected String buildResultString(Object obj) {
-        if (obj instanceof Entity) {
-            Entity entity = (Entity) obj;
-
-            // The name for display is null
-            // because you can know it other execute status logs.
-            return entity.buildDisplayString(null, true, true);
-        } else {
-            return obj != null ? obj.toString() : "null";
-        }
+    protected BehaviorResultBuilder createBehaviorResultBuilder() {
+        return new BehaviorResultBuilder();
     }
 
     // ===================================================================================

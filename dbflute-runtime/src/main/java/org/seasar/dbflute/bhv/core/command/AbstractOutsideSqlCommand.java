@@ -122,6 +122,7 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
         final OutsideSqlOption option = _outsideSqlOption;
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
+        outsideSqlContext.setResultType(getResultType());
         outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
@@ -134,6 +135,8 @@ public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehavior
         outsideSqlContext.setInternalDebug(ResourceContext.isInternalDebug());
         outsideSqlContext.setupBehaviorQueryPathIfNeeds();
     }
+
+    protected abstract Class<?> getResultType();
 
     protected String buildDbmsSuffix() {
         assertOutsideSqlBasic("buildDbmsSuffix");

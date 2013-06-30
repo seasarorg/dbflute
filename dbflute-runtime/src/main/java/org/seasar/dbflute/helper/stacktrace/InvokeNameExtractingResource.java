@@ -20,13 +20,36 @@ package org.seasar.dbflute.helper.stacktrace;
  */
 public interface InvokeNameExtractingResource {
 
+    /**
+     * Is the class extracting target? e.g. endsWith("Bhv")
+     * @param className The class name with package. (NotNull)
+     * @param methodName The method name without '()'. (NotNull)
+     * @return The determination, true or false.
+     */
     boolean isTargetElement(String className, String methodName);
 
+    /**
+     * Filter the simple class name. e.g. BsMemberBhv to MemberBhv
+     * @param simpleClassName The class name without package. (NotNull)
+     * @return The filtered string. (NotNull)
+     */
     String filterSimpleClassName(String simpleClassName);
 
+    /**
+     * Does it use additional info? e.g. line number
+     * @return The determination, true or false.
+     */
     boolean isUseAdditionalInfo();
 
+    /**
+     * Get the start index for stack trace searching.
+     * @return The number as start index. (NotMinus: if minus, returns empty result when extracting)
+     */
     int getStartIndex();
 
+    /**
+     * Get the loop size from start index for stack trace searching.
+     * @return The number as loop size. (NotMinus: if minus, returns empty result when extracting)
+     */
     int getLoopSize();
 }

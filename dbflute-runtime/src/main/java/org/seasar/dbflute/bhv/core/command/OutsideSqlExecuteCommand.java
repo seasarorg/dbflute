@@ -61,6 +61,14 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
     }
 
     // ===================================================================================
+    //                                                                  OutsideSql Element
+    //                                                                  ==================
+    @Override
+    protected Class<?> getResultType() {
+        return getCommandReturnType();
+    }
+
+    // ===================================================================================
     //                                                               SqlExecution Handling
     //                                                               =====================
     public String buildSqlExecutionKey() {

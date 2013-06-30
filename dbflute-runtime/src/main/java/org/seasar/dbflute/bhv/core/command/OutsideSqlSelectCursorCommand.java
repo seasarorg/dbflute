@@ -63,8 +63,16 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
     }
 
     // ===================================================================================
-    //                                                                     Extension Point
-    //                                                                     ===============
+    //                                                                  OutsideSql Element
+    //                                                                  ==================
+    @Override
+    protected Class<?> getResultType() {
+        return _cursorHandler.getClass();
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
     @Override
     protected TnResultSetHandler createOutsideSqlSelectResultSetHandler() {
         return new TnResultSetHandler() {
@@ -78,11 +86,6 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
                 return cursorHandler.handle(rs);
             }
         };
-    }
-
-    @Override
-    protected Class<?> getResultType() {
-        return _cursorHandler.getClass();
     }
 
     // ===================================================================================

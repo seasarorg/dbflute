@@ -52,7 +52,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         assertStatus("beforeGettingSqlExecution");
         OutsideSqlContext.setOutsideSqlContextOnThread(createOutsideSqlContext());
 
-        // Set up fetchNarrowingBean.
+        // set up fetchNarrowingBean
         final Object pmb = _parameterBean;
         final OutsideSqlOption option = _outsideSqlOption;
         setupFetchBean(pmb, option);
@@ -61,7 +61,6 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
     @Override
     protected void setupOutsideSqlContextProperty(OutsideSqlContext outsideSqlContext) {
         super.setupOutsideSqlContextProperty(outsideSqlContext);
-        outsideSqlContext.setResultType(getResultType());
         final OutsideSqlOption option = _outsideSqlOption;
         final boolean autoPagingLogging = (option.isAutoPaging() || option.isSourcePagingRequestTypeAuto());
         outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging
@@ -133,6 +132,8 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         return execution;
     }
 
+    protected abstract TnResultSetHandler createOutsideSqlSelectResultSetHandler();
+
     protected OutsideSqlSelectExecution createOutsideSqlSelectExecution(Object pmbTypeObj, String sql,
             TnResultSetHandler handler) {
         final Map<String, Class<?>> argNameTypeMap = createBeanArgNameTypeMap(pmbTypeObj);
@@ -148,13 +149,6 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         assertStatus("getSqlExecutionArgument");
         return new Object[] { _parameterBean };
     }
-
-    // ===================================================================================
-    //                                                                     Extension Point
-    //                                                                     ===============
-    protected abstract TnResultSetHandler createOutsideSqlSelectResultSetHandler();
-
-    protected abstract Class<?> getResultType();
 
     // ===================================================================================
     //                                                                       Assert Helper
