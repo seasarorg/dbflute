@@ -23,8 +23,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -282,6 +284,19 @@ public class DfClassificationTop {
     }
 
     // ===================================================================================
+    //                                                                         Escape Text
+    //                                                                         ===========
+    protected String resolveTextForJavaDoc(String comment, String indent) {
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        return prop.resolveTextForJavaDoc(comment, indent);
+    }
+
+    protected String resolveTextForSchemaHtml(String comment) {
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        return prop.resolveTextForSchemaHtml(comment);
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
@@ -298,19 +313,48 @@ public class DfClassificationTop {
     }
 
     public void setClassificationName(String classificationName) {
-        this._classificationName = classificationName;
+        _classificationName = classificationName;
     }
 
     public String getTopComment() {
-        if (_useDocumentOnly) {
-            return _topComment + " (document only)";
-        } else {
-            return _topComment;
+        return _topComment;
+    }
+
+    public String getTopCommentDisp() {
+        return buildTopCommentDisp();
+    }
+
+    protected String buildTopCommentDisp() {
+        if (_topComment == null) {
+            return "";
         }
+        final String comment;
+        if (_useDocumentOnly) {
+            comment = _topComment + " (document only)";
+        } else {
+            comment = _topComment;
+        }
+        return Srl.replace(comment, "\n", ""); // basically one line
+    }
+
+    public String getTopCommentForJavaDoc() {
+        return buildTopCommentForJavaDoc("    "); // basically indent unused
+    }
+
+    public String getTopCommentForJavaDocNest() {
+        return buildTopCommentForJavaDoc("        "); // basically indent unused
+    }
+
+    protected String buildTopCommentForJavaDoc(String indent) {
+        return resolveTextForJavaDoc(getTopCommentDisp(), indent);
+    }
+
+    public String getTopCommentForSchemaHtml() {
+        return resolveTextForSchemaHtml(getTopCommentDisp());
     }
 
     public void setTopComment(String topComment) {
-        this._topComment = topComment;
+        _topComment = topComment;
     }
 
     public String getCodeType() {
@@ -326,7 +370,7 @@ public class DfClassificationTop {
     }
 
     public void setRelatedColumnName(String relatedColumnName) {
-        this._relatedColumnName = relatedColumnName;
+        _relatedColumnName = relatedColumnName;
     }
 
     public List<DfClassificationElement> getClassificationElementList() {
@@ -335,14 +379,14 @@ public class DfClassificationTop {
 
     public void addClassificationElement(DfClassificationElement classificationElement) {
         classificationElement.setClassificationTop(this);
-        this._elementList.add(classificationElement);
+        _elementList.add(classificationElement);
     }
 
     public void addClassificationElementAll(List<DfClassificationElement> classificationElementList) {
         for (DfClassificationElement element : classificationElementList) {
             element.setClassificationTop(this);
         }
-        this._elementList.addAll(classificationElementList);
+        _elementList.addAll(classificationElementList);
     }
 
     public boolean isTableClassification() {
@@ -350,7 +394,7 @@ public class DfClassificationTop {
     }
 
     public void setTableClassification(boolean tableClassification) {
-        this._tableClassification = tableClassification;
+        _tableClassification = tableClassification;
     }
 
     public boolean isCheckImplicitSet() {
@@ -358,7 +402,7 @@ public class DfClassificationTop {
     }
 
     public void setCheckImplicitSet(boolean checkImplicitSet) {
-        this._checkImplicitSet = checkImplicitSet;
+        _checkImplicitSet = checkImplicitSet;
     }
 
     public boolean isUseDocumentOnly() {
@@ -366,7 +410,7 @@ public class DfClassificationTop {
     }
 
     public void setUseDocumentOnly(boolean useDocumentOnly) {
-        this._useDocumentOnly = useDocumentOnly;
+        _useDocumentOnly = useDocumentOnly;
     }
 
     public boolean isSuppressAutoDeploy() {
@@ -374,7 +418,7 @@ public class DfClassificationTop {
     }
 
     public void setSuppressAutoDeploy(boolean suppressAutoDeploy) {
-        this._suppressAutoDeploy = suppressAutoDeploy;
+        _suppressAutoDeploy = suppressAutoDeploy;
     }
 
     public boolean isDeprecated() {
@@ -382,7 +426,7 @@ public class DfClassificationTop {
     }
 
     public void setDeprecated(boolean deprecated) {
-        this._deprecated = deprecated;
+        _deprecated = deprecated;
     }
 
     public Map<String, Map<String, Object>> getGroupingMap() {
@@ -390,6 +434,6 @@ public class DfClassificationTop {
     }
 
     public void putGroupingAll(Map<String, Map<String, Object>> groupingMap) {
-        this._groupingMap.putAll(groupingMap);
+        _groupingMap.putAll(groupingMap);
     }
 }

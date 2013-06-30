@@ -141,7 +141,7 @@ namespace ${myExtendedEntityPackageName} {
         /// <summary>
         /// Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}.
         /// <![CDATA[
-        /// $database.buildClassificationApplicationComment($classificationElement)
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
         /// ]]>
         /// </summary>
         public void Set${col.javaName}_${classificationElement.name}() {
@@ -152,7 +152,7 @@ namespace ${myExtendedEntityPackageName} {
         /// <summary>
         /// Same as Set${col.javaName}_${classificationElement.name}().
         /// <![CDATA[
-        /// $database.buildClassificationApplicationComment($classificationElement)
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
         /// ]]>
         /// </summary>
         public void Classify${col.javaName}${classificationElement.name}() {
@@ -177,7 +177,7 @@ namespace ${myExtendedEntityPackageName} {
         /// <![CDATA[
         /// The difference of capital letters and small letters is NOT distinguished.
         /// If the value is null, this method returns false!
-        /// $database.buildClassificationApplicationComment($classificationElement)
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
         /// ]]>
         /// </summary>
         public bool Is${col.javaName}${classificationElement.name} {

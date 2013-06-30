@@ -40,7 +40,6 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.friends.velocity.DfFlutistLog4JLogSystem;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
@@ -570,6 +569,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     public void setEnvironmentType(String environmentType) {
-        DfEnvironmentType.getInstance().setEnvironmentType(environmentType);
+        _controlLogic.acceptEnvironmentType(environmentType);
     }
 }

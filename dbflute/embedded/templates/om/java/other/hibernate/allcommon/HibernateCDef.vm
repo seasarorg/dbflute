@@ -54,7 +54,7 @@ public interface ${glCDef} {
 
 #if ($classificationTop.hasTopComment())
     /**
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
      */
 #end
     public enum ${classificationName} implements ${glCDef} {
@@ -63,7 +63,7 @@ public interface ${glCDef} {
 #if ($count != 0)
         ,
 #end
-        /** $database.buildClassificationApplicationComment($classificationElement) */
+        /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
         ${classificationElement.name}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement))
 #set ($count = $count + 1)
 #end

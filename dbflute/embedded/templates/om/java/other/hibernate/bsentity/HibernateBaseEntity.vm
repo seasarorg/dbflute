@@ -133,7 +133,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     /**
      * Classify the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NullAllowed)
      */
@@ -162,7 +162,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
      * Classify the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void classify${col.javaName}${classificationElement.name}() {
         classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationElement.name});
@@ -180,7 +180,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     /**
      * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($classificationTop.hasTopComment())
-     * $classificationTop.topComment
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (NullAllowed)
      */
@@ -195,7 +195,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
      * Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'? <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!

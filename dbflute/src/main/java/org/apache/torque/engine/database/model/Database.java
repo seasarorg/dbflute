@@ -1767,6 +1767,14 @@ public class Database {
         return getClassificationProperties().buildClassificationApplicationComment(classificationElement);
     }
 
+    public String buildClassificationApplicationCommentForJavaDoc(DfClassificationElement classificationElement) {
+        return getClassificationProperties().buildClassificationApplicationCommentForJavaDoc(classificationElement);
+    }
+
+    public String buildClassificationApplicationCommentForSchemaHtml(DfClassificationElement classificationElement) {
+        return getClassificationProperties().buildClassificationApplicationCommentForSchemaHtml(classificationElement);
+    }
+
     public String buildClassificationCodeAliasVariables(DfClassificationElement classificationElement) {
         return getClassificationProperties().buildClassificationCodeAliasVariables(classificationElement);
     }

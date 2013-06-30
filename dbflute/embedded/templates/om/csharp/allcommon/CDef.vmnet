@@ -17,7 +17,7 @@ namespace ${glPackageBaseCommon} {
 #end
         public class ${classificationName} {
 #foreach ($classificationElement in $classificationTop.classificationElementList)
-            /** $database.buildClassificationApplicationComment($classificationElement) */
+            /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
             public static readonly ${classificationName} ${classificationElement.name} = new ${classificationName}($database.buildClassificationCodeNameAliasVariables($classificationElement));
 #end
             private static readonly Map<String, ${classificationName}> _codeValueMap = new LinkedHashMap<String, ${classificationName}>();

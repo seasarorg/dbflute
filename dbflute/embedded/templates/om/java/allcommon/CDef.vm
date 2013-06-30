@@ -38,7 +38,7 @@ public interface ${glCDef} extends Classification {
 #set ($classificationTop = $database.getClassificationTop($classificationName))
 #if ($classificationTop.hasTopComment())
     /**
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
      */
 #end
 #if ($classificationTop.isDeprecated())
@@ -50,7 +50,7 @@ public interface ${glCDef} extends Classification {
 #if ($count != 0)
         ,
 #end
-        /** $database.buildClassificationApplicationComment($classificationElement) */
+        /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
         ${classificationElement.name}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement))
 #set ($count = $count + 1)
 #end
@@ -112,7 +112,7 @@ public interface ${glCDef} extends Classification {
         /**
          * Is the classification in the group? <br />  
 #if ($group.hasGroupComment())
-         * ${group.groupComment} <br />
+         * ${group.groupCommentForJavaDocNest} <br />
 #end
          * ${group.buildElementDisp()}
          * @return The determination, true or false.
@@ -155,7 +155,7 @@ public interface ${glCDef} extends Classification {
         /**
          * Get the list of group classification elements. (returns new copied list) <br />
 #if ($group.hasGroupComment())
-         * ${group.groupComment} <br />
+         * ${group.groupCommentForJavaDocNest} <br />
 #end
          * ${group.buildElementDisp()}
          * @return The list of classification elements in the group. (NotNull)
@@ -181,7 +181,7 @@ public interface ${glCDef} extends Classification {
         ,
 #end
 #if ($classificationTop.hasTopComment())
-        /** $classificationTop.topComment */
+        /** ${classificationTop.topCommentForJavaDocNest} */
 #end
         ${classificationName}
 #set ($count = $count + 1)

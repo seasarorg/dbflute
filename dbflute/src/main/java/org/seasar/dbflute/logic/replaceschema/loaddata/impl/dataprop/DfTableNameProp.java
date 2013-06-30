@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.mapstring.MapListString;
-import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
+import org.seasar.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -43,7 +43,7 @@ public class DfTableNameProp {
         if (cachedMap != null) {
             return cachedMap;
         }
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
         String path = dataDirectory + "/tableNameMap.dataprop";
         Map<String, String> resultMap = reader.readMapAsStringValue(path);
         if (resultMap == null || resultMap.isEmpty()) {

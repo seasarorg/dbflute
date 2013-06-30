@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.infra.diffmap.DiffMapFile;
+import org.seasar.dbflute.infra.diffmap.DfDiffMapFile;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
@@ -75,7 +75,7 @@ public class DfSchemaHistory {
     //                                                                           =========
     public void serializeSchemaDiff(DfSchemaDiff schemaDiff) throws IOException {
         final String path = _historyFile;
-        final DiffMapFile diffMapFile = createDiffMapFile();
+        final DfDiffMapFile diffMapFile = createDiffMapFile();
         final File file = new File(path);
 
         // ordered by DIFF_DATE desc
@@ -132,7 +132,7 @@ public class DfSchemaHistory {
             _existsSchemaDiff = false;
             return;
         }
-        final DiffMapFile diffMapFile = createDiffMapFile();
+        final DfDiffMapFile diffMapFile = createDiffMapFile();
         final Map<String, Object> diffMap;
         FileInputStream fis = null;
         try {
@@ -202,8 +202,8 @@ public class DfSchemaHistory {
     // ===================================================================================
     //                                                                         Schema Diff
     //                                                                         ===========
-    protected DiffMapFile createDiffMapFile() {
-        return new DiffMapFile();
+    protected DfDiffMapFile createDiffMapFile() {
+        return new DfDiffMapFile();
     }
 
     // ===================================================================================

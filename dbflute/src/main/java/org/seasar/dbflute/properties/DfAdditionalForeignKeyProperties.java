@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
-import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -99,11 +98,6 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
             }
         }
         return _additionalForeignKeyMap;
-    }
-
-    @Override
-    protected DfMapStringFileReader createMapStringFileReader() {
-        return super.createMapStringFileReader().saveLine();
     }
 
     // ===================================================================================

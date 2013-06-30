@@ -13,12 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.properties.filereader;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+package org.seasar.dbflute.properties.propreader;
 
 import org.seasar.dbflute.infra.dfprop.DfPropFile;
 
@@ -26,7 +21,7 @@ import org.seasar.dbflute.infra.dfprop.DfPropFile;
  * @author jflute
  * @since 0.5.4 (2007/07/18)
  */
-public class DfStringFileReader {
+public class DfOutsideStringPropReader {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -36,20 +31,7 @@ public class DfStringFileReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public String readString(String path) {
-        FileInputStream ins = null;
-        try {
-            ins = new FileInputStream(new File(path));
-            return _dfpropFile.readString(ins);
-        } catch (FileNotFoundException e) {
-            return "";
-        } finally {
-            if (ins != null) {
-                try {
-                    ins.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
+    public String readString(String path, String environmentType) {
+        return _dfpropFile.readString(path, environmentType);
     }
 }

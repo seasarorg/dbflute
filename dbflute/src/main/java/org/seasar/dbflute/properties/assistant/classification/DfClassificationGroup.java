@@ -26,16 +26,25 @@ import org.seasar.dbflute.util.Srl;
  */
 public class DfClassificationGroup {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final String _classificationName;
     protected final String _groupName;
     protected String _groupComment;
     protected List<String> _elementNameList;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfClassificationGroup(String classificationName, String groupName) {
         _classificationName = classificationName;
         _groupName = groupName;
     }
 
+    // ===================================================================================
+    //                                                                          Expression
+    //                                                                          ==========
     public String getGroupNameInitCap() {
         return Srl.initCap(_groupName);
     }
@@ -96,14 +105,30 @@ public class DfClassificationGroup {
         return title != null ? " title=\"" + title + "\"" : "";
     }
 
-    protected DfBuildProperties getProperties() {
-        return DfBuildProperties.getInstance();
-    }
-
     public String buildElementDisp() {
         return "The group elements:" + _elementNameList;
     }
 
+    // ===================================================================================
+    //                                                                         Escape Text
+    //                                                                         ===========
+    protected String resolveTextForJavaDoc(String comment, String indent) {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        return prop.resolveTextForJavaDoc(comment, indent);
+    }
+
+    protected String resolveTextForSchemaHtml(String comment) {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        return prop.resolveTextForSchemaHtml(comment);
+    }
+
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getClassificationName() {
         return _classificationName;
     }
@@ -114,6 +139,29 @@ public class DfClassificationGroup {
 
     public String getGroupComment() {
         return _groupComment;
+    }
+
+    public String getGroupCommentDisp() {
+        return buildGroupCommentDisp();
+    }
+
+    protected String buildGroupCommentDisp() {
+        if (_groupComment == null) {
+            return "";
+        }
+        return Srl.replace(_groupComment, "\n", ""); // basically one line
+    }
+
+    public String getGroupCommentForJavaDoc() {
+        return buildGroupCommentForJavaDoc("    "); // basically indent unused
+    }
+
+    public String getGroupCommentForJavaDocNest() {
+        return buildGroupCommentForJavaDoc("        "); // basically indent unused
+    }
+
+    protected String buildGroupCommentForJavaDoc(String indent) {
+        return resolveTextForJavaDoc(getGroupCommentDisp(), indent);
     }
 
     public void setGroupComment(String groupComment) {

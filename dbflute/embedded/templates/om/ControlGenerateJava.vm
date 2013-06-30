@@ -405,10 +405,9 @@ $database.info("public void parseTableClass() {")
   ##
   ## Determination
   ##
-  #set ($isExistBehavior = false)
-  #set ($isExistBehavior = true)
-  #set ($isExistDao = true)
   #set ($isExistConditionBean = true)
+  #set ($isExistBehavior = true)
+  #set ($isExistDao = false)
 
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)

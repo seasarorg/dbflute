@@ -34,7 +34,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
         /// <summary>
         /// Set the value of ${classificationElement.name} of ${col.uncapitalisedJavaName} as equal. { = }
-        /// $database.buildClassificationApplicationComment($classificationElement)
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationElement.name}() {
             DoSet${tmpJavaName}_Equal(${glCDef}.${col.classificationName}.${classificationElement.name}.Code);
@@ -51,7 +51,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
         /// <summary>
         /// Set the value of ${classificationElement.name} of ${col.uncapitalisedJavaName} as notEqual. { &lt;&gt; }
-        /// $database.buildClassificationApplicationComment($classificationElement)
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
         /// </summary>
         public void Set${tmpJavaName}_NotEqual_${classificationElement.name}() {
             DoSet${tmpJavaName}_NotEqual(${glCDef}.${col.classificationName}.${classificationElement.name}.Code);
@@ -256,7 +256,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
         /// <summary>
         /// Set the value of ${classificationElement.name} of ${col.uncapitalisedJavaName} as equal. { = }
-        /// $database.buildClassificationApplicationComment($classificationElement)
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationElement.name}() {
             String code = ${glCDef}.${col.classificationName}.${classificationElement.name}.Code;
@@ -271,7 +271,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
         /// <summary>
         /// Set the value of ${classificationElement.name} of ${col.uncapitalisedJavaName} as notEqual. { &lt;&gt; }
-        /// $database.buildClassificationApplicationComment($classificationElement)
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
         /// </summary>
         public void Set${tmpJavaName}_NotEqual_${classificationElement.name}() {
             String code = ${glCDef}.${col.classificationName}.${classificationElement.name}.Code;
@@ -496,7 +496,7 @@ namespace ${glPackageBaseCQ} {
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
         /// <summary>
         /// Set the value od ${classificationElement.name} of ${col.uncapitalisedJavaName} as equal. { = }
-        /// $database.buildClassificationApplicationComment($classificationElement)
+        /// $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationElement.name}() {
             String code = ${glCDef}.${col.classificationName}.${classificationElement.name}.Code;

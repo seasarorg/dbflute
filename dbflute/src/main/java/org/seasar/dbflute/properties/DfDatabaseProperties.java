@@ -761,9 +761,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
         protected void initializeDatabaseInfoMap() {
             if (_databaseInfoMap == null) {
-                Map<String, Object> databaseInfoMap = getOutsidePropMap("databaseInfo");
+                Map<String, Object> databaseInfoMap = getOutsideMapProp("databaseInfo");
                 if (databaseInfoMap.isEmpty()) {
-                    databaseInfoMap = getOutsidePropMap("databaseInfoMap");
+                    databaseInfoMap = getOutsideMapProp("databaseInfoMap");
                 }
                 if (!databaseInfoMap.isEmpty()) {
                     _databaseInfoMap = databaseInfoMap;

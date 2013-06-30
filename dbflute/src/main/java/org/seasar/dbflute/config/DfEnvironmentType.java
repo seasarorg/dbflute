@@ -15,9 +15,6 @@
  */
 package org.seasar.dbflute.config;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * @author jflute
  * @since 0.7.9 (2008/08/26 Tuesday)
@@ -27,10 +24,7 @@ public class DfEnvironmentType {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    public static final Log _log = LogFactory.getLog(DfEnvironmentType.class);
-
-    /** The mark for default control. */
+    /** The mark for default control */
     public static final String DEFAULT_CONTROL_MARK = "df:default";
 
     /** The singleton instance of this. */
@@ -58,32 +52,34 @@ public class DfEnvironmentType {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    /**
+     * Is the environment type specified?
+     * @return The determination, true or false.
+     */
     public boolean isSpecifiedType() {
         return _environmentType != null;
     }
 
     /**
-     * @return The type of environment. (NullAllowed: if null, means non-specified type)
+     * Get the type of environment.
+     * @return The string for environment type. (NullAllowed: if null, means non-specified type)
      */
     public String getEnvironmentType() {
         return _environmentType;
     }
 
     /**
-     * @return The type of environment. (NotNull: if no specified environment type, returns default control mark)
+     * Get the type of environment it might be default expression {@link #DEFAULT_CONTROL_MARK}.
+     * @return The string for environment type. (NotNull: if no specified environment type, returns default control mark)
      */
-    public String getEnvironmentTypeIfNullDefaultControl() {
-        return _environmentType != null ? _environmentType : DfEnvironmentType.DEFAULT_CONTROL_MARK;
+    public String getEnvironmentTypeMightBeDefault() {
+        return _environmentType != null ? _environmentType : DEFAULT_CONTROL_MARK;
     }
 
-    public void setEnvironmentType(String environmentType) { // called by Ant
+    public void setEnvironmentType(String environmentType) {
         if (environmentType == null || environmentType.trim().length() == 0) {
             return;
         }
-        if (environmentType.startsWith("${dfenv}")) {
-            return;
-        }
-        _log.info("...Setting environmentType '" + environmentType + "'");
         _environmentType = environmentType;
     }
 }

@@ -59,7 +59,7 @@ public class DfFlutistGenerator extends DfGenerator {
      * output withing the control template. This could
      * use some cleaning up.
      */
-    private static DfFlutistGenerator instance = new DfFlutistGenerator();
+    private static final DfFlutistGenerator instance = new DfFlutistGenerator();
 
     /**
      * Where the texen output will placed.

@@ -43,7 +43,8 @@ public class DfDatabaseNameMapping {
         sb.append("    ; postgresql = map:{generateName = PostgreSql ; defName = postgresql}");
         sb.append("    ; oracle     = map:{generateName = Oracle     ; defName = oracle}");
         sb.append("    ; db2        = map:{generateName = Db2        ; defName = db2}");
-        sb.append("    ; mssql      = map:{generateName = SqlServer  ; defName = sqlserver}");
+        sb.append("    ; sqlserver  = map:{generateName = SqlServer  ; defName = sqlserver}");
+        sb.append("    ; mssql      = map:{generateName = SqlServer  ; defName = sqlserver}"); // for compatible
         sb.append("    ; h2         = map:{generateName = H2         ; defName = h2}");
         sb.append("    ; derby      = map:{generateName = Derby      ; defName = derby}");
         sb.append("    ; sqlite     = map:{generateName = Sqlite     ; defName = sqlite}");

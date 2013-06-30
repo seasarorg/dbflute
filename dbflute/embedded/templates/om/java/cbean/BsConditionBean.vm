@@ -606,7 +606,7 @@ public class ${myClassName} extends AbstractConditionBean {
          * @return The object to set up a function for myself table. (NotNull)
          */
         public HpSDRFunction<${myConditionBeanClassName}, ${myConditionQueryClassName}> myselfDerived() {
-            assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
+            assertDerived("myselfDerived"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
             return new HpSDRFunction<${myConditionBeanClassName}, ${myConditionQueryClassName}>(_baseCB, _qyCall.qy(), new HpSDRSetupper<${myConditionBeanClassName}, ${myConditionQueryClassName}>() {
                 public void setup(String function, SubQuery<${myConditionBeanClassName}> subQuery, ${myConditionQueryClassName} cq, String aliasName, DerivedReferrerOption option) {
                     cq.xsmyselfDerive(function, subQuery, aliasName, option); } }, _dbmetaProvider);

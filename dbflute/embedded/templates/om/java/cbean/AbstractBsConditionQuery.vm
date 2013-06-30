@@ -90,7 +90,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Equal(=). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -102,7 +102,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Equal(=). As boolean for ${col.classificationName}. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param determination The determination, true or false. (NullAllowed: if null, no condition)
      */
@@ -114,7 +114,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Equal(=). As ${classificationElement.name} (${classificationElement.code}). And OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void set${tmpJavaName}_Equal_${classificationElement.name}() {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
@@ -155,7 +155,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -166,7 +166,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * NotEqual(&lt;&gt;). As ${classificationElement.name} (${classificationElement.code}). And OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void set${tmpJavaName}_NotEqual_${classificationElement.name}() {
         set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
@@ -242,7 +242,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * InScope {in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
@@ -254,10 +254,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * InScope {in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment} <br />
+     * ${classificationTop.topCommentForJavaDoc} <br />
 #end
 #if ($group.hasGroupComment())
-     * ${group.groupComment}
+     * ${group.groupCommentForJavaDoc}
 #end
      */
     public void set${tmpJavaName}_InScope_${group.groupNameInitCap}() {
@@ -286,7 +286,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * NotInScope {not in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
@@ -545,8 +545,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
-     *     public void query(${tmpCBClassName} subCB) {
+     * cb.query().<span style="color: #FD4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     *     public void query(${relatedCBClassName} subCB) {
      *         subCB.specify().<span style="color: #FD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
      *     }
@@ -593,7 +593,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Equal(=). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -605,7 +605,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * Equal(=). As boolean for ${col.classificationName}. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param determination The determination, true or false. (NullAllowed: if null, no condition)
      */
@@ -617,7 +617,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Equal(=). As ${classificationElement.name} (${classificationElement.code}). And NullIgnored, OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void set${tmpJavaName}_Equal_${classificationElement.name}() {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
@@ -644,7 +644,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, no condition)
      */
@@ -655,7 +655,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * NotEqual(&lt;&gt;). As ${classificationElement.name} (${classificationElement.code}). And NullIgnored, OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void set${tmpJavaName}_NotEqual_${classificationElement.name}() {
         set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
@@ -742,7 +742,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * InScope {in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
@@ -754,10 +754,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * InScope {in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment} <br />
+     * ${classificationTop.topCommentForJavaDoc} <br />
 #end
 #if ($group.hasGroupComment())
-     * ${group.groupComment} <br />
+     * ${group.groupCommentForJavaDoc} <br />
      * ${group.buildElementDisp()}
 #end
      */
@@ -787,7 +787,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * NotInScope {not in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdefList The list of classification definition (as ENUM type). (NullAllowed: if null (or empty), no condition)
      */
@@ -1009,8 +1009,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * {FOO &lt;= (select max(BAR) from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
-     * cb.query().<span style="color: #FD4747">derived${tmpPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${tmpCBClassName}&gt;() {
-     *     public void query(${tmpCBClassName} subCB) {
+     * cb.query().<span style="color: #FD4747">derived${referrer.referrerPropertyNameInitCap}()</span>.<span style="color: #FD4747">max</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
+     *     public void query(${relatedCBClassName} subCB) {
      *         subCB.specify().<span style="color: #FD4747">columnFoo...</span> <span style="color: #3F7E5E">// derived column by function</span>
      *         subCB.query().setBar... <span style="color: #3F7E5E">// referrer condition</span>
      *     }
@@ -1188,7 +1188,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Equal(=). As ${classificationElement.name}. And OnlyOnceRegistered. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void set${tmpJavaName}_Equal_${classificationElement.name}() {
         reg${tmpJavaName}(CK_EQ, ${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationElement.name}.code()));

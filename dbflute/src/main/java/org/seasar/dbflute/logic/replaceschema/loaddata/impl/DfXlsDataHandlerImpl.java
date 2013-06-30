@@ -66,7 +66,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp.LoggingInsertType;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
-import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
+import org.seasar.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
@@ -629,7 +629,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     public static Map<String, Map<String, String>> doGetConvertValueMap(String dataDirectory) {
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
         String path = dataDirectory + "/convertValueMap.dataprop";
         final Map<String, Map<String, String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
         Map<String, Map<String, String>> readMap = reader.readMapAsStringMapValue(path);
@@ -691,7 +691,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     }
 
     public static StringKeyMap<String> doGetDefaultValueMap(String dataDirectory) { // recycle
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
         String path = dataDirectory + "/defaultValueMap.dataprop";
         Map<String, String> resultMap = reader.readMapAsStringValue(path);
         if (resultMap == null || resultMap.isEmpty()) {
@@ -723,7 +723,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         if (cachedMap != null) {
             return cachedMap;
         }
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
         String path = dataDirectory + "/notTrimColumnMap.dataprop";
         Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
         if (resultMap == null || resultMap.isEmpty()) {
@@ -749,7 +749,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         if (cachedMap != null) {
             return cachedMap;
         }
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
         String path = dataDirectory + "/emptyStringColumnMap.dataprop";
         Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
         if (resultMap == null || resultMap.isEmpty()) {

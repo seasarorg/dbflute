@@ -348,7 +348,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 	<tr>
 		<td>${classificationName}</td>
 		<td class="clstypecell">#if ($classificationTop.isTableClassification())table#else implicit#if ($classificationTop.isCheckImplicitSet())<br />(check)#end#end</td>
-		<td>#if ($classificationTop.hasTopComment())${classificationTop.topComment}#else &nbsp;#end</td>
+		<td>#if ($classificationTop.hasTopComment())${classificationTop.topCommentForSchemaHtml}#else &nbsp;#end</td>
 		<td>
 			<table class="child">
 			<tr>
@@ -375,7 +375,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #if ($database.hasClassificationAlias($classificationName))
 				<td>#if ($classificationElement.hasAlias())${classificationElement.alias}#else &nbsp;#end</td>
 #end
-				<td class="commentcell">#if ($classificationElement.hasComment())${classificationElement.comment}#else &nbsp;#end</td>
+				<td class="commentcell">#if ($classificationElement.hasComment())${classificationElement.commentForSchemaHtml}#else &nbsp;#end</td>
 #foreach ($group in $classificationTop.groupList)
 				<td class="flgcell">#if ($classificationElement.isGroup($group.groupName))o#else &nbsp;#end</td>
 #end

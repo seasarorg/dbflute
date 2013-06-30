@@ -47,13 +47,13 @@ public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
 
     /**
      * Classify the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void classify${javaName}${classificationElement.name}();
 
     /**
      * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!

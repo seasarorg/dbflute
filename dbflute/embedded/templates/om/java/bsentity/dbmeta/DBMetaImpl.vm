@@ -320,11 +320,6 @@ public class ${myClassName} extends AbstractDBMeta {
 #else
     public String getConditionBeanTypeName() { return null; }
 #end
-#if ($isExistDao)
-    public String getDaoTypeName() { return "${myExtendedDaoPackageName}.${myExtendedDaoClassName}"; }
-#else
-    public String getDaoTypeName() { return null; }
-#end
 #if ($isExistBehavior)
     public String getBehaviorTypeName() { return "${myExtendedBhvPackageName}.${myExtendedBhvClassName}"; }
 #else

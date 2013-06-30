@@ -280,12 +280,12 @@ public class DfLReverseOutputHandler {
                                 if (!wrapper.next()) {
                                     return null;
                                 }
-                                final LinkedHashMap<String, String> nameValueMap = new LinkedHashMap<String, String>();
+                                final List<String> valueList = new ArrayList<String>();
                                 for (String columnName : columnNameList) {
-                                    nameValueMap.put(columnName, wrapper.getString(columnName));
+                                    valueList.add(wrapper.getString(columnName));
                                 }
                                 final FileMakingRowResource resource = new FileMakingRowResource();
-                                resource.setNameValueMap(nameValueMap);
+                                resource.acceptValueList(valueList);
                                 ++count;
                                 return resource;
                             } catch (SQLException e) {

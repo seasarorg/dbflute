@@ -36,7 +36,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfRelativeDateResolver;
-import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
+import org.seasar.dbflute.properties.propreader.DfOutsideMapPropReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -326,7 +326,7 @@ public class DfLoadingControlProp {
         if (cachedMap != null) {
             return cachedMap;
         }
-        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        final DfOutsideMapPropReader reader = new DfOutsideMapPropReader();
         final String path = dataDirectory + "/" + LOADING_CONTROL_MAP_NAME;
         final Map<String, Object> resultMap = reader.readMap(path);
         final Map<String, Object> analyzedMap = new LinkedHashMap<String, Object>();

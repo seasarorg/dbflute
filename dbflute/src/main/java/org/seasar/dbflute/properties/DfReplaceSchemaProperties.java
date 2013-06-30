@@ -272,7 +272,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public boolean isTargetEnvTypeFile(String sql) { // for general purpose
-        return checkTargetEnvType(sql, getEnvironmentTypeIfNullDefaultControl());
+        return checkTargetEnvType(sql, getEnvironmentTypeMightBeDefault());
     }
 
     protected boolean checkTargetEnvType(String sql, String envType) {

@@ -183,7 +183,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     /**
      * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
      * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
@@ -195,7 +195,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     /**
      * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed: if null, null value is set to the column)
      */
@@ -213,7 +213,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     /**
      * Set the value of ${col.uncapitalisedJavaName} as boolean. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param determination The determination, true or false. (NullAllowed: if null, null value is set to the column)
      */
@@ -232,7 +232,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
      * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name} (${classificationElement.code}). <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void set${col.javaName}_${classificationElement.name}() {
         set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
@@ -241,7 +241,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if ($database.isMakeEntityOldStyleClassify())
     /**
      * Same as set${col.javaName}_${classificationElement.name}. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void classify${col.javaName}${classificationElement.name}() {
         set${col.javaName}_${classificationElement.name}();
@@ -269,7 +269,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
      * Is the value of ${col.uncapitalisedJavaName} ${classificationElement.name}? <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
      */
@@ -282,7 +282,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #foreach ($group in $col.classificationTop.groupList)
 #if ($group.hasGroupComment())
     /**
-     * ${group.groupComment} <br />
+     * ${group.groupCommentForJavaDoc} <br />
      * ${group.buildElementDisp()}
      * @return The determination, true or false.
      */

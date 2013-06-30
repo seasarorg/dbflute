@@ -120,7 +120,7 @@ public class DfClassificationResourceAnalyzer {
             }
             final List<DfClassificationTop> classificationTopList = analyze(lineList);
             for (DfClassificationTop top : classificationTopList) {
-                _log.info("    " + top.getClassificationName() + ", " + top.getTopComment());
+                _log.info("    " + top.getClassificationName() + ", " + top.getTopCommentDisp());
             }
             topList.addAll(classificationTopList);
         }

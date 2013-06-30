@@ -64,7 +64,7 @@ public interface ${database.simpleCDefClass} {
 #set ($classificationTop = $database.getClassificationTop($classificationName))
 #if ($classificationTop.hasTopComment())
     /**
-     * $classificationTop.topComment
+     * ${classificationTop.topCommentForJavaDoc}
      */
 #end
     public enum ${classificationName} implements ${database.simpleCDefClass} {
@@ -73,7 +73,7 @@ public interface ${database.simpleCDefClass} {
 #if ($count != 0)
         ,
 #end
-        /** $database.buildClassificationApplicationComment($classificationElement) */
+        /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
         ${classificationElement.name}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement))
 #set ($count = $count + 1)
 #end
@@ -156,7 +156,7 @@ public interface ${database.simpleCDefClass} {
         ,
 #end
 #if ($classificationTop.hasTopComment())
-        /** $classificationTop.topComment */
+        /** ${classificationTop.topCommentForJavaDocNest} */
 #end
         ${classificationName}
 #set ($count = $count + 1)

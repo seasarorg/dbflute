@@ -119,7 +119,7 @@ public abstract class $myClassName implements Serializable {
     /**
      * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * @param cdef The instance of classification definition (as ENUM type). (NullAllowed)
      */
@@ -136,7 +136,7 @@ public abstract class $myClassName implements Serializable {
     /**
      * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($classificationTop.hasTopComment())
-     * ${classificationTop.topComment}
+     * ${classificationTop.topCommentForJavaDoc}
 #end
      * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
      * @return The instance of classification definition (as ENUM type). (NullAllowed)
@@ -155,7 +155,7 @@ public abstract class $myClassName implements Serializable {
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
      * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name}. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     public void set${col.javaName}_${classificationElement.name}() {
         set${col.javaName}As${col.classificationName}(${database.simpleCDefClass}.${col.classificationName}.${classificationElement.name});
@@ -172,7 +172,7 @@ public abstract class $myClassName implements Serializable {
 #foreach ($classificationElement in $col.classificationTop.classificationElementList)
     /**
      * Is the value of ${col.uncapitalisedJavaName} '${classificationElement.name}'? <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
      */

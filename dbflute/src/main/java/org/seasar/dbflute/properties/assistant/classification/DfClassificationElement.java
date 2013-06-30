@@ -194,6 +194,19 @@ public class DfClassificationElement {
     }
 
     // ===================================================================================
+    //                                                                         Escape Text
+    //                                                                         ===========
+    protected String resolveTextForJavaDoc(String comment, String indent) {
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        return prop.resolveTextForJavaDoc(comment, indent);
+    }
+
+    protected String resolveTextForSchemaHtml(String comment) {
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        return prop.resolveTextForSchemaHtml(comment);
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
@@ -242,7 +255,7 @@ public class DfClassificationElement {
     }
 
     public void setName(String name) {
-        this._name = name;
+        _name = name;
     }
 
     public String getAlias() {
@@ -250,15 +263,42 @@ public class DfClassificationElement {
     }
 
     public void setAlias(String alias) {
-        this._alias = alias;
+        _alias = alias;
     }
 
     public String getComment() {
         return _comment;
     }
 
+    public String getCommentDisp() {
+        return buildCommentDisp();
+    }
+
+    protected String buildCommentDisp() {
+        if (_comment == null) {
+            return "";
+        }
+        return Srl.replace(_comment, "\n", ""); // basically one line
+    }
+
+    public String getCommentForJavaDoc() {
+        return buildCommentForJavaDoc("    "); // basically indent unused
+    }
+
+    public String getCommentForJavaDocNest() {
+        return buildCommentForJavaDoc("        "); // basically indent unused
+    }
+
+    protected String buildCommentForJavaDoc(String indent) {
+        return resolveTextForJavaDoc(getCommentDisp(), indent);
+    }
+
+    public String getCommentForSchemaHtml() {
+        return resolveTextForSchemaHtml(getCommentDisp());
+    }
+
     public void setComment(String comment) {
-        this._comment = comment;
+        _comment = comment;
     }
 
     public String[] getSisters() {
@@ -266,7 +306,7 @@ public class DfClassificationElement {
     }
 
     public void setSisters(String[] sisters) {
-        this._sisters = sisters;
+        _sisters = sisters;
     }
 
     public Map<String, Object> getSubItemMap() {
@@ -274,6 +314,6 @@ public class DfClassificationElement {
     }
 
     public void setSubItemMap(Map<String, Object> subItemMap) {
-        this._subItemMap = subItemMap;
+        _subItemMap = subItemMap;
     }
 }

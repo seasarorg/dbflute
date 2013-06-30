@@ -20,6 +20,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
@@ -48,6 +50,12 @@ import org.seasar.dbflute.util.DfTraceViewUtil;
  * @author jflute
  */
 public class DfTaskControlLogic {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DfTaskControlLogic.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -286,6 +294,22 @@ public class DfTaskControlLogic {
         final List<String> projectNameList = prop.getProjectNameList();
         final String requestUrl = prop.getRequestUrl();
         new DfRefreshResourceProcess(projectNameList, requestUrl).refreshResources();
+    }
+
+    // ===================================================================================
+    //                                                                    Environment Type
+    //                                                                    ================
+    public void acceptEnvironmentType(String environmentType) {
+        if (environmentType == null || environmentType.trim().length() == 0) {
+            return;
+        }
+        if (environmentType.startsWith("${dfenv}")) {
+            return;
+        }
+        DfEnvironmentType.getInstance().setEnvironmentType(environmentType);
+        if (DfEnvironmentType.getInstance().isSpecifiedType()) {
+            _log.info("...Setting environmentType '" + environmentType + "'");
+        }
     }
 
     // ===================================================================================

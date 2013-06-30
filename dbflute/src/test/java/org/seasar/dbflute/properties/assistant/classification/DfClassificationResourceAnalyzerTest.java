@@ -15,21 +15,18 @@
  */
 package org.seasar.dbflute.properties.assistant.classification;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.seasar.dbflute.properties.assistant.classification.DfClassificationResourceAnalyzer.LN_MARK_PLAIN;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.unit.core.PlainTestCase;
+
 /**
  * @author jflute
  * @since 0.8.2 (2008/10/22 Wednesday)
  */
-public class DfClassificationResourceAnalyzerTest {
+public class DfClassificationResourceAnalyzerTest extends PlainTestCase {
 
     public void test_analuze_by_lineList() {
         // ## Arrange ##
@@ -123,7 +120,7 @@ public class DfClassificationResourceAnalyzerTest {
         {
             final DfClassificationTop top = classificationTopList.get(2);
             assertEquals("MemberStatus3", top.getClassificationName());
-            assertNull(top.getTopComment());
+            assertEquals("", top.getTopComment());
             assertNull(top.getRelatedColumnName());
             assertEquals(2, top.getClassificationElementList().size());
             final List<DfClassificationElement> classificationElementList = top.getClassificationElementList();

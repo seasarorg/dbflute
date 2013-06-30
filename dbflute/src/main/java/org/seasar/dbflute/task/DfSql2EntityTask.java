@@ -32,7 +32,6 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfProcedureSetupFailureException;
@@ -63,6 +62,7 @@ import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
+import org.seasar.dbflute.task.bs.assistant.DfSpecifiedSqlFile;
 import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.Srl.IndexOfInfo;
 

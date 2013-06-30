@@ -163,8 +163,8 @@ $database.info("public void parseCustomizeEntity() {")
   #set ($myExtendedTypeSafeCursorClassName = "${glProjectPrefix}${table.javaName}Cursor")
   #set ($myExtendedTypeSafeCursorHandlerClassName = "${glProjectPrefix}${table.javaName}CursorHandler")
 
-  #set ($isExistDao = false)
   #set ($isExistConditionBean = false)
+  #set ($isExistDao = false)
 
   $table.switchSql2EntityOutputDirectory()
   #set ($path = $database.getPackageAsPath(${glPackageBaseCustomizeEntity}))

@@ -51,21 +51,21 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 
     /**
      * Set the value of ${uncapitalisedJavaName} as ${classificationElement.name}. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     void set${javaName}_${classificationElement.name}();
 #if ($database.isMakeEntityOldStyleClassify())
 
     /**
      * Same as set${javaName}_${classificationElement.name}. <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
     void classify${javaName}${classificationElement.name}();
 #end
 
     /**
      * Is the value of ${uncapitalisedJavaName} '${classificationElement.name}'? <br />
-     * $database.buildClassificationApplicationComment($classificationElement)
+     * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
      */

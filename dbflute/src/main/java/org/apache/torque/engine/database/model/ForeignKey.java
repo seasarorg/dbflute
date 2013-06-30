@@ -1353,14 +1353,14 @@ public class ForeignKey implements Constraint {
     //                                               Foreign
     //                                               -------
     public String getForeignDispForJavaDoc() {
-        return doGetForeignDispForJavaDoc("    ");
+        return buildForeignDispForJavaDoc("    ");
     }
 
     public String getForeignDispForJavaDocNest() {
-        return doGetForeignDispForJavaDoc("        ");
+        return buildForeignDispForJavaDoc("        ");
     }
 
-    public String doGetForeignDispForJavaDoc(String indent) {
+    protected String buildForeignDispForJavaDoc(String indent) {
         final StringBuilder sb = new StringBuilder();
         sb.append(getForeignSimpleDisp()).append(".");
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_comment)) {

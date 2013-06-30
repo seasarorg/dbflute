@@ -40,10 +40,10 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.jdbc.connection.DfCurrentSchemaConnector;
 import org.seasar.dbflute.properties.assistant.DfSchemaResourceFinder;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
-import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
-import org.seasar.dbflute.properties.filereader.DfStringFileReader;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
+import org.seasar.dbflute.properties.propreader.DfOutsideListPropReader;
+import org.seasar.dbflute.properties.propreader.DfOutsideMapPropReader;
+import org.seasar.dbflute.properties.propreader.DfOutsideStringPropReader;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
 import org.seasar.dbflute.util.DfNameHintUtil;
@@ -227,7 +227,7 @@ public abstract class DfAbstractHelperProperties {
      * @return Property as string. (NotNull)
      */
     final protected String stringProp(String key) {
-        final String outsidePropString = getOutsidePropString(key);
+        final String outsidePropString = getOutsideStringProp(key);
         if (outsidePropString != null && outsidePropString.trim().length() > 0) {
             return outsidePropString;
         }
@@ -242,7 +242,7 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected String stringProp(String key, String defaultValue) {
         try {
-            final String outsidePropString = getOutsidePropString(key);
+            final String outsidePropString = getOutsideStringProp(key);
             if (outsidePropString != null && outsidePropString.trim().length() > 0) {
                 return outsidePropString;
             }
@@ -260,7 +260,7 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected String stringPropNoEmpty(String key, String defaultValue) {
         try {
-            final String outsidePropString = getOutsidePropString(key);
+            final String outsidePropString = getOutsideStringProp(key);
             if (outsidePropString != null && outsidePropString.trim().length() > 0) {
                 return outsidePropString;
             }
@@ -339,7 +339,7 @@ public abstract class DfAbstractHelperProperties {
      * @return Property as list. (NotNull)
      */
     final protected List<Object> listProp(String key) {
-        final List<Object> outsidePropList = getOutsidePropList(key);
+        final List<Object> outsidePropList = getOutsideListProp(key);
         if (!outsidePropList.isEmpty()) {
             return outsidePropList;
         }
@@ -354,7 +354,7 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected List<Object> listProp(String key, List<Object> defaultValue) {
         try {
-            final List<Object> outsidePropList = getOutsidePropList(key);
+            final List<Object> outsidePropList = getOutsideListProp(key);
             if (!outsidePropList.isEmpty()) {
                 return outsidePropList;
             }
@@ -378,7 +378,7 @@ public abstract class DfAbstractHelperProperties {
      * @return Property as map. (NotNull)
      */
     final protected Map<String, Object> mapProp(String key) {
-        final Map<String, Object> outsidePropMap = getOutsidePropMap(key);
+        final Map<String, Object> outsidePropMap = getOutsideMapProp(key);
         if (!outsidePropMap.isEmpty()) {
             return outsidePropMap;
         }
@@ -393,7 +393,7 @@ public abstract class DfAbstractHelperProperties {
      */
     final protected Map<String, Object> mapProp(String key, Map<String, Object> defaultValue) {
         try {
-            final Map<String, Object> outsidePropMap = getOutsidePropMap(key);
+            final Map<String, Object> outsidePropMap = getOutsideMapProp(key);
             if (!outsidePropMap.isEmpty()) {
                 return outsidePropMap;
             }
@@ -411,75 +411,37 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                              Outside Properties
     //                                                              ==================
-    protected String getOutsidePropString(String key) {
+    protected String getOutsideStringProp(String key) {
+        final DfOutsideStringPropReader reader = createOutsideStringPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final DfStringFileReader reader = createStringFileReader();
-        if (isSpecifiedEnvironmentType()) {
-            final String environmentType = getEnvironmentType();
-            final String path = "./dfprop/" + environmentType + "/" + propName + ".dfprop";
-            final String str = reader.readString(path);
-            if (str.trim().length() > 0) {
-                return str;
-            }
-        }
-        return reader.readString("./dfprop/" + propName + ".dfprop");
+        final String path = "./dfprop/" + propName + ".dfprop";
+        return reader.readString(path, getEnvironmentType());
     }
 
-    protected DfStringFileReader createStringFileReader() {
-        return new DfStringFileReader();
+    protected DfOutsideStringPropReader createOutsideStringPropReader() {
+        return new DfOutsideStringPropReader();
     }
 
-    protected Map<String, Object> getOutsidePropMap(String key) {
+    protected Map<String, Object> getOutsideMapProp(String key) {
+        final DfOutsideMapPropReader reader = createOutsideMapPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final DfMapStringFileReader reader = createMapStringFileReader();
-        final String mainpath = "./dfprop/" + propName + ".dfprop";
-        if (isSpecifiedEnvironmentType()) {
-            final String envpath = "./dfprop/" + getEnvironmentType() + "/" + propName + ".dfprop";
-            Map<String, Object> map = reader.readMap(envpath);
-            if (map.isEmpty()) {
-                map = reader.readMap(mainpath);
-                setupOutsidePropExMap(reader, map, mainpath);
-            }
-            setupOutsidePropExMap(reader, map, envpath);
-            return map;
-        } else {
-            final Map<String, Object> map = reader.readMap(mainpath);
-            setupOutsidePropExMap(reader, map, mainpath);
-            return map;
-        }
+        final String path = "./dfprop/" + propName + ".dfprop";
+        return reader.readMap(path, getEnvironmentType());
     }
 
-    protected DfMapStringFileReader createMapStringFileReader() {
-        return new DfMapStringFileReader();
+    protected DfOutsideMapPropReader createOutsideMapPropReader() {
+        return new DfOutsideMapPropReader();
     }
 
-    protected void setupOutsidePropExMap(DfMapStringFileReader reader, Map<String, Object> map, String path) {
-        if (!path.endsWith(".dfprop")) {
-            String msg = "The path should end with '.dfprop':";
-            msg = msg + " path=" + path;
-            throw new IllegalStateException(msg);
-        }
-        path = path.substring(0, path.length() - ".dfprop".length()) + "+.dfprop";
-        final Map<String, Object> exMap = reader.readMap(path);
-        map.putAll(exMap);
-    }
-
-    protected List<Object> getOutsidePropList(String key) {
+    protected List<Object> getOutsideListProp(String key) {
+        final DfOutsideListPropReader reader = createOutsideListPropReader();
         final String propName = DfStringUtil.replace(key, "torque.", "");
-        final DfListStringFileReader reader = createListStringFileReader();
-        if (isSpecifiedEnvironmentType()) {
-            final String environmentType = getEnvironmentType();
-            final String path = "./dfprop/" + environmentType + "/" + propName + ".dfprop";
-            List<Object> list = reader.readList(path);
-            if (!list.isEmpty()) {
-                return list;
-            }
-        }
-        return reader.readList("./dfprop/" + propName + ".dfprop");
+        final String path = "./dfprop/" + propName + ".dfprop";
+        return reader.readList(path, getEnvironmentType());
     }
 
-    protected DfListStringFileReader createListStringFileReader() {
-        return new DfListStringFileReader();
+    protected DfOutsideListPropReader createOutsideListPropReader() {
+        return new DfOutsideListPropReader();
     }
 
     // ===============================================================================
@@ -687,8 +649,8 @@ public abstract class DfAbstractHelperProperties {
     /**
      * @return The type of environment. (NotNull: if no specified environment type, returns default control mark)
      */
-    protected final String getEnvironmentTypeIfNullDefaultControl() {
-        return DfEnvironmentType.getInstance().getEnvironmentTypeIfNullDefaultControl();
+    protected final String getEnvironmentTypeMightBeDefault() {
+        return DfEnvironmentType.getInstance().getEnvironmentTypeMightBeDefault();
     }
 
     // ===============================================================================

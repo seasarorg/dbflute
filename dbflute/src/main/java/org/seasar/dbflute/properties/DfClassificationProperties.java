@@ -748,9 +748,21 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             if (sb.length() > 0) {
                 sb.append(": ");
             }
-            sb.append(classificationElement.getComment());
+            final String comment = classificationElement.getCommentDisp();
+            final String filtered = Srl.replace(comment, "\n", comment); // just in case (basically one line)
+            sb.append(filtered);
         }
         return sb.toString();
+    }
+
+    public String buildClassificationApplicationCommentForJavaDoc(DfClassificationElement classificationElement) {
+        final String comment = buildClassificationApplicationComment(classificationElement);
+        return getDocumentProperties().resolveTextForJavaDoc(comment, "    "); // basically indent is unused
+    }
+
+    public String buildClassificationApplicationCommentForSchemaHtml(DfClassificationElement classificationElement) {
+        final String comment = buildClassificationApplicationComment(classificationElement);
+        return getDocumentProperties().resolveTextForSchemaHtml(comment);
     }
 
     public String buildClassificationCodeAliasVariables(DfClassificationElement classificationElement) {

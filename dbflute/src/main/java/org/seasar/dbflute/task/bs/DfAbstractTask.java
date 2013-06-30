@@ -25,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
@@ -305,6 +304,6 @@ public abstract class DfAbstractTask extends Task {
     }
 
     public void setEnvironmentType(String environmentType) {
-        DfEnvironmentType.getInstance().setEnvironmentType(environmentType);
+        _controlLogic.acceptEnvironmentType(environmentType);
     }
 }
