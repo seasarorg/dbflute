@@ -27,9 +27,15 @@ import java.io.UnsupportedEncodingException;
  */
 public class ProcessConsoleReader extends Thread {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final BufferedReader _reader;
     protected final StringBuilder _consoleSb = new StringBuilder();
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public ProcessConsoleReader(InputStream ins, String encoding) {
         encoding = encoding != null ? encoding : "UTF-8";
         try {
@@ -40,10 +46,16 @@ public class ProcessConsoleReader extends Thread {
         }
     }
 
+    // ===================================================================================
+    //                                                                                Read
+    //                                                                                ====
     public String read() {
         return _consoleSb.toString();
     }
 
+    // ===================================================================================
+    //                                                                              Thread
+    //                                                                              ======
     @Override
     public void run() {
         final StringBuilder sb = _consoleSb;

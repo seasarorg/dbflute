@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.helper.process.exception.SystemScriptFailureException;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -31,6 +32,9 @@ import org.seasar.dbflute.util.DfCollectionUtil;
  */
 public class SystemScript {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     public static final String WINDOWS_BATCH_EXT = ".bat";
     public static final String SHELL_SCRIPT_EXT = ".sh";
 
@@ -44,11 +48,28 @@ public class SystemScript {
         return SUPPORTED_EXT_LIST;
     }
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _consoleEncoding;
     protected Map<String, String> _environmentMap;
 
-    public ProcessResult execute(File baseDir, String scriptName) {
+    // ===================================================================================
+    //                                                                      Execute Script
+    //                                                                      ==============
+    public ProcessResult execute(File baseDir, String scriptName, String... args) {
         final ProcessResult result = new ProcessResult(scriptName);
+        final List<String> cmdList = prepareCommandList(scriptName, args);
+        if (cmdList.isEmpty()) {
+            result.setSystemMismatch(true);
+            return result;
+        }
+        final ProcessBuilder builder = prepareProcessBuilder(baseDir, cmdList);
+        final Process process = startProcess(scriptName, builder);
+        return handleProcessResult(scriptName, result, process);
+    }
+
+    protected List<String> prepareCommandList(String scriptName, String... args) {
         final List<String> cmdList = new ArrayList<String>();
         if (isSystemWindowsOS()) {
             if (scriptName.endsWith(WINDOWS_BATCH_EXT)) {
@@ -62,27 +83,53 @@ public class SystemScript {
                 cmdList.add(scriptName);
             }
         }
-        if (cmdList.isEmpty()) {
-            result.setSystemMismatch(true);
-            return result;
+        if (args != null && args.length > 0) {
+            for (String arg : args) {
+                cmdList.add(arg);
+            }
         }
-        final ProcessBuilder builder = new ProcessBuilder(cmdList);
+        return cmdList;
+    }
+
+    protected boolean isSystemWindowsOS() {
+        final String osName = System.getProperty("os.name");
+        return osName != null && osName.toLowerCase().contains("windows");
+    }
+
+    protected ProcessBuilder prepareProcessBuilder(File baseDir, final List<String> cmdList) {
+        final ProcessBuilder builder = createProcessBuilder(cmdList);
         if (_environmentMap != null && !_environmentMap.isEmpty()) {
             builder.environment().putAll(_environmentMap);
         }
+        builder.directory(baseDir).redirectErrorStream(true);
+        return builder;
+    }
+
+    protected ProcessBuilder createProcessBuilder(final List<String> cmdList) {
+        return new ProcessBuilder(cmdList);
+    }
+
+    protected Process startProcess(String scriptName, final ProcessBuilder builder) {
         final Process process;
         try {
-            process = builder.directory(baseDir).redirectErrorStream(true).start();
+            process = builder.start();
         } catch (IOException e) {
             String msg = "Failed to execute the command: " + scriptName;
             throw new IllegalStateException(msg, e);
         }
+        return process;
+    }
 
+    protected ProcessConsoleReader createProcessConsoleReader(InputStream stdin, final String encoding) {
+        return new ProcessConsoleReader(stdin, encoding);
+    }
+
+    protected ProcessResult handleProcessResult(String scriptName, final ProcessResult result, final Process process) {
         InputStream stdin = null;
         try {
             stdin = process.getInputStream();
             final String encoding = _consoleEncoding != null ? _consoleEncoding : "UTF-8";
-            final ProcessConsoleReader reader = new ProcessConsoleReader(stdin, encoding);
+            final ProcessConsoleReader reader = createProcessConsoleReader(stdin, encoding);
             reader.start();
             final int exitCode = process.waitFor();
             reader.join();
@@ -92,15 +139,13 @@ public class SystemScript {
             return result;
         } catch (InterruptedException e) {
             String msg = "The execution was interrupted: " + scriptName;
-            throw new IllegalStateException(msg, e);
+            throw new SystemScriptFailureException(msg, e);
         }
     }
 
-    protected boolean isSystemWindowsOS() {
-        final String osName = System.getProperty("os.name");
-        return osName != null && osName.toLowerCase().contains("windows");
-    }
-
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getConsoleEncoding() {
         return _consoleEncoding;
     }

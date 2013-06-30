@@ -291,25 +291,25 @@ public interface DBMeta {
 
     /**
      * Get the sequence name.
-     * @return The sequence name. (NullAllowed: If it does not have sequence, returns null.)
+     * @return The sequence name. (NullAllowed: if no sequence, returns null.)
      */
     String getSequenceName();
 
     /**
      * Get the SQL for next value of sequence.
-     * @return The SQL for next value of sequence. (NullAllowed: If it does not have sequence, returns null.)
+     * @return The SQL for next value of sequence. (NullAllowed: if no sequence, returns null.)
      */
     String getSequenceNextValSql();
 
     /**
      * Get the increment size of sequence.
-     * @return The increment size of sequence. (NullAllowed: If it is unknown, returns null.)
+     * @return The increment size of sequence. (NullAllowed: if unknown, returns null.)
      */
     Integer getSequenceIncrementSize();
 
     /**
      * Get the cache size of sequence. (The cache means sequence cache on DBFlute)
-     * @return The cache size of sequence. (NullAllowed: If it does not use cache, returns null.)
+     * @return The cache size of sequence. (NullAllowed: if no cache, returns null.)
      */
     Integer getSequenceCacheSize();
 
@@ -324,7 +324,7 @@ public interface DBMeta {
 
     /**
      * Get the column information of version no.
-     * @return The column information of version no. (NullAllowed: If it doesn't have the column, return null.)
+     * @return The column information of version no. (NullAllowed: if no column, return null)
      */
     ColumnInfo getVersionNoColumnInfo();
 
@@ -336,7 +336,7 @@ public interface DBMeta {
 
     /**
      * Get the column information of update date.
-     * @return The column information of update date. (NullAllowed: If it doesn't have the column, return null.)
+     * @return The column information of update date. (NullAllowed: if no column, return null)
      */
     ColumnInfo getUpdateDateColumnInfo();
 
@@ -404,19 +404,13 @@ public interface DBMeta {
 
     /**
      * Get the type name of condition-bean.
-     * @return The type name of condition-bean. (NullAllowed: If the condition-bean does not exist)
+     * @return The type name of condition-bean. (NullAllowed: if the condition-bean does not exist)
      */
     String getConditionBeanTypeName();
 
     /**
-     * Get the type name of DAO.
-     * @return The type name of DAO. (NullAllowed: If the DAO does not exist)
-     */
-    String getDaoTypeName();
-
-    /**
      * Get the type name of behavior.
-     * @return The type name of behavior. (NullAllowed: If the behavior does not exist)
+     * @return The type name of behavior. (NullAllowed: if the behavior does not exist)
      */
     String getBehaviorTypeName();
 

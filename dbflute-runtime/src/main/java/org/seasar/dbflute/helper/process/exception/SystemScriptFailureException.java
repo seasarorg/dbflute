@@ -13,12 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.token.file.exception;
+package org.seasar.dbflute.helper.process.exception;
 
 /**
  * @author jflute
  */
-public class FileMakingInvalidValueCountException extends RuntimeException {
+public class SystemScriptFailureException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -27,7 +27,7 @@ public class FileMakingInvalidValueCountException extends RuntimeException {
      * Constructor.
      * @param msg The message for the exception. (NotNull)
      */
-    public FileMakingInvalidValueCountException(String msg) {
+    public SystemScriptFailureException(String msg) {
         super(msg);
     }
 
@@ -36,7 +36,7 @@ public class FileMakingInvalidValueCountException extends RuntimeException {
      * @param msg Exception message. (NotNull)
      * @param cause The wrapped exception. (NotNull)
      */
-    public FileMakingInvalidValueCountException(String msg, Throwable cause) {
+    public SystemScriptFailureException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }
