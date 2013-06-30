@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.process.exception.SystemScriptFailureException;
+import org.seasar.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
@@ -61,8 +62,8 @@ public class SystemScript {
         final ProcessResult result = new ProcessResult(scriptName);
         final List<String> cmdList = prepareCommandList(scriptName, args);
         if (cmdList.isEmpty()) {
-            result.setSystemMismatch(true);
-            return result;
+            String msg = "Unsupported script: " + scriptName;
+            throw new SystemScriptUnsupportedScriptException(msg);
         }
         final ProcessBuilder builder = prepareProcessBuilder(baseDir, cmdList);
         final Process process = startProcess(scriptName, builder);
@@ -82,6 +83,9 @@ public class SystemScript {
                 cmdList.add("sh");
                 cmdList.add(scriptName);
             }
+        }
+        if (cmdList.isEmpty()) {
+            return DfCollectionUtil.emptyList();
         }
         if (args != null && args.length > 0) {
             for (String arg : args) {

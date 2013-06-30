@@ -24,7 +24,6 @@ public class ProcessResult {
     protected final String _processName;
     protected String _console;
     protected int _exitCode;
-    protected boolean _systemMismatch;
 
     public ProcessResult(String processName) {
         _processName = processName;
@@ -48,13 +47,5 @@ public class ProcessResult {
 
     public void setExitCode(int exitCode) {
         this._exitCode = exitCode;
-    }
-
-    public boolean isSystemMismatch() {
-        return _systemMismatch;
-    }
-
-    public void setSystemMismatch(boolean systemMismatch) {
-        this._systemMismatch = systemMismatch;
     }
 }
