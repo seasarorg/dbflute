@@ -16,12 +16,11 @@
 package org.seasar.dbflute.properties.assistant.freegen.filepath;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.helper.filesystem.FileHierarchyTracer;
+import org.seasar.dbflute.helper.filesystem.FileHierarchyTracingHandler;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenResource;
 import org.seasar.dbflute.properties.assistant.freegen.DfFreeGenTable;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -124,26 +123,27 @@ public class DfFilePathTableLoader {
      * @param exceptPathList The list of except path. (NotNull)
      * @param baseFile The base file. (NotNull)
      */
-    protected void collectFile(List<File> fileList, final String targetExt, final String targetKeyword,
-            List<String> exceptPathList, File baseFile) {
-        if (isExceptFile(exceptPathList, baseFile)) {
-            return;
-        }
-        if (baseFile.isFile()) { // only target extension here
-            fileList.add(baseFile);
-        } else if (baseFile.isDirectory()) {
-            final File[] listFiles = baseFile.listFiles(new FileFilter() {
-                public boolean accept(File file) {
-                    return file.isDirectory() || isHitByTargetExt(toPath(file), targetExt, targetKeyword);
+    protected void collectFile(final List<File> fileList, final String targetExt, final String targetKeyword,
+            final List<String> exceptPathList, final File baseFile) {
+        final FileHierarchyTracer tracer = new FileHierarchyTracer();
+        tracer.trace(baseFile, new FileHierarchyTracingHandler() {
+            public boolean isTargetFileOrDir(File currentFile) {
+                if (currentFile.isDirectory()) {
+                    return true;
                 }
-            });
-            if (listFiles != null) {
-                orderListFiles(listFiles); // to be same order between Windows and MacOSX
-                for (File currentFile : listFiles) {
-                    collectFile(fileList, targetExt, targetKeyword, exceptPathList, currentFile);
-                }
+                return isCollectFile(targetExt, targetKeyword, exceptPathList, currentFile);
             }
-        }
+
+            public void handleFile(File currentFile) {
+                fileList.add(currentFile);
+            }
+        });
+    }
+
+    protected boolean isCollectFile(String targetExt, String targetKeyword, List<String> exceptPathList,
+            File currentFile) {
+        return !isExceptFile(exceptPathList, currentFile)
+                && isHitByTargetExt(toPath(currentFile), targetExt, targetKeyword);
     }
 
     protected boolean isExceptFile(List<String> exceptPathList, File baseFile) {
@@ -171,14 +171,6 @@ public class DfFilePathTableLoader {
             result = true;
         }
         return result;
-    }
-
-    protected void orderListFiles(File[] listFiles) {
-        Arrays.sort(listFiles, new Comparator<File>() {
-            public int compare(File o1, File o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
     }
 
     // ===================================================================================
