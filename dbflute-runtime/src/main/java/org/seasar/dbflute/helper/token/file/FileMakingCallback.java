@@ -24,7 +24,7 @@ package org.seasar.dbflute.helper.token.file;
  * final FileMakingRowResource resource = new FileMakingRowResource();
  * FileToken fileToken = new FileToken();
  * <span style="color: #3F7E5E">// or final Iterator&lt;LinkedHashMap&lt;String, String&gt;&gt; iterator = ...</span>
- * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
+ * fileToken.makeFromIterator(new FileOutputStream(tsvFile), new FileMakingCallback() {
  *     public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
  *         return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
  *     }

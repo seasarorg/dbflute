@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.token.file.exception.FileMakingInvalidValueCountException;
+import org.seasar.dbflute.helper.token.file.exception.FileMakingRequiredOptionNotFoundException;
 import org.seasar.dbflute.helper.token.line.LineMakingOption;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
@@ -44,7 +45,7 @@ import org.seasar.dbflute.util.Srl;
  * The handler of token file. <br />
  * You can read/write the token file.
  * <pre>
- * e.g. Reading
+ * e.g. Tokenize (read)
  *  File tsvFile = ... <span style="color: #3F7E5E">// input file</span>
  *  FileToken fileToken = new FileToken();
  *  fileToken.tokenize(new FileInputStream(tsvFile), new FileTokenizingCallback() {
@@ -54,19 +55,7 @@ import org.seasar.dbflute.util.Srl;
  *      }
  *  }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8());
  * 
- * e.g. Writing (using Iterator)
- *  File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
- *  List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
- *  final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
- *  final FileMakingRowResource resource = new FileMakingRowResource();
- *  FileToken fileToken = new FileToken();
- *  fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *      public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
- *          return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
- *      }
- *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
- * 
- * e.g. Writing (using Writer)
+ * e.g. Make (write) by Writer
  *  File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
  *  List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
  *  final FileMakingRowResource resource = new FileMakingRowResource();
@@ -77,6 +66,18 @@ import org.seasar.dbflute.util.Srl;
  *              resource... <span style="color: #3F7E5E">// convert the member to the row resource</span>
  *              writer.<span style="color: #AD4747">write</span>(resource); <span style="color: #3F7E5E">// Yes, you write!</span>
  *          }
+ *      }
+ *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+ * 
+ * e.g. Make (write) from Iterator
+ *  File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
+ *  List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
+ *  final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
+ *  final FileMakingRowResource resource = new FileMakingRowResource();
+ *  FileToken fileToken = new FileToken();
+ *  fileToken.makeFromIterator(new FileOutputStream(tsvFile), new FileMakingCallback() {
+ *      public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
+ *          return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
  *      }
  *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * </pre>
@@ -100,8 +101,8 @@ public class FileToken {
     protected final LineToken _lineToken = new LineToken();
 
     // ===================================================================================
-    //                                                                      Tokenize(Read)
-    //                                                                      ==============
+    //                                                                     Tokenize (read)
+    //                                                                     ===============
     /**
      * Tokenize (read) the token data from the specified file. (file-tokenizing) <br />
      * CR + LF is treated as LF.
@@ -437,90 +438,8 @@ public class FileToken {
     }
 
     // ===================================================================================
-    //                                                                         Make(Write)
-    //                                                                         ===========
-    /**
-     * Make (write) token file from specified row resources.
-     * <pre>
-     * String tsvFile = ... <span style="color: #3F7E5E">// output file</span>
-     * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
-     * final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
-     * final FileMakingRowResource resource = new FileMakingRowResource();
-     * FileToken fileToken = new FileToken();
-     * fileToken.make(tsvFile, new FileMakingCallback() {
-     *     public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
-     *         return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
-     *     }
-     * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
-     * </pre>
-     * @param filePath The path of token file to write. (NotNull)
-     * @param callback The callback for file-making. (NotNull)
-     * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
-     * @throws FileNotFoundException When the file was not found.
-     * @throws IOException When the file writing failed.
-     * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
-     */
-    public void make(String filePath, FileMakingCallback callback, FileMakingOption option)
-            throws FileNotFoundException, IOException {
-        assertStringNotNullAndNotTrimmedEmpty("filePath", filePath);
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(filePath);
-            doMake(fos, callback, option);
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close(); // basically no needed but just in case
-                } catch (IOException ignored) {
-                }
-            }
-        }
-    }
-
-    /**
-     * Make (write) token-file from specified row resources. <br />
-     * This method uses {@link OutputStreamWriter} and {@link BufferedWriter} that wrap the stream. <br />
-     * And these objects are closed. (close() called finally)
-     * <pre>
-     * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
-     * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
-     * final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
-     * final FileMakingRowResource resource = new FileMakingRowResource();
-     * FileToken fileToken = new FileToken();
-     * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
-     *     public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
-     *         return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
-     *     }
-     * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
-     * </pre>
-     * @param ous The output stream for writing. This stream is closed after writing automatically. (NotNull)
-     * @param callback The callback for file-making. (NotNull)
-     * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
-     * @throws FileNotFoundException When the file was not found.
-     * @throws IOException When the file writing failed.
-     * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
-     */
-    public void make(OutputStream ous, final FileMakingCallback callback, FileMakingOption option)
-            throws FileNotFoundException, IOException {
-        doMake(ous, callback, option);
-    }
-
-    protected void doMake(OutputStream ous, final FileMakingCallback callback, FileMakingOption option)
-            throws FileNotFoundException, IOException {
-        doMakeByWriter(ous, new FileMakingWriterCallback() {
-            public void make(FileMakingRowWriter writer) throws IOException {
-                FileMakingRowResource resource = null;
-                while (true) {
-                    resource = callback.getRowResource();
-                    if (resource == null || !resource.hasRowData()) {
-                        break; // the end
-                    }
-                    writer.write(resource);
-                }
-            }
-        }, option);
-    }
-
+    //                                                                        Make (write)
+    //                                                                        ============
     /**
      * Make (write) token file by row writer that accepts row resources.
      * <pre>
@@ -539,7 +458,7 @@ public class FileToken {
      * </pre>
      * @param filePath The path of token file to write. (NotNull)
      * @param callback The callback for file-making with writer. (NotNull)
-     * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
+     * @param option The option for file-making. (NotNull, Required: delimiter, encoding)
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
      * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
@@ -581,7 +500,7 @@ public class FileToken {
      * </pre>
      * @param ous The output stream for writing. This stream is closed after writing automatically. (NotNull)
      * @param callback The callback for file-making with writer. (NotNull)
-     * @param option The option for file-making. (NotNull, Required{delimiter, encoding})
+     * @param option The option for file-making. (NotNull, Required: delimiter, encoding)
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
      * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
@@ -596,15 +515,12 @@ public class FileToken {
         assertObjectNotNull("ous", ous);
         assertObjectNotNull("callback", callback);
         assertObjectNotNull("option", option);
-        final String encoding = option.getEncoding();
-        assertStringNotNullAndNotTrimmedEmpty("encoding", encoding);
-        assertObjectNotNull("delimiter", option.getDelimiter());
-        final String lineSep = prepareWritingLineSeparator(option);
-        final LineMakingOption lineOption = prepareWritingLineOption(option);
+        assertMakingDelimiter(option);
+        assertMakingEncoding(option);
 
         Writer writer = null; // is interface not to use newLine() for fixed line separator
         try {
-            writer = new BufferedWriter(new OutputStreamWriter(ous, encoding));
+            writer = new BufferedWriter(new OutputStreamWriter(ous, option.getEncoding()));
             final Set<String> headerDoneMarkSet = new HashSet<String>(1);
             final Set<String> firstLineDoneMarkSet = new HashSet<String>(1);
 
@@ -616,6 +532,8 @@ public class FileToken {
             }
 
             // write data row
+            final LineMakingOption lineOption = prepareWritingLineOption(option);
+            final String lineSep = prepareWritingLineSeparator(option);
             callbackDataRowWriter(callback, option, lineSep, lineOption, writer, firstLineDoneMarkSet);
             writer.flush();
         } finally {
@@ -735,9 +653,130 @@ public class FileToken {
         throw new FileMakingInvalidValueCountException(msg);
     }
 
+    /**
+     * Make (write) token file from iterator that provides row resources.
+     * <pre>
+     * String tsvFile = ... <span style="color: #3F7E5E">// output file</span>
+     * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
+     * final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
+     * final FileMakingRowResource resource = new FileMakingRowResource();
+     * FileToken fileToken = new FileToken();
+     * fileToken.makeFromIterator(tsvFile, new FileMakingCallback() {
+     *     public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
+     *         return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
+     *     }
+     * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+     * </pre>
+     * @param filePath The path of token file to write. (NotNull)
+     * @param callback The callback for file-making. (NotNull)
+     * @param option The option for file-making. (NotNull, Required: delimiter, encoding)
+     * @throws FileNotFoundException When the file was not found.
+     * @throws IOException When the file writing failed.
+     * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
+     */
+    public void makeFromIterator(String filePath, FileMakingCallback callback, FileMakingOption option)
+            throws FileNotFoundException, IOException {
+        assertStringNotNullAndNotTrimmedEmpty("filePath", filePath);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(filePath);
+            doMake(fos, callback, option);
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close(); // basically no needed but just in case
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    /**
+     * Make (write) token-file from iterator that provides row resources. <br />
+     * This method uses {@link OutputStreamWriter} and {@link BufferedWriter} that wrap the stream. <br />
+     * And these objects are closed. (close() called finally)
+     * <pre>
+     * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
+     * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
+     * final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
+     * final FileMakingRowResource resource = new FileMakingRowResource();
+     * FileToken fileToken = new FileToken();
+     * fileToken.makeFromIterator(new FileOutputStream(tsvFile), new FileMakingCallback() {
+     *     public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
+     *         return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
+     *     }
+     * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+     * </pre>
+     * @param ous The output stream for writing. This stream is closed after writing automatically. (NotNull)
+     * @param callback The callback for file-making. (NotNull)
+     * @param option The option for file-making. (NotNull, Required: delimiter, encoding)
+     * @throws FileNotFoundException When the file was not found.
+     * @throws IOException When the file writing failed.
+     * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
+     */
+    public void makeFromIterator(OutputStream ous, final FileMakingCallback callback, FileMakingOption option)
+            throws FileNotFoundException, IOException {
+        doMake(ous, callback, option);
+    }
+
+    protected void doMake(OutputStream ous, final FileMakingCallback callback, FileMakingOption option)
+            throws FileNotFoundException, IOException {
+        doMakeByWriter(ous, new FileMakingWriterCallback() {
+            public void make(FileMakingRowWriter writer) throws IOException {
+                FileMakingRowResource resource = null;
+                while (true) {
+                    resource = callback.getRowResource();
+                    if (resource == null || !resource.hasRowData()) {
+                        break; // the end
+                    }
+                    writer.write(resource);
+                }
+            }
+        }, option);
+    }
+
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Assert Option
+    //                                         -------------
+    protected void assertMakingDelimiter(FileMakingOption option) {
+        final String delimiter = option.getDelimiter();
+        if (delimiter != null) { // don't trim it (might be tab)
+            return;
+        }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The option of delimiter for FileToken is required.");
+        br.addItem("Advice");
+        br.addElement("You should specify delimiter by option.");
+        br.addElement("For example:");
+        br.addElement("  (x): new FileMakingOption().encodeAsUTF8()");
+        br.addElement("  (o): new FileMakingOption().delimitateByTab().encodeAsUTF8()");
+        br.addItem("Option");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new FileMakingRequiredOptionNotFoundException(msg);
+    }
+
+    protected void assertMakingEncoding(FileMakingOption option) {
+        final String encoding = option.getEncoding();
+        if (encoding != null && encoding.trim().length() > 0) {
+            return;
+        }
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The option of encoding for FileToken is required.");
+        br.addItem("Advice");
+        br.addElement("You should specify delimiter by option.");
+        br.addElement("For example:");
+        br.addElement("  (x): new FileMakingOption().delimitateByTab()");
+        br.addElement("  (o): new FileMakingOption().delimitateByTab().encodeAsUTF8()");
+        br.addItem("Option");
+        br.addElement(option);
+        final String msg = br.buildExceptionMessage();
+        throw new FileMakingRequiredOptionNotFoundException(msg);
+    }
+
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------

@@ -55,7 +55,7 @@ public class FileMakingSimpleFacade {
             }
         };
         final FileToken fileToken = new FileToken();
-        fileToken.make(filePath, fileMakingCallback, option);
+        fileToken.makeFromIterator(filePath, fileMakingCallback, option);
     }
 
     /**
@@ -84,7 +84,7 @@ public class FileMakingSimpleFacade {
         };
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final FileToken fileToken = new FileToken();
-        fileToken.make(baos, fileMakingCallback, option);
+        fileToken.makeFromIterator(baos, fileMakingCallback, option);
         return baos.toByteArray();
     }
 }

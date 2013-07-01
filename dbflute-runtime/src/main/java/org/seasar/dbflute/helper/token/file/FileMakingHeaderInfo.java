@@ -47,6 +47,14 @@ public class FileMakingHeaderInfo {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _columnNameList + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public List<String> getColumnNameList() {

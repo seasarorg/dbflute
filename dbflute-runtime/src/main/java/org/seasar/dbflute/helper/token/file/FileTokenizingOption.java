@@ -28,12 +28,9 @@ public class FileTokenizingOption {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected String _encoding;
-
     protected String _delimiter;
-
+    protected String _encoding;
     protected boolean _beginFirstLine;
-
     protected boolean _handleEmptyAsNull;
 
     // =====================================================================================
@@ -83,6 +80,14 @@ public class FileTokenizingOption {
     public FileTokenizingOption handleEmptyAsNull() {
         _handleEmptyAsNull = true;
         return this;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _delimiter + ", " + _encoding + ", " + _beginFirstLine + ", " + _handleEmptyAsNull + "}";
     }
 
     // =====================================================================================

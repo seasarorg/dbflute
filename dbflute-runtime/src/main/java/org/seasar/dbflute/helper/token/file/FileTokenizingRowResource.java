@@ -31,6 +31,14 @@ public class FileTokenizingRowResource {
     protected int _rowNumber;
     protected int _lineNumber;
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _lineNumber + ", row=" + _rowNumber + ": " + _rowString + "}";
+    }
+
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
@@ -48,7 +56,7 @@ public class FileTokenizingRowResource {
 
     /**
      * Get the list of value.
-     * @return The list of value. (NotNull, NotEmpty)
+     * @return The list of value. (NotNull, NotEmpty in callback)
      */
     public List<String> getValueList() {
         return _valueList;
@@ -58,6 +66,10 @@ public class FileTokenizingRowResource {
         _valueList = valueList;
     }
 
+    /**
+     * Get the row string with delimiters. e.g. foo,bar,qux
+     * @return The string of row. (NotNull in callback)
+     */
     public String getRowString() {
         return _rowString;
     }
@@ -66,6 +78,10 @@ public class FileTokenizingRowResource {
         _rowString = rowString;
     }
 
+    /**
+     * Get the row number. e.g. first data is always 1
+     * @return The integer as row number. (NotZero, NotMinus in callback)
+     */
     public int getRowNumber() {
         return _rowNumber;
     }
@@ -74,6 +90,10 @@ public class FileTokenizingRowResource {
         _rowNumber = rowNumber;
     }
 
+    /**
+     * Get the line number. e.g. first data is 1 if no header, 2 if header exists
+     * @return The integer as line number. (NotZero, NotMinus in callback)
+     */
     public int getLineNumber() {
         return _lineNumber;
     }

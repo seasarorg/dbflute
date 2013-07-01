@@ -131,7 +131,7 @@ public class FileTokenTest extends PlainTestCase {
 
         // ## Act ##
         List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
-        impl.make(ous, new FileMakingCallback() {
+        impl.makeFromIterator(ous, new FileMakingCallback() {
             private final FileMakingRowResource resource = new FileMakingRowResource();
             private int index = 0;
 
@@ -183,7 +183,7 @@ public class FileTokenTest extends PlainTestCase {
         ByteArrayOutputStream ous = new ByteArrayOutputStream();
 
         // ## Act ##
-        impl.make(ous, new FileMakingCallback() {
+        impl.makeFromIterator(ous, new FileMakingCallback() {
             private final FileMakingRowResource resource = new FileMakingRowResource();
             private int index = 0;
 
@@ -234,7 +234,7 @@ public class FileTokenTest extends PlainTestCase {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         // ## Act ##
-        impl.make(outputStream, new FileMakingCallback() {
+        impl.makeFromIterator(outputStream, new FileMakingCallback() {
             private final FileMakingRowResource resource = new FileMakingRowResource();
             private int index = 0;
 
@@ -289,7 +289,7 @@ public class FileTokenTest extends PlainTestCase {
             List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
             FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf()
                     .quoteMinimally().headerInfo(columnNameList);
-            impl.make(outputStream, new FileMakingCallback() {
+            impl.makeFromIterator(outputStream, new FileMakingCallback() {
                 private final FileMakingRowResource resource = new FileMakingRowResource();
                 private int index = 0;
 
@@ -339,7 +339,7 @@ public class FileTokenTest extends PlainTestCase {
         List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
         FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf()
                 .quoteMinimally().suppressValueCountCheck().headerInfo(columnNameList);
-        impl.make(outputStream, new FileMakingCallback() {
+        impl.makeFromIterator(outputStream, new FileMakingCallback() {
             private final FileMakingRowResource resource = new FileMakingRowResource();
             private int index = 0;
 

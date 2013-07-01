@@ -23,15 +23,6 @@ import java.util.Iterator;
  * You can set one record info to this resource as list of string or map of string with header info. <br />
  * Null resource or null data or empty data means the end of data.
  * <pre>
- * e.g. make() (using Iterator)
- *  final FileMakingRowResource resource = new FileMakingRowResource();
- *  final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
- *  fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *      public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
- *          return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
- *      }
- *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
- * 
  * e.g. makeByWriter()
  *  final FileMakingRowResource resource = new FileMakingRowResource();
  *  fileToken.makeByWriter(new FileOutputStream(tsvFile), new FileMakingWriterCallback() {
@@ -42,7 +33,15 @@ import java.util.Iterator;
  *          }
  *      }
  *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
- * </pre>
+ * 
+ * e.g. makeFromIterator()
+ *  final FileMakingRowResource resource = new FileMakingRowResource();
+ *  final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
+ *  fileToken.makeFromIterator(new FileOutputStream(tsvFile), new FileMakingCallback() {
+ *      public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
+ *          return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
+ *      }
+ *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * </pre>
  * @author jflute
  */
@@ -74,7 +73,7 @@ public class FileMakingRowResource {
     }
 
     /**
-     * Accept the iterator for value list. {Priority One} <br />
+     * Accept the iterator for value list. <br />
      * If the iterator has the next element, set it to value list. (means next() called) <br />
      * No more element means end of data (no resource is treated as end of data by {@link FileToken}).
      * @param valueListIterator The iterator for value list. (NotNull)
@@ -101,6 +100,14 @@ public class FileMakingRowResource {
      */
     public void clear() {
         _valueList = null;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _valueList + "}";
     }
 
     // =====================================================================================

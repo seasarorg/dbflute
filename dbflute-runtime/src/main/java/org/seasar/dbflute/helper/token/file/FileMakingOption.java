@@ -30,11 +30,11 @@ public class FileMakingOption {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The encoding for the file. (Required) */
-    protected String _encoding;
-
     /** The delimiter of data. (Required) */
     protected String _delimiter;
+
+    /** The encoding for the file. (Required) */
+    protected String _encoding;
 
     /** The line separator for the file. (NotRequired) */
     protected String _lineSeparator;
@@ -158,22 +158,30 @@ public class FileMakingOption {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _delimiter + ", " + _encoding + ", " + _quoteMinimally + ", " + _headerInfo + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getEncoding() {
-        return _encoding;
-    }
-
-    public void setEncoding(String encoding) {
-        _encoding = encoding;
-    }
-
     public String getDelimiter() {
         return _delimiter;
     }
 
     public void setDelimiter(String delimiter) {
         _delimiter = delimiter;
+    }
+
+    public String getEncoding() {
+        return _encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        _encoding = encoding;
     }
 
     public String getLineSeparator() {
