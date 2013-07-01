@@ -1409,7 +1409,7 @@ public class ForeignKey implements Constraint {
         final StringBuilder sb = new StringBuilder();
         sb.append(getTable().getAliasExpression());
         sb.append(getTable().getTableDbName());
-        sb.append(" by your ").append(getLocalColumnNameCommaString());
+        sb.append(" by ").append(getLocalColumnNameCommaString());
         sb.append(", named '").append(getReferrerJavaBeansRulePropertyNameAsOne()).append("'");
         return sb.toString();
     }
@@ -1441,7 +1441,7 @@ public class ForeignKey implements Constraint {
         final StringBuilder sb = new StringBuilder();
         sb.append(getTable().getAliasExpression());
         sb.append(getTable().getTableDbName());
-        sb.append(" by your ").append(getLocalColumnNameCommaString());
+        sb.append(" by ").append(getLocalColumnNameCommaString());
         sb.append(", named '").append(getReferrerJavaBeansRulePropertyName()).append("'");
         return sb.toString();
     }

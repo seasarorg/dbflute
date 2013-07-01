@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.dbflute.DBDef;
-import org.seasar.dbflute.config.DfDatabaseNameMapping;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
@@ -29,6 +28,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
+import org.seasar.dbflute.infra.core.DfDatabaseNameMapping;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;

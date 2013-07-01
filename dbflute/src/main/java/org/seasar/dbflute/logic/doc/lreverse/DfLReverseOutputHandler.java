@@ -272,7 +272,7 @@ public class DfLReverseOutputHandler {
             public void handle(final DfJFadResultSetWrapper wrapper) {
                 try {
                     final FileMakingRowResource resource = new FileMakingRowResource();
-                    fileToken.make(delimiterFilePath, new FileMakingCallback() {
+                    fileToken.makeFromIterator(delimiterFilePath, new FileMakingCallback() {
                         public FileMakingRowResource getRowResource() {
                             try {
                                 if (limit >= 0 && limit < count) {
