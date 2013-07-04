@@ -1,5 +1,23 @@
+/*
+ * Copyright 2004-2013 the Seasar Foundation and the Others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 package org.seasar.dbflute.infra.dfprop;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.unit.core.PlainTestCase;
@@ -414,5 +432,234 @@ public class DfPropFileTest extends PlainTestCase {
             mockMap = null;
         }
         return (Map<String, ELEMENT>) mockMap;
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void test_readMap_Option_returnsNullIfNotFound_exists() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @SuppressWarnings("unchecked")
+            @Override
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
+                    String path) {
+                return (Map<String, ELEMENT>) newLinkedHashMap("foo", "bar");
+            }
+        }.returnsNullIfNotFound();
+
+        // ## Act ##
+        Map<String, Object> map = propFile.readMap("/dfprop/exampleMap.dfprop", null);
+
+        // ## Assert ##
+        log(map);
+        assertNotNull(map);
+        assertEquals(1, map.size());
+        assertEquals(map.get("foo"), "bar");
+    }
+
+    public void test_readMap_Option_returnsNullIfNotFound_empty() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @Override
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
+                    String path) {
+                return newLinkedHashMap();
+            }
+        }.returnsNullIfNotFound();
+
+        // ## Act ##
+        Map<String, Object> map = propFile.readMap("/dfprop/exampleMap.dfprop", null);
+
+        // ## Assert ##
+        log(map);
+        assertNotNull(map);
+        assertTrue(map.isEmpty());
+    }
+
+    public void test_readMap_Option_returnsNullIfNotFound_noExists() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile().returnsNullIfNotFound();
+
+        // ## Act ##
+        Map<String, Object> map = propFile.readMap("/noexists/noexistsMap.dfprop", null);
+
+        // ## Assert ##
+        log(map);
+        assertNull(map);
+    }
+
+    // ===================================================================================
+    //                                                                           Read List
+    //                                                                           =========
+    public void test_readList_default() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @Override
+            protected List<Object> actuallyReadList(String path) throws FileNotFoundException, IOException {
+                List<Object> list = newArrayList();
+                list.add(1);
+                list.add(2);
+                list.add(3);
+                return list;
+            }
+        };
+
+        // ## Act ##
+        List<Object> readList = propFile.readList("./dfprop/exampleList.dfprop", null);
+
+        // ## Assert ##
+        assertEquals(newArrayList(1, 2, 3), readList);
+    }
+
+    public void test_readList_switched() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @Override
+            protected List<Object> actuallyReadList(String path) throws FileNotFoundException, IOException {
+                List<Object> list = newArrayList();
+                if (path.contains("/maihama/")) {
+                    list.add("foo");
+                    list.add("bar");
+                } else {
+                    list.add(1);
+                    list.add(2);
+                    list.add(3);
+                }
+                return list;
+            }
+        };
+
+        // ## Act ##
+        List<Object> readList = propFile.readList("./dfprop/exampleList.dfprop", "maihama");
+
+        // ## Assert ##
+        assertEquals(newArrayList("foo", "bar"), readList);
+    }
+
+    // ===================================================================================
+    //                                                                           Read List
+    //                                                                           =========
+    public void test_readString_default() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @Override
+            protected String actuallyReadString(String path) throws FileNotFoundException, IOException {
+                return "foo\nbar";
+            }
+        };
+
+        // ## Act ##
+        String readString = propFile.readString("./dfprop/example.dfprop", null);
+
+        // ## Assert ##
+        assertEquals("foo\nbar", readString);
+    }
+
+    public void test_readString_switched() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @Override
+            protected String actuallyReadString(String path) throws FileNotFoundException, IOException {
+                if (path.contains("/maihama/")) {
+                    return "maihama\ndockside";
+                } else {
+                    return "foo\nbar";
+                }
+            }
+        };
+
+        // ## Act ##
+        String readString = propFile.readString("./dfprop/example.dfprop", "maihama");
+
+        // ## Assert ##
+        assertEquals("maihama\ndockside", readString);
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void test_actuallyReadMap_FileNotFound() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile();
+
+        // ## Act ##
+        try {
+            propFile.actuallyReadMap("/noexists/noexistsMap.dfprop");
+            // ## Assert ##
+            fail();
+        } catch (FileNotFoundException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_actuallyReadMapAsStringValue_FileNotFound() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile();
+
+        // ## Act ##
+        try {
+            propFile.actuallyReadMapAsStringValue("/noexists/noexistsMap.dfprop");
+            // ## Assert ##
+            fail();
+        } catch (FileNotFoundException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_actuallyReadMapAsStringListValue_FileNotFound() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile();
+
+        // ## Act ##
+        try {
+            propFile.actuallyReadMapAsStringListValue("/noexists/noexistsMap.dfprop");
+            // ## Assert ##
+            fail();
+        } catch (FileNotFoundException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_actuallyReadMapAsStringMapValue_FileNotFound() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile();
+
+        // ## Act ##
+        try {
+            propFile.actuallyReadMapAsStringMapValue("/noexists/noexistsMap.dfprop");
+            // ## Assert ##
+            fail();
+        } catch (FileNotFoundException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_actuallyReadList_FileNotFound() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile();
+
+        // ## Act ##
+        try {
+            propFile.actuallyReadList("/noexists/noexistsMap.dfprop");
+            // ## Assert ##
+            fail();
+        } catch (FileNotFoundException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_actuallyReadString_FileNotFound() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile();
+
+        // ## Act ##
+        try {
+            propFile.actuallyReadString("/noexists/noexistsMap.dfprop");
+            // ## Assert ##
+            fail();
+        } catch (FileNotFoundException e) {
+            log(e.getMessage());
+        }
     }
 }

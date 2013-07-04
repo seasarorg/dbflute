@@ -27,7 +27,6 @@ import java.util.Map;
 import org.seasar.dbflute.exception.DfPropFileReadFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.mapstring.MapListFile;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -100,11 +99,11 @@ public class DfPropFile {
      * if default, main and main+
      * </pre>
      * @param dfpropPath The path of DBFlute property file. (NotNull)
-     * @param env The environment type of DBFlute. (NullAllowed: if null, no environment file)
+     * @param envType The environment type of DBFlute. (NullAllowed: if null, no environment file)
      * @return The read map. (NotNull: if not found, returns empty map)
      */
-    public Map<String, Object> readMap(String dfpropPath, String env) {
-        return doReadMap(dfpropPath, env, new DfPropReadingMapHandler<Object>() {
+    public Map<String, Object> readMap(String dfpropPath, String envType) {
+        return doReadMap(dfpropPath, envType, new DfPropReadingMapHandler<Object>() {
             public Map<String, Object> readMap(String path) throws FileNotFoundException, IOException {
                 return actuallyReadMap(path);
             }
@@ -112,14 +111,7 @@ public class DfPropFile {
     }
 
     protected Map<String, Object> actuallyReadMap(String path) throws FileNotFoundException, IOException {
-        try {
-            return createMapListFileStructural().readMap(createInputStream(path));
-        } catch (FileNotFoundException e) {
-            return DfCollectionUtil.newLinkedHashMap();
-        } catch (RuntimeException e) {
-            throwDfPropFileReadFailureException(path, e);
-            return null; // unreachable
-        }
+        return createMapListFileStructural().readMap(createInputStream(path));
     }
 
     /**
@@ -151,14 +143,7 @@ public class DfPropFile {
     }
 
     protected Map<String, String> actuallyReadMapAsStringValue(String path) throws FileNotFoundException, IOException {
-        try {
-            return createMapListFileStructural().readMapAsStringValue(createInputStream(path));
-        } catch (FileNotFoundException e) {
-            return DfCollectionUtil.newLinkedHashMap();
-        } catch (RuntimeException e) {
-            throwDfPropFileReadFailureException(path, e);
-            return null; // unreachable
-        }
+        return createMapListFileStructural().readMapAsStringValue(createInputStream(path));
     }
 
     /**
@@ -191,14 +176,7 @@ public class DfPropFile {
 
     protected Map<String, List<String>> actuallyReadMapAsStringListValue(String path) throws FileNotFoundException,
             IOException {
-        try {
-            return createMapListFileStructural().readMapAsStringListValue(createInputStream(path));
-        } catch (FileNotFoundException e) {
-            return DfCollectionUtil.newLinkedHashMap();
-        } catch (RuntimeException e) {
-            throwDfPropFileReadFailureException(path, e);
-            return null; // unreachable
-        }
+        return createMapListFileStructural().readMapAsStringListValue(createInputStream(path));
     }
 
     /**
@@ -231,14 +209,7 @@ public class DfPropFile {
 
     protected Map<String, Map<String, String>> actuallyReadMapAsStringMapValue(String path)
             throws FileNotFoundException, IOException {
-        try {
-            return createMapListFileStructural().readMapAsStringMapValue(createInputStream(path));
-        } catch (FileNotFoundException e) {
-            return DfCollectionUtil.newLinkedHashMap();
-        } catch (RuntimeException e) {
-            throwDfPropFileReadFailureException(path, e);
-            return null; // unreachable
-        }
+        return createMapListFileStructural().readMapAsStringMapValue(createInputStream(path));
     }
 
     // ===================================================================================
@@ -272,12 +243,7 @@ public class DfPropFile {
     }
 
     protected List<Object> actuallyReadList(String path) throws FileNotFoundException, IOException {
-        try {
-            return createMapListFileStructural().readList(createInputStream(path));
-        } catch (RuntimeException e) {
-            throwDfPropFileReadFailureException(path, e);
-            return null; // unreachable
-        }
+        return createMapListFileStructural().readList(createInputStream(path));
     }
 
     // ===================================================================================
@@ -302,12 +268,7 @@ public class DfPropFile {
     }
 
     protected String actuallyReadString(String path) throws FileNotFoundException, IOException {
-        try {
-            return createMapListFilePlain().readString(createInputStream(path));
-        } catch (RuntimeException e) {
-            throwDfPropFileReadFailureException(path, e);
-            return null; // unreachable
-        }
+        return createMapListFilePlain().readString(createInputStream(path));
     }
 
     // ===================================================================================
@@ -324,20 +285,20 @@ public class DfPropFile {
             final String envPath = deriveEnvPath(dfpropPath, envType);
             map = callReadingMapChecked(handler, envPath);
             if (map != null) {
-                resolveOutsidePropExtendedMap(handler, envPath, map);
+                resolveOutsidePropInheritMap(handler, envPath, map);
             } else { // no environment file
                 map = callReadingMapChecked(handler, dfpropPath);
                 if (map != null) {
-                    final boolean envExDone = resolveOutsidePropExtendedMap(handler, envPath, map);
-                    if (!envExDone) {
-                        resolveOutsidePropExtendedMap(handler, dfpropPath, map);
+                    final boolean envInheritDone = resolveOutsidePropInheritMap(handler, envPath, map);
+                    if (!envInheritDone) {
+                        resolveOutsidePropInheritMap(handler, dfpropPath, map);
                     }
                 }
             }
         } else {
             map = callReadingMapChecked(handler, dfpropPath);
             if (map != null) {
-                resolveOutsidePropExtendedMap(handler, dfpropPath, map);
+                resolveOutsidePropInheritMap(handler, dfpropPath, map);
             }
         }
         if (map == null && !_returnsNullIfNotFound) {
@@ -357,15 +318,15 @@ public class DfPropFile {
         }
     }
 
-    protected <ELEMENT> boolean resolveOutsidePropExtendedMap(DfPropReadingMapHandler<ELEMENT> handler, String path,
+    protected <ELEMENT> boolean resolveOutsidePropInheritMap(DfPropReadingMapHandler<ELEMENT> handler, String path,
             Map<String, ELEMENT> map) {
         if (map == null) { // no parent
             return false;
         }
-        final String extendedPath = deriveExtendedPath(path);
-        final Map<String, ELEMENT> extendedMap = callReadingMapChecked(handler, extendedPath);
-        if (extendedMap != null) {
-            map.putAll(extendedMap);
+        final String inheritPath = deriveInheritPath(path);
+        final Map<String, ELEMENT> inheritMap = callReadingMapChecked(handler, inheritPath);
+        if (inheritMap != null) {
+            map.putAll(inheritMap);
             return true;
         }
         return false;
@@ -387,7 +348,7 @@ public class DfPropFile {
         } else {
             list = callReadingListChecked(handler, dfpropPath);
         }
-        if (list != null && !_returnsNullIfNotFound) {
+        if (list == null && !_returnsNullIfNotFound) {
             list = new ArrayList<ELEMENT>(2); // not read-only just in case
         }
         return list;
@@ -452,15 +413,15 @@ public class DfPropFile {
         return basePath + "/" + envType + "/" + pureFileName;
     }
 
-    protected String deriveExtendedPath(String path) {
-        final String extendableExt = getExtendableExt();
-        if (!path.endsWith(extendableExt)) {
+    protected String deriveInheritPath(String path) {
+        final String allowedExt = getInheritAllowedExt();
+        if (!path.endsWith(allowedExt)) { // out of target e.g. .dataprop
             return null;
         }
-        return path.substring(0, path.length() - extendableExt.length()) + "+" + extendableExt;
+        return path.substring(0, path.length() - allowedExt.length()) + "+" + allowedExt;
     }
 
-    protected String getExtendableExt() {
+    protected String getInheritAllowedExt() {
         return ".dfprop";
     }
 
