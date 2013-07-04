@@ -103,6 +103,7 @@ public class DfPropFile {
      * @return The read map. (NotNull: if not found, returns empty map)
      */
     public Map<String, Object> readMap(String dfpropPath, String envType) {
+        assertDfpropPath(dfpropPath);
         return doReadMap(dfpropPath, envType, new DfPropReadingMapHandler<Object>() {
             public Map<String, Object> readMap(String path) throws FileNotFoundException, IOException {
                 return actuallyReadMap(path);
@@ -135,6 +136,7 @@ public class DfPropFile {
      * @return The read map whose values is string. (NotNull: if not found, returns empty map)
      */
     public Map<String, String> readMapAsStringValue(String dfpropPath, String envType) {
+        assertDfpropPath(dfpropPath);
         return doReadMap(dfpropPath, envType, new DfPropReadingMapHandler<String>() {
             public Map<String, String> readMap(String path) throws FileNotFoundException, IOException {
                 return actuallyReadMapAsStringValue(path);
@@ -167,6 +169,7 @@ public class DfPropFile {
      * @return The read map whose values is string list. (NotNull: if not found, returns empty map)
      */
     public Map<String, List<String>> readMapAsStringListValue(String dfpropPath, String envType) {
+        assertDfpropPath(dfpropPath);
         return doReadMap(dfpropPath, envType, new DfPropReadingMapHandler<List<String>>() {
             public Map<String, List<String>> readMap(String path) throws IOException {
                 return actuallyReadMapAsStringListValue(path);
@@ -200,6 +203,7 @@ public class DfPropFile {
      * @return The read map whose values is string map. (NotNull: if not found, returns empty map)
      */
     public Map<String, Map<String, String>> readMapAsStringMapValue(String dfpropPath, String envType) {
+        assertDfpropPath(dfpropPath);
         return doReadMap(dfpropPath, envType, new DfPropReadingMapHandler<Map<String, String>>() {
             public Map<String, Map<String, String>> readMap(String path) throws IOException {
                 return actuallyReadMapAsStringMapValue(path);
@@ -235,6 +239,7 @@ public class DfPropFile {
      * @return The read list of object. (NotNull: if not found, returns empty list)
      */
     public List<Object> readList(String dfpropPath, String envType) {
+        assertDfpropPath(dfpropPath);
         return doReadList(dfpropPath, envType, new DfPropReadingListHandler<Object>() {
             public List<Object> readList(String path) throws FileNotFoundException, IOException {
                 return actuallyReadList(path);
@@ -260,6 +265,7 @@ public class DfPropFile {
      * @return The read string. (NotNull: if not found, returns empty string)
      */
     public String readString(String dfpropPath, String envType) {
+        assertDfpropPath(dfpropPath);
         return doReadString(dfpropPath, envType, new DfPropReadingStringHandler() {
             public String readString(String path) throws FileNotFoundException, IOException {
                 return actuallyReadString(path);
@@ -324,12 +330,15 @@ public class DfPropFile {
             return false;
         }
         final String inheritPath = deriveInheritPath(path);
-        final Map<String, ELEMENT> inheritMap = callReadingMapChecked(handler, inheritPath);
-        if (inheritMap != null) {
-            map.putAll(inheritMap);
-            return true;
+        if (inheritPath == null) {
+            return false;
         }
-        return false;
+        final Map<String, ELEMENT> inheritMap = callReadingMapChecked(handler, inheritPath);
+        if (inheritMap == null) {
+            return false;
+        }
+        map.putAll(inheritMap);
+        return true;
     }
 
     // -----------------------------------------------------
@@ -461,6 +470,16 @@ public class DfPropFile {
 
     protected MapListFile newMapListFile() {
         return new MapListFile();
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertDfpropPath(String dfpropPath) {
+        if (dfpropPath == null || dfpropPath.trim().length() == 0) {
+            String msg = "The argument 'dfpropPath' should not be null or empty: " + dfpropPath;
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     // ===================================================================================
