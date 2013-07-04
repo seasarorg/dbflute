@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.infra.dfprop;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -24,5 +26,5 @@ import java.util.Map;
  */
 public interface DfPropReadingMapHandler<VALUE> {
 
-    Map<String, VALUE> readMap(String path);
+    Map<String, VALUE> readMap(String path) throws FileNotFoundException, IOException;
 }

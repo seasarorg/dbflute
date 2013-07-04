@@ -37,13 +37,13 @@ public class DfDiffMapFile {
         final MapListFile mapListFile = createMapListFile();
         try {
             return mapListFile.readMap(ins);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             throwDfPropFileReadFailureException(ins, e);
             return null; // unreachable
         }
     }
 
-    protected void throwDfPropFileReadFailureException(InputStream ins, RuntimeException e) {
+    protected void throwDfPropFileReadFailureException(InputStream ins, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to read the diff-map file.");
         br.addItem("Advice");
@@ -62,12 +62,12 @@ public class DfDiffMapFile {
         final MapListFile mapListFile = createMapListFile();
         try {
             mapListFile.writeMap(ous, map);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             throwDfPropFileWriteFailureException(ous, e);
         }
     }
 
-    protected void throwDfPropFileWriteFailureException(OutputStream ous, RuntimeException e) {
+    protected void throwDfPropFileWriteFailureException(OutputStream ous, Exception e) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("Failed to write the diff-map file.");
         br.addItem("DBFlute Property");

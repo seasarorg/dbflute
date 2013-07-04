@@ -79,8 +79,9 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map. (NotNull)
+     * @throws IOException 
      */
-    public Map<String, Object> readMap(InputStream ins) {
+    public Map<String, Object> readMap(InputStream ins) throws IOException {
         final String mapString = readString(ins);
         if (mapString.trim().length() == 0) {
             return newLinkedHashMap();
@@ -103,8 +104,9 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string. (NotNull)
+     * @throws IOException 
      */
-    public Map<String, String> readMapAsStringValue(InputStream ins) {
+    public Map<String, String> readMapAsStringValue(InputStream ins) throws IOException {
         final Map<String, String> resultMap = new LinkedHashMap<String, String>();
         final Map<String, Object> map = readMap(ins);
         final Set<Entry<String, Object>> entrySet = map.entrySet();
@@ -128,9 +130,10 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string list. (NotNull)
+     * @throws IOException 
      */
     @SuppressWarnings("unchecked")
-    public Map<String, List<String>> readMapAsStringListValue(InputStream ins) {
+    public Map<String, List<String>> readMapAsStringListValue(InputStream ins) throws IOException {
         final Map<String, List<String>> resultMap = newLinkedHashMap();
         final Map<String, Object> map = readMap(ins);
         final Set<Entry<String, Object>> entrySet = map.entrySet();
@@ -154,9 +157,10 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read map whose values is string map. (NotNull)
+     * @throws IOException 
      */
     @SuppressWarnings("unchecked")
-    public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) {
+    public Map<String, Map<String, String>> readMapAsStringMapValue(InputStream ins) throws IOException {
         final Map<String, Map<String, String>> resultMap = newLinkedHashMap();
         final Map<String, Object> map = readMap(ins);
         final Set<Entry<String, Object>> entrySet = map.entrySet();
@@ -169,7 +173,7 @@ public class MapListFile {
     // -----------------------------------------------------
     //                                                 Write
     //                                                 -----
-    public void writeMap(OutputStream ous, Map<String, ? extends Object> map) {
+    public void writeMap(OutputStream ous, Map<String, ? extends Object> map) throws IOException {
         final MapListString mapListString = createMapListString();
         final String mapString = mapListString.buildMapString(map);
         writeString(ous, mapString);
@@ -195,8 +199,9 @@ public class MapListFile {
      * </pre>
      * @param ins The input stream for DBFlute property file, which is closed here. (NotNull)
      * @return The read list. (NotNull)
+     * @throws IOException 
      */
-    public List<Object> readList(InputStream ins) {
+    public List<Object> readList(InputStream ins) throws IOException {
         final String listString = readString(ins);
         if (listString.trim().length() == 0) {
             return new ArrayList<Object>();
@@ -208,7 +213,7 @@ public class MapListFile {
     // -----------------------------------------------------
     //                                                 Write
     //                                                 -----
-    public void writeList(OutputStream ous, List<Object> list) {
+    public void writeList(OutputStream ous, List<Object> list) throws IOException {
         final MapListString mapListString = createMapListString();
         final String listString = mapListString.buildListString(list);
         writeString(ous, listString);
@@ -225,8 +230,9 @@ public class MapListFile {
      * A trimmed line that starts with '#' is treated as line comment.
      * @param ins The input stream for DBFlute property file. (NotNull)
      * @return The read string. (NotNull)
+     * @throws IOException 
      */
-    public String readString(InputStream ins) {
+    public String readString(InputStream ins) throws IOException {
         final String encoding = getFileEncoding();
         final String lineComment = getLineCommentMark();
         final StringBuilder sb = new StringBuilder();
@@ -269,8 +275,6 @@ public class MapListFile {
         } catch (UnsupportedEncodingException e) {
             String msg = "The encoding is unsupported: " + encoding;
             throw new IllegalStateException(msg, e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
         } finally {
             if (br != null) {
                 try {
@@ -285,7 +289,7 @@ public class MapListFile {
     // -----------------------------------------------------
     //                                                 Write
     //                                                 -----
-    public void writeString(OutputStream ous, String mapListString) {
+    public void writeString(OutputStream ous, String mapListString) throws IOException {
         final String encoding = getFileEncoding();
         OutputStreamWriter ow = null;
         BufferedWriter bw = null;
@@ -297,8 +301,6 @@ public class MapListFile {
         } catch (UnsupportedEncodingException e) {
             String msg = "The encoding is unsupported: " + encoding;
             throw new IllegalStateException(msg, e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
         } finally {
             if (bw != null) {
                 try {

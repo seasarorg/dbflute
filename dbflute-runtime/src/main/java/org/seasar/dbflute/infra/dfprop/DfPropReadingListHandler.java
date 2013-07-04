@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.infra.dfprop;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,5 +26,5 @@ import java.util.List;
  */
 public interface DfPropReadingListHandler<ELEMENT> {
 
-    List<ELEMENT> readList(String path);
+    List<ELEMENT> readList(String path) throws FileNotFoundException, IOException;
 }

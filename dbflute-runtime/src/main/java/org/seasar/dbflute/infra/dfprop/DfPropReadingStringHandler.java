@@ -15,11 +15,14 @@
  */
 package org.seasar.dbflute.infra.dfprop;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /**
  * @author jflute
  * @since 1.0.4F (2013/06/30 Sunday)
  */
 public interface DfPropReadingStringHandler {
 
-    String readString(String path);
+    String readString(String path) throws FileNotFoundException, IOException;
 }
