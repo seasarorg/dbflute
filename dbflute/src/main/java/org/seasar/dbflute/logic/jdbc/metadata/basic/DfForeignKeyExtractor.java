@@ -264,11 +264,10 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             final String foreinKeyName = entry.getKey();
             final DfForeignKeyMeta metaInfo = entry.getValue();
             final Map<String, Object> checkKey = newLinkedHashMap();
-            checkKey.put(metaInfo.getForeignTableDbName(), dummyObj);
+            checkKey.put(metaInfo.getForeignTableIdentityName(), dummyObj);
             checkKey.put("columnNameMap:" + metaInfo.getColumnNameMap(), dummyObj);
             if (checkMap.containsKey(checkKey)) { // basically no way
-                String msg = "*The same-structural foreign key was found:";
-                msg = msg + " skipped = " + foreinKeyName + " - " + checkKey;
+                String msg = "*The same-structural foreign key was found: skipped=" + foreinKeyName + ":" + checkKey;
                 _log.warn(msg);
             } else {
                 checkMap.put(checkKey, dummyObj);

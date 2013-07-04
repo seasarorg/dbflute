@@ -40,26 +40,11 @@ public class DfForeignKeyMeta {
     // ===================================================================================
     //                                                                       Name Building
     //                                                                       =============
-    public String getLocalTableDbName() {
-        if (_localSchema == null) {
-            return _localTablePureName;
-        }
-        final String drivenSchema = _localSchema.getDrivenSchema();
-        if (drivenSchema == null) {
-            return _localTablePureName;
-        }
-        return drivenSchema + "." + _localTablePureName;
-    }
-
-    public String getForeignTableDbName() {
+    public String getForeignTableIdentityName() {
         if (_foreignSchema == null) {
             return _foreignTablePureName;
         }
-        final String drivenSchema = _foreignSchema.getDrivenSchema();
-        if (drivenSchema == null) {
-            return _foreignTablePureName;
-        }
-        return drivenSchema + "." + _foreignTablePureName;
+        return _foreignSchema.getIdentifiedSchema() + "." + _foreignTablePureName;
     }
 
     public String getLocalTableSqlName() {

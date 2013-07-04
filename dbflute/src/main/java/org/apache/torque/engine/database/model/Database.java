@@ -150,6 +150,7 @@ import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.infra.core.DfDatabaseNameMapping;
@@ -218,6 +219,8 @@ public class Database {
     // because tables are frequently referred
     protected final List<Table> _tableList = new ArrayList<Table>(100); // for ordering
     protected final StringKeyMap<Table> _tableMap = StringKeyMap.createAsFlexible(); // for key-map
+    protected final StringKeyMap<Table> _distinctPureNameTableMap = StringKeyMap.createAsFlexible(); // for schema driven
+    protected final StringSet _sameNameTableNameSet = StringSet.createAsFlexible(); // for schema driven or additional schema
 
     // -----------------------------------------------------
     //                                              Sequence
@@ -314,9 +317,24 @@ public class Database {
         if (byName != null) {
             return byName;
         }
-        if (tableDbName.contains(".")) {
-            final String pureName = Srl.substringLastRear(tableDbName, ".");
-            return _tableMap.get(pureName);
+        if (tableDbName.contains(".")) { // is e.g. EXAMPLEDB.PUBLIC.MEMBER or PUBLIC.MEMBER
+            final String firstPureName = Srl.substringFirstRear(tableDbName, "."); // first remove
+            final Table firstPureFound = _tableMap.get(firstPureName); // by e.g. PUBLIC.MEMBER or MEMBER
+            if (firstPureFound != null) {
+                return firstPureFound;
+            }
+            if (firstPureName.contains(".")) { // is e.g. PUBLIC.MEMBER
+                final String secondPureName = Srl.substringFirstRear(firstPureName, "."); // second remove
+                final Table secondPureFound = _tableMap.get(secondPureName); // by e.g. MEMBER
+                if (secondPureFound != null) {
+                    return secondPureFound;
+                }
+            }
+        } else { // is pure name e.g. MEMBER
+            final Table distinctFound = _distinctPureNameTableMap.get(tableDbName);
+            if (distinctFound != null && !distinctFound.existsSameNameTable()) { // unique even if pure name
+                return distinctFound; // basically for schema-driven table
+            }
         }
         return null;
     }
@@ -328,19 +346,64 @@ public class Database {
      * @return The instance of added table. (NullAllowed: if null, means the table was filtered)
      */
     public Table addTable(Attributes attrib, XmlReadingFilter readingFilter) {
-        final Table tbl = new Table();
-        tbl.setDatabase(this);
-        if (!tbl.loadFromXML(attrib, readingFilter)) {
+        final Table table = new Table();
+        table.setDatabase(this);
+        if (!table.loadFromXML(attrib, readingFilter)) {
             return null;
         }
-        addTable(tbl);
-        return tbl;
+        addTable(table);
+        return table;
     }
 
-    public void addTable(Table tbl) {
-        tbl.setDatabase(this);
-        _tableList.add(tbl);
-        _tableMap.put(tbl.getTableDbName(), tbl);
+    public void addTable(Table table) {
+        table.setDatabase(this);
+        _tableList.add(table);
+
+        // basically returns pure name (with schema prefix if schema-driven)
+        // consideration for same-name does not work yet here 
+        final String tableDbName = table.getTableDbName();
+
+        if (handleSameNameTable(table, tableDbName)) {
+            return;
+        }
+
+        // mainly here
+        _tableMap.put(tableDbName, table);
+
+        if (isAvailableSchemaDrivenTable()) { // use only when schema-driven table
+            final String pureName = Srl.substringLastRear(tableDbName, ".");
+            _distinctPureNameTableMap.put(pureName, table);
+        }
+    }
+
+    protected boolean handleSameNameTable(Table table, String tableDbName) {
+        if (_sameNameTableNameSet.contains(tableDbName)) { // found next same-name table
+            arrangeSameNameTable(table, tableDbName);
+            return true;
+        }
+        final Table sameNameTable = _tableMap.get(tableDbName);
+        if (sameNameTable != null) { // found first same-name table
+            _sameNameTableNameSet.add(tableDbName); // for next same-name table
+            rearrangeSameNameTable(sameNameTable, tableDbName);
+            arrangeSameNameTable(table, tableDbName);
+            return true;
+        }
+        return false;
+    }
+
+    protected void rearrangeSameNameTable(Table sameNameTable, String tableDbName) {
+        _tableMap.remove(tableDbName);
+        arrangeSameNameTable(sameNameTable, tableDbName);
+    }
+
+    protected void arrangeSameNameTable(Table table, String tableDbName) {
+        if (tableDbName.contains(".")) { // e.g. PUBLIC.MEMBER
+            // basically no way e.g. when driven-schema but found same-name
+            table.markSameSchemaSameNameTableExists();
+        } else { // pure name e.g. MEMBER
+            table.markSameNameTableExists();
+        }
+        _tableMap.put(table.getTableDbName(), table);
     }
 
     /**
@@ -1041,7 +1104,7 @@ public class Database {
     }
 
     protected boolean isSuppressDeleteOldClass() {
-        return _skipDeleteOldClass || !getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass();
+        return _skipDeleteOldClass || !isDeleteOldTableClass();
     }
 
     protected DfOldClassHandler createOldClassHandler() {
@@ -1849,6 +1912,10 @@ public class Database {
         return getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
+    public boolean isAvailableSchemaDrivenTable() {
+        return getLittleAdjustmentProperties().isAvailableSchemaDrivenTable();
+    }
+
     public boolean isCheckSelectedClassification() {
         return getLittleAdjustmentProperties().isCheckSelectedClassification();
     }
@@ -1961,16 +2028,20 @@ public class Database {
         return getLittleAdjustmentProperties().isStopGenerateExtendedEntity();
     }
 
+    public boolean isDeleteOldTableClass() {
+        return getLittleAdjustmentProperties().isDeleteOldTableClass();
+    }
+
+    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
+        return getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
+    }
+
     public boolean isMakeFlatExpansion() {
         return getLittleAdjustmentProperties().isMakeFlatExpansion();
     }
 
     public boolean isMakeDaoInterface() {
         return getLittleAdjustmentProperties().isMakeDaoInterface();
-    }
-
-    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
-        return getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
 
     // ===================================================================================

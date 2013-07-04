@@ -17,12 +17,14 @@ package org.seasar.dbflute.properties;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
@@ -79,11 +81,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public void checkBasicInfo() {
-        final String databaseName = getTargetDatabase();
-        if (databaseName == null || databaseName.trim().length() == 0) {
-            String msg = "Not found the property 'database' in basicInfoMap.dfprop: " + databaseName;
-            throw new DfRequiredPropertyNotFoundException(msg);
-        }
+        getTargetDatabase(); // checked in the method
     }
 
     // ===================================================================================
@@ -113,12 +111,25 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getTargetDatabase() {
-        final String databaseType = getProperty("database", null);
-        if (databaseType == null || databaseType.trim().length() == 0) {
-            String msg = "Not found the property 'database' in basicInfoMap.dfprop: " + databaseType;
-            throw new DfRequiredPropertyNotFoundException(msg);
+        final String database = getProperty("database", null);
+        if (database == null || database.trim().length() == 0) {
+            throwBasicInfoDatabaseNotFoundException(database);
         }
-        return databaseType;
+        return database;
+    }
+
+    protected void throwBasicInfoDatabaseNotFoundException(String returnedValue) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the property 'database' in basicInfoMap.dfprop.");
+        br.addItem("Returned Value");
+        br.addElement(returnedValue);
+        br.addItem("Map");
+        final Map<String, Object> basicInfoMap = getBasicInfoMap();
+        for (Entry<String, Object> entry : basicInfoMap.entrySet()) {
+            br.addElement(entry.getKey() + " = " + entry.getValue());
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new DfRequiredPropertyNotFoundException(msg);
     }
 
     protected DBDef _currentDBDef;

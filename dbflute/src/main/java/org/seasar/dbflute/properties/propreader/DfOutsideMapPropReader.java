@@ -28,6 +28,7 @@ public class DfOutsideMapPropReader {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected boolean _returnsNullIfNotFound;
     protected boolean _skipLineSeparator;
 
     // ===================================================================================
@@ -42,32 +43,32 @@ public class DfOutsideMapPropReader {
         return readMap(path, null);
     }
 
-    public Map<String, Object> readMap(String path, String environmentType) {
-        return createDfPropFile().readMap(path, environmentType);
+    public Map<String, Object> readMap(String path, String envType) {
+        return createDfPropFile().readMap(path, envType);
     }
 
     public Map<String, String> readMapAsStringValue(String path) {
         return readMapAsStringValue(path, null);
     }
 
-    public Map<String, String> readMapAsStringValue(String path, String environmentType) {
-        return createDfPropFile().readMapAsStringValue(path, environmentType);
+    public Map<String, String> readMapAsStringValue(String path, String envType) {
+        return createDfPropFile().readMapAsStringValue(path, envType);
     }
 
     public Map<String, List<String>> readMapAsStringListValue(String path) {
         return readMapAsStringListValue(path, null);
     }
 
-    public Map<String, List<String>> readMapAsStringListValue(String path, String environmentType) {
-        return createDfPropFile().readMapAsStringListValue(path, environmentType);
+    public Map<String, List<String>> readMapAsStringListValue(String path, String envType) {
+        return createDfPropFile().readMapAsStringListValue(path, envType);
     }
 
     public Map<String, Map<String, String>> readMapAsStringMapValue(String path) {
         return readMapAsStringMapValue(path, null);
     }
 
-    public Map<String, Map<String, String>> readMapAsStringMapValue(String path, String environmentType) {
-        return createDfPropFile().readMapAsStringMapValue(path, environmentType);
+    public Map<String, Map<String, String>> readMapAsStringMapValue(String path, String envType) {
+        return createDfPropFile().readMapAsStringMapValue(path, envType);
     }
 
     // ===================================================================================
@@ -75,6 +76,9 @@ public class DfOutsideMapPropReader {
     //                                                                         ===========
     protected DfPropFile createDfPropFile() {
         final DfPropFile file = newDfPropFile();
+        if (_returnsNullIfNotFound) {
+            file.returnsNullIfNotFound();
+        }
         if (_skipLineSeparator) {
             file.skipLineSeparator();
         }
@@ -88,6 +92,11 @@ public class DfOutsideMapPropReader {
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
+    public DfOutsideMapPropReader returnsNullIfNotFound() {
+        _returnsNullIfNotFound = true;
+        return this;
+    }
+
     public DfOutsideMapPropReader skipLineSeparator() {
         _skipLineSeparator = true;
         return this;

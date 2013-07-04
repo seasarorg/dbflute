@@ -274,28 +274,28 @@ public class ForeignKey implements Constraint {
      * @throws DfTableNotFoundException When the foreign table is not found.
      */
     public Table getForeignTable() {
-        final String foreignTableDbName = getForeignTableDbName();
-        final Table foreignTable = findTable(foreignTableDbName);
+        final String foreignTableSearchName = getForeignTableSearchName();
+        final Table foreignTable = findTable(foreignTableSearchName);
         if (foreignTable == null) {
-            throwForeignTableNotFoundException(foreignTableDbName);
+            throwForeignTableNotFoundException(foreignTableSearchName);
         }
         return foreignTable;
     }
 
-    public String getForeignTableDbName() {
+    protected String getForeignTableSearchName() {
         final String foreignTableName = getForeignTablePureName();
         if (_foreignSchema == null) {
             return foreignTableName;
         }
-        final String drivenSchema = _foreignSchema.getDrivenSchema();
-        if (drivenSchema == null) {
-            return _foreignTablePureName;
-        }
-        return drivenSchema + "." + foreignTableName;
+        return _foreignSchema.getCatalogSchema() + "." + foreignTableName;
     }
 
     protected Table findTable(String tableDbName) {
         return getTable().getDatabase().getTable(tableDbName);
+    }
+
+    public String getForeignTableDbName() {
+        return getForeignTable().getTableDbName();
     }
 
     protected void throwForeignTableNotFoundException(String foreignTableName) {

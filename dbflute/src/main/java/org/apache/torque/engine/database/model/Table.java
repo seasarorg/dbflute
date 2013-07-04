@@ -181,63 +181,64 @@ public class Table {
     // -----------------------------------------------------
     //                                              Database
     //                                              --------
-    private Database _database;
+    protected Database _database;
 
     // -----------------------------------------------------
     //                                      Table Definition
     //                                      ----------------
-    private String _name;
-    private String _type;
-    private UnifiedSchema _unifiedSchema;
-    private String _plainComment;
-    private boolean _existSameNameTable;
+    protected String _name;
+    protected String _type;
+    protected UnifiedSchema _unifiedSchema;
+    protected String _plainComment;
+    protected boolean _existsSameNameTable;
+    protected boolean _existsSameSchemaSameNameTable;
 
     // -----------------------------------------------------
     //                                                Column
     //                                                ------
-    private final List<Column> _columnList = new ArrayList<Column>();
-    private final List<String> _columnNameList = new ArrayList<String>();
-    private final StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexible(); // only used as key-value
+    protected final List<Column> _columnList = new ArrayList<Column>();
+    protected final List<String> _columnNameList = new ArrayList<String>();
+    protected final StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexible(); // only used as key-value
 
     // -----------------------------------------------------
     //                                           Foreign Key
     //                                           -----------
     // map style because of removing in the final initialization
     // and names of foreign key should be unique in a table
-    private final Map<String, ForeignKey> _foreignKeyMap = StringKeyMap.createAsFlexibleOrdered();
+    protected final Map<String, ForeignKey> _foreignKeyMap = StringKeyMap.createAsFlexibleOrdered();
 
     // on the other hand, names of referrer are not
     // always unique because a referrer may be synonym
     // (fortunately, removing is not required about referrer)
-    private final List<ForeignKey> _referrerList = new ArrayList<ForeignKey>(5);
+    protected final List<ForeignKey> _referrerList = new ArrayList<ForeignKey>(5);
 
-    private final List<ForeignKey> _cannotBeReferrerList = new ArrayList<ForeignKey>(3);
+    protected final List<ForeignKey> _cannotBeReferrerList = new ArrayList<ForeignKey>(3);
 
     // -----------------------------------------------------
     //                                                Unique
     //                                                ------
-    private final List<Unique> _unices = new ArrayList<Unique>(5);
+    protected final List<Unique> _unices = new ArrayList<Unique>(5);
 
     // -----------------------------------------------------
     //                                                 Index
     //                                                 -----
-    private final List<Index> _indices = new ArrayList<Index>(5);
+    protected final List<Index> _indices = new ArrayList<Index>(5);
 
     // -----------------------------------------------------
     //                                       Java Definition
     //                                       ---------------
-    private String _javaName;
+    protected String _javaName;
 
     // -----------------------------------------------------
     //                                 Sql2Entity Definition
     //                                 ---------------------
-    private boolean _sql2EntityCustomize;
-    private boolean _sql2EntityCustomizeHasNested;
-    private boolean _sql2EntityTypeSafeCursor;
+    protected boolean _sql2EntityCustomize;
+    protected boolean _sql2EntityCustomizeHasNested;
+    protected boolean _sql2EntityTypeSafeCursor;
 
     // basically not null if Sql2Entity
     // but you should check it just in case
-    private DfOutsideSqlFile _sql2EntitySqlFile;
+    protected DfOutsideSqlFile _sql2EntitySqlFile;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -323,13 +324,53 @@ public class Table {
         if (_unifiedSchema == null) {
             return pureName;
         }
-        final String drivenSchema = _unifiedSchema.getDrivenSchema();
-        if (drivenSchema == null) {
+        final String schemaPrefix = buildSchemaPrefixForIdentity();
+        if (schemaPrefix == null || schemaPrefix.trim().length() == 0) {
             return pureName;
         }
         final StringBuilder sb = new StringBuilder();
-        sb.append(drivenSchema).append(".").append(pureName);
+        sb.append(schemaPrefix).append(".").append(pureName);
         return sb.toString();
+    }
+
+    protected String buildSchemaPrefixForIdentity() {
+        if (_unifiedSchema == null) {
+            return "";
+        }
+        if (existsSameNameTable()) { // might be true after adding table in database
+            final String fixedPrefix;
+            if (existsSameSchemaSameNameTable()) {
+                // e.g. EXAMPLEDB.PUBLIC.MEMBER and NEXTEXAMPLEDB.PUBLIC.MEMBER
+                // schema-driven but exists same-schema same-name table
+                fixedPrefix = _unifiedSchema.getCatalogSchema(); // forcedly catalog schema
+            } else {
+                // e.g. PUBLIC.MEMBER and NEXTSCHEMA.MEMBER
+                fixedPrefix = _unifiedSchema.getExecutableSchema();
+            }
+            return fixedPrefix;
+        }
+        final String drivenSchema = _unifiedSchema.getDrivenSchema();
+        if (drivenSchema != null) { // e.g. PUBLIC.MEMBER, EXAMPLEDB.MEMBER
+            return drivenSchema;
+        }
+        return "";
+    }
+
+    public boolean existsSameNameTable() {
+        return _existsSameNameTable;
+    }
+
+    public void markSameNameTableExists() {
+        _existsSameNameTable = true;
+    }
+
+    public boolean existsSameSchemaSameNameTable() {
+        return _existsSameSchemaSameNameTable;
+    }
+
+    public void markSameSchemaSameNameTableExists() {
+        markSameNameTableExists();
+        _existsSameSchemaSameNameTable = true;
     }
 
     // -----------------------------------------------------
@@ -1962,52 +2003,76 @@ public class Table {
     // -----------------------------------------------------
     //                                   Schema Class Prefix
     //                                   -------------------
+    protected String _schemaClassPrefix;
+
     protected String getSchemaClassPrefix() {
+        if (_schemaClassPrefix != null) {
+            return _schemaClassPrefix;
+        }
         // *however same-name tables between different schemas are unsupported at 0.9.6.8
         // *and the limiter can be removed by DBFlute property at 1.0.3
-        if (hasSchema() && isAdditionalSchema() && existsSameNameTable()) { // additional schema only
-            // schema of DB2 may have space either size so needs to trim it
-            final String prefix;
-            if (isCatalogAdditionalSchema()) {
-                final String pureCatalog = filterSchemaForClassPrefix(getPureCatalog());
-                final String pureSchema = filterSchemaForClassPrefix(getPureSchema());
-                prefix = pureCatalog + pureSchema;
+        if (hasSchema()) {
+            final String drivenSchema = _unifiedSchema.getDrivenSchema();
+            if (drivenSchema != null) { // forcedly prefix
+                _schemaClassPrefix = filterSchemaForClassPrefix(drivenSchema);
             } else {
-                final String pureSchema = filterSchemaForClassPrefix(getPureSchema());
-                prefix = pureSchema;
+                _schemaClassPrefix = buildSameNameTableClassPrefix();
             }
-            return prefix;
         }
-        return "";
+        if (_schemaClassPrefix == null) {
+            _schemaClassPrefix = "";
+        }
+        return _schemaClassPrefix;
+    }
+
+    protected String buildSameNameTableClassPrefix() {
+        final String prefix;
+        if (existsSameNameTable()) {
+            if (isMainSchema()) {
+                // no prefix if main schema
+                // same-name table of other schemas should have prefix
+                prefix = "";
+            } else if (isAdditionalSchema()) {
+                // fixed prefix according to its definition if additional schema
+                if (isCatalogAdditionalSchema()) {
+                    prefix = buildCatalogSchemaTableClassPrefix();
+                } else { // pure schema
+                    prefix = buildPureSchemaTableClassPrefix();
+                }
+            } else { // unknown schema 
+                // dynamic prefix according to table's determination if unknown schema
+                if (existsSameSchemaSameNameTable()) {
+                    prefix = buildCatalogSchemaTableClassPrefix();
+                } else {
+                    prefix = buildPureSchemaTableClassPrefix();
+                }
+            }
+        } else { // unique name (mainly here)
+            prefix = "";
+        }
+        return prefix;
+    }
+
+    protected String buildCatalogSchemaTableClassPrefix() {
+        // schema of DB2 may have space either size so needs to trim it
+        final String pureCatalog = filterSchemaForClassPrefix(getPureCatalog());
+        final String pureSchema = filterSchemaForClassPrefix(getPureSchema());
+        return pureCatalog + pureSchema;
+    }
+
+    protected String buildPureSchemaTableClassPrefix() {
+        return filterSchemaForClassPrefix(getPureSchema());
     }
 
     protected String filterSchemaForClassPrefix(String name) {
-        // suppose that schema (or catalog) name is only e.g. 'EXAMPLEDB' (no delimiter, one word)
-        return name != null ? Srl.initCapTrimmed(name.trim().toLowerCase()) : "";
-    }
-
-    protected boolean _alreadyCheckedExistingSameNameTable;
-
-    protected boolean existsSameNameTable() {
-        if (_alreadyCheckedExistingSameNameTable) {
-            return _existSameNameTable;
+        if (name == null) {
+            return "";
         }
-        _alreadyCheckedExistingSameNameTable = true;
-        final List<Table> tableList = getDatabase().getTableList();
-        int count = 0;
-        final String myPureName = getName();
-        for (Table table : tableList) {
-            final String yourPureName = table.getName();
-            if (myPureName.equalsIgnoreCase(yourPureName)) {
-                ++count;
-                if (count > 1) {
-                    _existSameNameTable = true;
-                    return _existSameNameTable;
-                }
-            }
+        if (name.contains("_")) { // EXAMPLE_DB
+            return Srl.camelize(name);
+        } else { // e.g. 'EXAMPLEDB' (no delimiter, one word)
+            return Srl.initCapTrimmed(name.trim().toLowerCase());
         }
-        _existSameNameTable = false;
-        return _existSameNameTable;
     }
 
     // -----------------------------------------------------

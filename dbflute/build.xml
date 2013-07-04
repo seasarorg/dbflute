@@ -313,8 +313,6 @@
 		</copy>
 		<replace file="${postgresql.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}" />
 		<replace file="${postgresql.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}" />
-		<replace file="${postgresql.example.dir}/dbflute_nextschema/_project.bat" token="-${pre.version}" value="-${version}" />
-		<replace file="${postgresql.example.dir}/dbflute_nextschema/_project.sh" token="-${pre.version}" value="-${version}" />
 		<delete dir="${postgresql.example.dir}/mydbflute/dbflute-${pre.version}" />
 		<delete dir="${extraction.dir}" />
 	</target>

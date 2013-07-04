@@ -97,7 +97,7 @@ public class DfTaskBasicController {
             if (isUseDataSource()) {
                 try {
                     commitDataSource();
-                } catch (Exception ignored) {
+                } catch (SQLException ignored) {
                 } finally {
                     try {
                         destroyDataSource();
@@ -111,7 +111,7 @@ public class DfTaskBasicController {
                     long after = getTaskAfterTimeMillis();
                     showFinalMessage(before, after, cause != null);
                 } catch (RuntimeException e) {
-                    _log.info("*Failed to show final message!", e);
+                    _log.warn("*Failed to show final message!", e);
                 }
             }
             if (cause != null) {

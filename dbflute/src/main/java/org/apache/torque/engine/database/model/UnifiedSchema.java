@@ -267,6 +267,25 @@ public class UnifiedSchema {
                 return getPureSchema();
             }
         }
+        return getExecutableSchema();
+    }
+
+    public String getDrivenSchema() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        if (prop.isAvailableSchemaDrivenTable()) {
+            final String drivenSchema;
+            if (isNoNameSchema()) { // e.g. MySQL
+                drivenSchema = getCatalogSchema();
+            } else { // e.g. PostgreSQL, Oracle
+                drivenSchema = getPureSchema();
+            }
+            return drivenSchema;
+        }
+        // unsupported CatalogDrivenTable because it might be no-possible case
+        return null;
+    }
+
+    public String getExecutableSchema() {
         if (_mainSchema) {
             return "";
         }
@@ -280,16 +299,6 @@ public class UnifiedSchema {
         // basically no way but, for example,
         // SchemaSyncCheck's target schema comes here to extract auto-increment info
         return getCatalogSchema(); // as default
-    }
-
-    public String getDrivenSchema() {
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        if (prop.isAvailableSchemaDrivenTable()) {
-            return getPureSchema();
-        } else {
-            // #hope CatalogDrivenTable
-            return null;
-        }
     }
 
     // ===================================================================================

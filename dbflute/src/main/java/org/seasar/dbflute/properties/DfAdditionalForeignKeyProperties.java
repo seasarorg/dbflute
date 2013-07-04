@@ -61,43 +61,50 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     protected Map<String, Map<String, String>> _additionalForeignKeyMap;
 
     public Map<String, Map<String, String>> getAdditionalForeignKeyMap() {
-        if (_additionalForeignKeyMap == null) {
-            _additionalForeignKeyMap = newLinkedHashMap();
-            final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalForeignKeyMap, DEFAULT_EMPTY_MAP);
-            final Set<String> fisrtKeySet = generatedMap.keySet();
-            for (Object foreignName : fisrtKeySet) {// FK Loop!
-                final Object firstValue = generatedMap.get(foreignName);
-                if (!(firstValue instanceof Map<?, ?>)) {
-                    String msg = "The value type should be Map: tableName=" + foreignName + " property=CustomizeDao";
-                    msg = msg + " actualType=" + firstValue.getClass() + " actualValue=" + firstValue;
-                    throw new IllegalStateException(msg);
-                }
-                final Map<?, ?> foreignDefinitionMap = (Map<?, ?>) firstValue;
-                final Set<?> secondKeySet = foreignDefinitionMap.keySet();
-                final Map<String, String> genericForeignDefinitiontMap = newLinkedHashMap();
-                for (Object componentName : secondKeySet) { // FK component loop!
-                    final Object secondValue = foreignDefinitionMap.get(componentName);
-                    if (secondValue == null) {
-                        continue;
-                    }
-                    if (!(componentName instanceof String)) {
-                        String msg = "The key type should be String: foreignName=" + foreignName;
-                        msg = msg + " property=AdditionalForeignKey";
-                        msg = msg + " actualType=" + componentName.getClass() + " actualKey=" + componentName;
-                        throw new IllegalStateException(msg);
-                    }
-                    if (!(secondValue instanceof String)) {
-                        String msg = "The value type should be String: foreignName=" + foreignName;
-                        msg = msg + " property=AdditionalForeignKey";
-                        msg = msg + " actualType=" + secondValue.getClass() + " actualValue=" + secondValue;
-                        throw new IllegalStateException(msg);
-                    }
-                    genericForeignDefinitiontMap.put((String) componentName, (String) secondValue);
-                }
-                _additionalForeignKeyMap.put((String) foreignName, genericForeignDefinitiontMap);
+        if (_additionalForeignKeyMap != null) {
+            return _additionalForeignKeyMap;
+        }
+        _additionalForeignKeyMap = newLinkedHashMap();
+        final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalForeignKeyMap, DEFAULT_EMPTY_MAP);
+        final Set<String> fisrtKeySet = generatedMap.keySet();
+        for (Object foreignName : fisrtKeySet) { // FK Loop!
+            final Object firstValue = generatedMap.get(foreignName);
+            if (!(firstValue instanceof Map<?, ?>)) {
+                String msg = "The value type should be Map:";
+                msg = msg + " tableName=" + foreignName + " property=" + KEY_additionalForeignKeyMap;
+                msg = msg + " actualType=" + firstValue.getClass() + " actualValue=" + firstValue;
+                throw new IllegalStateException(msg);
             }
+            final Map<?, ?> fkDefMap = (Map<?, ?>) firstValue;
+            final Set<?> secondKeySet = fkDefMap.keySet();
+            final Map<String, String> genericMap = prepareFKDefGenericMap(foreignName, fkDefMap, secondKeySet);
+            _additionalForeignKeyMap.put((String) foreignName, genericMap);
         }
         return _additionalForeignKeyMap;
+    }
+
+    protected Map<String, String> prepareFKDefGenericMap(Object foreignName, Map<?, ?> fkDefMap, Set<?> secondKeySet) {
+        final Map<String, String> genericFKDefMap = newLinkedHashMap();
+        for (Object componentName : secondKeySet) { // FK component loop!
+            final Object secondValue = fkDefMap.get(componentName);
+            if (secondValue == null) {
+                continue;
+            }
+            if (!(componentName instanceof String)) {
+                String msg = "The key type should be String: foreignName=" + foreignName;
+                msg = msg + " property=AdditionalForeignKey";
+                msg = msg + " actualType=" + componentName.getClass() + " actualKey=" + componentName;
+                throw new IllegalStateException(msg);
+            }
+            if (!(secondValue instanceof String)) {
+                String msg = "The value type should be String: foreignName=" + foreignName;
+                msg = msg + " property=AdditionalForeignKey";
+                msg = msg + " actualType=" + secondValue.getClass() + " actualValue=" + secondValue;
+                throw new IllegalStateException(msg);
+            }
+            genericFKDefMap.put((String) componentName, (String) secondValue);
+        }
+        return genericFKDefMap;
     }
 
     // ===================================================================================
