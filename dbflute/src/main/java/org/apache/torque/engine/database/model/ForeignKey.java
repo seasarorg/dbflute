@@ -979,6 +979,10 @@ public class ForeignKey implements Constraint {
         return _fixedSuffix != null && _fixedSuffix.trim().length() > 0;
     }
 
+    public boolean containsIFCommentInFixedCondition() {
+        return hasFixedCondition() && _fixedCondition.contains("/*IF ");
+    }
+
     public String getDynamicFixedConditionArgs() {
         analyzeDynamicFixedConditionIfNeeds();
         return buildDynamicFixedConditionArgs(false);
@@ -1012,6 +1016,10 @@ public class ForeignKey implements Constraint {
 
     public String getDynamicFixedConditionVariables() {
         analyzeDynamicFixedConditionIfNeeds();
+        return buildDynamicFixedConditionVariables();
+    }
+
+    protected String buildDynamicFixedConditionVariables() {
         final StringBuilder sb = new StringBuilder();
         for (String parameterName : _dynamicFixedConditionMap.keySet()) {
             if (sb.length() > 0) {
@@ -1039,17 +1047,43 @@ public class ForeignKey implements Constraint {
         return sb.toString();
     }
 
+    public String getDynamicFixedConditionDBMetaSetupList() {
+        analyzeDynamicFixedConditionIfNeeds();
+        final String variables = buildDynamicFixedConditionVariables();
+        if (variables != null && variables.trim().length() > 0) {
+            return "newArrayList(\"" + variables + "\")";
+        } else {
+            return "null";
+        }
+    }
+
     public String getDynamicFixedConditionArgsJavaDocString() {
+        return buildDynamicFixedConditionArgsJavaDocString(false);
+    }
+
+    public String getDynamicFixedConditionArgsJavaDocStringNest() {
+        return buildDynamicFixedConditionArgsJavaDocString(true);
+    }
+
+    protected String buildDynamicFixedConditionArgsJavaDocString(boolean nest) {
         analyzeDynamicFixedConditionIfNeeds();
         final StringBuilder sb = new StringBuilder();
         int count = 0;
         for (Entry<String, String> entry : _dynamicFixedConditionMap.entrySet()) {
             final String parameterName = entry.getKey();
             if (count > 0) {
+                if (nest) {
+                    sb.append("    ");
+                }
                 sb.append("     * ");
             }
             sb.append("@param ").append(parameterName).append(" ");
-            sb.append("The bind parameter of fixed condition for ").append(parameterName).append(". (NotNull)");
+            sb.append("The bind parameter of fixed condition for ").append(parameterName);
+            if (containsIFCommentInFixedCondition()) {
+                sb.append(". (might be NullAllowed: IF comment exists in the fixed condition)");
+            } else { // mainly here
+                sb.append(". (NotNull)");
+            }
             sb.append(getBasicProperties().getSourceCodeLineSeparator());
             ++count;
         }
@@ -1671,7 +1705,7 @@ public class ForeignKey implements Constraint {
     }
 
     public void setFixedCondition(String fixedCondition) {
-        this._fixedCondition = fixedCondition;
+        _fixedCondition = fixedCondition;
     }
 
     public String getFixedSuffix() {
@@ -1679,7 +1713,7 @@ public class ForeignKey implements Constraint {
     }
 
     public void setFixedSuffix(String fixedSuffix) {
-        this._fixedSuffix = fixedSuffix;
+        _fixedSuffix = fixedSuffix;
     }
 
     public boolean isFixedInline() {
@@ -1687,7 +1721,7 @@ public class ForeignKey implements Constraint {
     }
 
     public void setFixedInline(boolean fixedInline) {
-        this._fixedInline = fixedInline;
+        _fixedInline = fixedInline;
     }
 
     public boolean isFixedReferrer() {
@@ -1695,7 +1729,7 @@ public class ForeignKey implements Constraint {
     }
 
     public void setFixedReferrer(boolean fixedReferrer) {
-        this._fixedReferrer = fixedReferrer;
+        _fixedReferrer = fixedReferrer;
     }
 
     public String getComment() {
@@ -1703,6 +1737,6 @@ public class ForeignKey implements Constraint {
     }
 
     public void setComment(String comment) {
-        this._comment = comment;
+        _comment = comment;
     }
 }

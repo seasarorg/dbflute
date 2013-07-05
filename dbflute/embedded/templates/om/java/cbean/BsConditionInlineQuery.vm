@@ -17,6 +17,7 @@ ${database.allClassCopyright}package ${glPackageCIQ};
 #set ($myClassName = "${myConditionInlineQueryClassName}")
 #set ($myCQClassName = "${myBaseConditionQueryClassName}")
 
+import java.util.Map;
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.cbean.ckey.*;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -295,6 +296,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 #end
 #end
+    protected Map<String, Object> xfindFixedConditionDynamicParameterMap(String property) { return null; }
 #if ($table.hasSinglePrimaryKey())
     public String keepScalarCondition(${myConditionQueryClassName} subQuery)
     { throwIICBOE("ScalarCondition"); return null; }

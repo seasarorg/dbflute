@@ -114,7 +114,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -135,7 +135,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -150,7 +150,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -170,7 +170,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -185,7 +185,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -205,7 +205,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -223,7 +223,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -242,14 +242,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
     protected Map<String, Object> _${subQueryPropertyName}ParameterMap;
     public Map<String, Object> get${subQueryPropertyNameInitCap}Parameter() { return _${subQueryPropertyName}ParameterMap; }
     public String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue) {
-        if (_${subQueryPropertyName}ParameterMap == null) { _${subQueryPropertyName}ParameterMap = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}ParameterMap == null) { _${subQueryPropertyName}ParameterMap = newLinkedHashMapSized(4); }
         String key = "subQueryParameterKey" + (_${subQueryPropertyName}ParameterMap.size() + 1);
         _${subQueryPropertyName}ParameterMap.put(key, parameterValue); return "${subQueryPropertyName}Parameter." + key;
     }
@@ -273,7 +273,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -294,7 +294,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -312,7 +312,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -328,7 +328,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -348,7 +348,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -363,7 +363,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -383,7 +383,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -401,14 +401,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
     protected Map<String, Object> _${subQueryPropertyName}ParameterMap;
     public Map<String, Object> get${subQueryPropertyNameInitCap}Parameter() { return _${subQueryPropertyName}ParameterMap; }
     public String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue) {
-        if (_${subQueryPropertyName}ParameterMap == null) { _${subQueryPropertyName}ParameterMap = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}ParameterMap == null) { _${subQueryPropertyName}ParameterMap = newLinkedHashMapSized(4); }
         String key = "subQueryParameterKey" + (_${subQueryPropertyName}ParameterMap.size() + 1);
         _${subQueryPropertyName}ParameterMap.put(key, parameterValue); return "${subQueryPropertyName}Parameter." + key;
     }
@@ -515,6 +515,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #if ($fk.hasDynamicFixedCondition())
         Map<String, Object> parameterMap = getParameterMap${fk.foreignPropertyNameInitCap}();
         ${fk.dynamicFixedConditionParameterMapSetup}
+        assertFixedConditionDynamicParameter("${fk.foreignPropertyName}", parameterMap);
 #end
         return getConditionQuery${fk.foreignPropertyNameInitCap}();
     }
@@ -530,7 +531,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<String, Object> _parameterMap${fk.foreignPropertyNameInitCap};
     public Map<String, Object> getParameterMap${fk.foreignPropertyNameInitCap}() {
         if (_parameterMap${fk.foreignPropertyNameInitCap} == null) {
-            _parameterMap${fk.foreignPropertyNameInitCap} = newLinkedHashMap();
+            _parameterMap${fk.foreignPropertyNameInitCap} = newLinkedHashMapSized(4);
         }
         return _parameterMap${fk.foreignPropertyNameInitCap};
     }
@@ -548,7 +549,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
     protected void xsetupOuterJoin${fk.foreignPropertyNameInitCap}() {
         ${foreignCQClassName} cq = getConditionQuery${fk.foreignPropertyNameInitCap}();
-        Map<String, String> joinOnMap = newLinkedHashMap();
+        Map<String, String> joinOnMap = newLinkedHashMapSized(4);
 #foreach ($columnName in $fk.localColumnNameList)
 #set ($localColumn = $table.getColumn($columnName))
 #set ($foreignColumnName = $fk.getLocalForeignMapping().get($columnName))
@@ -589,7 +590,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
     protected void xsetupOuterJoin${referrer.referrerPropertyNameInitCapAsOne}() {
         ${relatedCQClassName} cq = getConditionQuery${referrer.referrerPropertyNameInitCapAsOne}();
-        Map<String, String> joinOnMap = newLinkedHashMap();
+        Map<String, String> joinOnMap = newLinkedHashMapSized(4);
 #foreach ($columnName in $referrer.foreignColumnNameList)
 #set ($foreignColumn = $table.getColumn($columnName))
 #set ($referrerColumnName = $referrer.getForeignLocalMapping().get($columnName))
@@ -602,6 +603,17 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
 #end
+    protected Map<String, Object> xfindFixedConditionDynamicParameterMap(String property) {
+#foreach ($fk in $table.foreignKeys)
+#if ($fk.hasDynamicFixedCondition())
+        if ("${fk.foreignPropertyName}".equalsIgnoreCase(property)) {
+            return _parameterMap${fk.foreignPropertyNameInitCap};
+        }
+#end
+#end
+        return null;
+    }
+
 #if ($table.hasSinglePrimaryKey())
     // ===================================================================================
     //                                                                     ScalarCondition
@@ -609,7 +621,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<String, ${myConditionQueryClassName}> _scalarConditionMap;
     public Map<String, ${myConditionQueryClassName}> getScalarCondition() { return _scalarConditionMap; }
     public String keepScalarCondition(${myConditionQueryClassName} subQuery) {
-        if (_scalarConditionMap == null) { _scalarConditionMap = newLinkedHashMap(); }
+        if (_scalarConditionMap == null) { _scalarConditionMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_scalarConditionMap.size() + 1);
         _scalarConditionMap.put(key, subQuery); return "scalarCondition." + key;
     }
@@ -620,7 +632,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<String, ${myConditionQueryClassName}> _specifyMyselfDerivedMap;
     public Map<String, ${myConditionQueryClassName}> getSpecifyMyselfDerived() { return _specifyMyselfDerivedMap; }
     public String keepSpecifyMyselfDerived(${myConditionQueryClassName} subQuery) {
-        if (_specifyMyselfDerivedMap == null) { _specifyMyselfDerivedMap = newLinkedHashMap(); }
+        if (_specifyMyselfDerivedMap == null) { _specifyMyselfDerivedMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_specifyMyselfDerivedMap.size() + 1);
         _specifyMyselfDerivedMap.put(key, subQuery); return "specifyMyselfDerived." + key;
     }
@@ -628,14 +640,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<String, ${myConditionQueryClassName}> _queryMyselfDerivedMap;
     public Map<String, ${myConditionQueryClassName}> getQueryMyselfDerived() { return _queryMyselfDerivedMap; }
     public String keepQueryMyselfDerived(${myConditionQueryClassName} subQuery) {
-        if (_queryMyselfDerivedMap == null) { _queryMyselfDerivedMap = newLinkedHashMap(); }
+        if (_queryMyselfDerivedMap == null) { _queryMyselfDerivedMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_queryMyselfDerivedMap.size() + 1);
         _queryMyselfDerivedMap.put(key, subQuery); return "queryMyselfDerived." + key;
     }
     protected Map<String, Object> _qyeryMyselfDerivedParameterMap;
     public Map<String, Object> getQueryMyselfDerivedParameter() { return _qyeryMyselfDerivedParameterMap; }
     public String keepQueryMyselfDerivedParameter(Object parameterValue) {
-        if (_qyeryMyselfDerivedParameterMap == null) { _qyeryMyselfDerivedParameterMap = newLinkedHashMap(); }
+        if (_qyeryMyselfDerivedParameterMap == null) { _qyeryMyselfDerivedParameterMap = newLinkedHashMapSized(4); }
         String key = "subQueryParameterKey" + (_qyeryMyselfDerivedParameterMap.size() + 1);
         _qyeryMyselfDerivedParameterMap.put(key, parameterValue); return "queryMyselfDerivedParameter." + key;
     }
@@ -646,7 +658,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<String, ${myConditionQueryClassName}> _myselfExistsMap;
     public Map<String, ${myConditionQueryClassName}> getMyselfExists() { return _myselfExistsMap; }
     public String keepMyselfExists(${myConditionQueryClassName} subQuery) {
-        if (_myselfExistsMap == null) { _myselfExistsMap = newLinkedHashMap(); }
+        if (_myselfExistsMap == null) { _myselfExistsMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_myselfExistsMap.size() + 1);
         _myselfExistsMap.put(key, subQuery); return "myselfExists." + key;
     }
@@ -657,7 +669,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<String, ${myConditionQueryClassName}> _myselfInScopeMap;
     public Map<String, ${myConditionQueryClassName}> getMyselfInScope() { return _myselfInScopeMap; }
     public String keepMyselfInScope(${myConditionQueryClassName} subQuery) {
-        if (_myselfInScopeMap == null) { _myselfInScopeMap = newLinkedHashMap(); }
+        if (_myselfInScopeMap == null) { _myselfInScopeMap = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_myselfInScopeMap.size() + 1);
         _myselfInScopeMap.put(key, subQuery); return "myselfInScope." + key;
     }
@@ -698,7 +710,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<String, ${relatedCQClassName}> _${subQueryPropertyName}Map;
     public Map<String, ${relatedCQClassName}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
     public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMap(); }
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
         _${subQueryPropertyName}Map.put(key, subQuery); return "${subQueryPropertyName}." + key;
     }
@@ -723,7 +735,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     protected Map<String, ${relatedCQClassName}> _buriAllRoundStateHistory_${processName}Map;
     public Map<String, ${relatedCQClassName}> getBuriAllRoundStateHistory${processName}() { return _buriAllRoundStateHistory_${processName}Map; }
     public String keepBuriAllRoundStateHistory_${processName}(${relatedCQClassName} subQuery) {
-        if (_buriAllRoundStateHistory_${processName}Map == null) { _buriAllRoundStateHistory_${processName}Map = newLinkedHashMap(); }
+        if (_buriAllRoundStateHistory_${processName}Map == null) { _buriAllRoundStateHistory_${processName}Map = newLinkedHashMapSized(4); }
         String key = "subQueryMapKey" + (_buriAllRoundStateHistory_${processName}Map.size() + 1);
         _buriAllRoundStateHistory_${processName}Map.put(key, subQuery); return "buriAllRoundStateHistory${processName}." + key;
     }

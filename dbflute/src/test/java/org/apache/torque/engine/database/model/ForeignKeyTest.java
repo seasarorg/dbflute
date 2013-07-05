@@ -15,7 +15,6 @@
  */
 package org.apache.torque.engine.database.model;
 
-import org.junit.Assert;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
@@ -23,15 +22,18 @@ import org.seasar.dbflute.unit.core.PlainTestCase;
  */
 public class ForeignKeyTest extends PlainTestCase {
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     public void test_toString() {
         // ## Arrange ##
-        final ForeignKey foreignKey = new ForeignKey();
+        final ForeignKey fk = new ForeignKey();
 
         // ## Act ##
-        final String actual = foreignKey.toString();
+        final String actual = fk.toString();
 
         // ## Assert ##
         log(actual);
-        Assert.assertNotNull(actual);
+        assertNotNull(actual);
     }
 }

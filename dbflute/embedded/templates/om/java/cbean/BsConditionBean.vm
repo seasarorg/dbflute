@@ -514,6 +514,30 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
 #set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+#if ($fk.hasDynamicFixedCondition())
+        /**
+         * Prepare to specify functions about relation table. <br />
+         * ${fk.foreignDispForJavaDocNest}
+         * ${fk.dynamicFixedConditionArgsJavaDocStringNest}
+         * @return The instance for specification for relation table to specify. (NotNull)
+         */
+        public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionFinalArgs}) {
+            assertRelation("${tmpPropertyName}");
+            if (_${tmpPropertyName} == null) {
+                _${tmpPropertyName} = new ${tmpCBClassName}.HpSpecification(_baseCB, new HpSpQyCall<${tmpCQClassName}>() {
+                    public boolean has() { return _qyCall.has() && _qyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                    public ${tmpCQClassName} qy() { return _qyCall.qy().query${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionVariables}); } }
+                    , _purpose, _dbmetaProvider);
+                if (xhasSyncQyCall()) { // inherits it
+                    _${tmpPropertyName}.xsetSyncQyCall(new HpSpQyCall<${tmpCQClassName}>() {
+                        public boolean has() { return xsyncQyCall().has() && xsyncQyCall().qy().hasConditionQuery${tmpPropertyNameInitCap}(); }
+                        public ${tmpCQClassName} qy() { return xsyncQyCall().qy().query${tmpPropertyNameInitCap}(${fk.dynamicFixedConditionVariables}); }
+                    });
+                }
+            }
+            return _${tmpPropertyName};
+        }
+#end
         /**
          * Prepare to specify functions about relation table. <br />
          * ${fk.foreignDispForJavaDocNest}

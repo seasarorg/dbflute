@@ -129,16 +129,57 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
     public String findFixedCondition(String foreignKeyName) {
         String fixedCondition = doFindAttributeValue(foreignKeyName, KEY_FIXED_CONDITION);
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
+            fixedCondition = fixedCondition.trim(); // already trimmed but just in case
+
             // adjust a little about camel case
             final String foreignAliasMark = HpFixedConditionQueryResolver.FOREIGN_ALIAS_MARK;
             final String localAliasMark = HpFixedConditionQueryResolver.LOCAL_ALIAS_MARK;
             fixedCondition = Srl.replace(fixedCondition, "$$ALIAS$$", "$$alias$$");
             fixedCondition = Srl.replace(fixedCondition, "$$ForeignAlias$$", foreignAliasMark);
             fixedCondition = Srl.replace(fixedCondition, "$$LocalAlias$$", localAliasMark);
+
+            // adjust line separator
             fixedCondition = Srl.replace(fixedCondition, "\r\n", "\n"); // remove CR
             fixedCondition = Srl.replace(fixedCondition, "\n", "\\n"); // LF to "LF on Java"
+
+            // adjust formatting
+            fixedCondition = adjustFixedConditionFormat(fixedCondition);
         }
         return fixedCondition;
+    }
+
+    protected String adjustFixedConditionFormat(String fixedCondition) { // called in setter
+        if (fixedCondition == null) {
+            return null;
+        }
+        final String lineMark = "\\n"; // already replaced to line mark
+        if (!fixedCondition.contains(lineMark)) { // no need to adjust
+            return fixedCondition;
+        }
+        if (fixedCondition.contains(HpFixedConditionQueryResolver.SQ_BEGIN_MARK)) { // no need to adjust
+            return fixedCondition;
+        }
+        final List<String> splitList = Srl.splitList(fixedCondition, lineMark); // not trim
+        final StringBuilder sb = new StringBuilder();
+        final String andMark = "and ";
+        final int fitSize = 5;
+        int index = 0;
+        for (String element : splitList) {
+            if (index > 0) {
+                sb.append(lineMark);
+            }
+            if (isFixedConditionShortIndent(andMark, fitSize, element)) { // e.g. "and ...", "    and ..."
+                sb.append(Srl.indent(fitSize)).append(Srl.ltrim(element));
+            } else {
+                sb.append(element);
+            }
+            ++index;
+        }
+        return sb.toString();
+    }
+
+    protected boolean isFixedConditionShortIndent(String andMark, int fitSize, String element) {
+        return element.trim().startsWith(andMark) && element.indexOf(andMark) < fitSize;
     }
 
     public String findFixedSuffix(String foreignKeyName) {

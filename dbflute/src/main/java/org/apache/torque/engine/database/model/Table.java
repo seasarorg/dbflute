@@ -132,6 +132,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1332,10 +1333,20 @@ public class Table {
         return false;
     }
 
+    public boolean hasDynamicFixedConditionForeignKey() {
+        List<ForeignKey> foreignKeyList = getForeignKeyList();
+        for (ForeignKey foreignKey : foreignKeyList) {
+            if (foreignKey.hasDynamicFixedCondition()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                      Relation Index
     //                                                                      ==============
-    protected java.util.Map<String, Integer> _relationIndexMap = new java.util.LinkedHashMap<String, Integer>();
+    protected Map<String, Integer> _relationIndexMap = new LinkedHashMap<String, Integer>();
 
     public int resolveForeignIndex(ForeignKey foreignKey) {
         return doResolveRelationIndex(foreignKey, false, false);// Ignore oneToOne
@@ -2078,13 +2089,8 @@ public class Table {
     // -----------------------------------------------------
     //                                        Component Name
     //                                        --------------
-    public String getDaoComponentName() {
-        return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Dao";
-    }
-
     public String getBehaviorComponentName() {
-        final String uncapName = getUncapitalisedJavaName();
-        final String componentName = getDatabase().filterComponentNameWithProjectPrefix(uncapName) + "Bhv";
+        final String componentName = Srl.initUncap(getExtendedBehaviorClassName());
 
         // remove "$" because a component name that has a dollar mark may be unsupported
         // for example, in Spring Framework case:
@@ -2095,6 +2101,10 @@ public class Table {
     public String getBehaviorApComponentName() {
         final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
         return getBehaviorComponentName() + suffix;
+    }
+
+    public String getDaoComponentName() { // basically for CSharp
+        return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Dao";
     }
 
     // ===================================================================================
