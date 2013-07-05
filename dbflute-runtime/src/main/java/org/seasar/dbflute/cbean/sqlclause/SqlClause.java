@@ -31,6 +31,7 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
+import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionLazyChecker;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.join.LeftOuterJoinInfo;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
@@ -81,8 +82,8 @@ public interface SqlClause {
     boolean isForSubQuery();
 
     // ===================================================================================
-    //                                                                              Clause
-    //                                                                              ======
+    //                                                                        Whole Clause
+    //                                                                        ============
     // -----------------------------------------------------
     //                                       Complete Clause
     //                                       ---------------
@@ -271,6 +272,13 @@ public interface SqlClause {
     void registerOuterJoinFixedInline(String foreignAliasName, String foreignTableDbName, String localAliasName,
             String localTableDbName, Map<ColumnRealName, ColumnRealName> joinOnMap, ForeignInfo foreignInfo,
             String fixedCondition, FixedConditionResolver fixedConditionResolver);
+
+    /**
+     * Register the lazy checker for the fixed condition. <br />
+     * This is called when building SQL clause.
+     * @param checker The callback instance of checker. (NotNull)
+     */
+    void registerFixedConditionLazyChecker(FixedConditionLazyChecker checker);
 
     // -----------------------------------------------------
     //                                   OuterJoin Attribute
@@ -586,7 +594,7 @@ public interface SqlClause {
 
     /**
      * Is fetch scope effective?
-     * @return Determiantion.
+     * @return The determination, true or false.
      */
     boolean isFetchScopeEffective();
 

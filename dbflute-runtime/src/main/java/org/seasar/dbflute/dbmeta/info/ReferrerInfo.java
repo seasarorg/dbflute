@@ -62,7 +62,7 @@ public class ReferrerInfo implements RelationInfo {
         _localDBMeta = localDBMeta;
         _referrerDBMeta = referrerDBMeta;
         _localReferrerColumnInfoMap = Collections.unmodifiableMap(localReferrerColumnInfoMap);
-        final Map<ColumnInfo, ColumnInfo> referrerLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
+        final Map<ColumnInfo, ColumnInfo> referrerLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>(4);
         for (Entry<ColumnInfo, ColumnInfo> entry : localReferrerColumnInfoMap.entrySet()) {
             referrerLocalColumnInfoMap.put(entry.getValue(), entry.getKey());
         }

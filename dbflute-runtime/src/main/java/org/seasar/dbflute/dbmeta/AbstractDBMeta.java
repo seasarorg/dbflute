@@ -402,11 +402,12 @@ public abstract class AbstractDBMeta implements DBMeta {
     // createForeignInfo()
     protected ForeignInfo cfi(String consName, String propName // name
             , DBMeta localDbm, DBMeta foreignDbm // DB meta
-            , Map<ColumnInfo, ColumnInfo> locFrColMap, int relNo // relation info
-            , boolean oneToOne, boolean bizOne, boolean asOne // one-to-one info
-            , boolean addFK, String fixedCond, boolean fixedInl, String revsName) { // additional & reverse info
+            , Map<ColumnInfo, ColumnInfo> locFrColMap, int relNo // relation attribute
+            , boolean oneToOne, boolean bizOne, boolean asOne, boolean addFK // relation type
+            , String fixedCond, List<String> dynParamList, boolean fixedInl // fixed condition
+            , String revsName) { // various info
         return new ForeignInfo(consName, propName, localDbm, foreignDbm, locFrColMap, relNo, oneToOne, bizOne, asOne,
-                addFK, fixedCond, fixedInl, revsName);
+                addFK, fixedCond, dynParamList, fixedInl, revsName);
     }
 
     /**
@@ -1047,11 +1048,11 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                  Collection Generator
     //                                  --------------------
     protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
-        return new HashMap<KEY, VALUE>();
+        return DfCollectionUtil.newHashMap();
     }
 
     protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
-        return new ConcurrentHashMap<KEY, VALUE>();
+        return DfCollectionUtil.newConcurrentHashMap();
     }
 
     protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key, VALUE value) {
@@ -1061,7 +1062,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
-        return new LinkedHashMap<KEY, VALUE>();
+        return DfCollectionUtil.newLinkedHashMap();
     }
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key, VALUE value) {
@@ -1070,8 +1071,12 @@ public abstract class AbstractDBMeta implements DBMeta {
         return map;
     }
 
+    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMapSized(int size) {
+        return DfCollectionUtil.newLinkedHashMapSized(size);
+    }
+
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
-        return new ArrayList<ELEMENT>();
+        return DfCollectionUtil.newArrayList();
     }
 
     protected <ELEMENT> List<ELEMENT> newArrayList(ELEMENT... elements) {
@@ -1083,7 +1088,11 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {
-        return new ArrayList<ELEMENT>(collection);
+        return DfCollectionUtil.newArrayList(collection);
+    }
+
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayListSized(int size) {
+        return DfCollectionUtil.newArrayListSized(size);
     }
 
     protected <VALUE> StringKeyMap<VALUE> createFlexibleConcurrentMap() {

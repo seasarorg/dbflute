@@ -18,6 +18,7 @@ package org.seasar.dbflute.dbmeta.info;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -47,6 +48,7 @@ public class ForeignInfo implements RelationInfo {
     protected final boolean _referrerAsOne;
     protected final boolean _additionalFK;
     protected final String _fixedCondition;
+    protected final List<String> _dynamicParameterList;
     protected final boolean _fixedInline;
     protected final String _reversePropertyName;
     protected final Method _readMethod;
@@ -55,10 +57,12 @@ public class ForeignInfo implements RelationInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ForeignInfo(String constraintName, String foreignPropertyName, DBMeta localDBMeta, DBMeta foreignDBMeta,
-            Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, boolean oneToOne,
-            boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK, String fixedCondition,
-            boolean fixedInline, String reversePropertyName) {
+    public ForeignInfo(String constraintName, String foreignPropertyName // name
+            , DBMeta localDBMeta, DBMeta foreignDBMeta // DB meta
+            , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo // relation attribute
+            , boolean oneToOne, boolean bizOneToOne, boolean referrerAsOne, boolean additionalFK // relation type
+            , String fixedCondition, List<String> dynamicParameterList, boolean fixedInline // fixed condition
+            , String reversePropertyName) { // various info
         assertObjectNotNull("constraintName", constraintName);
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
@@ -69,7 +73,7 @@ public class ForeignInfo implements RelationInfo {
         _localDBMeta = localDBMeta;
         _foreignDBMeta = foreignDBMeta;
         _localForeignColumnInfoMap = Collections.unmodifiableMap(localForeignColumnInfoMap);
-        final Map<ColumnInfo, ColumnInfo> foreignLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
+        final Map<ColumnInfo, ColumnInfo> foreignLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>(4);
         for (Entry<ColumnInfo, ColumnInfo> entry : localForeignColumnInfoMap.entrySet()) {
             foreignLocalColumnInfoMap.put(entry.getValue(), entry.getKey());
         }
@@ -81,6 +85,11 @@ public class ForeignInfo implements RelationInfo {
         _additionalFK = additionalFK;
         _fixedCondition = fixedCondition;
         _fixedInline = fixedInline;
+        if (dynamicParameterList != null) {
+            _dynamicParameterList = Collections.unmodifiableList(dynamicParameterList);
+        } else {
+            _dynamicParameterList = Collections.emptyList();
+        }
         _reversePropertyName = reversePropertyName;
         _readMethod = findReadMethod();
         _writeMethod = findWriteMethod();
@@ -387,11 +396,19 @@ public class ForeignInfo implements RelationInfo {
     }
 
     /**
-     * Get the fixed condition if it's additional foreign key.
-     * @return The string of fixed condition. (NullAllowed)
+     * Get the fixed-condition if it's additional foreign key.
+     * @return The string of fixed-condition. (NullAllowed)
      */
     public String getFixedCondition() {
         return _fixedCondition;
+    }
+
+    /**
+     * Get the read-only list of dynamic parameter name for fixed-condition if it's additional foreign key.
+     * @return The read-only list. (NotNull: if no fixed-condition, returns empty list)
+     */
+    public List<String> getDynamicParameterList() {
+        return _dynamicParameterList;
     }
 
     /**
@@ -432,5 +449,29 @@ public class ForeignInfo implements RelationInfo {
             }
         }
         return true;
+    }
+
+    /**
+     * Does it have fixed-condition for this relation?
+     * @return The determination, true or false.
+     */
+    public boolean hasFixedCondition() {
+        return _fixedCondition != null && _fixedCondition.trim().length() > 0;
+    }
+
+    /**
+     * Does it have dynamic parameter of fixed-condition?
+     * @return The determination, true or false.
+     */
+    public boolean hasFixedConditionDynamicParameter() {
+        return hasFixedCondition() && !_dynamicParameterList.isEmpty();
+    }
+
+    /**
+     * Is the dynamic parameters of fixed condition required?
+     * @return The determination, true or false. (true if NOT contains IF comment)
+     */
+    public boolean isFixedConditionDynamicParameterRequired() {
+        return hasFixedConditionDynamicParameter() && !getFixedCondition().contains("/*IF ");
     }
 }

@@ -49,6 +49,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
 import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
+import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionLazyChecker;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByElement;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
@@ -402,13 +403,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String foreignPropertyName) {
         final DBMeta dbmeta = xgetLocalDBMeta();
         final ForeignInfo foreignInfo = dbmeta.findForeignInfo(foreignPropertyName);
-        final String fixedCondition = foreignInfo.getFixedCondition();
-        final boolean fixedInline = foreignInfo.isFixedInline();
-        doRegisterOuterJoin(foreignCQ, joinOnResourceMap, foreignPropertyName, fixedCondition, fixedInline);
+        doRegisterOuterJoin(foreignCQ, joinOnResourceMap, foreignPropertyName, foreignInfo);
     }
 
     protected void doRegisterOuterJoin(ConditionQuery foreignCQ, Map<String, String> joinOnResourceMap,
-            String foreignPropertyName, String fixedCondition, boolean fixedInline) {
+            final String foreignPropertyName, ForeignInfo foreignInfo) {
         // translate join-on map using column real name
         final Map<ColumnRealName, ColumnRealName> joinOnMap = newLinkedHashMap();
         for (Entry<String, String> entry : joinOnResourceMap.entrySet()) {
@@ -420,7 +419,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String foreignTable = foreignCQ.getTableDbName();
         final String localAlias = xgetAliasName();
         final String localTable = getTableDbName();
-        final ForeignInfo foreignInfo = xgetLocalDBMeta().findForeignInfo(foreignPropertyName);
+        final String fixedCondition = foreignInfo.getFixedCondition();
+        final boolean fixedInline = foreignInfo.isFixedInline();
         final FixedConditionResolver resolver = createForeignFixedConditionResolver(foreignCQ);
         if (fixedInline) {
             xgetSqlClause().registerOuterJoinFixedInline(foreignAlias, foreignTable, localAlias, localTable // basic
@@ -431,10 +431,67 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     , joinOnMap, foreignInfo // join objects
                     , fixedCondition, resolver); // fixed condition (to on-clause)
         }
+        xprepareFixedConditionDynamicParameterLazyChecker(foreignPropertyName, foreignInfo);
     }
 
     protected FixedConditionResolver createForeignFixedConditionResolver(ConditionQuery foreignCQ) {
         return new HpFixedConditionQueryResolver(this, foreignCQ, xgetDBMetaProvider());
+    }
+
+    protected void xprepareFixedConditionDynamicParameterLazyChecker(final String foreignPropertyName,
+            final ForeignInfo foreignInfo) {
+        if (!foreignInfo.hasFixedConditionDynamicParameter()) {
+            return;
+        }
+        // lazy check because the following code is allowed:
+        // e.g. ColumnQuery
+        //   cb.columnQuery(new ... {
+        //   }).lessThan(new ... {
+        //       cb.specify().specifyMemberAddressAsValid()... // no dynamic parameter
+        //   });
+        xgetSqlClause().registerFixedConditionLazyChecker(new FixedConditionLazyChecker() {
+            public void check() {
+                xcalbackAssertFixedConditionDynamicParameter(foreignPropertyName, foreignInfo);
+            }
+        });
+    }
+
+    protected void xcalbackAssertFixedConditionDynamicParameter(String foreignPropertyName, ForeignInfo foreignInfo) {
+        // cannot get dynamic parameter map directly in super classes of runtime
+        // and does not want to add inner class in generated classes,
+        // so this way...as a last-ditch measure
+        final Map<String, Object> parameterMap = xfindFixedConditionDynamicParameterMap(foreignPropertyName);
+        xdoAssertFixedConditionDynamicParameter(foreignPropertyName, foreignInfo, parameterMap);
+    }
+
+    protected abstract Map<String, Object> xfindFixedConditionDynamicParameterMap(String property);
+
+    protected void assertFixedConditionDynamicParameter(String property, Map<String, Object> parameterMap) {
+        final ForeignInfo foreignInfo = xgetLocalDBMeta().findForeignInfo(property);
+        xdoAssertFixedConditionDynamicParameter(property, foreignInfo, parameterMap);
+    }
+
+    protected void xdoAssertFixedConditionDynamicParameter(String property, ForeignInfo foreignInfo,
+            Map<String, Object> parameterMap) {
+        if (foreignInfo.isFixedConditionDynamicParameterRequired()) { // required check
+            boolean notFound = false;
+            if (parameterMap != null) {
+                for (Object value : parameterMap.values()) {
+                    if (value == null) {
+                        notFound = true;
+                        break;
+                    }
+                }
+            } else { // null treated as not found
+                notFound = true;
+            }
+            if (notFound) {
+                final String tableDbName = getTableDbName();
+                final String fixedCondition = foreignInfo.getFixedCondition();
+                createCBExThrower().throwFixedConditionParameterNotFoundException(tableDbName, property,
+                        fixedCondition, parameterMap);
+            }
+        }
     }
 
     // ===================================================================================
@@ -2446,6 +2503,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return DfCollectionUtil.newLinkedHashMap();
+    }
+
+    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMapSized(int size) {
+        return DfCollectionUtil.newLinkedHashMapSized(size);
     }
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {

@@ -19,7 +19,7 @@ package org.seasar.dbflute.exception;
  * The exception of when the relation variable on fixed condition is illegal.
  * @author jflute
  */
-public class IllegalFixedConditionOverRelationException extends RuntimeException {
+public class FixedConditionParameterNotFoundException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class IllegalFixedConditionOverRelationException extends RuntimeException
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public IllegalFixedConditionOverRelationException(String msg) {
+    public FixedConditionParameterNotFoundException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class IllegalFixedConditionOverRelationException extends RuntimeException
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public IllegalFixedConditionOverRelationException(String msg, Throwable cause) {
+    public FixedConditionParameterNotFoundException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

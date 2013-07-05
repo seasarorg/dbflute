@@ -25,6 +25,7 @@ import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
+import org.seasar.dbflute.exception.FixedConditionParameterNotFoundException;
 import org.seasar.dbflute.exception.InvalidQueryRegisteredException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartAlreadySetupException;
 import org.seasar.dbflute.exception.OrScopeQueryAndPartNotOrScopeException;
@@ -1068,6 +1069,53 @@ public class ConditionBeanExceptionThrower {
         br.addElement(pageNumber);
         final String msg = br.buildExceptionMessage();
         throw new PagingPageSizeNotPlusException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                      FixedCondition
+    //                                                                      ==============
+    public void throwFixedConditionParameterNotFoundException(String tableDbName, String property,
+            String fixedCondition, Map<String, Object> parameterMap) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the required parameter for the fixed condition.");
+        br.addItem("Advice");
+        br.addElement("Make sure your parameters to make the BizOneToOne relation.");
+        br.addElement("For example:");
+        br.addElement("  (x): cb.setupSelect_MemberAddressAsValid(null);");
+        br.addElement("  (o): cb.setupSelect_MemberAddressAsValid(currentDate());");
+        br.addElement("  (o): (SpecifyColumn)");
+        br.addElement("    cb.setupSelect_MemberAddressAsValid(currentDate());");
+        br.addElement("    cb.specify().specifyMemberAddressAsValid().columnAddress();");
+        br.addElement("  (x): (ColumnQuery)");
+        br.addElement("    cb.columnQuery(new ... {");
+        br.addElement("        ...");
+        br.addElement("    }).lessThan(new ...) {");
+        br.addElement("        cb.specify().specifyMemberAddressAsValid().columnAddress();");
+        br.addElement("    })");
+        br.addElement("  (o): (ColumnQuery)");
+        br.addElement("    cb.columnQuery(new ... {");
+        br.addElement("        ...");
+        br.addElement("    }).lessThan(new ...) {");
+        br.addElement("        cb.specify().specifyMemberAddressAsValid(currentDate()).columnAddress();");
+        br.addElement("    });");
+        br.addElement("  (x): (DerivedReferrer)");
+        br.addElement("    cb.specify().derivedMemberList(new ... {");
+        br.addElement("        cb.specify().specifyMemberAddressAsValid().columnAddress();");
+        br.addElement("    });");
+        br.addElement("  (o): (DerivedReferrer)");
+        br.addElement("    cb.specify().derivedMemberList(new ... {");
+        br.addElement("        cb.specify().specifyMemberAddressAsValid(currentDate()).columnAddress();");
+        br.addElement("    });");
+        br.addItem("Local Table");
+        br.addElement(tableDbName);
+        br.addItem("Relation Property");
+        br.addElement(property);
+        br.addItem("FixedCondition");
+        br.addElement(fixedCondition);
+        br.addItem("Parameters");
+        br.addElement(parameterMap);
+        final String msg = br.buildExceptionMessage();
+        throw new FixedConditionParameterNotFoundException(msg);
     }
 
     // ===================================================================================

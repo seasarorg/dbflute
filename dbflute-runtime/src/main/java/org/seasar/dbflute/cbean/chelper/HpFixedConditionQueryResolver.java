@@ -33,7 +33,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.TableSqlName;
 import org.seasar.dbflute.exception.DBMetaNotFoundException;
-import org.seasar.dbflute.exception.IllegalFixedConditionOverRelationException;
+import org.seasar.dbflute.exception.FixedConditionIllegalOverRelationException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.Srl;
@@ -405,7 +405,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         br.addItem("BizOneToOne's Local");
         br.addElement(_localCQ.getTableDbName());
         final String msg = br.buildExceptionMessage();
-        throw new IllegalFixedConditionOverRelationException(msg, e);
+        throw new FixedConditionIllegalOverRelationException(msg, e);
     }
 
     // ===================================================================================

@@ -43,6 +43,7 @@ import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue.QueryModeProvider;
 import org.seasar.dbflute.cbean.sqlclause.clause.ClauseLazyReflector;
+import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionLazyChecker;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinLazyReflector;
 import org.seasar.dbflute.cbean.sqlclause.join.InnerJoinLazyReflectorBase;
@@ -152,8 +153,11 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Is use select index? Default value is true. */
     protected boolean _useSelectIndex = true;
 
-    /** The map of left-outer-join info. map:{ foreignAliasName : leftOuterJoinInfo } */
+    /** The map of left-outer-join info. map:{ foreignAliasName : leftOuterJoinInfo } (NullAllowed: lazy-load) */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap;
+
+    /** The list of lazy checker for fixed-condition e.g. dynamic parameters. (NullAllowed: lazy-load) */
+    protected List<FixedConditionLazyChecker> _fixedConditionLazyChecker;
 
     /** Does it allow to auto-detect joins that can be structural-possible inner-join? */
     protected boolean _structuralPossibleInnerJoinAllowed;
@@ -161,19 +165,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Does it allow to auto-detect joins that can be where-used inner-join? */
     protected boolean _whereUsedInnerJoinAllowed;
 
-    /** The list of lazy reflector for auto-detected inner-join. */
+    /** The list of lazy reflector for auto-detected inner-join. (NullAllowed: lazy-load) */
     protected List<InnerJoinLazyReflector> _innerJoinLazyReflector;
 
-    /** The list of where clause. */
+    /** The list of where clause. (NullAllowed: lazy-load) */
     protected List<QueryClause> _whereList;
 
-    /** The list of in-line where clause for base table. */
+    /** The list of in-line where clause for base table. (NullAllowed: lazy-load) */
     protected List<QueryClause> _baseTableInlineWhereList;
 
     /** The clause of order-by. (NotNull) */
     protected OrderByClause _orderByClause;
 
-    /** The list of union clause. (NullAllowed: lazy-loaded) */
+    /** The list of union clause. (NullAllowed: lazy-loaded) (NullAllowed: lazy-load) */
     protected List<UnionQueryInfo> _unionQueryInfoList;
 
     /** Is order-by effective? Default value is false. True when registered. */
@@ -224,37 +228,37 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** Does it check an invalid query? */
     protected boolean _invalidQueryChecked;
 
-    /** The list of invalid query info. */
+    /** The list of invalid query info. (NullAllowed: lazy-load) */
     protected List<HpInvalidQueryInfo> _invalidQueryList;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
     //                               -----------------------
-    /** The filter for where clause. */
+    /** The filter for where clause. (NullAllowed: lazy-load) */
     protected transient List<QueryClauseFilter> _whereClauseSimpleFilterList; // transient because of non-serializable
 
     // -----------------------------------------------------
     //                                    ColumnQuery Object
     //                                    ------------------
-    /** The map for column query objects. (only for saving) (NullAllowed) */
+    /** The map for column query objects. (only for saving) (NullAllowed: lazy-load) */
     protected Map<String, Object> _columyQueryObjectMap;
 
     // -----------------------------------------------------
     //                                 ManualOrder Parameter
     //                                 ---------------------
-    /** The map for ManualOrder parameters. (only for saving) (NullAllowed) */
+    /** The map for ManualOrder parameters. (only for saving) (NullAllowed: lazy-load) */
     protected Map<String, Object> _manualOrderParameterMap;
 
     // -----------------------------------------------------
     //                                        Free Parameter
     //                                        --------------
-    /** The map for free parameters. (only for saving) (NullAllowed) */
+    /** The map for free parameters. (only for saving) (NullAllowed: lazy-load) */
     protected Map<String, Object> _freeParameterMap;
 
     // -----------------------------------------------------
     //                                         Geared Cipher
     //                                         -------------
-    /** The manager of geared cipher. (also for saving) (NullAllowed) */
+    /** The manager of geared cipher. (also for saving) (NullAllowed: lazy-load) */
     protected GearedCipherManager _gearedCipherManager;
 
     /** Does it suppress description for select columns? */
@@ -293,6 +297,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     // -----------------------------------------------------
     //                                        Lazy Reflector
     //                                        --------------
+    /** The list of lazy reflector for clause. (NullAllowed: lazy-load) */
     protected List<ClauseLazyReflector> _clauseLazyReflectorList;
 
     // ===================================================================================
@@ -318,8 +323,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
      */
     public AbstractSqlClause dbmetaProvider(DBMetaProvider dbmetaProvider) {
         if (dbmetaProvider == null) {
-            String msg = "The argument 'dbmetaProvider' should not be null:";
-            msg = msg + " tableDbName=" + _tableDbName;
+            String msg = "The argument 'dbmetaProvider' should not be null: tableDbName=" + _tableDbName;
             throw new IllegalArgumentException(msg);
         }
         _dbmetaProvider = dbmetaProvider;
@@ -362,8 +366,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // ===================================================================================
-    //                                                                         Main Clause
-    //                                                                         ===========
+    //                                                                        Whole Clause
+    //                                                                        ============
     // -----------------------------------------------------
     //                                       Complete Clause
     //                                       ---------------
@@ -509,11 +513,9 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     // ===================================================================================
-    //                                                                        Clause Parts
-    //                                                                        ============
-    // -----------------------------------------------------
-    //                                         Select Clause
-    //                                         -------------
+    //                                                                       Select Clause
+    //                                                                       =============
+    // Clause Parts
     public String getSelectClause() {
         reflectClauseLazilyIfExists();
         if (isSelectClauseNonUnionScalar()) {
@@ -856,9 +858,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         sb.append(SELECT_HINT);
     }
 
-    // -----------------------------------------------------
-    //                                           From Clause
-    //                                           -----------
+    // ===================================================================================
+    //                                                                         From Clause
+    //                                                                         ===========
+    // Clause Parts
     public String getFromClause() {
         reflectClauseLazilyIfExists();
         final StringBuilder sb = new StringBuilder();
@@ -893,8 +896,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return createFromBaseTableHint();
     }
 
+    // ===================================================================================
+    //                                                                         Join Clause
+    //                                                                         ===========
+    // Clause Parts
     protected String getLeftOuterJoinClause() {
         final StringBuilder sb = new StringBuilder();
+        checkFixedConditionLazily();
         reflectInnerJoinAutoDetectLazily();
         final boolean countLeastJoinAllowed = checkCountLeastJoinAllowed();
         final boolean structuralPossibleInnerJoinAllowed = checkStructuralPossibleInnerJoinAllowed();
@@ -909,6 +917,14 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return sb.toString();
     }
 
+    protected void checkFixedConditionLazily() {
+        if (_fixedConditionLazyChecker != null && !_fixedConditionLazyChecker.isEmpty()) {
+            for (FixedConditionLazyChecker lazyChecker : _fixedConditionLazyChecker) {
+                lazyChecker.check();
+            }
+        }
+    }
+
     protected void reflectInnerJoinAutoDetectLazily() {
         if (!hasInnerJoinLazyReflector()) {
             return;
@@ -918,10 +934,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             reflector.reflect();
         }
         reflectorList.clear();
-    }
-
-    protected boolean canBeCountLeastJoin(LeftOuterJoinInfo joinInfo) {
-        return !joinInfo.isCountableJoin();
     }
 
     protected boolean checkCountLeastJoinAllowed() {
@@ -951,6 +963,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             }
         }
         return false;
+    }
+
+    protected boolean canBeCountLeastJoin(LeftOuterJoinInfo joinInfo) {
+        return !joinInfo.isCountableJoin();
     }
 
     protected void buildLeftOuterJoinClause(StringBuilder sb, String foreignAliasName, LeftOuterJoinInfo joinInfo,
@@ -1086,9 +1102,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return createFromHint();
     }
 
-    // -----------------------------------------------------
-    //                                          Where Clause
-    //                                          ------------
+    // ===================================================================================
+    //                                                                        Where Clause
+    //                                                                        ============
+    // Clause Parts
     public String getWhereClause() {
         reflectClauseLazilyIfExists();
         final StringBuilder sb = new StringBuilder();
@@ -1122,9 +1139,10 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    // -----------------------------------------------------
-    //                                        OrderBy Clause
-    //                                        --------------
+    // ===================================================================================
+    //                                                                      OrderBy Clause
+    //                                                                      ==============
+    // Clause Parts
     public String getOrderByClause() {
         reflectClauseLazilyIfExists();
         final OrderByClause orderBy = getOrderBy();
@@ -1146,12 +1164,13 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         }
     }
 
-    // -----------------------------------------------------
-    //                                            SQL Suffix
-    //                                            ----------
+    // ===================================================================================
+    //                                                                          SQL Suffix
+    //                                                                          ==========
+    // Clause Parts
     public String getSqlSuffix() {
         reflectClauseLazilyIfExists();
-        String sqlSuffix = createSqlSuffix();
+        final String sqlSuffix = createSqlSuffix();
         if (sqlSuffix != null && sqlSuffix.trim().length() > 0) {
             return ln() + sqlSuffix;
         } else {
@@ -1329,6 +1348,16 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         joinInfo.resolveFixedCondition();
 
         outerJoinMap.put(foreignAliasName, joinInfo);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerFixedConditionLazyChecker(FixedConditionLazyChecker checker) {
+        if (_fixedConditionLazyChecker == null) {
+            _fixedConditionLazyChecker = new ArrayList<FixedConditionLazyChecker>(4);
+        }
+        _fixedConditionLazyChecker.add(checker);
     }
 
     // -----------------------------------------------------
