@@ -203,10 +203,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             }
 
             reflectClassificationResourceToDefinition(); // *Classification Resource Point!
+            filterUseDocumentOnly();
+            checkClassificationConstraints();
         } finally {
             new DfClassificationSqlResourceCloser().closeConnection(conn);
         }
-        checkClassificationConstraints();
         return _classificationTopMap;
     }
 
