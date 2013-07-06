@@ -295,7 +295,34 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         assertEquals(null, actual.getMaxRows());
     }
 
-    public void test_getActualStatementConfig_cursorSelectFetchSize_cursor_together() throws Exception {
+    public void test_getActualStatementConfig_cursorSelectFetchSize_cursor_merged() throws Exception {
+        // ## Arrange ##
+        TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
+            @Override
+            protected boolean isSelectCursorCommand() {
+                return true;
+            }
+        };
+        {
+            StatementConfig defaultConfig = new StatementConfig();
+            defaultConfig.queryTimeout(10).fetchSize(20).maxRows(30);
+            impl.setDefaultStatementConfig(defaultConfig);
+        }
+        impl.setCursorSelectFetchSize(200);
+        StatementConfig config = new StatementConfig();
+        config.queryTimeout(1);
+
+        // ## Act ##
+        StatementConfig actual = impl.getActualStatementConfig(config);
+
+        // ## Assert ##
+        assertNotNull(actual);
+        assertEquals(1, actual.getQueryTimeout());
+        assertEquals(200, actual.getFetchSize());
+        assertEquals(30, actual.getMaxRows());
+    }
+
+    public void test_getActualStatementConfig_cursorSelectFetchSize_cursor_suppressDefault() throws Exception {
         // ## Arrange ##
         TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
             @Override
@@ -319,7 +346,7 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         // ## Assert ##
         assertNotNull(actual);
         assertEquals(1, actual.getQueryTimeout());
-        assertEquals(200, actual.getFetchSize());
+        assertEquals(null, actual.getFetchSize());
         assertEquals(null, actual.getMaxRows());
     }
 
@@ -340,7 +367,7 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         assertNull(actual);
     }
 
-    public void test_getActualStatementConfig_cursorSelectFetchSize_notCursor_together() throws Exception {
+    public void test_getActualStatementConfig_cursorSelectFetchSize_notCursor_merged() throws Exception {
         // ## Arrange ##
         TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
             @Override
@@ -365,5 +392,33 @@ public class TnStatementFactoryImplTest extends PlainTestCase {
         assertEquals(1, actual.getQueryTimeout());
         assertEquals(20, actual.getFetchSize());
         assertEquals(30, actual.getMaxRows());
+    }
+
+    public void test_getActualStatementConfig_cursorSelectFetchSize_notCursor_suppressDefault() throws Exception {
+        // ## Arrange ##
+        TnStatementFactoryImpl impl = new TnStatementFactoryImpl() {
+            @Override
+            protected boolean isSelectCursorCommand() {
+                return false;
+            }
+        };
+        {
+            StatementConfig defaultConfig = new StatementConfig();
+            defaultConfig.queryTimeout(10).fetchSize(20).maxRows(30);
+            impl.setDefaultStatementConfig(defaultConfig);
+        }
+        impl.setCursorSelectFetchSize(200);
+        StatementConfig config = new StatementConfig();
+        config.suppressDefault();
+        config.queryTimeout(1);
+
+        // ## Act ##
+        StatementConfig actual = impl.getActualStatementConfig(config);
+
+        // ## Assert ##
+        assertNotNull(actual);
+        assertEquals(1, actual.getQueryTimeout());
+        assertEquals(null, actual.getFetchSize());
+        assertEquals(null, actual.getMaxRows());
     }
 }

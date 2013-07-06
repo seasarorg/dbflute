@@ -137,15 +137,21 @@ public class TnStatementFactoryImpl implements StatementFactory {
 
     protected StatementConfig getActualStatementConfig(StatementConfig config) {
         final boolean existsRequest = config != null;
+
         final StatementConfig defaultConfig = getActualDefaultConfig(config);
         final boolean existsDefault = defaultConfig != null;
-        final boolean existsCursor = _cursorSelectFetchSize != null;
+
+        final Integer cursorSelectFetchSize = getActualCursorSelectFetchSize(config);
+        final boolean existsCursor = cursorSelectFetchSize != null;
+
         final Integer queryTimeout = getActualQueryTimeout(config, existsRequest, defaultConfig, existsDefault);
-        final Integer fetchSize = getActualFetchSize(config, existsRequest, defaultConfig, existsDefault, existsCursor);
+        final Integer fetchSize = getActualFetchSize(config, existsRequest, cursorSelectFetchSize, existsCursor,
+                defaultConfig, existsDefault);
         final Integer maxRows = getActualMaxRows(config, existsRequest, defaultConfig, existsDefault);
         if (queryTimeout == null && fetchSize == null && maxRows == null) {
             return null;
         }
+
         final StatementConfig actualConfig = new StatementConfig();
         actualConfig.queryTimeout(queryTimeout).fetchSize(fetchSize).maxRows(maxRows);
         return actualConfig;
@@ -165,12 +171,19 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return defaultConfig;
     }
 
-    protected Integer getActualQueryTimeout(StatementConfig config, final boolean existsRequest,
-            final StatementConfig defaultConfig, final boolean existsDefault) {
+    protected Integer getActualCursorSelectFetchSize(StatementConfig config) {
+        if (config != null && config.isSuppressDefault()) {
+            return null; // suppressed
+        }
+        return _cursorSelectFetchSize;
+    }
+
+    protected Integer getActualQueryTimeout(StatementConfig config, boolean existsRequest,
+            StatementConfig defaultConfig, boolean existsDefault) {
         final Integer queryTimeout;
-        if (existsRequest && config.hasQueryTimeout()) {
+        if (existsRequest && config.hasQueryTimeout()) { // priority 1
             queryTimeout = config.getQueryTimeout();
-        } else if (existsDefault && defaultConfig.hasQueryTimeout()) {
+        } else if (existsDefault && defaultConfig.hasQueryTimeout()) { // priority 2
             queryTimeout = defaultConfig.getQueryTimeout();
         } else {
             queryTimeout = null;
@@ -178,14 +191,14 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return queryTimeout;
     }
 
-    protected Integer getActualFetchSize(StatementConfig config, final boolean existsRequest,
-            final StatementConfig defaultConfig, final boolean existsDefault, final boolean existsCursor) {
+    protected Integer getActualFetchSize(StatementConfig config, boolean existsRequest, Integer cursorSelectFetchSize,
+            boolean existsCursor, StatementConfig defaultConfig, boolean existsDefault) {
         final Integer fetchSize;
-        if (existsRequest && config.hasFetchSize()) {
+        if (existsRequest && config.hasFetchSize()) { // priority 1
             fetchSize = config.getFetchSize();
-        } else if (existsCursor && isSelectCursorCommand()) {
-            fetchSize = _cursorSelectFetchSize;
-        } else if (existsDefault && defaultConfig.hasFetchSize()) {
+        } else if (existsCursor && isSelectCursorCommand()) { // priority 2
+            fetchSize = cursorSelectFetchSize;
+        } else if (existsDefault && defaultConfig.hasFetchSize()) { // priority 3
             fetchSize = defaultConfig.getFetchSize();
         } else {
             fetchSize = null;
@@ -193,12 +206,12 @@ public class TnStatementFactoryImpl implements StatementFactory {
         return fetchSize;
     }
 
-    protected Integer getActualMaxRows(StatementConfig config, final boolean existsRequest,
-            final StatementConfig defaultConfig, final boolean existsDefault) {
+    protected Integer getActualMaxRows(StatementConfig config, boolean existsRequest, StatementConfig defaultConfig,
+            boolean existsDefault) {
         final Integer maxRows;
-        if (existsRequest && config.hasMaxRows()) {
+        if (existsRequest && config.hasMaxRows()) { // priority 1
             maxRows = config.getMaxRows();
-        } else if (existsDefault && defaultConfig.hasMaxRows()) {
+        } else if (existsDefault && defaultConfig.hasMaxRows()) { // priority 2
             maxRows = defaultConfig.getMaxRows();
         } else {
             maxRows = null;
