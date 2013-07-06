@@ -116,6 +116,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Equal(=). As ${classificationElement.name} (${classificationElement.code}). And OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
     public void set${tmpJavaName}_Equal_${classificationElement.name}() {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
@@ -168,6 +171,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * NotEqual(&lt;&gt;). As ${classificationElement.name} (${classificationElement.code}). And OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
     public void set${tmpJavaName}_NotEqual_${classificationElement.name}() {
         set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
@@ -619,6 +625,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Equal(=). As ${classificationElement.name} (${classificationElement.code}). And NullIgnored, OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
     public void set${tmpJavaName}_Equal_${classificationElement.name}() {
         set${tmpJavaName}_Equal_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
@@ -657,6 +666,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * NotEqual(&lt;&gt;). As ${classificationElement.name} (${classificationElement.code}). And NullIgnored, OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
     public void set${tmpJavaName}_NotEqual_${classificationElement.name}() {
         set${tmpJavaName}_NotEqual_As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
@@ -1190,6 +1202,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * Equal(=). As ${classificationElement.name}. And OnlyOnceRegistered. <br />
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
     public void set${tmpJavaName}_Equal_${classificationElement.name}() {
         reg${tmpJavaName}(CK_EQ, ${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationElement.name}.code()));
     }

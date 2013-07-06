@@ -234,6 +234,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * Set the value of ${col.uncapitalisedJavaName} as ${classificationElement.name} (${classificationElement.code}). <br />
      * $database.buildClassificationApplicationCommentForJavaDoc($classificationElement)
      */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
     public void set${col.javaName}_${classificationElement.name}() {
         set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationElement.name});
     }
@@ -273,6 +276,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return The determination, true or false.
      */
+#if ($classificationElement.isDeprecated())
+    @Deprecated
+#end
     public boolean is${col.javaName}${classificationElement.name}() {
         ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
         return cdef != null ? cdef.equals(${glCDef}.${col.classificationName}.${classificationElement.name}) : false;

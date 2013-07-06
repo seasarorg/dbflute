@@ -76,12 +76,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isAvailableAddingCatalogToTableSqlName", false);
     }
 
-    public boolean isAvailableSchemaDrivenTable() { // closet
-        return isProperty("isAvailableSchemaDrivenTable", false);
-    }
-
     public boolean isSuppressOtherSchemaSameNameTableLimiter() { // closet
         return isProperty("isSuppressOtherSchemaSameNameTableLimiter", false);
+    }
+
+    public boolean isAvailableSchemaDrivenTable() { // closet
+        return isProperty("isAvailableSchemaDrivenTable", false);
     }
 
     // ===================================================================================

@@ -912,17 +912,26 @@ public class DfSchemaXmlSerializer {
             }
         }
         if (!duplicateTableSet.isEmpty()) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-            msg = msg + "The same-name table between different schema is unsupported!" + ln();
-            msg = msg + ln();
-            msg = msg + "[Advice]" + ln();
-            msg = msg + "Use view or synonym (or alias) that refers to the table." + ln();
-            msg = msg + ln();
-            msg = msg + "[Duplicate Table]" + ln() + duplicateTableSet + ln();
-            msg = msg + "* * * * * * * * * */";
-            throw new DfTableDuplicateException(msg);
+            throwTableDuplicateException(duplicateTableSet);
         }
+    }
+
+    protected void throwTableDuplicateException(final Set<String> duplicateTableSet) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The same-name table between different schemas is unsupported.");
+        br.addItem("Advice");
+        br.addElement("Use view or synonym (or alias) that refers to the table.");
+        br.addElement("...");
+        br.addElement("However, if you have many many duplicate table,");
+        br.addElement("you can also remove the limitter by littleAdjustmentMap.dfprop.");
+        br.addElement("The classes of the same-name tables have schema name as class prefix.");
+        br.addElement(" isSuppressOtherSchemaSameNameTableLimiter = true");
+        br.addElement("In addition, you can also add schema name to all classes.");
+        br.addElement(" isAvailableSchemaDrivenTable = true");
+        br.addItem("Duplicate Table");
+        br.addElement(duplicateTableSet);
+        final String msg = br.buildExceptionMessage();
+        throw new DfTableDuplicateException(msg);
     }
 
     protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMeta> tableList) throws SQLException {

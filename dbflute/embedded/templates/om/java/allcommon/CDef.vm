@@ -51,6 +51,9 @@ public interface ${glCDef} extends Classification {
         ,
 #end
         /** $database.buildClassificationApplicationCommentForJavaDoc($classificationElement) */
+#if ($classificationElement.isDeprecated())
+        @Deprecated
+#end
         ${classificationElement.name}($database.buildClassificationCodeAliasSisterCodeVariables($classificationElement))
 #set ($count = $count + 1)
 #end

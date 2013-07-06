@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfClassificationRequiredAttributeNotFoundException;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.Srl;
@@ -53,6 +54,7 @@ public class DfClassificationTop {
     public static final String KEY_SUPPRESS_AUTO_DEPLOY = "isSuppressAutoDeploy";
     public static final String KEY_DEPRECATED = "isDeprecated";
     public static final String KEY_GROUPING_MAP = "groupingMap";
+    public static final String KEY_DEPRECATED_MAP = "deprecatedMap";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -68,6 +70,7 @@ public class DfClassificationTop {
     protected boolean _suppressAutoDeploy;
     protected boolean _deprecated;
     protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
+    protected final Map<String, String> _deprecatedMap = new LinkedHashMap<String, String>();
 
     // ===================================================================================
     //                                                                              Accept
@@ -82,7 +85,7 @@ public class DfClassificationTop {
         if (topComment == null) {
             throwClassificationLiteralCommentNotFoundException(_classificationName, elementMap);
         }
-        this._topComment = topComment;
+        _topComment = topComment;
 
         // codeType
         final String codeType;
@@ -277,6 +280,26 @@ public class DfClassificationTop {
     }
 
     // ===================================================================================
+    //                                                                     Deprecated List
+    //                                                                     ===============
+    public void checkDeprecatedElementExistence() {
+        for (String deprecated : _deprecatedMap.keySet()) {
+            boolean found = false;
+            for (DfClassificationElement element : _elementList) {
+                final String name = element.getName();
+                if (name.equals(deprecated)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                String msg = "Not found the specified element in deprecated list:";
+                msg = msg + " classification=" + _classificationName + " not-found=" + deprecated;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+        }
+    }
+
+    // ===================================================================================
     //                                                              Classification Element
     //                                                              ======================
     public int getElementSize() {
@@ -430,10 +453,18 @@ public class DfClassificationTop {
     }
 
     public Map<String, Map<String, Object>> getGroupingMap() {
-        return this._groupingMap;
+        return _groupingMap;
     }
 
     public void putGroupingAll(Map<String, Map<String, Object>> groupingMap) {
         _groupingMap.putAll(groupingMap);
+    }
+
+    public Map<String, String> getDeprecatedMap() {
+        return _deprecatedMap;
+    }
+
+    public void putDeprecatedAll(Map<String, String> deprecatedMap) {
+        _deprecatedMap.putAll(deprecatedMap);
     }
 }

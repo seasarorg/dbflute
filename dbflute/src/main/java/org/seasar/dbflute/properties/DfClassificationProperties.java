@@ -203,11 +203,19 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             }
 
             reflectClassificationResourceToDefinition(); // *Classification Resource Point!
-            filterUseDocumentOnly();
         } finally {
             new DfClassificationSqlResourceCloser().closeConnection(conn);
         }
+        checkClassificationConstraints();
         return _classificationTopMap;
+    }
+
+    protected void checkClassificationConstraints() {
+        for (DfClassificationTop classificationTop : _classificationTopMap.values()) {
+            // only check one that is not compile-safe
+            // (e.g. groupingMap gives us compile error if no-existence element)
+            classificationTop.checkDeprecatedElementExistence();
+        }
     }
 
     // -----------------------------------------------------
@@ -301,6 +309,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         classificationTop.setSuppressAutoDeploy(isClassificationSuppressAutoDeploy(elementMap));
         classificationTop.setDeprecated(isClassificationDeprecated(elementMap));
         classificationTop.putGroupingAll(getGroupingMap(elementMap));
+        classificationTop.putDeprecatedAll(getDeprecatedMap(elementMap));
     }
 
     @SuppressWarnings("unchecked")
@@ -364,6 +373,16 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         @SuppressWarnings("unchecked")
         Map<String, Map<String, Object>> groupingMap = (Map<String, Map<String, Object>>) obj;
         return groupingMap;
+    }
+
+    protected Map<String, String> getDeprecatedMap(Map<?, ?> elementMap) {
+        final Object obj = elementMap.get(DfClassificationTop.KEY_DEPRECATED_MAP);
+        if (obj == null) {
+            return DfCollectionUtil.emptyMap();
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, String> deprecatedList = (Map<String, String>) obj;
+        return deprecatedList;
     }
 
     // ===================================================================================
@@ -744,7 +763,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (classificationElement.hasAlias()) {
             sb.append(classificationElement.getAlias());
         }
-        if (classificationElement.hasComment()) {
+        if (classificationElement.hasCommentDisp()) {
             if (sb.length() > 0) {
                 sb.append(": ");
             }

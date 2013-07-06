@@ -118,7 +118,7 @@ public class DfClassificationElement {
     }
 
     // ===================================================================================
-    //                                                                       Determination
+    //                                                                       Alias/Comment
     //                                                                       =============
     public boolean hasAlias() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_alias);
@@ -126,6 +126,10 @@ public class DfClassificationElement {
 
     public boolean hasComment() {
         return Srl.is_NotNull_and_NotTrimmedEmpty(_comment);
+    }
+
+    public boolean hasCommentDisp() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(getCommentDisp());
     }
 
     // ===================================================================================
@@ -191,6 +195,28 @@ public class DfClassificationElement {
             }
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                                      Deprecated Map
+    //                                                                      ==============
+    public boolean isDeprecated() {
+        if (_classificationTop == null) { // just in case
+            return false;
+        }
+        return _classificationTop.getDeprecatedMap().containsKey(_name);
+    }
+
+    public String getDeprecatedComment() {
+        if (!isDeprecated()) {
+            return "";
+        }
+        final String comment = _classificationTop.getDeprecatedMap().get(_name);
+        return comment != null ? removeLineSeparator(comment) : "";
+    }
+
+    protected String removeLineSeparator(String str) {
+        return Srl.replace(Srl.replace(str, "\r\n", "\n"), "\n", "");
     }
 
     // ===================================================================================
@@ -275,10 +301,17 @@ public class DfClassificationElement {
     }
 
     protected String buildCommentDisp() {
-        if (_comment == null) {
-            return "";
+        final StringBuilder sb = new StringBuilder();
+        sb.append(_comment != null ? _comment : "");
+        if (isDeprecated()) {
+            final String deprecatedComment = getDeprecatedComment();
+            if (sb.length() > 0) {
+                sb.append(" ");
+            }
+            sb.append("(deprecated: ").append(deprecatedComment).append(")");
         }
-        return Srl.replace(_comment, "\n", ""); // basically one line
+        final String disp = sb.toString();
+        return Srl.replace(disp, "\n", ""); // basically one line
     }
 
     public String getCommentForJavaDoc() {
