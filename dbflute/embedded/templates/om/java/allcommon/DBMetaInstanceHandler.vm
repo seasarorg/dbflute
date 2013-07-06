@@ -163,16 +163,24 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
      */
     protected static DBMeta byTableFlexibleName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        final String pureName = normalizeTableFlexibleName(tableFlexibleName);
-        final String schema = extractSchemaIfExists(tableFlexibleName);
-        String tableDbName = null;
-        if (schema != null) { // at first, find by qualified name
-            tableDbName = _tableDbNameFlexibleMap.get(schema + "." + pureName);
-        }
-        if (tableDbName == null) { // and next, find by pure name
-            tableDbName = _tableDbNameFlexibleMap.get(pureName);
+        String tableDbName = _tableDbNameFlexibleMap.get(tableFlexibleName);
+        if (tableDbName == null) {
+            tableDbName = retryByNormalizedName(tableFlexibleName);
         }
         return tableDbName != null ? byTableDbName(tableDbName) : null;
+    }
+
+    protected static String retryByNormalizedName(String tableFlexibleName) {
+        String tableDbName = null;
+        String pureName = normalizeTableFlexibleName(tableFlexibleName);
+        String schema = extractSchemaIfExists(tableFlexibleName);
+        if (schema != null) { // first, find by qualified name
+            tableDbName = _tableDbNameFlexibleMap.get(schema + "." + pureName);
+        }
+        if (tableDbName == null) { // next, find by pure name
+            tableDbName = _tableDbNameFlexibleMap.get(pureName);
+        }
+        return tableDbName;
     }
 
     protected static String normalizeTableFlexibleName(String tableFlexibleName) {
@@ -189,12 +197,12 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     }
 
     protected static String removeSchemaIfExists(String name) {
-        final int dotLastIndex = name.lastIndexOf(".");
+        int dotLastIndex = name.lastIndexOf(".");
         return dotLastIndex >= 0 ? name.substring(dotLastIndex + ".".length()) : name; 
     }
 
     protected static String extractSchemaIfExists(String name) {
-        final int dotLastIndex = name.lastIndexOf(".");
+        int dotLastIndex = name.lastIndexOf(".");
         return dotLastIndex >= 0 ? name.substring(0, dotLastIndex) : null; 
     }
 
