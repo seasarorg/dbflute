@@ -338,26 +338,7 @@ public class DfXlsReader {
             }
             return new BigDecimal(Double.toString(numericCellValue));
         case HSSFCell.CELL_TYPE_STRING:
-            String s = cell.getRichStringCellValue().getString();
-            if (s != null) {
-                if (isNotTrimTarget(cell, table)) {
-                    if (s.length() != s.trim().length()) {
-                        s = "\"" + s + "\""; // for preventing trimming later
-                    }
-                } else {
-                    s = Srl.rtrim(s);
-                }
-            }
-            if ("".equals(s)) {
-                s = null;
-            }
-            if (isEmptyStringTarget(columnIndex, table) && s == null) {
-                s = "\"\""; // for preventing trimming later
-            }
-            if (isCellBase64Formatted(cell)) {
-                return DfTypeUtil.decodeAsBase64(s);
-            }
-            return s;
+            return processRichStringCellValue(columnIndex, cell, table);
         case HSSFCell.CELL_TYPE_BOOLEAN:
             boolean b = cell.getBooleanCellValue();
             return Boolean.valueOf(b);
@@ -368,6 +349,35 @@ public class DfXlsReader {
                 return null;
             }
         }
+    }
+
+    protected Object processRichStringCellValue(int columnIndex, HSSFCell cell, DfDataTable table) {
+        String s = cell.getRichStringCellValue().getString();
+        if (s != null) {
+            if (isNotTrimTarget(cell, table)) {
+                if (s.length() != s.trim().length()) {
+                    s = "\"" + s + "\""; // for preventing trimming later
+                }
+            } else {
+                s = Srl.rtrim(s);
+            }
+        }
+        if ("".equals(s)) {
+            s = null;
+        }
+        if (isEmptyStringTarget(columnIndex, table) && s == null) {
+            s = "\"\""; // for preventing trimming later
+        }
+
+        // remove CR for LF handling
+        // basically excel treats line separator as LF
+        // so this process cannot be required but just in case
+        s = Srl.replace(s, "\r\n", "\n");
+
+        if (isCellBase64Formatted(cell)) {
+            return DfTypeUtil.decodeAsBase64(s);
+        }
+        return s;
     }
 
     public boolean isNotTrimTarget(HSSFCell cell, DfDataTable table) {
