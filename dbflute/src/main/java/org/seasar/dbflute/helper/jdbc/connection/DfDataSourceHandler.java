@@ -159,7 +159,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
         final Properties info = prepareConnectionProperties();
         Connection conn = null;
         try {
-            _log.info("...Connecting to the database of data source:");
+            _log.info("...Connecting to database by data source:");
             conn = driverInstance.connect(_url, info);
         } catch (SQLException e) {
             String msg = "Failed to connect: url=" + _url + " user=" + _user;
