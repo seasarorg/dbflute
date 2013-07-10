@@ -89,6 +89,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Equal(=). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -101,6 +102,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Equal(=). As boolean for ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -157,6 +159,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullOrEmptyIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -247,6 +250,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * InScope {in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -291,6 +295,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * NotInScope {not in ('a', 'b')}. As ${col.classificationName}. And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -598,6 +603,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Equal(=). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -610,6 +616,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Equal(=). As boolean for ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -652,6 +659,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * NotEqual(&lt;&gt;). As ${col.classificationName}. And NullIgnored, OnlyOnceRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -753,6 +761,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * InScope {in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -798,6 +807,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * NotInScope {not in (1, 2)}. As ${col.classificationName}. And NullIgnored, NullElementIgnored, SeveralRegistered. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end

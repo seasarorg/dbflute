@@ -159,6 +159,9 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         if (fixedCondition.contains(HpFixedConditionQueryResolver.SQ_BEGIN_MARK)) { // no need to adjust
             return fixedCondition;
         }
+        if (fixedCondition.contains("(")) { // cannot adjust (might be sub-query or or-scope)
+            return fixedCondition;
+        }
         final List<String> splitList = Srl.splitList(fixedCondition, lineMark); // not trim
         final StringBuilder sb = new StringBuilder();
         final String andMark = "and ";
@@ -168,7 +171,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
             if (index > 0) {
                 sb.append(lineMark);
             }
-            if (isFixedConditionShortIndent(andMark, fitSize, element)) { // e.g. "and ...", "    and ..."
+            if (isFixedConditionIndentFittingTarget(andMark, fitSize, element)) {
                 sb.append(Srl.indent(fitSize)).append(Srl.ltrim(element));
             } else {
                 sb.append(element);
@@ -178,8 +181,9 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         return sb.toString();
     }
 
-    protected boolean isFixedConditionShortIndent(String andMark, int fitSize, String element) {
-        return element.trim().startsWith(andMark) && element.indexOf(andMark) < fitSize;
+    protected boolean isFixedConditionIndentFittingTarget(String andMark, int fitSize, String element) {
+        // e.g. "and ...", "    and ...", "        and ..."
+        return element.trim().startsWith(andMark);
     }
 
     public String findFixedSuffix(String foreignKeyName) {

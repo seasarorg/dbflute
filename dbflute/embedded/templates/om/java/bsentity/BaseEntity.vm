@@ -182,6 +182,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #set ($classificationTop = $database.getClassificationTop($col.classificationName))
     /**
      * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -194,6 +195,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
     /**
      * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
@@ -212,6 +214,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
     /**
      * Set the value of ${col.uncapitalisedJavaName} as boolean. <br />
+     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($classificationTop.hasTopComment())
      * ${classificationTop.topCommentForJavaDoc}
 #end
