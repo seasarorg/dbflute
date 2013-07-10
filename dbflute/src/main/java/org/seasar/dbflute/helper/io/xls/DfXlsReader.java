@@ -352,32 +352,32 @@ public class DfXlsReader {
     }
 
     protected Object processRichStringCellValue(int columnIndex, HSSFCell cell, DfDataTable table) {
-        String s = cell.getRichStringCellValue().getString();
-        if (s != null) {
+        String str = cell.getRichStringCellValue().getString();
+        if (str != null) {
             if (isNotTrimTarget(cell, table)) {
-                if (s.length() != s.trim().length()) {
-                    s = "\"" + s + "\""; // for preventing trimming later
+                if (str.length() != str.trim().length()) {
+                    str = "\"" + str + "\""; // for preventing trimming later
                 }
             } else {
-                s = Srl.rtrim(s);
+                str = Srl.rtrim(str);
             }
         }
-        if ("".equals(s)) {
-            s = null;
+        if ("".equals(str)) {
+            str = null;
         }
-        if (isEmptyStringTarget(columnIndex, table) && s == null) {
-            s = "\"\""; // for preventing trimming later
+        if (isEmptyStringTarget(columnIndex, table) && str == null) {
+            str = "\"\""; // for preventing trimming later
         }
 
         // remove CR for LF handling
-        // basically excel treats line separator as LF
+        // basically excel treats line separators as LF
         // so this process cannot be required but just in case
-        s = Srl.replace(s, "\r\n", "\n");
+        str = str != null ? Srl.replace(str, "\r\n", "\n") : null;
 
         if (isCellBase64Formatted(cell)) {
-            return DfTypeUtil.decodeAsBase64(s);
+            return DfTypeUtil.decodeAsBase64(str);
         }
-        return s;
+        return str;
     }
 
     public boolean isNotTrimTarget(HSSFCell cell, DfDataTable table) {

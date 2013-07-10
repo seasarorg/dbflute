@@ -17,8 +17,6 @@ package org.seasar.dbflute.task.bs.assistant;
 
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 
 /**
@@ -45,10 +43,6 @@ public interface DfTaskControlCallback {
     void callCommitDataSource() throws SQLException;
 
     void callDestroyDataSource() throws SQLException;
-
-    DataSource callGetDataSource();
-
-    void callConnectSchema() throws SQLException;
 
     DfConnectionMetaInfo callGetConnectionMetaInfo();
 

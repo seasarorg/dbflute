@@ -18,8 +18,6 @@ package org.seasar.dbflute.task.bs;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
@@ -103,14 +101,6 @@ public abstract class DfAbstractTask extends Task {
                 destroyDataSource();
             }
 
-            public DataSource callGetDataSource() {
-                return getDataSource();
-            }
-
-            public void callConnectSchema() throws SQLException {
-                connectSchema();
-            }
-
             public DfConnectionMetaInfo callGetConnectionMetaInfo() {
                 return getConnectionMetaInfo();
             }
@@ -176,10 +166,6 @@ public abstract class DfAbstractTask extends Task {
      */
     protected DfSchemaSource getDataSource() {
         return _controlLogic.getDataSource();
-    }
-
-    protected void connectSchema() throws SQLException {
-        _controlLogic.connectSchema();
     }
 
     protected DfConnectionMetaInfo getConnectionMetaInfo() {

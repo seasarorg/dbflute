@@ -859,7 +859,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         final UnifiedSchema schema = getDatabaseSchema();
         final String user = getDatabaseUser();
         final String password = getDatabasePassword();
-        _log.info("...Creating a connection to main schema");
+        _log.info("...Creating connection to main schema: " + schema);
         return createConnection(driver, url, schema, user, password);
     }
 }

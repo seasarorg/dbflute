@@ -17,8 +17,6 @@ package org.seasar.dbflute.task.bs.assistant;
 
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
@@ -173,14 +171,6 @@ public class DfTaskBasicController {
 
     protected void destroyDataSource() throws SQLException {
         _controlCallback.callDestroyDataSource();
-    }
-
-    protected DataSource getDataSource() {
-        return _controlCallback.callGetDataSource();
-    }
-
-    protected void connectSchema() throws SQLException {
-        _controlCallback.callConnectSchema();
     }
 
     protected DfConnectionMetaInfo getConnectionMetaInfo() {

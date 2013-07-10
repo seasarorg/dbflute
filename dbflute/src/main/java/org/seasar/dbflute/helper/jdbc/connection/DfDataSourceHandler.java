@@ -19,6 +19,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -26,6 +28,10 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 
+/**
+ * The handler of data source basically for main schema.
+ * @author jflute
+ */
 public class DfDataSourceHandler implements DfConnectionProvider {
 
     // ===================================================================================
@@ -61,15 +67,15 @@ public class DfDataSourceHandler implements DfConnectionProvider {
     /** The meta information of connected database. (lazy load) */
     protected DfConnectionMetaInfo _connectionMetaInfo;
 
-    /** Has a connection meta already been set up? (related to connectionMetaInfo) */
-    protected boolean _alreadySetupMeta;
+    /** The list of connection hook. (NotNull) */
+    protected final List<DfConnectionCreationHook> _hookList = new ArrayList<DfConnectionCreationHook>();
 
     // ===================================================================================
     //                                                                              Create
     //                                                                              ======
-    public void create() throws SQLException {
+    public void prepare() throws SQLException {
         if (!DfDataSourceContext.isExistDataSource()) {
-            _log.info("...Creating data source:");
+            _log.info("...Preparing data source:");
             _log.info("  driver = " + _driver);
             _log.info("  url    = " + _url);
             _log.info("  user   = " + _user);
@@ -143,34 +149,20 @@ public class DfDataSourceHandler implements DfConnectionProvider {
         }
         final Connection conn = createConnection();
         _cachedConnection = new DfSimpleConnection(conn);
-        processConnectionMetaInfo(conn);
+        setupConnectionMetaInfo(conn);
+        hookConnectionCreation(conn);
         return _cachedConnection;
     }
 
     protected Connection createConnection() throws SQLException {
-        Connection conn = null;
         final Driver driverInstance = newDriver();
-        final Properties info = new Properties();
-        if (_connectionProperties != null && !_connectionProperties.isEmpty()) {
-            info.putAll(_connectionProperties);
-        }
-        if (_user == null) {
-            String msg = "The database user should not be null.";
-            throw new IllegalStateException(msg);
-        }
-        info.put("user", _user);
-        if (_password == null) {
-            String msg = "The database password should not be null (but empty allowed).";
-            throw new IllegalStateException(msg);
-        }
-        info.put("password", _password);
-
+        final Properties info = prepareConnectionProperties();
+        Connection conn = null;
         try {
-            _log.info("...Connecting to the database:");
+            _log.info("...Connecting to the database of data source:");
             conn = driverInstance.connect(_url, info);
         } catch (SQLException e) {
-            String msg = "Failed to connect:";
-            msg = msg + " url=" + _url + " user=" + _user;
+            String msg = "Failed to connect: url=" + _url + " user=" + _user;
             throw new DfJDBCException(msg, e);
         }
         if (conn == null) {
@@ -180,8 +172,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
         try {
             conn.setAutoCommit(_autoCommit);
         } catch (SQLException e) {
-            String msg = "Failed to set auto commit:";
-            msg = msg + " autocommit=" + _autoCommit;
+            String msg = "Failed to set auto commit: autocommit=" + _autoCommit;
             throw new DfJDBCException(msg, e);
         }
         return conn;
@@ -206,10 +197,25 @@ public class DfDataSourceHandler implements DfConnectionProvider {
         return driverInstance;
     }
 
-    protected void processConnectionMetaInfo(Connection conn) throws SQLException {
-        if (_alreadySetupMeta) {
-            return;
+    protected Properties prepareConnectionProperties() {
+        final Properties info = new Properties();
+        if (_connectionProperties != null && !_connectionProperties.isEmpty()) {
+            info.putAll(_connectionProperties);
         }
+        if (_user == null) {
+            String msg = "The database user should not be null.";
+            throw new IllegalStateException(msg);
+        }
+        info.put("user", _user);
+        if (_password == null) {
+            String msg = "The database password should not be null (but empty allowed).";
+            throw new IllegalStateException(msg);
+        }
+        info.put("password", _password);
+        return info;
+    }
+
+    protected void setupConnectionMetaInfo(Connection conn) throws SQLException {
         try {
             final DfConnectionMetaInfo metaInfo = new DfConnectionMetaInfo();
             final DatabaseMetaData metaData = conn.getMetaData();
@@ -227,7 +233,12 @@ public class DfDataSourceHandler implements DfConnectionProvider {
             _log.info("*Failed to get connection meta: " + continued.getMessage());
             _connectionMetaInfo = null;
         }
-        _alreadySetupMeta = true;
+    }
+
+    protected void hookConnectionCreation(Connection conn) throws SQLException {
+        for (DfConnectionCreationHook hook : _hookList) {
+            hook.hook(conn);
+        }
     }
 
     // ===================================================================================
@@ -295,5 +306,13 @@ public class DfDataSourceHandler implements DfConnectionProvider {
      */
     public DfConnectionMetaInfo getConnectionMetaInfo() {
         return _connectionMetaInfo;
+    }
+
+    /**
+     * Add the hook of connection creation.
+     * @param hook The implementation instance to hook. (NotNull)
+     */
+    public void addConnectionCreationHook(DfConnectionCreationHook hook) {
+        _hookList.add(hook);
     }
 }

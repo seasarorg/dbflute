@@ -350,10 +350,10 @@ public class DfSchemaXmlSerializer {
      * @throws SQLException
      */
     protected void generateXML() throws SQLException {
-        _log.info("...Getting DB-connection");
+        _log.info("...Getting DB connection");
         final Connection conn = _dataSource.getConnection();
 
-        _log.info("...Getting DB-meta-data");
+        _log.info("...Getting DB meta data");
         final DatabaseMetaData metaData = conn.getMetaData();
 
         final List<DfTableMeta> tableList = getTableNames(metaData);

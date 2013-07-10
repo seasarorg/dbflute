@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.task.bs.assistant;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.connection.DfConnectionCreationHook;
 import org.seasar.dbflute.helper.jdbc.connection.DfConnectionMetaInfo;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
@@ -104,8 +106,18 @@ public class DfTaskControlLogic {
         dataSourceHandler.setUrl(_databaseResource.getUrl());
         dataSourceHandler.setConnectionProperties(_databaseResource.getConnectionProperties());
         dataSourceHandler.setAutoCommit(true);
-        dataSourceHandler.create();
-        connectSchema();
+        dataSourceHandler.addConnectionCreationHook(new DfConnectionCreationHook() {
+            public void hook(Connection conn) throws SQLException {
+                connectMainSchema(conn);
+            }
+        });
+        dataSourceHandler.prepare();
+    }
+
+    protected void connectMainSchema(Connection conn) throws SQLException {
+        final UnifiedSchema mainSchema = _databaseResource.getMainSchema();
+        final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(mainSchema, getDatabaseTypeFacadeProp());
+        connector.connectSchema(conn);
     }
 
     public void commitDataSource() throws SQLException {
@@ -146,12 +158,6 @@ public class DfTaskControlLogic {
         }
         final UnifiedSchema mainSchema = _databaseResource.getMainSchema();
         return new DfSchemaSource(dataSource, mainSchema);
-    }
-
-    public void connectSchema() throws SQLException {
-        final UnifiedSchema mainSchema = _databaseResource.getMainSchema();
-        final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(mainSchema, getDatabaseTypeFacadeProp());
-        connector.connectSchema(getSchemaSource());
     }
 
     public DfConnectionMetaInfo getConnectionMetaInfo() {

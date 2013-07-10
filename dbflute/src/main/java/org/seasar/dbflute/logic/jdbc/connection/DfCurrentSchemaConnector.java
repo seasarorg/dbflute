@@ -19,8 +19,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
@@ -56,21 +54,6 @@ public class DfCurrentSchemaConnector {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public void connectSchema(DataSource dataSource) throws SQLException {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                }
-            }
-        }
-        connectSchema(conn);
-    }
-
     public void connectSchema(Connection conn) throws SQLException {
         if (!_unifiedSchema.existsPureSchema()) {
             return;
