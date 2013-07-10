@@ -16,6 +16,7 @@
 package org.seasar.dbflute.helper.filesystem;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * The handler of file hierarchy.
@@ -43,6 +44,7 @@ public interface FileHierarchyTracingHandler {
     /**
      * Handle the file found by tracing.
      * @param currentFile The object of current file, always file (not directory). (NotNull)
+     * @throws IOException When it fails by the IO failure.
      */
-    void handleFile(File currentFile);
+    void handleFile(File currentFile) throws IOException;
 }

@@ -17,8 +17,11 @@ package org.seasar.dbflute.helper.filesystem;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+
+import org.seasar.dbflute.helper.filesystem.exception.FileHierarchyTracingIOFailureException;
 
 /**
  * @author jflute
@@ -39,12 +42,22 @@ public class FileHierarchyTracer {
      * </pre>
      * @param rootDir The directory for root to trace files. (NotNull)
      * @param handler The handler of tracing. (NotNull)
+     * @throws FileHierarchyTracingIOFailureException When it fails by IO failure.
      */
     public void trace(File rootDir, FileHierarchyTracingHandler handler) {
-        doTrace(rootDir, handler);
+        if (rootDir == null) {
+            String msg = "The argument 'rootDir' should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        try {
+            doTrace(rootDir, handler);
+        } catch (IOException e) {
+            String msg = "Failed to trace the directory: " + rootDir;
+            throw new FileHierarchyTracingIOFailureException(msg, e);
+        }
     }
 
-    protected void doTrace(File currentDir, final FileHierarchyTracingHandler handler) {
+    protected void doTrace(File currentDir, final FileHierarchyTracingHandler handler) throws IOException {
         final File[] listFiles = currentDir.listFiles(new FileFilter() {
             public boolean accept(File file) {
                 return handler.isTargetFileOrDir(file);
