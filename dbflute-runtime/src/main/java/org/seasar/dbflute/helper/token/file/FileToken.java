@@ -113,6 +113,7 @@ public class FileToken {
      * @param option The option for file-tokenizing. (NotNull, Required{delimiter, encoding})
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file reading failed.
+     * @throws FileTokenizingSQLHandlingFailureException When the SQL handling fails in the row handling process.
      */
     public void tokenize(String filePath, FileTokenizingCallback callback, FileTokenizingOption option)
             throws FileNotFoundException, IOException {
@@ -457,6 +458,7 @@ public class FileToken {
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
      * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
+     * @throws FileMakingSQLHandlingFailureException When the SQL handling fails in the row writing process.
      */
     public void make(String filePath, FileMakingCallback callback, FileMakingOption option)
             throws FileNotFoundException, IOException {
@@ -498,6 +500,7 @@ public class FileToken {
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file writing failed.
      * @throws FileMakingInvalidValueCountException When the value count of the row does not match column count of header.
+     * @throws FileMakingSQLHandlingFailureException When the SQL handling fails in the row writing process.
      */
     public void make(OutputStream ous, FileMakingCallback callback, FileMakingOption option)
             throws FileNotFoundException, IOException {
