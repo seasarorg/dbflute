@@ -42,7 +42,7 @@ import org.seasar.dbflute.helper.jdbc.facade.DfJFadCursorHandler;
 import org.seasar.dbflute.helper.jdbc.facade.DfJFadResultSetWrapper;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
-import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
+import org.seasar.dbflute.helper.token.file.FileMakingRowWriter;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -271,38 +271,35 @@ public class DfLReverseOutputHandler {
 
             public void handle(final DfJFadResultSetWrapper wrapper) {
                 try {
-                    final FileMakingRowResource resource = new FileMakingRowResource();
-                    fileToken.makeFromIterator(delimiterFilePath, new FileMakingCallback() {
-                        public FileMakingRowResource getRowResource() {
-                            try {
+                    fileToken.make(delimiterFilePath, new FileMakingCallback() {
+                        public void write(FileMakingRowWriter writer) throws IOException, SQLException {
+                            while (wrapper.next()) {
                                 if (limit >= 0 && limit < count) {
-                                    return null;
-                                }
-                                if (!wrapper.next()) {
-                                    return null;
+                                    break;
                                 }
                                 final List<String> valueList = new ArrayList<String>();
                                 for (String columnName : columnNameList) {
                                     valueList.add(wrapper.getString(columnName));
                                 }
-                                resource.acceptValueList(valueList);
+                                writer.writeRow(valueList);
                                 ++count;
-                                return resource;
-                            } catch (SQLException e) {
-                                throw new IllegalStateException(e);
                             }
                         }
                     }, option);
                 } catch (IOException e) {
-                    String msg = "Failed to output delimiter data:";
-                    msg = msg + " table=" + table.getTableDispName() + " file=" + delimiterFilePath;
-                    throw new IllegalStateException(msg, e);
+                    handleDelimiterDataFailureException(table, delimiterFilePath, e);
                 }
                 final String delimiterInfo = " -> " + delimiterFilePath + " (" + count + ")";
                 _log.info(delimiterInfo);
                 sectionInfoList.add(delimiterInfo);
             }
         });
+    }
+
+    protected void handleDelimiterDataFailureException(Table table, String delimiterFilePath, Exception e) {
+        String msg = "Failed to output delimiter data:";
+        msg = msg + " table=" + table.getTableDispName() + " file=" + delimiterFilePath;
+        throw new IllegalStateException(msg, e);
     }
 
     // ===================================================================================

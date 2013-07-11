@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,10 +30,9 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCraftDiffIllegalCraftKeyNameException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
-import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileMakingRowWriter;
-import org.seasar.dbflute.helper.token.file.FileMakingWriterCallback;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.resource.DBFluteSystem;
@@ -216,19 +214,14 @@ public class DfCraftDiffAssertHandler {
     //                                                                      ==============
     protected void dumpCraftMetaToDataFile(final List<Map<String, String>> diffDataList, File nextDataFile) {
         final FileToken fileToken = new FileToken();
-        List<String> columnNameList = null;
-        if (!diffDataList.isEmpty()) {
-            columnNameList = new ArrayList<String>(diffDataList.get(0).keySet());
-        }
         try {
-            final FileMakingRowResource resource = new FileMakingRowResource();
-            fileToken.makeByWriter(new FileOutputStream(nextDataFile), new FileMakingWriterCallback() {
-                public void make(FileMakingRowWriter writer) throws IOException {
+            fileToken.make(new FileOutputStream(nextDataFile), new FileMakingCallback() {
+                public void write(FileMakingRowWriter writer) throws IOException {
                     for (Map<String, String> map : diffDataList) {
-                        writer.write(resource.acceptValueList(map.values()));
+                        writer.writeRow(map);
                     }
                 }
-            }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
+            }, new FileMakingOption().delimitateByTab().encodeAsUTF8());
         } catch (IOException e) {
             String msg = "Failed to make file: " + nextDataFile.getPath();
             throw new IllegalStateException(msg, e);

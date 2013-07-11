@@ -17,6 +17,7 @@ package org.seasar.dbflute.logic.jdbc.schemadiff;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -117,17 +118,7 @@ public class DfCraftDiff extends DfAbstractDiff {
             final FileToken fileToken = new FileToken();
             final List<DfCraftValue> craftValueList = DfCollectionUtil.newArrayList();
             try {
-                fileToken.tokenize(new FileInputStream(metaFile), new FileTokenizingCallback() {
-                    private final Set<String> _craftKeyNameSet = DfCollectionUtil.newHashSet(); // for duplicate check
-
-                    public void handleRowResource(FileTokenizingRowResource rowResource) {
-                        final List<String> columnValueList = DfCollectionUtil.newArrayList(rowResource.getValueList());
-                        final String craftKeyName = columnValueList.remove(0); // it's the first item fixedly
-                        assertCraftKeyExists(craftKeyName, metaFile, rowResource);
-                        assertUniqueCraftKey(craftKeyName, metaFile, rowResource, _craftKeyNameSet);
-                        craftValueList.add(createCraftValue(craftKeyName, columnValueList));
-                    }
-                }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
+                tokenize(metaFile, fileToken, craftValueList);
             } catch (IOException e) {
                 String msg = "Failed to read the file: " + metaFile;
                 throw new IllegalStateException(msg, e);
@@ -139,6 +130,21 @@ public class DfCraftDiff extends DfAbstractDiff {
                 registerPreviousMeta(craftTitle, craftValueList);
             }
         }
+    }
+
+    protected void tokenize(final File metaFile, FileToken fileToken, final List<DfCraftValue> craftValueList)
+            throws FileNotFoundException, IOException {
+        fileToken.tokenize(new FileInputStream(metaFile), new FileTokenizingCallback() {
+            private final Set<String> _craftKeyNameSet = DfCollectionUtil.newHashSet(); // for duplicate check
+
+            public void handleRow(FileTokenizingRowResource resource) {
+                final List<String> columnValueList = DfCollectionUtil.newArrayList(resource.getValueList()); // snapshot
+                final String craftKeyName = columnValueList.remove(0); // it's the first item fixedly
+                assertCraftKeyExists(craftKeyName, metaFile, resource);
+                assertUniqueCraftKey(craftKeyName, metaFile, resource, _craftKeyNameSet);
+                craftValueList.add(createCraftValue(craftKeyName, columnValueList));
+            }
+        }, new FileTokenizingOption().delimitateByTab().encodeAsUTF8().handleEmptyAsNull());
     }
 
     // -----------------------------------------------------
