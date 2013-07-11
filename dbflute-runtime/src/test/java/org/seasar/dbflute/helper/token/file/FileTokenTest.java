@@ -18,6 +18,7 @@ package org.seasar.dbflute.helper.token.file;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -257,7 +258,7 @@ public class FileTokenTest extends PlainTestCase {
 
         // ## Act ##
         impl.make(ous, new FileMakingCallback() {
-            public void write(FileMakingRowWriter writer) throws IOException {
+            public void write(FileMakingRowWriter writer) throws IOException, SQLException {
                 List<String> valueList = new ArrayList<String>();
                 {
                     valueList.add("a");
@@ -307,7 +308,7 @@ public class FileTokenTest extends PlainTestCase {
 
         // ## Act ##
         impl.make(ous, new FileMakingCallback() {
-            public void write(FileMakingRowWriter writer) throws IOException {
+            public void write(FileMakingRowWriter writer) throws IOException, SQLException {
                 List<String> valueList = new ArrayList<String>();
                 {
                     valueList.add("a");
@@ -359,7 +360,7 @@ public class FileTokenTest extends PlainTestCase {
         try {
             List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
             impl.make(ous, new FileMakingCallback() {
-                public void write(FileMakingRowWriter writer) throws IOException {
+                public void write(FileMakingRowWriter writer) throws IOException, SQLException {
                     {
                         List<String> valueList = new ArrayList<String>();
                         valueList.add("a");
@@ -407,7 +408,7 @@ public class FileTokenTest extends PlainTestCase {
         // ## Act ##
         List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
         impl.make(ous, new FileMakingCallback() {
-            public void write(FileMakingRowWriter writer) throws IOException {
+            public void write(FileMakingRowWriter writer) throws IOException, SQLException {
                 {
                     List<String> valueList = new ArrayList<String>();
                     valueList.add("a");
@@ -450,9 +451,6 @@ public class FileTokenTest extends PlainTestCase {
         assertEquals("\",e", split[4]);
     }
 
-    // ===================================================================================
-    //                                                                      Make by Writer
-    //                                                                      ==============
     public void test_make_valueMap_basic() throws Exception {
         // ## Arrange ##
         FileToken impl = new FileToken();
@@ -460,7 +458,7 @@ public class FileTokenTest extends PlainTestCase {
 
         // ## Act ##
         impl.make(ous, new FileMakingCallback() {
-            public void write(FileMakingRowWriter writer) throws IOException {
+            public void write(FileMakingRowWriter writer) throws IOException, SQLException {
                 {
                     Map<String, String> valueMap = new LinkedHashMap<String, String>();
                     valueMap.put("A", "a");

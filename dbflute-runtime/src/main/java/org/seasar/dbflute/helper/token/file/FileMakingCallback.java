@@ -16,6 +16,7 @@
 package org.seasar.dbflute.helper.token.file;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * The callback of file-making with writer.
@@ -24,7 +25,7 @@ import java.io.IOException;
  * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
  * FileToken fileToken = new FileToken();
  * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *     public void write(FileMakingRowWriter writer, FileMakingRowAcceptor acceptor) {
+ *     public void write(FileMakingRowWriter writer, FileMakingRowAcceptor acceptor) throws IOException, SQLException {
  *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
  *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
  *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
@@ -40,7 +41,8 @@ public interface FileMakingCallback {
      * Make (write) token file by row writer that accepts row resources.
      * @param writer The row writer of file-making. (NotNull)
      * @param acceptor The acceptor of row data to provide row resource. (NotNull)
-     * @throws IOException When the file writing failed.
+     * @throws IOException When the IO handling fails in the row writing process.
+     * @throws SQLException When the SQL handling fails in the row writing process.
      */
-    void write(FileMakingRowWriter writer) throws IOException;
+    void write(FileMakingRowWriter writer) throws IOException, SQLException;
 }

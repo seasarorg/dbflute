@@ -25,8 +25,8 @@ import java.util.Map;
  * File tsvFile = ... <span style="color: #3F7E5E">// output file</span>
  * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
  * FileToken fileToken = new FileToken();
- * fileToken.make(new FileOutputStream(tsvFile), new FileMakingWriterCallback() {
- *     public void write(FileMakingRowWriter writer) {
+ * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
+ *     public void write(FileMakingRowWriter writer) throws IOException, SQLException {
  *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
  *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
  *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>

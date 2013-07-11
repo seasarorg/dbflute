@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,6 +37,8 @@ import java.util.Set;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.token.file.exception.FileMakingInvalidValueCountException;
 import org.seasar.dbflute.helper.token.file.exception.FileMakingRequiredOptionNotFoundException;
+import org.seasar.dbflute.helper.token.file.exception.FileMakingSQLHandlingFailureException;
+import org.seasar.dbflute.helper.token.file.exception.FileTokenizingSQLHandlingFailureException;
 import org.seasar.dbflute.helper.token.line.LineMakingOption;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
@@ -61,7 +64,7 @@ import org.seasar.dbflute.util.Srl;
  * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
  * FileToken fileToken = new FileToken();
  * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *     public void write(FileMakingRowWriter writer) {
+ *     public void write(FileMakingRowWriter writer) throws IOException, SQLException {
  *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
  *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
  *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
@@ -149,6 +152,7 @@ public class FileToken {
      * @param option The option for file-tokenizing. (NotNull, Required{delimiter, encoding})
      * @throws FileNotFoundException When the file was not found.
      * @throws IOException When the file reading failed.
+     * @throws FileTokenizingSQLHandlingFailureException When the SQL handling fails in the row handling process. 
      */
     public void tokenize(InputStream ins, FileTokenizingCallback callback, FileTokenizingOption option)
             throws FileNotFoundException, IOException {
@@ -241,6 +245,9 @@ public class FileToken {
                     preContinueString = "";
                 }
             }
+        } catch (SQLException e) {
+            String msg = "SQL handling failed in the row handling process: option=" + option;
+            throw new FileTokenizingSQLHandlingFailureException(msg, e);
         } finally {
             try {
                 if (br != null) {
@@ -436,7 +443,7 @@ public class FileToken {
      * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
      * FileToken fileToken = new FileToken();
      * fileToken.make(tsvFile, new FileMakingCallback() {
-     *     public void write(FileMakingRowWriter writer) {
+     *     public void write(FileMakingRowWriter writer) throws IOException, SQLException {
      *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
      *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
      *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
@@ -477,7 +484,7 @@ public class FileToken {
      * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
      * FileToken fileToken = new FileToken();
      * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
-     *     public void write(FileMakingRowWriter writer) {
+     *     public void write(FileMakingRowWriter writer) throws IOException, SQLException {
      *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
      *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
      *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
@@ -550,28 +557,32 @@ public class FileToken {
             final String lineSep, final LineMakingOption lineOption, final Writer writer, final Set<String> doneMarkSet)
             throws IOException {
         final FileMakingRowResource resource = new FileMakingRowResource();
-        callback.write(new FileMakingRowWriter() {
-            public void writeRow(List<String> valueList) throws IOException {
-                writeRow(resource.acceptRow(valueList));
-            }
-
-            public void writeRow(Map<String, String> columnValueMap) throws IOException {
-                writeRow(resource.acceptRow(columnValueMap));
-            }
-
-            protected void writeRow(FileMakingRowResource resource) throws IOException {
-                assertRowResourceOfWriter(resource);
-                doWriteDataRow(writer, resource, option, lineOption, lineSep, doneMarkSet);
-            }
-
-            protected void assertRowResourceOfWriter(FileMakingRowResource resource) {
-                if (resource == null || !resource.hasRowData()) {
-                    String msg = "The argument 'resource' of row writer should not be null.";
-                    throw new IllegalArgumentException(msg);
+        try {
+            callback.write(new FileMakingRowWriter() {
+                public void writeRow(List<String> valueList) throws IOException {
+                    writeRow(resource.acceptRow(valueList));
                 }
-            }
 
-        });
+                public void writeRow(Map<String, String> columnValueMap) throws IOException {
+                    writeRow(resource.acceptRow(columnValueMap));
+                }
+
+                protected void writeRow(FileMakingRowResource resource) throws IOException {
+                    assertRowResourceOfWriter(resource);
+                    doWriteDataRow(writer, resource, option, lineOption, lineSep, doneMarkSet);
+                }
+
+                protected void assertRowResourceOfWriter(FileMakingRowResource resource) {
+                    if (resource == null || !resource.hasRowData()) {
+                        String msg = "The argument 'resource' of row writer should not be null.";
+                        throw new IllegalArgumentException(msg);
+                    }
+                }
+            });
+        } catch (SQLException e) {
+            String msg = "SQL handling failed in the row writing process: option=" + option;
+            throw new FileMakingSQLHandlingFailureException(msg, e);
+        }
     }
 
     protected void doWriteDataRow(Writer writer, FileMakingRowResource resource, FileMakingOption option,
