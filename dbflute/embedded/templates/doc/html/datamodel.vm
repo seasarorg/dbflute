@@ -133,7 +133,7 @@ td {
 	font-size: 0.6em;
 }
 .relcell {
-	font-size: 0.6em;
+	font-size: 0.7em;
 }
 .commentcell {
 	font-size: 0.7em;
