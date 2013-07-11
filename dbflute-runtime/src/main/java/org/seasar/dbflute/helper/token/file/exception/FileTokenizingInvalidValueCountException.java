@@ -13,17 +13,30 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.token.file;
+package org.seasar.dbflute.helper.token.file.exception;
 
 /**
  * @author jflute
  */
-public interface FileTokenizingCallback {
+public class FileTokenizingInvalidValueCountException extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Handle the row per one record data. <br />
-     * You can get the data from row resources.
-     * @param resource The resource of row for the file-tokenizing. (NotNull)
+     * Constructor.
+     * @param msg The message for the exception. (NotNull)
      */
-    void handleRow(FileTokenizingRowResource resource);
+    public FileTokenizingInvalidValueCountException(String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause The wrapped exception. (NotNull)
+     */
+    public FileTokenizingInvalidValueCountException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

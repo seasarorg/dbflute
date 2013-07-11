@@ -15,7 +15,11 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.seasar.dbflute.helper.token.file.exception.FileTokenizingInvalidValueCountException;
 
 /**
  * @author jflute
@@ -30,6 +34,35 @@ public class FileTokenizingRowResource {
     protected String _rowString;
     protected int _rowNumber;
     protected int _lineNumber;
+
+    // ===================================================================================
+    //                                                                        Map Handling
+    //                                                                        ============
+    /**
+     * Convert the value list to column value map.
+     * @return The map of column-key value. (NullAllowed: when no header or no value list)
+     */
+    public Map<String, String> toColumnValueMap() {
+        if (_headerInfo == null || _headerInfo.isEmpty()) {
+            return null;
+        }
+        if (_valueList == null || _valueList.isEmpty()) {
+            return null;
+        }
+        final List<String> columnNameList = _headerInfo.getColumnNameList();
+        if (columnNameList.size() != _valueList.size()) {
+            String msg = "Different count between header columns and values:";
+            msg = msg + " " + columnNameList.size() + ", " + _valueList.size();
+            throw new FileTokenizingInvalidValueCountException(msg);
+        }
+        final Map<String, String> map = new LinkedHashMap<String, String>(columnNameList.size());
+        for (int i = 0; i < columnNameList.size(); i++) {
+            final String columnName = columnNameList.get(i);
+            final String value = _valueList.get(i);
+            map.put(columnName, value);
+        }
+        return map;
+    }
 
     // ===================================================================================
     //                                                                      Basic Override

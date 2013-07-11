@@ -16,30 +16,20 @@
 package org.seasar.dbflute.helper.token.file;
 
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Map;
 
 /**
  * The row resource of file-making. <br />
  * You can set one record info to this resource as list of string or map of string with header info. <br />
  * Null resource or null data or empty data means the end of data.
  * <pre>
- * e.g. makeByWriter()
- *  final FileMakingRowResource resource = new FileMakingRowResource();
- *  fileToken.makeByWriter(new FileOutputStream(tsvFile), new FileMakingWriterCallback() {
- *      public void make(FileMakingRowWriter writer) {
+ * e.g. make()
+ *  fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
+ *      public void write(FileMakingRowWriter writer, FileMakingRowResource resource) {
  *          for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
- *              resource... <span style="color: #3F7E5E">// convert the member to the row resource</span>
+ *              resource.acceptValueList(...); <span style="color: #3F7E5E">// convert the member to the row resource</span>
  *              writer.<span style="color: #AD4747">write</span>(resource); <span style="color: #3F7E5E">// Yes, you write!</span>
  *          }
- *      }
- *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
- * 
- * e.g. makeFromIterator()
- *  final FileMakingRowResource resource = new FileMakingRowResource();
- *  final Iterator&lt;List&lt;String&gt;&gt; iterator = ...
- *  fileToken.makeFromIterator(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *      public FileMakingRowResource getRowResource() { <span style="color: #3F7E5E">// null or empty resource means end of data</span>
- *          return resource.<span style="color: #AD4747">acceptValueListIterator</span>(iterator); <span style="color: #3F7E5E">// row data only here</span>
  *      }
  *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
  * </pre>
@@ -52,6 +42,7 @@ public class FileMakingRowResource {
     //                                                                             =========
     // either required, both null means end of data
     protected Collection<String> _valueList;
+    protected Map<String, String> _valueMap;
 
     // =====================================================================================
     //                                                                           Constructor
@@ -63,7 +54,7 @@ public class FileMakingRowResource {
     //                                                                      Accept ValueList
     //                                                                      ================
     /**
-     * Accept the list of value as one record.
+     * Accept the list of value as one record. (priority 1)
      * @param valueList The list of value. (NullAllowed, EmptyAllowed: if null or empty, means end of data)
      * @return this. (NotNull)
      */
@@ -73,14 +64,12 @@ public class FileMakingRowResource {
     }
 
     /**
-     * Accept the iterator for value list. <br />
-     * If the iterator has the next element, set it to value list. (means next() called) <br />
-     * No more element means end of data (no resource is treated as end of data by {@link FileToken}).
-     * @param valueListIterator The iterator for value list. (NotNull)
+     * Accept the map of column-key value as one record. (priority 2)
+     * @param valueMap The map of column-key value. (NullAllowed, EmptyAllowed: if null or empty, means end of data)
      * @return this. (NotNull)
      */
-    public FileMakingRowResource acceptValueListIterator(Iterator<? extends Collection<String>> valueListIterator) {
-        _valueList = valueListIterator.hasNext() ? valueListIterator.next() : null;
+    public FileMakingRowResource acceptValueMap(Map<String, String> valueMap) {
+        _valueMap = valueMap;
         return this;
     }
 
@@ -88,11 +77,27 @@ public class FileMakingRowResource {
     //                                                                       Resource Status
     //                                                                       ===============
     /**
-     * Does it have row data?
+     * Does it have row data? (value list or value map exists or not)
      * @return The determination, true or false.
      */
     public boolean hasRowData() {
+        return hasValueList() || hasValueMap();
+    }
+
+    /**
+     * Does it have value list?
+     * @return The determination, true or false.
+     */
+    public boolean hasValueList() {
         return _valueList != null && !_valueList.isEmpty();
+    }
+
+    /**
+     * Does it have column-key value map?
+     * @return The determination, true or false.
+     */
+    public boolean hasValueMap() {
+        return _valueMap != null && !_valueMap.isEmpty();
     }
 
     /**
@@ -100,6 +105,7 @@ public class FileMakingRowResource {
      */
     public void clear() {
         _valueList = null;
+        _valueMap = null;
     }
 
     // ===================================================================================
@@ -107,7 +113,15 @@ public class FileMakingRowResource {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _valueList + "}";
+        final String disp;
+        if (hasValueList()) {
+            disp = "{" + _valueList + "}";
+        } else if (hasValueMap()) {
+            disp = "{" + _valueList + "}";
+        } else {
+            disp = "{null}";
+        }
+        return disp;
     }
 
     // =====================================================================================
@@ -115,5 +129,9 @@ public class FileMakingRowResource {
     //                                                                              ========
     public Collection<String> getValueList() {
         return _valueList;
+    }
+
+    public Map<String, String> getValueMap() {
+        return _valueMap;
     }
 }

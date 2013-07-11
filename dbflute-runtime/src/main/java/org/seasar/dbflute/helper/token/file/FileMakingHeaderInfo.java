@@ -16,6 +16,7 @@
 package org.seasar.dbflute.helper.token.file;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ public class FileMakingHeaderInfo {
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
-    public void acceptColumnNameList(List<String> columnNameList) {
+    public void acceptColumnNameList(Collection<String> columnNameList) {
         clear();
         for (String columnName : columnNameList) {
             addColumnName(columnName);
