@@ -69,7 +69,7 @@
 	<property name="bhvap.seasar.example.dir" value="${workspace.base}/dbflute-bhvap-seasar-example" />
 	<property name="bhvap.spring.example.dir" value="${workspace.base}/dbflute-bhvap-spring-example" />
 	<property name="bhvap.guice.example.dir" value="${workspace.base}/dbflute-bhvap-guice-example" />
-	<property name="javatest.dir" value="${workspace.base}/javatest" />
+	<property name="javatry.dir" value="${workspace.base}/javatry" />
 
 	<!-- ============================================================================= -->
 	<!--                                                        C O M P I L E  T A S K -->
@@ -469,9 +469,9 @@
 		<delete dir="${extraction.dir}" />
 	</target>
 
-	<target name="reflect-to-javatest" depends="prepare-reflection" description="==> reflect to java test">
-		<copy file="${dist}/${runtime.jar}" tofile="${javatest.dir}/lib/${runtime.nonversion.jar}" overwrite="true" />
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${javatest.dir}/lib/sources/${runtime.sources.nonversion.jar}" overwrite="true" />
+	<target name="reflect-to-javatry" depends="prepare-reflection" description="==> reflect to java try">
+		<copy file="${dist}/${runtime.jar}" tofile="${javatry.dir}/lib/${runtime.nonversion.jar}" overwrite="true" />
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${javatry.dir}/lib/sources/${runtime.sources.nonversion.jar}" overwrite="true" />
 	</target>
 
 	<!-- = = = = = = = = = = -->
@@ -486,18 +486,18 @@
 		<antcall target="reflect-to-cdi" />
 		<antcall target="reflect-to-mysql" />
 		<antcall target="reflect-to-postgresql" />
-		<antcall target="reflect-to-oracle" />
-		<!-- deploy only -->
 		<antcall target="reflect-to-db2" />
+
+		<!-- deploy only -->
+		<antcall target="reflect-to-oracle" />
 		<antcall target="reflect-to-sqlserver" />
-		<!-- deploy only -->
 		<antcall target="reflect-to-msaccess" />
-		<!-- deploy only -->
+
 		<antcall target="reflect-to-sqlite" />
 		<antcall target="reflect-to-multipledb" />
 		<antcall target="reflect-to-flex" />
 		<antcall target="reflect-to-sastruts" />
 		<antcall target="reflect-to-ymir" />
-		<antcall target="reflect-to-javatest" />
+		<antcall target="reflect-to-javatry" />
 	</target>
 </project>
