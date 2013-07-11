@@ -206,7 +206,7 @@ public class FileTokenTest extends PlainTestCase {
         // ## Act ##
         List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
         impl.make(ous, new FileMakingCallback() {
-            public void write(FileMakingRowWriter writer, FileMakingRowResource resource) throws IOException {
+            public void write(FileMakingRowWriter writer) throws IOException {
                 List<String> valueList = new ArrayList<String>();
                 {
                     valueList.add("a");
@@ -214,7 +214,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("cc");
                     valueList.add("d");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                     valueList.clear();
                 }
                 {
@@ -223,7 +223,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("c\"c");
                     valueList.add("d\"");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                     valueList.clear();
                 }
                 {
@@ -232,7 +232,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("c\",c");
                     valueList.add("d\n");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                     valueList.clear();
                 }
             }
@@ -257,7 +257,7 @@ public class FileTokenTest extends PlainTestCase {
 
         // ## Act ##
         impl.make(ous, new FileMakingCallback() {
-            public void write(FileMakingRowWriter writer, FileMakingRowResource resource) throws IOException {
+            public void write(FileMakingRowWriter writer) throws IOException {
                 List<String> valueList = new ArrayList<String>();
                 {
                     valueList.add("a");
@@ -265,7 +265,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("cc");
                     valueList.add("d");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                     valueList.clear();
                 }
                 {
@@ -274,7 +274,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("c\"c");
                     valueList.add("d\"");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                     valueList.clear();
                 }
                 {
@@ -283,7 +283,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("c\",c");
                     valueList.add("d\n");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                     valueList.clear();
                 }
             }
@@ -307,7 +307,7 @@ public class FileTokenTest extends PlainTestCase {
 
         // ## Act ##
         impl.make(ous, new FileMakingCallback() {
-            public void write(FileMakingRowWriter writer, FileMakingRowResource resource) throws IOException {
+            public void write(FileMakingRowWriter writer) throws IOException {
                 List<String> valueList = new ArrayList<String>();
                 {
                     valueList.add("a");
@@ -315,7 +315,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("cc");
                     valueList.add("d");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                     valueList.clear();
                 }
                 {
@@ -324,7 +324,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("c\"c");
                     valueList.add("d");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                     valueList.clear();
                 }
                 {
@@ -333,10 +333,9 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("c\",c");
                     valueList.add("d\n");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                     valueList.clear();
                 }
-                resource.acceptValueList(valueList);
             }
         }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally());
 
@@ -360,7 +359,7 @@ public class FileTokenTest extends PlainTestCase {
         try {
             List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
             impl.make(ous, new FileMakingCallback() {
-                public void write(FileMakingRowWriter writer, FileMakingRowResource resource) throws IOException {
+                public void write(FileMakingRowWriter writer) throws IOException {
                     {
                         List<String> valueList = new ArrayList<String>();
                         valueList.add("a");
@@ -368,7 +367,7 @@ public class FileTokenTest extends PlainTestCase {
                         valueList.add("cc");
                         valueList.add("d");
                         valueList.add("e");
-                        writer.write(resource.acceptValueList(valueList));
+                        writer.writeRow(valueList);
                     }
                     {
                         List<String> valueList = new ArrayList<String>();
@@ -376,7 +375,7 @@ public class FileTokenTest extends PlainTestCase {
                         valueList.add("b");
                         valueList.add("c\"c");
                         valueList.add("d");
-                        writer.write(resource.acceptValueList(valueList));
+                        writer.writeRow(valueList);
                     }
                     {
                         List<String> valueList = new ArrayList<String>();
@@ -385,7 +384,7 @@ public class FileTokenTest extends PlainTestCase {
                         valueList.add("c\",c");
                         valueList.add("d\n");
                         valueList.add("e");
-                        writer.write(resource.acceptValueList(valueList));
+                        writer.writeRow(valueList);
                     }
                 }
             },
@@ -408,7 +407,7 @@ public class FileTokenTest extends PlainTestCase {
         // ## Act ##
         List<String> columnNameList = Arrays.asList("A", "B", "C", "D", "E");
         impl.make(ous, new FileMakingCallback() {
-            public void write(FileMakingRowWriter writer, FileMakingRowResource resource) throws IOException {
+            public void write(FileMakingRowWriter writer) throws IOException {
                 {
                     List<String> valueList = new ArrayList<String>();
                     valueList.add("a");
@@ -416,7 +415,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("cc");
                     valueList.add("d");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                 }
                 {
                     List<String> valueList = new ArrayList<String>();
@@ -424,7 +423,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("b");
                     valueList.add("c\"c");
                     valueList.add("d");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                 }
                 {
                     List<String> valueList = new ArrayList<String>();
@@ -433,7 +432,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueList.add("c\",c");
                     valueList.add("d\n");
                     valueList.add("e");
-                    writer.write(resource.acceptValueList(valueList));
+                    writer.writeRow(valueList);
                 }
             }
         }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf().quoteMinimally()
@@ -461,7 +460,7 @@ public class FileTokenTest extends PlainTestCase {
 
         // ## Act ##
         impl.make(ous, new FileMakingCallback() {
-            public void write(FileMakingRowWriter writer, FileMakingRowResource resource) throws IOException {
+            public void write(FileMakingRowWriter writer) throws IOException {
                 {
                     Map<String, String> valueMap = new LinkedHashMap<String, String>();
                     valueMap.put("A", "a");
@@ -469,7 +468,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueMap.put("C", "cc");
                     valueMap.put("D", "d");
                     valueMap.put("E", "e");
-                    writer.write(resource.acceptValueMap(valueMap));
+                    writer.writeRow(valueMap);
                 }
                 {
                     Map<String, String> valueMap = new LinkedHashMap<String, String>();
@@ -478,7 +477,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueMap.put("A", "a");
                     valueMap.put("E", "e");
                     valueMap.put("C", "c\"c");
-                    writer.write(resource.acceptValueMap(valueMap));
+                    writer.writeRow(valueMap);
                 }
                 {
                     Map<String, String> valueMap = new HashMap<String, String>();
@@ -487,7 +486,7 @@ public class FileTokenTest extends PlainTestCase {
                     valueMap.put("A", "a");
                     valueMap.put("B", "b,b");
                     valueMap.put("C", "c\",c");
-                    writer.write(resource.acceptValueMap(valueMap));
+                    writer.writeRow(valueMap);
                 }
             }
         }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateByLf());

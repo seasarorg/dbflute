@@ -24,10 +24,10 @@ import java.io.IOException;
  * List&lt;String&gt; columnNameList = ... <span style="color: #3F7E5E">// columns for header</span>
  * FileToken fileToken = new FileToken();
  * fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *     public void write(FileMakingRowWriter writer, FileMakingRowResource resource) {
+ *     public void write(FileMakingRowWriter writer, FileMakingRowAcceptor acceptor) {
  *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
- *             resource.acceptValueList(...); <span style="color: #3F7E5E">// convert the member to the row resource</span>
- *             writer.<span style="color: #AD4747">write</span>(resource); <span style="color: #3F7E5E">// Yes, you write!</span>
+ *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
+ *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
  *         }
  *     }
  * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
@@ -39,8 +39,8 @@ public interface FileMakingCallback {
     /**
      * Make (write) token file by row writer that accepts row resources.
      * @param writer The row writer of file-making. (NotNull)
-     * @param resource The resource of row to make file, can be recycled per row. (NotNull)
+     * @param acceptor The acceptor of row data to provide row resource. (NotNull)
      * @throws IOException When the file writing failed.
      */
-    void write(FileMakingRowWriter writer, FileMakingRowResource resource) throws IOException;
+    void write(FileMakingRowWriter writer) throws IOException;
 }

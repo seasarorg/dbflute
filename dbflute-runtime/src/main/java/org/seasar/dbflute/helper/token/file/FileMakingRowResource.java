@@ -15,24 +15,13 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
  * The row resource of file-making. <br />
  * You can set one record info to this resource as list of string or map of string with header info. <br />
  * Null resource or null data or empty data means the end of data.
- * <pre>
- * e.g. make()
- *  fileToken.make(new FileOutputStream(tsvFile), new FileMakingCallback() {
- *      public void write(FileMakingRowWriter writer, FileMakingRowResource resource) {
- *          for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
- *              resource.acceptValueList(...); <span style="color: #3F7E5E">// convert the member to the row resource</span>
- *              writer.<span style="color: #AD4747">write</span>(resource); <span style="color: #3F7E5E">// Yes, you write!</span>
- *          }
- *      }
- *  }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
- * </pre>
  * @author jflute
  */
 public class FileMakingRowResource {
@@ -41,7 +30,7 @@ public class FileMakingRowResource {
     //                                                                             Attribute
     //                                                                             =========
     // either required, both null means end of data
-    protected Collection<String> _valueList;
+    protected List<String> _valueList;
     protected Map<String, String> _valueMap;
 
     // =====================================================================================
@@ -54,21 +43,21 @@ public class FileMakingRowResource {
     //                                                                      Accept ValueList
     //                                                                      ================
     /**
-     * Accept the list of value as one record. (priority 1)
+     * Accept the list of value as one row. (priority 1)
      * @param valueList The list of value. (NullAllowed, EmptyAllowed: if null or empty, means end of data)
      * @return this. (NotNull)
      */
-    public FileMakingRowResource acceptValueList(Collection<String> valueList) {
+    public FileMakingRowResource acceptRow(List<String> valueList) {
         _valueList = valueList;
         return this;
     }
 
     /**
-     * Accept the map of column-key value as one record. (priority 2)
+     * Accept the map of column-key value as one row. (priority 2)
      * @param valueMap The map of column-key value. (NullAllowed, EmptyAllowed: if null or empty, means end of data)
      * @return this. (NotNull)
      */
-    public FileMakingRowResource acceptValueMap(Map<String, String> valueMap) {
+    public FileMakingRowResource acceptRow(Map<String, String> valueMap) {
         _valueMap = valueMap;
         return this;
     }
@@ -127,7 +116,7 @@ public class FileMakingRowResource {
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
-    public Collection<String> getValueList() {
+    public List<String> getValueList() {
         return _valueList;
     }
 

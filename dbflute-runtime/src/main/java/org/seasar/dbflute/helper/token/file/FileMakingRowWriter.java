@@ -16,6 +16,8 @@
 package org.seasar.dbflute.helper.token.file;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The writer of row for file making.
@@ -26,8 +28,8 @@ import java.io.IOException;
  * fileToken.make(new FileOutputStream(tsvFile), new FileMakingWriterCallback() {
  *     public void write(FileMakingRowWriter writer) {
  *         for (Member member : ...) { <span style="color: #3F7E5E">// output data loop</span>
- *             resource.acceptValueList(...); <span style="color: #3F7E5E">// convert the member to the row resource</span>
- *             writer.<span style="color: #AD4747">write</span>(resource); <span style="color: #3F7E5E">// Yes, you write!</span>
+ *             List&lt;String&gt; valueList = ...; <span style="color: #3F7E5E">// convert the member to the row resource</span>
+ *             writer.<span style="color: #AD4747">writeRow</span>(valueList); <span style="color: #3F7E5E">// Yes, you write!</span>
  *         }
  *     }
  * }, new FileMakingOption().delimitateByTab().encodeAsUTF8().headerInfo(columnNameList));
@@ -37,9 +39,18 @@ import java.io.IOException;
 public interface FileMakingRowWriter {
 
     /**
-     * Write the row to token file.
-     * @param resource The resource of row for file making. (NotNull, NotEmptyResource)
+     * Write the row as value list to token file. <br />
+     * Not Collection type because order is important here.
+     * @param valueList The list of value for row. (NotNull, NotEmpty)
      * @throws IOException When the file writing failed.
      */
-    void write(FileMakingRowResource resource) throws IOException;
+    void writeRow(List<String> valueList) throws IOException;
+
+    /**
+     * Write the row as column-key value map to token file. <br />
+     * Unordered map is allowed by key-mapping. (according to header's column order)
+     * @param columnValueMap The map of column-key value for row. (NotNull, NotEmpty)
+     * @throws IOException When the file writing failed.
+     */
+    void writeRow(Map<String, String> columnValueMap) throws IOException;
 }

@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * The option of file-making.
@@ -146,7 +146,7 @@ public class FileMakingOption {
      * @param columnNameList The list of column name. (NullAllowed: means no header)
      * @return this. (NotNull)
      */
-    public FileMakingOption headerInfo(Collection<String> columnNameList) {
+    public FileMakingOption headerInfo(List<String> columnNameList) {
         if (columnNameList != null) {
             final FileMakingHeaderInfo headerInfo = new FileMakingHeaderInfo();
             headerInfo.acceptColumnNameList(columnNameList);
