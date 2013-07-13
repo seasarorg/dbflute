@@ -24,13 +24,17 @@ import org.seasar.dbflute.infra.core.logic.DfSchemaResourceFinder;
  * @author jflute
  * @since 1.0.4G (2013/07/13 Saturday)
  */
-public class DfRepsReplaceSchemaSqlCollector {
+public class DfRepsSchemaSqlDir {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String SQL_TITLE = "replace-schema";
-    public static final String FILE_EXT = ".sql";
+    public static final String REPLACE_SCHEMA_SQL_TITLE = "replace-schema";
+    public static final String REPLACE_SCHEMA_FILE_EXT = ".sql";
+    public static final String TAKE_FINALLY_SQL_TITLE = "take-finally";
+    public static final String TAKE_FINALLY_FILE_EXT = ".sql";
+    public static final String ALTER_TAKE_FINALLY_SQL_TITLE = "alter-take-finally";
+    public static final String ALTER_TAKE_FINALLY_FILE_EXT = ".sql";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -40,7 +44,7 @@ public class DfRepsReplaceSchemaSqlCollector {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfRepsReplaceSchemaSqlCollector(String sqlRootDir) {
+    public DfRepsSchemaSqlDir(String sqlRootDir) {
         _sqlRootDir = sqlRootDir;
     }
 
@@ -52,11 +56,35 @@ public class DfRepsReplaceSchemaSqlCollector {
     }
 
     protected String getReplaceSchemaSqlTitle() {
-        return SQL_TITLE;
+        return REPLACE_SCHEMA_SQL_TITLE;
     }
 
     protected String getReplaceSchemaFileExt() {
-        return FILE_EXT;
+        return REPLACE_SCHEMA_FILE_EXT;
+    }
+
+    public List<File> collectTakeFinallySqlFileList() {
+        return findSchemaResourceFileList(getTakeFinallySqlTitle(), getTakeFinallyFileExt());
+    }
+
+    protected String getTakeFinallySqlTitle() {
+        return TAKE_FINALLY_SQL_TITLE;
+    }
+
+    protected String getTakeFinallyFileExt() {
+        return TAKE_FINALLY_FILE_EXT;
+    }
+
+    public List<File> collectAlterTakeFinallySqlFileList() {
+        return findSchemaResourceFileList(getAlterTakeFinallySqlTitle(), getAlterTakeFinallyFileExt());
+    }
+
+    protected String getAlterTakeFinallySqlTitle() {
+        return ALTER_TAKE_FINALLY_SQL_TITLE;
+    }
+
+    protected String getAlterTakeFinallyFileExt() {
+        return ALTER_TAKE_FINALLY_FILE_EXT;
     }
 
     protected List<File> findSchemaResourceFileList(String prefix, String suffix) {

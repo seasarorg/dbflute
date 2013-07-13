@@ -48,9 +48,9 @@ public class DfRepsExecuteLimitter {
     // ===================================================================================
     //                                                                    Check Executable
     //                                                                    ================
-    public void checkExecutableOrNot(String sqlFileEncoding) {
-        final DfRepsReplaceSchemaSqlCollector collector = createRepsReplaceSchemaSqlCollector();
-        final List<File> sqlFileList = collector.collectReplaceSchemaSqlFileList();
+    public void checkExecutableOrNot() {
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir();
+        final List<File> sqlFileList = schemaSqlDir.collectReplaceSchemaSqlFileList();
         for (File sqlFile : sqlFileList) {
             final String text = readSqlFileText(sqlFile);
             if (text.trim().length() > 0) {
@@ -60,8 +60,8 @@ public class DfRepsExecuteLimitter {
         throwReplaceSchemaExecuteNotAllowedException();
     }
 
-    protected DfRepsReplaceSchemaSqlCollector createRepsReplaceSchemaSqlCollector() {
-        return new DfRepsReplaceSchemaSqlCollector(_sqlRootDir);
+    protected DfRepsSchemaSqlDir createRepsSchemaSqlDir() {
+        return new DfRepsSchemaSqlDir(_sqlRootDir);
     }
 
     protected void throwReplaceSchemaExecuteNotAllowedException() {
