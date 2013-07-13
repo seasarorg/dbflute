@@ -41,6 +41,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute.DfRunnerDispatchResult;
+import org.seasar.dbflute.infra.reps.DfRepsExecuteLimitter;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfCreateSchemaFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.replaceschema.schemainitializer.factory.DfSchemaInitializerFactory;
@@ -136,10 +137,24 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
     //                                                                             Execute
     //                                                                             =======
     public DfCreateSchemaFinalInfo execute() {
+        checkBeforeInitialize();
         initializeSchema();
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireResult fireResult = createSchema(runInfo);
         return createFinalInfo(fireResult);
+    }
+
+    // ===================================================================================
+    //                                                             Check before Initialize 
+    //                                                             =======================
+    protected void checkBeforeInitialize() {
+        final DfRepsExecuteLimitter limitter = createRepsExecuteLimitter();
+        limitter.checkExecutableOrNot();
+    }
+
+    protected DfRepsExecuteLimitter createRepsExecuteLimitter() {
+        final String sqlFileEncoding = getSqlFileEncoding();
+        return new DfRepsExecuteLimitter(_sqlRootDir, sqlFileEncoding);
     }
 
     // ===================================================================================

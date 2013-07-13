@@ -34,6 +34,7 @@ import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.process.SystemScript;
+import org.seasar.dbflute.infra.reps.DfRepsSchemaSqlDir;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.DfUrlAnalyzer;
 import org.seasar.dbflute.logic.jdbc.urlanalyzer.factory.DfUrlAnalyzerFactory;
 import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
@@ -94,19 +95,20 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // -----------------------------------------------------
     //                                         Create Schema
     //                                         -------------
-    public String getReplaceSchemaSqlTitle() {
-        return "replace-schema";
-    }
-
     public List<File> getReplaceSchemaSqlFileList(String sqlRootDir) {
-        return doGetSchemaSqlFileList(sqlRootDir, getReplaceSchemaSqlTitle());
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(sqlRootDir);
+        return schemaSqlDir.collectReplaceSchemaSqlFileList();
     }
 
     public Map<String, File> getReplaceSchemaSqlFileMap(String sqlRootDir) {
-        return doGetSchemaSqlFileMap(getReplaceSchemaSqlFileList(sqlRootDir));
+        return convertToSchemaSqlFileMap(getReplaceSchemaSqlFileList(sqlRootDir));
     }
 
-    protected Map<String, File> doGetSchemaSqlFileMap(List<File> sqlFileList) {
+    protected DfRepsSchemaSqlDir createRepsSchemaSqlDir(String sqlRootDir) {
+        return new DfRepsSchemaSqlDir(sqlRootDir);
+    }
+
+    protected Map<String, File> convertToSchemaSqlFileMap(List<File> sqlFileList) {
         final Map<String, File> resultMap = new LinkedHashMap<String, File>();
         for (File sqlFile : sqlFileList) {
             // Schema SQL files are located in the same directory
@@ -116,27 +118,16 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return resultMap;
     }
 
-    protected List<File> doGetSchemaSqlFileList(String targetDir, String title) {
-        return findSchemaResourceFileList(targetDir, title, ".sql");
-    }
-
     // -----------------------------------------------------
     //                                          Take Finally
     //                                          ------------
-    protected String getTakeFinallySqlFile() {
-        return getPlaySqlDir() + "/take-finally.sql";
-    }
-
-    public String getTakeFinallySqlTitle() {
-        return "take-finally";
-    }
-
     public List<File> getTakeFinallySqlFileList(String sqlRootDir) {
-        return doGetSchemaSqlFileList(sqlRootDir, getTakeFinallySqlTitle());
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(sqlRootDir);
+        return schemaSqlDir.collectTakeFinallySqlFileList();
     }
 
     public Map<String, File> getTakeFinallySqlFileMap(String sqlRootDir) {
-        return doGetSchemaSqlFileMap(getTakeFinallySqlFileList(sqlRootDir));
+        return convertToSchemaSqlFileMap(getTakeFinallySqlFileList(sqlRootDir));
     }
 
     // ===================================================================================
@@ -680,7 +671,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (targetDir == null) {
             return DfCollectionUtil.emptyList();
         }
-        return doGetSchemaSqlFileList(targetDir, getReplaceSchemaSqlTitle());
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(targetDir);
+        return schemaSqlDir.collectReplaceSchemaSqlFileList();
     }
 
     public List<File> getAppcalitionTakeFinallySqlFileList() {
@@ -688,7 +680,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (targetDir == null) {
             return DfCollectionUtil.emptyList();
         }
-        return doGetSchemaSqlFileList(targetDir, getTakeFinallySqlTitle());
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(targetDir);
+        return schemaSqlDir.collectTakeFinallySqlFileList();
     }
 
     // ===================================================================================
@@ -834,20 +827,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                     Alter TakeFinally
     //                                     -----------------
     public List<File> getMigrationAlterTakeFinallySqlFileList(String sqlRootDir) {
-        return doGetSchemaSqlFileList(sqlRootDir, getMigrationAlterTakeFinallySqlTitle());
-    }
-
-    public String getMigrationAlterTakeFinallySqlTitle() {
-        return "alter-take-finally"; // same as normal
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(sqlRootDir);
+        return schemaSqlDir.collectAlterTakeFinallySqlFileList();
     }
 
     // -----------------------------------------------------
     //                                           Alter Draft
     //                                           -----------
-    public String getMigrationDraftAlterDirectory() {
-        return getMigrationDir() + "/alter/draft";
-    }
-
     public List<File> getMigrationDraftAlterSqlFileList() { // contains script files
         final String targetDir = getMigrationDraftAlterDirectory();
         final String sqlTitle = getMigrationAlterSchemaSqlTitle();
@@ -871,6 +857,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return fileList;
     }
 
+    protected String getMigrationDraftAlterDirectory() {
+        return getMigrationDir() + "/alter/draft";
+    }
+
+    protected String getMigrationAlterTakeFinallySqlTitle() {
+        return DfRepsSchemaSqlDir.ALTER_TAKE_FINALLY_SQL_TITLE; // same as normal
+    }
+
     // -----------------------------------------------------
     //                                     Previous Resource
     //                                     -----------------
@@ -888,14 +882,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_migrationPreviousReplaceSchemaSqlFileList != null) {
             return _migrationPreviousReplaceSchemaSqlFileList;
         }
-        final String targetDir = getMigrationPreviousDir();
-        final String sqlTitle = getReplaceSchemaSqlTitle();
-        _migrationPreviousReplaceSchemaSqlFileList = doGetSchemaSqlFileList(targetDir, sqlTitle);
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(getMigrationPreviousDir());
+        _migrationPreviousReplaceSchemaSqlFileList = schemaSqlDir.collectReplaceSchemaSqlFileList();
         return _migrationPreviousReplaceSchemaSqlFileList;
     }
 
     public Map<String, File> getMigrationPreviousReplaceSchemaSqlFileMap() {
-        return doGetSchemaSqlFileMap(getMigrationPreviousReplaceSchemaSqlFileList());
+        return convertToSchemaSqlFileMap(getMigrationPreviousReplaceSchemaSqlFileList());
     }
 
     protected List<File> _migrationPreviousTakeFinallySqlFileList;
@@ -904,14 +897,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (_migrationPreviousTakeFinallySqlFileList != null) {
             return _migrationPreviousTakeFinallySqlFileList;
         }
-        final String targetDir = getMigrationPreviousDir();
-        final String sqlTitle = getTakeFinallySqlTitle();
-        _migrationPreviousTakeFinallySqlFileList = doGetSchemaSqlFileList(targetDir, sqlTitle);
+        final DfRepsSchemaSqlDir schemaSqlDir = createRepsSchemaSqlDir(getMigrationPreviousDir());
+        _migrationPreviousTakeFinallySqlFileList = schemaSqlDir.collectTakeFinallySqlFileList();
         return _migrationPreviousTakeFinallySqlFileList;
     }
 
     public Map<String, File> getMigrationPreviousTakeFinallySqlFileMap() {
-        return doGetSchemaSqlFileMap(getMigrationPreviousTakeFinallySqlFileList());
+        return convertToSchemaSqlFileMap(getMigrationPreviousTakeFinallySqlFileList());
     }
 
     // -----------------------------------------------------
