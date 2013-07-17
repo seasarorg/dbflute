@@ -15,9 +15,13 @@
  */
 package org.seasar.dbflute.properties;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.properties.assistant.DfTableListProvider;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -51,7 +55,98 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
         return _optimisticLockDefinitionMap;
     }
 
-    public String getProperty(String key, String defaultValue) {
+    // -----------------------------------------------------
+    //                                      Check Definition
+    //                                      ----------------
+    public void checkDefinition(DfTableListProvider provider) {
+        if (!hasExplicitOptimisticLockColumn()) {
+            return;
+        }
+        final List<Table> tableList = provider.provideTableList();
+        boolean exists = false;
+        for (Table table : tableList) {
+            if (table.hasOptimisticLock()) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) {
+            throwOptimisticLockRelatedTableNotFoundException();
+        }
+    }
+
+    protected void throwOptimisticLockRelatedTableNotFoundException() {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The table related to optimistic lock was not found.");
+        br.addItem("Advice");
+        br.addElement("At least one table should be related to optimistic lock");
+        br.addElement("when the optimistic lock column is specified explicitly.");
+        br.addElement("Make sure your definition is correct.");
+        br.addItem("Specified Column");
+        br.addElement(getExplicitOptimisticLockColumn());
+        final String msg = br.buildExceptionMessage();
+        throw new DfOptimisticLockRelatedTableNotFoundException(msg);
+    }
+
+    public static class DfOptimisticLockRelatedTableNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public DfOptimisticLockRelatedTableNotFoundException(String msg) {
+            super(msg);
+        }
+    }
+
+    protected boolean hasExplicitOptimisticLockColumn() {
+        return getExplicitOptimisticLockColumn() != null;
+    }
+
+    protected String getExplicitOptimisticLockColumn() {
+        final String updateDateFieldName = doGetUpdateDateFieldName(""); // as no default
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(updateDateFieldName)) {
+            return updateDateFieldName;
+        }
+        final String versionNoFieldName = doGetVersionNoFieldName(""); // as no default
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(versionNoFieldName)) {
+            return versionNoFieldName;
+        }
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                                          Field Name
+    //                                                                          ==========
+    public String getUpdateDateFieldName() {
+        return doGetUpdateDateFieldName("");
+    }
+
+    protected String doGetUpdateDateFieldName(String defaultValue) {
+        return getProperty("updateDateFieldName", defaultValue);
+    }
+
+    public String getVersionNoFieldName() {
+        return doGetVersionNoFieldName("version_no");
+    }
+
+    protected String doGetVersionNoFieldName(String defaultValue) {
+        return getProperty("versionNoFieldName", defaultValue);
+    }
+
+    public boolean isOptimisticLockColumn(String columnName) {
+        final String updateDate = getUpdateDateFieldName();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(updateDate) && updateDate.equalsIgnoreCase(columnName)) {
+            return true;
+        }
+        final String versionNo = getVersionNoFieldName();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(versionNo) && versionNo.equalsIgnoreCase(columnName)) {
+            return true;
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                     Property Helper
+    //                                                                     ===============
+    protected String getProperty(String key, String defaultValue) {
         Map<String, Object> map = getOptimisticLockDefinitionMap();
         Object obj = map.get(key);
         if (obj != null) {
@@ -70,7 +165,7 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
         return stringProp("torque." + key, defaultValue);
     }
 
-    public boolean isProperty(String key, boolean defaultValue) {
+    protected boolean isProperty(String key, boolean defaultValue) {
         Map<String, Object> map = getOptimisticLockDefinitionMap();
         Object obj = map.get(key);
         if (obj != null) {
@@ -87,28 +182,5 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
             }
         }
         return booleanProp("torque." + key, defaultValue);
-    }
-
-    // ===================================================================================
-    //                                                                          Field Name
-    //                                                                          ==========
-    public String getUpdateDateFieldName() {
-        return getProperty("updateDateFieldName", "");
-    }
-
-    public String getVersionNoFieldName() {
-        return getProperty("versionNoFieldName", "version_no");
-    }
-
-    public boolean isOptimisticLockColumn(String columnName) {
-        final String updateDate = getUpdateDateFieldName();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(updateDate) && updateDate.equalsIgnoreCase(columnName)) {
-            return true;
-        }
-        final String versionNo = getVersionNoFieldName();
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(versionNo) && versionNo.equalsIgnoreCase(columnName)) {
-            return true;
-        }
-        return false;
     }
 }

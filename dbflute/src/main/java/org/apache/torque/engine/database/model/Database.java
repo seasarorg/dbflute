@@ -1026,12 +1026,18 @@ public class Database {
      * This is basically for Generate task. (Not Sql2Entity)
      */
     public void checkProperties() {
-        getProperties().getCommonColumnProperties().checkDefinition(new DfTableListProvider() {
+        final DfBuildProperties prop = getProperties();
+        prop.getCommonColumnProperties().checkDefinition(new DfTableListProvider() {
             public List<Table> provideTableList() {
                 return getTableList();
             }
         });
-        getProperties().getSequenceIdentityProperties().checkDefinition(new DfTableDeterminer() {
+        prop.getOptimisticLockProperties().checkDefinition(new DfTableListProvider() {
+            public List<Table> provideTableList() {
+                return getTableList();
+            }
+        });
+        prop.getSequenceIdentityProperties().checkDefinition(new DfTableDeterminer() {
             public boolean hasTable(String tableName) {
                 return getTable(tableName) != null;
             }
