@@ -135,6 +135,9 @@ public abstract class DfAbsractDataWriter {
     /** The resolver of relative date. (NotNull) */
     protected final DfRelativeDateResolver _relativeDateResolver = new DfRelativeDateResolver();
 
+    /** The list of lazy checker for loaded classification. (NotNull) */
+    protected final List<DfLoadedClassificationLazyChecker> _implicitClassificationLazyCheckerList = new ArrayList<DfLoadedClassificationLazyChecker>();
+
     /** The data-prop of default value map. (NotNull: after initialization) */
     protected DfDefaultValueProp _defaultValueProp;
 
@@ -1004,20 +1007,26 @@ public abstract class DfAbsractDataWriter {
     // ===================================================================================
     //                                                             Implicit Classification
     //                                                             =======================
-    protected void checkImplicitClassification(File file, String tableDbName, List<String> columnNameList,
-            Connection conn) throws SQLException {
+    protected void checkImplicitClassification(final File file, final String tableDbName,
+            final List<String> columnNameList) {
         if (_suppressCheckImplicitSet) {
             return;
         }
-        final DfClassificationProperties prop = getClassificationProperties();
-        if (!prop.hasImplicitSetCheck()) {
-            return;
-        }
-        for (String columnName : columnNameList) {
-            if (prop.hasImplicitClassification(tableDbName, columnName)) {
-                doCheckImplicitClassification(file, tableDbName, columnName, conn);
+        // lazy because classification might have no classification data on table
+        // (initialized with table and implicit classification at the same timing)
+        _implicitClassificationLazyCheckerList.add(new DfLoadedClassificationLazyChecker() {
+            public void check(Connection conn) throws SQLException {
+                final DfClassificationProperties prop = getClassificationProperties();
+                if (!prop.hasImplicitSetCheck()) {
+                    return;
+                }
+                for (String columnName : columnNameList) {
+                    if (prop.hasImplicitClassification(tableDbName, columnName)) {
+                        doCheckImplicitClassification(file, tableDbName, columnName, conn);
+                    }
+                }
             }
-        }
+        });
     }
 
     protected void doCheckImplicitClassification(File file, String tableDbName, String columnDbName, Connection conn)
@@ -1190,6 +1199,10 @@ public abstract class DfAbsractDataWriter {
 
     public void setDataWritingInterceptor(DfDataWritingInterceptor dataWritingInterceptor) {
         this._dataWritingInterceptor = dataWritingInterceptor;
+    }
+
+    public List<DfLoadedClassificationLazyChecker> getImplicitClassificationLazyCheckerList() {
+        return _implicitClassificationLazyCheckerList;
     }
 
     public DfDefaultValueProp getDefaultValueProp() {

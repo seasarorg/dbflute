@@ -20,6 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfLoadedClassificationLazyChecker;
+
 /**
  * @author jflute
  */
@@ -46,6 +48,7 @@ public class DfLoadedDataInfo {
     protected final Map<String, List<DfLoadedFile>> _loadTypeListMap = new LinkedHashMap<String, List<DfLoadedFile>>();
     protected final Map<String, List<DfLoadedFile>> _fileTypeListMap = new LinkedHashMap<String, List<DfLoadedFile>>();
     protected final Map<String, Map<String, List<DfLoadedFile>>> _hierarchyListMap = new LinkedHashMap<String, Map<String, List<DfLoadedFile>>>();
+    protected final List<DfLoadedClassificationLazyChecker> _loadedClassificationLazyChecker = new ArrayList<DfLoadedClassificationLazyChecker>();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -109,4 +112,13 @@ public class DfLoadedDataInfo {
         }
         elementList.add(loadedFile);
     }
+
+    public List<DfLoadedClassificationLazyChecker> getImplicitClassificationLazyChecker() {
+        return _loadedClassificationLazyChecker;
+    }
+
+    public void acceptImplicitClassificationLazyCheck(List<DfLoadedClassificationLazyChecker> checkerList) {
+        _loadedClassificationLazyChecker.addAll(checkerList);
+    }
+
 }

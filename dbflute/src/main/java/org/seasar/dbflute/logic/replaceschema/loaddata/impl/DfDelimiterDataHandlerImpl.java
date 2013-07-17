@@ -20,6 +20,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -121,6 +122,7 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
                     writer.setDefaultValueProp(_defaultValueProp);
                     writer.setLoadingControlProp(_loadingControlProp);
                     writer.writeData(resultInfo);
+                    prepareImplicitClassificationLazyCheck(loadedDataInfo, writer);
 
                     final String loadType = resource.getLoadType();
                     final String fileType = resource.getFileType();
@@ -144,13 +146,13 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
         }
     }
 
-    protected Map<String, String> getDefaultValueMap(DfDelimiterDataResource info, String encoding) {
-        final String dataDirectory = info.getBasePath() + "/" + encoding;
+    protected Map<String, String> getDefaultValueMap(DfDelimiterDataResource res, String encoding) {
+        final String dataDirectory = res.getBasePath() + "/" + encoding;
         return DfXlsDataHandlerImpl.doGetDefaultValueMap(dataDirectory);
     }
 
-    protected Map<String, Map<String, String>> getConvertValueMap(DfDelimiterDataResource info, String encoding) {
-        final String dataDirectory = info.getBasePath() + "/" + encoding;
+    protected Map<String, Map<String, String>> getConvertValueMap(DfDelimiterDataResource res, String encoding) {
+        final String dataDirectory = res.getBasePath() + "/" + encoding;
         return DfXlsDataHandlerImpl.doGetConvertValueMap(dataDirectory);
     }
 
@@ -161,6 +163,11 @@ public class DfDelimiterDataHandlerImpl implements DfDelimiterDataHandler {
             }
         };
         return filter;
+    }
+
+    protected void prepareImplicitClassificationLazyCheck(DfLoadedDataInfo info, DfDelimiterDataWriterImpl writer) {
+        final List<DfLoadedClassificationLazyChecker> checkerList = writer.getImplicitClassificationLazyCheckerList();
+        info.acceptImplicitClassificationLazyCheck(checkerList);
     }
 
     // ===================================================================================

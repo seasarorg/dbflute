@@ -292,11 +292,29 @@ public class DfClassificationTop {
                 }
             }
             if (!found) {
-                String msg = "Not found the specified element in deprecated list:";
-                msg = msg + " classification=" + _classificationName + " not-found=" + deprecated;
-                throw new DfIllegalPropertySettingException(msg);
+                throwDeprecatedClassificationElementNotFoundException(deprecated);
             }
         }
+    }
+
+    protected void throwDeprecatedClassificationElementNotFoundException(String deprecated) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the specified element in deprecated list.");
+        br.addItem("Classification");
+        br.addElement(_classificationName);
+        br.addItem("Existing Element");
+        final StringBuilder sb = new StringBuilder();
+        for (DfClassificationElement element : _elementList) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(element.getName());
+        }
+        br.addElement(sb.toString());
+        br.addItem("NotFound Element");
+        br.addElement(deprecated);
+        final String msg = br.buildExceptionMessage();
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     // ===================================================================================

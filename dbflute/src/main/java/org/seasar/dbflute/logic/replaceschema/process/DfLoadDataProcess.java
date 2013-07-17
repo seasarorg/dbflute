@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.logic.replaceschema.process;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.replaceschema.finalinfo.DfLoadDataFinalInfo;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfDelimiterDataResource;
@@ -36,6 +39,7 @@ import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedFile;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataHandler;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfXlsDataResource;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfDelimiterDataHandlerImpl;
+import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfLoadedClassificationLazyChecker;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.DfXlsDataHandlerImpl;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfDefaultValueProp;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
@@ -154,6 +158,8 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
             writeDbFromDelimiterFileAsLoadingTypeData(CSV_FILE_TYPE, CSV_FILE_TYPE, CSV_DELIMITER);
             writeDbFromXlsAsLoadingTypeData();
             writeDbFromXlsAsLoadingTypeDataApp();
+
+            checkImplicitClasification();
             _success = true; // means no exception
         } catch (RuntimeException e) {
             loadEx = e;
@@ -161,9 +167,9 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         return createFinalInfo(loadEx);
     }
 
-    // --------------------------------------------
-    //                               Delimiter Data
-    //                               --------------
+    // ===================================================================================
+    //                                                                      Delimiter Data
+    //                                                                      ==============
     protected void writeDbFromDelimiterFileAsCommonData(String typeName, String fileType, String delimter) {
         final String dir = _sqlRootDir;
         final String path = doGetCommonDataDirectoryPath(dir, typeName);
@@ -238,9 +244,9 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         }
     }
 
-    // --------------------------------------------
-    //                                     Xls Data
-    //                                     --------
+    // ===================================================================================
+    //                                                                            Xls Data
+    //                                                                            ========
     protected void writeDbFromXlsAsCommonDataFirst() {
         writeDbFromXls(new DfXlsWritingResource().commonType().firstXls());
     }
@@ -330,6 +336,9 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         return _xlsDataHandlerImpl;
     }
 
+    // ===================================================================================
+    //                                                                      Writing Helper
+    //                                                                      ==============
     // --------------------------------------------
     //                          Writing Interceptor
     //                          -------------------
@@ -353,6 +362,39 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
 
     protected String doGetLoadingTypeDataDirectoryPath(String dir, String loadType, String typeName) {
         return getReplaceSchemaProperties().getLoadTypeDataDir(dir, loadType, typeName);
+    }
+
+    // ===================================================================================
+    //                                                             Implicit Classification
+    //                                                             =======================
+    protected void checkImplicitClasification() {
+        lazyCheckLoadedClassifiaction(_dataSource, _loadedDataInfo.getImplicitClassificationLazyChecker());
+    }
+
+    protected void lazyCheckLoadedClassifiaction(DataSource dataSource,
+            List<DfLoadedClassificationLazyChecker> checkerList) {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            for (DfLoadedClassificationLazyChecker checker : checkerList) {
+                checker.check(conn);
+            }
+        } catch (SQLException e) { // might be framework bug
+            final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+            br.addNotice("Failed to lazy-check implicit classifications.");
+            br.addItem("SQLException");
+            br.addElement(e.getClass());
+            br.addElement(e.getMessage());
+            final String msg = br.buildExceptionMessage();
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
+        }
     }
 
     // ===================================================================================

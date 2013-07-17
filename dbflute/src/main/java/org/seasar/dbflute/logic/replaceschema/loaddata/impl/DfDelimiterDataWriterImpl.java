@@ -283,7 +283,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 ps.executeBatch();
             }
             noticeLoadedRowSize(tableDbName, rowNumber);
-            checkImplicitClassification(dataFile, tableDbName, columnNameList, conn);
+            checkImplicitClassification(dataFile, tableDbName, columnNameList);
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {

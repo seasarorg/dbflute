@@ -134,7 +134,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final boolean warned = false; // this has no warning fixedly
             loadedDataInfo.addLoadedFile(resource.getEnvType(), "xls", null, file.getName(), warned);
         }
+        prepareImplicitClassificationLazyCheck(loadedDataInfo);
         outputResultMark(resource.getDataDirectory(), msgSb.toString());
+    }
+
+    protected void prepareImplicitClassificationLazyCheck(DfLoadedDataInfo info) {
+        info.acceptImplicitClassificationLazyCheck(getImplicitClassificationLazyCheckerList());
     }
 
     // -----------------------------------------------------
@@ -244,7 +249,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 }
             }
             noticeLoadedRowSize(tableDbName, loadedRowCount);
-            checkImplicitClassification(file, tableDbName, columnNameList, conn);
+            checkImplicitClassification(file, tableDbName, columnNameList);
             return loadedRowCount;
         } catch (SQLException e) {
             handleWriteTableException(file, dataTable, e, retryEx, retryDataRow, columnNameList);
