@@ -407,13 +407,15 @@ public class DfBehaviorQueryPathSetupper {
             return bsbhvSimpleName;
         }
         final int prefixLength = prefix.length();
-        if (!Character.isUpperCase(bsbhvSimpleName.substring(prefixLength).charAt(0))) {
+        final String pureName = bsbhvSimpleName.substring(prefixLength);
+        final char pureInitChar = pureName.charAt(0);
+        if (pureInitChar <= 0x7F && !Character.isUpperCase(pureInitChar)) { // just in case
             return bsbhvSimpleName;
         }
-        if (bsbhvSimpleName.length() <= prefixLength) {
+        if (bsbhvSimpleName.length() <= prefixLength) { // just in case
             return bsbhvSimpleName;
         }
-        return projectPrefix + bsbhvSimpleName.substring(prefixLength);
+        return projectPrefix + pureName;
     }
 
     // ===================================================================================
