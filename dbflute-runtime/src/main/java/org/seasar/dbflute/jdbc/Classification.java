@@ -25,32 +25,38 @@ import java.util.Map;
 public interface Classification {
 
     /**
+     * Get the code of the classification.
      * @return The code of the classification. (NotNull)
      */
     String code();
 
     /**
+     * Get the name, means identity name, of the classification.
      * @return The name of the classification. (NotNull)
      */
     String name();
 
     /**
+     * Get the alias, means display name, of the classification.
      * @return The code of the classification. (NullAllowed: when an alias is not specified in its setting)
      */
     String alias();
 
     /**
+     * Is the classification in the group?
      * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns false)
      * @return The determination, true or false. (true: this classification is in the group)
      */
     boolean inGroup(String groupName);
 
     /**
+     * Get the map of sub items that are your original attributes.
      * @return The map of sub-items. (NotNull, EmptyAllowed, ReadOnly)
      */
     Map<String, Object> subItemMap();
 
     /**
+     * Get the meta of the classification.
      * @return The meta of the classification. (NotNull)
      */
     ClassificationMeta meta();

@@ -52,6 +52,7 @@ public interface ClassificationMeta {
     List<Classification> groupOf(String groupName);
 
     /**
+     * Get the code type of the classification. e.g. String, Number
      * @return The instance of the code type for the classification. (NotNull)
      */
     ClassificationCodeType codeType();
