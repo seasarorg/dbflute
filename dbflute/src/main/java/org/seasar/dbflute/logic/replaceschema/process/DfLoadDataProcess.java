@@ -376,7 +376,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
         if (checkerList.isEmpty()) {
             return;
         }
-        _log.info("...Checking implicit set: checkers=" + checkerList.size());
+        _log.info("...Checking implicit set of classification");
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
