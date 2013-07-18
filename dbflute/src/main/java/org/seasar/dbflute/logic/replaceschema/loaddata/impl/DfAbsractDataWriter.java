@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -42,7 +41,6 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfJDBCException;
-import org.seasar.dbflute.exception.DfLoadDataIllegalImplicitClassificationValueException;
 import org.seasar.dbflute.exception.DfLoadDataRegistrationFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -1020,82 +1018,14 @@ public abstract class DfAbsractDataWriter {
                 if (!prop.hasImplicitSetCheck()) {
                     return;
                 }
+                final DfImplicitClassificationChecker checker = new DfImplicitClassificationChecker();
                 for (String columnName : columnNameList) {
                     if (prop.hasImplicitClassification(tableDbName, columnName)) {
-                        doCheckImplicitClassification(file, tableDbName, columnName, conn);
+                        checker.check(file, tableDbName, columnName, conn);
                     }
                 }
             }
         });
-    }
-
-    protected void doCheckImplicitClassification(File file, String tableDbName, String columnDbName, Connection conn)
-            throws SQLException {
-        final DfClassificationProperties prop = getClassificationProperties();
-        final String classificationName = prop.getClassificationName(tableDbName, columnDbName);
-        if (!prop.isCheckImplicitSet(classificationName)) {
-            return;
-        }
-        final String titleName = classificationName + " for " + tableDbName + "." + columnDbName;
-        _log.info("...Checking implicit set: " + titleName);
-        final StringBuilder sb = new StringBuilder();
-        sb.append("select distinct " + columnDbName + " from ").append(tableDbName);
-        sb.append(" where ").append(columnDbName).append(" not in ");
-        final boolean quote = prop.isCodeTypeNeedsQuoted(classificationName);
-        final List<String> codeList = prop.getClassificationElementCodeList(classificationName);
-        sb.append("(");
-        int index = 0;
-        for (String code : codeList) {
-            if (index > 0) {
-                sb.append(", ");
-            }
-            sb.append(quote ? "'" : "").append(code).append(quote ? "'" : "");
-            ++index;
-        }
-        sb.append(")");
-        final String sql = sb.toString();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            _log.info(sql);
-            ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
-            final List<String> illegalCodeList = new ArrayList<String>();
-            while (rs.next()) {
-                illegalCodeList.add(rs.getString(1));
-            }
-            if (!illegalCodeList.isEmpty()) {
-                throwLoadDataIllegalImplicitClassificationValueException(file, tableDbName, columnDbName,
-                        classificationName, codeList, illegalCodeList);
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-        }
-    }
-
-    protected void throwLoadDataIllegalImplicitClassificationValueException(File file, String tableDbName,
-            String columnDbName, String classificationName, List<String> codeList, List<String> illegalCodeList) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The illegal code of the implicit classification was found.");
-        br.addItem("Data File");
-        br.addElement(file.getPath());
-        br.addItem("Table");
-        br.addElement(tableDbName);
-        br.addItem("Column");
-        br.addElement(columnDbName);
-        br.addItem("Classification");
-        br.addElement(classificationName);
-        br.addItem("Defined Element");
-        br.addElement(codeList);
-        br.addItem("Illegal Value");
-        br.addElement(illegalCodeList);
-        final String msg = br.buildExceptionMessage();
-        throw new DfLoadDataIllegalImplicitClassificationValueException(msg);
     }
 
     // ===================================================================================

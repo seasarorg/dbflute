@@ -110,17 +110,21 @@ public class DfClassificationResourceAnalyzer {
                 if (encoding == null) {
                     encoding = DEFAULT_ENCODING;
                 }
-                _log.info("...Analyzing classification resources: encoding=" + encoding);
+                _log.info("...Analyzing classification in resource file: encoding=" + encoding);
                 lineList = createLineList(file, encoding);
             } catch (RuntimeException ignored) {
-                String msg = "Failed to analyze classification resources: ";
+                String msg = "Failed to analyze classification in resource file: ";
                 msg = msg + " " + dirName + "/" + resourceName + "." + extension;
                 _log.info(msg, ignored);
                 continue;
             }
             final List<DfClassificationTop> classificationTopList = analyze(lineList);
-            for (DfClassificationTop top : classificationTopList) {
-                _log.info("    " + top.getClassificationName() + ", " + top.getTopCommentDisp());
+            if (!classificationTopList.isEmpty()) {
+                for (DfClassificationTop top : classificationTopList) {
+                    _log.info("    " + top.getClassificationName() + ", " + top.getTopCommentDisp());
+                }
+            } else {
+                _log.info(" -> no classification in resource file");
             }
             topList.addAll(classificationTopList);
         }

@@ -373,6 +373,7 @@ public class DfLoadDataProcess extends DfAbstractReplaceSchemaProcess {
 
     protected void lazyCheckLoadedClassifiaction(DataSource dataSource,
             List<DfLoadedClassificationLazyChecker> checkerList) {
+        _log.info("...Checking implicit set");
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
