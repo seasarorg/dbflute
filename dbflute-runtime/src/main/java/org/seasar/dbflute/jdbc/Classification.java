@@ -40,6 +40,12 @@ public interface Classification {
     String alias();
 
     /**
+     * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns false)
+     * @return The determination, true or false. (true: this classification is in the group)
+     */
+    boolean inGroup(String groupName);
+
+    /**
      * @return The map of sub-items. (NotNull, EmptyAllowed, ReadOnly)
      */
     Map<String, Object> subItemMap();

@@ -45,6 +45,13 @@ public interface ClassificationMeta {
     List<Classification> listAll();
 
     /**
+     * Get the list of group classification elements. (returns new copied list)
+     * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
+     * @return The list of classification elements. (NotNull)
+     */
+    List<Classification> groupOf(String groupName);
+
+    /**
      * @return The instance of the code type for the classification. (NotNull)
      */
     ClassificationCodeType codeType();

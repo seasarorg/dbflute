@@ -73,6 +73,10 @@ public class AbstractDBMetaTest extends PlainTestCase {
             return obj instanceof String && obj.equals("bar") ? BAR : null;
         }
 
+        public boolean inGroup(String groupName) {
+            return false;
+        }
+
         public Map<String, Object> subItemMap() {
             return DfCollectionUtil.emptyMap();
         }

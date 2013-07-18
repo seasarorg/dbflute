@@ -936,6 +936,10 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
             return null;
         }
 
+        public boolean inGroup(String groupName) {
+            return false;
+        }
+
         public Map<String, Object> subItemMap() {
             return DfCollectionUtil.emptyMap();
         }
