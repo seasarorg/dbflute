@@ -259,7 +259,12 @@ public class DfClassificationTop {
     // ===================================================================================
     //                                                                        Grouping Map
     //                                                                        ============
+    protected List<DfClassificationGroup> _cachedGroupList;
+
     public List<DfClassificationGroup> getGroupList() {
+        if (_cachedGroupList != null) {
+            return _cachedGroupList;
+        }
         final List<DfClassificationGroup> groupList = new ArrayList<DfClassificationGroup>();
         for (Entry<String, Map<String, Object>> entry : _groupingMap.entrySet()) {
             final String groupName = entry.getKey();
@@ -276,7 +281,12 @@ public class DfClassificationTop {
             group.setElementNameList(elementList);
             groupList.add(group);
         }
-        return groupList;
+        _cachedGroupList = groupList;
+        return _cachedGroupList;
+    }
+
+    public boolean hasGroup() {
+        return !getGroupList().isEmpty();
     }
 
     // ===================================================================================

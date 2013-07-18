@@ -46,9 +46,17 @@ public class ${myClassName} {
 #set ($dynamicFixedConditionArgs = "${fk.dynamicFixedConditionFinalArgs}")
 #set ($dynamicFixedConditionVariables = "${fk.dynamicFixedConditionVariables}")
 #end
+    /**
+     * With nested relation columns to select clause. <br />
+     * ${fk.foreignDispForJavaDoc}
+#if ($fk.hasDynamicFixedCondition())
+     * ${fk.dynamicFixedConditionArgsJavaDocString}
+#end
+     * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
+     */
     public ${fk.foreignTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ConditionQuery qf() { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
-		return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
+        return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
     }
 #end
 
@@ -56,9 +64,14 @@ public class ${myClassName} {
 #if (${referrer.isOneToOne()})
 #set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+    /**
+     * With nested relation columns to select clause. <br />
+     * ${referrer.referrerDispAsOneForJavaDoc}
+     * @return The set-upper of more nested relation. {...with[nested-relation].with[more-nested-relation]} (NotNull)
+     */
     public ${referrer.referrerTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
         _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ConditionQuery qf() { return _query.query${tmpPropertyNameInitCap}(); }});
-		return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
+        return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
     }
 #end
 #end

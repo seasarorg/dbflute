@@ -113,7 +113,7 @@ public interface ${glCDef} extends Classification {
 #end
 #foreach ($group in $classificationTop.groupList)
         /**
-         * Is the classification in the group? <br />  
+         * Is the classification in the group? <br />
 #if ($group.hasGroupComment())
          * ${group.groupCommentForJavaDocNest} <br />
 #end
@@ -125,6 +125,13 @@ public interface ${glCDef} extends Classification {
         }
 
 #end
+        public boolean inGroup(String groupName) {
+#foreach ($group in $classificationTop.groupList)
+            if ("${group.groupName}".equals(groupName)) { return is${group.groupNameInitCap}(); }
+#end
+            return false;
+        }
+
         /**
          * Get the classification by the code. (CaseInsensitive)
          * @param code The value of code, which is case-insensitive. (NullAllowed: if null, returns null)
@@ -168,6 +175,18 @@ public interface ${glCDef} extends Classification {
         }
 #end
 
+        /**
+         * Get the list of classification elements in the specified group. (returns new copied list) <br />
+         * @param groupName The string of group name, which is case-sensitive. (NullAllowed: if null, returns empty list)
+         * @return The list of classification elements in the group. (NotNull)
+         */
+        public static List<${classificationName}> groupOf(String groupName) {
+#foreach ($group in $classificationTop.groupList)
+            if ("${group.groupName}".equals(groupName)) { return listOf${group.groupNameInitCap}(); }
+#end
+            return new ArrayList<${classificationName}>(4);
+        }
+
 #if ($database.isCDefToStringReturnsName())
         @Override public String toString() { return name(); }
 #else
@@ -207,6 +226,13 @@ public interface ${glCDef} extends Classification {
         public List<Classification> listAll() {
 #foreach ($classificationName in $database.classificationNameList)
             if ("${classificationName}".equals(name())) { return toClassificationList(${glCDef}.${classificationName}.listAll()); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
+        }
+
+        public List<Classification> groupOf(String groupName) {
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equals(name())) { return toClassificationList(${glCDef}.${classificationName}.groupOf(groupName)); }
 #end
             throw new IllegalStateException("Unknown definition: " + this); // basically unreachable
         }
