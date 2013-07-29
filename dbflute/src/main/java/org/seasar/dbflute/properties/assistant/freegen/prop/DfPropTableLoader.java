@@ -200,7 +200,7 @@ public class DfPropTableLoader {
             columnMap.put("propertyValueHtmlEncoded", valueHtmlEncoded != null ? valueHtmlEncoded : "");
             columnMap.put("hasPropertyValue", Srl.is_NotNull_and_NotTrimmedEmpty(propertyValue));
 
-            final String defName = Srl.replace(propertyKey, ".", "_").toUpperCase();
+            final String defName = convertToDefName(propertyKey);
             columnMap.put("defName", defName);
 
             final String camelizedName = Srl.camelize(defName);
@@ -262,7 +262,27 @@ public class DfPropTableLoader {
         return DfNameHintUtil.isTargetByHint(propertyKey, targetDummyList, exceptKeyList);
     }
 
-    protected boolean isGroupingTarget(final String propertyKey, final String keyHint) {
+    protected String convertToDefName(String propertyKey) {
+        final List<String> splitList = Srl.splitList(propertyKey, ".");
+        final StringBuilder sb = new StringBuilder();
+        for (String element : splitList) {
+            if (sb.length() > 0) {
+                sb.append("_");
+            }
+            if (mightBeCamelCase(element)) {
+                sb.append(Srl.decamelize(element));
+            } else {
+                sb.append(element);
+            }
+        }
+        return sb.toString();
+    }
+
+    protected boolean mightBeCamelCase(String element) { // e.g. fooBar, foo
+        return Srl.isInitLowerCase(element) && !element.contains("_");
+    }
+
+    protected boolean isGroupingTarget(String propertyKey, String keyHint) {
         return DfNameHintUtil.isHitByTheHint(propertyKey, keyHint);
     }
 
