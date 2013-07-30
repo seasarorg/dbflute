@@ -294,14 +294,21 @@ public class DfPropHtmlManager {
 
     protected void prepareExtendsProperties(DfPropHtmlRequest request, JavaPropertiesReader reader,
             DfPropHtmlFileAttribute extendsAttribute) {
-        final File extendsFile = extendsAttribute.getPropertiesFile();
-        final String extendsFileKey = buildFileKey(extendsFile, extendsAttribute.getEnvType());
-        final String extendsTitle = extendsFileKey + ":" + extendsFile.getPath();
-        reader.extendsProperties(extendsTitle, new JavaPropertiesStreamProvider() {
-            public InputStream provideStream() throws IOException {
-                return new FileInputStream(extendsFile);
+        DfPropHtmlFileAttribute current = extendsAttribute;
+        while (true) {
+            if (current == null) {
+                break;
             }
-        });
+            final File extendsFile = current.getPropertiesFile();
+            final String extendsFileKey = buildFileKey(extendsFile, current.getEnvType());
+            final String extendsTitle = extendsFileKey + ":" + extendsFile.getPath();
+            reader.extendsProperties(extendsTitle, new JavaPropertiesStreamProvider() {
+                public InputStream provideStream() throws IOException {
+                    return new FileInputStream(extendsFile);
+                }
+            });
+            current = current.getExtendsAttribute();
+        }
         if (request.isCheckImplicitOverride()) {
             reader.checkImplicitOverride();
         }
