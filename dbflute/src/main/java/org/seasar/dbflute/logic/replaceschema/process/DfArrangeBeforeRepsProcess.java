@@ -26,6 +26,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.helper.process.ProcessResult;
+import org.seasar.dbflute.helper.process.SystemScript;
+import org.seasar.dbflute.helper.process.exception.SystemScriptUnsupportedScriptException;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -56,6 +59,14 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
             final String src = entry.getKey();
             final String dest = entry.getValue();
             arrangeCopy(src, dest);
+        }
+        final Map<String, String> scriptMap = prop.getArrangeBeforeRepsScriptMap();
+        if (!scriptMap.isEmpty()) {
+            _log.info("...Arranging by script files for ReplaceSchema");
+        }
+        for (Entry<String, String> entry : scriptMap.entrySet()) {
+            final String path = entry.getKey();
+            arrangeScript(path);
         }
     }
 
@@ -244,6 +255,42 @@ public class DfArrangeBeforeRepsProcess extends DfAbstractReplaceSchemaProcess {
         br.addItem("Found Files");
         br.addElement(first);
         br.addElement(second);
+        final String msg = br.buildExceptionMessage();
+        throw new IllegalStateException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                              Script
+    //                                                                              ======
+    protected void arrangeScript(String path) {
+        final SystemScript script = new SystemScript();
+        final String baseDir = Srl.substringLastFront(path, "/");
+        final String scriptName = Srl.substringLastRear(path, "/");
+        _log.info("...Executing the script: " + path);
+        final ProcessResult processResult;
+        try {
+            processResult = script.execute(new File(baseDir), scriptName);
+        } catch (SystemScriptUnsupportedScriptException ignored) {
+            _log.info("Skipped the script for system mismatch: " + scriptName);
+            return;
+        }
+        final String console = processResult.getConsole();
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(console)) {
+            _log.info("Catched the console for " + scriptName + ":" + ln() + console);
+        }
+        final int exitCode = processResult.getExitCode();
+        if (exitCode != 0) {
+            throwRepsArrangeScriptFailureException(path, exitCode);
+        }
+    }
+
+    protected void throwRepsArrangeScriptFailureException(String path, int exitCode) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to execute the script for ArrangeBeforeReps.");
+        br.addItem("Path");
+        br.addElement(path);
+        br.addItem("Exit Code");
+        br.addElement(exitCode);
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
     }

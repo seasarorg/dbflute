@@ -696,6 +696,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // #        ; $$SrcDir$$/data/common/xls/*.xls = ./playsql/data/common/xls
     // #        ; $$SrcDir$$/data/ut/xls/*.xls = ./playsql/data/ut/xls df:clean
     // #    }
+    // #    ; script = map:{
+    // #        ; ../maven-install.sh = dummy
+    // #    }
     // #}
     protected Map<String, Map<String, Object>> _arrangeBeforeRepsMap;
 
@@ -749,6 +752,23 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             copyMap.put(key, value);
         }
         return copyMap;
+    }
+
+    public Map<String, String> getArrangeBeforeRepsScriptMap() {
+        final Map<String, String> defineMap = getArrangeBeforeRepsDefineMap();
+        final Map<String, Map<String, Object>> repsMap = getArrangeBeforeRepsMap();
+        final Map<String, Object> elementMap = repsMap.get("script");
+        if (elementMap == null) {
+            return DfCollectionUtil.emptyMap();
+        }
+        final Map<String, String> scriptMap = new LinkedHashMap<String, String>();
+        for (Entry<String, Object> entry : elementMap.entrySet()) {
+            final String key = Srl.replaceBy(entry.getKey(), defineMap);
+            // value is dummy for now
+            //final String value = Srl.replaceBy((String) entry.getValue(), defineMap);
+            scriptMap.put(key, (String) entry.getValue());
+        }
+        return scriptMap;
     }
 
     // ===================================================================================

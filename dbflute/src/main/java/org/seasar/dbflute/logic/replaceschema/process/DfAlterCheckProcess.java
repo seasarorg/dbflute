@@ -745,16 +745,17 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
                 // script file
                 final String baseDir = Srl.substringLastFront(path, "/");
                 final String scriptName = Srl.substringLastRear(path, "/");
+                _log.info("...Executing the script: " + path);
                 final ProcessResult processResult;
                 try {
                     processResult = script.execute(new File(baseDir), scriptName);
                 } catch (SystemScriptUnsupportedScriptException ignored) {
-                    _log.info("...Skipping the script for system mismatch: " + scriptName);
+                    _log.info("Skipped the script for system mismatch: " + scriptName);
                     return null;
                 }
                 final String console = processResult.getConsole();
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(console)) {
-                    _log.info("...Reading console for " + scriptName + ":" + ln() + console);
+                    _log.info("Catched the console for " + scriptName + ":" + ln() + console);
                 }
                 final DfSqlFileRunnerResult runnerResult = new DfSqlFileRunnerResult(sqlFile);
                 runnerResult.setTotalSqlCount(1);
