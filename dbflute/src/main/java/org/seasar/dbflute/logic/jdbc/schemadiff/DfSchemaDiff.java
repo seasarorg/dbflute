@@ -28,12 +28,14 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Procedure;
 import org.apache.torque.engine.database.model.Sequence;
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfConstraintKeyDiffer;
 import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfForeignKeyDiffer;
 import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfIndexDiffer;
 import org.seasar.dbflute.logic.jdbc.schemadiff.differ.DfUniqueKeyDiffer;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.resource.DBFluteSystem;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -303,23 +305,41 @@ public class DfSchemaDiff extends DfAbstractDiff {
         _nextReader = nextReader;
     }
 
-    public static DfSchemaDiff createAsCore() {
-        // no need to filter when reading here
+    public static DfSchemaDiff createAsHistory() {
         final DfSchemaXmlReader reader = DfSchemaXmlReader.createAsCoreToManage();
-        return new DfSchemaDiff(reader, reader);
+        return newReader(reader);
     }
 
-    public static DfSchemaDiff createAsFlexible(String schemaXml) {
-        // no need to filter when reading here
+    public static DfSchemaDiff createAsSerializer(String schemaXml) {
         final DfSchemaXmlReader reader = DfSchemaXmlReader.createAsFlexibleToManage(schemaXml);
-        return new DfSchemaDiff(reader, reader);
+        return prepareDiffOption(newReader(reader));
     }
 
-    public static DfSchemaDiff createAsFlexible(String previousXml, String nextXml) {
-        // no need to filter when reading here
+    public static DfSchemaDiff createAsAlterCheck(String previousXml, String nextXml) {
         final DfSchemaXmlReader previousReader = DfSchemaXmlReader.createAsFlexibleToManage(previousXml);
         final DfSchemaXmlReader nextReader = DfSchemaXmlReader.createAsFlexibleToManage(nextXml);
+        return prepareDiffOption(newReader(previousReader, nextReader));
+    }
+
+    protected static DfSchemaDiff newReader(DfSchemaXmlReader reader) {
+        return new DfSchemaDiff(reader, reader);
+    }
+
+    protected static DfSchemaDiff newReader(DfSchemaXmlReader previousReader, DfSchemaXmlReader nextReader) {
         return new DfSchemaDiff(previousReader, nextReader);
+    }
+
+    protected static DfSchemaDiff prepareDiffOption(DfSchemaDiff schemaDiff) {
+        // all diff processes are depends on the DBFlute property
+        // (CraftDiff settings are set later)
+        final DfDocumentProperties prop = DfBuildProperties.getInstance().getDocumentProperties();
+        if (prop.isCheckColumnDefOrderDiff()) {
+            schemaDiff.checkColumnDefOrder();
+        }
+        if (prop.isCheckDbCommentDiff()) {
+            schemaDiff.checkDbComment();
+        }
+        return schemaDiff;
     }
 
     // ===================================================================================
@@ -472,8 +492,15 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processColumnDefOrder(Table next, Table previous, DfTableDiff tableDiff) {
+        System.out.println("*@@@@@@@@@@@@@@@@@@@@@@@ processColumnDefOrder(): " + next.getTableDbName() + " : "
+                + _checkColumnDefOrder);
         if (!_checkColumnDefOrder) {
             return;
+        }
+        if (next.getTableDbName().equals("MEMBER")) {
+            System.out.println("***********************************");
+            System.out.println("*********************************** : " + next.getColumnNameCommaString());
+            System.out.println("*********************************** : " + previous.getColumnNameCommaString());
         }
         diffNextPrevious(next, previous, tableDiff, new ColumnDefOrderDiffer());
     }

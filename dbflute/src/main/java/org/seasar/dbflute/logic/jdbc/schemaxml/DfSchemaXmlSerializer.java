@@ -185,7 +185,7 @@ public class DfSchemaXmlSerializer {
     protected boolean _suppressAdditionalSchema; // to check in processes related to additional schema
     protected boolean _craftDiffEnabled; // not null means CraftDiff enabled
     protected DfCraftDiffAssertSqlFire _craftDiffAssertSqlFire; // not null when CraftDiff enabled 
-    protected boolean _keepDefitionOrderAsPrevious; // not to get meta data change by only definition order 
+    protected boolean _keepDefinitionOrderAsPrevious; // not to get meta data change by only definition order 
 
     // ===================================================================================
     //                                                                         Constructor
@@ -199,16 +199,7 @@ public class DfSchemaXmlSerializer {
         _dataSource = dataSource;
         _schemaXml = schemaXml;
         _historyFile = historyFile;
-        _schemaDiff = DfSchemaDiff.createAsFlexible(schemaXml);
-
-        // all diff processes are depends on the DBFlute property
-        // (CraftDiff settings are set later)
-        if (getDocumentProperties().isCheckColumnDefOrderDiff()) {
-            _schemaDiff.checkColumnDefOrder();
-        }
-        if (getDocumentProperties().isCheckDbCommentDiff()) {
-            _schemaDiff.checkDbComment();
-        }
+        _schemaDiff = DfSchemaDiff.createAsSerializer(schemaXml);
     }
 
     /**
@@ -226,7 +217,7 @@ public class DfSchemaXmlSerializer {
         final DfDocumentProperties docProp = buildProp.getDocumentProperties();
         final String craftMetaDir = docProp.getCoreCraftMetaDir();
         serializer.enableCraftDiff(dataSource, craftMetaDir, DfCraftDiffAssertDirection.ROLLING_NEXT);
-        serializer.keepDefitionOrderAsPrevious(); // to avoid getting nonsense differences in JDBC task
+        serializer.keepDefinitionOrderAsPrevious(); // to avoid getting nonsense differences in JDBC task
         return serializer;
     }
 
@@ -264,13 +255,9 @@ public class DfSchemaXmlSerializer {
         return this;
     }
 
-    protected DfSchemaXmlSerializer keepDefitionOrderAsPrevious() {
-        _keepDefitionOrderAsPrevious = true;
+    protected DfSchemaXmlSerializer keepDefinitionOrderAsPrevious() {
+        _keepDefinitionOrderAsPrevious = true;
         return this;
-    }
-
-    public static DfSchemaXmlSerializer createAsPlain(DfSchemaSource dataSource, String schemaXml, String historyFile) {
-        return new DfSchemaXmlSerializer(dataSource, schemaXml, historyFile);
     }
 
     // ===================================================================================
@@ -595,7 +582,7 @@ public class DfSchemaXmlSerializer {
     }
 
     protected Set<String> deriveForeignKeyLoopSet(Map<String, DfForeignKeyMeta> nextFkMap, DfTableMeta tableMeta) {
-        if (!_keepDefitionOrderAsPrevious) { // this is option
+        if (!_keepDefinitionOrderAsPrevious) { // this is option
             return nextFkMap.keySet(); // normal
         }
         final List<ForeignKey> previousFkList = findPreviousConstraintKeyList(tableMeta, _previousForeignKeyProvider);
@@ -669,7 +656,7 @@ public class DfSchemaXmlSerializer {
     }
 
     protected Set<String> deriveUniqueLoopSet(Map<String, Map<Integer, String>> nextUqMap, DfTableMeta tableMeta) {
-        if (!_keepDefitionOrderAsPrevious) { // this is option
+        if (!_keepDefinitionOrderAsPrevious) { // this is option
             return nextUqMap.keySet(); // normal
         }
         final List<Unique> previousUqList = findPreviousConstraintKeyList(tableMeta, _previousUniqueProvider);
@@ -707,7 +694,7 @@ public class DfSchemaXmlSerializer {
     }
 
     protected Set<String> deriveIndexLoopSet(Map<String, Map<Integer, String>> nextIdxMap, DfTableMeta tableMeta) {
-        if (!_keepDefitionOrderAsPrevious) { // this is option
+        if (!_keepDefinitionOrderAsPrevious) { // this is option
             return nextIdxMap.keySet(); // normal
         }
         final List<Index> previousIdxList = findPreviousConstraintKeyList(tableMeta, _previousIndexProvider);

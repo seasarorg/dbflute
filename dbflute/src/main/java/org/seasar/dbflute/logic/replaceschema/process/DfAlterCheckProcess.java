@@ -905,7 +905,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
         _log.info("+-----------------|");
         final String previousXml = getMigrationAlterCheckPreviousSchemaXml();
         final String nextXml = getMigrationAlterCheckNextSchemaXml();
-        final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsFlexible(previousXml, nextXml);
+        final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsAlterCheck(previousXml, nextXml);
         schemaDiff.enableCraftDiff(getMigrationAlterCheckCraftMetaDir());
         schemaDiff.loadPreviousSchema();
         schemaDiff.loadNextSchema();

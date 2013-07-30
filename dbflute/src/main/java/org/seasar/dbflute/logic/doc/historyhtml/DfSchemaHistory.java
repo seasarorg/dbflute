@@ -174,7 +174,7 @@ public class DfSchemaHistory {
             assertDiffElementMap(key, value);
             @SuppressWarnings("unchecked")
             final Map<String, Object> schemaDiffMap = (Map<String, Object>) value;
-            final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsCore();
+            final DfSchemaDiff schemaDiff = DfSchemaDiff.createAsHistory();
             schemaDiff.acceptSchemaDiffMap(schemaDiffMap);
             if (index == 0) {
                 schemaDiff.setLatest(true);
