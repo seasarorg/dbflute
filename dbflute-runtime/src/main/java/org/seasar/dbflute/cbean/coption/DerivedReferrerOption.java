@@ -185,6 +185,16 @@ public class DerivedReferrerOption extends FunctionFilterOption {
 
     /**
      * Plus the specified column with the plus column. (+) {Dream Cruise}
+     * <pre>
+     * e.g. (Specify)DerivedReferrer: max(PURCHASE_PRICE) + SERVICE_POINT_COUNT
+     *  MemberCB cb = new MemberCB();
+     *  cb.specify().derivedPurchaseList().max(new SubQuery() {
+     *      public void query(Purchase subCB) {
+     *          cb.columnPurchasePrice();
+     *      }
+     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #FD4747">plus</span>(
+     *      cb.<span style="color: #FD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
+     * </pre>
      * @param plusColumn The plus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
@@ -207,6 +217,16 @@ public class DerivedReferrerOption extends FunctionFilterOption {
 
     /**
      * Minus the specified column with the minus column. (-) {Dream Cruise}
+     * <pre>
+     * e.g. (Specify)DerivedReferrer: max(PURCHASE_PRICE) - SERVICE_POINT_COUNT
+     *  MemberCB cb = new MemberCB();
+     *  cb.specify().derivedPurchaseList().max(new SubQuery() {
+     *      public void query(Purchase subCB) {
+     *          cb.columnPurchasePrice();
+     *      }
+     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #FD4747">minus</span>(
+     *      cb.<span style="color: #FD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
+     * </pre>
      * @param minusColumn The minus column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
@@ -229,6 +249,16 @@ public class DerivedReferrerOption extends FunctionFilterOption {
 
     /**
      * Multiply the specified column with the multiply column. (*) {Dream Cruise}
+     * <pre>
+     * e.g. (Specify)DerivedReferrer: max(PURCHASE_PRICE) * SERVICE_POINT_COUNT
+     *  MemberCB cb = new MemberCB();
+     *  cb.specify().derivedPurchaseList().max(new SubQuery() {
+     *      public void query(Purchase subCB) {
+     *          cb.columnPurchasePrice();
+     *      }
+     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #FD4747">multiply</span>(
+     *      cb.<span style="color: #FD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
+     * </pre>
      * @param multiplyColumn The multiply column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */
@@ -251,6 +281,16 @@ public class DerivedReferrerOption extends FunctionFilterOption {
 
     /**
      * Divide the specified column with the divide column. (/) {Dream Cruise}
+     * <pre>
+     * e.g. (Specify)DerivedReferrer: max(PURCHASE_PRICE) / SERVICE_POINT_COUNT
+     *  MemberCB cb = new MemberCB();
+     *  cb.specify().derivedPurchaseList().max(new SubQuery() {
+     *      public void query(Purchase subCB) {
+     *          cb.columnPurchasePrice();
+     *      }
+     *  }, ALIAS_..., new DerivedReferrerOption.<span style="color: #FD4747">divide</span>(
+     *      cb.<span style="color: #FD4747">dreamCruiseCB()</span>.specify().specify...().columnServicePointCount()));
+     * </pre>
      * @param divideColumn The divide column specified by your Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */

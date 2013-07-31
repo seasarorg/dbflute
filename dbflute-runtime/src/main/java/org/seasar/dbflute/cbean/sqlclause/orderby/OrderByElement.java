@@ -222,10 +222,11 @@ public class OrderByElement implements Serializable {
                 elseExp = String.valueOf(index);
             }
             sb.append("     else ").append(elseExp).append(ln());
-            sb.append("   end ").append(_ascDesc);
+            sb.append("   end");
         } else {
             sb.append(realAlias);
         }
+        sb.append(" ").append(_ascDesc);
     }
 
     protected void doSetupManualOrderClause(StringBuilder sb, String columnAlias, HpMobCaseWhenElement element) {

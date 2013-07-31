@@ -17,9 +17,11 @@ package org.seasar.dbflute.helper;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import org.seasar.dbflute.exception.ParseDateExpressionFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
@@ -32,18 +34,24 @@ import org.seasar.dbflute.util.DfTypeUtil.ParseDateException;
  * The date which provides you handy manipulations for Date.
  * <pre>
  * e.g.
- * HandyDate date = new HandyDate("2011/11/27 12:34:56.789");
- * date.addDay(1); // 2011/11/<span style="color: #FD4747">28</span> 12:34:56.789
- * date.addMonth(1); // 2011/<span style="color: #FD4747">12</span>/28 12:34:56.789
- * date.moveToDayJust(); // 2011/12/28 <span style="color: #FD4747">00:00:00.000</span>
- * date.moveToMonthTerminal(); // 2011/12/<span style="color: #FD4747">31 23:59:59.999</span>
- * date.isYear(2011); // true
- * if (date.isGreaterThan(toDate("2011/12/30"))) { // true
- *     // 2011/12/31 23:59:59.999
- *     java.util.Date movedDate = date.getDate();
- *     java.sql.Timestamp movedTimestamp = date.getTimestampDate();
- * }
- * calculateDistanceDays(toDate("2011/11/30")); // 3
+ *  HandyDate date = new HandyDate("2011/11/27 12:34:56.789");
+ *  date.addDay(1); // 2011/11/<span style="color: #FD4747">28</span> 12:34:56.789
+ *  date.addMonth(1); // 2011/<span style="color: #FD4747">12</span>/28 12:34:56.789
+ *  date.moveToDayJust(); // 2011/12/28 <span style="color: #FD4747">00:00:00.000</span>
+ *  date.moveToMonthTerminal(); // 2011/12/<span style="color: #FD4747">31 23:59:59.999</span>
+ *  date.isYear(2011); // true
+ *  if (date.isGreaterThan(toDate("2011/12/30"))) { // true
+ *      // 2011/12/31 23:59:59.999
+ *      java.util.Date movedDate = date.getDate();
+ *      java.sql.Timestamp movedTimestamp = date.getTimestampDate();
+ *  }
+ *  date.calculateDistanceDays(toDate("2011/11/30")); // 3
+ * </pre>
+ * The internal calendar uses default time-zone as default. <br />
+ * You can change the time-zone for it.
+ * <pre>
+ * e.g.
+ *  new HandyDate(date).timeZone(timeZone);
  * </pre>
  * @author jflute
  * @since 0.9.9.2A (2011/11/17 Thursday)
@@ -58,11 +66,11 @@ public class HandyDate implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Calendar _cal = Calendar.getInstance();
-    protected int _yearBeginMonth = _cal.getActualMinimum(Calendar.MONTH) + 1; // as default (zero origin headache)
-    protected int _monthBeginDay = _cal.getActualMinimum(Calendar.DAY_OF_MONTH); // as default
-    protected int _dayBeginHour = _cal.getActualMinimum(Calendar.HOUR_OF_DAY); // as default
-    protected int _weekBeginDay = Calendar.SUNDAY; // as default
+    protected final Calendar _cal;
+    protected int _yearBeginMonth;
+    protected int _monthBeginDay;
+    protected int _dayBeginHour;
+    protected int _weekBeginDay;
 
     // *you should also fix clone() when you add attributes 
 
@@ -71,39 +79,84 @@ public class HandyDate implements Serializable {
     //                                                                         ===========
     /**
      * Construct the handy date by the specified date. <br />
-     * The specified date is not changed by this handy date.
+     * The specified date is not changed by this handy date. <br />
+     * <pre>
+     * e.g.
+     *  Date adjusted = new HandyDate(date).addDay(3).getDate();
+     * </pre>
+     * The internal calendar uses default time-zone as default. <br />
+     * You can change the time-zone for it.
+     * <pre>
+     * e.g.
+     *  new HandyDate(date).timeZone(timeZone);
+     * </pre>
      * @param date The instance of the date. (NotNull)
      */
     public HandyDate(Date date) {
         assertConstructorArgumentNotNull("date", date);
+        _cal = createCalendar(null);
+        prepareDefaultBeginAttribute();
         _cal.setTime(date);
     }
 
     /**
-     * Construct the handy date by the string expression.
+     * Construct the handy date by the string expression for the default time-zone.
      * <pre>
      * e.g.
-     * o new HandyDate("2001/01/01"): 2001-01-01 00:00:00.000
-     * o new HandyDate("2001-01-01"): 2001-01-01 00:00:00.000
-     * o new HandyDate("2001/01/01 12:34:56"): 2001-01-01 12:34:56.000
-     * o new HandyDate("2001/01/01 12:34:56.798"): 2001-01-01 12:34:56.789
-     * o new HandyDate("date 20010101"): 2001-01-01
+     *  o new HandyDate("2001/01/01"): 2001-01-01 00:00:00.000
+     *  o new HandyDate("2001-01-01"): 2001-01-01 00:00:00.000
+     *  o new HandyDate("2001/01/01 12:34:56"): 2001-01-01 12:34:56.000
+     *  o new HandyDate("2001/01/01 12:34:56.798"): 2001-01-01 12:34:56.789
+     *  o new HandyDate("date 20010101"): 2001-01-01
      * </pre>
      * @param exp The string expression of the date. (NotNull)
      * @throws ParseDateExpressionFailureException When it fails to parse the expression.
      */
     public HandyDate(String exp) {
         assertConstructorArgumentNotNull("exp", exp);
+        final TimeZone timeZone = null;
+        _cal = createCalendar(timeZone);
+        prepareDefaultBeginAttribute();
         try {
-            _cal.setTime(DfTypeUtil.toDate(exp));
+            _cal.setTime(DfTypeUtil.toDate(exp, timeZone));
         } catch (ParseDateException e) {
             throwParseDateExpressionFailureException(exp, e);
         }
     }
 
     /**
-     * Construct the handy date by the string expression. <br />
-     * e.g. new HandyDate("20010101", "yyyyMMdd"): 2001-01-01 00:00:00.000
+     * Construct the handy date by the string expression for the specified time-zone.
+     * <pre>
+     * e.g.
+     *  TimeZone timeZone = ...
+     *  o new HandyDate("2001/01/01", timeZone): 2001-01-01 00:00:00.000
+     *  o new HandyDate("2001-01-01", timeZone): 2001-01-01 00:00:00.000
+     *  o new HandyDate("2001/01/01 12:34:56", timeZone): 2001-01-01 12:34:56.000
+     *  o new HandyDate("2001/01/01 12:34:56.798", timeZone): 2001-01-01 12:34:56.789
+     *  o new HandyDate("date 20010101", timeZone): 2001-01-01
+     * </pre>
+     * @param exp The string expression of the date. (NotNull)
+     * @param timeZone The time-zone to parse as date and for internal calendar. (NotNull)
+     * @throws ParseDateExpressionFailureException When it fails to parse the expression.
+     */
+    public HandyDate(String exp, TimeZone timeZone) {
+        assertConstructorArgumentNotNull("exp", exp);
+        assertConstructorArgumentNotNull("timeZone", timeZone);
+        _cal = createCalendar(timeZone);
+        prepareDefaultBeginAttribute();
+        try {
+            _cal.setTime(DfTypeUtil.toDate(exp, timeZone));
+        } catch (ParseDateException e) {
+            throwParseDateExpressionFailureException(exp, e);
+        }
+    }
+
+    /**
+     * Construct the handy date by the string expression for the default time-zone. <br />
+     * <pre>
+     * e.g.
+     *  new HandyDate("20010101", "yyyyMMdd"): 2001-01-01 00:00:00.000
+     * </pre>
      * @param exp The string expression of the date. (NotNull)
      * @param pattern The pattern to parse as date. (NotNull)
      * @throws ParseDateExpressionFailureException When it fails to parse the expression.
@@ -111,8 +164,36 @@ public class HandyDate implements Serializable {
     public HandyDate(String exp, String pattern) {
         assertConstructorArgumentNotNull("exp", exp);
         assertConstructorArgumentNotNull("pattern", pattern);
+        final TimeZone timeZone = null;
+        _cal = createCalendar(timeZone);
+        prepareDefaultBeginAttribute();
         try {
-            _cal.setTime(DfTypeUtil.toDate(exp, pattern));
+            _cal.setTime(DfTypeUtil.toDate(exp, pattern, timeZone));
+        } catch (ParseDateException e) {
+            throwParseDateExpressionFailureException(exp, e);
+        }
+    }
+
+    /**
+     * Construct the handy date by the string expression for the specified time-zone. <br />
+     * <pre>
+     * e.g.
+     *  TimeZone timeZone = ...
+     *  new HandyDate("20010101", "yyyyMMdd", timeZone): 2001-01-01 00:00:00.000
+     * </pre>
+     * @param exp The string expression of the date. (NotNull)
+     * @param pattern The pattern to parse as date. (NotNull)
+     * @param timeZone The time-zone to parse as date and for internal calendar. (NotNull)
+     * @throws ParseDateExpressionFailureException When it fails to parse the expression.
+     */
+    public HandyDate(String exp, String pattern, TimeZone timeZone) {
+        assertConstructorArgumentNotNull("exp", exp);
+        assertConstructorArgumentNotNull("pattern", pattern);
+        assertConstructorArgumentNotNull("timeZone", timeZone);
+        _cal = createCalendar(timeZone);
+        prepareDefaultBeginAttribute();
+        try {
+            _cal.setTime(DfTypeUtil.toDate(exp, pattern, timeZone));
         } catch (ParseDateException e) {
             throwParseDateExpressionFailureException(exp, e);
         }
@@ -120,9 +201,26 @@ public class HandyDate implements Serializable {
 
     protected void assertConstructorArgumentNotNull(String name, Object value) {
         if (value == null) {
-            String msg = "The argument '" + name + "' should not be null.";
+            String msg = "The constructor argument '" + name + "' should not be null.";
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    protected Calendar createCalendar(TimeZone timeZone) {
+        final Calendar cal;
+        if (timeZone != null) {
+            cal = Calendar.getInstance(timeZone);
+        } else {
+            cal = Calendar.getInstance(); // default time-zone, locale
+        }
+        return cal;
+    }
+
+    protected void prepareDefaultBeginAttribute() {
+        _yearBeginMonth = _cal.getActualMinimum(Calendar.MONTH) + 1; // as default (zero origin headache)
+        _monthBeginDay = _cal.getActualMinimum(Calendar.DAY_OF_MONTH); // as default
+        _dayBeginHour = _cal.getActualMinimum(Calendar.HOUR_OF_DAY); // as default
+        _weekBeginDay = Calendar.SUNDAY; // as default
     }
 
     protected void throwParseDateExpressionFailureException(String exp, ParseDateException e) {
@@ -132,6 +230,21 @@ public class HandyDate implements Serializable {
         br.addElement(exp);
         final String msg = br.buildExceptionMessage();
         throw new ParseDateExpressionFailureException(msg, e);
+    }
+
+    /**
+     * Set the time-zone to internal calendar. <br />
+     * <pre>
+     * e.g.
+     *  new HandyDate(date).timeZone(timeZone);
+     * </pre>
+     * @param timeZone The time-zone used in internal calendar. (NotNull)
+     * @return this. (NotNull)
+     */
+    public HandyDate timeZone(TimeZone timeZone) {
+        assertArgumentNotNull("timeZone", timeZone);
+        _cal.setTimeZone(timeZone);
+        return this;
     }
 
     // ===================================================================================
@@ -1275,7 +1388,7 @@ public class HandyDate implements Serializable {
      */
     public boolean isYearSameAs(Date date) {
         assertArgumentNotNull("date", date);
-        return getYear() == new HandyDate(date).getYear();
+        return getYear() == prepareCompareDate(date).getYear();
     }
 
     /**
@@ -1321,29 +1434,6 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the year and month of this date same as the year and month of the specified date? <br />
-     * e.g. if 2011/11/27, isMonthOfYearSameAs(toDate("2011/11/01")) is true
-     * @param date The date to compare. (NotNull)
-     * @return The determination, true or false.
-     */
-    public boolean isMonthOfYearSameAs(Date date) {
-        assertArgumentNotNull("date", date);
-        final HandyDate handyDate = new HandyDate(date);
-        return getYear() == handyDate.getYear() && getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
-    }
-
-    /**
-     * Is the year and month of this date same as the year and month of the specified date? <br />
-     * e.g. if 2011/11/27, isMonthOfYearSameAs(new HandyDate("2011/11/01")) is true
-     * @param handyDate The handy date to compare. (NotNull)
-     * @return The determination, true or false.
-     */
-    public boolean isMonthOfYearSameAs(HandyDate handyDate) {
-        assertArgumentNotNull("handyDate", handyDate);
-        return getYear() == handyDate.getYear() && getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
-    }
-
-    /**
      * Is the month of this date same as the month of the specified date? <br />
      * e.g. if 2011/11/27, isMonthSameAs(toDate("2013/11/01")) is true
      * @param date The date to compare. (NotNull)
@@ -1351,7 +1441,7 @@ public class HandyDate implements Serializable {
      */
     public boolean isMonthSameAs(Date date) {
         assertArgumentNotNull("date", date);
-        return getMonthAsOneOrigin() == new HandyDate(date).getMonthAsOneOrigin();
+        return getMonthAsOneOrigin() == prepareCompareDate(date).getMonthAsOneOrigin();
     }
 
     /**
@@ -1363,6 +1453,29 @@ public class HandyDate implements Serializable {
     public boolean isMonthSameAs(HandyDate handyDate) {
         assertArgumentNotNull("handyDate", handyDate);
         return getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
+    }
+
+    /**
+     * Is the year and month of this date same as the specified date? <br />
+     * e.g. if 2011/11/27, isMonthOfYearSameAs(toDate("2011/11/01")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthOfYearSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        final HandyDate handyDate = prepareCompareDate(date);
+        return getYear() == handyDate.getYear() && getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
+    }
+
+    /**
+     * Is the year and month of this date same as the specified date? <br />
+     * e.g. if 2011/11/27, isMonthOfYearSameAs(new HandyDate("2011/11/01")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMonthOfYearSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return getYear() == handyDate.getYear() && getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
     }
 
     /**
@@ -1475,35 +1588,6 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Is the date of this date same as the date of the specified date? <br />
-     * e.g. if 2011/11/27 00:00:00, isDaySameAs(toDate("2011/11/27 12:34:56")) is true
-     * @param date The date to compare. (NotNull)
-     * @return The determination, true or false.
-     */
-    public boolean isDayOfDateSameAs(Date date) {
-        assertArgumentNotNull("date", date);
-        final HandyDate handyDate = new HandyDate(date);
-        final int year = handyDate.getYear();
-        final int month = handyDate.getMonthAsOneOrigin();
-        final int day = handyDate.getDay();
-        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day;
-    }
-
-    /**
-     * Is the date of this date same as the date of the specified date? <br />
-     * e.g. if 2011/11/27 00:00:00, isDaySameAs(new HandyDate("2011/11/27 12:34:56")) is true
-     * @param handyDate The handy date to compare. (NotNull)
-     * @return The determination, true or false.
-     */
-    public boolean isDayOfDateSameAs(HandyDate handyDate) {
-        assertArgumentNotNull("handyDate", handyDate);
-        final int year = handyDate.getYear();
-        final int month = handyDate.getMonthAsOneOrigin();
-        final int day = handyDate.getDay();
-        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day;
-    }
-
-    /**
      * Is the day of this date same as the day of the specified date? <br />
      * e.g. if 2011/11/27, isDaySameAs(toDate("2013/09/27")) is true
      * @param date The date to compare. (NotNull)
@@ -1511,7 +1595,7 @@ public class HandyDate implements Serializable {
      */
     public boolean isDaySameAs(Date date) {
         assertArgumentNotNull("date", date);
-        return getDay() == new HandyDate(date).getDay();
+        return getDay() == prepareCompareDate(date).getDay();
     }
 
     /**
@@ -1523,6 +1607,35 @@ public class HandyDate implements Serializable {
     public boolean isDaySameAs(HandyDate handyDate) {
         assertArgumentNotNull("handyDate", handyDate);
         return getDay() == handyDate.getDay();
+    }
+
+    /**
+     * Is the date and day same as the specified date? <br />
+     * e.g. if 2011/11/27 00:00:00, isDayOfDateSameAs(toDate("2011/11/27 12:34:56")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDayOfDateSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        final HandyDate handyDate = prepareCompareDate(date);
+        final int year = handyDate.getYear();
+        final int month = handyDate.getMonthAsOneOrigin();
+        final int day = handyDate.getDay();
+        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day;
+    }
+
+    /**
+     * Is the date and day same as the specified date? <br />
+     * e.g. if 2011/11/27 00:00:00, isDayOfDateSameAs(new HandyDate("2011/11/27 12:34:56")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isDayOfDateSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        final int year = handyDate.getYear();
+        final int month = handyDate.getMonthAsOneOrigin();
+        final int day = handyDate.getDay();
+        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day;
     }
 
     /**
@@ -1553,6 +1666,67 @@ public class HandyDate implements Serializable {
      */
     public boolean isDay_MonthLastDay() {
         return isDay(_cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+    }
+
+    // -----------------------------------------------------
+    //                                          Confirm Hour
+    //                                          ------------
+    /**
+     * Is the hour of this date same as specified hour? <br />
+     * e.g. if 2011/11/27 12:34:56, isHour(12) is true
+     * @param hour The integer of hour(0-23).
+     * @return The determination, true or false.
+     */
+    public boolean isHour(int hour) {
+        return getHour() == hour;
+    }
+
+    /**
+     * Is the hour of this date same as the hour of the specified date? <br />
+     * e.g. if 2011/11/27, isHourSameAs(toDate("2013/09/27")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isHourSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        return isHourSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the hour of this date same as the hour of the specified date? <br />
+     * e.g. if 2011/11/27, isHourSameAs(new HandyDate("2013/09/27")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isHourSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return getHour() == handyDate.getHour();
+    }
+
+    /**
+     * Is the date and hour same as the specified date? <br />
+     * e.g. if 2011/11/27 12:00:00, isHourOfDateSameAs(toDate("2011/11/27 12:34:56")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isHourOfDateSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        return isHourOfDateSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the date and hour same as the specified date? <br />
+     * e.g. if 2011/11/27 12:00:00, isHourOfDateSameAs(new HandyDate("2011/11/27 12:34:56")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isHourOfDateSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        final int year = handyDate.getYear();
+        final int month = handyDate.getMonthAsOneOrigin();
+        final int day = handyDate.getDay();
+        final int hour = handyDate.getHour();
+        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day && getHour() == hour;
     }
 
     // -----------------------------------------------------
@@ -1648,7 +1822,7 @@ public class HandyDate implements Serializable {
         if (isYearSameAs(date)) {
             return 0;
         }
-        final HandyDate you = new HandyDate(date);
+        final HandyDate you = prepareCompareDate(date);
         return you.getYear() - getYear();
     }
 
@@ -1668,7 +1842,7 @@ public class HandyDate implements Serializable {
         if (isMonthOfYearSameAs(date)) {
             return 0;
         }
-        final HandyDate you = new HandyDate(date);
+        final HandyDate you = prepareCompareDate(date);
         final boolean greater = isGreaterThan(date);
         int countMonths = 0;
         while (true) {
@@ -1702,7 +1876,7 @@ public class HandyDate implements Serializable {
         if (isDayOfDateSameAs(date)) {
             return 0;
         }
-        final HandyDate you = new HandyDate(date);
+        final HandyDate you = prepareCompareDate(date);
         final boolean greater = isGreaterThan(date);
         int countDays = 0;
         while (true) {
@@ -1717,6 +1891,40 @@ public class HandyDate implements Serializable {
             countDays = countDays + plusDays;
         }
         return -1 * countDays; // -1 for greater: plus, less: minus
+    }
+
+    /**
+     * Calculate hour distance between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:00:00(this) and 2013/03/03 12:34:56(argument): 5
+     *  2013/03/03(this) and 2013/04/07(argument): 35
+     *  2013/04/07(this) and 2013/03/03(argument): -35
+     *  2013/03/03(this) and 2014/03/03(argument): 365
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of hour as distance between the two date. (MinusAllowed)
+     */
+    public int calculateDistanceHours(Date date) {
+        assertArgumentNotNull("date", date);
+        if (isHourOfDateSameAs(date)) {
+            return 0;
+        }
+        final HandyDate you = prepareCompareDate(date);
+        final boolean greater = isGreaterThan(date);
+        int countHours = 0;
+        while (true) {
+            if (isHourOfDateSameAs(you)) {
+                break;
+            }
+            final boolean sameAs = isDayOfDateSameAs(you);
+            final int baseHours = sameAs ? getHour() : (greater ? 23 : 0);
+            final int adjustmentHours = sameAs ? 0 : (greater ? 1 : -1);
+            final int plusHours = baseHours - you.getHour() + adjustmentHours;
+            you.addHour(plusHours);
+            countHours = countHours + plusHours;
+        }
+        return -1 * countHours; // -1 for greater: plus, less: minus
     }
 
     /**
@@ -1738,7 +1946,7 @@ public class HandyDate implements Serializable {
             return 0;
         }
         int countDays = 0;
-        final HandyDate you = new HandyDate(date);
+        final HandyDate you = prepareCompareDate(date);
         if (determiner.isBusinessDay(you)) {
             ++countDays;
         }
@@ -2356,6 +2564,122 @@ public class HandyDate implements Serializable {
     }
 
     // ===================================================================================
+    //                                                                          To Display
+    //                                                                          ==========
+    /**
+     * Convert to the display string of the date for the default time-zone.
+     * @param pattern The pattern of date, which can be used at {@link SimpleDateFormat}. (NotNull)
+     * @return The display string of the date. (NotNull)
+     */
+    public String toDisp(String pattern) {
+        assertArgumentNotNull("pattern", pattern);
+        return doConvertToDisp(pattern, _cal.getTimeZone());
+    }
+
+    /**
+     * Convert to the display string of the date for the specified time-zone.
+     * @param pattern The pattern of date, which can be used at {@link SimpleDateFormat}. (NotNull)
+     * @param timeZone The time-zone to format the date. (NotNull)
+     * @return The display string of the date for the time-zone. (NotNull)
+     */
+    public String toDisp(String pattern, TimeZone timeZone) {
+        assertArgumentNotNull("pattern", pattern);
+        assertArgumentNotNull("timeZone", timeZone);
+        return doConvertToDisp(pattern, timeZone);
+    }
+
+    protected String doConvertToDisp(String pattern, TimeZone timeZone) {
+        final Date date = _cal.getTime();
+        final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        if (timeZone != null) {
+            sdf.setTimeZone(timeZone);
+        }
+        return sdf.format(date);
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof HandyDate) {
+            final HandyDate date = (HandyDate) obj;
+            final String pattern = getBasicPattern();
+            return date.toDisp(pattern).equals(toDisp(pattern));
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return toDisp(getBasicPattern()).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return toDisp(getBasicPattern());
+    }
+
+    protected String getBasicPattern() {
+        if (isYear_BeforeChrist()) {
+            return "'BC'yyyy/MM/dd HH:mm:ss.SSS";
+        } else {
+            return "yyyy/MM/dd HH:mm:ss.SSS";
+        }
+    }
+
+    // *clone() is very hard to use (final field problem)
+
+    /**
+     * Copy this date deeply. (original method)
+     * @return The copy instance of this date. (NotNull)
+     */
+    public HandyDate deepCopy() {
+        final HandyDate cloned = createCopyInstance();
+        inheritBeginAttribute(cloned);
+        return cloned;
+    }
+
+    /**
+     * Create new instance for copy.
+     * @return The new instance of this date. (NotNull)
+     */
+    protected HandyDate createCopyInstance() {
+        return createCopyInstance(getDate());
+    }
+
+    /**
+     * Create new instance for copy.
+     * @param date The date for new instance. (NotNull)
+     * @return The new instance of this date. (NotNull)
+     */
+    protected HandyDate createCopyInstance(Date date) {
+        final HandyDate copy = new HandyDate(date);
+        inheritTimeZone(copy);
+        inheritBeginAttribute(copy);
+        return copy;
+    }
+
+    protected void inheritTimeZone(HandyDate copy) {
+        final TimeZone timeZone = _cal.getTimeZone();
+        if (timeZone != null) {
+            copy.timeZone(timeZone);
+        }
+    }
+
+    protected void inheritBeginAttribute(HandyDate cloned) {
+        cloned._yearBeginMonth = _yearBeginMonth;
+        cloned._monthBeginDay = _monthBeginDay;
+        cloned._dayBeginHour = _dayBeginHour;
+        cloned._weekBeginDay = _weekBeginDay;
+    }
+
+    protected HandyDate prepareCompareDate(Date date) { // for internal compare logic
+        return createCopyInstance(date);
+    }
+
+    // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
     protected void assertArgumentNotNull(String name, Object value) {
@@ -2419,73 +2743,5 @@ public class HandyDate implements Serializable {
             String msg = "The argument 'millisecond' should be 0 to 999: " + millisecond;
             throw new IllegalArgumentException(msg);
         }
-    }
-
-    // ===================================================================================
-    //                                                                          To Display
-    //                                                                          ==========
-    /**
-     * Convert to the display string of the date.
-     * @param pattern The pattern of date, which can be used at java.text.SimpleDateFormat. (NotNull)
-     * @return The display string of the date. (NotNull)
-     */
-    public String toDisp(String pattern) {
-        return DfTypeUtil.toString(_cal.getTime(), pattern);
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof HandyDate) {
-            final HandyDate date = (HandyDate) obj;
-            final String pattern = getBasicPattern();
-            return date.toDisp(pattern).equals(toDisp(pattern));
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        final String pattern = getBasicPattern();
-        return pattern.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return DfTypeUtil.toString(_cal.getTime(), getBasicPattern());
-    }
-
-    protected String getBasicPattern() {
-        if (isYear_BeforeChrist()) {
-            return "'BC'yyyy/MM/dd HH:mm:ss.SSS";
-        } else {
-            return "yyyy/MM/dd HH:mm:ss.SSS";
-        }
-    }
-
-    // *clone() is very hard to use (final field problem)
-
-    /**
-     * Copy this date deeply. (original method)
-     * @return The copy instance of this date. (NotNull)
-     */
-    public HandyDate deepCopy() {
-        final HandyDate cloned = newCopyInstance();
-        cloned._yearBeginMonth = _yearBeginMonth;
-        cloned._monthBeginDay = _monthBeginDay;
-        cloned._dayBeginHour = _dayBeginHour;
-        cloned._weekBeginDay = _weekBeginDay;
-        return cloned;
-    }
-
-    /**
-     * Create new instance for copy.
-     * @return The new instance of this date. (NotNull)
-     */
-    protected HandyDate newCopyInstance() {
-        return new HandyDate(getDate());
     }
 }

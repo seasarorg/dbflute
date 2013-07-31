@@ -88,7 +88,9 @@ public class FileTokenizingRowResource {
     }
 
     /**
-     * Get the list of value.
+     * Get the list of value. <br />
+     * The list instance is recycled for next line,
+     * so you cannot save it (or convert it to your object).
      * @return The list of value. (NotNull, NotEmpty in callback)
      */
     public List<String> getValueList() {

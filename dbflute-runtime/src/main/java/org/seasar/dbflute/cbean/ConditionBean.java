@@ -110,6 +110,29 @@ public interface ConditionBean extends PagingBean {
     //                                                                        ============
     /**
      * DBFlute Dreams.
+     * <pre>
+     * e.g. member that purchases products only purchased by the member
+     *  MemberCB cb = new MemberCB();
+     *  cb.specify().columnBirthdate();
+     *  final MemberCB dreamCruiseCB = cb.<span style="color: #FD4747">dreamCruiseCB()</span>;
+     *  cb.query().existsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
+     *      public void query(PurchaseCB subCB) {
+     *          subCB.query().queryProduct().notExistsPurchaseList(new SubQuery&lt;PurchaseCB&gt;() {
+     *              public void query(PurchaseCB subCB) {
+     *                  subCB.columnQuery(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     *                      public void specify(PurchaseCB cb) {
+     *                          cb.specify().columnMemberId();
+     *                      }
+     *                  }).notEqual(new SpecifyQuery&lt;PurchaseCB&gt;() {
+     *                      public void specify(PurchaseCB cb) {
+     *                          cb.<span style="color: #FD4747">overTheWaves</span>(dreamCruiseCB.specify().columnMemberId());
+     *                      }
+     *                  });
+     *              }
+     *          });
+     *      }
+     *  });
+     * </pre>
      * @param dreamCruiseTicket The ticket column specified by your Dream Cruise. (NotNull)
      */
     void overTheWaves(HpSpecifiedColumn dreamCruiseTicket);
@@ -122,8 +145,8 @@ public interface ConditionBean extends PagingBean {
     HpSpecifiedColumn inviteDerivedToDreamCruise(String derivedAlias);
 
     /**
-     * Bon voyage!
-     * @return The created condition-bean for Dream Cruise.
+     * Create condition-bean for dream cruise.
+     * @return The created condition-bean for Dream Cruise. (NotNull)
      */
     ConditionBean xcreateDreamCruiseCB();
 

@@ -315,6 +315,13 @@ public class LikeSearchOption extends SimpleStringOption {
     //                                          ------------
     /**
      * Add compound column connected to main column. {Dream Cruise}
+     * <pre>
+     * e.g. LikeSearch: MEMBER_NAME || MEMBER_ACCOUNT like ...
+     *  MemberCB cb = new MemberCB();
+     *  LikeSearchOption option = new LikeSearchOption().likeContain()
+     *      .<span style="color: #FD4747">addCompoundColumn</span>(cb.<span style="color: #FD4747">dreamCruiseCB()</span>.specify().columnMemberAccount());
+     *  cb.query().setMemberName_LikeSearch("S", option);
+     * </pre>
      * @param compoundColumn The compound column specified by Dream Cruise. (NotNull)
      * @return this. (NotNull)
      */

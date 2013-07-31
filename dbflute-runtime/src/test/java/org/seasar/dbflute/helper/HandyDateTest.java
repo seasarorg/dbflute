@@ -15,6 +15,11 @@
  */
 package org.seasar.dbflute.helper;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 import org.seasar.dbflute.helper.secretary.BusinessDayDeterminer;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
@@ -507,6 +512,15 @@ public class HandyDateTest extends PlainTestCase {
                 }));
     }
 
+    public void test_calculateDistanceHours() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateDistanceHours(toDate("2013/03/03")));
+        assertEquals(12, handy("2013/03/03").calculateDistanceHours(toDate("2013/03/03 12:34:56")));
+        assertEquals(96, handy("2013/03/03").calculateDistanceHours(toDate("2013/03/07")));
+        assertEquals(23, handy("2013/03/03 01:59:59").calculateDistanceHours(toDate("2013/03/04")));
+        assertEquals(-6, handy("2013/03/03 12:34:56").calculateDistanceHours(toDate("2013/03/03 06:00:00")));
+        assertEquals(-30, handy("2013/03/03 12:34:56").calculateDistanceHours(toDate("2013/03/02 06:59:59")));
+    }
+
     public void test_calculateSizeWeekdays() throws Exception {
         assertEquals(0, handy("2013/03/03").calculateSizeWeekdays(toDate("2013/03/03")));
         assertEquals(0, handy("2013/03/03").calculateSizeWeekdays(toDate("2013/03/03 12:34:56")));
@@ -571,6 +585,97 @@ public class HandyDateTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                          To Display
+    //                                                                          ==========
+    public void test_toDisp_TimeZone_GMT_constructor() throws Exception {
+        TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+        HandyDate handyDate = handy("2011/01/01", gmtZone);
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd"));
+        assertEquals("2011-01-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd", gmtZone));
+        assertEquals("2011-01-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", gmtZone));
+        TimeZone japanZone = TimeZone.getTimeZone("Asia/Tokyo");
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd", japanZone));
+        assertEquals("2011-01-01 09:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", japanZone));
+    }
+
+    public void test_toDisp_TimeZone_GMT_later() throws Exception {
+        TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+        HandyDate handyDate = handy(prepareJapanDate("2011/01/01")).timeZone(gmtZone);
+        assertEquals("2010-12-31", handyDate.toDisp("yyyy-MM-dd"));
+        assertEquals("2010-12-31 15:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2010-12-31", handyDate.toDisp("yyyy-MM-dd", gmtZone));
+        assertEquals("2010-12-31 15:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", gmtZone));
+        TimeZone japanZone = TimeZone.getTimeZone("Asia/Tokyo");
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd", japanZone));
+        assertEquals("2011-01-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", japanZone));
+    }
+
+    public void test_toDisp_TimeZone_Japan_constructor() throws Exception {
+        TimeZone japanZone = TimeZone.getTimeZone("Asia/Tokyo");
+        HandyDate handyDate = handy("2011/01/01", japanZone);
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd"));
+        assertEquals("2011-01-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd", japanZone));
+        assertEquals("2011-01-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", japanZone));
+    }
+
+    public void test_toDisp_TimeZone_Japan_later() throws Exception {
+        TimeZone japanZone = TimeZone.getTimeZone("Asia/Tokyo");
+        HandyDate handyDate = handy(prepareJapanDate("2011/01/01")).timeZone(japanZone);
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd"));
+        assertEquals("2011-01-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void test_toDisp_TimeZone_Canada_constructor() throws Exception {
+        TimeZone canadaZone = TimeZone.getTimeZone("Canada/Mountain"); // GMT-07:00, Etc/GMT+7
+        HandyDate handyDate = handy("2011/01/01", canadaZone);
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd"));
+        assertEquals("2011-01-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd", canadaZone));
+        assertEquals("2011-01-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", canadaZone));
+        TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+        assertEquals("2011-01-01", handyDate.toDisp("yyyy-MM-dd", gmtZone));
+        assertEquals("2011-01-01 07:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", gmtZone));
+    }
+
+    public void test_toDisp_TimeZone_Canada_later() throws Exception {
+        TimeZone canadaZone = TimeZone.getTimeZone("Canada/Mountain"); // GMT-07:00, Etc/GMT+7
+        HandyDate handyDate = handy(prepareJapanDate("2011/01/01")).timeZone(canadaZone);
+        assertEquals("2010-12-31", handyDate.toDisp("yyyy-MM-dd"));
+        assertEquals("2010-12-31 08:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2010-12-31", handyDate.toDisp("yyyy-MM-dd", canadaZone));
+        assertEquals("2010-12-31 08:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", canadaZone));
+        TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+        assertEquals("2010-12-31", handyDate.toDisp("yyyy-MM-dd", gmtZone));
+        assertEquals("2010-12-31 15:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", gmtZone));
+    }
+
+    public void test_toDisp_TimeZone_Canada_daylight_constructor() throws Exception {
+        TimeZone canadaZone = TimeZone.getTimeZone("Canada/Mountain"); // GMT-07:00, Etc/GMT+7
+        HandyDate handyDate = handy("2011/07/01", canadaZone).timeZone(canadaZone);
+        assertEquals("2011-07-01", handyDate.toDisp("yyyy-MM-dd"));
+        assertEquals("2011-07-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2011-07-01", handyDate.toDisp("yyyy-MM-dd", canadaZone));
+        assertEquals("2011-07-01 00:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", canadaZone));
+        TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+        assertEquals("2011-07-01", handyDate.toDisp("yyyy-MM-dd", gmtZone));
+        assertEquals("2011-07-01 06:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", gmtZone));
+    }
+
+    public void test_toDisp_TimeZone_Canada_daylight_later() throws Exception {
+        TimeZone canadaZone = TimeZone.getTimeZone("Canada/Mountain"); // GMT-07:00, Etc/GMT+7
+        HandyDate handyDate = handy(prepareJapanDate("2011/07/01")).timeZone(canadaZone);
+        assertEquals("2011-06-30", handyDate.toDisp("yyyy-MM-dd"));
+        assertEquals("2011-06-30 09:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss"));
+        assertEquals("2011-06-30", handyDate.toDisp("yyyy-MM-dd", canadaZone));
+        assertEquals("2011-06-30 09:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", canadaZone));
+        TimeZone gmtZone = TimeZone.getTimeZone("GMT");
+        assertEquals("2011-06-30", handyDate.toDisp("yyyy-MM-dd", gmtZone));
+        assertEquals("2011-06-30 15:00:00", handyDate.toDisp("yyyy-MM-dd HH:mm:ss", gmtZone));
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     public void test_deepCopy_basic() throws Exception {
@@ -597,8 +702,16 @@ public class HandyDateTest extends PlainTestCase {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected HandyDate handy(Date date) {
+        return new HandyDate(date);
+    }
+
     protected HandyDate handy(String exp) {
         return new HandyDate(exp);
+    }
+
+    protected HandyDate handy(String exp, TimeZone timeZone) {
+        return new HandyDate(exp, timeZone);
     }
 
     protected HandyDate year4(String exp) {
@@ -619,5 +732,24 @@ public class HandyDateTest extends PlainTestCase {
 
     protected HandyDate handyRelated(String exp) {
         return new HandyDate(exp).beginYear_Month02_February().beginMonth_Day(3).beginDay_Hour(4);
+    }
+
+    protected Date prepareDate(String exp, String timeZoneId) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        TimeZone japanZone = TimeZone.getTimeZone(timeZoneId);
+        dateFormat.setTimeZone(japanZone);
+        return dateFormat.parse(exp);
+    }
+
+    protected Date prepareGMTDate(String exp) throws ParseException {
+        return prepareDate(exp, "GMT");
+    }
+
+    protected Date prepareJapanDate(String exp) throws ParseException {
+        return prepareDate(exp, "Asia/Tokyo");
+    }
+
+    protected Date prepareCanadaDate(String exp) throws ParseException {
+        return prepareDate(exp, "Canada/Mountain");
     }
 }
