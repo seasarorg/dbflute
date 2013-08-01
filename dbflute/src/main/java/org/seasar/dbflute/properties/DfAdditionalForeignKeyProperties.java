@@ -159,7 +159,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         if (fixedCondition.contains(HpFixedConditionQueryResolver.SQ_BEGIN_MARK)) { // no need to adjust
             return fixedCondition;
         }
-        if (Srl.removeBlockComment(fixedCondition).contains("(")) { // might be sub-query or or-scope
+        if (mightBeSubQueryOrOrScope(fixedCondition)) {
             return fixedCondition;
         }
         final List<String> splitList = Srl.splitList(fixedCondition, lineMark); // not trim
@@ -179,6 +179,11 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
             ++index;
         }
         return sb.toString();
+    }
+
+    protected boolean mightBeSubQueryOrOrScope(String fixedCondition) {
+        final String clause = Srl.removeScope(Srl.removeBlockComment(fixedCondition), "$$over(", ")$$");
+        return clause.contains("(");
     }
 
     protected boolean isFixedConditionIndentFittingTarget(String andMark, int fitSize, String element) {
