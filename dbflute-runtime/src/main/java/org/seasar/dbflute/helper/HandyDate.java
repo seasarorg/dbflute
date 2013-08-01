@@ -252,81 +252,81 @@ public class HandyDate implements Serializable {
     //                                                                            ========
     /**
      * Add years. e.g. addYear(1): 2001/01/01 to <span style="color: #FD4747">2002</span>/01/01
-     * @param year The added count of year. (MinusAllowed: if minus, move back)
+     * @param years The added count of year. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate addYear(int year) {
-        DfTypeUtil.addCalendarYear(_cal, year);
+    public HandyDate addYear(int years) {
+        DfTypeUtil.addCalendarYear(_cal, years);
         return this;
     }
 
     /**
      * Add months. e.g. addMonth(1): 2001/01/01 to 2001/<span style="color: #FD4747">02</span>/01
-     * @param month The added count of month. (MinusAllowed: if minus, move back)
+     * @param months The added count of month. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate addMonth(int month) {
-        DfTypeUtil.addCalendarMonth(_cal, month);
+    public HandyDate addMonth(int months) {
+        DfTypeUtil.addCalendarMonth(_cal, months);
         return this;
     }
 
     /**
      * Add days. e.g. addDay(1): 2001/01/01 to 2001/01/<span style="color: #FD4747">02</span>
-     * @param day The added count of day. (MinusAllowed: if minus, move back)
+     * @param days The added count of day. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate addDay(int day) {
-        DfTypeUtil.addCalendarDay(_cal, day);
+    public HandyDate addDay(int days) {
+        DfTypeUtil.addCalendarDay(_cal, days);
         return this;
     }
 
     /**
      * Add hours. e.g. addHour(1): 2001/01/01 00:00:00 to 2001/01/02 <span style="color: #FD4747">01</span>:00:00
-     * @param hour The added count of hour. (MinusAllowed: if minus, move back)
+     * @param hours The added count of hour. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate addHour(int hour) {
-        DfTypeUtil.addCalendarHour(_cal, hour);
+    public HandyDate addHour(int hours) {
+        DfTypeUtil.addCalendarHour(_cal, hours);
         return this;
     }
 
     /**
      * Add minutes. e.g. addMinute(1): 2001/01/01 00:00:00 to 2001/01/02 00:<span style="color: #FD4747">01</span>:00
-     * @param minute The added count of minute. (MinusAllowed: if minus, move back)
+     * @param minutes The added count of minute. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate addMinute(int minute) {
-        DfTypeUtil.addCalendarMinute(_cal, minute);
+    public HandyDate addMinute(int minutes) {
+        DfTypeUtil.addCalendarMinute(_cal, minutes);
         return this;
     }
 
     /**
      * Add seconds. e.g. addSecond(1): 2001/01/01 00:00:00 to 2001/01/02 00:00:<span style="color: #FD4747">01</span>
-     * @param second The added count of second. (MinusAllowed: if minus, move back)
+     * @param seconds The added count of second. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate addSecond(int second) {
-        DfTypeUtil.addCalendarSecond(_cal, second);
+    public HandyDate addSecond(int seconds) {
+        DfTypeUtil.addCalendarSecond(_cal, seconds);
         return this;
     }
 
     /**
      * Add milliseconds. e.g. addMillisecond(1): 2001/01/01 00:00:00.000 to 2001/01/02 00:00:00.<span style="color: #FD4747">001</span>
-     * @param millisecond The added count of millisecond. (MinusAllowed: if minus, move back)
+     * @param milliseconds The added count of millisecond. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate addMillisecond(int millisecond) {
-        DfTypeUtil.addCalendarMillisecond(_cal, millisecond);
+    public HandyDate addMillisecond(int milliseconds) {
+        DfTypeUtil.addCalendarMillisecond(_cal, milliseconds);
         return this;
     }
 
     /**
      * Add weeks. e.g. addWeek(1): 2001/01/01 to 2001/01/<span style="color: #FD4747">08</span>
-     * @param week The added count of week. (MinusAllowed: if minus, move back)
+     * @param weeks The added count of week. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate addWeek(int week) {
-        DfTypeUtil.addCalendarWeek(_cal, week);
+    public HandyDate addWeek(int weeks) {
+        DfTypeUtil.addCalendarWeek(_cal, weeks);
         return this;
     }
 
@@ -365,11 +365,11 @@ public class HandyDate implements Serializable {
     /**
      * Move to the year just (beginning) after the year added. <br />
      * e.g. moveToYearJustAdded(1): 2011/11/27 12:34:56.789 to 2012/01/01 00:00:00.000
-     * @param year The count added of year. (MinusAllowed: if minus, move back)
+     * @param years The count added of year. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate moveToYearJustAdded(int year) {
-        DfTypeUtil.moveToCalendarYearJustAdded(_cal, year);
+    public HandyDate moveToYearJustAdded(int years) {
+        DfTypeUtil.moveToCalendarYearJustAdded(_cal, years);
         return this;
     }
 
@@ -398,11 +398,11 @@ public class HandyDate implements Serializable {
     /**
      * Move to the terminal of the year after the year added. <br />
      * e.g. moveToYearTerminalAdded(1): 2011/11/27 12:34:56.789 to 2012/12/31 23:59:59.999
-     * @param year The count added of year. (MinusAllowed: if minus, move back)
+     * @param years The count added of year. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate moveToYearTerminalAdded(int year) {
-        DfTypeUtil.moveToCalendarYearTerminalAdded(_cal, year);
+    public HandyDate moveToYearTerminalAdded(int years) {
+        DfTypeUtil.moveToCalendarYearTerminalAdded(_cal, years);
         return this;
     }
 
@@ -446,11 +446,11 @@ public class HandyDate implements Serializable {
     /**
      * Move to the month just (beginning) after the month added. <br />
      * e.g. moveToMonthJustAdded(1): 2011/11/27 12:34:56.789 to 2011/12/01 00:00:00.000
-     * @param month The count added of month. (MinusAllowed: if minus, move back)
+     * @param months The count added of month. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate moveToMonthJustAdded(int month) {
-        DfTypeUtil.moveToCalendarMonthJustAdded(_cal, month);
+    public HandyDate moveToMonthJustAdded(int months) {
+        DfTypeUtil.moveToCalendarMonthJustAdded(_cal, months);
         return this;
     }
 
@@ -480,11 +480,11 @@ public class HandyDate implements Serializable {
     /**
      * Move to the terminal of the month after the month added. <br />
      * e.g. moveToMonthTerminalAdded(1): 2011/11/27 12:34:56.789 to 2011/12/31 23:59:59.999
-     * @param month The count added of month. (MinusAllowed: if minus, move back)
+     * @param months The count added of month. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate moveToMonthTerminalAdded(int month) {
-        DfTypeUtil.moveToCalendarMonthTerminalAdded(_cal, month);
+    public HandyDate moveToMonthTerminalAdded(int months) {
+        DfTypeUtil.moveToCalendarMonthTerminalAdded(_cal, months);
         return this;
     }
 
@@ -590,11 +590,11 @@ public class HandyDate implements Serializable {
     /**
      * Move to the day just (beginning) after the day added. <br />
      * e.g. moveToDayJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/28 00:00:00.000
-     * @param day The count added of day. (MinusAllowed: if minus, move back)
+     * @param days The count added of day. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate moveToDayJustAdded(int day) {
-        DfTypeUtil.moveToCalendarDayJustAdded(_cal, day);
+    public HandyDate moveToDayJustAdded(int days) {
+        DfTypeUtil.moveToCalendarDayJustAdded(_cal, days);
         return this;
     }
 
@@ -623,11 +623,11 @@ public class HandyDate implements Serializable {
     /**
      * Move to the terminal of the day after the day added. <br />
      * e.g. moveToDayJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/28 23:59:59.999
-     * @param day The count added of day. (MinusAllowed: if minus, move back)
+     * @param days The count added of day. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate moveToDayTerminalAdded(int day) {
-        DfTypeUtil.moveToCalendarDayTerminalAdded(_cal, day);
+    public HandyDate moveToDayTerminalAdded(int days) {
+        DfTypeUtil.moveToCalendarDayTerminalAdded(_cal, days);
         return this;
     }
 
@@ -675,11 +675,11 @@ public class HandyDate implements Serializable {
     /**
      * Move to the hour just (beginning) after the hour added. <br />
      * e.g. moveToHourJustAdded(1): 2011/11/27 12:34:56.789 to 2011/11/27 13:00:00.000
-     * @param hour The count added of hour. (MinusAllowed: if minus, move back)
+     * @param hours The count added of hour. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate moveToHourJustAdded(int hour) {
-        DfTypeUtil.moveToCalendarHourJustAdded(_cal, hour);
+    public HandyDate moveToHourJustAdded(int hours) {
+        DfTypeUtil.moveToCalendarHourJustAdded(_cal, hours);
         return this;
     }
 
@@ -708,11 +708,11 @@ public class HandyDate implements Serializable {
     /**
      * Move to the terminal of the hour after the hour added. <br />
      * e.g. moveToHourTerminalAdded(1): 2011/11/27 12:34:56.789 to 2011/11/27 13:59:59.999
-     * @param hour The count added of hour. (MinusAllowed: if minus, move back)
+     * @param hours The count added of hour. (MinusAllowed: if minus, move back)
      * @return this. (NotNull)
      */
-    public HandyDate moveToHourTerminalAdded(int hour) {
-        DfTypeUtil.moveToCalendarHourTerminalAdded(_cal, hour);
+    public HandyDate moveToHourTerminalAdded(int hours) {
+        DfTypeUtil.moveToCalendarHourTerminalAdded(_cal, hours);
         return this;
     }
 
@@ -767,8 +767,8 @@ public class HandyDate implements Serializable {
         return this;
     }
 
-    public HandyDate moveToMinuteJustAdded(int minute) {
-        DfTypeUtil.moveToCalendarMinuteJustAdded(_cal, minute);
+    public HandyDate moveToMinuteJustAdded(int minutes) {
+        DfTypeUtil.moveToCalendarMinuteJustAdded(_cal, minutes);
         return this;
     }
 
@@ -788,8 +788,8 @@ public class HandyDate implements Serializable {
         return this;
     }
 
-    public HandyDate moveToMinuteTerminalÅdded(int minute) {
-        DfTypeUtil.moveToCalendarMinuteTerminalAdded(_cal, minute);
+    public HandyDate moveToMinuteTerminalÅdded(int minutes) {
+        DfTypeUtil.moveToCalendarMinuteTerminalAdded(_cal, minutes);
         return this;
     }
 
@@ -834,8 +834,8 @@ public class HandyDate implements Serializable {
         return this;
     }
 
-    public HandyDate moveToSecondJustAdded(int second) {
-        DfTypeUtil.moveToCalendarSecondJustAdded(_cal, second);
+    public HandyDate moveToSecondJustAdded(int seconds) {
+        DfTypeUtil.moveToCalendarSecondJustAdded(_cal, seconds);
         return this;
     }
 
@@ -849,8 +849,8 @@ public class HandyDate implements Serializable {
         return this;
     }
 
-    public HandyDate moveToSecondTerminalAdded(int second) {
-        DfTypeUtil.moveToCalendarSecondTerminalAdded(_cal, second);
+    public HandyDate moveToSecondTerminalAdded(int seconds) {
+        DfTypeUtil.moveToCalendarSecondTerminalAdded(_cal, seconds);
         return this;
     }
 
@@ -1463,8 +1463,7 @@ public class HandyDate implements Serializable {
      */
     public boolean isMonthOfYearSameAs(Date date) {
         assertArgumentNotNull("date", date);
-        final HandyDate handyDate = prepareCompareDate(date);
-        return getYear() == handyDate.getYear() && getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
+        return isMonthOfYearSameAs(prepareCompareDate(date));
     }
 
     /**
@@ -1475,7 +1474,7 @@ public class HandyDate implements Serializable {
      */
     public boolean isMonthOfYearSameAs(HandyDate handyDate) {
         assertArgumentNotNull("handyDate", handyDate);
-        return getYear() == handyDate.getYear() && getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
+        return isYearSameAs(handyDate) && getMonthAsOneOrigin() == handyDate.getMonthAsOneOrigin();
     }
 
     /**
@@ -1617,11 +1616,7 @@ public class HandyDate implements Serializable {
      */
     public boolean isDayOfDateSameAs(Date date) {
         assertArgumentNotNull("date", date);
-        final HandyDate handyDate = prepareCompareDate(date);
-        final int year = handyDate.getYear();
-        final int month = handyDate.getMonthAsOneOrigin();
-        final int day = handyDate.getDay();
-        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day;
+        return isDayOfDateSameAs(prepareCompareDate(date));
     }
 
     /**
@@ -1632,10 +1627,7 @@ public class HandyDate implements Serializable {
      */
     public boolean isDayOfDateSameAs(HandyDate handyDate) {
         assertArgumentNotNull("handyDate", handyDate);
-        final int year = handyDate.getYear();
-        final int month = handyDate.getMonthAsOneOrigin();
-        final int day = handyDate.getDay();
-        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day;
+        return isMonthOfYearSameAs(handyDate) && getDay() == handyDate.getDay();
     }
 
     /**
@@ -1683,7 +1675,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Is the hour of this date same as the hour of the specified date? <br />
-     * e.g. if 2011/11/27, isHourSameAs(toDate("2013/09/27")) is true
+     * e.g. if 2011/11/27 12:34:56, isHourSameAs(toDate("2013/09/24 12:21:58")) is true
      * @param date The date to compare. (NotNull)
      * @return The determination, true or false.
      */
@@ -1694,7 +1686,7 @@ public class HandyDate implements Serializable {
 
     /**
      * Is the hour of this date same as the hour of the specified date? <br />
-     * e.g. if 2011/11/27, isHourSameAs(new HandyDate("2013/09/27")) is true
+     * e.g. if 2011/11/27 12:34:56, isHourSameAs(new HandyDate("2013/09/24 12:21:58")) is true
      * @param handyDate The handy date to compare. (NotNull)
      * @return The determination, true or false.
      */
@@ -1722,11 +1714,121 @@ public class HandyDate implements Serializable {
      */
     public boolean isHourOfDateSameAs(HandyDate handyDate) {
         assertArgumentNotNull("handyDate", handyDate);
-        final int year = handyDate.getYear();
-        final int month = handyDate.getMonthAsOneOrigin();
-        final int day = handyDate.getDay();
-        final int hour = handyDate.getHour();
-        return getYear() == year && getMonthAsOneOrigin() == month && getDay() == day && getHour() == hour;
+        return isDayOfDateSameAs(handyDate) && getHour() == handyDate.getHour();
+    }
+
+    // -----------------------------------------------------
+    //                                        Confirm Minute
+    //                                        --------------
+    /**
+     * Is the minute of this date same as specified minute? <br />
+     * e.g. if 2011/11/27 12:34:56, isMinute(34) is true
+     * @param minute The integer of minute(0-59).
+     * @return The determination, true or false.
+     */
+    public boolean isMinute(int minute) {
+        return getMinute() == minute;
+    }
+
+    /**
+     * Is the minute of this date same as the minute of the specified date? <br />
+     * e.g. if 2011/11/27 12:34:56, isMinuteSameAs(toDate("2013/09/26 07:34:31")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMinuteSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        return isMinuteSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the minute of this date same as the minute of the specified date? <br />
+     * e.g. if 2011/11/27 12:34:56, isMinuteSameAs(new HandyDate("2013/09/26 07:34:31")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMinuteSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return getMinute() == handyDate.getMinute();
+    }
+
+    /**
+     * Is the date and hour and minute same as the specified date? <br />
+     * e.g. if 2011/11/27 12:34:00, isMinuteOfDateSameAs(toDate("2011/11/27 12:34:56")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMinuteOfDateSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        return isMinuteOfDateSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the date and hour and minute same as the specified date? <br />
+     * e.g. if 2011/11/27 12:34:00, isMinuteOfDateSameAs(new HandyDate("2011/11/27 12:34:56")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isMinuteOfDateSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return isHourOfDateSameAs(handyDate) && getMinute() == handyDate.getMinute();
+    }
+
+    // -----------------------------------------------------
+    //                                        Confirm Second
+    //                                        --------------
+    /**
+     * Is the second of this date same as specified second? <br />
+     * e.g. if 2011/11/27 12:34:56, isSecond(56) is true
+     * @param second The integer of minute(0-59).
+     * @return The determination, true or false.
+     */
+    public boolean isSecond(int second) {
+        return getSecond() == second;
+    }
+
+    /**
+     * Is the second of this date same as the second of the specified date? <br />
+     * e.g. if 2011/11/27 12:34:56.123, isSecondSameAs(toDate("2013/09/26 07:41:56.456")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isSecondSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        return isSecondSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the second of this date same as the second of the specified date? <br />
+     * e.g. if 2011/11/27 12:34:56.123, isSecondSameAs(new HandyDate("2013/09/26 07:34:56.456")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isSecondSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return getSecond() == handyDate.getSecond();
+    }
+
+    /**
+     * Is the date and time same as the specified date? <br />
+     * e.g. if 2011/11/27 12:34:56.123, isSecondOfDateSameAs(toDate("2011/11/27 12:34:56.456")) is true
+     * @param date The date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isSecondOfDateSameAs(Date date) {
+        assertArgumentNotNull("date", date);
+        return isSecondOfDateSameAs(prepareCompareDate(date));
+    }
+
+    /**
+     * Is the date and time same as the specified date? <br />
+     * e.g. if 2011/11/27 12:34:56.123, isSecondOfDateSameAs(new HandyDate("2011/11/27 12:34:56.456")) is true
+     * @param handyDate The handy date to compare. (NotNull)
+     * @return The determination, true or false.
+     */
+    public boolean isSecondOfDateSameAs(HandyDate handyDate) {
+        assertArgumentNotNull("handyDate", handyDate);
+        return isMinuteOfDateSameAs(handyDate) && getSecond() == handyDate.getSecond();
     }
 
     // -----------------------------------------------------
@@ -1807,12 +1909,16 @@ public class HandyDate implements Serializable {
     // ===================================================================================
     //                                                                     Calculate Parts
     //                                                                     ===============
+    // -----------------------------------------------------
+    //                                  (Truncated) Distance
+    //                                  --------------------
     /**
-     * Calculate year distance between two date. <br />
+     * Calculate distance of year between two date. <br />
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2014/03/03(argument): 1
      *  2014/03/03(this) and 2012/03/03(argument): -2
+     *  2013/12/31(this) and 2014/01/01(argument): 1
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as distance between the two date. (MinusAllowed)
@@ -1833,6 +1939,7 @@ public class HandyDate implements Serializable {
      *  2013/03/03(this) and 2013/04/03(argument): 1
      *  2013/03/03(this) and 2013/01/03(argument): -2
      *  2013/03/03(this) and 2014/01/03(argument): 10
+     *  2013/03/31(this) and 2013/04/01(argument): 1
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of month as distance between the two date. (MinusAllowed)
@@ -1867,6 +1974,7 @@ public class HandyDate implements Serializable {
      *  2013/03/03(this) and 2013/04/07(argument): 35
      *  2013/04/07(this) and 2013/03/03(argument): -35
      *  2013/03/03(this) and 2014/03/03(argument): 365
+     *  2013/03/03 23:59:59(this) and 2013/03/07 00:00:00(argument): 4
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of day as distance between the two date. (MinusAllowed)
@@ -1898,9 +2006,9 @@ public class HandyDate implements Serializable {
      * <pre>
      * e.g.
      *  2013/03/03 07:00:00(this) and 2013/03/03 12:34:56(argument): 5
-     *  2013/03/03(this) and 2013/04/07(argument): 35
-     *  2013/04/07(this) and 2013/03/03(argument): -35
-     *  2013/03/03(this) and 2014/03/03(argument): 365
+     *  2013/03/03 12:00:00(this) and 2013/03/03 07:34:56(argument): -5
+     *  2013/03/03 07:00:00(this) and 2013/03/04 14:34:56(argument): 31
+     *  2013/03/03 07:59:59(this) and 2013/03/03 09:00:00(argument): 2
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of hour as distance between the two date. (MinusAllowed)
@@ -1927,6 +2035,192 @@ public class HandyDate implements Serializable {
         return -1 * countHours; // -1 for greater: plus, less: minus
     }
 
+    /**
+     * Calculate minute distance between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:34:00(this) and 2013/03/03 07:57:00(argument): 23
+     *  2013/03/03 07:34:00(this) and 2013/03/03 12:34:00(argument): 300
+     *  2013/03/03 07:34:00(this) and 2013/03/03 07:22:56(argument): -12
+     *  2013/03/03 07:34:59(this) and 2013/03/03 07:36:00(argument): 2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of minute as distance between the two date. (MinusAllowed)
+     */
+    public int calculateDistanceMinutes(Date date) {
+        assertArgumentNotNull("date", date);
+        if (isMinuteOfDateSameAs(date)) {
+            return 0;
+        }
+        final HandyDate you = prepareCompareDate(date);
+        final boolean greater = isGreaterThan(date);
+        int countMinutes = 0;
+        while (true) {
+            if (isMinuteOfDateSameAs(you)) {
+                break;
+            }
+            final boolean sameAs = isHourOfDateSameAs(you);
+            final int baseMinutes = sameAs ? getMinute() : (greater ? 59 : 0);
+            final int adjustmentMinutes = sameAs ? 0 : (greater ? 1 : -1);
+            final int plusMinutes = baseMinutes - you.getMinute() + adjustmentMinutes;
+            you.addMinute(plusMinutes);
+            countMinutes = countMinutes + plusMinutes;
+        }
+        return -1 * countMinutes; // -1 for greater: plus, less: minus
+    }
+
+    /**
+     * Calculate second distance between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:34:22(this) and 2013/03/03 07:34:37(argument): 15
+     *  2013/03/03 07:34:22(this) and 2013/03/03 07:35:24(argument): 62
+     *  2013/03/03 07:34:43(this) and 2013/03/03 07:34:22(argument): -21
+     *  2013/03/03 07:34:56.999(this) and 2013/03/03 07:34.58.000(argument): 2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of second as distance between the two date. (MinusAllowed)
+     */
+    public int calculateDistanceSeconds(Date date) {
+        assertArgumentNotNull("date", date);
+        if (isSecondOfDateSameAs(date)) {
+            return 0;
+        }
+        final HandyDate you = prepareCompareDate(date);
+        final boolean greater = isGreaterThan(date);
+        int countSeconds = 0;
+        while (true) {
+            if (isSecondOfDateSameAs(you)) {
+                break;
+            }
+            final boolean sameAs = isMinuteOfDateSameAs(you);
+            final int baseSeconds = sameAs ? getSecond() : (greater ? 59 : 0);
+            final int adjustmentSeconds = sameAs ? 0 : (greater ? 1 : -1);
+            final int plusSeconds = baseSeconds - you.getSecond() + adjustmentSeconds;
+            you.addSecond(plusSeconds);
+            countSeconds = countSeconds + plusSeconds;
+        }
+        return -1 * countSeconds; // -1 for greater: plus, less: minus
+    }
+
+    /**
+     * Calculate millisecond distance between two date.
+     * <pre>
+     * e.g.
+     *  2013/03/03 07:34:12.123(this) and 2013/03/03 07:34:12.163(argument): 40
+     *  2013/03/03 07:34:12.123(this) and 2013/03/03 07:34:15.163(argument): 3040
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of millisecond as distance between the two date. (MinusAllowed)
+     */
+    public long calculateDistanceMillisecond(Date date) {
+        assertArgumentNotNull("date", date);
+        return date.getTime() - _cal.getTimeInMillis();
+    }
+
+    // -----------------------------------------------------
+    //                                    (Rounded) Distance
+    //                                    ------------------
+    /**
+     * Calculate rounded distance of year between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31(this) and 2014/01/01(argument): 0
+     *  2013/12/31(this) and 2014/07/15(argument): 1
+     *  2014/01/01(this) and 2015/04/01(argument): 1
+     *  2014/01/01(this) and 2015/09/01(argument): 2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of year as rounded distance between the two date. (MinusAllowed)
+     */
+    public int calculateRoundedDistanceYears(Date date) {
+        final int months = calculateRoundedDistanceMonths(date);
+        return (months / 12) + ((months % 12) > 6 ? 1 : 0);
+    }
+
+    /**
+     * Calculate rounded distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/03/20(this) and 2013/04/03(argument): 0
+     *  2013/03/07(this) and 2013/04/03(argument): 1
+     *  2013/03/01(this) and 2013/01/28(argument): 2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of year as rounded distance between the two date. (MinusAllowed)
+     */
+    public int calculateRoundedDistanceMonths(Date date) {
+        final int days = calculateRoundedDistanceDays(date);
+        return (days / 30) + ((days % 30) > 15 ? 1 : 0);
+    }
+
+    /**
+     * Calculate rounded distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31(this) and 2014/01/01(argument): 0
+     *  2013/12/31(this) and 2014/07/01(argument): 1
+     *  2013/01/01(this) and 2014/07/01(argument): 2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of year as rounded distance between the two date. (MinusAllowed)
+     */
+    public int calculateRoundedDistanceDays(Date date) {
+        final int hours = calculateRoundedDistanceHours(date);
+        return (hours / 24) + ((hours % 24) > 12 ? 1 : 0);
+    }
+
+    /**
+     * Calculate rounded distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31(this) and 2014/01/01(argument): 0
+     *  2013/12/31(this) and 2014/07/01(argument): 1
+     *  2013/01/01(this) and 2014/07/01(argument): 2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of year as rounded distance between the two date. (MinusAllowed)
+     */
+    public int calculateRoundedDistanceHours(Date date) {
+        final int hours = calculateRoundedDistanceMinutes(date);
+        return (hours / 60) + ((hours % 60) > 30 ? 1 : 0);
+    }
+
+    /**
+     * Calculate rounded distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31(this) and 2014/01/01(argument): 0
+     *  2013/12/31(this) and 2014/07/01(argument): 1
+     *  2013/01/01(this) and 2014/07/01(argument): 2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of year as rounded distance between the two date. (MinusAllowed)
+     */
+    public int calculateRoundedDistanceMinutes(Date date) {
+        final int hours = calculateRoundedDistanceSeconds(date);
+        return (hours / 60) + ((hours % 60) > 30 ? 1 : 0);
+    }
+
+    /**
+     * Calculate rounded distance of month between two date. <br />
+     * <pre>
+     * e.g.
+     *  2013/12/31(this) and 2014/01/01(argument): 0
+     *  2013/12/31(this) and 2014/07/01(argument): 1
+     *  2013/01/01(this) and 2014/07/01(argument): 2
+     * </pre>
+     * @param date The date to calculate. (NotNull)
+     * @return The count of year as rounded distance between the two date. (MinusAllowed)
+     */
+    public int calculateRoundedDistanceSeconds(Date date) {
+        final long milliseconds = calculateDistanceMillisecond(date);
+        return (int) (milliseconds / 1000) + ((milliseconds % 1000) > 500 ? 1 : 0);
+    }
+
+    // -----------------------------------------------------
+    //                                             Size Days
+    //                                             ---------
     /**
      * Calculate business-day size between two date.
      * <pre>
