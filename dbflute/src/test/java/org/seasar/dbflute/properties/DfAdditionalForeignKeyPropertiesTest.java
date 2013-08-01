@@ -72,7 +72,7 @@ public class DfAdditionalForeignKeyPropertiesTest extends PlainTestCase {
 
         // ## Assert ##
         log(ln() + actual);
-        assertTrue(actual.contains("\\n       and "));
+        assertTrue(actual.contains("\\n     and "));
         assertEquals(1, Srl.count(actual, "\\n"));
     }
 

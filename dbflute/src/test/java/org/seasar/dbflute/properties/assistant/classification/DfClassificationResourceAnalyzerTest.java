@@ -120,7 +120,7 @@ public class DfClassificationResourceAnalyzerTest extends PlainTestCase {
         {
             final DfClassificationTop top = classificationTopList.get(2);
             assertEquals("MemberStatus3", top.getClassificationName());
-            assertEquals("", top.getTopComment());
+            assertEquals(null, top.getTopComment());
             assertNull(top.getRelatedColumnName());
             assertEquals(2, top.getClassificationElementList().size());
             final List<DfClassificationElement> classificationElementList = top.getClassificationElementList();

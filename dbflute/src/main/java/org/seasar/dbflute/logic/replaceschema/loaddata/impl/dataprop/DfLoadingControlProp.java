@@ -380,9 +380,9 @@ public class DfLoadingControlProp {
                     }
                     final Date currentDate = DBFluteSystem.currentDate();
                     registeredTableValue = originDate.getDate();
-                    flTableMap.put(KEY_DISTANCE_YEARS, originDate.calculateDistanceYears(currentDate));
-                    flTableMap.put(KEY_DISTANCE_MONTHS, originDate.calculateDistanceMonths(currentDate));
-                    flTableMap.put(KEY_DISTANCE_DAYS, originDate.calculateDistanceDays(currentDate));
+                    flTableMap.put(KEY_DISTANCE_YEARS, originDate.calculateCalendarDistanceYears(currentDate));
+                    flTableMap.put(KEY_DISTANCE_MONTHS, originDate.calculateCalendarDistanceMonths(currentDate));
+                    flTableMap.put(KEY_DISTANCE_DAYS, originDate.calculateCalendarDistanceDays(currentDate));
                 } else {
                     @SuppressWarnings("unchecked")
                     final Map<String, Object> elementColumnMap = (Map<String, Object>) elementTableValue;

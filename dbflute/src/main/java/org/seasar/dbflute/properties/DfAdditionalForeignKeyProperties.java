@@ -159,7 +159,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         if (fixedCondition.contains(HpFixedConditionQueryResolver.SQ_BEGIN_MARK)) { // no need to adjust
             return fixedCondition;
         }
-        if (fixedCondition.contains("(")) { // cannot adjust (might be sub-query or or-scope)
+        if (Srl.removeBlockComment(fixedCondition).contains("(")) { // might be sub-query or or-scope
             return fixedCondition;
         }
         final List<String> splitList = Srl.splitList(fixedCondition, lineMark); // not trim
