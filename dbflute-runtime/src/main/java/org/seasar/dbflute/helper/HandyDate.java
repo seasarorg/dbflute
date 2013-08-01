@@ -1910,15 +1910,15 @@ public class HandyDate implements Serializable {
     //                                                                     Calculate Parts
     //                                                                     ===============
     // -----------------------------------------------------
-    //                                  (Truncated) Distance
-    //                                  --------------------
+    //                                     Calendar Distance
+    //                                     -----------------
     /**
-     * Calculate distance of year between two date. <br />
+     * Calculate calendar distance of year between two date. <br />
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2014/03/03(argument): 1
      *  2014/03/03(this) and 2012/03/03(argument): -2
-     *  2013/12/31(this) and 2014/01/01(argument): 1
+     *  2013/12/31(this) and 2014/01/01(argument): 1 *attention
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as distance between the two date. (MinusAllowed)
@@ -1933,13 +1933,13 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate month distance between two date. <br />
+     * Calculate calendar distance of month between two date. <br />
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2013/04/03(argument): 1
      *  2013/03/03(this) and 2013/01/03(argument): -2
      *  2013/03/03(this) and 2014/01/03(argument): 10
-     *  2013/03/31(this) and 2013/04/01(argument): 1
+     *  2013/03/31(this) and 2013/04/01(argument): 1 *attention
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of month as distance between the two date. (MinusAllowed)
@@ -1967,14 +1967,14 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate day distance between two date.
+     * Calculate calendar distance of day between two date.
      * <pre>
      * e.g.
      *  2013/03/03(this) and 2013/03/07(argument): 4
      *  2013/03/03(this) and 2013/04/07(argument): 35
      *  2013/04/07(this) and 2013/03/03(argument): -35
      *  2013/03/03(this) and 2014/03/03(argument): 365
-     *  2013/03/03 23:59:59(this) and 2013/03/07 00:00:00(argument): 4
+     *  2013/03/03 23:59:59(this) and 2013/03/07 00:00:00(argument): 4 *attention
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of day as distance between the two date. (MinusAllowed)
@@ -2002,13 +2002,13 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate hour distance between two date.
+     * Calculate calendar distance of hour between two date.
      * <pre>
      * e.g.
      *  2013/03/03 07:00:00(this) and 2013/03/03 12:34:56(argument): 5
      *  2013/03/03 12:00:00(this) and 2013/03/03 07:34:56(argument): -5
      *  2013/03/03 07:00:00(this) and 2013/03/04 14:34:56(argument): 31
-     *  2013/03/03 07:59:59(this) and 2013/03/03 09:00:00(argument): 2
+     *  2013/03/03 07:59:59(this) and 2013/03/03 09:00:00(argument): 2 *attention
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of hour as distance between the two date. (MinusAllowed)
@@ -2036,25 +2036,25 @@ public class HandyDate implements Serializable {
     }
 
     /**
-     * Calculate minute distance between two date.
+     * Calculate calendar distance of minute between two date.
      * <pre>
      * e.g.
      *  2013/03/03 07:34:00(this) and 2013/03/03 07:57:00(argument): 23
      *  2013/03/03 07:34:00(this) and 2013/03/03 12:34:00(argument): 300
      *  2013/03/03 07:34:00(this) and 2013/03/03 07:22:56(argument): -12
-     *  2013/03/03 07:34:59(this) and 2013/03/03 07:36:00(argument): 2
+     *  2013/03/03 07:34:59(this) and 2013/03/03 07:36:00(argument): 2 *attention
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of minute as distance between the two date. (MinusAllowed)
      */
-    public int calculateDistanceMinutes(Date date) {
+    public long calculateDistanceMinutes(Date date) {
         assertArgumentNotNull("date", date);
         if (isMinuteOfDateSameAs(date)) {
             return 0;
         }
         final HandyDate you = prepareCompareDate(date);
         final boolean greater = isGreaterThan(date);
-        int countMinutes = 0;
+        long countMinutes = 0;
         while (true) {
             if (isMinuteOfDateSameAs(you)) {
                 break;
@@ -2064,31 +2064,31 @@ public class HandyDate implements Serializable {
             final int adjustmentMinutes = sameAs ? 0 : (greater ? 1 : -1);
             final int plusMinutes = baseMinutes - you.getMinute() + adjustmentMinutes;
             you.addMinute(plusMinutes);
-            countMinutes = countMinutes + plusMinutes;
+            countMinutes = countMinutes + (long) plusMinutes;
         }
-        return -1 * countMinutes; // -1 for greater: plus, less: minus
+        return -1L * countMinutes; // -1 for greater: plus, less: minus
     }
 
     /**
-     * Calculate second distance between two date.
+     * Calculate calendar distance of second between two date.
      * <pre>
      * e.g.
      *  2013/03/03 07:34:22(this) and 2013/03/03 07:34:37(argument): 15
      *  2013/03/03 07:34:22(this) and 2013/03/03 07:35:24(argument): 62
      *  2013/03/03 07:34:43(this) and 2013/03/03 07:34:22(argument): -21
-     *  2013/03/03 07:34:56.999(this) and 2013/03/03 07:34.58.000(argument): 2
+     *  2013/03/03 07:34:56.999(this) and 2013/03/03 07:34.58.000(argument): 2 *attention
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of second as distance between the two date. (MinusAllowed)
      */
-    public int calculateDistanceSeconds(Date date) {
+    public long calculateDistanceSeconds(Date date) {
         assertArgumentNotNull("date", date);
         if (isSecondOfDateSameAs(date)) {
             return 0;
         }
         final HandyDate you = prepareCompareDate(date);
         final boolean greater = isGreaterThan(date);
-        int countSeconds = 0;
+        long countSeconds = 0L;
         while (true) {
             if (isSecondOfDateSameAs(you)) {
                 break;
@@ -2098,13 +2098,13 @@ public class HandyDate implements Serializable {
             final int adjustmentSeconds = sameAs ? 0 : (greater ? 1 : -1);
             final int plusSeconds = baseSeconds - you.getSecond() + adjustmentSeconds;
             you.addSecond(plusSeconds);
-            countSeconds = countSeconds + plusSeconds;
+            countSeconds = countSeconds + (long) plusSeconds;
         }
-        return -1 * countSeconds; // -1 for greater: plus, less: minus
+        return -1L * countSeconds; // -1 for greater: plus, less: minus
     }
 
     /**
-     * Calculate millisecond distance between two date.
+     * Calculate calendar distance of millisecond between two date.
      * <pre>
      * e.g.
      *  2013/03/03 07:34:12.123(this) and 2013/03/03 07:34:12.163(argument): 40
@@ -2113,14 +2113,14 @@ public class HandyDate implements Serializable {
      * @param date The date to calculate. (NotNull)
      * @return The count of millisecond as distance between the two date. (MinusAllowed)
      */
-    public long calculateDistanceMillisecond(Date date) {
+    public long calculateDistanceMilliseconds(Date date) {
         assertArgumentNotNull("date", date);
         return date.getTime() - _cal.getTimeInMillis();
     }
 
     // -----------------------------------------------------
-    //                                    (Rounded) Distance
-    //                                    ------------------
+    //                                      Rounded Distance
+    //                                      ----------------
     /**
      * Calculate rounded distance of year between two date. <br />
      * <pre>
@@ -2129,6 +2129,7 @@ public class HandyDate implements Serializable {
      *  2013/12/31(this) and 2014/07/15(argument): 1
      *  2014/01/01(this) and 2015/04/01(argument): 1
      *  2014/01/01(this) and 2015/09/01(argument): 2
+     *  2013/03/07(this) and 7099/10/07(argument): 5087
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as rounded distance between the two date. (MinusAllowed)
@@ -2140,27 +2141,43 @@ public class HandyDate implements Serializable {
 
     /**
      * Calculate rounded distance of month between two date. <br />
+     * The distance might have margin of error.
      * <pre>
      * e.g.
      *  2013/03/20(this) and 2013/04/03(argument): 0
      *  2013/03/07(this) and 2013/04/03(argument): 1
      *  2013/03/01(this) and 2013/01/28(argument): 2
+     *  2013/03/01(this) and 2013/08/01(argument): 5
+     *  2013/03/01(this) and 2013/08/31(argument): 6
+     *  2013/03/01(this) and 2033/08/31(argument): 246
+     *  2013/01/01(this) and 3013/01/01(argument): 12000
+     *  2013/01/01(this) and 7013/01/01(argument): 60000
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as rounded distance between the two date. (MinusAllowed)
      */
     public int calculateRoundedDistanceMonths(Date date) {
-        final int days = calculateRoundedDistanceDays(date);
-        return (days / 30) + ((days % 30) > 15 ? 1 : 0);
+        final HandyDate copyInstance = createCopyInstance();
+        final int months = calculateDistanceMonths(date);
+        final int diffDays = copyInstance.addMonth(months).calculateDistanceDays(date);
+        return months + (diffDays > 15 ? 1 : (diffDays < -15 ? -1 : 0));
+
+        // memorable code
+        //final int months = calculateDistanceMonths(date);
+        //final int distance = (days / 30) + ((days % 30) > 15 ? 1 : 0);
+        //final int years = (months / 12);
+        //final int marginOfErrorDays = (years * 5) + (years / 4);
+        //final int marginOfErrorMonths = marginOfErrorDays / 30;
+        //final int ajudstedDistance = distance - marginOfErrorMonths;
+        //return months + (months - ajudstedDistance > 0 ? -1 : (months - ajudstedDistance < 0 ? 1 : 0));
     }
 
     /**
      * Calculate rounded distance of month between two date. <br />
      * <pre>
      * e.g.
-     *  2013/12/31(this) and 2014/01/01(argument): 0
-     *  2013/12/31(this) and 2014/07/01(argument): 1
-     *  2013/01/01(this) and 2014/07/01(argument): 2
+     *  2013/04/01 23:59:59(this) and 2013/04/02 00:00:00(argument): 0
+     *  2013/04/01 10:00:00(this) and 2013/04/02 23:59:59(argument): 2
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as rounded distance between the two date. (MinusAllowed)
@@ -2174,48 +2191,45 @@ public class HandyDate implements Serializable {
      * Calculate rounded distance of month between two date. <br />
      * <pre>
      * e.g.
-     *  2013/12/31(this) and 2014/01/01(argument): 0
-     *  2013/12/31(this) and 2014/07/01(argument): 1
-     *  2013/01/01(this) and 2014/07/01(argument): 2
+     *  2013/12/31 12:34:56(this) and 2013/12/31 13:00:00(argument): 0
+     *  2013/12/31 12:34:56(this) and 2013/12/31 14:10:00(argument): 2
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as rounded distance between the two date. (MinusAllowed)
      */
     public int calculateRoundedDistanceHours(Date date) {
-        final int hours = calculateRoundedDistanceMinutes(date);
-        return (hours / 60) + ((hours % 60) > 30 ? 1 : 0);
+        final long minutes = calculateRoundedDistanceMinutes(date);
+        return (int) (minutes / 60) + ((minutes % 60) > 30 ? 1 : 0); // to integer
     }
 
     /**
      * Calculate rounded distance of month between two date. <br />
      * <pre>
      * e.g.
-     *  2013/12/31(this) and 2014/01/01(argument): 0
-     *  2013/12/31(this) and 2014/07/01(argument): 1
-     *  2013/01/01(this) and 2014/07/01(argument): 2
+     *  2013/12/31 12:34:56(this) and 2013/12/31 12:35:00(argument): 0
+     *  2013/12/31 12:34:56(this) and 2013/12/31 12:37:00(argument): 2
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as rounded distance between the two date. (MinusAllowed)
      */
-    public int calculateRoundedDistanceMinutes(Date date) {
-        final int hours = calculateRoundedDistanceSeconds(date);
-        return (hours / 60) + ((hours % 60) > 30 ? 1 : 0);
+    public long calculateRoundedDistanceMinutes(Date date) {
+        final long seconds = calculateRoundedDistanceSeconds(date);
+        return (seconds / 60L) + ((seconds % 60L) > 30L ? 1L : 0L);
     }
 
     /**
      * Calculate rounded distance of month between two date. <br />
      * <pre>
      * e.g.
-     *  2013/12/31(this) and 2014/01/01(argument): 0
-     *  2013/12/31(this) and 2014/07/01(argument): 1
-     *  2013/01/01(this) and 2014/07/01(argument): 2
+     *  2013/12/31 12:34:56.789(this) and 2013/12/31 12:34:57.000(argument): 0
+     *  2013/12/31 12:34:56.789(this) and 2013/12/31 12:34:58.333(argument): 2
      * </pre>
      * @param date The date to calculate. (NotNull)
      * @return The count of year as rounded distance between the two date. (MinusAllowed)
      */
-    public int calculateRoundedDistanceSeconds(Date date) {
-        final long milliseconds = calculateDistanceMillisecond(date);
-        return (int) (milliseconds / 1000) + ((milliseconds % 1000) > 500 ? 1 : 0);
+    public long calculateRoundedDistanceSeconds(Date date) {
+        final long milliseconds = calculateDistanceMilliseconds(date);
+        return (milliseconds / 1000L) + ((milliseconds % 1000L) > 500L ? 1L : 0L);
     }
 
     // -----------------------------------------------------
