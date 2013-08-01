@@ -463,147 +463,163 @@ public class HandyDateTest extends PlainTestCase {
     // ===================================================================================
     //                                                                     Calculate Parts
     //                                                                     ===============
-    public void test_calculateDistanceYears() throws Exception {
-        assertEquals(0, handy("2013/03/03").calculateDistanceYears(toDate("2013/03/03")));
-        assertEquals(0, handy("2013/03/07").calculateDistanceYears(toDate("2013/03/03")));
-        assertEquals(0, handy("2013/03/07").calculateDistanceYears(toDate("2013/04/03")));
-        assertEquals(1, handy("2013/12/31").calculateDistanceYears(toDate("2014/01/01")));
-        assertEquals(-1, handy("2013/03/07").calculateDistanceYears(toDate("2012/01/03")));
-        assertEquals(1, handy("2013/03/07").calculateDistanceYears(toDate("2014/01/03")));
-        assertEquals(7, handy("2013/03/07").calculateDistanceYears(toDate("2020/01/03")));
-        assertEquals(1000, handy("2013/03/07").calculateDistanceYears(toDate("3013/03/07")));
+    // -----------------------------------------------------
+    //                                     Calendar Distance
+    //                                     -----------------
+    public void test_calculateCalendarDistanceYears() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateCalendarDistanceYears(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/07").calculateCalendarDistanceYears(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/07").calculateCalendarDistanceYears(toDate("2013/04/03")));
+        assertEquals(1, handy("2013/12/31").calculateCalendarDistanceYears(toDate("2014/01/01")));
+        assertEquals(-1, handy("2013/03/07").calculateCalendarDistanceYears(toDate("2012/01/03")));
+        assertEquals(1, handy("2013/03/07").calculateCalendarDistanceYears(toDate("2014/01/03")));
+        assertEquals(7, handy("2013/03/07").calculateCalendarDistanceYears(toDate("2020/01/03")));
+        assertEquals(1000, handy("2013/03/07").calculateCalendarDistanceYears(toDate("3013/03/07")));
     }
 
-    public void test_calculateDistanceMonths() throws Exception {
-        assertEquals(0, handy("2013/03/03").calculateDistanceMonths(toDate("2013/03/03")));
-        assertEquals(0, handy("2013/03/07").calculateDistanceMonths(toDate("2013/03/03")));
-        assertEquals(1, handy("2013/03/07").calculateDistanceMonths(toDate("2013/04/03")));
-        assertEquals(-2, handy("2013/03/07").calculateDistanceMonths(toDate("2013/01/03")));
-        assertEquals(10, handy("2013/03/07").calculateDistanceMonths(toDate("2014/01/03")));
-        assertEquals(1, handy("2013/03/31").calculateDistanceMonths(toDate("2013/04/01")));
-        assertEquals(12000, handy("2013/01/01").calculateDistanceMonths(toDate("3013/01/01")));
+    public void test_calculateCalendarDistanceMonths() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateCalendarDistanceMonths(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/07").calculateCalendarDistanceMonths(toDate("2013/03/03")));
+        assertEquals(1, handy("2013/03/07").calculateCalendarDistanceMonths(toDate("2013/04/03")));
+        assertEquals(-2, handy("2013/03/07").calculateCalendarDistanceMonths(toDate("2013/01/03")));
+        assertEquals(10, handy("2013/03/07").calculateCalendarDistanceMonths(toDate("2014/01/03")));
+        assertEquals(1, handy("2013/03/31").calculateCalendarDistanceMonths(toDate("2013/04/01")));
+        assertEquals(12000, handy("2013/01/01").calculateCalendarDistanceMonths(toDate("3013/01/01")));
     }
 
-    public void test_calculateDistanceDays() throws Exception {
-        assertEquals(0, handy("2013/03/03").calculateDistanceDays(toDate("2013/03/03")));
-        assertEquals(0, handy("2013/03/03").calculateDistanceDays(toDate("2013/03/03 12:34:56")));
-        assertEquals(4, handy("2013/03/03").calculateDistanceDays(toDate("2013/03/07")));
-        assertEquals(35, handy("2013/03/03").calculateDistanceDays(toDate("2013/04/07")));
-        assertEquals(-4, handy("2013/03/07").calculateDistanceDays(toDate("2013/03/03")));
-        assertEquals(-35, handy("2013/04/07").calculateDistanceDays(toDate("2013/03/03")));
-        assertEquals(365, handy("2013/03/03").calculateDistanceDays(toDate("2014/03/03")));
-        assertEquals(400, handy("2013/03/03").calculateDistanceDays(toDate("2014/04/07")));
-        assertEquals(4, handy("2013/03/03 23:59:59").calculateDistanceDays(toDate("2013/03/07")));
+    public void test_calculateCalendarDistanceDays() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateCalendarDistanceDays(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/03").calculateCalendarDistanceDays(toDate("2013/03/03 12:34:56")));
+        assertEquals(4, handy("2013/03/03").calculateCalendarDistanceDays(toDate("2013/03/07")));
+        assertEquals(35, handy("2013/03/03").calculateCalendarDistanceDays(toDate("2013/04/07")));
+        assertEquals(-4, handy("2013/03/07").calculateCalendarDistanceDays(toDate("2013/03/03")));
+        assertEquals(-35, handy("2013/04/07").calculateCalendarDistanceDays(toDate("2013/03/03")));
+        assertEquals(365, handy("2013/03/03").calculateCalendarDistanceDays(toDate("2014/03/03")));
+        assertEquals(400, handy("2013/03/03").calculateCalendarDistanceDays(toDate("2014/04/07")));
+        assertEquals(4, handy("2013/03/03 23:59:59").calculateCalendarDistanceDays(toDate("2013/03/07")));
     }
 
-    public void test_calculateDistanceHours() throws Exception {
-        assertEquals(0, handy("2013/03/03").calculateDistanceHours(toDate("2013/03/03")));
-        assertEquals(12, handy("2013/03/03").calculateDistanceHours(toDate("2013/03/03 12:34:56")));
-        assertEquals(96, handy("2013/03/03").calculateDistanceHours(toDate("2013/03/07")));
-        assertEquals(-5, handy("2013/03/03 12:00:00").calculateDistanceHours(toDate("2013/03/03 07:34:56")));
-        assertEquals(-6, handy("2013/03/03 12:34:56").calculateDistanceHours(toDate("2013/03/03 06:00:00")));
-        assertEquals(-30, handy("2013/03/03 12:34:56").calculateDistanceHours(toDate("2013/03/02 06:59:59")));
-        assertEquals(31, handy("2013/03/03 07:00:00").calculateDistanceHours(toDate("2013/03/04 14:34:56")));
-        assertEquals(23, handy("2013/03/03 01:59:59").calculateDistanceHours(toDate("2013/03/04")));
-        assertEquals(2, handy("2013/03/03 07:59:59").calculateDistanceHours(toDate("2013/03/03 09:00:00")));
+    public void test_calculateCalendarDistanceHours() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateCalendarDistanceHours(toDate("2013/03/03")));
+        assertEquals(12, handy("2013/03/03").calculateCalendarDistanceHours(toDate("2013/03/03 12:34:56")));
+        assertEquals(96, handy("2013/03/03").calculateCalendarDistanceHours(toDate("2013/03/07")));
+        assertEquals(-5, handy("2013/03/03 12:00:00").calculateCalendarDistanceHours(toDate("2013/03/03 07:34:56")));
+        assertEquals(-6, handy("2013/03/03 12:34:56").calculateCalendarDistanceHours(toDate("2013/03/03 06:00:00")));
+        assertEquals(-30, handy("2013/03/03 12:34:56").calculateCalendarDistanceHours(toDate("2013/03/02 06:59:59")));
+        assertEquals(31, handy("2013/03/03 07:00:00").calculateCalendarDistanceHours(toDate("2013/03/04 14:34:56")));
+        assertEquals(23, handy("2013/03/03 01:59:59").calculateCalendarDistanceHours(toDate("2013/03/04")));
+        assertEquals(2, handy("2013/03/03 07:59:59").calculateCalendarDistanceHours(toDate("2013/03/03 09:00:00")));
     }
 
-    public void test_calculateDistanceMinutes() throws Exception {
-        assertEquals(0, handy("2013/03/03").calculateDistanceMinutes(toDate("2013/03/03")));
-        assertEquals(3, handy("2013/03/03 12:34:56").calculateDistanceMinutes(toDate("2013/03/03 12:37:56")));
-        assertEquals(63, handy("2013/03/03 12:34:56").calculateDistanceMinutes(toDate("2013/03/03 13:37:56")));
-        assertEquals(-26, handy("2013/03/03 12:00:00").calculateDistanceMinutes(toDate("2013/03/03 11:34:56")));
-        assertEquals(3, handy("2013/03/03 07:13:59").calculateDistanceMinutes(toDate("2013/03/03 07:16:00")));
+    public void test_calculateCalendarDistanceMinutes() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateCalendarDistanceMinutes(toDate("2013/03/03")));
+        assertEquals(3, handy("2013/03/03 12:34:56").calculateCalendarDistanceMinutes(toDate("2013/03/03 12:37:56")));
+        assertEquals(63, handy("2013/03/03 12:34:56").calculateCalendarDistanceMinutes(toDate("2013/03/03 13:37:56")));
+        assertEquals(-26, handy("2013/03/03 12:00:00").calculateCalendarDistanceMinutes(toDate("2013/03/03 11:34:56")));
+        assertEquals(3, handy("2013/03/03 07:13:59").calculateCalendarDistanceMinutes(toDate("2013/03/03 07:16:00")));
     }
 
-    public void test_calculateDistanceSeconds() throws Exception {
-        assertEquals(0, handy("2013/03/03").calculateDistanceSeconds(toDate("2013/03/03")));
-        assertEquals(3, handy("2013/03/03 12:34:56").calculateDistanceSeconds(toDate("2013/03/03 12:34:59")));
-        assertEquals(65, handy("2013/03/03 12:58:56").calculateDistanceSeconds(toDate("2013/03/03 13:00:01")));
-        assertEquals(-6, handy("2013/03/03 12:34:56").calculateDistanceSeconds(toDate("2013/03/03 12:34:50")));
-        assertEquals(2, handy("2013/03/03 07:13:25.999").calculateDistanceSeconds(toDate("2013/03/03 07:13:27.000")));
+    public void test_calculateCalendarDistanceSeconds() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateCalendarDistanceSeconds(toDate("2013/03/03")));
+        assertEquals(3, handy("2013/03/03 12:34:56").calculateCalendarDistanceSeconds(toDate("2013/03/03 12:34:59")));
+        assertEquals(65, handy("2013/03/03 12:58:56").calculateCalendarDistanceSeconds(toDate("2013/03/03 13:00:01")));
+        assertEquals(-6, handy("2013/03/03 12:34:56").calculateCalendarDistanceSeconds(toDate("2013/03/03 12:34:50")));
+        assertEquals(2,
+                handy("2013/03/03 07:13:25.999").calculateCalendarDistanceSeconds(toDate("2013/03/03 07:13:27.000")));
     }
 
-    public void test_calculateDistanceMilliseconds() throws Exception {
-        assertEquals(1000,
-                handy("2013/03/03 12:34:56.000").calculateDistanceMilliseconds(toDate("2013/03/03 12:34:57.000")));
-        assertEquals(877,
-                handy("2013/03/03 12:34:56.123").calculateDistanceMilliseconds(toDate("2013/03/03 12:34:57.000")));
-        assertEquals(3040,
-                handy("2013/03/03 07:34:12.123").calculateDistanceMilliseconds(toDate("2013/03/03 07:34:15.163")));
+    public void test_calculateCalendarDistanceMilliseconds() throws Exception {
+        assertEquals(
+                1000,
+                handy("2013/03/03 12:34:56.000").calculateCalendarDistanceMilliseconds(
+                        toDate("2013/03/03 12:34:57.000")));
+        assertEquals(
+                877,
+                handy("2013/03/03 12:34:56.123").calculateCalendarDistanceMilliseconds(
+                        toDate("2013/03/03 12:34:57.000")));
+        assertEquals(
+                3040,
+                handy("2013/03/03 07:34:12.123").calculateCalendarDistanceMilliseconds(
+                        toDate("2013/03/03 07:34:15.163")));
     }
 
-    public void test_calculateRoundedDistanceYears() throws Exception {
-        assertEquals(0, handy("2013/03/03").calculateRoundedDistanceYears(toDate("2013/03/03")));
-        assertEquals(0, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2014/01/01")));
-        assertEquals(0, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2014/06/15")));
-        assertEquals(0, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2014/06/30")));
-        assertEquals(0, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2014/07/01")));
-        assertEquals(0, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2014/07/15")));
-        assertEquals(1, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2014/07/16")));
-        assertEquals(1, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2014/08/31")));
-        assertEquals(1, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2015/06/30")));
-        assertEquals(1, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2015/07/01")));
-        assertEquals(1, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2015/07/09")));
-        assertEquals(2, handy("2013/12/31").calculateRoundedDistanceYears(toDate("2015/07/16")));
-        assertEquals(0, handy("2014/01/01").calculateRoundedDistanceYears(toDate("2014/06/15")));
-        assertEquals(0, handy("2014/01/01").calculateRoundedDistanceYears(toDate("2014/06/30")));
-        assertEquals(0, handy("2014/01/01").calculateRoundedDistanceYears(toDate("2014/07/01")));
-        assertEquals(1, handy("2014/01/01").calculateRoundedDistanceYears(toDate("2014/07/17")));
-        assertEquals(1, handy("2014/01/01").calculateRoundedDistanceYears(toDate("2014/08/31")));
-        assertEquals(1, handy("2014/01/01").calculateRoundedDistanceYears(toDate("2015/06/30")));
-        assertEquals(1, handy("2014/01/01").calculateRoundedDistanceYears(toDate("2015/07/01")));
-        assertEquals(2, handy("2013/01/01").calculateRoundedDistanceYears(toDate("2014/12/31")));
-        assertEquals(1, handy("2013/01/01").calculateRoundedDistanceYears(toDate("2014/06/06")));
-        assertEquals(1, handy("2013/01/01").calculateRoundedDistanceYears(toDate("2014/07/01")));
-        assertEquals(1, handy("2013/01/01").calculateRoundedDistanceYears(toDate("2014/07/09")));
-        assertEquals(2, handy("2013/01/01").calculateRoundedDistanceYears(toDate("2014/07/17")));
-        assertEquals(3, handy("2013/01/01").calculateRoundedDistanceYears(toDate("2015/10/01")));
-        assertEquals(1000, handy("2013/03/07").calculateRoundedDistanceYears(toDate("3013/03/07")));
-        assertEquals(5000, handy("2013/03/07").calculateRoundedDistanceYears(toDate("7013/03/07")));
-        assertEquals(5087, handy("2013/03/07").calculateRoundedDistanceYears(toDate("7099/10/07")));
+    // -----------------------------------------------------
+    //                                     Measured Distance
+    //                                     -----------------
+    public void test_calculateMeasuredDistanceYears() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateMeasuredDistanceYears(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2014/01/01")));
+        assertEquals(0, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2014/06/15")));
+        assertEquals(0, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2014/06/30")));
+        assertEquals(0, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2014/07/01")));
+        assertEquals(0, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2014/07/15")));
+        assertEquals(1, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2014/07/16")));
+        assertEquals(1, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2014/08/31")));
+        assertEquals(1, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2015/06/30")));
+        assertEquals(1, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2015/07/01")));
+        assertEquals(1, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2015/07/09")));
+        assertEquals(2, handy("2013/12/31").calculateMeasuredDistanceYears(toDate("2015/07/16")));
+        assertEquals(0, handy("2014/01/01").calculateMeasuredDistanceYears(toDate("2014/06/15")));
+        assertEquals(0, handy("2014/01/01").calculateMeasuredDistanceYears(toDate("2014/06/30")));
+        assertEquals(0, handy("2014/01/01").calculateMeasuredDistanceYears(toDate("2014/07/01")));
+        assertEquals(1, handy("2014/01/01").calculateMeasuredDistanceYears(toDate("2014/07/17")));
+        assertEquals(1, handy("2014/01/01").calculateMeasuredDistanceYears(toDate("2014/08/31")));
+        assertEquals(1, handy("2014/01/01").calculateMeasuredDistanceYears(toDate("2015/06/30")));
+        assertEquals(1, handy("2014/01/01").calculateMeasuredDistanceYears(toDate("2015/07/01")));
+        assertEquals(2, handy("2013/01/01").calculateMeasuredDistanceYears(toDate("2014/12/31")));
+        assertEquals(1, handy("2013/01/01").calculateMeasuredDistanceYears(toDate("2014/06/06")));
+        assertEquals(1, handy("2013/01/01").calculateMeasuredDistanceYears(toDate("2014/07/01")));
+        assertEquals(1, handy("2013/01/01").calculateMeasuredDistanceYears(toDate("2014/07/09")));
+        assertEquals(2, handy("2013/01/01").calculateMeasuredDistanceYears(toDate("2014/07/17")));
+        assertEquals(3, handy("2013/01/01").calculateMeasuredDistanceYears(toDate("2015/10/01")));
+        assertEquals(1000, handy("2013/03/07").calculateMeasuredDistanceYears(toDate("3013/03/07")));
+        assertEquals(5000, handy("2013/03/07").calculateMeasuredDistanceYears(toDate("7013/03/07")));
+        assertEquals(5087, handy("2013/03/07").calculateMeasuredDistanceYears(toDate("7099/10/07")));
     }
 
-    public void test_calculateRoundedDistanceMonths() throws Exception {
-        assertEquals(0, handy("2013/03/03").calculateRoundedDistanceMonths(toDate("2013/03/03")));
-        assertEquals(0, handy("2013/03/07").calculateRoundedDistanceMonths(toDate("2013/03/03")));
-        assertEquals(0, handy("2013/03/20").calculateRoundedDistanceMonths(toDate("2013/04/03")));
-        assertEquals(1, handy("2013/03/07").calculateRoundedDistanceMonths(toDate("2013/04/03")));
-        assertEquals(-1, handy("2013/03/01").calculateRoundedDistanceMonths(toDate("2013/01/28")));
-        assertEquals(5, handy("2013/03/01").calculateRoundedDistanceMonths(toDate("2013/08/01")));
-        assertEquals(6, handy("2013/03/01").calculateRoundedDistanceMonths(toDate("2013/08/31")));
-        assertEquals(30, handy("2013/03/01").calculateRoundedDistanceMonths(toDate("2015/08/31")));
-        assertEquals(246, handy("2013/03/01").calculateRoundedDistanceMonths(toDate("2033/08/31")));
-        assertEquals(12000, handy("2013/01/01").calculateRoundedDistanceMonths(toDate("3013/01/01")));
-        assertEquals(24000, handy("2013/01/01").calculateRoundedDistanceMonths(toDate("4013/01/01")));
-        assertEquals(36000, handy("2013/01/01").calculateRoundedDistanceMonths(toDate("5013/01/01")));
-        assertEquals(60000, handy("2013/01/01").calculateRoundedDistanceMonths(toDate("7013/01/01")));
-        assertEquals(12001, handy("2013/01/01").calculateRoundedDistanceMonths(toDate("3013/01/31")));
+    public void test_calculateMeasuredDistanceMonths() throws Exception {
+        assertEquals(0, handy("2013/03/03").calculateMeasuredDistanceMonths(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/07").calculateMeasuredDistanceMonths(toDate("2013/03/03")));
+        assertEquals(0, handy("2013/03/20").calculateMeasuredDistanceMonths(toDate("2013/04/03")));
+        assertEquals(1, handy("2013/03/07").calculateMeasuredDistanceMonths(toDate("2013/04/03")));
+        assertEquals(-1, handy("2013/03/01").calculateMeasuredDistanceMonths(toDate("2013/01/28")));
+        assertEquals(5, handy("2013/03/01").calculateMeasuredDistanceMonths(toDate("2013/08/01")));
+        assertEquals(6, handy("2013/03/01").calculateMeasuredDistanceMonths(toDate("2013/08/31")));
+        assertEquals(30, handy("2013/03/01").calculateMeasuredDistanceMonths(toDate("2015/08/31")));
+        assertEquals(246, handy("2013/03/01").calculateMeasuredDistanceMonths(toDate("2033/08/31")));
+        assertEquals(12000, handy("2013/01/01").calculateMeasuredDistanceMonths(toDate("3013/01/01")));
+        assertEquals(24000, handy("2013/01/01").calculateMeasuredDistanceMonths(toDate("4013/01/01")));
+        assertEquals(36000, handy("2013/01/01").calculateMeasuredDistanceMonths(toDate("5013/01/01")));
+        assertEquals(60000, handy("2013/01/01").calculateMeasuredDistanceMonths(toDate("7013/01/01")));
+        assertEquals(12001, handy("2013/01/01").calculateMeasuredDistanceMonths(toDate("3013/01/31")));
     }
 
-    public void test_calculateRoundedDistanceDays() throws Exception {
-        assertEquals(0, handy("2013/04/01 23:59:59").calculateRoundedDistanceDays(toDate("2013/04/02 00:00:00")));
-        assertEquals(2, handy("2013/04/01 10:00:00").calculateRoundedDistanceDays(toDate("2013/04/02 23:59:59")));
-        assertEquals(1, handy("2013/04/01 10:00:00").calculateRoundedDistanceDays(toDate("2013/04/01 23:59:59")));
+    public void test_calculateMeasuredDistanceDays() throws Exception {
+        assertEquals(0, handy("2013/04/01 23:59:59").calculateMeasuredDistanceDays(toDate("2013/04/02 00:00:00")));
+        assertEquals(2, handy("2013/04/01 10:00:00").calculateMeasuredDistanceDays(toDate("2013/04/02 23:59:59")));
+        assertEquals(1, handy("2013/04/01 10:00:00").calculateMeasuredDistanceDays(toDate("2013/04/01 23:59:59")));
     }
 
-    public void test_calculateRoundedDistanceHours() throws Exception {
-        assertEquals(0, handy("2013/12/31 12:34:56").calculateRoundedDistanceHours(toDate("2013/12/31 13:00:00")));
-        assertEquals(2, handy("2013/12/31 12:34:56").calculateRoundedDistanceHours(toDate("2013/12/31 14:10:00")));
+    public void test_calculateMeasuredDistanceHours() throws Exception {
+        assertEquals(0, handy("2013/12/31 12:34:56").calculateMeasuredDistanceHours(toDate("2013/12/31 13:00:00")));
+        assertEquals(2, handy("2013/12/31 12:34:56").calculateMeasuredDistanceHours(toDate("2013/12/31 14:10:00")));
     }
 
-    public void test_calculateRoundedDistanceMinutes() throws Exception {
-        assertEquals(0, handy("2013/12/31 12:34:56").calculateRoundedDistanceMinutes(toDate("2013/12/31 12:35:00")));
-        assertEquals(2, handy("2013/12/31 12:34:56").calculateRoundedDistanceMinutes(toDate("2013/12/31 12:37:00")));
+    public void test_calculateMeasuredDistanceMinutes() throws Exception {
+        assertEquals(0, handy("2013/12/31 12:34:56").calculateMeasuredDistanceMinutes(toDate("2013/12/31 12:35:00")));
+        assertEquals(2, handy("2013/12/31 12:34:56").calculateMeasuredDistanceMinutes(toDate("2013/12/31 12:37:00")));
     }
 
     public void test_calculateDistanceSecondsRounded() throws Exception {
         assertEquals(0,
-                handy("2013/12/31 12:34:56.789").calculateRoundedDistanceSeconds(toDate("2013/12/31 12:34:57.000")));
+                handy("2013/12/31 12:34:56.789").calculateMeasuredDistanceSeconds(toDate("2013/12/31 12:34:57.000")));
         assertEquals(2,
-                handy("2013/12/31 12:34:56.789").calculateRoundedDistanceSeconds(toDate("2013/12/31 12:34:58.333")));
+                handy("2013/12/31 12:34:56.789").calculateMeasuredDistanceSeconds(toDate("2013/12/31 12:34:58.333")));
     }
 
+    // -----------------------------------------------------
+    //                                          Size of Days
+    //                                          ------------
     public void test_calculateSizeBusinessDays() throws Exception {
         assertEquals(5,
                 handy("2013/03/14").calculateSizeBusinessDays(toDate("2013/03/21"), new BusinessDayDeterminer() {
