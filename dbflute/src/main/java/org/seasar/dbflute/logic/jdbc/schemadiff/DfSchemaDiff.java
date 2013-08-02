@@ -492,15 +492,8 @@ public class DfSchemaDiff extends DfAbstractDiff {
     }
 
     protected void processColumnDefOrder(Table next, Table previous, DfTableDiff tableDiff) {
-        System.out.println("*@@@@@@@@@@@@@@@@@@@@@@@ processColumnDefOrder(): " + next.getTableDbName() + " : "
-                + _checkColumnDefOrder);
         if (!_checkColumnDefOrder) {
             return;
-        }
-        if (next.getTableDbName().equals("MEMBER")) {
-            System.out.println("***********************************");
-            System.out.println("*********************************** : " + next.getColumnNameCommaString());
-            System.out.println("*********************************** : " + previous.getColumnNameCommaString());
         }
         diffNextPrevious(next, previous, tableDiff, new ColumnDefOrderDiffer());
     }
