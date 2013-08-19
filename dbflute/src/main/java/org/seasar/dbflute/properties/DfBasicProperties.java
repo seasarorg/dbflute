@@ -677,7 +677,15 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
                 throw new DfIllegalPropertySettingException(msg);
             }
         } else { // null
-            _sourceCodeLineSeparator = "\r\n"; // as default but no convert
+            final String defaultLineSeparator;
+            if (isTargetLanguageJava()) {
+                defaultLineSeparator = "\n";
+            } else if (isTargetLanguageCSharp()) {
+                defaultLineSeparator = "\r\n";
+            } else {
+                defaultLineSeparator = "\n";
+            }
+            _sourceCodeLineSeparator = defaultLineSeparator; // as default but no convert
         }
         return _sourceCodeLineSeparator;
     }
