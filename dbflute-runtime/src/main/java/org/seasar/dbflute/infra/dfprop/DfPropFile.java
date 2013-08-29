@@ -290,20 +290,34 @@ public class DfPropFile {
         if (envType != null) {
             final String envPath = deriveEnvPath(dfpropPath, envType);
             map = callReadingMapChecked(handler, envPath);
-            if (map != null) {
+            if (map != null) { // environment driven
+                // dfprop
+                //  |-env
+                //  |  |-foo.dfprop  // *base map
+                //  |  |-foo+.dfprop // if exists
+                //  |-foo.dfprop
+                //  |-foo+.dfprop    // no target
                 resolveOutsidePropInheritMap(handler, envPath, map);
-            } else { // no environment file
+            } else { // top driven in environment
+                // dfprop
+                //  |-env
+                //  |  |-foo+.dfprop // if exists (first priority)
+                //  |-foo.dfprop     // *base map
+                //  |-foo+.dfprop    // if exists (second priority)
                 map = callReadingMapChecked(handler, dfpropPath);
                 if (map != null) {
-                    final boolean envInheritDone = resolveOutsidePropInheritMap(handler, envPath, map);
-                    if (!envInheritDone) {
-                        resolveOutsidePropInheritMap(handler, dfpropPath, map);
-                    }
+                    resolveOutsidePropInheritMap(handler, dfpropPath, map);
+                    resolveOutsidePropInheritMap(handler, envPath, map);
                 }
             }
-        } else {
+        } else { // no environment type
+            // dfprop
+            //  |-env
+            //  |  |-...         // no target
+            //  |-foo.dfprop     // *base map
+            //  |-foo+.dfprop    // if exists
             map = callReadingMapChecked(handler, dfpropPath);
-            if (map != null) {
+            if (map != null) { // top driven without environment
                 resolveOutsidePropInheritMap(handler, dfpropPath, map);
             }
         }

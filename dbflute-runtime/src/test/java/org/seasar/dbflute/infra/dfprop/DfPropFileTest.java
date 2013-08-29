@@ -316,6 +316,57 @@ public class DfPropFileTest extends PlainTestCase {
         assertEquals(map.get("main*"), "mainValue*");
     }
 
+    /**
+     * <pre>
+     * dbflute_exampledb
+     *  |-dfprop
+     *  |  |-maihama
+     *  |  |  |-exampleMap+.dfprop // env
+     *  |  |-exampleMap.dfprop     // main
+     *  |  |-exampleMap+.dfprop    // main+
+     *  
+     * env: maihama
+     * </pre>
+     * @throws Exception
+     */
+    public void test_readMap_InheritStyle_doubleInherit() throws Exception {
+        // ## Arrange ##
+        DfPropFile propFile = new DfPropFile() {
+            @SuppressWarnings("unchecked")
+            @Override
+            protected <ELEMENT> Map<String, ELEMENT> callReadingMapChecked(DfPropReadingMapHandler<ELEMENT> handler,
+                    String path) {
+                Map<String, Object> mockMap = newLinkedHashMap();
+                if ("/dfprop/exampleMap.dfprop".equals(path)) {
+                    mockMap.put("main", "mainValue");
+                    mockMap.put("main*", "mainValue*");
+                } else if ("/dfprop/exampleMap+.dfprop".equals(path)) {
+                    mockMap.put("main+", "mainPlusValue");
+                    mockMap.put("main+*", "mainPlusValue*");
+                } else if ("/dfprop/maihama/exampleMap+.dfprop".equals(path)) {
+                    mockMap.put("main*", "envPlugValue*");
+                    mockMap.put("env+", "envPlusValue");
+                    mockMap.put("main+*", "envPlusValue*");
+                } else {
+                    mockMap = null;
+                }
+                return (Map<String, ELEMENT>) mockMap;
+            }
+        };
+
+        // ## Act ##
+        Map<String, Object> map = propFile.readMap("/dfprop/exampleMap.dfprop", "maihama");
+
+        // ## Assert ##
+        log(map);
+        assertEquals(5, map.size());
+        assertEquals(map.get("main"), "mainValue");
+        assertEquals(map.get("main*"), "envPlugValue*");
+        assertEquals(map.get("main+"), "mainPlusValue");
+        assertEquals(map.get("env+"), "envPlusValue");
+        assertEquals(map.get("main+*"), "envPlusValue*");
+    }
+
     // ===================================================================================
     //                                                                           All Stars
     //                                                                           =========
