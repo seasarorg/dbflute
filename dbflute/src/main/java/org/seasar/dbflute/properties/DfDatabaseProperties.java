@@ -101,13 +101,13 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                               Catalog
     //                                               -------
-    public String getDatabaseCatalog() { // as main catalog
+    public String getDatabaseCatalog() { // as main catalog (closet)
         if (_catalogCacheDone) {
             return _cacheMainCatalog;
         }
         _catalogCacheDone = true;
-
-        final String catalog = _databaseInfo.getDatabaseCatalog(); // It's closet!
+        final String propTitle = "databaseInfoMap#catalog";
+        final String catalog = resolveDispatchVariable(propTitle, _databaseInfo.getDatabaseCatalog());
         _cacheMainCatalog = prepareMainCatalog(catalog, getDatabaseUrl());
         return _cacheMainCatalog;
     }
@@ -145,7 +145,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         if (_cacheMainSchema != null) {
             return _cacheMainSchema;
         }
-        final String schema = _databaseInfo.getDatabaseSchema();
+        final String propTitle = "databaseInfoMap#schema";
+        final String schema = resolveDispatchVariable(propTitle, _databaseInfo.getDatabaseSchema());
         _cacheMainSchema = prepareMainUnifiedSchema(getDatabaseCatalog(), schema);
         return _cacheMainSchema;
     }
