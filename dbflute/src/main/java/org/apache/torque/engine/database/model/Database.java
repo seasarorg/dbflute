@@ -1027,17 +1027,15 @@ public class Database {
      */
     public void checkProperties() {
         final DfBuildProperties prop = getProperties();
-        prop.getCommonColumnProperties().checkDefinition(new DfTableListProvider() {
+        final DfTableListProvider tableListProvider = new DfTableListProvider() {
             public List<Table> provideTableList() {
                 return getTableList();
             }
-        });
-        prop.getOptimisticLockProperties().checkDefinition(new DfTableListProvider() {
-            public List<Table> provideTableList() {
-                return getTableList();
-            }
-        });
-        prop.getSequenceIdentityProperties().checkDefinition(new DfTableDeterminer() {
+        };
+        prop.getCommonColumnProperties().checkDefinition(tableListProvider);
+        prop.getOptimisticLockProperties().checkDefinition(tableListProvider);
+
+        final DfTableDeterminer tableDeterminer = new DfTableDeterminer() {
             public boolean hasTable(String tableName) {
                 return getTable(tableName) != null;
             }
@@ -1048,7 +1046,10 @@ public class Database {
                 }
                 return getTable(tableName).getColumn(columnName) != null;
             }
-        });
+        };
+        prop.getClassificationProperties().checkProperties(tableDeterminer);
+        prop.getSequenceIdentityProperties().checkDefinition(tableDeterminer);
+
         getBasicProperties().checkDirectoryPackage();
     }
 
