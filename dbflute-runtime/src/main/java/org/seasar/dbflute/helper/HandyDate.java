@@ -17,10 +17,12 @@ package org.seasar.dbflute.helper;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.seasar.dbflute.exception.ParseDateExpressionFailureException;
@@ -2917,7 +2919,9 @@ public class HandyDate implements Serializable {
      */
     public String toDisp(String pattern) {
         assertArgumentNotNull("pattern", pattern);
-        return doConvertToDisp(pattern, _cal.getTimeZone());
+        final Date date = _cal.getTime();
+        final DateFormat dateFormat = createDateFormat(pattern, _cal.getTimeZone(), null);
+        return dateFormat.format(date);
     }
 
     /**
@@ -2929,16 +2933,45 @@ public class HandyDate implements Serializable {
     public String toDisp(String pattern, TimeZone timeZone) {
         assertArgumentNotNull("pattern", pattern);
         assertArgumentNotNull("timeZone", timeZone);
-        return doConvertToDisp(pattern, timeZone);
+        final Date date = _cal.getTime();
+        final DateFormat dateFormat = createDateFormat(pattern, timeZone, null);
+        return dateFormat.format(date);
     }
 
-    protected String doConvertToDisp(String pattern, TimeZone timeZone) {
+    /**
+     * Convert to the display string of the date for the specified time-zone.
+     * @param pattern The pattern of date, which can be used at {@link SimpleDateFormat}. (NotNull)
+     * @param timeZone The time-zone to format the date. (NotNull)
+     * @param locale The locale for formatting symbols. (NotNull)
+     * @return The display string of the date for the time-zone. (NotNull)
+     */
+    public String toDisp(String pattern, TimeZone timeZone, Locale locale) {
+        assertArgumentNotNull("pattern", pattern);
+        assertArgumentNotNull("timeZone", timeZone);
+        assertArgumentNotNull("locale", locale);
         final Date date = _cal.getTime();
-        final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-        if (timeZone != null) {
-            sdf.setTimeZone(timeZone);
+        final DateFormat dateFormat = createDateFormat(pattern, timeZone, locale);
+        return dateFormat.format(date);
+    }
+
+    /**
+     * Create the data format for display methods. 
+     * @param pattern The pattern of date, which can be used at {@link SimpleDateFormat}. (NotNull)
+     * @param timeZone The time-zone to format the date. (NullAllowed)
+     * @param locale The locale for formatting symbols. (NullAllowed)
+     * @return The new-created date format. (NotNull)
+     */
+    protected DateFormat createDateFormat(String pattern, TimeZone timeZone, Locale locale) {
+        final SimpleDateFormat dateFormat;
+        if (locale != null) {
+            dateFormat = new SimpleDateFormat(pattern, locale);
+        } else {
+            dateFormat = new SimpleDateFormat(pattern);
         }
-        return sdf.format(date);
+        if (timeZone != null) {
+            dateFormat.setTimeZone(timeZone);
+        }
+        return dateFormat;
     }
 
     // ===================================================================================
