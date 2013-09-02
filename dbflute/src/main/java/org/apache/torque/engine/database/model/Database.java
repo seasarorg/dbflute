@@ -1047,7 +1047,9 @@ public class Database {
                 return getTable(tableName).getColumn(columnName) != null;
             }
         };
-        prop.getClassificationProperties().checkProperties(tableDeterminer);
+        // give up because all mark provides complex structure and also for Sql2Entity case
+        // so cost-benefit performance is low (to suppress degrading is prior)
+        //prop.getClassificationProperties().checkProperties(tableDeterminer);
         prop.getSequenceIdentityProperties().checkDefinition(tableDeterminer);
 
         getBasicProperties().checkDirectoryPackage();

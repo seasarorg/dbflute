@@ -41,7 +41,6 @@ import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.properties.assistant.DfTableDeterminer;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationAllInOneSqlExecutor;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationLiteralArranger;
@@ -1181,62 +1180,70 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // ===================================================================================
     //                                                                    Check Properties
     //                                                                    ================
-    public void checkProperties(DfTableDeterminer determiner) {
-        // check deployment only (table classification is naturally checked when select)
-        final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final Map<String, DfClassificationTop> definitionMap = getClassificationDefinitionMap();
-        final List<String> notFoundTableList = new ArrayList<String>();
-        final List<String> notFoundColumnList = new ArrayList<String>();
-        final List<String> notFoundClsList = new ArrayList<String>();
-        for (Entry<String, Map<String, String>> entry : deploymentMap.entrySet()) {
-            final String tableName = entry.getKey();
-            final boolean allTable = MARK_allColumnClassification.equalsIgnoreCase(tableName);
-            boolean notFoundTable = false;
-            if (!allTable) { // NOT all mark
-                if (!determiner.hasTable(tableName)) {
-                    notFoundTableList.add(tableName);
-                    notFoundTable = true;
-                }
-            }
-            final Map<String, String> columnClsMap = entry.getValue();
-            for (Entry<String, String> columnEntry : columnClsMap.entrySet()) {
-                final String columnName = columnEntry.getKey();
-                if (!allTable && !notFoundTable && !columnName.contains(":")) { // table exists and NOT e.g. prefix:_FLG
-                    if (!determiner.hasTableColumn(tableName, columnName)) {
-                        notFoundColumnList.add(tableName + "." + columnName);
-                    }
-                }
-                final String classificationName = columnEntry.getValue();
-                if (!definitionMap.containsKey(classificationName)) {
-                    notFoundClsList.add(classificationName);
-                }
-            }
-        }
-        if (notFoundTableList.size() + notFoundColumnList.size() + notFoundClsList.size() > 0) {
-            throwClassificationDeploymentMapTableColumnNotFoundException(notFoundTableList, notFoundColumnList,
-                    notFoundClsList);
-        }
-    }
-
-    protected void throwClassificationDeploymentMapTableColumnNotFoundException(List<String> notFoundTableList,
-            List<String> notFoundColumnList, List<String> notFoundClsList) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The table/column on the classification deployment was not found.");
-        br.addItem("NotFound Table");
-        br.addElement(notFoundTableList);
-        br.addItem("NotFound Column");
-        br.addElement(notFoundColumnList);
-        br.addItem("NotFound Classification");
-        br.addElement(notFoundClsList);
-        final String msg = br.buildExceptionMessage();
-        throw new DfClassificationDeploymentMapTableColumnNotFoundException(msg);
-    }
-
-    public static class DfClassificationDeploymentMapTableColumnNotFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public DfClassificationDeploymentMapTableColumnNotFoundException(String msg) {
-            super(msg);
-        }
-    }
+    // give up because all mark provides complex structure and also for Sql2Entity case
+    // so cost-benefit performance is low (to suppress degrading is prior)
+    //public void checkProperties(DfTableDeterminer determiner) {
+    //    // check deployment only (table classification is naturally checked when select)
+    //    final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
+    //    final Map<String, DfClassificationTop> definitionMap = getClassificationDefinitionMap();
+    //    final List<String> notFoundTableList = new ArrayList<String>();
+    //    final List<String> notFoundColumnList = new ArrayList<String>();
+    //    final Set<String> notFoundClsSet = new LinkedHashSet<String>(); // might be duplicate
+    //    for (Entry<String, Map<String, String>> entry : deploymentMap.entrySet()) {
+    //        final String tableName = entry.getKey();
+    //        final boolean pureTableName = isPureTableName(tableName);
+    //        boolean notFoundTable = false;
+    //        if (pureTableName) {
+    //            if (!determiner.hasTable(tableName)) {
+    //                notFoundTableList.add(tableName);
+    //                notFoundTable = true;
+    //            }
+    //        }
+    //        final Map<String, String> columnClsMap = entry.getValue();
+    //        for (Entry<String, String> columnEntry : columnClsMap.entrySet()) {
+    //            final String columnName = columnEntry.getKey();
+    //            final boolean pureColumnName = !columnName.contains(":"); // NOT e.g. prefix:_FLG
+    //            if (pureTableName && !notFoundTable && pureColumnName) {
+    //                if (!determiner.hasTableColumn(tableName, columnName)) {
+    //                    notFoundColumnList.add(tableName + "." + columnName);
+    //                }
+    //            }
+    //            final String classificationName = columnEntry.getValue();
+    //            if (!definitionMap.containsKey(classificationName)) {
+    //                notFoundClsSet.add(classificationName);
+    //            }
+    //        }
+    //    }
+    //    if (notFoundTableList.size() + notFoundColumnList.size() + notFoundClsSet.size() > 0) {
+    //        throwClassificationDeploymentMapTableColumnNotFoundException(notFoundTableList, notFoundColumnList,
+    //                notFoundClsSet);
+    //    }
+    //}
+    //
+    //protected boolean isPureTableName(String tableName) {
+    //    // NOT all and NOT $sql: ...
+    //    return !MARK_allColumnClassification.equalsIgnoreCase(tableName) && !tableName.contains(":");
+    //}
+    //
+    //protected void throwClassificationDeploymentMapTableColumnNotFoundException(List<String> notFoundTableList,
+    //        List<String> notFoundColumnList, Set<String> notFoundClsSet) {
+    //    final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+    //    br.addNotice("The table/column on the classification deployment was not found.");
+    //    br.addItem("NotFound Table");
+    //    br.addElement(notFoundTableList);
+    //    br.addItem("NotFound Column");
+    //    br.addElement(notFoundColumnList);
+    //    br.addItem("NotFound Classification");
+    //    br.addElement(notFoundClsSet);
+    //    final String msg = br.buildExceptionMessage();
+    //    throw new DfClassificationDeploymentMapTableColumnNotFoundException(msg);
+    //}
+    //
+    //public static class DfClassificationDeploymentMapTableColumnNotFoundException extends RuntimeException {
+    //    private static final long serialVersionUID = 1L;
+    //
+    //    public DfClassificationDeploymentMapTableColumnNotFoundException(String msg) {
+    //        super(msg);
+    //    }
+    //}
 }
