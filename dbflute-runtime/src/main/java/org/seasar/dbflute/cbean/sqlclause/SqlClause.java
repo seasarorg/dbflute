@@ -839,6 +839,8 @@ public interface SqlClause {
 
     void checkInvalidQuery();
 
+    void throughInvalidQuery();
+
     /**
      * Get the list of invalid query. (basically for logging)
      * @return The list of invalid query. (NotNull, ReadOnly)

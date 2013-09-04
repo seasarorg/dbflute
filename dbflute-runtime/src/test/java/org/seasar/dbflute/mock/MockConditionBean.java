@@ -260,6 +260,9 @@ public class MockConditionBean implements ConditionBean {
     public void checkInvalidQuery() {
     }
 
+    public void throughInvalidQuery() {
+    }
+
     public HpCBPurpose getPurpose() {
         return null;
     }

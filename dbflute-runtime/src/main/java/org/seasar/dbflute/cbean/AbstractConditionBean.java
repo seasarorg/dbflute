@@ -611,6 +611,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().checkInvalidQuery();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void throughInvalidQuery() {
+        getSqlClause().throughInvalidQuery();
+    }
+
     // ===================================================================================
     //                                                                   Accept PrimaryKey
     //                                                                   =================

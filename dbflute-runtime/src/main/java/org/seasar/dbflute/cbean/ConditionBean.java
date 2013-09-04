@@ -213,6 +213,14 @@ public interface ConditionBean extends PagingBean {
      */
     void checkInvalidQuery();
 
+    /**
+     * Pass through (no check) an invalid query when a query is set. <br />
+     * (no condition if a set query is invalid) <br />
+     * You should call this before registrations of where clause and other queries. <br />
+     * Union and SubQuery and other sub condition-bean inherit this.
+     */
+    void throughInvalidQuery();
+
     // ===================================================================================
     //                                                                      Paging Setting
     //                                                                      ==============
