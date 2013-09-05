@@ -32,7 +32,7 @@ public class SQLExceptionAdviser {
         }
         if (DBDef.MySQL.equals(dbdef)) {
             if (hasMessageHint(sqlEx, "Communications link failure")) {
-                return "And also check the MySQL is booting.";
+                return "And also check the MySQL bootstrap and network.";
             } else if (hasMessageHint(sqlEx, "Field", "doesn't have a default value")) {
                 return "And also check the insert values to not-null columns.";
             } else if (hasMessageHint(sqlEx, "Column", "cannot be null")) {
