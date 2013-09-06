@@ -45,6 +45,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     protected CQ _query; // lazy-loaded
     protected boolean _alreadySpecifiedRequiredColumn; // also means specification existence
     protected Map<String, HpSpecifiedColumn> _specifiedColumnMap; // saves specified columns (lazy-loaded)
+    protected boolean _alreadySpecifiedEveryColumn;
     protected boolean _alreadySpecifiedExceptColumn;
 
     // ===================================================================================
@@ -68,9 +69,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     //                                                                Column Specification
     //                                                                ====================
     protected HpSpecifiedColumn doColumn(String columnName) {
-        if (_alreadySpecifiedExceptColumn) {
-            throwSpecifyColumnAlreadySpecifiedExceptColumnException(columnName);
-        }
+        checkSpecifiedThemeColumnStatus(columnName);
         if (isSpecifiedColumn(columnName)) {
             // returns the same instance as the specified before
             return getSpecifiedColumn(columnName);
@@ -95,6 +94,15 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         sqlClause.specifySelectColumn(specifiedColumn);
         saveSpecifiedColumn(columnName, specifiedColumn);
         return specifiedColumn;
+    }
+
+    protected void checkSpecifiedThemeColumnStatus(String columnName) {
+        if (_alreadySpecifiedEveryColumn) {
+            throwSpecifyColumnAlreadySpecifiedEveryColumnException(columnName);
+        }
+        if (_alreadySpecifiedExceptColumn) {
+            throwSpecifyColumnAlreadySpecifiedExceptColumnException(columnName);
+        }
     }
 
     protected void callQuery() {
@@ -160,6 +168,23 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             return;
         }
         _baseCB.xkeepDreamCruiseJourneyLogBook(relationPath);
+    }
+
+    // ===================================================================================
+    //                                                                        Every Column
+    //                                                                        ============
+    protected void doEveryColumn() {
+        if (hasSpecifiedColumn()) {
+            throwSpecifyEveryColumnAlreadySpecifiedColumnException();
+        }
+        callQuery();
+        final String tableDbName = _query.getTableDbName();
+        final DBMeta dbmeta = _dbmetaProvider.provideDBMeta(tableDbName);
+        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+        for (ColumnInfo columnInfo : columnInfoList) {
+            doColumn(columnInfo.getColumnDbName());
+        }
+        _alreadySpecifiedExceptColumn = true;
     }
 
     // ===================================================================================
@@ -275,9 +300,19 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         createCBExThrower().throwSpecifyColumnWithDerivedReferrerException(_purpose, _baseCB, columnName, referrerName);
     }
 
+    protected void throwSpecifyColumnAlreadySpecifiedEveryColumnException(String columnName) {
+        final String tableDbName = _baseCB.getTableDbName();
+        createCBExThrower().throwSpecifyColumnAlreadySpecifiedEveryColumnException(tableDbName, columnName);
+    }
+
     protected void throwSpecifyColumnAlreadySpecifiedExceptColumnException(String columnName) {
         final String tableDbName = _baseCB.getTableDbName();
         createCBExThrower().throwSpecifyColumnAlreadySpecifiedExceptColumnException(tableDbName, columnName);
+    }
+
+    protected void throwSpecifyEveryColumnAlreadySpecifiedColumnException() {
+        final String tableDbName = _baseCB.getTableDbName();
+        createCBExThrower().throwSpecifyEveryColumnAlreadySpecifiedColumnException(tableDbName, _specifiedColumnMap);
     }
 
     protected void throwSpecifyExceptColumnAlreadySpecifiedColumnException() {

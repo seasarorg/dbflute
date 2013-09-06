@@ -26,7 +26,7 @@ public class ScalarSelectInvalidColumnSpecificationException extends RuntimeExce
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      */
     public ScalarSelectInvalidColumnSpecificationException(String msg) {
         super(msg);
@@ -34,8 +34,8 @@ public class ScalarSelectInvalidColumnSpecificationException extends RuntimeExce
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
+     * @param msg The message of the exception. (NotNull)
+     * @param cause The cause of the exception. (NotNull)
      */
     public ScalarSelectInvalidColumnSpecificationException(String msg, Throwable cause) {
         super(msg, cause);

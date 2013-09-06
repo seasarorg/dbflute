@@ -41,6 +41,7 @@ import org.seasar.dbflute.exception.ScalarConditionUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.ScalarSelectInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.SetupSelectIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifiedDerivedOrderByAliasNameNotFoundException;
+import org.seasar.dbflute.exception.SpecifyColumnAlreadySpecifiedEveryColumnException;
 import org.seasar.dbflute.exception.SpecifyColumnAlreadySpecifiedExceptColumnException;
 import org.seasar.dbflute.exception.SpecifyColumnNotSetupSelectColumnException;
 import org.seasar.dbflute.exception.SpecifyColumnTwoOrMoreColumnException;
@@ -52,6 +53,7 @@ import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecifica
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerSelectAllPossibleException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerTwoOrMoreException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
+import org.seasar.dbflute.exception.SpecifyEveryColumnAlreadySpecifiedColumnException;
 import org.seasar.dbflute.exception.SpecifyExceptColumnAlreadySpecifiedColumnException;
 import org.seasar.dbflute.exception.SpecifyIllegalPurposeException;
 import org.seasar.dbflute.exception.SpecifyRelationIllegalPurposeException;
@@ -264,6 +266,33 @@ public class ConditionBeanExceptionThrower {
         throw new SpecifyColumnWithDerivedReferrerException(msg);
     }
 
+    public void throwSpecifyColumnAlreadySpecifiedEveryColumnException(String tableDbName, String columnName) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The SpecifyColumn is specified after SpecifyEveryColumn.");
+        br.addItem("Advice");
+        br.addElement("You cannot specify columns with every column.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            cb.specify().everyColumn();");
+        br.addElement("            cb.specify().columnMemberName(); // *No");
+        br.addElement("        }");
+        br.addElement("    }");
+        br.addElement("  (o):");
+        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            cb.specify().everyColumn();");
+        br.addElement("        }");
+        br.addElement("    }");
+        br.addItem("Base Table");
+        br.addElement(tableDbName);
+        br.addItem("Specified Column");
+        br.addElement(columnName);
+        final String msg = br.buildExceptionMessage();
+        throw new SpecifyColumnAlreadySpecifiedEveryColumnException(msg);
+    }
+
     public void throwSpecifyColumnAlreadySpecifiedExceptColumnException(String tableDbName, String columnName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The SpecifyColumn is specified after SpecifyExceptColumn.");
@@ -286,6 +315,39 @@ public class ConditionBeanExceptionThrower {
         br.addElement(columnName);
         final String msg = br.buildExceptionMessage();
         throw new SpecifyColumnAlreadySpecifiedExceptColumnException(msg);
+    }
+
+    public void throwSpecifyEveryColumnAlreadySpecifiedColumnException(String tableDbName,
+            Map<String, HpSpecifiedColumn> specifiedColumnMap) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The SpecifyEveryColumn is specified after SpecifyColumn.");
+        br.addItem("Advice");
+        br.addElement("You cannot specify columns with every column.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            cb.specify().columnMemberName();");
+        br.addElement("            cb.specify().everyColumn(); // *No");
+        br.addElement("        }");
+        br.addElement("    }");
+        br.addElement("  (o):");
+        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
+        br.addElement("        public void specify(MemberCB cb) {");
+        br.addElement("            cb.specify().everyColumn();");
+        br.addElement("        }");
+        br.addElement("    }");
+        br.addItem("Base Table");
+        br.addElement(tableDbName);
+        if (specifiedColumnMap != null) { // basically true
+            br.addItem("Specified Column");
+            final Collection<HpSpecifiedColumn> columnList = specifiedColumnMap.values();
+            for (HpSpecifiedColumn column : columnList) {
+                br.addElement(column);
+            }
+        }
+        final String msg = br.buildExceptionMessage();
+        throw new SpecifyEveryColumnAlreadySpecifiedColumnException(msg);
     }
 
     public void throwSpecifyExceptColumnAlreadySpecifiedColumnException(String tableDbName,

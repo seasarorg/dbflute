@@ -32,7 +32,7 @@ public class FetchingOverSafetySizeException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
     public FetchingOverSafetySizeException(String msg, int safetyMaxResultSize) {
@@ -42,7 +42,7 @@ public class FetchingOverSafetySizeException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      * @param cause Throwable. (NullAllowed)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */

@@ -26,7 +26,7 @@ public class PagingPageSizeNotPlusException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      */
     public PagingPageSizeNotPlusException(String msg) {
         super(msg);

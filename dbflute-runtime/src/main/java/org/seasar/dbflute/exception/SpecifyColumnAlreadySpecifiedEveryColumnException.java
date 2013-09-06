@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the purpose of condition-bean is illegal for order-by.
+ * The exception of when the SpecifyColumn is specified after SpecifyEveryColumn.
  * @author jflute
  */
-public class OrderByIllegalPurposeException extends RuntimeException {
+public class SpecifyColumnAlreadySpecifiedEveryColumnException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class OrderByIllegalPurposeException extends RuntimeException {
      * Constructor.
      * @param msg The message of the exception. (NotNull)
      */
-    public OrderByIllegalPurposeException(String msg) {
+    public SpecifyColumnAlreadySpecifiedEveryColumnException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class OrderByIllegalPurposeException extends RuntimeException {
      * @param msg The message of the exception. (NotNull)
      * @param cause The cause of the exception. (NotNull)
      */
-    public OrderByIllegalPurposeException(String msg, Throwable cause) {
+    public SpecifyColumnAlreadySpecifiedEveryColumnException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

@@ -28,7 +28,7 @@ public class EntityAlreadyExistsException extends SQLFailureException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      * @param cause SQLException. (NotNull)
      */
     public EntityAlreadyExistsException(String msg, SQLException cause) {

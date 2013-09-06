@@ -32,7 +32,7 @@ public class PagingOverSafetySizeException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
     public PagingOverSafetySizeException(String msg, int safetyMaxResultSize) {
@@ -42,7 +42,7 @@ public class PagingOverSafetySizeException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      * @param cause Throwable. (NullAllowed)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
@@ -53,7 +53,7 @@ public class PagingOverSafetySizeException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      * @param allRecordCount The count of all records. (NotZero, ZotMinus, GraeterThanMaxSize)
      */
@@ -65,7 +65,7 @@ public class PagingOverSafetySizeException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      * @param cause Throwable. (NullAllowed)
      * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      * @param allRecordCount The count of all records. (NotZero, ZotMinus, GraeterThanMaxSize)

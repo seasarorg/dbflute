@@ -26,7 +26,7 @@ public class MappingClassCastException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      */
     public MappingClassCastException(String msg) {
         super(msg);
@@ -34,7 +34,7 @@ public class MappingClassCastException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      * @param e Exception about class cast. (NotNull)
      */
     public MappingClassCastException(String msg, ClassCastException e) {

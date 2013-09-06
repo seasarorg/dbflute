@@ -33,7 +33,7 @@ public class SelectedCountExceedMaxCountException extends RuntimeException {
     /**
      * Constructor.
      * 
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      * @param maxCount Max count.
      * @param selectedCount Selected count.
      */

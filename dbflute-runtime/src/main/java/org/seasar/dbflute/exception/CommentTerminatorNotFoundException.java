@@ -26,7 +26,7 @@ public class CommentTerminatorNotFoundException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      */
     public CommentTerminatorNotFoundException(String msg) {
         super(msg);

@@ -26,7 +26,7 @@ public class DBMetaNotFoundException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      */
     public DBMetaNotFoundException(String msg) {
         super(msg);

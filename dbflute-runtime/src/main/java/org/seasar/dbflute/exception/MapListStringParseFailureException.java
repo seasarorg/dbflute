@@ -26,7 +26,7 @@ public class MapListStringParseFailureException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      */
     public MapListStringParseFailureException(String msg) {
         super(msg);

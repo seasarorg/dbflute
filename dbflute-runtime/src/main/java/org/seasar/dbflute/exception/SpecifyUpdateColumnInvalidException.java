@@ -26,7 +26,7 @@ public class SpecifyUpdateColumnInvalidException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
+     * @param msg The message of the exception. (NotNull)
      */
     public SpecifyUpdateColumnInvalidException(String msg) {
         super(msg);
@@ -34,8 +34,8 @@ public class SpecifyUpdateColumnInvalidException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
+     * @param msg The message of the exception. (NotNull)
+     * @param cause The cause of the exception. (NotNull)
      */
     public SpecifyUpdateColumnInvalidException(String msg, Throwable cause) {
         super(msg, cause);
