@@ -171,35 +171,38 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     }
 
     // ===================================================================================
-    //                                                                        Every Column
+    //                                                                        Theme Column
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                          Every Column
+    //                                          ------------
     protected void doEveryColumn() {
         if (hasSpecifiedColumn()) {
             throwSpecifyEveryColumnAlreadySpecifiedColumnException();
         }
         callQuery();
-        final String tableDbName = _query.getTableDbName();
-        final DBMeta dbmeta = _dbmetaProvider.provideDBMeta(tableDbName);
-        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+        final boolean specifiedUpdateUse = isSpecifiedUpdateUse();
+        final List<ColumnInfo> columnInfoList = getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
-            doColumn(columnInfo.getColumnDbName());
+            if (!(specifiedUpdateUse && columnInfo.isPrimary())) {
+                doColumn(columnInfo.getColumnDbName());
+            }
         }
-        _alreadySpecifiedExceptColumn = true;
+        _alreadySpecifiedEveryColumn = true;
     }
 
-    // ===================================================================================
-    //                                                                       Except Column
-    //                                                                       =============
+    // -----------------------------------------------------
+    //                                         Except Column
+    //                                         -------------
     protected void doExceptRecordMetaColumn() {
         if (hasSpecifiedColumn()) {
             throwSpecifyExceptColumnAlreadySpecifiedColumnException();
         }
         callQuery();
-        final String tableDbName = _query.getTableDbName();
-        final DBMeta dbmeta = _dbmetaProvider.provideDBMeta(tableDbName);
-        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+        final boolean specifiedUpdateUse = isSpecifiedUpdateUse();
+        final List<ColumnInfo> columnInfoList = getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
-            if (!isRecordMetaColumn(columnInfo)) {
+            if (!isRecordMetaColumn(columnInfo) && !(specifiedUpdateUse && columnInfo.isPrimary())) {
                 doColumn(columnInfo.getColumnDbName());
             }
         }
@@ -208,6 +211,19 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
 
     protected boolean isRecordMetaColumn(ColumnInfo columnInfo) {
         return columnInfo.isCommonColumn() || columnInfo.isOptimisticLock();
+    }
+
+    // -----------------------------------------------------
+    //                                         Assist Helper
+    //                                         -------------
+    protected List<ColumnInfo> getColumnInfoList() {
+        final String tableDbName = _query.getTableDbName();
+        final DBMeta dbmeta = _dbmetaProvider.provideDBMeta(tableDbName);
+        return dbmeta.getColumnInfoList();
+    }
+
+    protected boolean isSpecifiedUpdateUse() {
+        return HpCBPurpose.SPECIFIED_UPDATE.equals(_purpose);
     }
 
     // ===================================================================================
