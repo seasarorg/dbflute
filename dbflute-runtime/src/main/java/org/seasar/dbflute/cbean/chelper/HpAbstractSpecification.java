@@ -184,6 +184,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         final boolean specifiedUpdateUse = isSpecifiedUpdateUse();
         final List<ColumnInfo> columnInfoList = getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
+            // primary key specification in BatchUpdate is not allowed
             if (!(specifiedUpdateUse && columnInfo.isPrimary())) {
                 doColumn(columnInfo.getColumnDbName());
             }
@@ -202,6 +203,7 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         final boolean specifiedUpdateUse = isSpecifiedUpdateUse();
         final List<ColumnInfo> columnInfoList = getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
+            // this specification in BatchUpdate is non-sense but just in case
             if (!isRecordMetaColumn(columnInfo) && !(specifiedUpdateUse && columnInfo.isPrimary())) {
                 doColumn(columnInfo.getColumnDbName());
             }

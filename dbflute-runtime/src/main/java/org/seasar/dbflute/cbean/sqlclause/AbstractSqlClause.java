@@ -58,6 +58,7 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.cbean.sqlclause.query.StringQueryClause;
 import org.seasar.dbflute.cbean.sqlclause.select.SelectedRelationColumn;
+import org.seasar.dbflute.cbean.sqlclause.select.SpecifiedSelectColumnHandler;
 import org.seasar.dbflute.cbean.sqlclause.subquery.SubQueryIndentProcessor;
 import org.seasar.dbflute.cbean.sqlclause.union.UnionClauseProvider;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -2450,6 +2451,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             return false;
         }
         return elementMap.containsKey(columnDbName);
+    }
+
+    public void handleSpecifiedSelectColumn(String tableAliasName, SpecifiedSelectColumnHandler columnHandler) {
+        if (_specifiedSelectColumnMap == null) {
+            return;
+        }
+        final Map<String, HpSpecifiedColumn> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+        if (elementMap == null) {
+            return;
+        }
+        for (HpSpecifiedColumn specifiedColumn : elementMap.values()) {
+            columnHandler.handle(tableAliasName, specifiedColumn);
+        }
     }
 
     public void backupSpecifiedSelectColumn() {

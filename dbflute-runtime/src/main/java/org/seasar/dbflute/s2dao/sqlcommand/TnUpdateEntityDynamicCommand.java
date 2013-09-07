@@ -87,6 +87,7 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         @SuppressWarnings("unchecked")
         final UpdateOption<ConditionBean> option = (UpdateOption<ConditionBean>) args[1];
         option.xcheckSpecifiedUpdateColumnPrimaryKey();
+        option.xcheckSpecifiedUpdateColumnSyncWithModified();
         return option;
     }
 

@@ -40,6 +40,7 @@ import org.seasar.dbflute.cbean.sqlclause.query.QueryClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseFilter;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryUsedAliasInfo;
 import org.seasar.dbflute.cbean.sqlclause.select.SelectedRelationColumn;
+import org.seasar.dbflute.cbean.sqlclause.select.SpecifiedSelectColumnHandler;
 import org.seasar.dbflute.cbean.sqlclause.union.UnionClauseProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
@@ -757,6 +758,13 @@ public interface SqlClause {
      * @return The determination, true or false.
      */
     boolean hasSpecifiedSelectColumn(String tableAliasName, String columnDbName);
+
+    /**
+     * Handle the specified select column in the table.
+     * @param tableAliasName The alias name of table. (NotNull)
+     * @param columnHandler The handler of the specified column. (NotNull)
+     */
+    void handleSpecifiedSelectColumn(String tableAliasName, SpecifiedSelectColumnHandler columnHandler);
 
     /**
      * Back up specified select columns.
