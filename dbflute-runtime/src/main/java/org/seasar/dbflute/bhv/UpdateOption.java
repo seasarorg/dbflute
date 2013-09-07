@@ -32,7 +32,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.exception.SpecifyUpdateColumnInvalidException;
-import org.seasar.dbflute.exception.SpecifyUpdateColumnModifiedPropertiesNotSpecifiedException;
+import org.seasar.dbflute.exception.SpecifyUpdateColumnModifiedPropertyNotSpecifiedException;
 import org.seasar.dbflute.exception.SpecifyUpdateColumnNotModifiedPropertyException;
 import org.seasar.dbflute.exception.VaryingUpdateCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.VaryingUpdateCommonColumnSpecificationException;
@@ -379,18 +379,32 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         }
         assertUpdateColumnSpecifiedCB();
         final CB cb = _updateColumnSpecifiedCB;
-        final DBMeta dbmeta = cb.getDBMeta();
-        final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
+        if (!cb.hasSpecifiedColumn()) { // no specification
+            return; // no check as default all columns
+        }
         final Set<String> modifiedProperties = _updateColumnModifiedProperties;
+        doCheckSpecifiedUpdateColumnModifiedPropertyNotSpecified(cb, modifiedProperties);
+        if (!cb.localSp().isSpecifiedEveryColumn()) { // not every column
+            doCheckSpecifiedUpdateColumnNotModifiedProperty(cb, modifiedProperties);
+        }
+    }
+
+    protected void doCheckSpecifiedUpdateColumnModifiedPropertyNotSpecified(CB cb, Set<String> modifiedProperties) {
+        final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
+        final DBMeta dbmeta = cb.getDBMeta();
         for (String prop : modifiedProperties) {
             final ColumnInfo columnInfo = dbmeta.findColumnInfo(prop);
             if (columnInfo.isPrimary()) { // primary key is out of check
                 continue;
             }
             if (!cb.getSqlClause().hasSpecifiedSelectColumn(basePointAliasName, columnInfo.getColumnDbName())) {
-                throwSpecifyUpdateColumnModifiedPropertiesNotSpecifiedException(modifiedProperties, columnInfo);
+                throwSpecifyUpdateColumnModifiedPropertyNotSpecifiedException(modifiedProperties, columnInfo);
             }
         }
+    }
+
+    protected void doCheckSpecifiedUpdateColumnNotModifiedProperty(CB cb, final Set<String> modifiedProperties) {
+        final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
         cb.getSqlClause().handleSpecifiedSelectColumn(basePointAliasName, new SpecifiedSelectColumnHandler() {
             public void handle(String tableAliasName, HpSpecifiedColumn specifiedColumn) {
                 final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
@@ -404,13 +418,13 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         });
     }
 
-    protected void throwSpecifyUpdateColumnModifiedPropertiesNotSpecifiedException(Set<String> modifiedProperties,
+    protected void throwSpecifyUpdateColumnModifiedPropertyNotSpecifiedException(Set<String> modifiedProperties,
             ColumnInfo columnInfo) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The modified property in the entity is not specified as update column.");
+        br.addNotice("The modified property in the entities is not specified as update column.");
         br.addItem("Advice");
-        br.addElement("You should specify the column in your specify-query.");
-        br.addElement("(At least one modification should exist in the entities)");
+        br.addElement("You should specify the column in your specify-query,");
+        br.addElement("which is modified in any entities (at least one entity).");
         br.addElement("For example:");
         br.addElement("");
         br.addElement("  (x): (BatchUpdate)");
@@ -441,7 +455,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         br.addItem("NotSpecified Modified Property");
         br.addElement(columnInfo.getPropertyName());
         final String msg = br.buildExceptionMessage();
-        throw new SpecifyUpdateColumnModifiedPropertiesNotSpecifiedException(msg);
+        throw new SpecifyUpdateColumnModifiedPropertyNotSpecifiedException(msg);
     }
 
     protected void throwSpecifyUpdateColumnNotModifiedPropertyException(Set<String> modifiedProperties,
@@ -450,7 +464,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         br.addNotice("The specified update column is not modified property.");
         br.addItem("Advice");
         br.addElement("Is is unnecessary specification?");
-        br.addElement("(At least one modification should exist in the entities)");
+        br.addElement("At least one modification should exist in any entities.");
         br.addElement("For example:");
         br.addElement("");
         br.addElement("  (x): (BatchUpdate)");

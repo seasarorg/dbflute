@@ -24,6 +24,7 @@ import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.chelper.HpColumnSpHandler;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
@@ -79,6 +80,14 @@ public class MockConditionBean implements ConditionBean {
     }
 
     public boolean isSelectCountIgnoreFetchScope() {
+        return false;
+    }
+
+    public HpColumnSpHandler localSp() {
+        return null;
+    }
+
+    public boolean hasSpecifiedColumn() {
         return false;
     }
 

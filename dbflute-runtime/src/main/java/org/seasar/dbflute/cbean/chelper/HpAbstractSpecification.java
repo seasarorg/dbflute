@@ -32,7 +32,7 @@ import org.seasar.dbflute.resource.DBFluteSystem;
  * @author jflute
  * @param <CQ> The type of condition-query.
  */
-public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
+public abstract class HpAbstractSpecification<CQ extends ConditionQuery> implements HpColumnSpHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -68,7 +68,11 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     // ===================================================================================
     //                                                                Column Specification
     //                                                                ====================
-    protected HpSpecifiedColumn doColumn(String columnName) {
+    public HpSpecifiedColumn specifyColumn(String columnName) { // for interface
+        return doColumn(columnName);
+    }
+
+    protected HpSpecifiedColumn doColumn(String columnName) { // for extended class
         checkSpecifiedThemeColumnStatus(columnName);
         if (isSpecifiedColumn(columnName)) {
             // returns the same instance as the specified before
@@ -141,15 +145,15 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     // -----------------------------------------------------
     //                             Specified Column Handling
     //                             -------------------------
-    protected HpSpecifiedColumn getSpecifiedColumn(String columnName) {
+    public HpSpecifiedColumn getSpecifiedColumn(String columnName) {
         return _specifiedColumnMap != null ? _specifiedColumnMap.get(columnName) : null;
     }
 
-    protected boolean hasSpecifiedColumn() {
+    public boolean hasSpecifiedColumn() {
         return _specifiedColumnMap != null && !_specifiedColumnMap.isEmpty();
     }
 
-    protected boolean isSpecifiedColumn(String columnName) {
+    public boolean isSpecifiedColumn(String columnName) {
         return _specifiedColumnMap != null && _specifiedColumnMap.containsKey(columnName);
     }
 
@@ -192,6 +196,10 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         _alreadySpecifiedEveryColumn = true;
     }
 
+    public boolean isSpecifiedEveryColumn() { // for e.g. UpdateOption's check
+        return _alreadySpecifiedEveryColumn;
+    }
+
     // -----------------------------------------------------
     //                                         Except Column
     //                                         -------------
@@ -209,6 +217,10 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
             }
         }
         _alreadySpecifiedExceptColumn = true;
+    }
+
+    public boolean isSpecifiedExceptColumn() { // for e.g. UpdateOption's check
+        return _alreadySpecifiedExceptColumn;
     }
 
     protected boolean isRecordMetaColumn(ColumnInfo columnInfo) {

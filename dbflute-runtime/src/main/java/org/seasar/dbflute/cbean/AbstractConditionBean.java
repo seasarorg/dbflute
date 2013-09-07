@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
@@ -210,10 +209,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
-    protected abstract boolean hasSpecifiedColumn();
-
-    protected abstract HpAbstractSpecification<? extends ConditionQuery> localSp();
-
     protected void assertSpecifyPurpose() {
         if (_purpose.isNoSpecify()) {
             throwSpecifyIllegalPurposeException();
@@ -1255,9 +1250,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public HpSpecifiedColumn invokeSpecifyColumn(String columnNamePath) {
-        final HpAbstractSpecification<? extends ConditionQuery> localSp = localSp();
         final String delimiter = ".";
-        Object currentObj = localSp;
+        Object currentObj = localSp();
         String remainder = columnNamePath;
         boolean last = false;
         while (true) {

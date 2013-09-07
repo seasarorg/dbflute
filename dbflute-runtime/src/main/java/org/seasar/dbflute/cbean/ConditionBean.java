@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
+import org.seasar.dbflute.cbean.chelper.HpColumnSpHandler;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.coption.CursorSelectOption;
 import org.seasar.dbflute.cbean.coption.ScalarSelectOption;
@@ -81,11 +82,26 @@ public interface ConditionBean extends PagingBean {
     ConditionBean addOrderBy_PK_Desc();
 
     // ===================================================================================
+    //                                                                             Specify
+    //                                                                             =======
+    /**
+     * Get the handler of the column specification as interface.
+     * @return The instance of column specification. (NotNull: instance is created if null)
+     */
+    HpColumnSpHandler localSp();
+
+    /**
+     * Does it have specified columns at least one? (without new-creation of specification instance)
+     * @return The determination, true or false.
+     */
+    boolean hasSpecifiedColumn();
+
+    // ===================================================================================
     //                                                                               Query
     //                                                                               =====
     /**
      * Get the conditionQuery of the local table as interface.
-     * @return The conditionQuery of the local table as interface. (NotNull)
+     * @return The instance of conditionQuery. (NotNull: instance is created if null)
      */
     ConditionQuery localCQ();
 
@@ -317,8 +333,8 @@ public interface ConditionBean extends PagingBean {
     boolean isCheckCountBeforeQueryUpdate();
 
     // ===================================================================================
-    //                                                                    Statement Config
-    //                                                                    ================
+    //                                                                     StatementConfig
+    //                                                                     ===============
     /**
      * Configure statement JDBC options. (For example, queryTimeout, fetchSize, ...)
      * @param statementConfig The configuration of statement. (NullAllowed)

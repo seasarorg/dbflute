@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the modified properties are not specified as update column.
+ * The exception of when the modified property is not specified as update column.
  * @author jflute
  */
-public class SpecifyUpdateColumnModifiedPropertiesNotSpecifiedException extends RuntimeException {
+public class SpecifyUpdateColumnModifiedPropertyNotSpecifiedException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class SpecifyUpdateColumnModifiedPropertiesNotSpecifiedException extends 
      * Constructor.
      * @param msg The message of the exception. (NotNull)
      */
-    public SpecifyUpdateColumnModifiedPropertiesNotSpecifiedException(String msg) {
+    public SpecifyUpdateColumnModifiedPropertyNotSpecifiedException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class SpecifyUpdateColumnModifiedPropertiesNotSpecifiedException extends 
      * @param msg The message of the exception. (NotNull)
      * @param cause The cause of the exception. (NotNull)
      */
-    public SpecifyUpdateColumnModifiedPropertiesNotSpecifiedException(String msg, Throwable cause) {
+    public SpecifyUpdateColumnModifiedPropertyNotSpecifiedException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }
