@@ -68,10 +68,6 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> impleme
     // ===================================================================================
     //                                                                Column Specification
     //                                                                ====================
-    public HpSpecifiedColumn specifyColumn(String columnName) { // for interface
-        return doColumn(columnName);
-    }
-
     protected HpSpecifiedColumn doColumn(String columnName) { // for extended class
         checkSpecifiedThemeColumnStatus(columnName);
         if (isSpecifiedColumn(columnName)) {

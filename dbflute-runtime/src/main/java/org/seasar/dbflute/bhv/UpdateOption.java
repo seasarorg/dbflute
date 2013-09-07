@@ -378,15 +378,16 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
             return;
         }
         assertUpdateColumnSpecifiedCB();
-        final CB cb = _updateColumnSpecifiedCB;
-        if (!cb.hasSpecifiedColumn()) { // no specification
-            return; // no check as default all columns
-        }
-        final Set<String> modifiedProperties = _updateColumnModifiedProperties;
-        doCheckSpecifiedUpdateColumnModifiedPropertyNotSpecified(cb, modifiedProperties);
-        if (!cb.localSp().isSpecifiedEveryColumn()) { // not every column
-            doCheckSpecifiedUpdateColumnNotModifiedProperty(cb, modifiedProperties);
-        }
+        // under review
+        //final CB cb = _updateColumnSpecifiedCB;
+        //if (!cb.hasSpecifiedColumn()) { // no specification
+        //    return; // no check as default all columns
+        //}
+        //final Set<String> modifiedProperties = _updateColumnModifiedProperties;
+        //doCheckSpecifiedUpdateColumnModifiedPropertyNotSpecified(cb, modifiedProperties);
+        //if (!cb.localSp().isSpecifiedEveryColumn()) { // not every column
+        //    doCheckSpecifiedUpdateColumnNotModifiedProperty(cb, modifiedProperties);
+        //}
     }
 
     protected void doCheckSpecifiedUpdateColumnModifiedPropertyNotSpecified(CB cb, Set<String> modifiedProperties) {
