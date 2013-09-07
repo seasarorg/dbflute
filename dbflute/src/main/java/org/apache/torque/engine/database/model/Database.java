@@ -2053,6 +2053,10 @@ public class Database {
         return getLittleAdjustmentProperties().isMakeDaoInterface();
     }
 
+    public boolean isCompatibleBatchUpdateNoSpecify() {
+        return getLittleAdjustmentProperties().isCompatibleBatchUpdateNoSpecify();
+    }
+
     // ===================================================================================
     //                                                                     Buri Properties
     //                                                                     ===============

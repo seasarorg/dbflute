@@ -446,12 +446,12 @@ public class ${myClassName} extends AbstractConditionBean {
         return _specification;
     }
 
-    protected boolean hasSpecifiedColumn() {
-        return _specification != null && _specification.isAlreadySpecifiedRequiredColumn();
+    public HpColumnSpHandler localSp() {
+        return specify();
     }
 
-    protected HpAbstractSpecification<? extends ConditionQuery> localSp() {
-        return specify();
+    public boolean hasSpecifiedColumn() {
+        return _specification != null && _specification.isAlreadySpecifiedRequiredColumn();
     }
 
     public static class HpSpecification extends HpAbstractSpecification<${myConditionQueryClassName}> {
@@ -475,10 +475,7 @@ public class ${myClassName} extends AbstractConditionBean {
          */
         public HpSpecifiedColumn column${col.javaName}() { return doColumn("${col.name}"); }
 #end
-        /**
-         * Specify columns except record meta columns. <br />
-         * You cannot use normal SpecifyColumn with this method.
-         */
+        public void everyColumn() { doEveryColumn(); }
         public void exceptRecordMetaColumn() { doExceptRecordMetaColumn(); }
         @Override
         protected void doSpecifyRequiredColumn() {

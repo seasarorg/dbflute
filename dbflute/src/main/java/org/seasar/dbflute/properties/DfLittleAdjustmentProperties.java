@@ -684,4 +684,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isCompatibleAutoMappingOldStyle() { // closet
         return isProperty("isCompatibleAutoMappingOldStyle", false);
     }
+
+    public boolean isCompatibleBatchUpdateNoSpecify() { // closet
+        return isProperty("isCompatibleBatchUpdateNoSpecify", true); // under review
+    }
 }

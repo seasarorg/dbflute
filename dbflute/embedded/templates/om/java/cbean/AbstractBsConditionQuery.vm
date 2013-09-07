@@ -1161,7 +1161,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param toDate The to-date(yyyy/MM/dd) of ${col.uncapitalisedJavaName}. (NullAllowed: if null, no to-condition)
      */
     public void set${tmpJavaName}_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
-        set${tmpJavaName}_FromTo(fromDate, toDate, new DateFromToOption());
+        set${tmpJavaName}_FromTo(fromDate, toDate, new FromToOption().compareAsDate());
     }
 #end
 #if (${col.isAvailableDateInScope()})
