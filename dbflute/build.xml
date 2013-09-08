@@ -488,10 +488,11 @@
 		<antcall target="reflect-to-postgresql" />
 		<antcall target="reflect-to-db2" />
 
-		<!-- deploy only -->
+		<!-- in virtual machine
 		<antcall target="reflect-to-oracle" />
 		<antcall target="reflect-to-sqlserver" />
 		<antcall target="reflect-to-msaccess" />
+		-->
 
 		<antcall target="reflect-to-sqlite" />
 		<antcall target="reflect-to-multipledb" />
