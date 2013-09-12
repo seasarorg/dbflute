@@ -395,11 +395,11 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         while (true) {
             cb.paging(pageSize, pageNumber);
             List<ENTITY> pageList = callback.callbackSelectList(cb, entityType);
-            if (pageList.size() < pageSize) { // means last page
-                break;
-            }
             for (ENTITY entity : pageList) {
                 entityRowHandler.handle(entity);
+            }
+            if (pageList.size() < pageSize) { // means last page
+                break;
             }
             ++pageNumber;
         }
