@@ -135,37 +135,41 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     }
 
     protected String resolveFixedConditionOverRelation(String fixedCondition, boolean fixedInline) {
+        // analyze:
+        // - "$$over($localTable.memberSecurity)$$.REMINDER_QUESTION"
+        // - "$$over($foreignTable.memberStatus, DISPLAY_ORDER)$$.ORDER_NO"
+        // - "$$over(PURCHASE.product.productStatus)$$.PRODUCT_STATUS_NAME"
         final String relationBeginMark = getRelationBeginMark();
         final String relationEndMark = getRelationEndMark();
         String remainder = fixedCondition;
         while (true) {
+            // "|$$over(|$localTable.memberSecurity)$$.REMINDER_QUESTION"
             final IndexOfInfo relationBeginIndex = Srl.indexOfFirst(remainder, relationBeginMark);
             if (relationBeginIndex == null) {
                 break;
             }
             remainder = relationBeginIndex.substringRear();
+            // "$localTable.memberSecurity|)$$|.REMINDER_QUESTION"
             final IndexOfInfo relationEndIndex = Srl.indexOfFirst(remainder, relationEndMark);
             if (relationEndIndex == null) {
                 break;
             }
+            // remainder is e.g. "$localTable.memberSecurity)$$" now
 
-            // analyze:
-            // - $$over($$localTable$$.memberStatus)$$
-            // - $$over($$foreignTable$$.memberStatus, DISPLAY_ORDER)$$
-            // - $$over(PURCHASE.product.productStatus)$$
+            // e.g. "$localTable.memberSecurity" or "$foreignTable.memberStatus, DISPLAY_ORDER"
             final String relationExp = relationEndIndex.substringFront();
-            final String pointTable;
-            final String targetRelation;
-            final String secondArg;
+            final String pointTable; // e.g. "$localTable" or "$foreignTable" or "PURCHASE"
+            final String targetRelation; // e.g. "memberSecurity" or "product.productStatus" or null (means base only)
+            final String secondArg; // e.g. DISPLAY_ORDER or null (means no argument)
             {
                 final IndexOfInfo separatorIndex = Srl.indexOfFirst(relationExp, ".");
-                if (separatorIndex != null) {
-                    pointTable = separatorIndex.substringFrontTrimmed();
-                    final IndexOfInfo argIndex = Srl.indexOfFirst(separatorIndex.substringRearTrimmed(), ",");
-                    targetRelation = argIndex != null ? argIndex.substringFrontTrimmed() : separatorIndex
-                            .substringRearTrimmed();
+                if (separatorIndex != null) { // normally here
+                    pointTable = separatorIndex.substringFrontTrimmed(); // e.g. $localTable
+                    final String separatorRear = separatorIndex.substringRearTrimmed();
+                    final IndexOfInfo argIndex = Srl.indexOfFirst(separatorRear, ",");
+                    targetRelation = argIndex != null ? argIndex.substringFrontTrimmed() : separatorRear;
                     secondArg = argIndex != null ? argIndex.substringRearTrimmed() : null;
-                } else {
+                } else { // e.g. "$$over(PURCHASE)$$"
                     final IndexOfInfo argIndex = Srl.indexOfFirst(relationExp, ",");
                     pointTable = argIndex != null ? argIndex.substringFrontTrimmed() : Srl.trim(relationExp);
                     targetRelation = null;
@@ -205,6 +209,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                 }
                 final String columnName;
                 {
+                    // e.g. "$$over($localTable.memberSecurity)$$|.|REMINDER_QUESTION = ..."
                     final IndexOfInfo rearIndex = Srl.indexOfFirst(relationEndIndex.substringRearTrimmed(), ".");
                     if (rearIndex == null || rearIndex.getIndex() > 0) {
                         String notice = "The OverRelation variable should continue to column after the variable.";
@@ -212,13 +217,13 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                                 fixedCondition);
                         return null; // unreachable
                     }
-                    final String columnStart = rearIndex.substringRear();
+                    final String columnStart = rearIndex.substringRear(); // e.g. REMINDER_QUESTION = ...
                     final IndexOfInfo indexInfo = Srl.indexOfFirst(columnStart, " ", ",", ")", "\n", "\t");
-                    columnName = indexInfo != null ? indexInfo.substringFront() : columnStart;
+                    columnName = indexInfo != null ? indexInfo.substringFront() : columnStart; // REMINDER_QUESTION
                 }
                 // the secondArg should be a column DB name, and then rear column is alias name
                 final String resolvedColumn = secondArg != null ? secondArg + " as " + columnName : columnName;
-                resource.addAdditionalColumn(resolvedColumn);
+                resource.addAdditionalColumn(resolvedColumn); // selected in in-line view
                 final List<String> splitList = Srl.splitList(targetRelation, ".");
                 DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
                 for (String element : splitList) {
@@ -259,15 +264,17 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                 }
             }
 
+            // e.g. "$$over($localTable.memberSecurity)$$"
             final String relationVariable = relationBeginMark + relationExp + relationEndMark;
-            final String relationAlias = columnTargetCQ.xgetAliasName();
+            final String relationAlias = columnTargetCQ.xgetAliasName(); // e.g. "dfrel_4"
             fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
 
             // after case for loop
             remainder = relationEndIndex.substringRear();
 
-            // for prevent from processing same one
-            remainder = replaceString(remainder, relationVariable, relationAlias);
+            // no replace even if same relation because of additional column
+            //// to prevent from processing same one
+            //remainder = replaceString(remainder, relationVariable, relationAlias);
         }
         return fixedCondition;
     }
