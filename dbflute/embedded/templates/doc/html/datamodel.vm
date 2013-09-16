@@ -484,7 +484,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #end
 <script>
 /**
- * Incremental Search contributed by makoto
+ * Incremental Search contributed by makotot (Thanks!)
  */
 
 function Incremental (targetInput, dist) {
