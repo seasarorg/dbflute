@@ -78,6 +78,26 @@ h4 {
 	text-align: right;
 }
 
+/* keyword search */
+.keywordsearch {
+	padding: 0.7em 0 0.7em 0;
+}
+.searchmemo {
+	font-size: 0.9em;
+	color: #114488;
+}
+#suggestion-list {
+	padding: 0 0.2em 0.2em 0.2em;
+	margin: 0;
+	position: absolute;
+	zindex: 100;
+	background-color: #DDFFDD;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #CCCCCC;
+	list-style-type: none;
+}
+
 /* table */
 table {
 	border-collapse:collapse;
@@ -282,6 +302,10 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())
 #set ($hasTableComment = $database.hasTableComment())
 <h2>Table List</h2>
+<div class="keywordsearch">
+	<input type="text" id="incremental-search-field" tabindex=1 value="" placeholder="Table Search" />
+	<span class="searchmemo">*Push 'tab' (primary tab order)</span>
+</div>
 <table summary="Tables in the Schema">
 	<thead>
 	<tr>
@@ -302,7 +326,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 		<th>EntityName</th>
 	</tr>
 	</thead>
-	<tbody>
+	<tbody id="table-list-body">
 #set ($rownum = 1)
 #foreach ($table in $database.tableDisplaySortedList)
 	<tr>
@@ -458,5 +482,314 @@ ${database.schemaHtmlJavaScriptEmbedded}
 </dl>
 #end
 #end
+<script>
+/**
+ * Incremental Search contributed by makoto
+ */
+
+function Incremental (targetInput, dist) {
+	this.targetInput = targetInput;
+	this.targetParent = this.targetInput.parentNode;
+	this.dist = dist;
+	this.query = '';
+	this.suggestionIdx = 0;
+	this.currentSuggestion = '';
+}
+
+Incremental.prototype = {
+
+	/**
+	 * @method init
+	 */
+	init: function () {
+		var dataList = this.getDataList();
+
+		this.distDataList = dataList.distList;
+		this.sectionList = dataList.sectionList;
+		this.buildSuggestList();
+		this.attachEvent();
+	},
+
+	/**
+	 * @method buildSuggetList
+	 */
+	buildSuggestList: function () {
+		var fragment = document.createDocumentFragment(),
+			ul = document.createElement('ul'),
+			li, anchor;
+
+		ul.id = 'suggestion-list';
+		this.ul = ul;
+
+		for (var i = 0, max = this.distDataList.length; i < max; i++) {
+			li = document.createElement('li');
+			li.style.display = 'none';
+			anchor = document.createElement('a');
+			anchor.href = this.sectionList[i];
+
+			if (document.body.dataset) {
+				anchor.dataset.name = this.distDataList[i];
+			} else {
+				anchor.setAttribute('data-name', this.distDataList[i]);
+			}
+
+			this.util.setElemTxt(anchor, this.distDataList[i]);
+
+			li.appendChild(anchor);
+			fragment.appendChild(li);
+		}
+		ul.appendChild(fragment);
+
+		this.targetParent.appendChild(ul);
+		this.attachSuggestionEvent();
+	},
+
+	/**
+	 * @method attachEvent
+	 */
+	attachEvent: function () {
+		var self = this,
+			eventHandler = function () {
+				self.displaySuggestion();
+			},
+			eventName = ('oninput' in window) ? 'input' : 'propertychange';
+
+		this.util.addEvent(this.targetInput, eventName, eventHandler);
+	},
+
+	/**
+	 * @method displaySuggestion
+	 */
+	displaySuggestion: function () {
+		this.query = (this.util.trim(this.targetInput.value)).toLowerCase();
+
+		var judgeList = [],
+			i, j, max;
+
+		this.resetSuggestion();
+
+		var visibleList;
+
+		if (this.query.length) {
+			for (i = 0, max = this.distDataList.length; i < max; i++) {
+				judgeList.push(this.distDataList[i].indexOf(this.query) > -1);
+			}
+			for (j = 0; j < max; j++) {
+				this.ul.childNodes[j].style.display = judgeList[j] ? '' : 'none';
+			}
+
+			visibleList = this.filterVisibleChild();
+
+			if (visibleList.length) {
+				visibleList[0].style.backgroundColor = '#CCCCCC';
+			}
+		} else {
+			for (i = 0, max = this.distDataList.length; i < max; i++) {
+				this.ul.childNodes[i].style.display = 'none';
+			}
+		}
+	},
+
+	/**
+	 * @method getDataList
+	 */
+	getDataList: function () {
+		var tr = this.dist.getElementsByTagName('tr'),
+			distDataList = [],
+			sectionIdList = [];
+
+		for (var i = 0, max = tr.length; i < max; i++) {
+			distDataList.push(this.util.getElemTxt(tr[i].getElementsByTagName('td')[2]).toLowerCase());
+			sectionIdList.push(tr[i].getElementsByTagName('td')[2].getElementsByTagName('a')[0].getAttribute('href'));
+		}
+
+		return {
+			distList: distDataList,
+			sectionList: sectionIdList
+		};
+	},
+
+	/**
+	 * @method attachSuggestionEvent
+	 */
+	attachSuggestionEvent: function () {
+		var self = this;
+
+		this.util.addEvent(this.targetInput, 'keyup', function (e) {
+			self.selectSuggestion(e);
+			self.setInputValue(e);
+		});
+		this.util.addEvent(this.targetInput, 'blur', function () {
+			setTimeout(function () {
+				self.resetSuggestion();
+			}, 100);
+		});
+	},
+
+	/**
+	 * @method selectSuggestion
+	 */
+	selectSuggestion: function (ev) {
+		var keyCode = ev.keyCode,
+			visibleChildNodes = this.filterVisibleChild(),
+			prevIdx;
+
+		if (keyCode === 38 || keyCode === 40) {
+
+			if (visibleChildNodes.length) {
+				prevIdx = this.suggestionIdx;
+
+				if (keyCode === 40 && this.suggestionIdx < visibleChildNodes.length - 1) {
+					this.suggestionIdx++;
+				}
+
+				if (keyCode === 38 && this.suggestionIdx > 0) {
+					this.suggestionIdx--;
+				}
+
+				if (prevIdx > -1) {
+					visibleChildNodes[prevIdx].style.backgroundColor = '';
+				}
+
+				visibleChildNodes[this.suggestionIdx].style.backgroundColor = '#CCCCCC';
+				this.currentSuggestion = this.util.getElemTxt(visibleChildNodes[this.suggestionIdx]);
+
+			} else if (this.query.length) {
+
+				this.displaySuggestion();
+			}
+		}
+
+		if (!this.query.length) {
+			this.resetSuggestion();
+		}
+	},
+
+	/**
+	 * @method setInputValue
+	 * @param ev {Object}
+	 */
+	setInputValue: function (ev) {
+		var keyCode = ev.keyCode,
+			visibleChildNodes = this.filterVisibleChild(),
+			currentSuggestionTxt,
+			selectedSection;
+
+		if (visibleChildNodes.length) {
+			currentSuggestionTxt = this.util.getElemTxt(visibleChildNodes[this.suggestionIdx]);
+
+			if (keyCode === 13) {
+				this.targetInput.value = currentSuggestionTxt;
+				selectedSection = this.getSelectedSection(visibleChildNodes[this.suggestionIdx]);
+				this.clearSuggestion();
+				this.scrollToSelectedSection(selectedSection);
+				this.setHash(selectedSection);
+			}
+		}
+	},
+
+	/**
+	 * @method filterVisibleChild
+	 */
+	filterVisibleChild: function () {
+		var visibleChildNodes = [];
+
+		for (var i = 0, max = this.ul.childNodes.length; i < max; i++) {
+			if (this.ul.childNodes[i].style.display !== 'none') {
+				visibleChildNodes.push(this.ul.childNodes[i]);
+			}
+		}
+
+		return visibleChildNodes;
+	},
+
+	/**
+	 * @method clearSuggestion
+	 */
+	clearSuggestion: function () {
+		for (var i = 0, max = this.ul.childNodes.length; i < max; i++) {
+			this.ul.childNodes[i].style.display = 'none';
+			this.ul.childNodes[i].style.backgroundColor = '';
+		}
+	},
+
+	/**
+	 * @method resetSuggestion
+	 */
+	resetSuggestion: function () {
+		this.clearSuggestion();
+
+		this.suggestionIdx = 0;
+	},
+
+	/**
+	 * @method getToSelectedSection
+	 * @param suggestionNode {Object}
+	 * @return selectedIdx {Number}
+	 */
+	getSelectedSection: function (suggestionNode) {
+		var selectedIdx;
+
+		for (var i = 0, max = this.ul.childNodes.length; i < max; i++) {
+			if (this.ul.childNodes[i] === suggestionNode) {
+				selectedIdx = i;
+				break;
+			}
+		}
+
+		return selectedIdx;
+	},
+
+	/**
+	 * @method scrollToSelectedSection
+	 * @param idx {Number}
+	 */
+	scrollToSelectedSection: function (idx) {
+		var selectedId = (this.sectionList[idx]).split('#')[1],
+			targetSection = document.getElementById(selectedId);
+
+		window.scrollTo(0, targetSection.offsetTop);
+		this.targetInput.blur();
+	},
+
+	/**
+	 * @method setHash
+	 */
+	setHash: function (idx) {
+		var selectedId = this.sectionList[idx];
+
+		window.location.hash = selectedId;
+	}
+};
+
+
+Incremental.prototype.util = {
+
+	addEvent: function (elem, ev, fn) {
+		if (elem.addEventListener) {
+			elem.addEventListener(ev, fn, false);
+		} else if (elem.attachEvent) {
+			elem.attachEvent('on' + ev, fn);
+		} else {
+			elem['on' + ev] = fn;
+		}
+	},
+
+	trim: function (txt) {
+		return (String.prototype.trim) ? txt.trim() : txt.replace(/^\s+|\s+$/g, '');
+	},
+
+	getElemTxt: function (elem) {
+		return (elem.innerText !== undefined) ? elem.innerText : elem.textContent;
+	},
+
+	setElemTxt: function (elem, data) {
+		return (elem.innerText !== undefined) ? (elem.innerText = data) : (elem.textContent = data);
+	}
+};
+
+var searcher = new Incremental(document.getElementById('incremental-search-field'), document.getElementById('table-list-body'));
+searcher.init();
+</script>
 </body>
 </html>
