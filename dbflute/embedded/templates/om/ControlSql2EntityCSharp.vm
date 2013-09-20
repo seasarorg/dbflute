@@ -197,18 +197,18 @@ $database.info("public void parseCustomizeEntity() {")
     #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
     #end
-  #else
-    $database.info("    parse('${myExtendedObjectClassName}')")
-    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
+  #end
 
-    #set ( $path = "${database.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
+  $database.info("    parse('${myExtendedObjectClassName}')")
+  #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
 
-    #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.outputPath},$path).exists())
-      $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
-    #end
+  #set ( $path = "${database.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
+
+  #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
   #end
 #end
 $database.info("}")
