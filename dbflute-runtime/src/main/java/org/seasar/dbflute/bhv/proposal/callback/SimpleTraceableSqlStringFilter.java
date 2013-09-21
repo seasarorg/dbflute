@@ -25,30 +25,49 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 1.0.4D (2013/06/16 Sunday)
  */
-public class SimpleTraceableSqlStringFilter implements SqlStringFilter {
+public class SimpleTraceableSqlStringFilter implements SqlStringFilter, ExecutedSqlCounter {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected final Method _actionMethod;
     protected final TraceableSqlAdditionalInfoProvider _additionalInfoProvider;
     protected boolean _markingAtFront;
+    protected boolean _suppressMarking;
+    protected int _countOfSelectCB;
+    protected int _countOfEntityUpdate;
+    protected int _countOfQueryUpdate;
+    protected int _countOfOutsideSql;
+    protected int _countOfProcedure;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public SimpleTraceableSqlStringFilter(Method actionMethod, TraceableSqlAdditionalInfoProvider additionalInfoProvider) {
         _actionMethod = actionMethod;
         _additionalInfoProvider = additionalInfoProvider;
     }
 
+    // ===================================================================================
+    //                                                                              Filter
+    //                                                                              ======
     public String filterSelectCB(BehaviorCommandMeta meta, String executedSql) {
+        ++_countOfSelectCB;
         return markingSql(executedSql);
     }
 
     public String filterEntityUpdate(BehaviorCommandMeta meta, String executedSql) {
+        ++_countOfEntityUpdate;
         return markingSql(executedSql);
     }
 
     public String filterQueryUpdate(BehaviorCommandMeta meta, String executedSql) {
+        ++_countOfQueryUpdate;
         return markingSql(executedSql);
     }
 
     public String filterOutsideSql(BehaviorCommandMeta meta, String executedSql) {
+        ++_countOfOutsideSql;
         // outside-SQL is easy to find caller by SQL
         // and it might have unexpected SQL so no marking
         //return markingSql(executedSql);
@@ -56,13 +75,20 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter {
     }
 
     public String filterProcedure(BehaviorCommandMeta meta, String executedSql) {
+        ++_countOfProcedure;
         // procedure call uses JDBC's escape "{" and "}"
         // so it might fail to execute the SQL (actually PostgreSQL)
         //return markingSql(executedSql);
         return null;
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected String markingSql(String executedSql) {
+        if (_suppressMarking) {
+            return null;
+        }
         final String filtered;
         if (_markingAtFront) {
             filtered = "-- " + buildInvokeMark() + "\n" + executedSql;
@@ -93,8 +119,55 @@ public class SimpleTraceableSqlStringFilter implements SqlStringFilter {
         return resolved;
     }
 
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
     public SimpleTraceableSqlStringFilter markingAtFront() {
         _markingAtFront = true;
         return this;
+    }
+
+    public SimpleTraceableSqlStringFilter suppressMarking() {
+        _suppressMarking = true;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                         SQL Counter
+    //                                                                         ===========
+    public int getTotalCountOfSql() {
+        return _countOfSelectCB + _countOfEntityUpdate + _countOfQueryUpdate + _countOfOutsideSql + _countOfProcedure;
+    }
+
+    public int getCountOfSelectCB() {
+        return _countOfSelectCB;
+    }
+
+    public int getCountOfEntityUpdate() {
+        return _countOfEntityUpdate;
+    }
+
+    public int getCountOfQueryUpdate() {
+        return _countOfQueryUpdate;
+    }
+
+    public int getCountOfOutsideSql() {
+        return _countOfOutsideSql;
+    }
+
+    public int getCountOfProcedure() {
+        return _countOfProcedure;
+    }
+
+    public String toLineDisp() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{total=").append(getTotalCountOfSql());
+        sb.append(", selectCB=").append(getCountOfSelectCB());
+        sb.append(", entityUpdate=").append(getCountOfEntityUpdate());
+        sb.append(", queryUpdate=").append(getCountOfQueryUpdate());
+        sb.append(", outsideSql=").append(getCountOfOutsideSql());
+        sb.append(", procedure=").append(getCountOfProcedure());
+        sb.append("}");
+        return sb.toString();
     }
 }
