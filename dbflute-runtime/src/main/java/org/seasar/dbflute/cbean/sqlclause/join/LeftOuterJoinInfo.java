@@ -56,7 +56,7 @@ public class LeftOuterJoinInfo implements Serializable {
 
     // fixed condition
     protected String _fixedCondition;
-    protected transient FixedConditionResolver _fixedConditionResolver;
+    protected FixedConditionResolver _fixedConditionResolver;
     protected boolean _fixedConditionOverRelation; // derived by resolving
 
     // additional join attribute

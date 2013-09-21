@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import org.seasar.dbflute.cbean.ManualOrderBean;
 import org.seasar.dbflute.cbean.chelper.HpCBPurpose;
 import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
+import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
@@ -1076,12 +1077,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             Map<ColumnRealName, ColumnRealName> joinOnMap, int currentConditionCount) {
         if (joinInfo.hasFixedCondition()) {
             final String fixedCondition = joinInfo.getFixedCondition();
+            if (isInlineViewOptimizedCondition(fixedCondition)) {
+                return currentConditionCount;
+            }
             sb.append(ln()).append("    ");
             sb.append(currentConditionCount > 0 ? " and " : "");
             sb.append(fixedCondition);
             ++currentConditionCount;
         }
         return currentConditionCount;
+    }
+
+    protected boolean isInlineViewOptimizedCondition(String fixedCondition) {
+        return HpFixedConditionQueryResolver.OPTIMIZED_MARK.equals(fixedCondition);
     }
 
     protected int doBuildJoinOnClauseAdditional(StringBuilder sb, LeftOuterJoinInfo joinInfo,

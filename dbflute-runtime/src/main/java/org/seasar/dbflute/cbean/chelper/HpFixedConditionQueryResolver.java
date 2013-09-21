@@ -17,6 +17,7 @@ package org.seasar.dbflute.cbean.chelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -52,7 +53,9 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     public static final String FOREIGN_ALIAS_MARK = "$$foreignAlias$$";
     public static final String SQ_BEGIN_MARK = "$$sqbegin$$";
     public static final String SQ_END_MARK = "$$sqend$$";
+    public static final String INLINE_MARK = "$$inline$$";
     public static final String LOCATION_BASE_MARK = "$$locationBase$$";
+    public static final String OPTIMIZED_MARK = "$$optimized$$";
 
     // ===================================================================================
     //                                                                           Attribute
@@ -60,7 +63,13 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     protected final ConditionQuery _localCQ;
     protected final ConditionQuery _foreignCQ;
     protected final DBMetaProvider _dbmetaProvider;
-    protected Map<String, InlineViewResource> _inlineViewResourceMap; // internal bridge container
+
+    // analyzing result in variable resolution (internal bridge variables for next step)
+    protected String _resolvedFixedCondition;
+    protected Map<String, InlineViewResource> _inlineViewResourceMap;
+    protected String _inlineViewOptimizedCondition;
+    protected boolean _inlineViewOptimizationWholeCondition;
+    protected Set<Integer> _inlineViewOptimizedLineNumberSet;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -78,19 +87,155 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
      * {@inheritDoc}
      */
     public String resolveVariable(String fixedCondition, boolean fixedInline) {
+        analyzeInlineViewOptimization(fixedCondition, fixedInline);
         fixedCondition = filterBasicMark(fixedCondition, fixedInline);
         fixedCondition = filterSubQueryIndentMark(fixedCondition, fixedInline);
         fixedCondition = filterLocationMark(fixedCondition, fixedInline);
-        fixedCondition = resolveFixedConditionOverRelation(fixedCondition, fixedInline);
-        return fixedCondition;
+        fixedCondition = resolveOverRelation(fixedCondition, fixedInline);
+        final String resolvedFixedCondition;
+        final String delimiter = INLINE_MARK;
+        if (fixedCondition.contains(delimiter)) { // mark optimization
+            final String inlineCondition = Srl.substringFirstFront(fixedCondition, delimiter);
+            final String filtered = Srl.rtrim(inlineCondition);
+            if (filtered.trim().length() > 0) {
+                resolvedFixedCondition = filtered;
+            } else { // mark exists at first line (same as whole actually)
+                resolvedFixedCondition = OPTIMIZED_MARK;
+            }
+        } else {
+            if (_inlineViewOptimizationWholeCondition) { // whole optimization
+                resolvedFixedCondition = OPTIMIZED_MARK; // as dummy
+            } else { // part optimization or no optimized
+                resolvedFixedCondition = fixedCondition;
+            }
+        }
+        _resolvedFixedCondition = resolvedFixedCondition;
+        return _resolvedFixedCondition;
     }
 
+    // ===================================================================================
+    //                                                                Analyze Optimization
+    //                                                                ====================
+    protected void analyzeInlineViewOptimization(String fixedCondition, boolean fixedInline) {
+        if (fixedInline) {
+            return;
+        }
+        if (!hasFixedInlineView(fixedCondition)) {
+            return;
+        }
+        if (doAnalyzeInlineViewOptimizationMark(fixedCondition)) {
+            return;
+        }
+        if (doAnalyzeInlineViewOptimizationWhole(fixedCondition)) {
+            return;
+        }
+        if (doAnalyzeInlineViewOptimizationPart(fixedCondition)) {
+            return;
+        }
+    }
+
+    protected boolean hasFixedInlineView(String fixedCondition) {
+        final String relationBeginMark = getRelationBeginMark();
+        final String foreignTableMark = getForeignTableMark();
+        final String foreignOverMark = relationBeginMark + foreignTableMark;
+        return fixedCondition.contains(foreignOverMark);
+    }
+
+    protected boolean doAnalyzeInlineViewOptimizationMark(String fixedCondition) {
+        final String delimiter = INLINE_MARK;
+        if (fixedCondition.contains(delimiter)) {
+            final String inlineCondition = Srl.substringFirstRear(fixedCondition, delimiter);
+            final String filtered = removePrefixConnector(inlineCondition);
+            // null means no in-line, while it means suppressing optimization
+            _inlineViewOptimizedCondition = filtered.trim().length() > 0 ? filtered : null;
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean doAnalyzeInlineViewOptimizationWhole(String fixedCondition) {
+        _inlineViewOptimizationWholeCondition = canBeInlineViewOptimization(fixedCondition);
+        if (_inlineViewOptimizationWholeCondition) {
+            _inlineViewOptimizedCondition = fixedCondition;
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean doAnalyzeInlineViewOptimizationPart(String fixedCondition) {
+        final List<String> lineList = Srl.splitList(fixedCondition, ln());
+        String previous = null;
+        final List<String> optLineList = new ArrayList<String>();
+        final List<Integer> optLineNumberList = new ArrayList<Integer>(lineList.size());
+        int lineNumber = 1;
+        for (String line : lineList) {
+            if (previous != null && canBeInlineViewOptimization(previous) && !hasUnclosedBrace(previous)) {
+                if ((lineNumber >= 3 && startsWithConnector(previous)) && startsWithConnector(line)) {
+                    // and ... (previous)
+                    // and ... (current)
+                    optLineList.add(previous); // previous line can be optimized
+                    optLineNumberList.add(lineNumber - 1);
+                }
+            }
+            previous = line;
+            ++lineNumber;
+        }
+        if (previous != null && canBeInlineViewOptimization(previous) && !hasUnclosedBrace(previous)) {
+            if (startsWithConnector(previous)) {
+                // ...
+                // and ... (previous)
+                optLineList.add(previous);
+                optLineNumberList.add(lineNumber - 1);
+            }
+        }
+        if (!optLineNumberList.isEmpty()) {
+            _inlineViewOptimizedLineNumberSet = new HashSet<Integer>(optLineNumberList);
+        }
+        if (!optLineList.isEmpty()) {
+            final StringBuilder optSb = new StringBuilder();
+            for (String line : optLineList) {
+                if (optSb.length() > 0) {
+                    optSb.append(ln());
+                }
+                optSb.append(line);
+            }
+            _inlineViewOptimizedCondition = removePrefixConnector(optSb.toString());
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean canBeInlineViewOptimization(String fixedCondition) {
+        final String relationBeginMark = getRelationBeginMark();
+        final String foreignTableMark = getForeignTableMark();
+        final String foreignOverMark = relationBeginMark + foreignTableMark;
+        final String foreignAliasMark = getForeignAliasMark();
+        if (!Srl.containsAny(fixedCondition, foreignOverMark, foreignAliasMark)) {
+            return false;
+        }
+        final String removedCondition = replaceString(fixedCondition, foreignOverMark, "");
+        if (removedCondition.contains(relationBeginMark)) { // other over relation exists
+            return false;
+        }
+        final String localAliasMark = getLocalAliasMark();
+        if (removedCondition.contains(localAliasMark)) { // local element exists
+            return false;
+        }
+        // has (foreign over relation or foreign alias) and no local elements
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                            Filter Mark and Variable
+    //                                                            ========================
     protected String filterBasicMark(String fixedCondition, boolean fixedInline) {
         final String localAliasName = _localCQ.xgetAliasName();
         final String foreignAliasName = _foreignCQ.xgetAliasName();
         fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName); // for compatibility
         fixedCondition = replaceString(fixedCondition, getLocalAliasMark(), localAliasName);
-        fixedCondition = replaceString(fixedCondition, getForeignAliasMark(), foreignAliasName);
+        if (!_inlineViewOptimizationWholeCondition) {
+            fixedCondition = replaceString(fixedCondition, getForeignAliasMark(), foreignAliasName);
+        }
         return fixedCondition;
     }
 
@@ -134,14 +279,18 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         return replaceString(fixedCondition, getLocationBaseMark() + ".", "pmb." + locationBase);
     }
 
-    protected String resolveFixedConditionOverRelation(String fixedCondition, boolean fixedInline) {
+    // ===================================================================================
+    //                                                               Resolve Over Relation
+    //                                                               =====================
+    protected String resolveOverRelation(String fixedCondition, boolean fixedInline) {
         // analyze:
         // - "$$over($localTable.memberSecurity)$$.REMINDER_QUESTION"
         // - "$$over($foreignTable.memberStatus, DISPLAY_ORDER)$$.ORDER_NO"
         // - "$$over(PURCHASE.product.productStatus)$$.PRODUCT_STATUS_NAME"
         final String relationBeginMark = getRelationBeginMark();
         final String relationEndMark = getRelationEndMark();
-        String remainder = fixedCondition;
+        String resolvedClause = fixedCondition;
+        String remainder = resolvedClause;
         while (true) {
             // "|$$over(|$localTable.memberSecurity)$$.REMINDER_QUESTION"
             final IndexOfInfo relationBeginIndex = Srl.indexOfFirst(remainder, relationBeginMark);
@@ -158,6 +307,8 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
 
             // e.g. "$localTable.memberSecurity" or "$foreignTable.memberStatus, DISPLAY_ORDER"
             final String relationExp = relationEndIndex.substringFront();
+            // e.g. "$$over($localTable.memberSecurity)$$" or "$$over($foreignTable.memberStatus, DISPLAY_ORDER)$$"
+            final String relationVariable = relationBeginMark + relationExp + relationEndMark;
             final String pointTable; // e.g. "$localTable" or "$foreignTable" or "PURCHASE"
             final String targetRelation; // e.g. "memberSecurity" or "product.productStatus" or null (means base only)
             final String secondArg; // e.g. DISPLAY_ORDER or null (means no argument)
@@ -224,12 +375,20 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                 // the secondArg should be a column DB name, and then rear column is alias name
                 final String resolvedColumn = secondArg != null ? secondArg + " as " + columnName : columnName;
                 resource.addAdditionalColumn(resolvedColumn); // selected in in-line view
-                final List<String> splitList = Srl.splitList(targetRelation, ".");
-                DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
-                for (String element : splitList) {
-                    final ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(element);
-                    resource.addJoinInfo(foreignInfo);
-                    currentDBMeta = foreignInfo.getForeignDBMeta();
+
+                if (!resource.hasJoinInfo()) { // first analyze
+                    final List<String> splitList = Srl.splitList(targetRelation, ".");
+                    DBMeta currentDBMeta = _dbmetaProvider.provideDBMeta(_foreignCQ.getTableDbName());
+                    for (String element : splitList) {
+                        final ForeignInfo foreignInfo = currentDBMeta.findForeignInfo(element);
+                        resource.addJoinInfo(foreignInfo);
+                        currentDBMeta = foreignInfo.getForeignDBMeta();
+                    }
+                }
+                final List<ForeignInfo> joinInfoList = resource.getJoinInfoList();
+                if (!joinInfoList.isEmpty()) { // basically true (but just in case)
+                    final ForeignInfo latestForeignInfo = joinInfoList.get(joinInfoList.size() - 1);
+                    resource.addOptimizedVariable(relationVariable, latestForeignInfo);
                 }
             } else { // referrer table
                 final DBMeta pointDBMeta;
@@ -264,10 +423,9 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                 }
             }
 
-            // e.g. "$$over($localTable.memberSecurity)$$"
-            final String relationVariable = relationBeginMark + relationExp + relationEndMark;
+            // resolve over-relation variables in clause
             final String relationAlias = columnTargetCQ.xgetAliasName(); // e.g. "dfrel_4"
-            fixedCondition = replaceString(fixedCondition, relationVariable, relationAlias);
+            resolvedClause = replaceString(resolvedClause, relationVariable, relationAlias);
 
             // after case for loop
             remainder = relationEndIndex.substringRear();
@@ -276,17 +434,43 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
             //// to prevent from processing same one
             //remainder = replaceString(remainder, relationVariable, relationAlias);
         }
-        return fixedCondition;
+        resolvedClause = adjustOptimizedLine(resolvedClause);
+        return resolvedClause;
     }
 
     protected ConditionQuery invokeColumnTargetCQ(ConditionQuery relationPointCQ, String targetRelation) {
         return relationPointCQ.invokeForeignCQ(targetRelation);
     }
 
+    protected String adjustOptimizedLine(String resolvedClause) {
+        if (_inlineViewOptimizedLineNumberSet == null) {
+            return resolvedClause;
+        }
+        final List<String> lineList = Srl.splitList(resolvedClause, ln());
+        final List<String> filteredList = new ArrayList<String>();
+        int lineNumber = 1;
+        for (String line : lineList) {
+            if (!_inlineViewOptimizedLineNumberSet.contains(lineNumber)) {
+                filteredList.add(line);
+            }
+            ++lineNumber;
+        }
+        final StringBuilder filteredSb = new StringBuilder();
+        for (String line : filteredList) {
+            if (filteredSb.length() > 0) {
+                filteredSb.append(ln());
+            }
+            filteredSb.append(line);
+        }
+        return removePrefixConnector(filteredSb.toString());
+    }
+
     // ===================================================================================
     //                                                            Resolve Fixed InlineView
     //                                                            ========================
     public String resolveFixedInlineView(String foreignTableSqlName, boolean treatedAsInnerJoin) {
+        // it is precondition that the fixed condition has already been resolved here
+        // so it can uses bridge variables here
         if (_inlineViewResourceMap == null || _inlineViewResourceMap.isEmpty()) {
             return foreignTableSqlName; // not uses InlineView
         }
@@ -303,6 +487,8 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         final StringBuilder joinSb = new StringBuilder();
         final Map<ForeignInfo, String> relationMap = new HashMap<ForeignInfo, String>();
         final List<String> additionalRealColumnList = new ArrayList<String>();
+        final String resolvedFixedCondition = _resolvedFixedCondition; // basically not null
+        String optimizedCondition = _inlineViewOptimizedCondition;
         int groupIndex = 0;
         for (InlineViewResource resource : _inlineViewResourceMap.values()) {
             final List<ForeignInfo> joinInfoList = resource.getJoinInfoList();
@@ -310,6 +496,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
             String preForeignAlias = null;
             String foreignAlias = null;
             int joinIndex = 0;
+            final Map<ForeignInfo, String> foreignAliasMap = new HashMap<ForeignInfo, String>(joinInfoList.size());
             for (ForeignInfo joinInfo : joinInfoList) {
                 if (relationMap.containsKey(joinInfo)) { // already joined
                     preForeignAlias = relationMap.get(joinInfo); // update previous alias
@@ -339,14 +526,18 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                     joinSb.append(" = ").append(foreignAlias).append(".").append(foreignColumninfo.getColumnSqlName());
                     ++columnIndex;
                 }
+                foreignAliasMap.put(joinInfo, foreignAlias);
                 relationMap.put(joinInfo, foreignAlias);
                 ++joinIndex;
             }
-            final Set<String> additionalColumnSet = resource.getAdditionalColumnSet();
-            for (String columnName : additionalColumnSet) {
-                additionalRealColumnList.add(foreignAlias + "." + columnName); // latest alias is target
+            if (optimizedCondition != null) {
+                optimizedCondition = resolvedOptimizedCondition(optimizedCondition, resource, foreignAliasMap);
             }
+            collectAdditionalRealColumnList(additionalRealColumnList, resolvedFixedCondition, resource, foreignAlias);
             ++groupIndex;
+        }
+        if (optimizedCondition != null) { // foreign alias for in-line view is resolved here
+            optimizedCondition = replaceString(optimizedCondition, getForeignAliasMark(), baseAlias);
         }
         final StringBuilder sqlSb = new StringBuilder();
         sqlSb.append("(select ").append(baseAlias).append(".*");
@@ -356,9 +547,104 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         sqlSb.append(ln()).append(baseIndent);
         sqlSb.append("   from ").append(foreignTableSqlName).append(" ").append(baseAlias);
         sqlSb.append(joinSb);
+        if (optimizedCondition != null) {
+            sqlSb.append(ln()).append(baseIndent);
+            sqlSb.append("  where ");
+            final List<String> splitList = Srl.splitList(optimizedCondition, ln());
+            int index = 0;
+            for (String line : splitList) {
+                if (index == 0) {
+                    sqlSb.append(line);
+                } else {
+                    sqlSb.append(ln()).append(baseIndent);
+                    final String trimmedLine = line.trim();
+                    if (trimmedLine.startsWith("and ")) {
+                        sqlSb.append("    ").append(trimmedLine);
+                    } else {
+                        sqlSb.append(line);
+                    }
+                }
+                ++index;
+            }
+        }
         sqlSb.append(ln()).append(baseIndent);
         sqlSb.append(")");
         return sqlSb.toString();
+    }
+
+    protected String resolvedOptimizedCondition(String optimizedCondition, InlineViewResource resource,
+            Map<ForeignInfo, String> foreignAliasMap) {
+        final Set<String> additionalColumnSet = resource.getAdditionalColumnSet();
+        if (additionalColumnSet == null) { // basically no way here (but just in case)
+            return optimizedCondition;
+        }
+        Map<String, String> optimizedReverseColumnMap = null;
+        for (String columnName : additionalColumnSet) {
+            final String delimiter = " as ";
+            if (columnName.contains(delimiter)) {
+                if (optimizedReverseColumnMap == null) {
+                    optimizedReverseColumnMap = new HashMap<String, String>(additionalColumnSet.size());
+                }
+                // e.g. MEMBER_STATUS_NAME as STATUS
+                final String physicalName = Srl.substringLastFront(columnName, delimiter);
+                final String logicalName = Srl.substringLastRear(columnName, delimiter);
+                optimizedReverseColumnMap.put(logicalName, physicalName); // e.g. STATUS : MEMBER_STATUS_NAME
+            }
+        }
+        optimizedCondition = resolveOptimizedForeignAlias(optimizedCondition, resource, foreignAliasMap);
+        optimizedCondition = reverseOptimizedColumnAlias(optimizedCondition, optimizedReverseColumnMap);
+        return optimizedCondition;
+    }
+
+    protected String resolveOptimizedForeignAlias(String optimizedCondition, InlineViewResource resource,
+            Map<ForeignInfo, String> foreignAliasMap) {
+        if (optimizedCondition == null) {
+            return null;
+        }
+        final Map<String, ForeignInfo> optimizedVariableMap = resource.getOptimizedVariableMap();
+        if (optimizedVariableMap == null) {
+            return optimizedCondition;
+        }
+        for (Entry<String, ForeignInfo> entry : optimizedVariableMap.entrySet()) {
+            final String relationVariable = entry.getKey();
+            final ForeignInfo foreignInfo = entry.getValue();
+            final String inlineAlias = foreignAliasMap.get(foreignInfo);
+            optimizedCondition = replaceString(optimizedCondition, relationVariable, inlineAlias);
+        }
+        return optimizedCondition;
+    }
+
+    protected String reverseOptimizedColumnAlias(String optimizedCondition,
+            Map<String, String> optimizedReverseColumnMap) {
+        if (optimizedReverseColumnMap != null) {
+            for (Entry<String, String> entry : optimizedReverseColumnMap.entrySet()) {
+                final String logicalName = entry.getKey();
+                final String physicalName = entry.getValue();
+                optimizedCondition = replaceString(optimizedCondition, "." + logicalName, "." + physicalName);
+            }
+        }
+        return optimizedCondition;
+    }
+
+    protected void collectAdditionalRealColumnList(List<String> additionalRealColumnList,
+            String resolvedFixedCondition, InlineViewResource resource, String foreignAlias) {
+        final Set<String> additionalColumnSet = resource.getAdditionalColumnSet();
+        if (additionalColumnSet == null) { // basically no way here (but just in case)
+            return;
+        }
+        for (String columnName : additionalColumnSet) {
+            final String delimiter = " as ";
+            final String columnMark;
+            if (columnName.contains(delimiter)) {
+                final String logicalName = Srl.substringLastRear(columnName, delimiter);
+                columnMark = "." + logicalName;
+            } else {
+                columnMark = "." + columnName;
+            }
+            if (resolvedFixedCondition != null && resolvedFixedCondition.contains(columnMark)) {
+                additionalRealColumnList.add(foreignAlias + "." + columnName);
+            }
+        }
     }
 
     // ===================================================================================
@@ -367,6 +653,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     protected static class InlineViewResource {
         protected Set<String> _additionalColumnSet;
         protected List<ForeignInfo> _joinInfoList;
+        protected Map<String, ForeignInfo> _optimizedVariableMap;
 
         public Set<String> getAdditionalColumnSet() {
             return _additionalColumnSet;
@@ -379,6 +666,10 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
             _additionalColumnSet.add(additionalColumn);
         }
 
+        public boolean hasJoinInfo() {
+            return _joinInfoList != null && !_joinInfoList.isEmpty();
+        }
+
         public List<ForeignInfo> getJoinInfoList() {
             return _joinInfoList;
         }
@@ -388,6 +679,17 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
                 _joinInfoList = new ArrayList<ForeignInfo>();
             }
             _joinInfoList.add(joinInfo);
+        }
+
+        public Map<String, ForeignInfo> getOptimizedVariableMap() {
+            return _optimizedVariableMap;
+        }
+
+        public void addOptimizedVariable(String relationVariable, ForeignInfo foreignInfo) {
+            if (_optimizedVariableMap == null) {
+                _optimizedVariableMap = new HashMap<String, ForeignInfo>();
+            }
+            _optimizedVariableMap.put(relationVariable, foreignInfo);
         }
     }
 
@@ -464,6 +766,25 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
 
     protected String getForeignTableMark() {
         return "$foreignTable";
+    }
+
+    // ===================================================================================
+    //                                                                       Clause Helper
+    //                                                                       =============
+    protected boolean isOneLine(String fixedCondition) {
+        return !fixedCondition.contains(ln());
+    }
+
+    protected boolean hasUnclosedBrace(String line) {
+        return line.contains("(") && !line.contains(")");
+    }
+
+    protected boolean startsWithConnector(String line) {
+        return line.trim().startsWith("and ");
+    }
+
+    protected String removePrefixConnector(String clause) {
+        return Srl.ltrim(Srl.ltrim(Srl.ltrim(clause), "and "));
     }
 
     // ===================================================================================
