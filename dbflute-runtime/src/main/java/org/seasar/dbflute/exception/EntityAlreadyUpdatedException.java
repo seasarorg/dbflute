@@ -41,7 +41,7 @@ public class EntityAlreadyUpdatedException extends SQLFailureException {
      * @param rows The row count returned by update process. (basically zero)
      */
     public EntityAlreadyUpdatedException(Object bean, int rows) {
-        super("The entity already been updated: rows=" + rows + ", bean=" + bean, null);
+        super("The entity has already been updated: rows=" + rows + ", bean=" + bean, null);
         this._bean = bean;
         this._rows = rows;
     }
