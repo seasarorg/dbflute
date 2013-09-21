@@ -107,6 +107,7 @@ public class DfPmbGenerationHandler {
                 customizeEntityType = null; // no used
             }
             final String entityGenericDef = "<" + behaviorClassName + ", " + customizeEntityType + ">";
+            final String voidResultGenericDef = "<" + behaviorClassName + ", Void>";
             final String noResultGenericDef = "<" + behaviorClassName + ">";
 
             // several typed interfaces can be implemented
@@ -123,7 +124,12 @@ public class DfPmbGenerationHandler {
                 sb.append(", ").append("AutoPagingHandlingPmb").append(entityGenericDef);
             }
             if (isTypedCursorHandling(className)) {
-                sb.append(", ").append("CursorHandlingPmb").append(noResultGenericDef);
+                sb.append(", ").append("CursorHandlingPmb");
+                if (isTypedPagingHandling(className)) { // cursor with paging
+                    sb.append(entityGenericDef);
+                } else { // pure cursor
+                    sb.append(voidResultGenericDef);
+                }
             }
             if (isTypedExecuteHandling(className)) {
                 sb.append(", ").append("ExecuteHandlingPmb").append(noResultGenericDef);

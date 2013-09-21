@@ -396,7 +396,7 @@ public class DfPmbMetaData {
             String msg = "This parameter-bean was not related to customize entity.";
             throw new IllegalStateException(msg);
         }
-        if (_customizeEntityInfo.isCursorHandling()) {
+        if (_customizeEntityInfo.isCursorHandling() && !isTypedPagingHandling()) { // pure cursor
             return "Void";
         }
         if (_customizeEntityInfo.isScalarHandling()) {

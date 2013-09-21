@@ -2110,6 +2110,9 @@ public class Table {
     // ===================================================================================
     //                                                               Sql2Entity Definition
     //                                                               =====================
+    // -----------------------------------------------------
+    //                                        Basic Property
+    //                                        --------------
     public boolean isSql2EntityCustomize() {
         return _sql2EntityCustomize;
     }
@@ -2132,6 +2135,48 @@ public class Table {
 
     public void setSql2EntityTypeSafeCursor(boolean sql2EntityTypeSafeCursor) {
         this._sql2EntityTypeSafeCursor = sql2EntityTypeSafeCursor;
+    }
+
+    // -----------------------------------------------------
+    //                                     Physical Property
+    //                                     -----------------
+    /**
+     * @return The file of outside-SQL. (basically NotNull if Sql2Entity)
+     */
+    public DfOutsideSqlFile getSql2EntitySqlFile() {
+        return _sql2EntitySqlFile;
+    }
+
+    /**
+     * @param sql2EntitySqlFile The file of outside-SQL. (basically NotNull if Sql2Entity)
+     */
+    public void setSql2EntitySqlFile(DfOutsideSqlFile sql2EntitySqlFile) {
+        this._sql2EntitySqlFile = sql2EntitySqlFile;
+    }
+
+    /**
+     * @return The output directory for Sql2Entity. (NotNull)
+     */
+    public String getSql2EntityOutputDirectory() {
+        if (_sql2EntitySqlFile != null) {
+            return _sql2EntitySqlFile.getSql2EntityOutputDirectory();
+        }
+        // basically no way if Sql2Entity
+        return getOutsideSqlProperties().getSql2EntityOutputDirectory();
+    }
+
+    // -----------------------------------------------------
+    //                                     Thematic Property
+    //                                     -----------------
+    public boolean isGenerateTypeSafeCursor() {
+        return isSql2EntityTypeSafeCursor(); // only when cursor (might be with cursor)
+    }
+
+    public boolean isGenerateCustomizeEntity() {
+        // always generate in spite of pure cursor
+        // because it might be used for paging or free-style select
+        // and to avoid remaining old customize entity of pure cursor
+        return true;
     }
 
     public boolean isLoadableCustomizeEntity() {
@@ -2194,31 +2239,6 @@ public class Table {
             ++index;
         }
         return settingList;
-    }
-
-    /**
-     * @return The file of outside-SQL. (basically NotNull if Sql2Entity)
-     */
-    public DfOutsideSqlFile getSql2EntitySqlFile() {
-        return _sql2EntitySqlFile;
-    }
-
-    /**
-     * @param sql2EntitySqlFile The file of outside-SQL. (basically NotNull if Sql2Entity)
-     */
-    public void setSql2EntitySqlFile(DfOutsideSqlFile sql2EntitySqlFile) {
-        this._sql2EntitySqlFile = sql2EntitySqlFile;
-    }
-
-    /**
-     * @return The output directory for Sql2Entity. (NotNull)
-     */
-    public String getSql2EntityOutputDirectory() {
-        if (_sql2EntitySqlFile != null) {
-            return _sql2EntitySqlFile.getSql2EntityOutputDirectory();
-        }
-        // basically no way if Sql2Entity
-        return getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory();
     }
 
     // -----------------------------------------------------
@@ -2299,6 +2319,10 @@ public class Table {
 
     protected DfSequenceIdentityProperties getSequenceIdentityProperties() {
         return getProperties().getSequenceIdentityProperties();
+    }
+
+    protected DfOutsideSqlProperties getOutsideSqlProperties() {
+        return getProperties().getOutsideSqlProperties();
     }
 
     // ===================================================================================

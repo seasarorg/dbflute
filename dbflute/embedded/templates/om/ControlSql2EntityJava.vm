@@ -144,7 +144,7 @@ $database.info("public void parseCustomizeEntity() {")
   #set ($path = $database.getPackageAsPath(${glPackageExtendedCustomizeEntity}))
   $database.makeDirectory($path)
 
-  #if ($table.isSql2EntityTypeSafeCursor())
+  #if ($table.isGenerateTypeSafeCursor())
     #set ($path = $database.getPackageAsPath(${myBaseCursorPackageName}))
     $database.makeDirectory($path)
 
@@ -170,19 +170,20 @@ $database.info("public void parseCustomizeEntity() {")
     #end
     $database.reflectAllExCopyright($path)
   #end
+  #if ($table.isGenerateCustomizeEntity())
+    #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
 
-  #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}",$path ,"" ,"")
+    #set ( $path = "${database.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
 
-  #set ( $path = "${database.getPackageAsPath(${myDBMetaPackageName})}${myDBMetaClassName}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('${myExtendedObjectClassName}')")
-  #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-  #if (!$files.file(${generator.outputPath},$path).exists())
-    $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
+    $database.info("    parse('${myExtendedObjectClassName}')")
+    #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
+    #end
+    $database.reflectAllExCopyright($path)
   #end
-  $database.reflectAllExCopyright($path)
 #end
 $database.info("}")
 
