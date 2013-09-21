@@ -451,7 +451,10 @@ public class DfOldClassHandler {
         doDeleteOldCustomizeClass_for_BaseEntity(packagePath, classSuffix, _deletedOldCustomizeBaseCursorListMap,
                 new NotDeleteTCNSetupper() {
                     public String setup(Table table) {
-                        return table.getBaseEntityClassName() + classSuffix;
+                        if (table.isSql2EntityTypeSafeCursor()) {
+                            return table.getBaseEntityClassName() + classSuffix;
+                        }
+                        return null; // means customize entity
                     }
                 }, oldStylePackagePath, false);
     }
@@ -471,7 +474,10 @@ public class DfOldClassHandler {
         doDeleteOldCustomizeClass_for_BaseEntity(packagePath, classSuffix,
                 _deletedOldCustomizeBaseCursorHandlerListMap, new NotDeleteTCNSetupper() {
                     public String setup(Table table) {
-                        return table.getBaseEntityClassName() + classSuffix;
+                        if (table.isSql2EntityTypeSafeCursor()) {
+                            return table.getBaseEntityClassName() + classSuffix;
+                        }
+                        return null; // means customize entity
                     }
                 }, oldStylePackagePath, false);
     }
