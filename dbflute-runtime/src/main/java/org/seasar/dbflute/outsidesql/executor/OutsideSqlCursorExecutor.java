@@ -101,12 +101,13 @@ public class OutsideSqlCursorExecutor<BEHAVIOR> {
      * <span style="color: #3F7E5E">-- #df:entity#</span>
      * <span style="color: #3F7E5E">-- +cursor+</span>
      * </pre>
+     * @param <ENTITY> The type of entity, might be void.
      * @param pmb The typed parameter-bean for cursor handling. (NotNull)
      * @param handler The handler of cursor called back with result set. (NotNull)
      * @return The result object that the cursor handler returns. (NullAllowed)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
-    public Object selectCursor(CursorHandlingPmb<BEHAVIOR> pmb, CursorHandler handler) {
+    public <ENTITY> Object selectCursor(CursorHandlingPmb<BEHAVIOR, ENTITY> pmb, CursorHandler handler) {
         if (pmb == null) {
             String msg = "The argument 'pmb' (typed parameter-bean) should not be null.";
             throw new IllegalArgumentException(msg);
