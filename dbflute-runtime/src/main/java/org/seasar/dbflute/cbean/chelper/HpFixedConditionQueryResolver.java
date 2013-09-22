@@ -89,7 +89,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     public String resolveVariable(String fixedCondition, boolean fixedInline) {
         analyzeInlineViewOptimization(fixedCondition, fixedInline);
         fixedCondition = filterBasicMark(fixedCondition, fixedInline);
-        fixedCondition = filterSubQueryIndentMark(fixedCondition, fixedInline);
+        fixedCondition = filterSubQueryIndentMark(fixedCondition, fixedInline, false);
         fixedCondition = filterLocationMark(fixedCondition, fixedInline);
         fixedCondition = resolveOverRelation(fixedCondition, fixedInline);
         final String resolvedFixedCondition;
@@ -239,13 +239,13 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         return fixedCondition;
     }
 
-    protected String filterSubQueryIndentMark(String fixedCondition, boolean fixedInline) {
+    protected String filterSubQueryIndentMark(String fixedCondition, boolean fixedInline, boolean optimized) {
         final String sqBeginMark = getSqBeginMark();
         final String sqEndMark = getSqEndMark();
         if (!fixedCondition.contains(sqBeginMark) || !fixedCondition.contains(sqEndMark)) {
             return fixedCondition;
         }
-        final String sqEndIndent = getSqEndIndent(fixedInline);
+        final String sqEndIndent = calculateSqEndIndent(fixedInline, optimized);
         final String indentFrom = "\n)" + sqEndMark;
         final String indentTo = "\n" + sqEndIndent + ")" + sqEndMark;
         fixedCondition = Srl.replace(fixedCondition, indentFrom, indentTo);
@@ -259,14 +259,25 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         return fixedCondition;
     }
 
-    protected String getSqEndIndent(boolean fixedInline) {
+    protected String calculateSqEndIndent(boolean fixedInline, boolean optimized) {
         final String indent;
         if (fixedInline) {
+            // ------"select ..."
+            // ------"  from ..."
             // ------"    left outer join (select ..."
             // ------"                      where ..."
             indent = "                            ";
             // *inner-join gives up
-        } else {
+        } else if (optimized) {
+            // ------"(select ..."
+            // ------"   from ..."
+            // ------"     left outer join ..."
+            // ------"       on ..."
+            // ------"  where ..."
+            indent = "        ";
+        } else { // normal
+            // ------"select ..."
+            // ------"  from ..."
             // ------"    left outer join ..."
             // ------"      on ..."
             indent = "         ";
@@ -538,6 +549,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         }
         if (optimizedCondition != null) { // foreign alias for in-line view is resolved here
             optimizedCondition = replaceString(optimizedCondition, getForeignAliasMark(), baseAlias);
+            optimizedCondition = filterSubQueryIndentMark(optimizedCondition, false, true);
         }
         final StringBuilder sqlSb = new StringBuilder();
         sqlSb.append("(select ").append(baseAlias).append(".*");
@@ -548,24 +560,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         sqlSb.append("   from ").append(foreignTableSqlName).append(" ").append(baseAlias);
         sqlSb.append(joinSb);
         if (optimizedCondition != null) {
-            sqlSb.append(ln()).append(baseIndent);
-            sqlSb.append("  where ");
-            final List<String> splitList = Srl.splitList(optimizedCondition, ln());
-            int index = 0;
-            for (String line : splitList) {
-                if (index == 0) {
-                    sqlSb.append(line);
-                } else {
-                    sqlSb.append(ln()).append(baseIndent);
-                    final String trimmedLine = line.trim();
-                    if (trimmedLine.startsWith("and ")) {
-                        sqlSb.append("    ").append(trimmedLine);
-                    } else {
-                        sqlSb.append(line);
-                    }
-                }
-                ++index;
-            }
+            buildOptimizedInlineWhereClause(optimizedCondition, baseIndent, sqlSb);
         }
         sqlSb.append(ln()).append(baseIndent);
         sqlSb.append(")");
@@ -644,6 +639,42 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
             if (resolvedFixedCondition != null && resolvedFixedCondition.contains(columnMark)) {
                 additionalRealColumnList.add(foreignAlias + "." + columnName);
             }
+        }
+    }
+
+    protected void buildOptimizedInlineWhereClause(String optimizedCondition, String baseIndent, StringBuilder sqlSb) {
+        sqlSb.append(ln()).append(baseIndent);
+        sqlSb.append("  where ");
+
+        // sub-query marks are already replaced here so it uses indent processor
+        final String sqBeginMark = SubQueryIndentProcessor.BEGIN_MARK_PREFIX;
+        final String sqEndMark = SubQueryIndentProcessor.END_MARK_PREFIX;
+
+        final List<String> splitList = Srl.splitList(optimizedCondition, ln());
+        boolean subQueryIndentScope = false;
+        int index = 0;
+        for (String line : splitList) {
+            if (line.contains(sqEndMark)) {
+                subQueryIndentScope = false;
+            }
+            if (index == 0) {
+                sqlSb.append(line);
+            } else {
+                sqlSb.append(ln());
+                if (!subQueryIndentScope) { // no sub-query: sub-query has own formatting
+                    sqlSb.append(baseIndent);
+                }
+                final String trimmedLine = line.trim();
+                if (trimmedLine.startsWith("and ")) {
+                    sqlSb.append("    ").append(trimmedLine);
+                } else {
+                    sqlSb.append(line);
+                }
+            }
+            if (line.contains(sqBeginMark)) {
+                subQueryIndentScope = true;
+            }
+            ++index;
         }
     }
 
