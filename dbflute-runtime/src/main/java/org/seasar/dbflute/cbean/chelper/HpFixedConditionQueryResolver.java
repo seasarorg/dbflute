@@ -163,16 +163,21 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     }
 
     protected boolean doAnalyzeInlineViewOptimizationPart(String fixedCondition) {
+        final String ifCommentMark = "/*IF";
+        if (fixedCondition.contains(ifCommentMark)) {
+            return false; // optimization part is unsupported when IF comment exists 
+        }
         final List<String> lineList = Srl.splitList(fixedCondition, ln());
         String previous = null;
         final List<String> optLineList = new ArrayList<String>();
         final List<Integer> optLineNumberList = new ArrayList<Integer>(lineList.size());
+        boolean ifScope = false;
         int lineNumber = 1;
         for (String line : lineList) {
-            if (previous != null && canBeInlineViewOptimization(previous) && !hasUnclosedBrace(previous)) {
-                if ((lineNumber >= 3 && startsWithConnector(previous)) && startsWithConnector(line)) {
+            if (!ifScope && previous != null && canBeInlineViewOptimization(previous) && !hasUnclosedBrace(previous)) {
+                if ((lineNumber >= 3 && startsWithConnector(previous) && startsWithConnector(line))) {
                     // and ... (previous)
-                    // and ... (current)
+                    // and ... (current) or /*IF ...
                     optLineList.add(previous); // previous line can be optimized
                     optLineNumberList.add(lineNumber - 1);
                 }
@@ -816,6 +821,10 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
 
     protected boolean startsWithConnector(String line) {
         return line.trim().startsWith("and ");
+    }
+
+    protected boolean startsWithIfComment(String line) {
+        return line.trim().startsWith("/*IF");
     }
 
     protected String removePrefixConnector(String clause) {
