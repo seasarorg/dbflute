@@ -823,10 +823,6 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         return line.trim().startsWith("and ");
     }
 
-    protected boolean startsWithIfComment(String line) {
-        return line.trim().startsWith("/*IF");
-    }
-
     protected String removePrefixConnector(String clause) {
         return Srl.ltrim(Srl.ltrim(Srl.ltrim(clause), "and "));
     }
