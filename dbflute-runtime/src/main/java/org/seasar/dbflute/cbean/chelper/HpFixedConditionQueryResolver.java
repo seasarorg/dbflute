@@ -168,24 +168,21 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
             return false; // optimization part is unsupported when IF comment exists 
         }
         final List<String> lineList = Srl.splitList(fixedCondition, ln());
-        String previous = null;
+        String previous = null; // optimization candidate value
         final List<String> optLineList = new ArrayList<String>();
         final List<Integer> optLineNumberList = new ArrayList<Integer>(lineList.size());
-        boolean ifScope = false;
         int lineNumber = 1;
-        for (String line : lineList) {
-            if (!ifScope && previous != null && canBeInlineViewOptimization(previous) && !hasUnclosedBrace(previous)) {
-                if ((lineNumber >= 3 && startsWithConnector(previous) && startsWithConnector(line))) {
-                    // and ... (previous)
-                    // and ... (current) or /*IF ...
-                    optLineList.add(previous); // previous line can be optimized
-                    optLineNumberList.add(lineNumber - 1);
-                }
+        for (String current : lineList) {
+            if (isCandidateOfOptimization(previous) && isOptimizationHitLine(previous, current, lineNumber)) {
+                // and ... (previous) or ...
+                // and ... (current)
+                optLineList.add(previous); // previous line can be optimized
+                optLineNumberList.add(lineNumber - 1);
             }
-            previous = line;
+            previous = current;
             ++lineNumber;
         }
-        if (previous != null && canBeInlineViewOptimization(previous) && !hasUnclosedBrace(previous)) {
+        if (isCandidateOfOptimization(previous)) {
             if (startsWithConnector(previous)) {
                 // ...
                 // and ... (previous)
@@ -206,6 +203,17 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
             }
             _inlineViewOptimizedCondition = removePrefixConnector(optSb.toString());
             return true;
+        }
+        return false;
+    }
+
+    protected boolean isCandidateOfOptimization(String previous) {
+        return previous != null && canBeInlineViewOptimization(previous) && !hasUnclosedBrace(previous);
+    }
+
+    protected boolean isOptimizationHitLine(String previous, String current, int lineNumber) {
+        if (lineNumber == 2 || (lineNumber >= 3 && startsWithConnector(previous))) { // first line or 'and'
+            return startsWithConnector(current); // current (means next) line should start with 'and'
         }
         return false;
     }
