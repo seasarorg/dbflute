@@ -310,14 +310,14 @@ ${database.schemaHtmlJavaScriptEmbedded}
 	<thead>
 	<tr>
 		<th class="rownumhead">No.</th>
-#if ($hasAdditionalSchema)
-		<th>Schema</th>
-#end
 #if ($isAliasDelimiterInDbCommentValid)
 		<th>Alias</th>
 #end
 		<th>Name</th>
 		<th>Type</th>
+#if ($hasAdditionalSchema)
+		<th>Schema</th>
+#end
 		<th>ForeignTable</th>
 		<th>ReferrerTable</th>
 #if ($hasTableComment)
@@ -331,14 +331,14 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #foreach ($table in $database.tableDisplaySortedList)
 	<tr>
 		<td class="rownumcell">${rownum}</td>
-#if ($hasAdditionalSchema)
-		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>
-#end
 #if ($isAliasDelimiterInDbCommentValid)
 		<td class="aliascell">${table.alias}</td>
 #end
 		<td><a href="#${table.tableIdForSchemaHtml}"${table.titleForSchemaHtml}>${table.tableDispName}</a></td>
 		<td class="typecell">${table.type}</td>
+#if ($hasAdditionalSchema)
+		<td class="schemacell">#if ($table.hasSchema()) ${table.documentSchema}#else &nbsp;#end</td>
+#end
 		<td class="relcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
 		<td class="relcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
 #if ($hasTableComment)
@@ -450,13 +450,13 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #end
 #end
 #if ($database.isSchemaHtmlProcedureValid())
-<h2 id="procedure">Procedure</h3>
+<h2 id="procedure">Procedure</h2>
 #set ($hasSeveralProcedureSchema = $database.hasSeveralProcedureSchema())
 #foreach ($procedureEntry in $database.availableSchemaProcedureMap.entrySet())
 #set ($procedureSchema = $procedureEntry.key)
 #set ($procedureList = $procedureEntry.value)
 #if ($hasSeveralProcedureSchema)
-	<h3>${procedureSchema}</h3>
+<h3>${procedureSchema}</h3>
 #end
 <dl class="procedurelist">
 #foreach ($procedure in $procedureList)
@@ -598,9 +598,14 @@ Incremental.prototype = {
 			distDataList = [],
 			sectionIdList = [];
 
+#if ($isAliasDelimiterInDbCommentValid)
+        var nameIndex = 2; // number, alias, name
+#else
+        var nameIndex = 1; // number, name
+#end
 		for (var i = 0, max = tr.length; i < max; i++) {
-			distDataList.push(this.util.getElemTxt(tr[i].getElementsByTagName('td')[2]).toLowerCase());
-			sectionIdList.push(tr[i].getElementsByTagName('td')[2].getElementsByTagName('a')[0].getAttribute('href'));
+			distDataList.push(this.util.getElemTxt(tr[i].getElementsByTagName('td')[nameIndex]).toLowerCase());
+			sectionIdList.push(tr[i].getElementsByTagName('td')[nameIndex].getElementsByTagName('a')[0].getAttribute('href'));
 		}
 
 		return {
