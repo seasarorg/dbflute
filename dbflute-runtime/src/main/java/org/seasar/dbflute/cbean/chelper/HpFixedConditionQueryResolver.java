@@ -93,7 +93,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
         fixedCondition = filterLocationMark(fixedCondition, fixedInline);
         fixedCondition = resolveOverRelation(fixedCondition, fixedInline);
         final String resolvedFixedCondition;
-        final String delimiter = INLINE_MARK;
+        final String delimiter = getInlineMark();
         if (fixedCondition.contains(delimiter)) { // mark optimization
             final String inlineCondition = Srl.substringFirstFront(fixedCondition, delimiter);
             final String filtered = Srl.rtrim(inlineCondition);
@@ -142,7 +142,7 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
     }
 
     protected boolean doAnalyzeInlineViewOptimizationMark(String fixedCondition) {
-        final String delimiter = INLINE_MARK;
+        final String delimiter = getInlineMark();
         if (fixedCondition.contains(delimiter)) {
             final String inlineCondition = Srl.substringFirstRear(fixedCondition, delimiter);
             final String filtered = removePrefixConnector(inlineCondition);
@@ -777,6 +777,10 @@ public class HpFixedConditionQueryResolver implements FixedConditionResolver {
 
     protected String getSqEndMark() {
         return SQ_END_MARK;
+    }
+
+    protected String getInlineMark() {
+        return INLINE_MARK;
     }
 
     protected String getLocationBaseMark() {
