@@ -67,7 +67,8 @@ public class TnBatchUpdateDynamicCommand extends TnUpdateEntityDynamicCommand {
     // ===================================================================================
     //                                                                       Update Column
     //                                                                       =============
-    // Batch Update does not use modified properties
+    // Batch Update does not use modified properties here
+    // (modified properties are converted to specified columns before here)
     @Override
     protected Set<?> getModifiedPropertyNames(Object bean) {
         return Collections.EMPTY_SET;

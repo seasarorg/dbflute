@@ -15,7 +15,9 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -53,6 +55,21 @@ public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
         // because the variable is set when exception occurs if batch 
         //handler.setExceptionMessageSqlArgs(new Object[] { ... });
         return handler.executeBatch(beanList);
+    }
+
+    // ===================================================================================
+    //                                                                       Insert Column
+    //                                                                       =============
+    // Batch Update does not use modified properties here
+    // (modified properties are converted to specified columns before here)
+    @Override
+    protected Set<?> getModifiedPropertyNames(Object bean) {
+        return Collections.EMPTY_SET;
+    }
+
+    @Override
+    protected boolean isModifiedProperty(Set<?> modifiedSet, TnPropertyType pt) {
+        return true; // as default (all columns are updated)
     }
 
     // ===================================================================================

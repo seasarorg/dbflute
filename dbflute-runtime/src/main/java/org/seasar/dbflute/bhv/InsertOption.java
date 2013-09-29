@@ -54,6 +54,7 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     protected Set<String> _forcedSpecifiedInsertColumnSet;
     protected boolean _exceptCommonColumnForcedSpecified;
     protected boolean _insertColumnModifiedPropertiesFragmentedAllowed;
+    protected boolean _compatibleBatchInsertDefaultEveryColumn;
     protected boolean _compatibleInsertColumnNotNullOnly;
 
     protected boolean _disableCommonColumnAutoSetup;
@@ -169,7 +170,10 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
             return; // already specified
         }
         if (entityList.isEmpty()) {
-            return;
+            return; // do nothing
+        }
+        if (xisCompatibleBatchInsertDefaultEveryColumn()) {
+            return; // every column for compatible
         }
         final Entity firstEntity = entityList.get(0);
         if (firstEntity.createdBySelect()) { // all columns e.g. copy insert
@@ -204,8 +208,12 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
         _insertColumnModifiedPropertiesFragmentedAllowed = true;
     }
 
+    public boolean xisInsertColumnModifiedPropertiesFragmentedAllowed() {
+        return _insertColumnModifiedPropertiesFragmentedAllowed;
+    }
+
     protected Set<String> xgatherInsertColumnModifiedProperties(List<? extends Entity> entityList, Entity firstEntity) {
-        if (_insertColumnModifiedPropertiesFragmentedAllowed) { // least common multiple (mainly here)
+        if (xisInsertColumnModifiedPropertiesFragmentedAllowed()) { // least common multiple (mainly here)
             final Set<String> mergedProps = new LinkedHashSet<String>();
             for (Entity entity : entityList) {
                 mergedProps.addAll(entity.modifiedProperties());
@@ -274,6 +282,15 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     // -----------------------------------------------------
     //                               Compatible InsertColumn
     //                               -----------------------
+    // for BatchInsert
+    public void xtoBeCompatibleBatchInsertDefaultEveryColumn() {
+        _compatibleBatchInsertDefaultEveryColumn = true;
+    }
+
+    public boolean xisCompatibleBatchInsertDefaultEveryColumn() {
+        return _compatibleBatchInsertDefaultEveryColumn;
+    }
+
     // for EntityInsert
     public void xtoBeCompatibleInsertColumnNotNullOnly() {
         _compatibleInsertColumnNotNullOnly = true;
@@ -284,9 +301,9 @@ public class InsertOption<CB extends ConditionBean> implements WritableOption<CB
     }
 
     // -----------------------------------------------------
-    //                                        Update Process
+    //                                        Insert Process
     //                                        --------------
-    public void xcheckSpecifiedUpdateColumnPrimaryKey() { // checked later by process if it needs
+    public void xcheckSpecifiedInsertColumnPrimaryKey() { // checked later by process if it needs
         if (_insertColumnSpecification == null) {
             return;
         }

@@ -62,6 +62,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected Set<String> _forcedSpecifiedUpdateColumnSet;
     protected boolean _exceptCommonColumnForcedSpecified;
     protected boolean _updateColumnModifiedPropertiesFragmentedAllowed;
+    protected boolean _compatibleBatchUpdateDefaultEveryColumn;
 
     protected boolean _disableCommonColumnAutoSetup;
     protected boolean _nonQueryUpdateAllowed;
@@ -388,7 +389,10 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
             return; // already specified
         }
         if (entityList.isEmpty()) {
-            return;
+            return; // do nothing
+        }
+        if (xisCompatibleBatchUpdateDefaultEveryColumn()) {
+            return; // every column for compatible
         }
         final Entity firstEntity = entityList.get(0);
         final Set<String> targetProps = xgatherUpdateColumnModifiedProperties(entityList, firstEntity);
@@ -410,10 +414,14 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         _updateColumnModifiedPropertiesFragmentedAllowed = true;
     }
 
+    public boolean xisUpdateColumnModifiedPropertiesFragmentedAllowed() {
+        return _updateColumnModifiedPropertiesFragmentedAllowed;
+    }
+
     protected Set<String> xgatherUpdateColumnModifiedProperties(List<? extends Entity> entityList, Entity firstEntity) {
         // no use for now (same-set columns basis)
         //if (firstEntity.createdBySelect() || ...) { // ...
-        if (_updateColumnModifiedPropertiesFragmentedAllowed) { // least common multiple
+        if (xisUpdateColumnModifiedPropertiesFragmentedAllowed()) { // least common multiple
             final Set<String> mergedProps = new LinkedHashSet<String>();
             for (Entity entity : entityList) { // for merge
                 mergedProps.addAll(entity.modifiedProperties());
@@ -484,6 +492,18 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         br.addElement(entity.modifiedProperties());
         final String msg = br.buildExceptionMessage();
         throw new BatchUpdateColumnModifiedPropertiesFragmentedException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                               Compatible UpdateColumn
+    //                               -----------------------
+    // for BatchUpdate
+    public void xtoBeCompatibleBatchUpdateDefaultEveryColumn() {
+        _compatibleBatchUpdateDefaultEveryColumn = true;
+    }
+
+    public boolean xisCompatibleBatchUpdateDefaultEveryColumn() {
+        return _compatibleBatchUpdateDefaultEveryColumn;
     }
 
     // -----------------------------------------------------
