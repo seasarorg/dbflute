@@ -7,10 +7,10 @@
 	<!-- Version -->
 	<property name="version" value="1.0.5A" />
 	<property name="build.version" value="${version}" />
-	<property name="pre.version" value="1.0.4L" />
+	<property name="pre.version" value="1.0.4K" />
 	<property name="runtime.version" value="1.0.5A" />
 	<property name="runtime.build.version" value="${runtime.version}" />
-	<property name="runtime.pre.version" value="1.0.4L" />
+	<property name="runtime.pre.version" value="1.0.4K" />
 
 	<!-- Resource Directories -->
 	<property name="workspace.base" value=".." />
