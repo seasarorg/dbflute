@@ -482,7 +482,6 @@
 		<antcall target="reflect-to-basic" />
 		<antcall target="reflect-to-spring" />
 		<antcall target="reflect-to-guice" />
-		<antcall target="reflect-to-lucy" />
 		<antcall target="reflect-to-cdi" />
 		<antcall target="reflect-to-mysql" />
 		<antcall target="reflect-to-postgresql" />
