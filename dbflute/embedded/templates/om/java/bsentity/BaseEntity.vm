@@ -129,6 +129,9 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     protected boolean __canCommonColumnAutoSetup = true;
 #end
 
+    /** Is the entity created by DBFlute select process? */
+    protected boolean __createdBySelect;
+
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
@@ -537,11 +540,28 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     protected EntityModifiedProperties newModifiedProperties() {
         return new EntityModifiedProperties();
     }
-#if (${table.hasAllCommonColumn()})
-    
+
     // ===================================================================================
-    //                                                              Common Column Handling
-    //                                                              ======================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
+    /**
+     * {@inheritDoc}
+     */
+    public void markAsSelect() {
+        __createdBySelect = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean createdBySelect() {
+        return __createdBySelect;
+    }
+#if (${table.hasAllCommonColumn()})
+
+    // ===================================================================================
+    //                                                                       Common Column
+    //                                                                       =============
     /**
      * {@inheritDoc}
      */

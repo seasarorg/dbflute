@@ -466,6 +466,18 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                        Batch Update
+    //                                                                        ============
+    public boolean isInsertColumnModifiedPropertiesFragmentedAllowed() { // closet
+        // BatchInsert can allow fragmented properties (least common multiple)
+        return isProperty("isInsertColumnModifiedPropertiesFragmentedAllowed", true);
+    }
+
+    public boolean isUpdateColumnModifiedPropertiesFragmentedAllowed() { // closet
+        return isProperty("isUpdateColumnModifiedPropertiesFragmentedAllowed", false);
+    }
+
+    // ===================================================================================
     //                                                                        Query Update
     //                                                                        ============
     public boolean isCheckCountBeforeQueryUpdate() { // closet
@@ -685,7 +697,15 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCompatibleAutoMappingOldStyle", false);
     }
 
-    public boolean isCompatibleBatchUpdateNoSpecify() { // closet
-        return isProperty("isCompatibleBatchUpdateNoSpecify", true); // under review
+    public boolean isCompatibleInsertColumnNotNullOnly() { // closet
+        return isProperty("isCompatibleInsertColumnNotNullOnly", false);
+    }
+
+    public boolean isCompatibleBatchInsertDefaultEveryColumn() { // closet
+        return isProperty("isCompatibleBatchInsertDefaultEveryColumn", false);
+    }
+
+    public boolean isCompatibleBatchUpdateDefaultEveryColumn() { // closet
+        return isProperty("isCompatibleBatchUpdateDefaultEveryColumn", false);
     }
 }

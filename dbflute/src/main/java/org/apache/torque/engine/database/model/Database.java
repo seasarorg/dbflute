@@ -2021,6 +2021,14 @@ public class Database {
         return getLittleAdjustmentProperties().getCursorSelectFetchSize();
     }
 
+    public boolean isInsertColumnModifiedPropertiesFragmentedAllowed() {
+        return getLittleAdjustmentProperties().isInsertColumnModifiedPropertiesFragmentedAllowed();
+    }
+
+    public boolean isUpdateColumnModifiedPropertiesFragmentedAllowed() {
+        return getLittleAdjustmentProperties().isUpdateColumnModifiedPropertiesFragmentedAllowed();
+    }
+
     public boolean isCheckCountBeforeQueryUpdate() {
         return getLittleAdjustmentProperties().isCheckCountBeforeQueryUpdate();
     }
@@ -2053,8 +2061,16 @@ public class Database {
         return getLittleAdjustmentProperties().isMakeDaoInterface();
     }
 
-    public boolean isCompatibleBatchUpdateNoSpecify() {
-        return getLittleAdjustmentProperties().isCompatibleBatchUpdateNoSpecify();
+    public boolean isCompatibleInsertColumnNotNullOnly() {
+        return getLittleAdjustmentProperties().isCompatibleBatchUpdateDefaultEveryColumn();
+    }
+
+    public boolean isCompatibleBatchInsertDefaultEveryColumn() {
+        return getLittleAdjustmentProperties().isCompatibleBatchInsertDefaultEveryColumn();
+    }
+    
+    public boolean isCompatibleBatchUpdateDefaultEveryColumn() {
+        return getLittleAdjustmentProperties().isCompatibleBatchUpdateDefaultEveryColumn();
     }
 
     // ===================================================================================
