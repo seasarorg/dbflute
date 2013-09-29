@@ -25,15 +25,12 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.chelper.HpCalcSpecification;
 import org.seasar.dbflute.cbean.chelper.HpCalculator;
-import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.cbean.sqlclause.select.SpecifiedSelectColumnHandler;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
+import org.seasar.dbflute.exception.BatchUpdateColumnModifiedPropertiesFragmentedException;
 import org.seasar.dbflute.exception.SpecifyUpdateColumnInvalidException;
-import org.seasar.dbflute.exception.SpecifyUpdateColumnModifiedPropertyNotSpecifiedException;
-import org.seasar.dbflute.exception.SpecifyUpdateColumnNotModifiedPropertyException;
 import org.seasar.dbflute.exception.VaryingUpdateCalculationUnsupportedColumnTypeException;
 import org.seasar.dbflute.exception.VaryingUpdateCommonColumnSpecificationException;
 import org.seasar.dbflute.exception.VaryingUpdateInvalidColumnSpecificationException;
@@ -64,7 +61,7 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     protected CB _updateColumnSpecifiedCB;
     protected Set<String> _forcedSpecifiedUpdateColumnSet;
     protected boolean _exceptCommonColumnForcedSpecified;
-    protected Set<String> _updateColumnModifiedProperties;
+    protected boolean _updateColumnModifiedPropertiesFragmentedAllowed;
 
     protected boolean _disableCommonColumnAutoSetup;
     protected boolean _nonQueryUpdateAllowed;
@@ -307,6 +304,9 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
     // ===================================================================================
     //                                                                       Update Column
     //                                                                       =============
+    // -----------------------------------------------------
+    //                                        Specify Column
+    //                                        --------------
     /**
      * Specify update columns manually. <br />
      * You can update fixed columns instead of modified update columns.
@@ -335,25 +335,162 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         _updateColumnSpecification = updateColumnSpecification;
     }
 
-    public boolean hasSpecifiedUpdateColumn() {
-        return _updateColumnSpecification != null;
-    }
-
     public void resolveUpdateColumnSpecification(CB cb) {
-        if (!hasSpecifiedUpdateColumn()) {
+        if (_updateColumnSpecification == null) {
             return;
         }
         _updateColumnSpecification.specify(cb);
         _updateColumnSpecifiedCB = cb;
         if (!_exceptCommonColumnForcedSpecified) {
-            final List<ColumnInfo> beforeUpdateList = cb.getDBMeta().getCommonColumnInfoBeforeUpdateList();
-            xacceptForcedSpecifiedUpdateColumn(beforeUpdateList);
+            xacceptCommonColumnForcedSpecification(cb);
         }
         // an exclusive control column is specified forcedly by behavior's logic
     }
 
+    // -----------------------------------------------------
+    //                                         Common Column
+    //                                         -------------
+    /**
+     * Except common columns from forced specified update columns.
+     * @return The option of update. (NotNull: returns this)
+     */
+    public UpdateOption<CB> exceptCommonColumnForcedSpecified() {
+        _exceptCommonColumnForcedSpecified = true;
+        return this;
+    }
+
+    protected void xacceptCommonColumnForcedSpecification(CB cb) { // internal
+        final List<ColumnInfo> beforeUpdateList = cb.getDBMeta().getCommonColumnInfoBeforeUpdateList();
+        if (beforeUpdateList == null || beforeUpdateList.isEmpty()) {
+            return;
+        }
+        for (ColumnInfo columnInfo : beforeUpdateList) {
+            addForcedSpecifiedUpdateColumn(columnInfo);
+        }
+    }
+
+    protected void addForcedSpecifiedUpdateColumn(ColumnInfo columnInfo) {
+        if (_forcedSpecifiedUpdateColumnSet == null) {
+            _forcedSpecifiedUpdateColumnSet = DfCollectionUtil.newHashSet();
+        }
+        _forcedSpecifiedUpdateColumnSet.add(columnInfo.getColumnDbName());
+    }
+
+    // -----------------------------------------------------
+    //                                   Modified Properties
+    //                                   -------------------
+    // for BatchUpdate
+    public void xacceptUpdateColumnModifiedPropertiesIfNeeds(List<? extends Entity> entityList) { // internal
+        if (entityList == null) {
+            throw new IllegalArgumentException("The argument 'entityList' should not be null.");
+        }
+        if (_updateColumnSpecification != null) {
+            return; // already specified
+        }
+        if (entityList.isEmpty()) {
+            return;
+        }
+        final Entity firstEntity = entityList.get(0);
+        final Set<String> targetProps = xgatherUpdateColumnModifiedProperties(entityList, firstEntity);
+        final DBMeta dbmeta = firstEntity.getDBMeta();
+        specify(new SpecifyQuery<CB>() {
+            public void specify(CB cb) {
+                // you don't need to specify primary key because primary key has special handling
+                for (String prop : targetProps) {
+                    final ColumnInfo info = dbmeta.findColumnInfo(prop);
+                    if (!info.isPrimary()) { // except PK
+                        cb.localSp().xspecifyColumn(info.getColumnDbName());
+                    }
+                }
+            }
+        });
+    }
+
+    public void xallowUpdateColumnModifiedPropertiesFragmented() { // depends on generator option (mainly NOT called)
+        _updateColumnModifiedPropertiesFragmentedAllowed = true;
+    }
+
+    protected Set<String> xgatherUpdateColumnModifiedProperties(List<? extends Entity> entityList, Entity firstEntity) {
+        // no use for now (same-set columns basis)
+        //if (firstEntity.createdBySelect() || ...) { // ...
+        if (_updateColumnModifiedPropertiesFragmentedAllowed) { // least common multiple
+            final Set<String> mergedProps = new LinkedHashSet<String>();
+            for (Entity entity : entityList) { // for merge
+                mergedProps.addAll(entity.modifiedProperties());
+            }
+            return mergedProps;
+        } else { // same-set columns (mainly here)
+            final Set<String> firstProps = firstEntity.modifiedProperties();
+            for (Entity entity : entityList) { // for check
+                if (!entity.modifiedProperties().equals(firstProps)) {
+                    throwBatchUpdateColumnModifiedPropertiesFragmentedException(firstProps, entity);
+                }
+            }
+            return firstProps; // use first entity's
+        }
+    }
+
+    protected void throwBatchUpdateColumnModifiedPropertiesFragmentedException(Set<String> baseProps, Entity entity) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("The modified properties in the entity are fragmented as batch update column.");
+        br.addItem("Advice");
+        br.addElement("You should specify the same-set columns to your entities.");
+        br.addElement("For example:");
+        br.addElement("");
+        br.addElement("  (x): (BatchUpdate)");
+        br.addElement("    for (... : ...) {");
+        br.addElement("        Member member = new Member();");
+        br.addElement("        member.setMemberName(\"foo\");");
+        br.addElement("        if (...) { // only a part of entities is set");
+        br.addElement("            member.setMemberStatusCode_Formalized();");
+        br.addElement("        }");
+        br.addElement("        member.setVersionNo(...);");
+        br.addElement("        memberList.add(member);");
+        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList); // throws exception");
+        br.addElement("  (o): (BatchUpdate)");
+        br.addElement("    for (... : ...) {");
+        br.addElement("        Member member = new Member();");
+        br.addElement("        member.setMemberName(\"foo\");");
+        br.addElement("        if (...) {");
+        br.addElement("            member.setMemberStatusCode_Formalized();");
+        br.addElement("        } else {");
+        br.addElement("            member.setMemberStatusCode_Provisional();");
+        br.addElement("        }");
+        br.addElement("        member.setVersionNo(...);");
+        br.addElement("        memberList.add(member);");
+        br.addElement("    }");
+        br.addElement("    memberBhv.batchUpdate(memberList); // MEMBER_STATUS_CODE is updated");
+        br.addElement("  (o): (EntityUpdate)");
+        br.addElement("    for (... : ...) {");
+        br.addElement("        Member member = new Member();");
+        br.addElement("        member.setMemberName(\"foo\");");
+        br.addElement("        if (...) { // only a part of entities is set");
+        br.addElement("            member.setMemberStatusCode_Formalized();");
+        br.addElement("        }");
+        br.addElement("        member.setVersionNo(...);");
+        br.addElement("        memberList.add(member);");
+        br.addElement("    }");
+        br.addElement("    for (Member member : memberList) {");
+        br.addElement("        memberBhv.update(member); // keep or update new value of MEMBER_STATUS_CODE");
+        br.addElement("    }");
+        br.addItem("Update Table");
+        br.addElement(entity.getDBMeta().getTableDbName());
+        br.addItem("Base Properties");
+        br.addElement(baseProps);
+        br.addItem("Fragmented Entity");
+        br.addElement(entity.getDBMeta().extractPrimaryKeyMap(entity));
+        br.addItem("Fragmented Properties");
+        br.addElement(entity.modifiedProperties());
+        final String msg = br.buildExceptionMessage();
+        throw new BatchUpdateColumnModifiedPropertiesFragmentedException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                        Update Process
+    //                                        --------------
     public void xcheckSpecifiedUpdateColumnPrimaryKey() { // checked later by process if it needs
-        if (!hasSpecifiedUpdateColumn()) {
+        if (_updateColumnSpecification == null) {
             return;
         }
         assertUpdateColumnSpecifiedCB();
@@ -373,128 +510,8 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
         }
     }
 
-    public void xcheckSpecifiedUpdateColumnSyncWithModified() { // checked later by process if it needs
-        if (!hasSpecifiedUpdateColumn() || _updateColumnModifiedProperties == null) {
-            return;
-        }
-        assertUpdateColumnSpecifiedCB();
-        // under review
-        //final CB cb = _updateColumnSpecifiedCB;
-        //if (!cb.hasSpecifiedColumn()) { // no specification
-        //    return; // no check as default all columns
-        //}
-        //final Set<String> modifiedProperties = _updateColumnModifiedProperties;
-        //doCheckSpecifiedUpdateColumnModifiedPropertyNotSpecified(cb, modifiedProperties);
-        //if (!cb.localSp().isSpecifiedEveryColumn()) { // not every column
-        //    doCheckSpecifiedUpdateColumnNotModifiedProperty(cb, modifiedProperties);
-        //}
-    }
-
-    protected void doCheckSpecifiedUpdateColumnModifiedPropertyNotSpecified(CB cb, Set<String> modifiedProperties) {
-        final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
-        final DBMeta dbmeta = cb.getDBMeta();
-        for (String prop : modifiedProperties) {
-            final ColumnInfo columnInfo = dbmeta.findColumnInfo(prop);
-            if (columnInfo.isPrimary()) { // primary key is out of check
-                continue;
-            }
-            if (!cb.getSqlClause().hasSpecifiedSelectColumn(basePointAliasName, columnInfo.getColumnDbName())) {
-                throwSpecifyUpdateColumnModifiedPropertyNotSpecifiedException(modifiedProperties, columnInfo);
-            }
-        }
-    }
-
-    protected void doCheckSpecifiedUpdateColumnNotModifiedProperty(CB cb, final Set<String> modifiedProperties) {
-        final String basePointAliasName = cb.getSqlClause().getBasePointAliasName();
-        cb.getSqlClause().handleSpecifiedSelectColumn(basePointAliasName, new SpecifiedSelectColumnHandler() {
-            public void handle(String tableAliasName, HpSpecifiedColumn specifiedColumn) {
-                final ColumnInfo columnInfo = specifiedColumn.getColumnInfo();
-                if (columnInfo.isPrimary()) { // primary key is out of check
-                    return;
-                }
-                if (!modifiedProperties.contains(columnInfo.getPropertyName())) {
-                    throwSpecifyUpdateColumnNotModifiedPropertyException(modifiedProperties, columnInfo);
-                }
-            }
-        });
-    }
-
-    protected void throwSpecifyUpdateColumnModifiedPropertyNotSpecifiedException(Set<String> modifiedProperties,
-            ColumnInfo columnInfo) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The modified property in the entities is not specified as update column.");
-        br.addItem("Advice");
-        br.addElement("You should specify the column in your specify-query,");
-        br.addElement("which is modified in any entities (at least one entity).");
-        br.addElement("For example:");
-        br.addElement("");
-        br.addElement("  (x): (BatchUpdate)");
-        br.addElement("    for (Member member : memberList) {");
-        br.addElement("        member.setMemberName(\"foo\");");
-        br.addElement("        member.setMemberStatusCode_Formalized();");
-        br.addElement("    }");
-        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) { // *no!");
-        br.addElement("            cb.specify().columnMemberName();");
-        br.addElement("        }");
-        br.addElement("    });");
-        br.addElement("  (o): (BatchUpdate)");
-        br.addElement("    for (Member member : memberList) {");
-        br.addElement("        member.setMemberName(\"foo\");");
-        br.addElement("        member.setMemberStatusCode_Formalized();");
-        br.addElement("    }");
-        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().columnMemberName();");
-        br.addElement("            cb.specify().columnMemberStatusCode(); // OK");
-        br.addElement("        }");
-        br.addElement("    });");
-        br.addItem("Update Table");
-        br.addElement(columnInfo.getDBMeta().getTableDbName());
-        br.addItem("Modified Properties");
-        br.addElement(modifiedProperties);
-        br.addItem("NotSpecified Modified Property");
-        br.addElement(columnInfo.getPropertyName());
-        final String msg = br.buildExceptionMessage();
-        throw new SpecifyUpdateColumnModifiedPropertyNotSpecifiedException(msg);
-    }
-
-    protected void throwSpecifyUpdateColumnNotModifiedPropertyException(Set<String> modifiedProperties,
-            ColumnInfo columnInfo) {
-        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
-        br.addNotice("The specified update column is not modified property.");
-        br.addItem("Advice");
-        br.addElement("Is is unnecessary specification?");
-        br.addElement("At least one modification should exist in any entities.");
-        br.addElement("For example:");
-        br.addElement("");
-        br.addElement("  (x): (BatchUpdate)");
-        br.addElement("    for (Member member : memberList) {");
-        br.addElement("        member.setMemberStatusCode_Formalized();");
-        br.addElement("    }");
-        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) {");
-        br.addElement("            cb.specify().columnMemberName(); // *no!");
-        br.addElement("            cb.specify().columnMemberStatusCode();");
-        br.addElement("        }");
-        br.addElement("    });");
-        br.addElement("  (o): (BatchUpdate)");
-        br.addElement("    for (Member member : memberList) {");
-        br.addElement("        member.setMemberStatusCode_Formalized();");
-        br.addElement("    }");
-        br.addElement("    memberBhv.batchUpdate(memberList, new SpecifyQuery<MemberCB>() {");
-        br.addElement("        public void specify(MemberCB cb) { // OK");
-        br.addElement("            cb.specify().columnMemberStatusCode();");
-        br.addElement("        }");
-        br.addElement("    });");
-        br.addItem("Update Table");
-        br.addElement(columnInfo.getDBMeta().getTableDbName());
-        br.addItem("Modified Properties");
-        br.addElement(modifiedProperties);
-        br.addItem("NotModified Specified Column");
-        br.addElement(columnInfo.getColumnDbName());
-        final String msg = br.buildExceptionMessage();
-        throw new SpecifyUpdateColumnNotModifiedPropertyException(msg);
+    public boolean hasSpecifiedUpdateColumn() {
+        return _updateColumnSpecification != null;
     }
 
     public boolean isSpecifiedUpdateColumn(String columnDbName) {
@@ -511,38 +528,6 @@ public class UpdateOption<CB extends ConditionBean> implements WritableOption<CB
             String msg = "The CB for specification of update columns should be required here.";
             throw new IllegalStateException(msg);
         }
-    }
-
-    /**
-     * Except common columns from forced specified update columns.
-     * @return The option of update. (NotNull: returns this)
-     */
-    public UpdateOption<CB> exceptCommonColumnForcedSpecified() {
-        _exceptCommonColumnForcedSpecified = true;
-        return this;
-    }
-
-    protected void xacceptForcedSpecifiedUpdateColumn(List<ColumnInfo> columnInfoList) { // internal
-        if (columnInfoList == null || columnInfoList.isEmpty()) {
-            return;
-        }
-        if (_forcedSpecifiedUpdateColumnSet == null) {
-            _forcedSpecifiedUpdateColumnSet = DfCollectionUtil.newHashSet();
-        }
-        for (ColumnInfo columnInfo : columnInfoList) {
-            _forcedSpecifiedUpdateColumnSet.add(columnInfo.getColumnDbName());
-        }
-    }
-
-    public void xgatherUpdateColumnModifiedProperties(List<? extends Entity> entityList) {
-        if (entityList == null) {
-            throw new IllegalArgumentException("The argument 'entityList' should not be null");
-        }
-        final Set<String> propSet = new LinkedHashSet<String>();
-        for (Entity entity : entityList) {
-            propSet.addAll(entity.modifiedProperties());
-        }
-        _updateColumnModifiedProperties = propSet;
     }
 
     // ===================================================================================

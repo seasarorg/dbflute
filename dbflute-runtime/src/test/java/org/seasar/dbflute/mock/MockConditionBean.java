@@ -269,7 +269,7 @@ public class MockConditionBean implements ConditionBean {
     public void checkInvalidQuery() {
     }
 
-    public void throughInvalidQuery() {
+    public void acceptInvalidQuery() {
     }
 
     public HpCBPurpose getPurpose() {

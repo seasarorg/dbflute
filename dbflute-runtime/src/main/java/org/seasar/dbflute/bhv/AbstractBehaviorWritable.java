@@ -757,9 +757,17 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         dbmeta.getPrimaryUniqueInfo().getFirstColumn().write(entity, readNextVal());
     }
 
+    protected <CB extends ConditionBean> InsertOption<CB> createInsertUpdateOption() {
+        return new InsertOption<CB>();
+    }
+
+    protected <CB extends ConditionBean> UpdateOption<CB> createPlainUpdateOption() {
+        return new UpdateOption<CB>();
+    }
+
     protected <CB extends ConditionBean> UpdateOption<CB> createSpecifiedUpdateOption(SpecifyQuery<CB> updateColumnSpec) {
         assertUpdateColumnSpecificationNotNull(updateColumnSpec);
-        final UpdateOption<CB> option = new UpdateOption<CB>();
+        final UpdateOption<CB> option = createPlainUpdateOption();
         option.specify(updateColumnSpec);
         return option;
     }

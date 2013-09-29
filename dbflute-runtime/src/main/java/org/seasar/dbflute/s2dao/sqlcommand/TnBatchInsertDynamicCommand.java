@@ -56,15 +56,6 @@ public class TnBatchInsertDynamicCommand extends TnInsertEntityDynamicCommand {
     }
 
     // ===================================================================================
-    //                                                                       Insert Column
-    //                                                                       =============
-    @Override
-    protected boolean isExceptProperty(Object bean, TnPropertyType pt, String timestampPropertyName,
-            String versionNoPropertyName) {
-        return false; // all columns are target
-    }
-
-    // ===================================================================================
     //                                                                             Handler
     //                                                                             =======
     protected TnBatchInsertHandler createBatchInsertHandler(TnPropertyType[] boundPropTypes, String sql,

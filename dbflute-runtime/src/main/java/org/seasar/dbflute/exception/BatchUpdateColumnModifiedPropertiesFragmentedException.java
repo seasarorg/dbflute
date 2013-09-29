@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the specified update column is not modified property.
+ * The exception of when the modified properties are fragmented as batch update column.
  * @author jflute
  */
-public class SpecifyUpdateColumnNotModifiedPropertyException extends RuntimeException {
+public class BatchUpdateColumnModifiedPropertiesFragmentedException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class SpecifyUpdateColumnNotModifiedPropertyException extends RuntimeExce
      * Constructor.
      * @param msg The message of the exception. (NotNull)
      */
-    public SpecifyUpdateColumnNotModifiedPropertyException(String msg) {
+    public BatchUpdateColumnModifiedPropertiesFragmentedException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class SpecifyUpdateColumnNotModifiedPropertyException extends RuntimeExce
      * @param msg The message of the exception. (NotNull)
      * @param cause The cause of the exception. (NotNull)
      */
-    public SpecifyUpdateColumnNotModifiedPropertyException(String msg, Throwable cause) {
+    public BatchUpdateColumnModifiedPropertiesFragmentedException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

@@ -70,7 +70,7 @@ public interface Entity {
     //                                                                 Modified Properties
     //                                                                 ===================
     /**
-     * Get the set of modified properties. (basically for Framework)<br />
+     * Get the set of modified properties. (basically for Framework) <br />
      * The properties needs to be according to Java Beans rule.
      * @return The set instance that contains names of modified property. (NotNull)
      */
@@ -148,6 +148,20 @@ public interface Entity {
             }
         }
     }
+
+    // ===================================================================================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
+    /**
+     * Mark as select that means the entity is created by DBFlute select process. (basically for Framework)
+     */
+    void markAsSelect();
+
+    /**
+     * Is the entity created by DBFlute select process? (basically for Framework)
+     * @return The determination, true or false.
+     */
+    boolean createdBySelect();
 
     // ===================================================================================
     //                                                                    Extension Method

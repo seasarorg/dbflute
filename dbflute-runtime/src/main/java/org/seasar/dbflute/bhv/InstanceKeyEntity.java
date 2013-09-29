@@ -90,6 +90,14 @@ public class InstanceKeyEntity implements Entity {
         return _actualEntity.hasModification();
     }
 
+    public void markAsSelect() {
+        _actualEntity.markAsSelect();
+    }
+
+    public boolean createdBySelect() {
+        return _actualEntity.createdBySelect();
+    }
+
     public int instanceHash() {
         return _actualEntity.instanceHash();
     }

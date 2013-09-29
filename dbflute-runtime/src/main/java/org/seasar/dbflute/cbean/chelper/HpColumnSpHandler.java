@@ -23,7 +23,7 @@ public interface HpColumnSpHandler {
     // ===================================================================================
     //                                                                Column Specification
     //                                                                ====================
-    HpSpecifiedColumn getSpecifiedColumn(String columnName);
+    HpSpecifiedColumn xspecifyColumn(String columnName); // internal
 
     boolean hasSpecifiedColumn();
 

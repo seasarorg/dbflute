@@ -289,6 +289,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         for (Entry<String, Entity> entry : entrySet) {
             final Entity currentRegisteredEntity = entry.getValue();
             currentRegisteredEntity.clearModifiedInfo();
+            currentRegisteredEntity.markAsSelect();
         }
 
         return localTableList;

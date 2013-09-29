@@ -300,7 +300,9 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
      */
     public static void adjustCreatedRow(final Object row, TnBeanMetaData bmd) {
         if (row instanceof Entity) {
-            ((Entity) row).clearModifiedInfo();
+            final Entity entity = (Entity) row;
+            entity.clearModifiedInfo();
+            entity.markAsSelect();
         } else { // not DBFlute entity
             // actually any bean meta data can be accepted
             // because only it gets modified properties

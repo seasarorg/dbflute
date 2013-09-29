@@ -87,7 +87,6 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         @SuppressWarnings("unchecked")
         final UpdateOption<ConditionBean> option = (UpdateOption<ConditionBean>) args[1];
         option.xcheckSpecifiedUpdateColumnPrimaryKey();
-        option.xcheckSpecifiedUpdateColumnSyncWithModified();
         return option;
     }
 
@@ -140,9 +139,9 @@ public class TnUpdateEntityDynamicCommand extends TnAbstractEntityDynamicCommand
     }
 
     protected boolean isSpecifiedProperty(UpdateOption<ConditionBean> option, Set<?> modifiedSet, TnPropertyType pt) {
-        if (option != null && option.hasSpecifiedUpdateColumn()) {
+        if (option != null && option.hasSpecifiedUpdateColumn()) { // BatchUpdate
             return option.isSpecifiedUpdateColumn(pt.getColumnDbName());
-        } else { // basically here when UpdateEntity
+        } else { // EntityUpdate
             return isModifiedProperty(modifiedSet, pt); // process for ModifiedColumnUpdate
         }
     }

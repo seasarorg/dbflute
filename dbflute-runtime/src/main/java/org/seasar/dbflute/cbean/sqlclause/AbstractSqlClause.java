@@ -2624,7 +2624,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _invalidQueryChecked = true;
     }
 
-    public void throughInvalidQuery() {
+    public void acceptInvalidQuery() {
         _invalidQueryChecked = false;
     }
 

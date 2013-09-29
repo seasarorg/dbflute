@@ -17,9 +17,11 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.InsertOption;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
@@ -97,8 +99,9 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
             throw new IllegalStateException(msg);
         }
         final List<TnPropertyType> typeList = new ArrayList<TnPropertyType>();
-        final String timestampPropertyName = bmd.getTimestampPropertyName();
-        final String versionNoPropertyName = bmd.getVersionNoPropertyName();
+        final Set<?> modifiedSet = getModifiedPropertyNames(bean);
+        final String timestampProp = bmd.getTimestampPropertyName();
+        final String versionNoProp = bmd.getVersionNoPropertyName();
 
         for (int i = 0; i < propertyNames.length; ++i) {
             final TnPropertyType pt = bmd.getPropertyType(propertyNames[i]);
@@ -109,17 +112,62 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
                         continue;
                     }
                 }
+                typeList.add(pt);
             } else {
-                if (isExceptProperty(bean, pt, timestampPropertyName, versionNoPropertyName)) {
-                    continue;
+                if (isOptimisticLockProperty(timestampProp, versionNoProp, pt) // OptimisticLock
+                        || isSpecifiedProperty(bean, option, modifiedSet, pt)) { // Specified
+                    typeList.add(pt);
                 }
             }
-            typeList.add(pt);
         }
         if (typeList.isEmpty()) {
             throwEntityInsertPropertyNotFoundException(bmd, bean);
         }
         return (TnPropertyType[]) typeList.toArray(new TnPropertyType[typeList.size()]);
+    }
+
+    protected Set<?> getModifiedPropertyNames(Object bean) {
+        return _beanMetaData.getModifiedPropertyNames(bean);
+    }
+
+    protected boolean isOptimisticLockProperty(String timestampProp, String versionNoProp, TnPropertyType pt) {
+        final String propertyName = pt.getPropertyName();
+        return propertyName.equalsIgnoreCase(timestampProp) || propertyName.equalsIgnoreCase(versionNoProp);
+    }
+
+    protected boolean isSpecifiedProperty(Object bean, InsertOption<ConditionBean> option, Set<?> modifiedSet,
+            TnPropertyType pt) {
+        if (option != null && option.hasSpecifiedInsertColumn()) { // basically BatchUpdate
+            // BatchUpdate's modified properties are translated to specified columns
+            // so all BatchUpdate commands are here
+            return option.isSpecifiedInsertColumn(pt.getColumnDbName());
+        } else { // basically EntityInsert
+            if (isEntityCreatedBySelect(bean)) { // e.g. copy insert
+                return true; // every column
+            } else { // new-created entity: mainly here
+                if (option != null && option.xisCompatibleInsertColumnNotNullOnly()) { // for compatible
+                    return isNotNullProperty(bean, pt);
+                } else { // mainly here
+                    return isModifiedProperty(modifiedSet, pt); // process for ModifiedColumnInsert
+                }
+            }
+        }
+    }
+
+    protected boolean isEntityCreatedBySelect(Object bean) {
+        if (bean instanceof Entity) {
+            Entity entity = (Entity) bean;
+            return entity.createdBySelect();
+        }
+        return false;
+    }
+
+    protected boolean isNotNullProperty(Object bean, TnPropertyType pt) {
+        return pt.getPropertyAccessor().getValue(bean) != null;
+    }
+
+    protected boolean isModifiedProperty(Set<?> modifiedSet, TnPropertyType pt) {
+        return modifiedSet.contains(pt.getPropertyName());
     }
 
     protected void throwEntityInsertPropertyNotFoundException(TnBeanMetaData bmd, Object bean) {
@@ -134,25 +182,6 @@ public class TnInsertEntityDynamicCommand extends TnAbstractEntityDynamicCommand
         br.addElement(bean != null ? bean.getClass() : null);
         final String msg = br.buildExceptionMessage();
         throw new IllegalStateException(msg);
-    }
-
-    protected boolean isExceptProperty(Object bean, TnPropertyType pt, String timestampPropertyName,
-            String versionNoPropertyName) {
-        if (isOptimisticLockProperty(pt, timestampPropertyName, versionNoPropertyName)) {
-            return false;
-        }
-        return isNullProperty(bean, pt); // as default (only not null columns are target)
-    }
-
-    protected boolean isOptimisticLockProperty(TnPropertyType pt, String timestampPropertyName,
-            String versionNoPropertyName) {
-        final String propertyName = pt.getPropertyName();
-        return propertyName.equalsIgnoreCase(timestampPropertyName)
-                || propertyName.equalsIgnoreCase(versionNoPropertyName);
-    }
-
-    protected boolean isNullProperty(Object bean, TnPropertyType pt) {
-        return pt.getPropertyDesc().getValue(bean) == null; // getting by reflection here
     }
 
     // ===================================================================================
