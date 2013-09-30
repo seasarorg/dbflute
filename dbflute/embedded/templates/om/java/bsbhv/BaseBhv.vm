@@ -1133,7 +1133,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     protected void prepareBatchInsertOption(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, InsertOption<${myConditionBeanClassName}> option) {
-#if ($database.isInsertColumnModifiedPropertiesFragmentedAllowed())
+#if ($database.isBatchInsertColumnModifiedPropertiesFragmentedAllowed())
         option.xallowInsertColumnModifiedPropertiesFragmented();
 #end
 #if ($database.isCompatibleBatchInsertDefaultEveryColumn())
@@ -1193,7 +1193,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     protected void prepareBatchUpdateOption(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
-#if ($database.isUpdateColumnModifiedPropertiesFragmentedAllowed())
+#if ($database.isBatchUpdateColumnModifiedPropertiesFragmentedAllowed())
         option.xallowUpdateColumnModifiedPropertiesFragmented();
 #end
 #if ($database.isCompatibleBatchUpdateDefaultEveryColumn())

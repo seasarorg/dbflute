@@ -2021,12 +2021,12 @@ public class Database {
         return getLittleAdjustmentProperties().getCursorSelectFetchSize();
     }
 
-    public boolean isInsertColumnModifiedPropertiesFragmentedAllowed() {
-        return getLittleAdjustmentProperties().isInsertColumnModifiedPropertiesFragmentedAllowed();
+    public boolean isBatchInsertColumnModifiedPropertiesFragmentedAllowed() {
+        return getLittleAdjustmentProperties().isBatchInsertColumnModifiedPropertiesFragmentedAllowed();
     }
 
-    public boolean isUpdateColumnModifiedPropertiesFragmentedAllowed() {
-        return getLittleAdjustmentProperties().isUpdateColumnModifiedPropertiesFragmentedAllowed();
+    public boolean isBatchUpdateColumnModifiedPropertiesFragmentedAllowed() {
+        return getLittleAdjustmentProperties().isBatchUpdateColumnModifiedPropertiesFragmentedAllowed();
     }
 
     public boolean isCheckCountBeforeQueryUpdate() {
@@ -2068,7 +2068,7 @@ public class Database {
     public boolean isCompatibleBatchInsertDefaultEveryColumn() {
         return getLittleAdjustmentProperties().isCompatibleBatchInsertDefaultEveryColumn();
     }
-    
+
     public boolean isCompatibleBatchUpdateDefaultEveryColumn() {
         return getLittleAdjustmentProperties().isCompatibleBatchUpdateDefaultEveryColumn();
     }
