@@ -162,9 +162,11 @@ public class DfJdbcTypeMapper {
         if (isConceptTypeBytesOid(dbTypeName)) {
             return getBlobJdbcType();
         }
-        if (isPostgreSQLInterval(dbTypeName)) {
-            return getTimeJdbcType();
-        }
+        // interval type needs ... string? at PostgreSQL-9.x!?
+        // (it had been worked but error now)
+        //if (isPostgreSQLInterval(dbTypeName)) {
+        //    return getTimeJdbcType();
+        //}
         if (isOracleCompatibleDate(jdbcDefValue, dbTypeName)) {
             // for compatibility to Oracle's JDBC driver
             return getDateJdbcType();
