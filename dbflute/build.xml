@@ -12,13 +12,24 @@
 	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="runtime.pre.version" value="1.0.4K" />
 
-	<!-- Resource Directories -->
-	<property name="workspace.base" value=".." />
+	<!-- Base Directories -->
+	<property name="workspace.base" value="../.." />
+	<property name="dbflute.base" value="${workspace.base}/dbflute" />
+	<property name="dbflute.www.base" value="${workspace.base}/dbflute-www" />
+	<property name="example.container.base" value="${workspace.base}/dbflute-example-container" />
+	<property name="example.database.base" value="${workspace.base}/dbflute-example-database" />
+	<property name="example.multipledb.base" value="${workspace.base}/dbflute-example-multipledb" />
+	<property name="example.subproject.base" value="${workspace.base}/dbflute-example-subproject" />
+	<property name="example.friends.frank.base" value="${workspace.base}/dbflute-example-friends-frank" />
+	<property name="example.friends.guest.base" value="${workspace.base}/dbflute-example-friends-guest" />
+	<property name="tryout.base" value="${workspace.base}/tryout" />
+
+	<!-- Point Directories -->
 	<property name="dist" value="dist" />
 	<property name="embedded" value="embedded" />
-	<property name="runtime.dir" value="${workspace.base}/dbflute-runtime" />
+	<property name="runtime.dir" value="${dbflute.base}/dbflute-runtime" />
 	<property name="extraction.dir" value="${dist}/extraction" />
-	<property name="stage.dir" value="${workspace.base}/dbflute-www/download" />
+	<property name="stage.dir" value="${dbflute.www.base}/download" />
 
 	<!-- Jar Files -->
 	<property name="engine.jar" value="dbflute.jar" />
@@ -33,43 +44,43 @@
 	<property name="module.zip" value="dbflute-${version}.zip" />
 	<property name="module.build.zip" value="dbflute-${build.version}.zip" />
 
-	<!-- Basic Examples -->
-	<property name="basic.example.dir" value="${workspace.base}/dbflute-basic-example" />
-
 	<!-- DI Container Examples -->
-	<property name="spring.example.dir" value="${workspace.base}/dbflute-spring-example" />
-	<property name="guice.example.dir" value="${workspace.base}/dbflute-guice-example" />
-	<property name="cdi.example.dir" value="${workspace.base}/dbflute-cdi-example" />
-	<property name="lucy.example.dir" value="${workspace.base}/dbflute-lucy-example" />
-	<property name="slim3.example.dir" value="${workspace.base}/dbflute-slim3-example" />
+	<property name="seasar.example.dir" value="${example.container.base}/dbflute-seasar-example" />
+	<property name="spring.example.dir" value="${example.container.base}/dbflute-spring-example" />
+	<property name="guice.example.dir" value="${example.container.base}/dbflute-guice-example" />
+	<property name="cdi.example.dir" value="${example.container.base}/dbflute-cdi-example" />
 
 	<!-- Database Examples -->
-	<property name="mysql.example.dir" value="${workspace.base}/dbflute-mysql-example" />
-	<property name="postgresql.example.dir" value="${workspace.base}/dbflute-postgresql-example" />
-	<property name="oracle.example.dir" value="${workspace.base}/dbflute-oracle-example" />
-	<property name="sqlserver.example.dir" value="${workspace.base}/dbflute-sqlserver-example" />
-	<property name="db2.example.dir" value="${workspace.base}/dbflute-db2-example" />
-	<property name="sqlite.example.dir" value="${workspace.base}/dbflute-sqlite-example" />
-	<property name="msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example" />
+	<property name="mysql.example.dir" value="${example.database.base}/dbflute-mysql-example" />
+	<property name="postgresql.example.dir" value="${example.database.base}/dbflute-postgresql-example" />
+	<property name="oracle.example.dir" value="${example.database.base}/dbflute-oracle-example" />
+	<property name="sqlserver.example.dir" value="${example.database.base}/dbflute-sqlserver-example" />
+	<property name="db2.example.dir" value="${example.database.base}/dbflute-db2-example" />
+	<property name="sqlite.example.dir" value="${example.database.base}/dbflute-sqlite-example" />
+	<property name="msaccess.example.dir" value="${example.database.base}/dbflute-msaccess-example" />
 
-	<!-- Friendly Examples -->
-	<property name="ymir.example.dir" value="${workspace.base}/dbflute-ymir-example" />
-	<property name="sastruts.example.dir" value="${workspace.base}/dbflute-sastruts-example" />
-	<property name="teeda.example.dir" value="${workspace.base}/dbflute-teeda-example" />
-	<property name="buri.example.dir" value="${workspace.base}/dbflute-buri-example" />
-	<property name="doma.example.dir" value="${workspace.base}/dbflute-doma-example" />
-	<property name="flex.example.dir" value="${workspace.base}/dbflute-flexserver-example" />
-	<property name="hibernate.example.dir" value="${workspace.base}/dbflute-hibernate-example" />
-	<property name="s2jdbc.example.dir" value="${workspace.base}/dbflute-s2jdbc-example" />
+	<!-- MultipleDB Examples -->
+	<property name="multipledb.seasar.example.dir" value="${example.multipledb.base}/dbflute-multipledb-seasar-example" />
+	<property name="multipledb.spring.example.dir" value="${example.multipledb.base}/dbflute-multipledb-spring-example" />
 
-	<!-- Other Examples -->
-	<property name="multipledb.seasar.example.dir" value="${workspace.base}/dbflute-multipledb-seasar-example" />
-	<property name="multipledb.spring.example.dir" value="${workspace.base}/dbflute-multipledb-spring-example" />
-	<property name="sqlap.example.dir" value="${workspace.base}/dbflute-sqlap-example" />
-	<property name="bhvap.seasar.example.dir" value="${workspace.base}/dbflute-bhvap-seasar-example" />
-	<property name="bhvap.spring.example.dir" value="${workspace.base}/dbflute-bhvap-spring-example" />
-	<property name="bhvap.guice.example.dir" value="${workspace.base}/dbflute-bhvap-guice-example" />
-	<property name="javatry.dir" value="${workspace.base}/javatry" />
+	<!-- SubProject Examples -->
+	<property name="bhvap.seasar.example.dir" value="${example.subproject.base}/dbflute-bhvap-seasar-example" />
+	<property name="bhvap.spring.example.dir" value="${example.subproject.base}/dbflute-bhvap-spring-example" />
+	<property name="bhvap.guice.example.dir" value="${example.subproject.base}/dbflute-bhvap-guice-example" />
+	<property name="sqlap.example.dir" value="${example.subproject.base}/dbflute-sqlap-example" />
+
+	<!-- Friends Frank Examples -->
+	<property name="ymir.example.dir" value="${example.friends.frank.base}/dbflute-ymir-example" />
+	<property name="sastruts.example.dir" value="${example.friends.frank.base}/dbflute-sastruts-example" />
+	<property name="flex.example.dir" value="${example.friends.frank.base}/dbflute-flexserver-example" />
+
+	<!-- Friends Guest Examples -->
+	<property name="doma.example.dir" value="${example.friends.guest.base}/dbflute-doma-example" />
+	<property name="hibernate.example.dir" value="${example.friends.guest.base}/dbflute-hibernate-example" />
+	<property name="s2jdbc.example.dir" value="${example.friends.guest.base}/dbflute-s2jdbc-example" />
+
+	<!-- Tryout -->
+	<property name="javatry.dir" value="${tryout.base}/javatry" />
 
 	<!-- ============================================================================= -->
 	<!--                                                        C O M P I L E  T A S K -->
@@ -237,13 +248,13 @@
 		<chmod dir="${extraction.dir}/ant/bin" perm="ugo+rx" includes="**/*" />
 	</target>
 
-	<target name="reflect-to-basic" depends="prepare-reflection" description="==> reflect to basic example">
-		<copy todir="${basic.example.dir}/mydbflute/dbflute-${version}" overwrite="true">
+	<target name="reflect-to-seasar" depends="prepare-reflection" description="==> reflect to seasar example">
+		<copy todir="${seasar.example.dir}/mydbflute/dbflute-${version}" overwrite="true">
 			<fileset dir="${extraction.dir}" />
 		</copy>
-		<replace file="${basic.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}" />
-		<replace file="${basic.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}" />
-		<delete dir="${basic.example.dir}/mydbflute/dbflute-${pre.version}" />
+		<replace file="${seasar.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}" />
+		<replace file="${seasar.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}" />
+		<delete dir="${seasar.example.dir}/mydbflute/dbflute-${pre.version}" />
 		<delete dir="${extraction.dir}" />
 	</target>
 
@@ -479,7 +490,7 @@
 	<!-- = = = = = = = = = = -->
 
 	<target name="reflect-to-all-regulars" depends="prepare-reflection" description="==> reflect to all examples">
-		<antcall target="reflect-to-basic" />
+		<antcall target="reflect-to-seasar" />
 		<antcall target="reflect-to-spring" />
 		<antcall target="reflect-to-guice" />
 		<antcall target="reflect-to-cdi" />

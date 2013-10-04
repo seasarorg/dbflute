@@ -1,14 +1,12 @@
 cd ..
-ant -f build.xml reflect-to-basic
+ant -f build.xml reflect-to-seasar
 ant -f build.xml reflect-to-spring
 ant -f build.xml reflect-to-guice
 ant -f build.xml reflect-to-mysql
 ant -f build.xml reflect-to-postgresql
 export answer=y
 
-cd ../dbflute-basic-example
-. sync-lib.sh
-cd dbflute_exampledb
+cd ../../dbflute-example-container/dbflute-seasar-example/dbflute_exampledb
 rm ./log/*.log
 . replace-schema.sh
 . jdbc.sh
@@ -17,9 +15,7 @@ rm ./log/*.log
 . sql2entity.sh
 . outside-sql-test.sh
 
-cd ../../dbflute-spring-example
-. sync-lib.sh
-cd dbflute_exampledb
+cd ../../dbflute-spring-example/dbflute_exampledb
 rm ./log/*.log
 . replace-schema.sh
 . jdbc.sh
@@ -36,7 +32,7 @@ rm ./log/*.log
 . manage.sh freegen
 . diffworld-test.sh
 
-cd ../../dbflute-mysql-example/dbflute_exampledb
+cd ../../../dbflute-example-database/dbflute-mysql-example/dbflute_exampledb
 rm ./log/*.log
 . replace-schema.sh
 . jdbc.sh

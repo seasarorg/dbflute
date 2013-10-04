@@ -3,7 +3,7 @@ ant -f build.xml reflect-to-hibernate
 ant -f build.xml reflect-to-s2jdbc
 ant -f build.xml reflect-to-doma
 
-cd ../dbflute-hibernate-example/dbflute_exampledb
+cd ../../dbflute-example-friends-guest/dbflute-hibernate-example/dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh

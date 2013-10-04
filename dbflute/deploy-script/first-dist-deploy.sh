@@ -2,7 +2,7 @@ cd ..
 ant -f build.xml dist
 ant -f build.xml reflect-to-spring
 
-cd ../dbflute-spring-example
+cd ../dbflute-example-container/dbflute-spring-example
 . sync-lib.sh
 cd dbflute_exampledb
 rm ./log/*.log
