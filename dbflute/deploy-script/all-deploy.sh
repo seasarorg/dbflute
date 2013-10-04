@@ -2,9 +2,7 @@ cd ..
 ant -f build.xml reflect-to-all-regulars
 export answer=y
 
-cd ../dbflute-basic-example
-. sync-lib.sh
-cd dbflute_exampledb
+cd ../../dbflute-example-container/dbflute-seasar-example/dbflute_exampledb
 rm ./log/*.log
 . replace-schema.sh
 . jdbc.sh
@@ -13,9 +11,7 @@ rm ./log/*.log
 . sql2entity.sh
 . outside-sql-test.sh
 
-cd ../../dbflute-spring-example
-. sync-lib.sh
-cd dbflute_exampledb
+cd ../../dbflute-spring-example/dbflute_exampledb
 rm ./log/*.log
 . replace-schema.sh
 . jdbc.sh
@@ -39,7 +35,7 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-mysql-example/dbflute_exampledb
+cd ../../../dbflute-example-database/dbflute-mysql-example/dbflute_exampledb
 rm ./log/*.log
 . replace-schema.sh
 . jdbc.sh
@@ -90,7 +86,14 @@ rm ./log/*.log
 #rm ./log/*.log
 #. manage.sh refresh
 
-cd ../../dbflute-multipledb-seasar-example/dbflute_librarydb
+cd ../../dbflute-sqlite-example/dbflute_exampledb
+rm ./log/*.log
+. jdbc.sh
+. doc.sh
+. generate.sh
+. sql2entity.sh
+
+cd ../../../dbflute-example-multipledb/dbflute-multipledb-seasar-example/dbflute_librarydb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
@@ -116,7 +119,7 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-flexserver-example
+cd ../../../dbflute-example-friends-frank/dbflute-flexserver-example
 . sync-lib.sh
 cd dbflute_exampledb
 rm ./log/*.log
@@ -141,14 +144,7 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 
-cd ../../dbflute-sqlite-example/dbflute_exampledb
-rm ./log/*.log
-. jdbc.sh
-. doc.sh
-. generate.sh
-. sql2entity.sh
-
-cd ../../dbflute-mysql-example/dbflute_exampledb
+cd ../../../dbflute-example-database/dbflute-mysql-example/dbflute_exampledb
 . bhvap-doc.sh
 . bhvap-generate.sh
 . bhvap-sql2entity.sh
@@ -166,9 +162,8 @@ cd ../../dbflute-sqlite-example/dbflute_exampledb
 . bhvap-sql2entity.sh
 . bhvap-outside-sql-test.sh
 
-cd ..
-cd ../dbflute-basic-example/
+cd ../../../dbflute-example-container/dbflute-seasar-example/
 ant
 
-cd ../dbflute-spring-example/
+cd ../../dbflute-spring-example/
 ant

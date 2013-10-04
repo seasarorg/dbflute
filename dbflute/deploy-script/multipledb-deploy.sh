@@ -1,7 +1,7 @@
 cd ..
 ant -f build.xml reflect-to-multipledb
 
-cd ../dbflute-multipledb-seasar-example/dbflute_librarydb
+cd ../../dbflute-example-multipledb/dbflute-multipledb-seasar-example/dbflute_librarydb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh

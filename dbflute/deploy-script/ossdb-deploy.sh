@@ -3,7 +3,7 @@ ant -f build.xml reflect-to-mysql
 ant -f build.xml reflect-to-postgresql
 ant -f build.xml reflect-to-sqlite
 
-cd ../dbflute-mysql-example/dbflute_exampledb
+cd ../../dbflute-example-database/dbflute-mysql-example/dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
