@@ -129,6 +129,7 @@ package org.apache.torque.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
@@ -351,6 +352,18 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         br.addElement("  }");
         final String msg = br.buildExceptionMessage();
         throw new DfRequiredPropertyNotFoundException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                  Prepare Generation
+    //                                                                  ==================
+    @Override
+    protected void initializeSchemaData() {
+        if (isSchemaSyncCheckOnly()) { // SchemaSyncCheck doesn't use basic schema data
+            _schemaData = AppData.createAsEmpty(); // not to depends on JDBC task
+        } else { // normally here
+            super.initializeSchemaData();
+        }
     }
 
     // ===================================================================================
