@@ -158,7 +158,7 @@ public class DfSchemaXmlReader {
             schemaData = createXmlToAppData().parseFile(_schemaXml);
         } catch (IOException e) {
             String msg = "Failed to read the SchemaXML: " + _schemaXml;
-            throw new IllegalStateException(msg);
+            throw new IllegalStateException(msg, e);
         }
         schemaData.setName(grokName(_schemaXml));
         return schemaData;
