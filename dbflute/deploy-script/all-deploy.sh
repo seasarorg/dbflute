@@ -163,7 +163,7 @@ cd ../../dbflute-sqlite-example/dbflute_exampledb
 . bhvap-outside-sql-test.sh
 
 cd ../../../dbflute-example-container/dbflute-seasar-example/
-ant
+mvn -e compile
 
 cd ../../dbflute-spring-example/
-ant
+mvn -e compile
