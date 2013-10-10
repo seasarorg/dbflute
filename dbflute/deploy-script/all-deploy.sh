@@ -27,6 +27,7 @@ rm ./log/*.log
 . manage.sh schema-sync-check
 . manage.sh freegen
 . diffworld-test.sh
+. sqlap-manage.sh
 
 cd ../../dbflute-cdi-example/dbflute_exampledb
 rm ./log/*.log
