@@ -74,20 +74,21 @@ public class DfOutsideSqlCollector {
                     }
                 }
             } else {
+                final boolean suppressCheck = _suppressDirectoryCheck || sqlLocation.isSuppressDirectoryCheck();
                 if (containsSrcMainJava(sqlDirectory)) {
                     final String srcMainResources = replaceSrcMainJavaToSrcMainResources(sqlDirectory);
                     if (!sqlDirectory.equals(srcMainResources)) {
                         if (existsSqlDir(srcMainResources)) {
                             outsideSqlPack.addAll(collectSqlFile(srcMainResources, sqlLocation));
                         } else {
-                            if (!_suppressDirectoryCheck) {
+                            if (!suppressCheck) {
                                 String msg = "The sqlDirectory does not exist: " + srcMainResources;
                                 throw new IllegalStateException(msg);
                             }
                         }
                     }
                 } else {
-                    if (!_suppressDirectoryCheck) {
+                    if (!suppressCheck) {
                         String msg = "The sqlDirectory does not exist: " + sqlDirectory;
                         throw new IllegalStateException(msg);
                     }

@@ -28,15 +28,18 @@ public class DfOutsideSqlLocation {
     protected final String _sqlDirectory;
     protected final String _sql2EntityOutputDirectory;
     protected final boolean _sqlAp;
+    protected final boolean _suppressDirectoryCheck;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOutsideSqlLocation(String projectName, String sqlDirectory, String sql2EntityOutputDirectory, boolean sqlAp) {
+    public DfOutsideSqlLocation(String projectName, String sqlDirectory, String sql2EntityOutputDirectory,
+            boolean sqlAp, boolean suppressDirectoryCheck) {
         _projectName = projectName;
         _sqlDirectory = sqlDirectory;
         _sql2EntityOutputDirectory = sql2EntityOutputDirectory;
         _sqlAp = sqlAp;
+        _suppressDirectoryCheck = suppressDirectoryCheck;
     }
 
     // ===================================================================================
@@ -56,5 +59,9 @@ public class DfOutsideSqlLocation {
 
     public boolean isSqlAp() {
         return _sqlAp;
+    }
+
+    public boolean isSuppressDirectoryCheck() {
+        return _suppressDirectoryCheck;
     }
 }

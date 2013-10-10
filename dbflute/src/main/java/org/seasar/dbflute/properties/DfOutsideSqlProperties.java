@@ -300,7 +300,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         final String mainProjectName = "main"; // basically unused
         final String mainDir = getMainSqlDirectory();
         final String mainOutput = getSql2EntityOutputDirectory();
-        _outsideSqlLocationList.add(createOutsideSqlLocation(mainProjectName, mainDir, mainOutput, false));
+        _outsideSqlLocationList.add(createOutsideSqlLocation(mainProjectName, mainDir, mainOutput, false, false));
         final Object obj = getOutsideSqlDefinitionMap().get("applicationOutsideSqlMap");
         if (obj == null) {
             return _outsideSqlLocationList;
@@ -348,9 +348,19 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
                 }
                 sql2EntityOutputDirectory = applicationDir + "/" + plainDir;
             }
+            final boolean suppressDirectoryCheck;
+            {
+                String value = elementMap.get("isSuppressDirectoryCheck");
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(value) && value.trim().equalsIgnoreCase("true")) {
+                    suppressDirectoryCheck = true;
+                } else {
+                    suppressDirectoryCheck = false;
+                }
+            }
 
-            _outsideSqlLocationList.add(createOutsideSqlLocation(projectName, sqlDirectory, sql2EntityOutputDirectory,
-                    true));
+            final DfOutsideSqlLocation sqlApLocation = createOutsideSqlLocation(projectName, sqlDirectory,
+                    sql2EntityOutputDirectory, true, suppressDirectoryCheck);
+            _outsideSqlLocationList.add(sqlApLocation);
         }
         return _outsideSqlLocationList;
     }
@@ -374,8 +384,9 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     protected DfOutsideSqlLocation createOutsideSqlLocation(String projectName, String sqlDirectory,
-            String sql2EntityOutputDirectory, boolean sqlAp) {
-        return new DfOutsideSqlLocation(projectName, sqlDirectory, sql2EntityOutputDirectory, sqlAp);
+            String sql2EntityOutputDirectory, boolean sqlAp, boolean suppressDirectoryCheck) {
+        return new DfOutsideSqlLocation(projectName, sqlDirectory, sql2EntityOutputDirectory, sqlAp,
+                suppressDirectoryCheck);
     }
 
     // -----------------------------------------------------
