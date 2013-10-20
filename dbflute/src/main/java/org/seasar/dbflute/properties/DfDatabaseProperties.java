@@ -627,7 +627,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         // and other modes do not need to retry
         //
         // while, Oracle causes a trouble of performance (very heavy)
-        // anyway, various problems exist so default is false
+        // anyway, various problems exist so default is false since 1.0.5A
         // (in the first place, I cannot remember the reason why I implemented it...)
         // - - - - - - - - - -/
         return false;
