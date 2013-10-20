@@ -71,11 +71,11 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
         DfPrimaryKeyMeta info = doGetPrimaryKey(metaData, unifiedSchema, tableName, false);
-        if (canRetryCaseInsensitive()) {
-            if (!info.hasPrimaryKey()) { // retry by lower case
+        if (isRetryCaseInsensitivePrimaryKey()) {
+            if (!info.hasPrimaryKey() && !tableName.equals(tableName.toLowerCase())) { // retry by lower case
                 info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toLowerCase(), true);
             }
-            if (!info.hasPrimaryKey()) { // retry by upper case
+            if (!info.hasPrimaryKey() && !tableName.equals(tableName.toUpperCase())) { // retry by upper case
                 info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toUpperCase(), true);
             }
         }
@@ -200,11 +200,11 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, List<String> pkList) throws SQLException { // non primary key only
         Map<String, Map<Integer, String>> map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName, pkList, false);
-        if (canRetryCaseInsensitive()) {
-            if (map.isEmpty()) { // retry by lower case
+        if (isRetryCaseInsensitiveUniqueKey()) {
+            if (map.isEmpty() && !tableName.equals(tableName.toLowerCase())) { // retry by lower case
                 map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), pkList, true);
             }
-            if (map.isEmpty()) { // retry by upper case
+            if (map.isEmpty() && !tableName.equals(tableName.toUpperCase())) { // retry by upper case
                 map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toUpperCase(), pkList, true);
             }
         }

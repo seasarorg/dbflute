@@ -688,19 +688,6 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
-    protected Connection createConnection(String driver, String url, UnifiedSchema unifiedSchema, String user,
-            String password) {
-        setupConnectionDriver(driver);
-        try {
-            final Connection conn = DriverManager.getConnection(url, user, password);
-            setupConnectionVariousSetting(unifiedSchema, conn);
-            return conn;
-        } catch (SQLException e) {
-            String msg = "Failed to connect: url=" + url + " user=" + user;
-            throw new IllegalStateException(msg, e);
-        }
-    }
-
     private void setupConnectionDriver(String driver) {
         try {
             Class.forName(driver);

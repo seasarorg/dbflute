@@ -36,11 +36,11 @@ import java.util.Properties;
 /**
  * @author jflute
  */
-public class DfSimpleConnection implements Connection {
+public class DfFittingConnection implements Connection {
 
     protected Connection _realConnection;
 
-    public DfSimpleConnection(Connection realConnection) {
+    public DfFittingConnection(Connection realConnection) {
         _realConnection = realConnection;
     }
 

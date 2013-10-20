@@ -506,8 +506,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema);
         final String user = resolveDispatchVariable(title + "user", propertyMap.get("user"));
         final String password = resolvePasswordVariable(title + "password", additonalUser, propertyMap.get("password"));
-        _log.info("...Creating a connection for additional user");
-        return createConnection(driver, url, unifiedSchema, user, password);
+        final Properties prop = getDatabaseProperties().getConnectionProperties();
+        prop.setProperty("user", user);
+        prop.setProperty("password", password);
+        _log.info("...Creating a connection for additional user: " + user);
+        return createConnection(driver, url, unifiedSchema, prop);
     }
 
     protected final Map<String, Boolean> _additionalUserSkipIfNotFoundPasswordFileAndDefaultMap = newLinkedHashMap();

@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.util.Srl;
@@ -52,12 +53,15 @@ public abstract class DfAbstractMetaDataExtractor {
         return DfBuildProperties.getInstance();
     }
 
+    // -----------------------------------------------------
+    //                                      Basic Properties
+    //                                      ----------------
     protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
+        return getProperties().getBasicProperties();
     }
 
     protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
-        return DfBuildProperties.getInstance().getBasicProperties().getDatabaseTypeFacadeProp();
+        return getBasicProperties().getDatabaseTypeFacadeProp();
     }
 
     protected boolean isDatabaseMySQL() {
@@ -127,6 +131,33 @@ public abstract class DfAbstractMetaDataExtractor {
         // Firebird treats the argument "tableName" as PrefixSearch
         // (otherwise, Oracle does not need to check because of synonym handling)
         return isDatabaseFirebird();
+    }
+
+    // -----------------------------------------------------
+    //                                   Database Properties
+    //                                   -------------------
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return getProperties().getDatabaseProperties();
+    }
+
+    protected boolean isRetryCaseInsensitiveColumn() {
+        return getDatabaseProperties().isRetryCaseInsensitiveColumn();
+    }
+
+    protected boolean isRetryCaseInsensitivePrimaryKey() {
+        return getDatabaseProperties().isRetryCaseInsensitivePrimaryKey();
+    }
+
+    protected boolean isRetryCaseInsensitiveForeignKey() {
+        return getDatabaseProperties().isRetryCaseInsensitiveForeignKey();
+    }
+
+    protected boolean isRetryCaseInsensitiveUniqueKey() {
+        return getDatabaseProperties().isRetryCaseInsensitiveUniqueKey();
+    }
+
+    protected boolean isRetryCaseInsensitiveIndex() {
+        return getDatabaseProperties().isRetryCaseInsensitiveIndex();
     }
 
     // ===================================================================================

@@ -73,11 +73,11 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
         List<DfColumnMeta> ls = doGetColumnList(metaData, unifiedSchema, tableName, false);
-        if (canRetryCaseInsensitive()) {
-            if (ls.isEmpty()) { // retry by lower case
+        if (isRetryCaseInsensitiveColumn()) {
+            if (ls.isEmpty() && !tableName.equals(tableName.toLowerCase())) { // retry by lower case
                 ls = doGetColumnList(metaData, unifiedSchema, tableName.toLowerCase(), true);
             }
-            if (ls.isEmpty()) { // retry by upper case
+            if (ls.isEmpty() && !tableName.equals(tableName.toUpperCase())) { // retry by upper case
                 ls = doGetColumnList(metaData, unifiedSchema, tableName.toUpperCase(), true);
             }
         }

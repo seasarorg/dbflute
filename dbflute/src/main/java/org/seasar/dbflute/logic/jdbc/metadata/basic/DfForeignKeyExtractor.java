@@ -74,11 +74,11 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName) throws SQLException {
         Map<String, DfForeignKeyMeta> map = doGetForeignKeyMap(metaData, unifiedSchema, tableName, false);
-        if (canRetryCaseInsensitive()) {
-            if (map.isEmpty()) { // retry by lower case
+        if (isRetryCaseInsensitiveForeignKey()) {
+            if (map.isEmpty() && !tableName.equals(tableName.toLowerCase())) { // retry by lower case
                 map = doGetForeignKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), true);
             }
-            if (map.isEmpty()) { // retry by upper case
+            if (map.isEmpty() && !tableName.equals(tableName.toUpperCase())) { // retry by upper case
                 map = doGetForeignKeyMap(metaData, unifiedSchema, tableName.toUpperCase(), true);
             }
         }

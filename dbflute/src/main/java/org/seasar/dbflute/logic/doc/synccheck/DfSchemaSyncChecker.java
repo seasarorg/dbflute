@@ -27,7 +27,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.jdbc.connection.DfDataSourceHandler;
-import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSource;
+import org.seasar.dbflute.helper.jdbc.connection.DfFittingDataSource;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertDirection;
 import org.seasar.dbflute.logic.jdbc.schemadiff.DfSchemaDiff;
@@ -151,7 +151,7 @@ public class DfSchemaSyncChecker {
         handler.setPassword(getDocumentProperties().getSchemaSyncCheckDatabasePassword());
         handler.setConnectionProperties(getDatabaseProperties().getConnectionProperties()); // inherit
         handler.setAutoCommit(true);
-        return new DfSimpleDataSource(handler);
+        return new DfFittingDataSource(handler);
     }
 
     protected void throwSchemaSyncCheckTragedyResultException() {

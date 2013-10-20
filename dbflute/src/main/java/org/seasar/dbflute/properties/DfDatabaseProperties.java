@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -578,6 +579,61 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                              CountDownRace MetaData
+    //                                                              ======================
+    public int getMetaDataCountDownRaceRunnerCount() {
+        final int defaultValue = isMetaDataCountDownRaceRunnerDefaultValid() ? 5 : -1;
+        final int count = getVariousInteger("metaDataCountDownRaceRunnerCount", defaultValue);
+        if (count > 20) {
+            String msg = "The property 'metaDataCountDownRaceRunnerCount' should be until 20: " + count;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+        return count; // minus means single thread
+    }
+
+    protected boolean isMetaDataCountDownRaceRunnerDefaultValid() {
+        // Oracle causes a trouble of performance (very heavy)
+        return isDatabaseOracle();
+    }
+
+    // ===================================================================================
+    //                                                              Retry Case Insensitive
+    //                                                              ======================
+    public boolean isRetryCaseInsensitiveColumn() {
+        return isVariousBoolean("isRetryCaseInsensitiveColumn", isRetryCaseInsensitiveDefaultValid());
+    }
+
+    public boolean isRetryCaseInsensitivePrimaryKey() {
+        return isVariousBoolean("isRetryCaseInsensitivePrimaryKey", isRetryCaseInsensitiveDefaultValid());
+    }
+
+    public boolean isRetryCaseInsensitiveForeignKey() {
+        return isVariousBoolean("isRetryCaseInsensitiveForeignKey", isRetryCaseInsensitiveDefaultValid());
+    }
+
+    public boolean isRetryCaseInsensitiveUniqueKey() {
+        return isVariousBoolean("isRetryCaseInsensitiveUniqueKey", isRetryCaseInsensitiveDefaultValid());
+    }
+
+    public boolean isRetryCaseInsensitiveIndex() {
+        return isVariousBoolean("isRetryCaseInsensitiveIndex", isRetryCaseInsensitiveDefaultValid());
+    }
+
+    protected boolean isRetryCaseInsensitiveDefaultValid() {
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - -
+        // MySQL causes a trouble by setting a name only differed in case as parameter
+        // when Windows and lower_case_table_names = 0
+        //  -> Can't create table '.\exampledb\Foo.frm' (errno: 121)
+        // and other modes do not need to retry
+        //
+        // while, Oracle causes a trouble of performance (very heavy)
+        // anyway, various problems exist so default is false
+        // (in the first place, I cannot remember the reason why I implemented it...)
+        // - - - - - - - - - -/
+        return false;
+    }
+
+    // ===================================================================================
     //                                                                   VariousMap Helper
     //                                                                   =================
     @SuppressWarnings("unchecked")
@@ -622,6 +678,18 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             String msg = "The property '" + name + "' should be Map: " + value;
             throw new IllegalStateException(msg);
         }
+    }
+
+    protected int getVariousInteger(String key, int defaultValue) {
+        final Map<String, Object> variousMap = _databaseInfo.getDatabaseVariousMap();
+        final Object obj = variousMap.get(key);
+        return obj != null ? Integer.parseInt(obj.toString()) : defaultValue;
+    }
+
+    protected boolean isVariousBoolean(String key, boolean defaultValue) {
+        final Map<String, Object> variousMap = _databaseInfo.getDatabaseVariousMap();
+        final Object obj = variousMap.get(key);
+        return obj != null ? obj.toString().equalsIgnoreCase("true") : defaultValue;
     }
 
     protected Object getVariousObject(String key) {
@@ -860,7 +928,10 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         final UnifiedSchema schema = getDatabaseSchema();
         final String user = getDatabaseUser();
         final String password = getDatabasePassword();
+        final Properties prop = getConnectionProperties();
+        prop.setProperty("user", user);
+        prop.setProperty("password", password);
         _log.info("...Creating connection to main schema: " + schema);
-        return createConnection(driver, url, schema, user, password);
+        return createConnection(driver, url, schema, prop);
     }
 }

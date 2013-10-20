@@ -43,7 +43,7 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                        Meta Getting
     //                                                                        ============
     public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, DfTableMeta tableInfo,
-            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
+            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
         final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
         if (tableInfo.isTableTypeView()) {
@@ -55,11 +55,11 @@ public class DfIndexExtractor extends DfAbstractMetaDataBasicExtractor {
     public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
         Map<String, Map<Integer, String>> map = doGetIndexMap(metaData, unifiedSchema, tableName, uniqueKeyMap, false);
-        if (canRetryCaseInsensitive()) {
-            if (map.isEmpty()) { // retry by lower case
+        if (isRetryCaseInsensitiveIndex()) {
+            if (map.isEmpty() && !tableName.equals(tableName.toLowerCase())) { // retry by lower case
                 map = doGetIndexMap(metaData, unifiedSchema, tableName.toLowerCase(), uniqueKeyMap, true);
             }
-            if (map.isEmpty()) { // retry by upper case
+            if (map.isEmpty() && !tableName.equals(tableName.toUpperCase())) { // retry by upper case
                 map = doGetIndexMap(metaData, unifiedSchema, tableName.toUpperCase(), uniqueKeyMap, true);
             }
         }

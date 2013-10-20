@@ -12,31 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
- */
-package org.seasar.dbflute.helper.jdbc.connection;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import org.seasar.dbflute.util.DfTypeUtil;
+ */package org.seasar.dbflute.helper.thread.exception;
 
 /**
  * @author jflute
+ * @since 1.0.5A (2013/10/17 Thursday)
  */
-public class DfSimpleDataSource extends DfCushionDataSource {
+public class DfThreadFireFailureException extends RuntimeException {
 
-    protected final DfConnectionProvider _dataSourceProvider;
+    private static final long serialVersionUID = 1L;
 
-    public DfSimpleDataSource(DfDataSourceHandler dataSourceProvider) {
-        _dataSourceProvider = dataSourceProvider;
-    }
-
-    public Connection getConnection() throws SQLException {
-        return _dataSourceProvider.getConnection();
-    }
-
-    @Override
-    public String toString() {
-        return DfTypeUtil.toClassTitle(this) + ":" + _dataSourceProvider;
+    public DfThreadFireFailureException(String msg, Throwable e) {
+        super(msg, e);
     }
 }

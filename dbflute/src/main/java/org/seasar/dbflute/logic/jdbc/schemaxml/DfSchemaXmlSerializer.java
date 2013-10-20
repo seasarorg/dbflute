@@ -25,12 +25,14 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +55,11 @@ import org.seasar.dbflute.exception.DfTableDuplicateException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.helper.jdbc.connection.DfFittingDataSource;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
+import org.seasar.dbflute.helper.thread.DfCountDownRace;
+import org.seasar.dbflute.helper.thread.DfCountDownRaceExecution;
+import org.seasar.dbflute.helper.thread.DfCountDownRaceRunner;
 import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertDirection;
 import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertSqlFire;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
@@ -186,6 +192,13 @@ public class DfSchemaXmlSerializer {
     protected boolean _craftDiffEnabled; // not null means CraftDiff enabled
     protected DfCraftDiffAssertSqlFire _craftDiffAssertSqlFire; // not null when CraftDiff enabled 
     protected boolean _keepDefinitionOrderAsPrevious; // not to get meta data change by only definition order 
+
+    // -----------------------------------------------------
+    //                                           Thread Fire
+    //                                           -----------
+    private final Set<String> _tableMetaDataSyncSet = Collections.synchronizedSet(new HashSet<String>());
+    private final Map<String, Element> _tableElementStagingMap = Collections
+            .synchronizedMap(new TreeMap<String, Element>()); // simple order
 
     // ===================================================================================
     //                                                                         Constructor
@@ -337,54 +350,61 @@ public class DfSchemaXmlSerializer {
      * @throws SQLException
      */
     protected void generateXML() throws SQLException {
-        _log.info("...Getting DB connection");
-        final Connection conn = _dataSource.getConnection();
+        Connection conn = null;
+        try {
+            _log.info("...Getting DB connection");
+            conn = _dataSource.getConnection();
 
-        _log.info("...Getting DB meta data");
-        final DatabaseMetaData metaData = conn.getMetaData();
+            _log.info("...Getting DB meta data");
+            final DatabaseMetaData metaData = conn.getMetaData();
 
-        final List<DfTableMeta> tableList = getTableNames(metaData);
+            final List<DfTableMeta> tableList = getTableList(metaData);
 
-        // initialize the map of generated tables
-        // this is used by synonym handling and foreign key handling
-        // so this process should be before their processes
-        _generatedTableMap = StringKeyMap.createAsCaseInsensitive();
-        for (DfTableMeta info : tableList) {
-            _generatedTableMap.put(info.getTableName(), info);
+            // initialize the map of generated tables
+            // this is used by synonym handling and foreign key handling
+            // so this process should be before their processes
+            _generatedTableMap = StringKeyMap.createAsCaseInsensitive();
+            for (DfTableMeta meta : tableList) {
+                _generatedTableMap.put(meta.getTableName(), meta);
+            }
+
+            // Load synonym information for merging additional meta data if it needs.
+            loadSupplementarySynonymInfoIfNeeds();
+
+            // This should be after loading synonyms so it is executed at this timing!
+            // The property 'outOfGenerateTarget' is set here
+            processSynonymTable(tableList);
+
+            // The handler of foreign keys for generating.
+            // It needs to check whether a reference table is generate-target or not.
+            _foreignKeyExtractor.exceptForeignTableNotGenerated(_generatedTableMap);
+
+            // Create database node. (The beginning of schema XML!)
+            _databaseNode = _doc.createElement("database");
+            _databaseNode.setAttribute("name", _dataSource.getSchema().getPureSchema()); // as main schema
+
+            processTable(conn, metaData, tableList);
+            final boolean additionalTableExists = setupAddtionalTableIfNeeds();
+            if (tableList.isEmpty() && !additionalTableExists) {
+                throwSchemaEmptyException();
+            }
+
+            processSequence(conn, metaData);
+
+            if (isProcedureMetaEnabled()) {
+                processProcedure(conn, metaData);
+            }
+
+            if (isCraftMetaEnabled()) {
+                processCraftMeta(tableList);
+            }
+
+            _doc.appendChild(_databaseNode);
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
         }
-
-        // Load synonym information for merging additional meta data if it needs.
-        loadSupplementarySynonymInfoIfNeeds();
-
-        // This should be after loading synonyms so it is executed at this timing!
-        // The property 'outOfGenerateTarget' is set here
-        processSynonymTable(tableList);
-
-        // The handler of foreign keys for generating.
-        // It needs to check whether a reference table is generate-target or not.
-        _foreignKeyExtractor.exceptForeignTableNotGenerated(_generatedTableMap);
-
-        // Create database node. (The beginning of schema XML!)
-        _databaseNode = _doc.createElement("database");
-        _databaseNode.setAttribute("name", _dataSource.getSchema().getPureSchema()); // as main schema
-
-        processTable(conn, metaData, tableList);
-        final boolean additionalTableExists = setupAddtionalTableIfNeeds();
-        if (tableList.isEmpty() && !additionalTableExists) {
-            throwSchemaEmptyException();
-        }
-
-        processSequence(conn, metaData);
-
-        if (isProcedureMetaEnabled()) {
-            processProcedure(conn, metaData);
-        }
-
-        if (isCraftMetaEnabled()) {
-            processCraftMeta(tableList);
-        }
-
-        _doc.appendChild(_databaseNode);
     }
 
     // -----------------------------------------------------
@@ -395,25 +415,72 @@ public class DfSchemaXmlSerializer {
         _log.info("");
         _log.info("$ /= = = = = = = = = = = = = = = = = = = = = = = = = =");
         _log.info("$ [Table List]");
-        int tableCount = 0;
-        for (int i = 0; i < tableList.size(); i++) {
-            final DfTableMeta tableInfo = tableList.get(i);
-            if (doProcessTable(conn, metaData, tableInfo)) {
-                ++tableCount;
+        final int runnerCount = getMetaDataCountDownRaceRunnerCount();
+        if (runnerCount > 1 && _dataSource.getDataSource() instanceof DfFittingDataSource) {
+            countDownRaceProcessTable(tableList, runnerCount, (DfFittingDataSource) _dataSource.getDataSource());
+        } else {
+            for (DfTableMeta tableMeta : tableList) {
+                doProcessTable(conn, metaData, tableMeta);
             }
-        } // end of table loop
+        }
+        for (Element element : _tableElementStagingMap.values()) {
+            _databaseNode.appendChild(element);
+        }
         _log.info("$ ");
         _log.info("$ [Table Count]");
-        _log.info("$ " + tableCount);
+        _log.info("$ " + _tableElementStagingMap.size());
         _log.info("$ = = = = = = = = = =/");
         _log.info("");
     }
 
+    protected int getMetaDataCountDownRaceRunnerCount() {
+        final DfDatabaseProperties prop = getDatabaseProperties();
+        return prop.getMetaDataCountDownRaceRunnerCount();
+    }
+
+    protected void countDownRaceProcessTable(final List<DfTableMeta> tableList, int runnerCount,
+            final DfFittingDataSource fittingDs) {
+        final DfCountDownRace fireMan = new DfCountDownRace(runnerCount);
+        fireMan.readyGo(new DfCountDownRaceExecution() {
+            public void execute(DfCountDownRaceRunner resource) {
+                final Object lockObj = resource.getLockObj();
+                String currentTable = null; // for exception message
+                Connection runnerConn = null;
+                try {
+                    runnerConn = fittingDs.newConnection();
+                    final DatabaseMetaData newMetaData = runnerConn.getMetaData();
+                    for (DfTableMeta tableMeta : tableList) {
+                        final String tableKey = tableMeta.getTableFullQualifiedName();
+                        synchronized (lockObj) {
+                            if (_tableMetaDataSyncSet.contains(tableKey)) {
+                                continue;
+                            }
+                            _tableMetaDataSyncSet.add(tableKey);
+                        }
+                        currentTable = tableKey;
+                        doProcessTable(runnerConn, newMetaData, tableMeta);
+                    }
+                } catch (SQLException e) {
+                    String msg = "Failed to get the table meta data: " + currentTable;
+                    throw new IllegalStateException(msg, e);
+                } finally {
+                    if (runnerConn != null) {
+                        try {
+                            runnerConn.close();
+                        } catch (SQLException e) {
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     protected boolean doProcessTable(Connection conn, DatabaseMetaData metaData, DfTableMeta tableMeta)
             throws SQLException {
+        final String tableFullQualifiedName = tableMeta.getTableFullQualifiedName();
         if (tableMeta.isOutOfGenerateTarget()) {
             // for example, sequence synonym and so on...
-            _log.info("$ " + tableMeta.getTableFullQualifiedName() + " is out of generation target!");
+            _log.info("$ " + tableFullQualifiedName + " is out of generation target!");
             return false;
         }
         _log.info("$ " + tableMeta.toString());
@@ -453,7 +520,7 @@ public class DfSchemaXmlSerializer {
         final Map<String, Map<Integer, String>> uniqueKeyMap = processUniqueKey(metaData, tableMeta, tableElement);
         processIndex(metaData, tableMeta, tableElement, uniqueKeyMap);
 
-        _databaseNode.appendChild(tableElement);
+        _tableElementStagingMap.put(tableFullQualifiedName, tableElement);
         return true;
     }
 
@@ -870,12 +937,12 @@ public class DfSchemaXmlSerializer {
     //                                                 Table
     //                                                 -----
     /**
-     * Get all the table names in the current database that are not system tables.
+     * Get the list of table meta in the current database that are not system tables.
      * @param dbMeta The meta data of a database. (NotNull)
-     * @return The list of all the tables in a database.
+     * @return The list of all the tables in a database. (NotNull)
      * @throws SQLException
      */
-    public List<DfTableMeta> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
+    public List<DfTableMeta> getTableList(DatabaseMetaData dbMeta) throws SQLException {
         final UnifiedSchema mainSchema = _dataSource.getSchema();
         final List<DfTableMeta> tableList = _tableExtractor.getTableList(dbMeta, mainSchema);
         helpTableComments(tableList, mainSchema);
@@ -1006,24 +1073,24 @@ public class DfSchemaXmlSerializer {
      * JDBC meta data.  It returns a List of Lists.  Each element
      * of the returned List is a List with:
      * @param dbMeta The meta data of a database. (NotNull)
-     * @param tableInfo The meta information of table, which has column list after this method. (NotNull)
+     * @param tableMeta The meta information of table, which has column list after this method. (NotNull)
      * @return The list of columns in <code>tableName</code>.
      * @throws SQLException
      */
-    protected List<DfColumnMeta> getColumns(DatabaseMetaData dbMeta, DfTableMeta tableInfo) throws SQLException {
-        List<DfColumnMeta> columnList = _columnExtractor.getColumnList(dbMeta, tableInfo);
-        columnList = helpColumnAdjustment(dbMeta, tableInfo, columnList);
-        helpColumnComments(tableInfo, columnList);
-        tableInfo.setLazyColumnMetaList(columnList);
+    protected List<DfColumnMeta> getColumns(DatabaseMetaData dbMeta, DfTableMeta tableMeta) throws SQLException {
+        List<DfColumnMeta> columnList = _columnExtractor.getColumnList(dbMeta, tableMeta);
+        columnList = helpColumnAdjustment(dbMeta, tableMeta, columnList);
+        helpColumnComments(tableMeta, columnList);
+        tableMeta.setLazyColumnMetaList(columnList);
         return columnList;
     }
 
-    protected List<DfColumnMeta> helpColumnAdjustment(DatabaseMetaData dbMeta, DfTableMeta tableInfo,
+    protected List<DfColumnMeta> helpColumnAdjustment(DatabaseMetaData dbMeta, DfTableMeta tableMeta,
             List<DfColumnMeta> columnList) {
-        if (!canHandleSynonym(tableInfo)) {
+        if (!canHandleSynonym(tableMeta)) {
             return columnList;
         }
-        final DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
+        final DfSynonymMeta synonym = getSynonymMetaInfo(tableMeta);
         if (synonym == null) { // means not synonym or no supplementary info
             return columnList;
         }
@@ -1058,15 +1125,15 @@ public class DfSchemaXmlSerializer {
         return columnList;
     }
 
-    protected void helpColumnComments(DfTableMeta tableInfo, List<DfColumnMeta> columnList) {
+    protected void helpColumnComments(DfTableMeta tableMeta, List<DfColumnMeta> columnList) {
         if (_columnCommentAllMap != null) {
-            final String tableName = tableInfo.getTableName();
+            final String tableName = tableMeta.getTableName();
             final Map<String, UserColComments> columnCommentMap = _columnCommentAllMap.get(tableName);
             for (DfColumnMeta column : columnList) {
                 column.acceptColumnComment(columnCommentMap);
             }
         }
-        helpSynonymColumnComments(tableInfo, columnList);
+        helpSynonymColumnComments(tableMeta, columnList);
     }
 
     protected void helpSynonymColumnComments(DfTableMeta tableInfo, List<DfColumnMeta> columnList) {
@@ -1089,18 +1156,18 @@ public class DfSchemaXmlSerializer {
     /**
      * Get the meta information of primary key.
      * @param metaData The meta data of a database. (NotNull)
-     * @param tableInfo The meta information of table. (NotNull)
+     * @param tableMeta The meta information of table. (NotNull)
      * @return The meta information of primary key. (NotNull)
      * @throws SQLException
      */
-    protected DfPrimaryKeyMeta getPrimaryColumnMetaInfo(DatabaseMetaData metaData, DfTableMeta tableInfo)
+    protected DfPrimaryKeyMeta getPrimaryColumnMetaInfo(DatabaseMetaData metaData, DfTableMeta tableMeta)
             throws SQLException {
-        final DfPrimaryKeyMeta pkInfo = _uniqueKeyExtractor.getPrimaryKey(metaData, tableInfo);
+        final DfPrimaryKeyMeta pkInfo = _uniqueKeyExtractor.getPrimaryKey(metaData, tableMeta);
         final List<String> pkList = pkInfo.getPrimaryKeyList();
-        if (!canHandleSynonym(tableInfo) || !pkList.isEmpty()) {
+        if (!canHandleSynonym(tableMeta) || !pkList.isEmpty()) {
             return pkInfo;
         }
-        final DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
+        final DfSynonymMeta synonym = getSynonymMetaInfo(tableMeta);
         if (synonym != null) {
             return synonym.getPrimaryKey();
         } else {
@@ -1114,17 +1181,17 @@ public class DfSchemaXmlSerializer {
     /**
      * Get unique column name list.
      * @param metaData The meta data of a database. (NotNull)
-     * @param tableInfo The meta information of table. (NotNull)
+     * @param tableMeta The meta information of table. (NotNull)
      * @return The list of unique columns. (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableInfo)
+    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, DfTableMeta tableMeta)
             throws SQLException {
-        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyExtractor.getUniqueKeyMap(metaData, tableInfo);
-        if (!canHandleSynonym(tableInfo) || !uniqueKeyMap.isEmpty()) {
+        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyExtractor.getUniqueKeyMap(metaData, tableMeta);
+        if (!canHandleSynonym(tableMeta) || !uniqueKeyMap.isEmpty()) {
             return uniqueKeyMap;
         }
-        final DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
+        final DfSynonymMeta synonym = getSynonymMetaInfo(tableMeta);
         return synonym != null ? synonym.getUniqueKeyMap() : uniqueKeyMap;
     }
 
@@ -1133,19 +1200,19 @@ public class DfSchemaXmlSerializer {
     //                                        --------------
     /**
      * Get auto-increment column name.
-     * @param tableInfo The meta information of table from which to retrieve PK information.
+     * @param tableMeta The meta information of table from which to retrieve PK information.
      * @param primaryKeyColumnInfo The meta information of primary-key column.
      * @param conn Connection.
      * @return Auto-increment column name. (NullAllowed)
      * @throws SQLException
      */
-    protected boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableInfo, DfColumnMeta primaryKeyColumnInfo)
+    protected boolean isAutoIncrementColumn(Connection conn, DfTableMeta tableMeta, DfColumnMeta primaryKeyColumnInfo)
             throws SQLException {
-        if (_autoIncrementExtractor.isAutoIncrementColumn(conn, tableInfo, primaryKeyColumnInfo)) {
+        if (_autoIncrementExtractor.isAutoIncrementColumn(conn, tableMeta, primaryKeyColumnInfo)) {
             return true;
         }
-        if (canHandleSynonym(tableInfo)) {
-            final DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
+        if (canHandleSynonym(tableMeta)) {
+            final DfSynonymMeta synonym = getSynonymMetaInfo(tableMeta);
             if (synonym != null && synonym.isAutoIncrement()) {
                 return true;
             }
@@ -1154,7 +1221,7 @@ public class DfSchemaXmlSerializer {
             return false;
         }
         final String primaryKeyColumnName = primaryKeyColumnInfo.getColumnName();
-        final String columnName = _identityMap.get(tableInfo.getTableName());
+        final String columnName = _identityMap.get(tableMeta.getTableName());
         return primaryKeyColumnName.equals(columnName);
     }
 
@@ -1178,17 +1245,17 @@ public class DfSchemaXmlSerializer {
     /**
      * Retrieves a list of foreign key columns for a given table.
      * @param metaData The meta data of a database. (NotNull)
-     * @param tableInfo The meta information of table. (NotNull)
+     * @param tableMeta The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    protected Map<String, DfForeignKeyMeta> getForeignKeys(DatabaseMetaData metaData, DfTableMeta tableInfo)
+    protected Map<String, DfForeignKeyMeta> getForeignKeys(DatabaseMetaData metaData, DfTableMeta tableMeta)
             throws SQLException {
-        final Map<String, DfForeignKeyMeta> foreignKeyMap = _foreignKeyExtractor.getForeignKeyMap(metaData, tableInfo);
-        if (!canHandleSynonym(tableInfo) || !foreignKeyMap.isEmpty()) {
+        final Map<String, DfForeignKeyMeta> foreignKeyMap = _foreignKeyExtractor.getForeignKeyMap(metaData, tableMeta);
+        if (!canHandleSynonym(tableMeta) || !foreignKeyMap.isEmpty()) {
             return foreignKeyMap;
         }
-        final DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
+        final DfSynonymMeta synonym = getSynonymMetaInfo(tableMeta);
         return synonym != null ? synonym.getForeignKeyMap() : foreignKeyMap;
     }
 
@@ -1198,19 +1265,19 @@ public class DfSchemaXmlSerializer {
     /**
      * Get index column name list.
      * @param metaData The meta data of a database. (NotNull)
-     * @param tableInfo The meta information of table. (NotNull)
+     * @param tableMeta The meta information of table. (NotNull)
      * @param uniqueKeyMap The map of unique key. (NotNull)
      * @return The list of index columns. (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, DfTableMeta tableInfo,
+    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, DfTableMeta tableMeta,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
-        final Map<String, Map<Integer, String>> indexMap = _indexExtractor.getIndexMap(metaData, tableInfo,
+        final Map<String, Map<Integer, String>> indexMap = _indexExtractor.getIndexMap(metaData, tableMeta,
                 uniqueKeyMap);
-        if (!canHandleSynonym(tableInfo) || !indexMap.isEmpty()) {
+        if (!canHandleSynonym(tableMeta) || !indexMap.isEmpty()) {
             return indexMap;
         }
-        final DfSynonymMeta synonym = getSynonymMetaInfo(tableInfo);
+        final DfSynonymMeta synonym = getSynonymMetaInfo(tableMeta);
         return synonym != null ? synonym.getIndexMap() : indexMap;
     }
 

@@ -18,12 +18,29 @@ package org.seasar.dbflute.helper.jdbc.connection;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.seasar.dbflute.util.DfTypeUtil;
+
 /**
  * @author jflute
  */
-public interface DfConnectionProvider {
+public class DfFittingDataSource extends DfCushionDataSource {
 
-    Connection getConnection() throws SQLException;
+    protected final DfConnectionProvider _dataSourceProvider;
 
-    Connection newConnection() throws SQLException;
+    public DfFittingDataSource(DfDataSourceHandler dataSourceProvider) {
+        _dataSourceProvider = dataSourceProvider;
+    }
+
+    public Connection getConnection() throws SQLException {
+        return _dataSourceProvider.getConnection();
+    }
+
+    public Connection newConnection() throws SQLException {
+        return _dataSourceProvider.newConnection();
+    }
+
+    @Override
+    public String toString() {
+        return DfTypeUtil.toClassTitle(this) + ":" + _dataSourceProvider;
+    }
 }

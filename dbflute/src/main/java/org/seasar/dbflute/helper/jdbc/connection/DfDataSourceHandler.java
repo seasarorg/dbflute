@@ -79,7 +79,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
             _log.info("  driver = " + _driver);
             _log.info("  url    = " + _url);
             _log.info("  user   = " + _user);
-            DfDataSourceContext.setDataSource(new DfSimpleDataSource(this));
+            DfDataSourceContext.setDataSource(new DfFittingDataSource(this));
         }
     }
 
@@ -117,9 +117,9 @@ public class DfDataSourceHandler implements DfConnectionProvider {
                 _log.info("...rollback()");
                 conn.rollback();
             }
-            if (conn instanceof DfSimpleConnection) {
+            if (conn instanceof DfFittingConnection) {
                 _log.info("...closeReally()");
-                ((DfSimpleConnection) conn).closeReally();
+                ((DfFittingConnection) conn).closeReally();
             } else {
                 _log.info("...close()");
                 conn.close();
@@ -135,8 +135,14 @@ public class DfDataSourceHandler implements DfConnectionProvider {
     // ===================================================================================
     //                                                             Provider Implementation
     //                                                             =======================
-    public Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException { // main use
         return processCachedConnection();
+    }
+
+    public Connection newConnection() throws SQLException { // special use
+        final Connection conn = createConnection();
+        hookConnectionCreation(conn);
+        return conn;
     }
 
     public Connection getCachedConnection() {
@@ -148,7 +154,7 @@ public class DfDataSourceHandler implements DfConnectionProvider {
             return _cachedConnection;
         }
         final Connection conn = createConnection();
-        _cachedConnection = new DfSimpleConnection(conn);
+        _cachedConnection = new DfFittingConnection(conn);
         setupConnectionMetaInfo(conn);
         hookConnectionCreation(conn);
         return _cachedConnection;

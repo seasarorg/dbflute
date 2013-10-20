@@ -13,17 +13,17 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.jdbc.connection;
-
-import java.sql.Connection;
-import java.sql.SQLException;
+package org.seasar.dbflute.helper.thread;
 
 /**
  * @author jflute
+ * @since 1.0.5A (2013/10/17 Thursday)
  */
-public interface DfConnectionProvider {
+public interface DfCountDownRaceExecution {
 
-    Connection getConnection() throws SQLException;
-
-    Connection newConnection() throws SQLException;
+    /**
+     * Execute the application code as thread-fire.
+     * @param resource The resource for the thread-fire. (NotNull)
+     */
+    void execute(DfCountDownRaceRunner resource);
 }
