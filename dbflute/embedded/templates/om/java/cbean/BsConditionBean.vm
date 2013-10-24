@@ -67,6 +67,13 @@ public class ${myClassName} extends AbstractConditionBean {
         if (${glDBFluteConfig}.getInstance().isCheckCountBeforeQueryUpdate()) {
             enableCheckCountBeforeQueryUpdate();
         }
+#foreach ($relation in $table.setupSelectForcedRelationList)
+#if (!$relation.isOneToOne())
+        setupSelect_${relation.foreignPropertyNameInitCap}();
+#else
+        setupSelect_${relation.referrerPropertyNameInitCapAsOne}();
+#end
+#end
     }
 
     // ===================================================================================
@@ -381,6 +388,13 @@ public class ${myClassName} extends AbstractConditionBean {
         doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery())
         { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables})); }
+#foreach ($relation in $fk.setupSelectForcedForeignKeyList)
+#if (!$relation.isOneToOne())
+        _nss${tmpPropertyNameInitCap}.with${relation.foreignPropertyNameInitCap}();
+#else
+        _nss${tmpPropertyNameInitCap}.with${relation.referrerPropertyNameInitCapAsOne}();
+#end
+#end
         return _nss${tmpPropertyNameInitCap};
     }
 #end
@@ -409,6 +423,13 @@ public class ${myClassName} extends AbstractConditionBean {
     public ${nestSelectSetuppperClassName} setupSelect_${tmpPropertyNameInitCap}() {
         doSetupSelect(new SsCall() { public ConditionQuery qf() { return query().query${tmpPropertyNameInitCap}(); } });
         if (_nss${tmpPropertyNameInitCap} == null || !_nss${tmpPropertyNameInitCap}.hasConditionQuery()) { _nss${tmpPropertyNameInitCap} = new ${nestSelectSetuppperClassName}(query().query${tmpPropertyNameInitCap}()); }
+#foreach ($relation in $referrer.setupSelectForcedReferrerAsOneList)
+#if (!$relation.isOneToOne())
+        _nss${tmpPropertyNameInitCap}.with${relation.foreignPropertyNameInitCap}();
+#else
+        _nss${tmpPropertyNameInitCap}.with${relation.referrerPropertyNameInitCapAsOne}();
+#end
+#end
         return _nss${tmpPropertyNameInitCap};
     }
 #end

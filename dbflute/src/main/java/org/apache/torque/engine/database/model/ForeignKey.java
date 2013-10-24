@@ -1538,6 +1538,17 @@ public class ForeignKey implements Constraint {
     }
 
     // ===================================================================================
+    //                                                         SetupSelect Forced Relation
+    //                                                         ===========================
+    public List<ForeignKey> getSetupSelectForcedForeignKeyList() { // from foreign relation
+        return getForeignTable().getSetupSelectForcedRelationList(); // foreign table is join table here
+    }
+
+    public List<ForeignKey> getSetupSelectForcedReferrerAsOneList() { // from referrer relation
+        return getTable().getSetupSelectForcedRelationList(); // local table is join table here
+    }
+
+    // ===================================================================================
     //                                                                          Properties
     //                                                                          ==========
     protected DfBuildProperties getProperties() {
