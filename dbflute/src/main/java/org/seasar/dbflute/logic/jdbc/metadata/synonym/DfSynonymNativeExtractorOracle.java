@@ -58,7 +58,7 @@ public class DfSynonymNativeExtractorOracle {
     //                                                                        ============
     public Map<String, SynonymNativeInfo> selectSynonymInfoMap(UnifiedSchema unifiedSchema) {
         final String sql = buildSynonymSql(unifiedSchema);
-        return doSelectSynonymInfoMap(sql);
+        return doSelectSynonymInfoMap(sql, false);
     }
 
     protected String buildSynonymSql(UnifiedSchema unifiedSchema) {
@@ -72,7 +72,7 @@ public class DfSynonymNativeExtractorOracle {
 
     public Map<String, SynonymNativeInfo> selectDBLinkSynonymInfoMap(String dbLinkName) {
         final String sql = buildDBLinkSynonymSql(dbLinkName);
-        return doSelectSynonymInfoMap(sql);
+        return doSelectSynonymInfoMap(sql, true);
     }
 
     protected String buildDBLinkSynonymSql(String dbLinkName) {
@@ -83,8 +83,13 @@ public class DfSynonymNativeExtractorOracle {
         return sb.toString();
     }
 
-    protected Map<String, SynonymNativeInfo> doSelectSynonymInfoMap(String sql) {
+    protected Map<String, SynonymNativeInfo> doSelectSynonymInfoMap(String sql, boolean transaction) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        if (transaction) {
+            // reported that five or more DB links are not allowed to connect
+            // you can avoid it by committing so it uses transaction
+            facade.useTransaction();
+        }
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SYNONYM_NAME");
         columnList.add("TABLE_OWNER");

@@ -51,6 +51,7 @@ public class DfJdbcFacade {
     //                                                                           =========
     protected final DataSource _dataSource;
     protected final Connection _conn;
+    protected boolean _useTransaction;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -83,6 +84,7 @@ public class DfJdbcFacade {
         ResultSet rs = null;
         try {
             conn = getConnection();
+            beginTransactionIfNeeds(conn);
             st = conn.createStatement();
             rs = st.executeQuery(sql);
             final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, null);
@@ -99,10 +101,12 @@ public class DfJdbcFacade {
                 resultList.add(recordMap);
                 ++count;
             }
+            commitTrasactionIfNeeds(conn);
         } catch (SQLException e) {
             handleSQLException(sql, e);
             return null; // unreachable
         } finally {
+            rollbackTransactionIfNeeds(conn);
             closeResultSet(rs);
             closeStatement(st);
             closeConnection(conn);
@@ -112,6 +116,39 @@ public class DfJdbcFacade {
 
     protected boolean isOverLimit(int limit, int count) {
         return limit >= 0 && limit <= count;
+    }
+
+    // -----------------------------------------------------
+    //                                           Transaction
+    //                                           -----------
+    public DfJdbcFacade useTransaction() {
+        _useTransaction = true;
+        return this;
+    }
+
+    protected void beginTransactionIfNeeds(Connection conn) throws SQLException {
+        if (_useTransaction) {
+            conn.setAutoCommit(false);
+        }
+    }
+
+    protected void commitTrasactionIfNeeds(Connection conn) throws SQLException {
+        if (_useTransaction) {
+            conn.commit();
+        }
+    }
+
+    protected void rollbackTransactionIfNeeds(Connection conn) {
+        if (_useTransaction) {
+            try {
+                conn.rollback();
+            } catch (SQLException ignored) {
+            }
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException ignored) {
+            }
+        }
     }
 
     // -----------------------------------------------------
