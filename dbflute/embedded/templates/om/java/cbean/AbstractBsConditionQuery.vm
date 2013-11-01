@@ -369,7 +369,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${myConditionBeanClassName} subCB) {
+     *     public void query(${relatedCBClassName} subCB) {
      *         subCB.query().setXxx...
      *     }
      * });
@@ -407,7 +407,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${myConditionBeanClassName} subCB) {
+     *     public void query(${relatedCBClassName} subCB) {
      *         subCB.query().setXxx...
      *     }
      * });
@@ -844,7 +844,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">exists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${myConditionBeanClassName} subCB) {
+     *     public void query(${relatedCBClassName} subCB) {
      *         subCB.query().setXxx...
      *     }
      * });
@@ -882,7 +882,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
      * cb.query().<span style="color: #FD4747">notExists${relationPropertyNameInitCap}</span>(new SubQuery&lt;${relatedCBClassName}&gt;() {
-     *     public void query(${myConditionBeanClassName} subCB) {
+     *     public void query(${relatedCBClassName} subCB) {
      *         subCB.query().setXxx...
      *     }
      * });

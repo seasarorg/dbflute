@@ -70,88 +70,6 @@ public class DfJdbcFacade {
     //                                                                              Select
     //                                                                              ======
     // -----------------------------------------------------
-    //                                            Typed List
-    //                                            ----------
-    public List<Map<String, Object>> selectList(String sql, Map<String, ValueType> columnValueTypeMap) {
-        return selectList(sql, columnValueTypeMap, -1);
-    }
-
-    public List<Map<String, Object>> selectList(String sql, Map<String, ValueType> columnValueTypeMap, int limit) {
-        // [ATTENTION]: no use bind variables
-        final List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-        Connection conn = null;
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            conn = getConnection();
-            beginTransactionIfNeeds(conn);
-            st = conn.createStatement();
-            rs = st.executeQuery(sql);
-            final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, null);
-            int count = 0;
-            while (wrapper.next()) {
-                if (isOverLimit(limit, count)) {
-                    break;
-                }
-                final Map<String, Object> recordMap = StringKeyMap.createAsFlexibleOrdered();
-                for (String columnName : columnValueTypeMap.keySet()) {
-                    final Object value = wrapper.getObject(columnName);
-                    recordMap.put(columnName, value);
-                }
-                resultList.add(recordMap);
-                ++count;
-            }
-            commitTrasactionIfNeeds(conn);
-        } catch (SQLException e) {
-            handleSQLException(sql, e);
-            return null; // unreachable
-        } finally {
-            rollbackTransactionIfNeeds(conn);
-            closeResultSet(rs);
-            closeStatement(st);
-            closeConnection(conn);
-        }
-        return resultList;
-    }
-
-    protected boolean isOverLimit(int limit, int count) {
-        return limit >= 0 && limit <= count;
-    }
-
-    // -----------------------------------------------------
-    //                                           Transaction
-    //                                           -----------
-    public DfJdbcFacade useTransaction() {
-        _useTransaction = true;
-        return this;
-    }
-
-    protected void beginTransactionIfNeeds(Connection conn) throws SQLException {
-        if (_useTransaction) {
-            conn.setAutoCommit(false);
-        }
-    }
-
-    protected void commitTrasactionIfNeeds(Connection conn) throws SQLException {
-        if (_useTransaction) {
-            conn.commit();
-        }
-    }
-
-    protected void rollbackTransactionIfNeeds(Connection conn) {
-        if (_useTransaction) {
-            try {
-                conn.rollback();
-            } catch (SQLException ignored) {
-            }
-            try {
-                conn.setAutoCommit(true);
-            } catch (SQLException ignored) {
-            }
-        }
-    }
-
-    // -----------------------------------------------------
     //                                           String List
     //                                           -----------
     /**
@@ -208,6 +126,7 @@ public class DfJdbcFacade {
         ResultSet rs = null;
         try {
             conn = getConnection();
+            beginTransactionIfNeeds(conn);
             st = conn.createStatement();
             rs = st.executeQuery(sql);
             final DfJFadResultSetWrapper wrapper = new DfJFadResultSetWrapper(rs, columnValueTypeMap, converter);
@@ -226,10 +145,12 @@ public class DfJdbcFacade {
                 resultList.add(recordMap);
                 ++count;
             }
+            commitTrasactionIfNeeds(conn);
         } catch (SQLException e) {
             handleSQLException(sql, e);
             return null; // unreachable
         } finally {
+            rollbackTransactionIfNeeds(conn);
             closeResultSet(rs);
             closeStatement(st);
             closeConnection(conn);
@@ -271,6 +192,46 @@ public class DfJdbcFacade {
                 }
             }
         };
+    }
+
+    // -----------------------------------------------------
+    //                                           Transaction
+    //                                           -----------
+    public DfJdbcFacade useTransaction() {
+        _useTransaction = true;
+        return this;
+    }
+
+    protected void beginTransactionIfNeeds(Connection conn) throws SQLException {
+        if (_useTransaction) {
+            conn.setAutoCommit(false);
+        }
+    }
+
+    protected void commitTrasactionIfNeeds(Connection conn) throws SQLException {
+        if (_useTransaction) {
+            conn.commit();
+        }
+    }
+
+    protected void rollbackTransactionIfNeeds(Connection conn) {
+        if (_useTransaction) {
+            try {
+                conn.rollback();
+            } catch (SQLException ignored) {
+            }
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException ignored) {
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                 Limit
+    //                                                 -----
+    protected boolean isOverLimit(int limit, int count) {
+        return limit >= 0 && limit <= count;
     }
 
     // ===================================================================================
