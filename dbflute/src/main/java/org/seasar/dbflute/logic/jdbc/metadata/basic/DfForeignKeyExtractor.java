@@ -18,16 +18,26 @@ package org.seasar.dbflute.logic.jdbc.metadata.basic;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
+import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.supplement.DfUniqueKeyFkExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.supplement.DfUniqueKeyFkExtractor.UserUniqueFkColumn;
+import org.seasar.dbflute.logic.jdbc.metadata.supplement.factory.DfUniqueKeyFkExtractorFactory;
+import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -40,6 +50,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfForeignKeyExtractor.class);
+    protected static Map<UnifiedSchema, Map<String, List<DfForeignKeyMeta>>> _tableUserUniqueFkMap; // singleton cache
 
     // ===================================================================================
     //                                                                           Attribute
@@ -142,15 +153,15 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                 final UnifiedSchema foreignSchema = createAsDynamicSchema(foreignCatalogName, foreignSchemaName);
                 assertPKColumnNotExcepted(foreignSchema, foreignTableName, foreignColumnName);
 
-                DfForeignKeyMeta metaInfo = fkMap.get(fkName);
-                if (metaInfo == null) { // basically here
-                    metaInfo = new DfForeignKeyMeta();
-                    fkMap.put(fkName, metaInfo);
+                DfForeignKeyMeta meta = fkMap.get(fkName);
+                if (meta == null) { // basically here
+                    meta = new DfForeignKeyMeta();
+                    fkMap.put(fkName, meta);
                 } else { // same-name FK was found!
-                    final String firstName = metaInfo.getForeignTablePureName(); // pure name is enough for check
+                    final String firstName = meta.getForeignTablePureName(); // pure name is enough for check
                     final String secondName = foreignTableName;
                     if (firstName.equalsIgnoreCase(secondName)) { // means compound FK
-                        metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
+                        meta.putColumnNameMap(localColumnName, foreignColumnName);
                         continue; // putting columns only
                     } else { // here: same-name FK and same different foreign table.
                         // Basically no way!
@@ -169,18 +180,19 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                     }
                 }
                 // first or override
-                metaInfo.setForeignKeyName(fkName);
-                metaInfo.setLocalSchema(createAsDynamicSchema(localCatalogName, localSchemaName));
-                metaInfo.setLocalTablePureName(localTableName);
-                metaInfo.setForeignSchema(foreignSchema);
-                metaInfo.setForeignTablePureName(foreignTableName);
-                metaInfo.putColumnNameMap(localColumnName, foreignColumnName);
+                meta.setForeignKeyName(fkName);
+                meta.setLocalSchema(createAsDynamicSchema(localCatalogName, localSchemaName));
+                meta.setLocalTablePureName(localTableName);
+                meta.setForeignSchema(foreignSchema);
+                meta.setForeignTablePureName(foreignTableName);
+                meta.putColumnNameMap(localColumnName, foreignColumnName);
             }
         } finally {
             if (rs != null) {
                 rs.close();
             }
         }
+        reflectUniqueKeyFk(unifiedSchema, tableName, fkMap);
         handleExceptedForeignKey(exceptedFKMap, tableName);
         return filterSameStructureForeignKey(fkMap);
     }
@@ -275,6 +287,81 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             }
         }
         return filteredFKMap;
+    }
+
+    // ===================================================================================
+    //                                                                        UniqueKey FK
+    //                                                                        ============
+    protected void reflectUniqueKeyFk(UnifiedSchema unifiedSchema, String tableName, Map<String, DfForeignKeyMeta> fkMap) {
+        final List<DfForeignKeyMeta> uniqueKeyFkMetaList = findUniqueKeyFkMetaList(unifiedSchema, tableName);
+        if (uniqueKeyFkMetaList == null) {
+            return;
+        }
+        for (DfForeignKeyMeta uniqueKeyFkMeta : uniqueKeyFkMetaList) {
+            fkMap.put(uniqueKeyFkMeta.getForeignKeyName(), uniqueKeyFkMeta);
+        }
+    }
+
+    protected List<DfForeignKeyMeta> findUniqueKeyFkMetaList(UnifiedSchema unifiedSchema, String tableName) {
+        if (_tableUserUniqueFkMap != null) {
+            final Map<String, List<DfForeignKeyMeta>> tableMap = _tableUserUniqueFkMap.get(unifiedSchema);
+            if (tableMap != null) {
+                return tableMap.get(tableName);
+            }
+        }
+        if (_tableUserUniqueFkMap == null) {
+            _tableUserUniqueFkMap = newLinkedHashMap();
+        }
+        final Map<String, List<DfForeignKeyMeta>> tableMap = StringKeyMap.createAsFlexible();
+        final DataSource dataSource = DfDataSourceContext.getDataSource();
+        final DfDatabaseTypeFacadeProp facadeProp = new DfDatabaseTypeFacadeProp(getBasicProperties());
+        final DfUniqueKeyFkExtractorFactory factory = new DfUniqueKeyFkExtractorFactory(dataSource, unifiedSchema,
+                facadeProp);
+        final DfUniqueKeyFkExtractor extractor = factory.createUniqueKeyFkExtractor();
+        if (extractor == null) {
+            final Map<String, List<DfForeignKeyMeta>> emptyTableMap = newLinkedHashMap();
+            _tableUserUniqueFkMap.put(unifiedSchema, emptyTableMap);
+            return null;
+        }
+        _log.info("...Extracting unique-key FK: " + unifiedSchema);
+        final Map<String, Map<String, List<UserUniqueFkColumn>>> uniqueKeyFkMap = extractor.extractUniqueKeyFkMap();
+        for (Entry<String, Map<String, List<UserUniqueFkColumn>>> tableEntry : uniqueKeyFkMap.entrySet()) {
+            final String tableKey = tableEntry.getKey();
+            final List<DfForeignKeyMeta> metaList = new ArrayList<DfForeignKeyMeta>();
+            final Map<String, List<UserUniqueFkColumn>> fkColumnListMap = tableEntry.getValue();
+            for (Entry<String, List<UserUniqueFkColumn>> fkEntry : fkColumnListMap.entrySet()) {
+                final List<UserUniqueFkColumn> columnList = fkEntry.getValue();
+                DfForeignKeyMeta meta = null;
+                for (UserUniqueFkColumn uniqueFkColumn : columnList) {
+                    if (meta == null) {
+                        meta = new DfForeignKeyMeta();
+                        meta.setForeignKeyName(uniqueFkColumn.getForeignKeyName());
+                        meta.setLocalSchema(unifiedSchema);
+                        meta.setLocalTablePureName(uniqueFkColumn.getLocalTableName());
+                        meta.setForeignSchema(unifiedSchema); // same schema only supported
+                        final String foreignTableName = uniqueFkColumn.getForeignTableName();
+                        meta.setForeignTablePureName(foreignTableName);
+                        if (!isForeignTableGenerated(foreignTableName)) {
+                            break;
+                        }
+                    }
+                    meta.putColumnNameMap(uniqueFkColumn.getLocalColumnName(), uniqueFkColumn.getForeignColumnName());
+                }
+                if (meta == null) { // basically no way
+                    throw new IllegalStateException("The key should have any elements: " + tableKey);
+                }
+                metaList.add(meta);
+            }
+            tableMap.put(tableKey, metaList);
+        }
+        _tableUserUniqueFkMap.put(unifiedSchema, tableMap);
+        if (!tableMap.isEmpty()) {
+            _log.info(" -> Unique-key FK: " + tableMap.keySet());
+        } else {
+            _log.info(" -> Not found unique-key FK");
+        }
+
+        return _tableUserUniqueFkMap.get(unifiedSchema).get(tableName);
     }
 
     // ===================================================================================

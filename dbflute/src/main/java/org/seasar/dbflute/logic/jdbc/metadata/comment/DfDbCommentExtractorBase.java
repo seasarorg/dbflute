@@ -114,12 +114,12 @@ public abstract class DfDbCommentExtractorBase extends DfAbstractMetaDataExtract
     protected abstract List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet);
 
     protected List<UserTabComments> doSelectUserTabComments(String sql, Connection conn, Set<String> tableSet) {
-        Statement statement = null;
+        Statement st = null;
         ResultSet rs = null;
         try {
-            statement = conn.createStatement();
+            st = conn.createStatement();
             _log.info(sql);
-            rs = statement.executeQuery(sql);
+            rs = st.executeQuery(sql);
             final List<UserTabComments> resultList = new ArrayList<UserTabComments>();
             while (rs.next()) {
                 final String tableName = rs.getString("TABLE_NAME");
@@ -144,9 +144,9 @@ public abstract class DfDbCommentExtractorBase extends DfAbstractMetaDataExtract
                     _log.info("rs.close() threw the exception!", ignored);
                 }
             }
-            if (statement != null) {
+            if (st != null) {
                 try {
-                    statement.close();
+                    st.close();
                 } catch (SQLException ignored) {
                     _log.info("statement.close() threw the exception!", ignored);
                 }
