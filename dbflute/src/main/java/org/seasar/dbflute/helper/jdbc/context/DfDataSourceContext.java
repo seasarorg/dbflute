@@ -35,14 +35,14 @@ public class DfDataSourceContext {
 
     /**
      * Set DataSource on thread.
-     * @param DataSource DataSource. (NotNull)
+     * @param dataSource DataSource. (NotNull)
      */
-    public static void setDataSource(DataSource DataSource) {
-        if (DataSource == null) {
-            String msg = "The argument[DataSource] must not be null.";
+    public static void setDataSource(DataSource dataSource) {
+        if (dataSource == null) {
+            String msg = "The argument[dataSource] must not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _threadLocal.set(DataSource);
+        _threadLocal.set(dataSource);
     }
 
     /**

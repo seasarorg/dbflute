@@ -372,7 +372,11 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     }
 
     protected DfUniqueKeyFkExtractor createUniqueKeyFkExtractor(UnifiedSchema unifiedSchema) {
-        final DataSource dataSource = DfDataSourceContext.getDataSource();
+        final DataSource dataSource = DfDataSourceContext.getDataSource(); // uses thread data source
+        if (dataSource == null) {
+            String msg = "Not found thread data source for unique-key FK extracting: " + unifiedSchema;
+            throw new IllegalStateException(msg);
+        }
         final DfDatabaseTypeFacadeProp facadeProp = new DfDatabaseTypeFacadeProp(getBasicProperties());
         final DfUniqueKeyFkExtractorFactory factory = new DfUniqueKeyFkExtractorFactory(dataSource, unifiedSchema,
                 facadeProp);

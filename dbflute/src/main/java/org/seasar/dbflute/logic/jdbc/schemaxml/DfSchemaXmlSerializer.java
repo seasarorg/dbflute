@@ -34,6 +34,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Constraint;
@@ -56,10 +58,14 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.connection.DfFittingDataSource;
+import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.helper.thread.DfCountDownRace;
 import org.seasar.dbflute.helper.thread.DfCountDownRaceExecution;
 import org.seasar.dbflute.helper.thread.DfCountDownRaceRunner;
+import org.seasar.dbflute.jdbc.DataSourceHandler;
+import org.seasar.dbflute.jdbc.HandlingDataSourceWrapper;
+import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
 import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertDirection;
 import org.seasar.dbflute.logic.doc.craftdiff.DfCraftDiffAssertSqlFire;
 import org.seasar.dbflute.logic.doc.historyhtml.DfSchemaHistory;
@@ -448,6 +454,7 @@ public class DfSchemaXmlSerializer {
                 Connection runnerConn = null;
                 try {
                     runnerConn = fittingDs.newConnection();
+                    prepareThreadDataSource(fittingDs, runnerConn);
                     final DatabaseMetaData newMetaData = runnerConn.getMetaData();
                     for (DfTableMeta tableMeta : tableList) {
                         final String tableKey = tableMeta.getTableFullQualifiedName();
@@ -470,7 +477,20 @@ public class DfSchemaXmlSerializer {
                         } catch (SQLException e) {
                         }
                     }
+                    DfDataSourceContext.clearDataSource();
                 }
+            }
+
+            protected void prepareThreadDataSource(final DfFittingDataSource fittingDs, final Connection runnerConn) {
+                if (DfDataSourceContext.isExistDataSource()) {
+                    return;
+                }
+                final Connection threadConn = new NotClosingConnectionWrapper(runnerConn);
+                DfDataSourceContext.setDataSource(new HandlingDataSourceWrapper(fittingDs, new DataSourceHandler() {
+                    public Connection getConnection(DataSource dataSource) throws SQLException {
+                        return threadConn;
+                    }
+                }));
             }
         });
     }
