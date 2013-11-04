@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
@@ -50,7 +51,7 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfForeignKeyExtractor.class);
-    protected static Map<UnifiedSchema, Map<String, List<DfForeignKeyMeta>>> _tableUserUniqueFkMap; // singleton cache
+    protected static final Map<UnifiedSchema, Map<String, List<DfForeignKeyMeta>>> _uniqueKeyFkMap = new ConcurrentHashMap<UnifiedSchema, Map<String, List<DfForeignKeyMeta>>>(); // singleton cache
 
     // ===================================================================================
     //                                                                           Attribute
@@ -298,30 +299,38 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             return;
         }
         for (DfForeignKeyMeta uniqueKeyFkMeta : uniqueKeyFkMetaList) {
-            fkMap.put(uniqueKeyFkMeta.getForeignKeyName(), uniqueKeyFkMeta);
+            final String foreignKeyName = uniqueKeyFkMeta.getForeignKeyName();
+            if (fkMap.containsKey(foreignKeyName)) {
+                _log.info("*The foreign key already exists: table=" + tableName + ", fk=" + foreignKeyName);
+                continue;
+            }
+            fkMap.put(foreignKeyName, uniqueKeyFkMeta);
         }
     }
 
     protected List<DfForeignKeyMeta> findUniqueKeyFkMetaList(UnifiedSchema unifiedSchema, String tableName) {
-        if (_tableUserUniqueFkMap != null) {
-            final Map<String, List<DfForeignKeyMeta>> tableMap = _tableUserUniqueFkMap.get(unifiedSchema);
-            if (tableMap != null) {
-                return tableMap.get(tableName);
+        final Map<String, List<DfForeignKeyMeta>> tableMap = _uniqueKeyFkMap.get(unifiedSchema);
+        if (tableMap != null) {
+            return tableMap.get(tableName);
+        }
+        // not found info of the schema
+        synchronized (_uniqueKeyFkMap) {
+            final Map<String, List<DfForeignKeyMeta>> retryMap = _uniqueKeyFkMap.get(unifiedSchema); // retry
+            if (retryMap != null) {
+                return retryMap.get(tableName);
             }
+            prepareUniqueKeyFkCache(unifiedSchema);
+            return _uniqueKeyFkMap.get(unifiedSchema).get(tableName);
         }
-        if (_tableUserUniqueFkMap == null) {
-            _tableUserUniqueFkMap = newLinkedHashMap();
-        }
-        final Map<String, List<DfForeignKeyMeta>> tableMap = StringKeyMap.createAsFlexible();
-        final DataSource dataSource = DfDataSourceContext.getDataSource();
-        final DfDatabaseTypeFacadeProp facadeProp = new DfDatabaseTypeFacadeProp(getBasicProperties());
-        final DfUniqueKeyFkExtractorFactory factory = new DfUniqueKeyFkExtractorFactory(dataSource, unifiedSchema,
-                facadeProp);
-        final DfUniqueKeyFkExtractor extractor = factory.createUniqueKeyFkExtractor();
-        if (extractor == null) {
-            final Map<String, List<DfForeignKeyMeta>> emptyTableMap = newLinkedHashMap();
-            _tableUserUniqueFkMap.put(unifiedSchema, emptyTableMap);
-            return null;
+    }
+
+    protected void prepareUniqueKeyFkCache(UnifiedSchema unifiedSchema) {
+        // preparing unique-key FK info of the schema
+        final Map<String, List<DfForeignKeyMeta>> tableMap = StringKeyMap.createAsFlexibleConcurrent();
+        final DfUniqueKeyFkExtractor extractor = createUniqueKeyFkExtractor(unifiedSchema);
+        if (extractor == null) { // no need to extract in this DBMS
+            _uniqueKeyFkMap.put(unifiedSchema, new ConcurrentHashMap<String, List<DfForeignKeyMeta>>());
+            return;
         }
         _log.info("...Extracting unique-key FK: " + unifiedSchema);
         final Map<String, Map<String, List<UserUniqueFkColumn>>> uniqueKeyFkMap = extractor.extractUniqueKeyFkMap();
@@ -354,14 +363,20 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             }
             tableMap.put(tableKey, metaList);
         }
-        _tableUserUniqueFkMap.put(unifiedSchema, tableMap);
+        _uniqueKeyFkMap.put(unifiedSchema, tableMap);
         if (!tableMap.isEmpty()) {
             _log.info(" -> Unique-key FK: " + tableMap.keySet());
         } else {
             _log.info(" -> Not found unique-key FK");
         }
+    }
 
-        return _tableUserUniqueFkMap.get(unifiedSchema).get(tableName);
+    protected DfUniqueKeyFkExtractor createUniqueKeyFkExtractor(UnifiedSchema unifiedSchema) {
+        final DataSource dataSource = DfDataSourceContext.getDataSource();
+        final DfDatabaseTypeFacadeProp facadeProp = new DfDatabaseTypeFacadeProp(getBasicProperties());
+        final DfUniqueKeyFkExtractorFactory factory = new DfUniqueKeyFkExtractorFactory(dataSource, unifiedSchema,
+                facadeProp);
+        return factory.createUniqueKeyFkExtractor();
     }
 
     // ===================================================================================

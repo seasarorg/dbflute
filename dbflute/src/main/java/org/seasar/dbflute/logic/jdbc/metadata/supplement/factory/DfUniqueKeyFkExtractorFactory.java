@@ -58,6 +58,7 @@ public class DfUniqueKeyFkExtractorFactory {
      */
     public DfUniqueKeyFkExtractor createUniqueKeyFkExtractor() {
         if (_databaseTypeFacadeProp.isDatabaseOracle()) {
+            // Oracle JDBC driver does not return unique-key FK so it needs to select data dictionary
             final DfUniqueKeyFkExtractorOracle extractor = new DfUniqueKeyFkExtractorOracle();
             extractor.setDataSource(_dataSource);
             extractor.setUnifiedSchema(_unifiedSchema);
