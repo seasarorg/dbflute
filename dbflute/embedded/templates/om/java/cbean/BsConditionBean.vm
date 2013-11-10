@@ -67,13 +67,6 @@ public class ${myClassName} extends AbstractConditionBean {
         if (${glDBFluteConfig}.getInstance().isCheckCountBeforeQueryUpdate()) {
             enableCheckCountBeforeQueryUpdate();
         }
-#foreach ($relation in $table.setupSelectForcedRelationList)
-#if (!$relation.isOneToOne())
-        setupSelect_${relation.foreignPropertyNameInitCap}();
-#else
-        setupSelect_${relation.referrerPropertyNameInitCapAsOne}();
-#end
-#end
     }
 
     // ===================================================================================

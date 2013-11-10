@@ -147,6 +147,7 @@ import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
@@ -1328,6 +1329,9 @@ public class ForeignKey implements Constraint {
     }
 
     public boolean canBeReferrer() {
+        if (isSuppressReferrerRelation()) {
+            return false;
+        }
         if (hasFixedCondition() && !isFixedReferrer()) {
             return false;
         }
@@ -1335,6 +1339,29 @@ public class ForeignKey implements Constraint {
 
         // *reference to unique key is unsupported basically
         //  (a-little-supported)
+    }
+
+    protected boolean isSuppressReferrerRelation() {
+        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
+        final Map<String, Set<String>> referrerRelationMap = prop.getSuppressReferrerRelationMap();
+        final Set<String> relationNameSet = referrerRelationMap.get(getForeignTable().getTableDbName());
+        if (relationNameSet == null) {
+            return false;
+        }
+        // the table exists in the map here
+        final String relationName;
+        if (isOneToOne()) {
+            relationName = getReferrerPropertyNameAsOne();
+        } else {
+            relationName = getReferrerPropertyName();
+        }
+        if (relationNameSet.contains("$$ALL$$")) {
+            if (relationNameSet.contains("!" + relationName)) { // pinpoint include
+                return false;
+            }
+            return true;
+        }
+        return relationNameSet.contains(relationName);
     }
 
     /**
@@ -1565,6 +1592,10 @@ public class ForeignKey implements Constraint {
 
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
+    }
+
+    protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 
     // ===================================================================================

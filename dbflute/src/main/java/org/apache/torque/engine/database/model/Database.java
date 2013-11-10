@@ -428,8 +428,11 @@ public class Database {
 
                 // adjust reverse relation
                 final List<ForeignKey> refererList = foreignTable.getRefererList();
+                final boolean canBeReferrer;
                 if ((refererList == null || !refererList.contains(fk))) {
-                    foreignTable.addReferrer(fk);
+                    canBeReferrer = foreignTable.addReferrer(fk);
+                } else {
+                    canBeReferrer = false;
                 }
 
                 // local column references
@@ -454,7 +457,9 @@ public class Database {
                     if (foreignColumn == null) {
                         throwForeignKeyForeignColumnNotFoundException(table, fk, foreignColumn);
                     } else {
-                        foreignColumn.addReferrer(fk);
+                        if (canBeReferrer) {
+                            foreignColumn.addReferrer(fk);
+                        }
                     }
                 }
             }

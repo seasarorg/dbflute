@@ -493,6 +493,19 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                         SetupSelect Forced Relation
     //                                                         ===========================
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    // e.g. MEMBER_SERVICE to SERVICE_RANK
+    // <supported>
+    // MemberCB cb = new MemberCB();
+    // cb.setupSelect_MemberService();
+    //
+    // PurchaseCB cb = new PurchaseCB();
+    // cb.setupSelect_Member().withMemberService();
+    //
+    // <unsupported>
+    // MemberServiceCB cb = new MemberServiceCB();
+    // *no timing for auto relation
+    // = = = = = = = = = =/
     public static final String KEY_setupSelectForcedRelationMap = "setupSelectForcedRelationMap";
     protected Map<String, Set<String>> _setupSelectForcedRelationMap;
 
@@ -560,6 +573,54 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                          Suppress Referrer Relation
+    //                                                          ==========================
+    // to suppress referrer relation that are not used in application (not doc-only task)
+    // so basically don't use this, however just in case
+    public static final String KEY_suppressReferrerRelationMap = "suppressReferrerRelationMap";
+    protected Map<String, Set<String>> _suppressReferrerRelationMap;
+
+    public Map<String, Set<String>> getSuppressReferrerRelationMap() { // closet
+        if (_suppressReferrerRelationMap != null) {
+            return _suppressReferrerRelationMap;
+        }
+        final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
+        final Object obj = littleAdjustmentMap.get(KEY_suppressReferrerRelationMap);
+        final Map<String, Set<String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
+        if (obj != null) {
+            final boolean generateTask = !isDocOnlyTask(); // not doc-only task means generate (contains sql2entity)
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> propMap = (Map<String, Object>) obj;
+            for (Entry<String, Object> entry : propMap.entrySet()) {
+                final String key = entry.getKey();
+                final Object value = entry.getValue();
+                if (!(value instanceof List<?>)) {
+                    final String typeExp = value != null ? value.getClass().getName() : null;
+                    String msg = "The element of suppressReferrerRelationMap should be list but: " + typeExp + " key="
+                            + key;
+                    throw new DfIllegalPropertyTypeException(msg);
+                }
+                @SuppressWarnings("unchecked")
+                final List<String> valueList = (List<String>) value;
+                final Set<String> relationSet = StringSet.createAsCaseInsensitive(); // not flexible for relation name
+                for (String relation : valueList) {
+                    final String genSuffix = "@gen";
+                    if (relation.endsWith(genSuffix)) {
+                        if (generateTask) {
+                            relationSet.add(Srl.substringLastFront(relation, genSuffix));
+                        }
+                    } else {
+                        relationSet.add(relation);
+                    }
+                }
+                resultMap.put(key, relationSet);
+            }
+        }
+        _suppressReferrerRelationMap = resultMap;
+        return _suppressReferrerRelationMap;
     }
 
     // ===================================================================================
