@@ -23,15 +23,11 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.torque.engine.database.model.ForeignKey;
-import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
-import org.seasar.dbflute.exception.DfPropertySettingTableNotFoundException;
 import org.seasar.dbflute.exception.DfTableColumnNameNonCompilableConnectorException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -490,90 +486,91 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isCheckCountBeforeQueryUpdate", false);
     }
 
-    // ===================================================================================
-    //                                                         SetupSelect Forced Relation
-    //                                                         ===========================
-    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    // e.g. MEMBER_SERVICE to SERVICE_RANK
-    // <supported>
-    // MemberCB cb = new MemberCB();
-    // cb.setupSelect_MemberService();
+    // *stop support because of incomplete, not look much like DBFlute policy
+    //// ===================================================================================
+    ////                                                         SetupSelect Forced Relation
+    ////                                                         ===========================
+    //// /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    //// e.g. MEMBER_SERVICE to SERVICE_RANK
+    //// <supported>
+    //// MemberCB cb = new MemberCB();
+    //// cb.setupSelect_MemberService();
+    ////
+    //// PurchaseCB cb = new PurchaseCB();
+    //// cb.setupSelect_Member().withMemberService();
+    ////
+    //// <unsupported>
+    //// MemberServiceCB cb = new MemberServiceCB();
+    //// *no timing for auto relation
+    //// = = = = = = = = = =/
+    //public static final String KEY_setupSelectForcedRelationMap = "setupSelectForcedRelationMap";
+    //protected Map<String, Set<String>> _setupSelectForcedRelationMap;
     //
-    // PurchaseCB cb = new PurchaseCB();
-    // cb.setupSelect_Member().withMemberService();
+    //public Map<String, Set<String>> getSetupSelectForcedRelationMap() { // closet
+    //    if (_setupSelectForcedRelationMap != null) {
+    //        return _setupSelectForcedRelationMap;
+    //    }
+    //    final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
+    //    final Object obj = littleAdjustmentMap.get(KEY_setupSelectForcedRelationMap);
+    //    final Map<String, Set<String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
+    //    if (obj != null) {
+    //        @SuppressWarnings("unchecked")
+    //        Map<String, Object> propMap = (Map<String, Object>) obj;
+    //        for (Entry<String, Object> entry : propMap.entrySet()) {
+    //            final String key = entry.getKey();
+    //            final Object value = entry.getValue();
+    //            if (!(value instanceof List<?>)) {
+    //                final String typeExp = value != null ? value.getClass().getName() : null;
+    //                String msg = "The element of forcedNextRelationMap should be list but: " + typeExp + " key=" + key;
+    //                throw new DfIllegalPropertyTypeException(msg);
+    //            }
+    //            @SuppressWarnings("unchecked")
+    //            final List<String> valueList = (List<String>) value;
+    //            final Set<String> relationSet = StringSet.createAsCaseInsensitive(); // not flexible for relation name
+    //            relationSet.addAll(valueList);
+    //            resultMap.put(key, relationSet);
+    //        }
+    //    }
+    //    _setupSelectForcedRelationMap = resultMap;
+    //    return _setupSelectForcedRelationMap;
+    //}
     //
-    // <unsupported>
-    // MemberServiceCB cb = new MemberServiceCB();
-    // *no timing for auto relation
-    // = = = = = = = = = =/
-    public static final String KEY_setupSelectForcedRelationMap = "setupSelectForcedRelationMap";
-    protected Map<String, Set<String>> _setupSelectForcedRelationMap;
-
-    public Map<String, Set<String>> getSetupSelectForcedRelationMap() { // closet
-        if (_setupSelectForcedRelationMap != null) {
-            return _setupSelectForcedRelationMap;
-        }
-        final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
-        final Object obj = littleAdjustmentMap.get(KEY_setupSelectForcedRelationMap);
-        final Map<String, Set<String>> resultMap = StringKeyMap.createAsFlexibleOrdered();
-        if (obj != null) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> propMap = (Map<String, Object>) obj;
-            for (Entry<String, Object> entry : propMap.entrySet()) {
-                final String key = entry.getKey();
-                final Object value = entry.getValue();
-                if (!(value instanceof List<?>)) {
-                    final String typeExp = value != null ? value.getClass().getName() : null;
-                    String msg = "The element of forcedNextRelationMap should be list but: " + typeExp + " key=" + key;
-                    throw new DfIllegalPropertyTypeException(msg);
-                }
-                @SuppressWarnings("unchecked")
-                final List<String> valueList = (List<String>) value;
-                final Set<String> relationSet = StringSet.createAsCaseInsensitive(); // not flexible for relation name
-                relationSet.addAll(valueList);
-                resultMap.put(key, relationSet);
-            }
-        }
-        _setupSelectForcedRelationMap = resultMap;
-        return _setupSelectForcedRelationMap;
-    }
-
-    public Set<String> getSetupSelectForcedRelationSet(String tableName) {
-        return getSetupSelectForcedRelationMap().get(tableName);
-    }
-
-    public void checkSetupSelectForcedRelation(DfTableFinder tableFinder) {
-        final String propKey = KEY_setupSelectForcedRelationMap;
-        final Map<String, Set<String>> relationMap = getSetupSelectForcedRelationMap();
-        for (Entry<String, Set<String>> entry : relationMap.entrySet()) {
-            final String tableName = entry.getKey();
-            final Table table = tableFinder.findTable(tableName);
-            if (table == null) {
-                String msg = "Not found the table: " + tableName + " in " + propKey;
-                throw new DfPropertySettingTableNotFoundException(msg);
-            }
-            final Set<String> relationSet = entry.getValue();
-            for (String relation : relationSet) {
-                boolean found = false;
-                final List<ForeignKey> foreignKeyList = table.getForeignKeyList();
-                for (ForeignKey fk : foreignKeyList) {
-                    if (fk.getForeignPropertyName().equalsIgnoreCase(relation)) {
-                        found = true;
-                    }
-                }
-                List<ForeignKey> referrerAsOneList = table.getReferrerAsOneList();
-                for (ForeignKey fk : referrerAsOneList) {
-                    if (fk.getReferrerPropertyNameAsOne().equalsIgnoreCase(relation)) {
-                        found = true;
-                    }
-                }
-                if (!found) {
-                    String msg = "Not found the relation: " + relation + " of " + tableName + " in " + propKey;
-                    throw new DfPropertySettingTableNotFoundException(msg);
-                }
-            }
-        }
-    }
+    //public Set<String> getSetupSelectForcedRelationSet(String tableName) {
+    //    return getSetupSelectForcedRelationMap().get(tableName);
+    //}
+    //
+    //public void checkSetupSelectForcedRelation(DfTableFinder tableFinder) {
+    //    final String propKey = KEY_setupSelectForcedRelationMap;
+    //    final Map<String, Set<String>> relationMap = getSetupSelectForcedRelationMap();
+    //    for (Entry<String, Set<String>> entry : relationMap.entrySet()) {
+    //        final String tableName = entry.getKey();
+    //        final Table table = tableFinder.findTable(tableName);
+    //        if (table == null) {
+    //            String msg = "Not found the table: " + tableName + " in " + propKey;
+    //            throw new DfPropertySettingTableNotFoundException(msg);
+    //        }
+    //        final Set<String> relationSet = entry.getValue();
+    //        for (String relation : relationSet) {
+    //            boolean found = false;
+    //            final List<ForeignKey> foreignKeyList = table.getForeignKeyList();
+    //            for (ForeignKey fk : foreignKeyList) {
+    //                if (fk.getForeignPropertyName().equalsIgnoreCase(relation)) {
+    //                    found = true;
+    //                }
+    //            }
+    //            List<ForeignKey> referrerAsOneList = table.getReferrerAsOneList();
+    //            for (ForeignKey fk : referrerAsOneList) {
+    //                if (fk.getReferrerPropertyNameAsOne().equalsIgnoreCase(relation)) {
+    //                    found = true;
+    //                }
+    //            }
+    //            if (!found) {
+    //                String msg = "Not found the relation: " + relation + " of " + tableName + " in " + propKey;
+    //                throw new DfPropertySettingTableNotFoundException(msg);
+    //            }
+    //        }
+    //    }
+    //}
 
     // ===================================================================================
     //                                                          Suppress Referrer Relation

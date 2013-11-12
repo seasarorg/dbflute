@@ -3071,39 +3071,6 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                         SetupSelect Forced Relation
-    //                                                         ===========================
-    protected List<ForeignKey> _setupSelectForcedRelation;
-
-    public List<ForeignKey> getSetupSelectForcedRelationList() {
-        if (_setupSelectForcedRelation != null) {
-            return _setupSelectForcedRelation;
-        }
-        final List<ForeignKey> forcedList = new ArrayList<ForeignKey>(4);
-        final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        final Set<String> relationSet = prop.getSetupSelectForcedRelationSet(getTableDbName());
-        if (relationSet == null) {
-            return forcedList;
-        }
-        final List<ForeignKey> foreignKeyList = getForeignKeyList();
-        for (ForeignKey fk : foreignKeyList) {
-            final String foreignPropertyName = fk.getForeignPropertyName();
-            if (relationSet.contains(foreignPropertyName)) {
-                forcedList.add(fk);
-            }
-        }
-        final List<ForeignKey> referrerAsOneList = getReferrerAsOneList();
-        for (ForeignKey referrer : referrerAsOneList) {
-            final String referrerPropertyName = referrer.getReferrerPropertyNameAsOne();
-            if (relationSet.contains(referrerPropertyName)) {
-                forcedList.add(referrer);
-            }
-        }
-        _setupSelectForcedRelation = forcedList;
-        return _setupSelectForcedRelation;
-    }
-
-    // ===================================================================================
     //                                                                          Simple DTO
     //                                                                          ==========
     public String getSimpleDtoBaseDtoClassName() {

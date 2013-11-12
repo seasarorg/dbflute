@@ -1057,12 +1057,6 @@ public class Database {
         //prop.getClassificationProperties().checkProperties(tableDeterminer);
         prop.getSequenceIdentityProperties().checkDefinition(tableDeterminer);
 
-        prop.getLittleAdjustmentProperties().checkSetupSelectForcedRelation(new DfTableFinder() {
-            public Table findTable(String tableName) {
-                return getTable(tableName);
-            }
-        });
-
         getBasicProperties().checkDirectoryPackage();
     }
 

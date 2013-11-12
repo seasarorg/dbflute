@@ -56,19 +56,7 @@ public class ${myClassName} {
      */
     public ${fk.foreignTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}(${dynamicFixedConditionArgs}) {
         _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ConditionQuery qf() { return _query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}); }});
-#if ($fk.setupSelectForcedForeignKeyList.isEmpty())
         return new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
-#else
-        ${fk.foreignTableNestSelectSetupperClassName} moreNss = new ${fk.foreignTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}(${dynamicFixedConditionVariables}));
-#foreach ($relation in $fk.setupSelectForcedForeignKeyList)
-#if (!$relation.isOneToOne())
-        moreNss.with${relation.foreignPropertyNameInitCap}();
-#else
-        moreNss.with${relation.referrerPropertyNameInitCapAsOne}();
-#end
-#end
-        return moreNss;
-#end
     }
 #end
 
@@ -83,19 +71,7 @@ public class ${myClassName} {
      */
     public ${referrer.referrerTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
         _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ConditionQuery qf() { return _query.query${tmpPropertyNameInitCap}(); }});
-#if ($referrer.setupSelectForcedReferrerAsOneList.isEmpty())
         return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
-#else
-        ${referrer.referrerTableNestSelectSetupperClassName} moreNss = new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());
-#foreach ($relation in $referrer.setupSelectForcedReferrerAsOneList)
-#if (!$relation.isOneToOne())
-        moreNss.with${relation.foreignPropertyNameInitCap}();
-#else
-        moreNss.with${relation.referrerPropertyNameInitCapAsOne}();
-#end
-#end
-        return moreNss;
-#end
     }
 #end
 #end
