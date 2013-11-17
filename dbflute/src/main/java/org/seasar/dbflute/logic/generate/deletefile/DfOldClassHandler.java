@@ -16,6 +16,7 @@
 package org.seasar.dbflute.logic.generate.deletefile;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfSimpleDtoProperties;
 
 /**
@@ -897,6 +899,10 @@ public class DfOldClassHandler {
         return DfBuildProperties.getInstance().getLittleAdjustmentProperties();
     }
 
+    protected DfOutsideSqlProperties getOutsideSqlProperties() {
+        return DfBuildProperties.getInstance().getOutsideSqlProperties();
+    }
+
     protected DfSimpleDtoProperties getSimpleDtoProperties() {
         return DfBuildProperties.getInstance().getSimpleDtoProperties();
     }
@@ -915,6 +921,10 @@ public class DfOldClassHandler {
             }
             elementMap.put(table.getTableDbName(), table);
         }
+        if (cmentityLocationMap.isEmpty()) { // no outsideSql (all classes for outsideSql are old)
+            final String mainDir = getOutsideSqlProperties().getSql2EntityOutputDirectory(); // main directory only
+            cmentityLocationMap.put(mainDir, new HashMap<String, Table>());
+        }
         _cmentityLocationMap = cmentityLocationMap;
     }
 
@@ -931,6 +941,10 @@ public class DfOldClassHandler {
                 pmbLocationMap.put(outputDirectory, elementMap);
             }
             elementMap.put(pmbName, pmbMetaData);
+        }
+        if (pmbLocationMap.isEmpty()) { // no outsideSql (all classes for outsideSql are old)
+            final String mainDir = getOutsideSqlProperties().getSql2EntityOutputDirectory(); // main directory only
+            pmbLocationMap.put(mainDir, new HashMap<String, DfPmbMetaData>());
         }
         _pmbLocationMap = pmbLocationMap;
     }

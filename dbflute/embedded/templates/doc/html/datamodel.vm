@@ -86,7 +86,7 @@ h4 {
 	font-size: 0.9em;
 	color: #114488;
 }
-#suggestion-list {
+.suggestionarea {
 	padding: 0 0.2em 0.2em 0.2em;
 	margin: 0;
 	position: absolute;
@@ -304,6 +304,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 <h2>Table List</h2>
 <div class="keywordsearch">
 	<input type="text" id="incremental-search-field" tabindex=1 value="" placeholder="Table Search" />
+	<ul id="suggestion-list" class="suggestionarea"></ul>
 	<span class="searchmemo">*Push 'tab' (primary tab order)</span>
 </div>
 <table summary="Tables in the Schema">
@@ -515,12 +516,10 @@ Incremental.prototype = {
 	 */
 	buildSuggestList: function () {
 		var fragment = document.createDocumentFragment(),
-			ul = document.createElement('ul'),
+			ul = document.getElementById('suggestion-list'),
 			li, anchor;
 
-		ul.id = 'suggestion-list';
 		this.ul = ul;
-
 		for (var i = 0, max = this.distDataList.length; i < max; i++) {
 			li = document.createElement('li');
 			li.style.display = 'none';
@@ -540,7 +539,6 @@ Incremental.prototype = {
 		}
 		ul.appendChild(fragment);
 
-		this.targetParent.appendChild(ul);
 		this.attachSuggestionEvent();
 	},
 
