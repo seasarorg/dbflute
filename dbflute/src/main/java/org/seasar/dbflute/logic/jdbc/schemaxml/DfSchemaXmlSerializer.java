@@ -968,7 +968,21 @@ public class DfSchemaXmlSerializer {
         helpTableComments(tableList, mainSchema);
         resolveAdditionalSchema(dbMeta, tableList);
         assertDuplicateTable(tableList);
+        // table names from meta data are used so basically it does not need it
+        // but it prepares here just in case
+        prepareTableCaseTranslation(tableList);
         return tableList;
+    }
+
+    protected void prepareTableCaseTranslation(List<DfTableMeta> tableList) {
+        final List<String> tableNameList = new ArrayList<String>();
+        for (DfTableMeta meta : tableList) {
+            tableNameList.add(meta.getTableDbName());
+        }
+        _columnExtractor.enableTableCaseTranslation(tableNameList);
+        _uniqueKeyExtractor.enableTableCaseTranslation(tableNameList);
+        _indexExtractor.enableTableCaseTranslation(tableNameList);
+        _foreignKeyExtractor.enableTableCaseTranslation(tableNameList);
     }
 
     protected void assertDuplicateTable(List<DfTableMeta> tableList) {

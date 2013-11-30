@@ -46,7 +46,9 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.basic.DfTableExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfDefaultValueProp;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfLoadingControlProp;
@@ -98,6 +100,9 @@ public abstract class DfAbsractDataWriter {
 
     /** The intercepter of data writing. (NullAllowed) */
     protected DfDataWritingInterceptor _dataWritingInterceptor;
+
+    /** The handler of tables for getting column meta information(as helper). */
+    protected final DfTableExtractor _tableHandler = new DfTableExtractor();
 
     /** The handler of columns for getting column meta information(as helper). */
     protected final DfColumnExtractor _columnHandler = new DfColumnExtractor();
@@ -912,6 +917,8 @@ public abstract class DfAbsractDataWriter {
             bindType = Long.class;
         } else if (jdbcDefValue == Types.DECIMAL || jdbcDefValue == Types.NUMERIC) {
             bindType = BigDecimal.class;
+        } else if (jdbcDefValue == Types.FLOAT || jdbcDefValue == Types.REAL) {
+            bindType = BigDecimal.class;
         } else if (jdbcDefValue == Types.TIMESTAMP) {
             bindType = Timestamp.class;
         } else if (jdbcDefValue == Types.TIME) {
@@ -942,6 +949,7 @@ public abstract class DfAbsractDataWriter {
         if (_columnInfoCacheMap.containsKey(tableDbName)) {
             return _columnInfoCacheMap.get(tableDbName);
         }
+        prepareTableCaseTranslationIfNeeds(); // because the name might be user favorite case name
         final Map<String, DfColumnMeta> columnMetaMap = StringKeyMap.createAsFlexible();
         Connection conn = null;
         try {
@@ -955,6 +963,33 @@ public abstract class DfAbsractDataWriter {
             return columnMetaMap;
         } catch (SQLException e) {
             String msg = "Failed to get column meta informations: table=" + tableDbName;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
+        }
+    }
+
+    protected void prepareTableCaseTranslationIfNeeds() {
+        if (_columnHandler.isEnableTableCaseTranslation()) {
+            return;
+        }
+        Connection conn = null;
+        try {
+            conn = _dataSource.getConnection();
+            final DatabaseMetaData metaData = conn.getMetaData();
+            final List<DfTableMeta> tableList = _tableHandler.getTableList(metaData, _unifiedSchema);
+            final List<String> tableNameList = new ArrayList<String>();
+            for (DfTableMeta meta : tableList) {
+                tableNameList.add(meta.getTableDbName());
+            }
+            _columnHandler.enableTableCaseTranslation(tableNameList);
+        } catch (SQLException e) {
+            String msg = "Failed to get meta data of tables.";
             throw new IllegalStateException(msg, e);
         } finally {
             if (conn != null) {

@@ -79,19 +79,20 @@ public class DfForeignKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * Retrieves a map of foreign key columns for a given table. (the key is FK name)
      * @param metaData JDBC meta data. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
-     * @param tableName The name of table. (NotNull)
+     * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
     public Map<String, DfForeignKeyMeta> getForeignKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName) throws SQLException {
-        Map<String, DfForeignKeyMeta> map = doGetForeignKeyMap(metaData, unifiedSchema, tableName, false);
+        final String translatedName = translateTableCaseName(tableName);
+        Map<String, DfForeignKeyMeta> map = doGetForeignKeyMap(metaData, unifiedSchema, translatedName, false);
         if (isRetryCaseInsensitiveForeignKey()) {
-            if (map.isEmpty() && !tableName.equals(tableName.toLowerCase())) { // retry by lower case
-                map = doGetForeignKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), true);
+            if (map.isEmpty() && !translatedName.equals(translatedName.toLowerCase())) { // retry by lower case
+                map = doGetForeignKeyMap(metaData, unifiedSchema, translatedName.toLowerCase(), true);
             }
-            if (map.isEmpty() && !tableName.equals(tableName.toUpperCase())) { // retry by upper case
-                map = doGetForeignKeyMap(metaData, unifiedSchema, tableName.toUpperCase(), true);
+            if (map.isEmpty() && !translatedName.equals(translatedName.toUpperCase())) { // retry by upper case
+                map = doGetForeignKeyMap(metaData, unifiedSchema, translatedName.toUpperCase(), true);
             }
         }
         return map;

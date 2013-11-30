@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -40,6 +41,9 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _suppressExceptTarget;
+
+    /** The dictionary set of table name for real case name. (NullAllowed) */
+    protected Map<String, String> _tableNameDictionaryMap;
 
     // ===================================================================================
     //                                                                        Table Except
@@ -101,5 +105,24 @@ public class DfAbstractMetaDataBasicExtractor extends DfAbstractMetaDataExtracto
     //                                                                              ======
     public void suppressExceptTarget() {
         _suppressExceptTarget = true;
+    }
+
+    public void enableTableCaseTranslation(List<String> tableNameList) {
+        _tableNameDictionaryMap = StringKeyMap.createAsFlexible();
+        for (String tableName : tableNameList) {
+            _tableNameDictionaryMap.put(tableName, tableName);
+        }
+    }
+
+    public boolean isEnableTableCaseTranslation() {
+        return _tableNameDictionaryMap != null;
+    }
+
+    protected String translateTableCaseName(String tableName) {
+        if (_tableNameDictionaryMap == null) {
+            return tableName;
+        }
+        final String foundName = _tableNameDictionaryMap.get(tableName);
+        return foundName != null ? foundName : tableName;
     }
 }

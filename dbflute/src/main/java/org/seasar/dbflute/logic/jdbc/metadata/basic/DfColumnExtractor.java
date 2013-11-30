@@ -54,7 +54,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     /**
      * Get the list of column meta information.
      * @param metaData The meta data of database. (NotNull)
-     * @param tableInfo The meta information of table. (NotNull, CaseInsensitive)
+     * @param tableInfo The meta information of table. (NotNull)
      * @return The list of column meta information. (NotNull)
      */
     public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, DfTableMeta tableInfo) throws SQLException {
@@ -67,18 +67,19 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
      * Get the list of column meta information.
      * @param metaData The meta data of database. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
-     * @param tableName The name of table. (NotNull, CaseInsensitive)
+     * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return The list of column meta information. (NotNull)
      */
     public List<DfColumnMeta> getColumnList(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
-        List<DfColumnMeta> ls = doGetColumnList(metaData, unifiedSchema, tableName, false);
+        final String translatedName = translateTableCaseName(tableName);
+        List<DfColumnMeta> ls = doGetColumnList(metaData, unifiedSchema, translatedName, false);
         if (isRetryCaseInsensitiveColumn()) {
-            if (ls.isEmpty() && !tableName.equals(tableName.toLowerCase())) { // retry by lower case
-                ls = doGetColumnList(metaData, unifiedSchema, tableName.toLowerCase(), true);
+            if (ls.isEmpty() && !translatedName.equals(translatedName.toLowerCase())) { // retry by lower case
+                ls = doGetColumnList(metaData, unifiedSchema, translatedName.toLowerCase(), true);
             }
-            if (ls.isEmpty() && !tableName.equals(tableName.toUpperCase())) { // retry by upper case
-                ls = doGetColumnList(metaData, unifiedSchema, tableName.toUpperCase(), true);
+            if (ls.isEmpty() && !translatedName.equals(translatedName.toUpperCase())) { // retry by upper case
+                ls = doGetColumnList(metaData, unifiedSchema, translatedName.toUpperCase(), true);
             }
         }
         return ls;

@@ -64,19 +64,20 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * Retrieves an info of the columns composing the primary key for a given table.
      * @param metaData JDBC meta data. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
-     * @param tableName The name of table. (NotNull)
+     * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return The meta information of primary keys. (NotNull)
      * @throws SQLException
      */
     public DfPrimaryKeyMeta getPrimaryKey(DatabaseMetaData metaData, UnifiedSchema unifiedSchema, String tableName)
             throws SQLException {
-        DfPrimaryKeyMeta info = doGetPrimaryKey(metaData, unifiedSchema, tableName, false);
+        final String translatedName = translateTableCaseName(tableName);
+        DfPrimaryKeyMeta info = doGetPrimaryKey(metaData, unifiedSchema, translatedName, false);
         if (isRetryCaseInsensitivePrimaryKey()) {
-            if (!info.hasPrimaryKey() && !tableName.equals(tableName.toLowerCase())) { // retry by lower case
-                info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toLowerCase(), true);
+            if (!info.hasPrimaryKey() && !translatedName.equals(translatedName.toLowerCase())) { // retry by lower case
+                info = doGetPrimaryKey(metaData, unifiedSchema, translatedName.toLowerCase(), true);
             }
-            if (!info.hasPrimaryKey() && !tableName.equals(tableName.toUpperCase())) { // retry by upper case
-                info = doGetPrimaryKey(metaData, unifiedSchema, tableName.toUpperCase(), true);
+            if (!info.hasPrimaryKey() && !translatedName.equals(translatedName.toUpperCase())) { // retry by upper case
+                info = doGetPrimaryKey(metaData, unifiedSchema, translatedName.toUpperCase(), true);
             }
         }
         return info;
@@ -193,19 +194,21 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
      * Retrieves an map of the columns composing the unique key for a given table.
      * @param metaData JDBC meta data. (NotNull)
      * @param unifiedSchema The unified schema that can contain catalog name and no-name mark. (NullAllowed)
-     * @param tableName The name of table. (NotNull)
+     * @param tableName The name of table. (NotNull, CaseInsensitiveByOption)
      * @return The meta information map of unique keys. The key is unique key name. (NotNull)
      * @throws SQLException
      */
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema,
             String tableName, List<String> pkList) throws SQLException { // non primary key only
-        Map<String, Map<Integer, String>> map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName, pkList, false);
+        final String translatedName = translateTableCaseName(tableName);
+        Map<String, Map<Integer, String>> map = doGetUniqueKeyMap(metaData, unifiedSchema, translatedName, pkList,
+                false);
         if (isRetryCaseInsensitiveUniqueKey()) {
-            if (map.isEmpty() && !tableName.equals(tableName.toLowerCase())) { // retry by lower case
-                map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toLowerCase(), pkList, true);
+            if (map.isEmpty() && !translatedName.equals(translatedName.toLowerCase())) { // retry by lower case
+                map = doGetUniqueKeyMap(metaData, unifiedSchema, translatedName.toLowerCase(), pkList, true);
             }
-            if (map.isEmpty() && !tableName.equals(tableName.toUpperCase())) { // retry by upper case
-                map = doGetUniqueKeyMap(metaData, unifiedSchema, tableName.toUpperCase(), pkList, true);
+            if (map.isEmpty() && !translatedName.equals(translatedName.toUpperCase())) { // retry by upper case
+                map = doGetUniqueKeyMap(metaData, unifiedSchema, translatedName.toUpperCase(), pkList, true);
             }
         }
         return map;

@@ -621,6 +621,12 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
     protected boolean isRetryCaseInsensitiveDefaultValid() {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - -
+        // JDBC task specifies table case name from meta data
+        // so it does not need case insensitive
+        //
+        // ReplaceSchema task has user favorite table case name
+        // but it translates the name so safety (not need this) since 1.0.5A
+        //
         // MySQL causes a trouble by setting a name only differed in case as parameter
         // when Windows and lower_case_table_names = 0
         //  -> Can't create table '.\exampledb\Foo.frm' (errno: 121)
@@ -628,7 +634,13 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         //
         // while, Oracle causes a trouble of performance (very heavy)
         // anyway, various problems exist so default is false since 1.0.5A
-        // (in the first place, I cannot remember the reason why I implemented it...)
+        //
+        // JDBC driver specification:
+        //  MySQL: case insensitive (depends on mode!?)
+        //  PostgreSQL: case sensitive
+        //  Oracle: case sensitive
+        //  DB2: case sensitive
+        //  SQLServer: case insensitive
         // - - - - - - - - - -/
         return false;
     }
