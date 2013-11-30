@@ -1,5 +1,5 @@
 #!/bin/bash
 
-if [ -d ./extlib ]; then
+if [ -e ./extlib/*.jar ]; then
   cp -Rf ./extlib $DBFLUTE_HOME/lib/extlib
 fi
