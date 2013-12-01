@@ -917,7 +917,7 @@ public abstract class DfAbsractDataWriter {
             bindType = Long.class;
         } else if (jdbcDefValue == Types.DECIMAL || jdbcDefValue == Types.NUMERIC) {
             bindType = BigDecimal.class;
-        } else if (jdbcDefValue == Types.FLOAT || jdbcDefValue == Types.REAL) {
+        } else if (jdbcDefValue == Types.REAL || jdbcDefValue == Types.FLOAT || jdbcDefValue == Types.DOUBLE) {
             bindType = BigDecimal.class;
         } else if (jdbcDefValue == Types.TIMESTAMP) {
             bindType = Timestamp.class;
