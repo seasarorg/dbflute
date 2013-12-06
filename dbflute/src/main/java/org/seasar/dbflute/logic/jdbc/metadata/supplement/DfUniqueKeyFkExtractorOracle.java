@@ -44,7 +44,7 @@ public class DfUniqueKeyFkExtractorOracle extends DfUniqueKeyFkExtractorBase {
         sb.append(" left outer join ALL_CONS_COLUMNS cols");
         sb.append(" on cons.OWNER = cols.OWNER and cons.CONSTRAINT_NAME = cols.CONSTRAINT_NAME");
         sb.append(" left outer join ALL_CONS_COLUMNS yourCols");
-        sb.append(" on cons.R_OWNER = cols.OWNER and cons.R_CONSTRAINT_NAME = yourCols.CONSTRAINT_NAME");
+        sb.append(" on cons.R_OWNER = yourCols.OWNER and cons.R_CONSTRAINT_NAME = yourCols.CONSTRAINT_NAME");
         sb.append(" and cols.POSITION = yourCols.POSITION");
         sb.append(" where cons.OWNER = '").append(pureSchema).append("'");
         sb.append(" and cons.R_OWNER = '").append(pureSchema).append("'"); // same schema only
