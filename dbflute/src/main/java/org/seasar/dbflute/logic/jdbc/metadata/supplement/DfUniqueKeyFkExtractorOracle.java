@@ -45,11 +45,12 @@ public class DfUniqueKeyFkExtractorOracle extends DfUniqueKeyFkExtractorBase {
         sb.append(" on cons.OWNER = cols.OWNER and cons.CONSTRAINT_NAME = cols.CONSTRAINT_NAME");
         sb.append(" left outer join ALL_CONS_COLUMNS yourCols");
         sb.append(" on cons.R_OWNER = cols.OWNER and cons.R_CONSTRAINT_NAME = yourCols.CONSTRAINT_NAME");
+        sb.append(" and cols.POSITION = yourCols.POSITION");
         sb.append(" where cons.OWNER = '").append(pureSchema).append("'");
         sb.append(" and cons.R_OWNER = '").append(pureSchema).append("'"); // same schema only
         sb.append(" and cons.CONSTRAINT_TYPE = 'R'"); // foreign key
         sb.append(" and yourCons.CONSTRAINT_TYPE = 'U'"); // unique key
-        sb.append(" order by cons.TABLE_NAME, cols.POSITION nulls last");
+        sb.append(" order by cons.TABLE_NAME, cons.CONSTRAINT_NAME, cols.POSITION nulls last");
         final String sql = sb.toString();
         return doSelectUserUniqueFkList(sql, conn);
     }
