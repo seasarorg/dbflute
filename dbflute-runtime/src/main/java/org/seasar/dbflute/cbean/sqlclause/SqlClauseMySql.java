@@ -17,13 +17,13 @@ package org.seasar.dbflute.cbean.sqlclause;
 
 import java.util.List;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.query.QueryClauseArranger;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbway.DBWay;
-import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier;
 import org.seasar.dbflute.util.Srl;
 
@@ -38,9 +38,6 @@ public class SqlClauseMySql extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-
-    /** The instance of DBWay. */
-    protected static final DBWay _dbway = new WayOfMySQL();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -325,7 +322,7 @@ public class SqlClauseMySql extends AbstractSqlClause {
     //                                                                               DBWay
     //                                                                               =====
     public DBWay dbway() {
-        return _dbway;
+        return DBDef.MySQL.dbway();
     }
 
     // [DBFlute-1.0.4D]

@@ -130,7 +130,7 @@ public class TnValueTypes {
         _valueTypesMap.put(DBDef.H2, createValueTypes());
         _valueTypesMap.put(DBDef.Derby, createValueTypes());
         _valueTypesMap.put(DBDef.SQLite, createValueTypes());
-        _valueTypesMap.put(DBDef.FireBird, createValueTypes());
+        _valueTypesMap.put(DBDef.Firebird, createValueTypes());
         _valueTypesMap.put(DBDef.MSAccess, createValueTypes());
         _valueTypesMap.put(DBDef.Unknown, createValueTypes());
     }

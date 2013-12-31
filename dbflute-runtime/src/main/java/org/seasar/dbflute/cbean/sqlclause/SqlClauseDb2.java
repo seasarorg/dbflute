@@ -15,9 +15,9 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbway.DBWay;
-import org.seasar.dbflute.dbway.WayOfDB2;
 
 /**
  * SqlClause for DB2.
@@ -30,9 +30,6 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-
-    /** The instance of DBWay. */
-    protected static final DBWay _dbway = new WayOfDB2();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -196,7 +193,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     //                                                                               DBWay
     //                                                                               =====
     public DBWay dbway() {
-        return _dbway;
+        return DBDef.DB2.dbway();
     }
 
     // [DBFlute-0.9.6.9]

@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.dbway.DBWay;
-import org.seasar.dbflute.dbway.WayOfH2;
 
 /**
  * SqlClause for H2.
@@ -29,9 +29,6 @@ public class SqlClauseH2 extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-
-    /** The instance of DBWay. */
-    protected static final DBWay _dbway = new WayOfH2();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -138,7 +135,7 @@ public class SqlClauseH2 extends AbstractSqlClause {
     //                                                                               DBWay
     //                                                                               =====
     public DBWay dbway() {
-        return _dbway;
+        return DBDef.H2.dbway();
     }
 
     // [DBFlute-1.0.4D]

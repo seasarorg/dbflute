@@ -15,9 +15,9 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbway.DBWay;
-import org.seasar.dbflute.dbway.WayOfSQLite;
 
 /**
  * SqlClause for SQLite.
@@ -30,9 +30,6 @@ public class SqlClauseSqlite extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-
-    /** The instance of DBWay. */
-    protected static final DBWay _dbway = new WayOfSQLite();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -132,6 +129,6 @@ public class SqlClauseSqlite extends AbstractSqlClause {
     //                                                                               DBWay
     //                                                                               =====
     public DBWay dbway() {
-        return _dbway;
+        return DBDef.SQLite.dbway();
     }
 }

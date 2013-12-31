@@ -18,6 +18,8 @@ package org.seasar.dbflute;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.dbway.DBWay;
 import org.seasar.dbflute.dbway.WayOfDB2;
 import org.seasar.dbflute.dbway.WayOfDerby;
@@ -50,13 +52,15 @@ public enum DBDef {
     , Derby("derby", null, new WayOfDerby()) // supported
     , SQLite("sqlite", null, new WayOfSQLite()) // sub supported
     , MSAccess("msaccess", null, new WayOfMSAccess()) // sub supported
-    , FireBird("firebird", null, new WayOfFirebird()) // a-little-bit supported
+    , Firebird("firebird", null, new WayOfFirebird()) // a-little-bit supported
     , Sybase("sybase", null, new WayOfSybase()) // a-little-bit supported
     , Unknown("unknown", null, new WayOfUnknown());
 
     // ===================================================================================
     //                                                                    Static Reference
     //                                                                    ================
+    private static final Log _log = LogFactory.getLog(DBDef.class);
+
     // -----------------------------------------------------
     //                                            Code Value
     //                                            ----------
@@ -95,10 +99,10 @@ public enum DBDef {
     //                                                                           Attribute
     //                                                                           =========
     /** The code of the DB. (NotNull) */
-    private String _code;
+    private final String _code;
 
     /** The code alias of the DB. (NullAllowed) */
-    private String _codeAlias;
+    private final String _codeAlias;
 
     /** The way of the DB. (NotNull) */
     private DBWay _dbway;
@@ -138,5 +142,17 @@ public enum DBDef {
      */
     public DBWay dbway() {
         return _dbway;
+    }
+
+    /**
+     * @param dbway The new way of the DB. (NotNull)
+     */
+    public void switchDBWay(DBWay dbway) {
+        if (dbway == null) {
+            String msg = "The specified DB way to switch should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        _log.info("...Switching DB way from " + _dbway + " to " + dbway);
+        _dbway = dbway;
     }
 }

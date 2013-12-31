@@ -17,12 +17,12 @@ package org.seasar.dbflute.cbean.sqlclause;
 
 import java.util.Map;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.join.FixedConditionResolver;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbway.DBWay;
-import org.seasar.dbflute.dbway.WayOfMSAccess;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
@@ -36,9 +36,6 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-
-    /** The instance of DBWay. */
-    protected static final DBWay _dbway = new WayOfMSAccess();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -153,6 +150,6 @@ public class SqlClauseMsAccess extends AbstractSqlClause {
     //                                                                               DBWay
     //                                                                               =====
     public DBWay dbway() {
-        return _dbway;
+        return DBDef.MSAccess.dbway();
     }
 }

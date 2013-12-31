@@ -15,9 +15,9 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.sqlclause.orderby.OrderByClause;
 import org.seasar.dbflute.dbway.DBWay;
-import org.seasar.dbflute.dbway.WayOfSybase;
 
 /**
  * SqlClause for Sybase.
@@ -30,9 +30,6 @@ public class SqlClauseSybase extends AbstractSqlClause {
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-
-    /** The instance of DBWay. */
-    protected static final DBWay _dbway = new WayOfSybase();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -166,6 +163,6 @@ public class SqlClauseSybase extends AbstractSqlClause {
     //                                                                               DBWay
     //                                                                               =====
     public DBWay dbway() {
-        return _dbway;
+        return DBDef.Sybase.dbway();
     }
 }
