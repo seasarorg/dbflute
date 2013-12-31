@@ -18,11 +18,11 @@
  * @author jflute
  * @since 1.0.5A (2013/10/17 Thursday)
  */
-public class DfThreadFireFailureException extends RuntimeException {
+public class ThreadFireFailureException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    public DfThreadFireFailureException(String msg, Throwable e) {
+    public ThreadFireFailureException(String msg, Throwable e) {
         super(msg, e);
     }
 }

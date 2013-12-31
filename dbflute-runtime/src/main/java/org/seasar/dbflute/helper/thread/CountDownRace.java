@@ -26,18 +26,18 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.thread.exception.DfThreadFireFailureException;
+import org.seasar.dbflute.helper.thread.exception.ThreadFireFailureException;
 
 /**
  * @author jflute
  * @since 1.0.5A (2013/10/17 Thursday)
  */
-public class DfCountDownRace {
+public class CountDownRace {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfCountDownRace.class);
+    private static final Log _log = LogFactory.getLog(CountDownRace.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -47,7 +47,7 @@ public class DfCountDownRace {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCountDownRace(int runnerCount) {
+    public CountDownRace(int runnerCount) {
         if (runnerCount < 1) {
             String msg = "The argument 'runnerCount' should not be minus or zero: " + runnerCount;
             throw new IllegalArgumentException(msg);
@@ -58,7 +58,7 @@ public class DfCountDownRace {
     // ===================================================================================
     //                                                                         Thread Fire
     //                                                                         ===========
-    public void readyGo(DfCountDownRaceExecution execution) {
+    public void readyGo(CountDownRaceExecution execution) {
         if (execution == null) {
             String msg = "The argument 'execution' should be not null.";
             throw new IllegalArgumentException(msg);
@@ -66,12 +66,12 @@ public class DfCountDownRace {
         doReadyGo(execution);
     }
 
-    protected void doReadyGo(DfCountDownRaceExecution execution) {
+    protected void doReadyGo(CountDownRaceExecution execution) {
         final ExecutorService service = Executors.newCachedThreadPool();
         final CountDownLatch ready = new CountDownLatch(_runnerCount);
         final CountDownLatch start = new CountDownLatch(1);
         final CountDownLatch goal = new CountDownLatch(_runnerCount);
-        final DfCountDownRaceLatch yourLatch = new DfCountDownRaceLatch(_runnerCount);
+        final CountDownRaceLatch yourLatch = new CountDownRaceLatch(_runnerCount);
         final List<Future<Void>> futureList = new ArrayList<Future<Void>>();
         final Object lockObj = new Object();
         for (int i = 0; i < _runnerCount; i++) { // basically synchronized with parameter size
@@ -106,7 +106,7 @@ public class DfCountDownRace {
                 throw new IllegalStateException(msg, e);
             } catch (ExecutionException e) {
                 String msg = "Failed to fire the thread: " + future;
-                throw new DfThreadFireFailureException(msg, e.getCause());
+                throw new ThreadFireFailureException(msg, e.getCause());
             }
         }
     }
@@ -114,8 +114,8 @@ public class DfCountDownRace {
     // ===================================================================================
     //                                                                            Callable
     //                                                                            ========
-    protected Callable<Void> createCallable(final DfCountDownRaceExecution execution, final CountDownLatch ready,
-            final CountDownLatch start, final CountDownLatch goal, final DfCountDownRaceLatch yourLatch,
+    protected Callable<Void> createCallable(final CountDownRaceExecution execution, final CountDownLatch ready,
+            final CountDownLatch start, final CountDownLatch goal, final CountDownRaceLatch yourLatch,
             final Object lockObj) {
         return new Callable<Void>() {
             public Void call() { // each thread here
@@ -146,7 +146,7 @@ public class DfCountDownRace {
         };
     }
 
-    protected DfCountDownRaceRunner createRunner(long threadId, DfCountDownRaceLatch yourLatch, Object lockObj) {
-        return new DfCountDownRaceRunner(threadId, yourLatch, lockObj);
+    protected CountDownRaceRunner createRunner(long threadId, CountDownRaceLatch yourLatch, Object lockObj) {
+        return new CountDownRaceRunner(threadId, yourLatch, lockObj);
     }
 }

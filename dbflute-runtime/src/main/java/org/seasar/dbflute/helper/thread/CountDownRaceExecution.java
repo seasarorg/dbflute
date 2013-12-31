@@ -19,11 +19,11 @@ package org.seasar.dbflute.helper.thread;
  * @author jflute
  * @since 1.0.5A (2013/10/17 Thursday)
  */
-public interface DfCountDownRaceExecution {
+public interface CountDownRaceExecution {
 
     /**
      * Execute the application code as thread-fire.
      * @param resource The resource for the thread-fire. (NotNull)
      */
-    void execute(DfCountDownRaceRunner resource);
+    void execute(CountDownRaceRunner resource);
 }

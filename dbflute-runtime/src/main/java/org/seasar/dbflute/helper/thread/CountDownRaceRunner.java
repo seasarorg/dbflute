@@ -19,19 +19,19 @@ package org.seasar.dbflute.helper.thread;
  * @author jflute
  * @since 1.0.5A (2013/10/17 Thursday)
  */
-public class DfCountDownRaceRunner {
+public class CountDownRaceRunner {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected final long _uniformNumber;
-    protected final DfCountDownRaceLatch _yourLatch;
+    protected final CountDownRaceLatch _yourLatch;
     protected final Object _lockObj;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCountDownRaceRunner(long uniformNumber, DfCountDownRaceLatch yourLatch, Object lockObj) {
+    public CountDownRaceRunner(long uniformNumber, CountDownRaceLatch yourLatch, Object lockObj) {
         _uniformNumber = uniformNumber;
         _yourLatch = yourLatch;
         _lockObj = lockObj;
@@ -54,7 +54,7 @@ public class DfCountDownRaceRunner {
         return _uniformNumber;
     }
 
-    public DfCountDownRaceLatch getYourLatch() {
+    public CountDownRaceLatch getYourLatch() {
         return _yourLatch;
     }
 

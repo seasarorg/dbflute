@@ -19,18 +19,18 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.thread.exception.DfThreadFireFailureException;
+import org.seasar.dbflute.helper.thread.exception.ThreadFireFailureException;
 
 /**
  * @author jflute
  * @since 1.0.5A (2013/10/17 Thursday)
  */
-public class DfCountDownRaceLatch {
+public class CountDownRaceLatch {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfCountDownRaceLatch.class);
+    private static final Log _log = LogFactory.getLog(CountDownRaceLatch.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -41,7 +41,7 @@ public class DfCountDownRaceLatch {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfCountDownRaceLatch(int runnerCount) {
+    public CountDownRaceLatch(int runnerCount) {
         _runnerCount = runnerCount;
     }
 
@@ -94,7 +94,7 @@ public class DfCountDownRaceLatch {
             latch.await();
         } catch (InterruptedException e) {
             String msg = "Failed to await by your latch: latch=" + latch;
-            throw new DfThreadFireFailureException(msg, e);
+            throw new ThreadFireFailureException(msg, e);
         }
     }
 

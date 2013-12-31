@@ -60,9 +60,9 @@ import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.connection.DfFittingDataSource;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
-import org.seasar.dbflute.helper.thread.DfCountDownRace;
-import org.seasar.dbflute.helper.thread.DfCountDownRaceExecution;
-import org.seasar.dbflute.helper.thread.DfCountDownRaceRunner;
+import org.seasar.dbflute.helper.thread.CountDownRace;
+import org.seasar.dbflute.helper.thread.CountDownRaceExecution;
+import org.seasar.dbflute.helper.thread.CountDownRaceRunner;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.HandlingDataSourceWrapper;
 import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
@@ -446,9 +446,9 @@ public class DfSchemaXmlSerializer {
 
     protected void countDownRaceProcessTable(final List<DfTableMeta> tableList, int runnerCount,
             final DfFittingDataSource fittingDs) {
-        final DfCountDownRace fireMan = new DfCountDownRace(runnerCount);
-        fireMan.readyGo(new DfCountDownRaceExecution() {
-            public void execute(DfCountDownRaceRunner resource) {
+        final CountDownRace fireMan = new CountDownRace(runnerCount);
+        fireMan.readyGo(new CountDownRaceExecution() {
+            public void execute(CountDownRaceRunner resource) {
                 final Object lockObj = resource.getLockObj();
                 String currentTable = null; // for exception message
                 Connection runnerConn = null;
