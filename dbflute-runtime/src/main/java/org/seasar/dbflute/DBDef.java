@@ -113,6 +113,7 @@ public enum DBDef {
     /**
      * @param code The code of the DB. (NotNull)
      * @param codeAlias The code alias of the DB. (NullAllowed)
+     * @param codeAlias The DB way of the DB. (NotNull)
      */
     private DBDef(String code, String codeAlias, DBWay dbway) {
         _code = code;
@@ -152,7 +153,8 @@ public enum DBDef {
             String msg = "The specified DB way to switch should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _log.info("...Switching DB way from " + _dbway + " to " + dbway);
+        final String oldName = _dbway.getClass().getSimpleName();
+        _log.info("...Switching DB way from " + oldName + " to " + dbway);
         _dbway = dbway;
     }
 }
