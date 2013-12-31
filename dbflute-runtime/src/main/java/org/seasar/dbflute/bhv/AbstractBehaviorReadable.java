@@ -427,6 +427,17 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                         Scalar Read
     //                                                                         ===========
     /**
+     * {@inheritDoc}
+     */
+    public <RESULT> SLFunction<ConditionBean, RESULT> readScalar(Class<RESULT> resultType) {
+        @SuppressWarnings("unchecked")
+        final SLFunction<ConditionBean, RESULT> func = (SLFunction<ConditionBean, RESULT>) doReadScalar(resultType);
+        return func;
+    }
+
+    protected abstract <RESULT> SLFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> resultType);
+
+    /**
      * The scalar function. <br />
      * This is not static class because this uses the method 'invoke(BehaviorCommand)'
      * @param <CB> The type of condition-bean.
@@ -459,7 +470,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The count value. (NotNull)
+         * @return The count value calculated by function. (NotNull)
          */
         public RESULT count(ScalarQuery<CB> scalarQuery) {
             return doCount(scalarQuery, null);
@@ -475,7 +486,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
-         * @return The count value. (NotNull)
+         * @return The count value calculated by function. (NotNull)
          */
         public RESULT count(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
             assertScalarSelectOption(option);
@@ -497,7 +508,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The count-distinct value. (NotNull)
+         * @return The count-distinct value calculated by function. (NotNull)
          */
         public RESULT countDistinct(ScalarQuery<CB> scalarQuery) {
             return doCountDistinct(scalarQuery, null);
@@ -513,7 +524,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
-         * @return The count-distinct value. (NotNull)
+         * @return The count-distinct value calculated by function. (NotNull)
          */
         public RESULT countDistinct(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
             assertScalarSelectOption(option);
@@ -534,7 +545,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The maximum value. (NullAllowed)
+         * @return The maximum value calculated by function. (NullAllowed)
          */
         public RESULT max(ScalarQuery<CB> scalarQuery) {
             return doMax(scalarQuery, null);
@@ -550,7 +561,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
-         * @return The maximum value. (NullAllowed: but NotNull null if you use coalesce by option)
+         * @return The maximum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
          */
         public RESULT max(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
             assertScalarSelectOption(option);
@@ -571,7 +582,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The minimum value. (NullAllowed)
+         * @return The minimum value calculated by function. (NullAllowed)
          */
         public RESULT min(ScalarQuery<CB> scalarQuery) {
             return doMin(scalarQuery, null);
@@ -587,7 +598,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
-         * @return The minimum value. (NullAllowed: but NotNull null if you use coalesce by option)
+         * @return The minimum value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
          */
         public RESULT min(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
             assertScalarSelectOption(option);
@@ -608,7 +619,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The summary value. (NullAllowed)
+         * @return The summary value calculated by function. (NullAllowed)
          */
         public RESULT sum(ScalarQuery<CB> scalarQuery) {
             return doSum(scalarQuery, null);
@@ -624,7 +635,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
-         * @return The summary value. (NullAllowed: but NotNull null if you use coalesce by option)
+         * @return The summary value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
          */
         public RESULT sum(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
             assertScalarSelectOption(option);
@@ -645,7 +656,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * });
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
-         * @return The average value. (NullAllowed)
+         * @return The average value calculated by function. (NullAllowed)
          */
         public RESULT avg(ScalarQuery<CB> scalarQuery) {
             return doAvg(scalarQuery, null);
@@ -661,7 +672,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * </pre>
          * @param scalarQuery The query for scalar. (NotNull)
          * @param option The option for scalar. (NotNull)
-         * @return The average value. (NullAllowed: but NotNull null if you use coalesce by option)
+         * @return The average value calculated by function. (NullAllowed: or NotNull if you use coalesce by option)
          */
         public RESULT avg(ScalarQuery<CB> scalarQuery, ScalarSelectOption option) {
             assertScalarSelectOption(option);

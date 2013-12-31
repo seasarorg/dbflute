@@ -16,6 +16,7 @@
 package org.seasar.dbflute.bhv;
 
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.bhv.AbstractBehaviorReadable.SLFunction;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingResultBean;
@@ -110,7 +111,19 @@ public interface BehaviorReadable {
      * @param cb The instance of corresponding condition-bean. (NotNull)
      * @return The page of entity as result-bean. (NotNull)
      */
-    <ENTITY extends Entity> PagingResultBean<ENTITY> readPage(final ConditionBean cb);
+    <ENTITY extends Entity> PagingResultBean<ENTITY> readPage(ConditionBean cb);
+
+    // ===================================================================================
+    //                                                                         Scalar Read
+    //                                                                         ===========
+    /**
+     * Read the scalar value derived by a function from uniquely-selected records. <br />
+     * An interface dispatch for scalarSelect().
+     * @param <RESULT> The type of scalar result.
+     * @param resultType The type of result. (NotNull)
+     * @return The scalar function object to specify function for scalar value. (NotNull)
+     */
+    <RESULT> SLFunction<ConditionBean, RESULT> readScalar(Class<RESULT> resultType);
 
     // ===================================================================================
     //                                                                            Sequence
