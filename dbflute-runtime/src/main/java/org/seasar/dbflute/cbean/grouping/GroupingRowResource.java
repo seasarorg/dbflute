@@ -35,7 +35,7 @@ public class GroupingRowResource<ENTITY> implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected List<ENTITY> _groupingRowList = new ArrayList<ENTITY>();
+    protected final List<ENTITY> _groupingRowList = new ArrayList<ENTITY>();
     protected int _elementCurrentIndex;
     protected int _breakCount;
 
@@ -56,7 +56,7 @@ public class GroupingRowResource<ENTITY> implements Serializable {
      * @return The list of grouping row. (NotNull and NotEmpty)
      */
     public List<ENTITY> getGroupingRowList() {
-        return this._groupingRowList;
+        return _groupingRowList;
     }
 
     /**
@@ -64,7 +64,7 @@ public class GroupingRowResource<ENTITY> implements Serializable {
      * @param groupingRow The element entity to the list of grouping row.
      */
     public void addGroupingRowList(ENTITY groupingRow) {
-        this._groupingRowList.add(groupingRow);
+        _groupingRowList.add(groupingRow);
     }
 
     /**
@@ -78,7 +78,7 @@ public class GroupingRowResource<ENTITY> implements Serializable {
      * @return The index of current element.
      */
     public int getElementCurrentIndex() {
-        return this._elementCurrentIndex;
+        return _elementCurrentIndex;
     }
 
     /**
@@ -86,14 +86,14 @@ public class GroupingRowResource<ENTITY> implements Serializable {
      * @param elementCurrentIndex The index of current element.
      */
     public void setElementCurrentIndex(int elementCurrentIndex) {
-        this._elementCurrentIndex = elementCurrentIndex;
+        _elementCurrentIndex = elementCurrentIndex;
     }
 
     /**
      * @return The count of break loop.
      */
     public int getBreakCount() {
-        return this._breakCount;
+        return _breakCount;
     }
 
     /**
@@ -101,6 +101,6 @@ public class GroupingRowResource<ENTITY> implements Serializable {
      * @param breakCount The count of break loop.
      */
     public void setBreakCount(int breakCount) {
-        this._breakCount = breakCount;
+        _breakCount = breakCount;
     }
 }

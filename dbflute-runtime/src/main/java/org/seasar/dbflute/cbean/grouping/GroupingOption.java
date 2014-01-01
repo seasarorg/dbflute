@@ -26,38 +26,51 @@ public class GroupingOption<ENTITY> {
     //                                                                           Attribute
     //                                                                           =========
     protected int _elementCount;
-
     protected GroupingRowEndDeterminer<ENTITY> _groupingRowEndDeterminer;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    /**
-     * Constructor. You should set the determiner of grouping row end after you create the instance.
-     */
     public GroupingOption() {
     }
 
-    /**
-     * Constructor.
-     * @param elementCount The count of row element in a group.
-     */
     public GroupingOption(int elementCount) {
         _elementCount = elementCount;
+    }
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    public GroupingOption<ENTITY> byCount(int elementCount) {
+        _elementCount = elementCount;
+        return this;
+    }
+
+    public GroupingOption<ENTITY> determineEnd(GroupingRowEndDeterminer<ENTITY> endDeterminer) {
+        _groupingRowEndDeterminer = endDeterminer;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _elementCount + ", " + _groupingRowEndDeterminer + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public int getElementCount() {
-        return this._elementCount;
+        return _elementCount;
     }
 
     public GroupingRowEndDeterminer<ENTITY> getGroupingRowEndDeterminer() {
-        return this._groupingRowEndDeterminer;
+        return _groupingRowEndDeterminer;
     }
 
     public void setGroupingRowEndDeterminer(GroupingRowEndDeterminer<ENTITY> groupingRowEndDeterminer) {
-        this._groupingRowEndDeterminer = groupingRowEndDeterminer;
+        _groupingRowEndDeterminer = groupingRowEndDeterminer;
     }
 }

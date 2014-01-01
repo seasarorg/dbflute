@@ -16,7 +16,7 @@
 package org.seasar.dbflute.cbean.grouping;
 
 /**
- * The interface of grouping end(switch point) determiner.
+ * The determiner of grouping end (switch point).
  * @param <ENTITY> The type of entity.
  * @author jflute
  */
