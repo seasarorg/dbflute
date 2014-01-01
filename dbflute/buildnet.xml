@@ -10,7 +10,7 @@
 	<property name="pre.version" value="0.8.9.54"/>
 
 	<!-- Resource Directories -->
-	<property name="workspace.base" value=".."/>
+	<property name="workspace.base" value="../.."/>
 	<property name="dist" value="dist/net"/>
 	<property name="embedded" value="embedded"/>
 	<property name="extraction.dir" value="${dist}/extraction"/>
