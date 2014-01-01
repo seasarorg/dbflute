@@ -414,9 +414,9 @@
 		<!-- in virtual machine
 		<antcall target="reflect-to-oracle" />
 		<antcall target="reflect-to-sqlserver" />
-		<antcall target="reflect-to-msaccess" />
 		-->
 
+		<antcall target="reflect-to-msaccess" />
 		<antcall target="reflect-to-sqlite" />
 		<antcall target="reflect-to-multipledb" />
 		<antcall target="reflect-to-flex" />

@@ -43,11 +43,14 @@ public class DfTableOrderAnalyzer {
     // ===================================================================================
     //                                                                      Analyzer Order
     //                                                                      ==============
-    public List<List<Table>> analyzeOrder(List<Table> tableList) {
+    public List<List<Table>> analyzeOrder(List<Table> tableList, List<Table> skippedTableList) {
         final Set<String> alreadyRegisteredSet = new HashSet<String>();
-        final List<List<Table>> outputOrderedList = new ArrayList<List<Table>>();
+        for (Table skippedTable : skippedTableList) {
+            alreadyRegisteredSet.add(skippedTable.getName()); // pure name here
+        }
+        final List<List<Table>> orderedList = new ArrayList<List<Table>>();
 
-        List<Table> workTableList;
+        List<Table> unregisteredTableList;
         {
             final TreeSet<Table> allTableSet = new TreeSet<Table>(new Comparator<Table>() {
                 public int compare(Table o1, Table o2) {
@@ -56,31 +59,31 @@ public class DfTableOrderAnalyzer {
                 }
             });
             allTableSet.addAll(tableList);
-            workTableList = new ArrayList<Table>(allTableSet);
+            unregisteredTableList = new ArrayList<Table>(allTableSet);
         }
         int level = 1;
         while (true) {
-            final int beforeSize = workTableList.size();
-            workTableList = doAnalyzeOrder(workTableList, alreadyRegisteredSet, outputOrderedList, level);
-            if (workTableList.isEmpty()) {
-                break;
+            final int beforeSize = unregisteredTableList.size();
+            unregisteredTableList = doAnalyzeOrder(unregisteredTableList, alreadyRegisteredSet, orderedList, level);
+            if (unregisteredTableList.isEmpty()) {
+                break; // happy end
             }
-            final int afterSize = workTableList.size();
+            final int afterSize = unregisteredTableList.size();
             if (beforeSize == afterSize) { // means it cannot analyze more
-                if (level == 1) {
-                    ++level; // next: ignores additional foreign key
-                } else {
-                    outputOrderedList.add(workTableList);
-                    break;
+                if (level == 1) { // level finished: next challenge, ignores additional foreign key
+                    ++level;
+                } else { // level 2 finished: however unregistered tables exist 
+                    orderedList.add(unregisteredTableList);
+                    break; // sadly end
                 }
             }
         }
-        return groupingSize(groupingCategory(outputOrderedList));
+        return groupingSize(groupingCategory(orderedList));
     }
 
     /**
      * @param tableList The list of table, which may be registered. (NotNull)
-     * @param alreadyRegisteredSet The name set of already registered table. (NotNull)
+     * @param alreadyRegisteredSet The (pure) name set of already registered table. (NotNull)
      * @param outputOrderedList The ordered list of table for output. (NotNull)
      * @return The list of unregistered table. (NotNull)
      */
@@ -90,26 +93,25 @@ public class DfTableOrderAnalyzer {
         final List<Table> elementList = new ArrayList<Table>();
         for (Table table : tableList) {
             final List<ForeignKey> foreignKeyList = table.getForeignKeyList();
-            boolean independent = true;
+            boolean dependsOnAny = false;
             for (ForeignKey fk : foreignKeyList) {
-                final String foreignTableName = fk.getForeignTablePureName();
-                if (level == 1 && fk.hasFixedCondition()) {
+                final String foreignTablePureName = fk.getForeignTablePureName();
+                if (level >= 1 && fk.hasFixedCondition()) { // from first level, ignore fixed condition
                     continue;
                 }
-                if (level == 2 && fk.isAdditionalForeignKey()) {
+                if (level >= 2 && fk.isAdditionalForeignKey()) { // from second level, ignore additional FK
                     continue;
                 }
-                if (!fk.isSelfReference() && !alreadyRegisteredSet.contains(foreignTableName)) {
-                    // found parent non-registered
-                    independent = false;
+                if (!fk.isSelfReference() && !alreadyRegisteredSet.contains(foreignTablePureName)) {
+                    dependsOnAny = true; // found non-registered parent table so it still depends on any 
                     break;
                 }
             }
-            if (independent) {
-                elementList.add(table);
-                alreadyRegisteredSet.add(table.getName());
-            } else {
+            if (dependsOnAny) {
                 unregisteredTableList.add(table);
+            } else {
+                elementList.add(table);
+                alreadyRegisteredSet.add(table.getName()); // pure name here
             }
         }
         if (!elementList.isEmpty()) {

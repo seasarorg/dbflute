@@ -82,10 +82,10 @@ rm ./log/*.log
 #. outside-sql-test.sh
 #. manage.sh refresh
 
-# cannot do on Mac
-#cd ../../dbflute-msaccess-example/dbflute_exampledb
-#rm ./log/*.log
-#. manage.sh refresh
+# deploy only (cannot do tasks on Mac)
+cd ../../dbflute-msaccess-example/dbflute_exampledb
+rm ./log/*.log
+. manage.sh refresh
 
 cd ../../dbflute-sqlite-example/dbflute_exampledb
 rm ./log/*.log
@@ -93,6 +93,7 @@ rm ./log/*.log
 . doc.sh
 . generate.sh
 . sql2entity.sh
+. outside-sql-test.sh
 
 cd ../../../dbflute-example-multipledb/dbflute-multipledb-seasar-example/dbflute_librarydb
 rm ./log/*.log

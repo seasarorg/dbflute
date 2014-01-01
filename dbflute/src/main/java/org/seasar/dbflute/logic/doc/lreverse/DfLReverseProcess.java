@@ -70,6 +70,7 @@ public class DfLReverseProcess {
     //                                                                           =========
     protected final DfLReverseOutputHandler _outputHandler;
     protected final DfTableNameProp _tableNameProp = new DfTableNameProp();
+    protected final List<Table> _skippedTableList = DfCollectionUtil.newArrayList(); // initialize in filter
 
     // ===================================================================================
     //                                                                         Constructor
@@ -376,6 +377,7 @@ public class DfLReverseProcess {
         final List<Table> tableList = database.getTableList();
         final Set<String> commonExistingTableSet = getCommonExistingTableSet();
         final List<Table> filteredList = DfCollectionUtil.newArrayListSized(tableList.size());
+        _skippedTableList.clear();
         final List<Table> commonSkippedList = DfCollectionUtil.newArrayList();
         final List<Table> exceptSkippedList = DfCollectionUtil.newArrayList();
         _log.info("...Filtering reversed table: " + tableList.size());
@@ -400,12 +402,14 @@ public class DfLReverseProcess {
             _log.info("[Common Table] *skipped");
             for (Table table : commonSkippedList) {
                 _log.info("  " + table.getTableDbName());
+                _skippedTableList.add(table);
             }
         }
         if (!exceptSkippedList.isEmpty()) {
             _log.info("[Except Table] *skipped");
             for (Table table : exceptSkippedList) {
                 _log.info("  " + table.getTableDbName());
+                _skippedTableList.add(table);
             }
         }
         return filteredList;
@@ -435,7 +439,7 @@ public class DfLReverseProcess {
     //                                                                       =============
     protected List<List<Table>> analyzeOrder(List<Table> tableList) {
         final DfTableOrderAnalyzer analyzer = new DfTableOrderAnalyzer();
-        return analyzer.analyzeOrder(tableList);
+        return analyzer.analyzeOrder(tableList, _skippedTableList);
     }
 
     protected String extractMainName(List<Table> tableList) {
