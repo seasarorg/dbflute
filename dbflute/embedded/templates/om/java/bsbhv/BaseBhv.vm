@@ -17,18 +17,9 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 #set ($myClassName = "${myBaseBhvClassName}")
 
 import java.util.List;
-#if ($database.isTargetContainerCDI())
-import javax.inject.Inject;
-#end
 
 import org.seasar.dbflute.*;
 import org.seasar.dbflute.bhv.*;
-#if ($database.isTargetContainerCDI())
-import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
-#if ($table.isWritable())
-import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
-#end
-#end
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.dbmeta.DBMeta;
 #if ($database.isMakeFlatExpansion())
@@ -62,28 +53,28 @@ import ${glPackageCB}.*;
  * <pre>
  * [primary key]
  *     ${table.primaryKeyNameCommaString}
- * 
+ *
  * [column]
  *     ${table.columnNameCommaString}
- * 
+ *
  * [sequence]
  *     ${table.definedSequenceName}
- * 
+ *
  * [identity]
  *     ${table.identityColumnName}
- * 
+ *
  * [version-no]
  *     ${table.versionNoColumnName}
- * 
+ *
  * [foreign table]
  *     ${table.foreignTableNameCommaString}
- * 
+ *
  * [referrer table]
  *     ${table.referrerTableNameCommaString}
- * 
+ *
  * [foreign property]
  *     ${table.foreignPropertyNameCommaString}
- * 
+ *
  * [referrer property]
  *     ${table.referrerPropertyNameCommaString}
  * </pre>
@@ -145,7 +136,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectCountUniquely(cb);
     }
 
-    protected int doSelectCountUniquely(${myConditionBeanClassName} cb) { // called by selectCount(cb) 
+    protected int doSelectCountUniquely(${myConditionBeanClassName} cb) { // called by selectCount(cb)
         assertCBStateValid(cb);
         return delegateSelectCountUniquely(cb);
     }
@@ -413,7 +404,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     /**
      * Select the next value as sequence. <br />
      * This method is called when insert() and set to primary-key automatically.
-     * So you don't need to call this as long as you need to get next value before insert().  
+     * So you don't need to call this as long as you need to get next value before insert().
      * @return The next value. (NotNull)
      */
     public ${table.sequenceReturnType} selectNextVal() {
@@ -822,7 +813,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      *     ${myEntityVariableName}Bhv.<span style="color: #FD4747">update</span>(${myEntityVariableName});
      * } catch (EntityAlreadyUpdatedException e) { <span style="color: #3F7E5E">// if concurrent update</span>
      *     ...
-     * } 
+     * }
      * </pre>
      * @param ${myEntityVariableName} The entity of update target. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnRequired)
 #if ($table.hasOptimisticLock())
@@ -1008,7 +999,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      *     ${myEntityVariableName}Bhv.<span style="color: #FD4747">delete</span>(${myEntityVariableName});
      * } catch (EntityAlreadyUpdatedException e) { <span style="color: #3F7E5E">// if concurrent update</span>
      *     ...
-     * } 
+     * }
      * </pre>
      * @param ${myEntityVariableName} The entity of delete target. (NotNull, PrimaryKeyNotNull, ConcurrencyColumnRequired)
 #if ($table.hasOptimisticLock())
@@ -1225,14 +1216,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
      * This method uses executeBatch() of java.sql.PreparedStatement.
      * <pre>
-     * <span style="color: #3F7E5E">// e.g. update two columns only</span> 
+     * <span style="color: #3F7E5E">// e.g. update two columns only</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">batchUpdate</span>(${myEntityListVariableName}, new SpecifyQuery<${myConditionBeanClassName}>() {
      *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// the two only updated</span>
      *         cb.specify().<span style="color: #FD4747">columnFooStatusCode()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
      *         cb.specify().<span style="color: #FD4747">columnBarDate()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
      *     }
      * });
-     * <span style="color: #3F7E5E">// e.g. update every column in the table</span> 
+     * <span style="color: #3F7E5E">// e.g. update every column in the table</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">batchUpdate</span>(${myEntityListVariableName}, new SpecifyQuery<${myConditionBeanClassName}>() {
      *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// all columns are updated</span>
      *         cb.specify().<span style="color: #FD4747">columnEveryColumn()</span>; <span style="color: #3F7E5E">// no check of modified properties</span>
@@ -1297,14 +1288,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Batch-update the entity list non-strictly specified-only. (NonExclusiveControl) <br />
      * This method uses executeBatch() of java.sql.PreparedStatement.
      * <pre>
-     * <span style="color: #3F7E5E">// e.g. update two columns only</span> 
+     * <span style="color: #3F7E5E">// e.g. update two columns only</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">batchUpdateNonstrict</span>(${myEntityListVariableName}, new SpecifyQuery<${myConditionBeanClassName}>() {
      *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// the two only updated</span>
      *         cb.specify().<span style="color: #FD4747">columnFooStatusCode()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
      *         cb.specify().<span style="color: #FD4747">columnBarDate()</span>; <span style="color: #3F7E5E">// should be modified in any entities</span>
      *     }
      * });
-     * <span style="color: #3F7E5E">// e.g. update every column in the table</span> 
+     * <span style="color: #3F7E5E">// e.g. update every column in the table</span>
      * ${myEntityVariableName}Bhv.<span style="color: #FD4747">batchUpdateNonstrict</span>(${myEntityListVariableName}, new SpecifyQuery<${myConditionBeanClassName}>() {
      *     public void specify(${myConditionBeanClassName} cb) { <span style="color: #3F7E5E">// all columns are updated</span>
      *         cb.specify().<span style="color: #FD4747">columnEveryColumn()</span>; <span style="color: #3F7E5E">// no check of modified properties</span>
@@ -1405,7 +1396,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      *     public ConditionBean setup(${myEntityVariableName} entity, ${myConditionBeanClassName} intoCB) {
      *         FooCB cb = FooCB();
      *         cb.setupSelect_Bar();
-     * 
+     *
      *         <span style="color: #3F7E5E">// mapping</span>
      *         intoCB.specify().columnMyName().mappedFrom(cb.specify().columnFooName());
      *         intoCB.specify().columnMyCount().mappedFrom(cb.specify().columnFooCount());
@@ -1416,7 +1407,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      *         <span style="color: #3F7E5E">//entity.set...;</span>
      *         <span style="color: #3F7E5E">// you don't need to set a value of exclusive control column</span>
      *         <span style="color: #3F7E5E">//entity.setVersionNo(value);</span>
-     * 
+     *
      *         return cb;
      *     }
      * });
@@ -1774,7 +1765,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     /**
      * Insert the several entities by query with varying requests (modified-only for fixed value). <br />
      * For example, disableCommonColumnAutoSetup(), disablePrimaryKeyIdentity(). <br />
-     * Other specifications are same as queryInsert(entity, setupper). 
+     * Other specifications are same as queryInsert(entity, setupper).
      * @param setupper The setup-per of query-insert. (NotNull)
      * @param option The option of insert for varying requests. (NotNull)
      * @return The inserted count.
@@ -1788,7 +1779,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * Update the several entities by query with varying requests non-strictly modified-only. {NonExclusiveControl} <br />
      * For example, self(selfCalculationSpecification), specify(updateColumnSpecification)
      * , disableCommonColumnAutoSetup(), allowNonQueryUpdate(). <br />
-     * Other specifications are same as queryUpdate(entity, cb). 
+     * Other specifications are same as queryUpdate(entity, cb).
      * <pre>
      * <span style="color: #3F7E5E">// ex) you can update by self calculation values</span>
      * ${myExtendedObjectClassName} ${myEntityVariableName} = new ${myExtendedObjectClassName}();
@@ -1868,27 +1859,27 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      *   o selectList()
      *   o execute()
      *   o call()
-     * 
+     *
      * {Entity}
      *   o entityHandling().selectEntity()
      *   o entityHandling().selectEntityWithDeletedCheck()
-     * 
+     *
      * {Paging}
      *   o autoPaging().selectList()
      *   o autoPaging().selectPage()
      *   o manualPaging().selectList()
      *   o manualPaging().selectPage()
-     * 
+     *
      * {Cursor}
      *   o cursorHandling().selectCursor()
-     * 
+     *
      * {Option}
      *   o dynamicBinding().selectList()
      *   o removeBlockComment().selectList()
      *   o removeLineComment().selectList()
      *   o formatSql().selectList()
      * </pre>
-     * @return The basic executor of outside-SQL. (NotNull) 
+     * @return The basic executor of outside-SQL. (NotNull)
      */
     public OutsideSqlBasicExecutor<${myExtendedBhvClassName}> outsideSql() {
         return doOutsideSql();
@@ -2205,37 +2196,6 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     @SuppressWarnings("unchecked")
     protected QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> downcast(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> option) {
         return (QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}>)option;
-    }
-#end
-#if ($database.isTargetContainerCDI())
-#if ($table.isWritable())
-
-    /**
-     * Set the auto set-upper of common column.
-     * @param commonColumnAutoSetupper The auto set-upper of common column. (NotNull)
-     */
-    @Override @Inject
-    public void setCommonColumnAutoSetupper(CommonColumnAutoSetupper commonColumnAutoSetupper) {
-        this._commonColumnAutoSetupper = commonColumnAutoSetupper;
-    }
-#end
-
-    /**
-     * Set the selector of behavior.
-     * @param behaviorSelector The selector of behavior. (NotNull)
-     */
-    @Override @Inject
-    public void setBehaviorSelector(BehaviorSelector behaviorSelector) {
-        this._behaviorSelector = behaviorSelector;
-    }
-
-    /**
-     * Set the invoker of behavior command.
-     * @param behaviorCommandInvoker The invoker of behavior command. (NotNull)
-     */
-    @Override @Inject
-    public void setBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
-        this._behaviorCommandInvoker = behaviorCommandInvoker;
     }
 #end
 }

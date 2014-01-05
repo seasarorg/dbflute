@@ -45,7 +45,6 @@ import com.google.inject.Injector;
 import org.slim3.container.S3Container;
 #end
 #if ($database.isTargetContainerCDI())
-import javax.inject.Inject;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -313,7 +312,6 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     }
 #end
 #if ($database.isTargetContainerCDI())
-    @Inject
     public void setContainer(BeanManager container) {
         this._container = container;
     }
