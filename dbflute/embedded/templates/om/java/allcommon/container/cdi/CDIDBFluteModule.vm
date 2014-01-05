@@ -15,11 +15,21 @@
 ##
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -27,6 +37,7 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Default;
+import javax.enterprise.inject.UnsatisfiedResolutionException;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.AnnotatedType;
@@ -36,8 +47,12 @@ import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.util.AnnotationLiteral;
+import javax.inject.Qualifier;
+import javax.sql.DataSource;
 
 import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.bhv.AbstractBehaviorReadable;
+import org.seasar.dbflute.bhv.AbstractBehaviorWritable;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
@@ -50,6 +65,12 @@ import ${glPackageExtendedBhv}.*;
  * @author ${database.classAuthor}
  */
 public class ${glDBFluteModule} implements Extension {
+
+    /** DBFlute qualifier. */
+    @Qualifier
+    @Retention(RUNTIME)
+    @Target({TYPE, METHOD, FIELD, PARAMETER})
+    public @interface DBFlute {}
 
     /**
      * Register DBFlute beans to container.
@@ -66,21 +87,45 @@ public class ${glDBFluteModule} implements Extension {
      * @param event
      * @param beanManager
      */
-    @SuppressWarnings("unchecked")
     protected void setupDfComponents(final AfterBeanDiscovery event, final BeanManager beanManager) {
-        event.addBean(new DBFluteBean<${database.implementedInvokerAssistantClass}>(beanManager, ${database.implementedInvokerAssistantClass}.class, InvokerAssistant.class));
+        event.addBean(new DBFluteBean<${database.implementedInvokerAssistantClass}>(
+                beanManager, ${database.implementedInvokerAssistantClass}.class, InvokerAssistant.class) {
+            @Override
+            protected void postInject(final ${database.implementedInvokerAssistantClass} instance) {
+                Bean<?> bean = beanManager.resolve(beanManager.getBeans(DataSource.class, new AnnotationLiteral<DBFlute>() {}));
+                if (bean == null) {
+                    bean = beanManager.resolve(beanManager.getBeans(DataSource.class, new AnnotationLiteral<Default>() {}));
+                }
+                if (bean == null) {
+                    throw new UnsatisfiedResolutionException(String.format(
+                            "Unable to resolve a bean for '%s' with qualifiers %s or %s.",
+                            DataSource.class.getName(), new AnnotationLiteral<DBFlute>() {}, new AnnotationLiteral<Default>() {}));
+                }
+                instance.setDataSource((DataSource) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
+            }
+        });
         event.addBean(new DBFluteBean<${database.implementedCommonColumnAutoSetupperClass}>(beanManager, ${database.implementedCommonColumnAutoSetupperClass}.class, CommonColumnAutoSetupper.class));
-        event.addBean(new DBFluteBean<${glImplementedBehaviorSelector}>(beanManager, ${glImplementedBehaviorSelector}.class, BehaviorSelector.class));
+        event.addBean(new DBFluteBean<${glImplementedBehaviorSelector}>(beanManager, ${glImplementedBehaviorSelector}.class, BehaviorSelector.class) {
+            @Override
+            protected void postInject(final ${glImplementedBehaviorSelector} instance) {
+                instance.setContainer(beanManager);
+            }
+        });
         event.addBean(new DBFluteBean<${glImplementedSqlClauseCreator}>(beanManager, ${glImplementedSqlClauseCreator}.class, SqlClauseCreator.class));
 
         event.addBean(new DBFluteBean<BehaviorCommandInvoker>(beanManager, BehaviorCommandInvoker.class) {
-            @SuppressWarnings("serial")
             @Override
             protected void postInject(final BehaviorCommandInvoker instance) {
-                final Bean<?> iaBean = beanManager.resolve(beanManager.getBeans(
-                        InvokerAssistant.class, new AnnotationLiteral<Default>() {}));
-                instance.setInvokerAssistant((InvokerAssistant) beanManager.getReference(
-                        iaBean, iaBean.getBeanClass(), beanManager.createCreationalContext(iaBean)));
+                final Bean<?> bean = beanManager.resolve(beanManager.getBeans(InvokerAssistant.class, new AnnotationLiteral<DBFlute>() {}));
+                instance.setInvokerAssistant((InvokerAssistant) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
+            }
+
+            @Override
+            public String getName() {
+                final StringBuilder name = new StringBuilder(DBFlute.class.getPackage().getName());
+                name.append(".");
+                name.append(this.beanClass.getSimpleName());
+                return name.toString();
             }
         });
     }
@@ -91,9 +136,14 @@ public class ${glDBFluteModule} implements Extension {
      * @param beanManager
      */
     protected void setupBehaviors(final AfterBeanDiscovery event, final BeanManager beanManager) {
+        final List<Class<? extends AbstractBehaviorReadable>> list = new ArrayList<Class<? extends AbstractBehaviorReadable>>();
 #foreach ($table in $database.tables)
-        event.addBean(new DBFluteBean<${table.extendedBehaviorClassName}>(beanManager, ${table.extendedBehaviorClassName}.class));
+        list.add(${table.extendedBehaviorClassName}.class);
 #end
+
+        for (Class<? extends AbstractBehaviorReadable> clazz : list) {
+            event.addBean(newBehaviorBean(beanManager, clazz));
+        }
     }
 
     /**
@@ -106,28 +156,36 @@ public class ${glDBFluteModule} implements Extension {
 
     /**
      * Simple implementation of {@link Bean}.
-     *
-     * @param <T>
+     * @param <T> The type of object.
      */
     public class DBFluteBean<T> implements Bean<T> {
-        private final Class<T> beanClass;
-        private final Class<? super T>[] superTypes;
-        private final AnnotatedType<T> at;
-        private final InjectionTarget<T> it;
+        protected final Class<T> beanClass;
+        protected final List<Class<? super T>> superTypes;
+        protected final AnnotatedType<T> annotatedType;
+        protected final InjectionTarget<T> injectionTarget;
 
-        public DBFluteBean(final BeanManager beanManager, final Class<T> beanClass, final Class<? super T>... superTypes) {
+        public DBFluteBean(final BeanManager beanManager, final Class<T> beanClass) {
+            this(beanManager, beanClass, (List<Class<? super T>>) null);
+        }
+
+        @SuppressWarnings("unchecked")
+        public DBFluteBean(final BeanManager beanManager, final Class<T> beanClass, final Class<? super T> superType) {
+            this(beanManager, beanClass, new ArrayList<Class<? super T>>(Arrays.asList(superType)));
+        }
+
+        public DBFluteBean(final BeanManager beanManager, final Class<T> beanClass, final List<Class<? super T>> superTypes) {
             this.beanClass = beanClass;
             this.superTypes = superTypes;
-            this.at = beanManager.createAnnotatedType(beanClass);
-            this.it = beanManager.createInjectionTarget(this.at);
+            this.annotatedType = beanManager.createAnnotatedType(beanClass);
+            this.injectionTarget = beanManager.createInjectionTarget(this.annotatedType);
         }
 
         @Override
-        public T create(final CreationalContext<T> cc) {
-            final T instance = this.it.produce(cc);
-            this.it.inject(instance, cc);
+        public T create(final CreationalContext<T> creationalContext) {
+            final T instance = this.injectionTarget.produce(creationalContext);
+            this.injectionTarget.inject(instance, creationalContext);
             this.postInject(instance);
-            this.it.postConstruct(instance);
+            this.injectionTarget.postConstruct(instance);
             return instance;
         }
 
@@ -139,10 +197,10 @@ public class ${glDBFluteModule} implements Extension {
         }
 
         @Override
-        public void destroy(final T instance, final CreationalContext<T> cc) {
-            this.it.preDestroy(instance);
-            this.it.dispose(instance);
-            cc.release();
+        public void destroy(final T instance, final CreationalContext<T> creationalContext) {
+            this.injectionTarget.preDestroy(instance);
+            this.injectionTarget.dispose(instance);
+            creationalContext.release();
         };
 
         @Override
@@ -152,27 +210,18 @@ public class ${glDBFluteModule} implements Extension {
 
         @Override
         public Set<InjectionPoint> getInjectionPoints() {
-            return this.it.getInjectionPoints();
+            return this.injectionTarget.getInjectionPoints();
         }
 
         @Override
         public String getName() {
-            String className = this.beanClass.getName();
-            final int index = className.lastIndexOf('.');
-            if (0 < index) {
-                className = className.substring(index + 1);
-            }
-            final char[] chars = className.toCharArray();
-            if (Character.isUpperCase(chars[0])) {
-                chars[0] = Character.toLowerCase(chars[0]);
-            }
-            return new String(chars);
+            return this.beanClass.getName();
         }
 
         @Override
-        @SuppressWarnings("serial")
         public Set<Annotation> getQualifiers() {
             final Set<Annotation> qualifiers = new HashSet<Annotation>();
+            qualifiers.add(new AnnotationLiteral<DBFlute>() {});
             qualifiers.add(new AnnotationLiteral<Default>() {});
             qualifiers.add(new AnnotationLiteral<Any>() {});
             return qualifiers;
@@ -194,7 +243,7 @@ public class ${glDBFluteModule} implements Extension {
             types.add(this.beanClass);
             types.add(Object.class);
             if (this.superTypes != null) {
-                types.addAll(Arrays.asList(this.superTypes));
+                types.addAll(this.superTypes);
             }
             return types;
         }
@@ -207,6 +256,45 @@ public class ${glDBFluteModule} implements Extension {
         @Override
         public boolean isNullable() {
             return false;
+        }
+    }
+
+    /**
+     * New behavior-bean instance.
+     * @param <BEHAVIOR> The type of behavior.
+     * @return Behavior-bean. (NotNull)
+     */
+    public <BEHAVIOR extends AbstractBehaviorReadable> BehaviorBean<BEHAVIOR> newBehaviorBean(final BeanManager beanManager, final Class<BEHAVIOR> beanClass) {
+        return new BehaviorBean<BEHAVIOR>(beanManager, beanClass);
+    }
+
+    /**
+     * Behavior implementation of {@link Bean}.
+     * @param <BEHAVIOR> The type of behavior.
+     */
+    public class BehaviorBean<BEHAVIOR extends AbstractBehaviorReadable> extends DBFluteBean<BEHAVIOR> {
+        protected final BeanManager beanManager;
+
+        public BehaviorBean(final BeanManager beanManager, final Class<BEHAVIOR> beanClass) {
+            super(beanManager, beanClass, (List<Class<? super BEHAVIOR>>) null);
+            this. beanManager = beanManager;
+        }
+
+        @Override
+        protected void postInject(final BEHAVIOR instance) {
+            Bean<?> bean = beanManager.resolve(beanManager.getBeans(BehaviorCommandInvoker.class, new AnnotationLiteral<DBFlute>() {}));
+            instance.setBehaviorCommandInvoker((BehaviorCommandInvoker) beanManager.getReference(
+                    bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
+
+            bean = beanManager.resolve(beanManager.getBeans(BehaviorSelector.class, new AnnotationLiteral<DBFlute>() {}));
+            instance.setBehaviorSelector((BehaviorSelector) beanManager.getReference(
+                    bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
+
+            if (instance instanceof AbstractBehaviorWritable) {
+                bean = beanManager.resolve(beanManager.getBeans(CommonColumnAutoSetupper.class, new AnnotationLiteral<DBFlute>() {}));
+                ((AbstractBehaviorWritable) instance).setCommonColumnAutoSetupper(
+                        (CommonColumnAutoSetupper) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
+            }
         }
     }
 }
