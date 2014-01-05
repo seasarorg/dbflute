@@ -1,5 +1,5 @@
 ##
-## Copyright 2004-2013 the Seasar Foundation and the Others.
+## Copyright 2004-2014 the Seasar Foundation and the Others.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -66,57 +66,151 @@ import ${glPackageExtendedBhv}.*;
  */
 public class ${glDBFluteModule} implements Extension {
 
+    // ===================================================================================
+    //                                                                           Qualifier
+    //                                                                           =========
     /** DBFlute qualifier. */
     @Qualifier
     @Retention(RUNTIME)
     @Target({TYPE, METHOD, FIELD, PARAMETER})
     public @interface DBFlute {}
 
+    // ===================================================================================
+    //                                                                         Set up Bean
+    //                                                                         ===========
     /**
      * Register DBFlute beans to container.
-     * @param event event
-     * @param beanManager bean manager
+     * @param event The event type after bean discovery process. (NotNull)
+     * @param beanManager The manager of CDI beans. (NotNull)
      */
     public void afterBeanDiscovery(@Observes final AfterBeanDiscovery event, final BeanManager beanManager) {
-        this.setupDfComponents(event, beanManager);
-        this.setupBehaviors(event, beanManager);
+        setupDfComponents(event, beanManager);
+        setupBehaviors(event, beanManager);
     }
 
     /**
      * Register environment dependent implementations to container.
-     * @param event
-     * @param beanManager
+     * @param event The event type after bean discovery process. (NotNull)
+     * @param beanManager The manager of CDI beans. (NotNull)
      */
     protected void setupDfComponents(final AfterBeanDiscovery event, final BeanManager beanManager) {
-        event.addBean(new DBFluteBean<${database.implementedInvokerAssistantClass}>(
+        event.addBean(newDBFluteBeanOfInvokerAssistant(beanManager));
+        event.addBean(newDBFluteBeanOfCommonColumnAutoSetupper(beanManager));
+        event.addBean(newDBFluteBeanOfBehaviorSelector(beanManager));
+        event.addBean(newDBFluteBeanOfSqlClauseCreator(beanManager));
+        event.addBean(newDBFluteBeanOfBehaviorCommandInvoker(beanManager));
+    }
+
+    /**
+     * Register behaviors to container.
+     * @param event The event type after bean discovery process. (NotNull)
+     * @param beanManager The manager of CDI beans. (NotNull)
+     */
+    protected void setupBehaviors(final AfterBeanDiscovery event, final BeanManager beanManager) {
+        final List<Class<? extends AbstractBehaviorReadable>> typeList = new ArrayList<Class<? extends AbstractBehaviorReadable>>();
+#foreach ($table in $database.tables)
+        typeList.add(${table.extendedBehaviorClassName}.class);
+#end
+        doSetupBehaviors(event, beanManager, typeList);
+    }
+
+    /**
+     * Actually register behaviors to container.
+     * @param event The event type after bean discovery process. (NotNull)
+     * @param beanManager The manager of CDI beans. (NotNull)
+     * @param typeList The list of behavior types to be registered. (NotNull)
+     */
+    protected void doSetupBehaviors(final AfterBeanDiscovery event, final BeanManager beanManager, final List<Class<? extends AbstractBehaviorReadable>> typeList) {
+        for (Class<? extends AbstractBehaviorReadable> clazz : typeList) {
+            event.addBean(newBehaviorBean(beanManager, clazz));
+        }
+    }
+
+    /**
+     * Initialize DBFlute.
+     * @param event The event type after deployment validation process. (NotNull)
+     */
+    public void afterDeploymentValidation(@Observes final AfterDeploymentValidation event) {
+        initializeDBFlute();
+    }
+
+    /**
+     * Initialize DBFlute (by creating DBFlute initializer).
+     */
+    protected void initializeDBFlute() {
+        new ${database.DBFluteInitializerClass}();
+    }
+
+    // ===================================================================================
+    //                                                                        DBFlute Bean
+    //                                                                        ============
+    /**
+     * New DBFlute bean for invoker assistant.
+     * @param beanManager The manager of CDI beans. (NotNull)
+     * @return The new-created DBFlute bean. (NotNull)
+     */
+    protected DBFluteBean<${database.implementedInvokerAssistantClass}> newDBFluteBeanOfInvokerAssistant(final BeanManager beanManager) {
+        return new DBFluteBean<${database.implementedInvokerAssistantClass}>(
                 beanManager, ${database.implementedInvokerAssistantClass}.class, InvokerAssistant.class) {
             @Override
             protected void postInject(final ${database.implementedInvokerAssistantClass} instance) {
-                Bean<?> bean = beanManager.resolve(beanManager.getBeans(DataSource.class, new AnnotationLiteral<DBFlute>() {}));
+                Bean<?> bean = beanManager.resolve(beanManager.getBeans(DataSource.class, createDBFluteAnnotationLiteral()));
                 if (bean == null) {
-                    bean = beanManager.resolve(beanManager.getBeans(DataSource.class, new AnnotationLiteral<Default>() {}));
+                    bean = beanManager.resolve(beanManager.getBeans(DataSource.class, createDefaultAnnotationLiteral()));
                 }
                 if (bean == null) {
                     throw new UnsatisfiedResolutionException(String.format(
                             "Unable to resolve a bean for '%s' with qualifiers %s or %s.",
-                            DataSource.class.getName(), new AnnotationLiteral<DBFlute>() {}, new AnnotationLiteral<Default>() {}));
+                            DataSource.class.getName(), createDBFluteAnnotationLiteral(), createDefaultAnnotationLiteral()));
                 }
-                instance.setDataSource((DataSource) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
+                DataSource dataSource = (DataSource) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean));
+                instance.setDataSource(dataSource);
             }
-        });
-        event.addBean(new DBFluteBean<${database.implementedCommonColumnAutoSetupperClass}>(beanManager, ${database.implementedCommonColumnAutoSetupperClass}.class, CommonColumnAutoSetupper.class));
-        event.addBean(new DBFluteBean<${glImplementedBehaviorSelector}>(beanManager, ${glImplementedBehaviorSelector}.class, BehaviorSelector.class) {
+        };
+    }
+
+    /**
+     * New DBFlute bean for common column auto set-upper.
+     * @param beanManager The manager of CDI beans. (NotNull)
+     * @return The new-created DBFlute bean. (NotNull)
+     */
+    protected DBFluteBean<${database.implementedCommonColumnAutoSetupperClass}> newDBFluteBeanOfCommonColumnAutoSetupper(final BeanManager beanManager) {
+        return new DBFluteBean<${database.implementedCommonColumnAutoSetupperClass}>(beanManager, ${database.implementedCommonColumnAutoSetupperClass}.class, CommonColumnAutoSetupper.class);
+    }
+
+    /**
+     * New DBFlute bean for behavior selector.
+     * @param beanManager The manager of CDI beans. (NotNull)
+     * @return The new-created DBFlute bean. (NotNull)
+     */
+    protected DBFluteBean<${glImplementedBehaviorSelector}> newDBFluteBeanOfBehaviorSelector(final BeanManager beanManager) {
+        return new DBFluteBean<${glImplementedBehaviorSelector}>(beanManager, ${glImplementedBehaviorSelector}.class, BehaviorSelector.class) {
             @Override
             protected void postInject(final ${glImplementedBehaviorSelector} instance) {
                 instance.setContainer(beanManager);
             }
-        });
-        event.addBean(new DBFluteBean<${glImplementedSqlClauseCreator}>(beanManager, ${glImplementedSqlClauseCreator}.class, SqlClauseCreator.class));
+        };
+    }
 
-        event.addBean(new DBFluteBean<BehaviorCommandInvoker>(beanManager, BehaviorCommandInvoker.class) {
+    /**
+     * New DBFlute bean for SQL clause creator.
+     * @param beanManager The manager of CDI beans. (NotNull)
+     * @return The new-created DBFlute bean. (NotNull)
+     */
+    protected DBFluteBean<${glImplementedSqlClauseCreator}> newDBFluteBeanOfSqlClauseCreator(final BeanManager beanManager) {
+        return new DBFluteBean<${glImplementedSqlClauseCreator}>(beanManager, ${glImplementedSqlClauseCreator}.class, SqlClauseCreator.class);
+    }
+
+    /**
+     * New DBFlute bean for behavior command invoker.
+     * @param beanManager The manager of CDI beans. (NotNull)
+     * @return The new-created DBFlute bean. (NotNull)
+     */
+    protected DBFluteBean<BehaviorCommandInvoker> newDBFluteBeanOfBehaviorCommandInvoker(final BeanManager beanManager) {
+        return new DBFluteBean<BehaviorCommandInvoker>(beanManager, BehaviorCommandInvoker.class) {
             @Override
             protected void postInject(final BehaviorCommandInvoker instance) {
-                final Bean<?> bean = beanManager.resolve(beanManager.getBeans(InvokerAssistant.class, new AnnotationLiteral<DBFlute>() {}));
+                final Bean<?> bean = beanManager.resolve(beanManager.getBeans(InvokerAssistant.class, createDBFluteAnnotationLiteral()));
                 instance.setInvokerAssistant((InvokerAssistant) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
             }
 
@@ -127,31 +221,7 @@ public class ${glDBFluteModule} implements Extension {
                 name.append(this.beanClass.getSimpleName());
                 return name.toString();
             }
-        });
-    }
-
-    /**
-     * Register behaviors to container.
-     * @param event
-     * @param beanManager
-     */
-    protected void setupBehaviors(final AfterBeanDiscovery event, final BeanManager beanManager) {
-        final List<Class<? extends AbstractBehaviorReadable>> list = new ArrayList<Class<? extends AbstractBehaviorReadable>>();
-#foreach ($table in $database.tables)
-        list.add(${table.extendedBehaviorClassName}.class);
-#end
-
-        for (Class<? extends AbstractBehaviorReadable> clazz : list) {
-            event.addBean(newBehaviorBean(beanManager, clazz));
-        }
-    }
-
-    /**
-     * Initialize DBFlute.
-     * @param event
-     */
-    public void afterDeploymentValidation(@Observes final AfterDeploymentValidation event) {
-        new ${database.DBFluteInitializerClass}();
+        };
     }
 
     /**
@@ -221,9 +291,9 @@ public class ${glDBFluteModule} implements Extension {
         @Override
         public Set<Annotation> getQualifiers() {
             final Set<Annotation> qualifiers = new HashSet<Annotation>();
-            qualifiers.add(new AnnotationLiteral<DBFlute>() {});
-            qualifiers.add(new AnnotationLiteral<Default>() {});
-            qualifiers.add(new AnnotationLiteral<Any>() {});
+            qualifiers.add(createDBFluteAnnotationLiteral());
+            qualifiers.add(createDefaultAnnotationLiteral());
+            qualifiers.add(createAnyAnnotationLiteral());
             return qualifiers;
         }
 
@@ -259,6 +329,9 @@ public class ${glDBFluteModule} implements Extension {
         }
     }
 
+    // ===================================================================================
+    //                                                                       Behavior Bean
+    //                                                                       =============
     /**
      * New behavior-bean instance.
      * @param <BEHAVIOR> The type of behavior.
@@ -282,19 +355,52 @@ public class ${glDBFluteModule} implements Extension {
 
         @Override
         protected void postInject(final BEHAVIOR instance) {
-            Bean<?> bean = beanManager.resolve(beanManager.getBeans(BehaviorCommandInvoker.class, new AnnotationLiteral<DBFlute>() {}));
+            Bean<?> bean = beanManager.resolve(beanManager.getBeans(BehaviorCommandInvoker.class, createDBFluteAnnotationLiteral()));
             instance.setBehaviorCommandInvoker((BehaviorCommandInvoker) beanManager.getReference(
                     bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
 
-            bean = beanManager.resolve(beanManager.getBeans(BehaviorSelector.class, new AnnotationLiteral<DBFlute>() {}));
+            bean = beanManager.resolve(beanManager.getBeans(BehaviorSelector.class, createDBFluteAnnotationLiteral()));
             instance.setBehaviorSelector((BehaviorSelector) beanManager.getReference(
                     bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
 
             if (instance instanceof AbstractBehaviorWritable) {
-                bean = beanManager.resolve(beanManager.getBeans(CommonColumnAutoSetupper.class, new AnnotationLiteral<DBFlute>() {}));
+                bean = beanManager.resolve(beanManager.getBeans(CommonColumnAutoSetupper.class, createDBFluteAnnotationLiteral()));
                 ((AbstractBehaviorWritable) instance).setCommonColumnAutoSetupper(
                         (CommonColumnAutoSetupper) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)));
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                  Annotation Literal
+    //                                                                  ==================
+    /**
+     * Create annotation literal for DBFlute.
+     * @return The new-created annotation literal. (NotNull)
+     */
+    protected AnnotationLiteral<DBFlute> createDBFluteAnnotationLiteral() {
+        return new AnnotationLiteral<DBFlute>() {
+            private static final long serialVersionUID = 1L;
+        };
+    }
+
+    /**
+     * Create annotation literal for default.
+     * @return The new-created annotation literal. (NotNull)
+     */
+    protected AnnotationLiteral<Default> createDefaultAnnotationLiteral() {
+        return new AnnotationLiteral<Default>() {
+            private static final long serialVersionUID = 1L;
+        };
+    }
+
+    /**
+     * Create annotation literal for any.
+     * @return The new-created annotation literal. (NotNull)
+     */
+    protected AnnotationLiteral<Any> createAnyAnnotationLiteral() {
+        return new AnnotationLiteral<Any>() {
+            private static final long serialVersionUID = 1L;
+        };
     }
 }
