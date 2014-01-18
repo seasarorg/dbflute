@@ -21,7 +21,7 @@
 	<property name="example.subproject.base" value="${workspace.base}/dbflute-example-subproject" />
 	<property name="example.friends.frank.base" value="${workspace.base}/dbflute-example-friends-frank" />
 	<property name="example.friends.guest.base" value="${workspace.base}/dbflute-example-friends-guest" />
-	<property name="tryout.base" value="${workspace.base}/tryout" />
+	<property name="tryout.base" value="${workspace.base}/dbflute-tryout" />
 
 	<!-- Point Directories -->
 	<property name="dist" value="dist" />
