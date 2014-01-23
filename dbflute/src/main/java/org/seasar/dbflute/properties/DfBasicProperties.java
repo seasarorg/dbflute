@@ -160,7 +160,11 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isDatabaseSQLServer() {
-        return getTargetDatabase().equalsIgnoreCase("mssql");
+        final String database = getTargetDatabase();
+        if (database.equalsIgnoreCase("sqlserver")) {
+            return true;
+        }
+        return database.equalsIgnoreCase("mssql"); // for compatible
     }
 
     public boolean isDatabaseH2() {
