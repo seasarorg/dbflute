@@ -1267,7 +1267,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     protected void reg${tmpJavaName}(ConditionKey k, Object v) { regQ(k, v, getCValue${tmpJavaName}(), "${col.name}"); }
-    abstract protected ConditionValue getCValue${tmpJavaName}();
+    protected abstract ConditionValue getCValue${tmpJavaName}();
 #end
 #if ($table.hasSinglePrimaryKey())
 
