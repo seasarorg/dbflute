@@ -190,23 +190,25 @@ public class DfPmbCommentSetupper {
                 sb.append(", <br />").append(lineSep).append(indent);
                 sb.append("described as \"").append(sqlTitle).append("\"");
             }
-            sb.append(".").append(lineSep);
+            sb.append(".");
         } else if (pmbMetaData.isRelatedToProcedure()) {
             final String procedureName = pmbMetaData.getProcedureName();
             sb.append(indent).append("The typed parameter-bean of " + pmbBizName + ". <br />").append(lineSep);
             sb.append(indent).append("This is related to \"<span style=\"color: #AD4747\">");
-            sb.append(procedureName).append("</span>\".").append(lineSep);
+            sb.append(procedureName).append("</span>\".");
         } else {
             if (pmbMetaData.isRelatedToBehaviorQuery()) {
                 sb.append(indent).append("The simple parameter-bean of " + pmbBizName + ". <br />").append(lineSep);
                 final String bhvClassName = pmbMetaData.getBehaviorClassName();
                 final String bhvQueryPath = pmbMetaData.getBehaviorQueryPath();
                 sb.append(indent).append("This is defined at \"<span style=\"color: #AD4747\">");
-                sb.append(bhvQueryPath).append("</span>\" on ").append(bhvClassName).append(".").append(lineSep);
+                sb.append(bhvQueryPath).append("</span>\" on ").append(bhvClassName).append(".");
             } else {
-                sb.append(indent).append("The simple parameter-bean of " + pmbBizName + ".").append(lineSep);
+                sb.append(indent).append("The simple parameter-bean of ").append(pmbBizName).append(".");
             }
         }
+        sb.append(" <br />"); // basically unnecessary but against Eclipse default code formatter problem
+        sb.append(lineSep);
         return sb.toString();
     }
 
