@@ -52,6 +52,7 @@ public class DfClassificationTop {
     public static final String KEY_CHECK_IMPLICIT_SET = "isCheckImplicitSet";
     public static final String KEY_USE_DOCUMENT_ONLY = "isUseDocumentOnly";
     public static final String KEY_SUPPRESS_AUTO_DEPLOY = "isSuppressAutoDeploy";
+    public static final String KEY_SUPPRESS_DBACCESS_CLASS = "isSuppressDBAccessClass";
     public static final String KEY_DEPRECATED = "isDeprecated";
     public static final String KEY_GROUPING_MAP = "groupingMap";
     public static final String KEY_DEPRECATED_MAP = "deprecatedMap";
@@ -67,7 +68,8 @@ public class DfClassificationTop {
     protected boolean _tableClassification;
     protected boolean _checkImplicitSet;
     protected boolean _useDocumentOnly;
-    protected boolean _suppressAutoDeploy;
+    protected boolean _suppressAutoDeploy; // no automatic classification deployment
+    protected boolean _suppressDBAccessClass; // no behavior, condition-bean for table classification
     protected boolean _deprecated;
     protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
     protected final Map<String, String> _deprecatedMap = new LinkedHashMap<String, String>();
@@ -470,6 +472,14 @@ public class DfClassificationTop {
 
     public void setSuppressAutoDeploy(boolean suppressAutoDeploy) {
         _suppressAutoDeploy = suppressAutoDeploy;
+    }
+
+    public boolean isSuppressDBAccessClass() {
+        return _suppressDBAccessClass;
+    }
+
+    public void setSuppressDBAccessClass(boolean suppressDBAccessClass) {
+        _suppressDBAccessClass = suppressDBAccessClass;
     }
 
     public boolean isDeprecated() {

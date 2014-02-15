@@ -127,6 +127,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isMakeEntityOldStyleClassify", false);
     }
 
+    public boolean isSuppressTableClassificationDBAccessClass() { // closet
+        return isProperty("isSuppressTableClassificationDBAccessClass", false);
+    }
+
     // ===================================================================================
     //                                                                              Entity
     //                                                                              ======

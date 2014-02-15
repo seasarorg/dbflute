@@ -409,21 +409,24 @@ $database.info("public void parseTableClass() {")
   #set ($isExistBehavior = true)
   #set ($isExistDao = false)
 
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
-
+  #if (!$table.isSuppressDBAccessClass())
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/bsbhv/BaseBhv.${glTemplateFileExtension}", $path, "table", $table)
+  #end
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseEntity})}${myBaseObjectClassName}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/bsentity/BaseEntity.${glTemplateFileExtension}", $path, "table", $table)
 
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseDBMeta})}${myDBMetaClassName}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
 
-  #if (!$database.isStopGenerateExtendedBhv())
-    #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.outputPath},$path).exists())
-      $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+  #if (!$table.isSuppressDBAccessClass())
+    #if (!$database.isStopGenerateExtendedBhv())
+      #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
+      #if (!$files.file(${generator.outputPath},$path).exists())
+        $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
+      #end
+      $database.reflectAllExCopyright($path)
     #end
-    $database.reflectAllExCopyright($path)
   #end
 
   #if (!$database.isStopGenerateExtendedEntity())
@@ -434,32 +437,34 @@ $database.info("public void parseTableClass() {")
     $database.reflectAllExCopyright($path)
   #end
 
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCB})}${myBaseConditionBeanClassName}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/cbean/BsConditionBean.${glTemplateFileExtension}", $path, "table", $table)
+  #if (!$table.isSuppressDBAccessClass())
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCB})}${myBaseConditionBeanClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/cbean/BsConditionBean.${glTemplateFileExtension}", $path, "table", $table)
 
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCQ})}${myAbstractBaseConditionQueryClassName}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/cbean/AbstractBsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCQ})}${myAbstractBaseConditionQueryClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/cbean/AbstractBsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
 
-  #set ( $path = "${database.getPackageAsPath(${glPackageCIQ})}${myConditionInlineQueryClassName}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/cbean/BsConditionInlineQuery.${glTemplateFileExtension}", $path, "table", $table)
+    #set ( $path = "${database.getPackageAsPath(${glPackageCIQ})}${myConditionInlineQueryClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/cbean/BsConditionInlineQuery.${glTemplateFileExtension}", $path, "table", $table)
 
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCQ})}${myBaseConditionQueryClassName}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/cbean/BsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseCQ})}${myBaseConditionQueryClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/cbean/BsConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
 
-  #set ( $path = "${database.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
+    #set ( $path = "${database.getPackageAsPath(${glPackageNss})}${myNestSelectSetupperClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
 
-  #set ( $path = "${database.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
-  #if (!$files.file(${generator.outputPath},$path).exists())
-    $generator.parse("om/${glResourceDirectory}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
+    #set ( $path = "${database.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
+    #end
+    $database.reflectAllExCopyright($path)
+
+    #set ( $path = "${database.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.outputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/cbean/ExConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
+    #end
+    $database.reflectAllExCopyright($path)
   #end
-  $database.reflectAllExCopyright($path)
-
-  #set ( $path = "${database.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
-  #if (!$files.file(${generator.outputPath},$path).exists())
-    $generator.parse("om/${glResourceDirectory}/cbean/ExConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
-  #end
-  $database.reflectAllExCopyright($path)
 #end
 $database.info("}")
 $database.info(" ")

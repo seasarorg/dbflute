@@ -423,7 +423,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
-#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()} && !${col.isForeignTableSuppressDBAccessClass()})
 #set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
@@ -444,7 +444,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #if (${col.hasSingleKeyReferrer()})
-#foreach ($referrer in $col.singleKeyReferrers)
+#foreach ($referrer in $col.generatedDBAccessClassSingleKeyReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #if (${referrer.isOneToOne()})
@@ -898,7 +898,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #end
-#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()} && !${col.isForeignTableSuppressDBAccessClass()})
 #set ($relatedCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
@@ -919,7 +919,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #if (${col.hasSingleKeyReferrer()})
-#foreach ($referrer in $col.singleKeyReferrers)
+#foreach ($referrer in $col.generatedDBAccessClassSingleKeyReferrers)
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #if (${referrer.isOneToOne()})

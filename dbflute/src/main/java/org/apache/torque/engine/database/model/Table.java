@@ -153,6 +153,7 @@ import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
+import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -2309,6 +2310,10 @@ public class Table {
         return getProperties().getDatabaseProperties();
     }
 
+    protected DfClassificationProperties getClassificationProperties() {
+        return getProperties().getClassificationProperties();
+    }
+
     protected DfCommonColumnProperties getCommonColumnProperties() {
         return getProperties().getCommonColumnProperties();
     }
@@ -2376,6 +2381,10 @@ public class Table {
             }
         }
         return false;
+    }
+
+    public boolean isSuppressDBAccessClass() {
+        return getClassificationProperties().isSuppressDBAccessClassTable(getTableDbName());
     }
 
     // ===================================================================================

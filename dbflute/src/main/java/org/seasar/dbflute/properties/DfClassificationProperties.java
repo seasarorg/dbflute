@@ -65,7 +65,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The element map of table classification. The key is classification name. (NotNull) */
     protected final Map<String, DfClassificationElement> _tableClassificationMap = newLinkedHashMap();
+
+    /** The name set of table suppressing DB-access-class. (NotNull) */
+    protected final Set<String> _suppressedDBAccessClassTableSet = StringSet.createAsFlexible();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -205,6 +209,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             reflectClassificationResourceToDefinition(); // *Classification Resource Point!
             filterUseDocumentOnly();
             checkClassificationConstraints();
+            prepareSuppressedDBAccessClassTableSet();
         } finally {
             new DfClassificationSqlResourceCloser().closeConnection(conn);
         }
@@ -216,6 +221,15 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             // only check one that is not compile-safe
             // (e.g. groupingMap gives us compile error if no-existence element)
             classificationTop.checkDeprecatedElementExistence();
+        }
+    }
+
+    protected void prepareSuppressedDBAccessClassTableSet() {
+        for (Entry<String, DfClassificationElement> entry : _tableClassificationMap.entrySet()) {
+            final DfClassificationElement element = entry.getValue();
+            if (element.getClassificationTop().isSuppressDBAccessClass()) {
+                _suppressedDBAccessClassTableSet.add(element.getTable());
+            }
         }
     }
 
@@ -308,6 +322,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         classificationTop.setCheckImplicitSet(isClassificationCheckImplicitSet(elementMap));
         classificationTop.setUseDocumentOnly(isClassificationUseDocumentOnly(elementMap));
         classificationTop.setSuppressAutoDeploy(isClassificationSuppressAutoDeploy(elementMap));
+        classificationTop.setSuppressDBAccessClass(isClassificationSuppressDBAccessClass(elementMap));
         classificationTop.setDeprecated(isClassificationDeprecated(elementMap));
         classificationTop.putGroupingAll(getGroupingMap(elementMap));
         classificationTop.putDeprecatedAll(getDeprecatedMap(elementMap));
@@ -326,6 +341,14 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     @SuppressWarnings("unchecked")
     protected boolean isClassificationSuppressAutoDeploy(Map<?, ?> elementMap) {
         return isProperty(DfClassificationTop.KEY_SUPPRESS_AUTO_DEPLOY, false,
+                (Map<String, ? extends Object>) elementMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isClassificationSuppressDBAccessClass(Map<?, ?> elementMap) {
+        final DfLittleAdjustmentProperties littleAdjustmentProp = getLittleAdjustmentProperties();
+        final boolean defaultValue = littleAdjustmentProp.isSuppressTableClassificationDBAccessClass();
+        return isProperty(DfClassificationTop.KEY_SUPPRESS_DBACCESS_CLASS, defaultValue,
                 (Map<String, ? extends Object>) elementMap);
     }
 
@@ -372,7 +395,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return DfCollectionUtil.emptyMap();
         }
         @SuppressWarnings("unchecked")
-        Map<String, Map<String, Object>> groupingMap = (Map<String, Map<String, Object>>) obj;
+        final Map<String, Map<String, Object>> groupingMap = (Map<String, Map<String, Object>>) obj;
         return groupingMap;
     }
 
@@ -382,7 +405,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return DfCollectionUtil.emptyMap();
         }
         @SuppressWarnings("unchecked")
-        Map<String, String> deprecatedList = (Map<String, String>) obj;
+        final Map<String, String> deprecatedList = (Map<String, String>) obj;
         return deprecatedList;
     }
 
@@ -396,20 +419,26 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         return _tableClassificationMap.containsKey(classificationName);
     }
 
+    public boolean isSuppressDBAccessClassTable(String tableDbName) {
+        return _suppressedDBAccessClassTableSet.contains(tableDbName);
+    }
+
     protected void processTableClassification(DfClassificationTop classificationTop, Map<?, ?> elementMap,
             String table, List<DfClassificationElement> elementList, Connection conn) {
         final DfClassificationElement metaElement = new DfClassificationElement();
         metaElement.setClassificationName(classificationTop.getClassificationName());
         metaElement.setTable(table);
         metaElement.acceptBasicItemMap(elementMap);
+        if (isClassificationSuppressAutoDeploy(elementMap)) { // for compatible
+            classificationTop.setSuppressAutoDeploy(true);
+        }
         final String where = (String) elementMap.get("where");
         final String orderBy = (String) elementMap.get("orderBy");
         final Set<String> exceptCodeSet = extractExceptCodeSet(classificationTop, elementMap);
         final String sql = buildTableClassificationSql(metaElement, table, where, orderBy);
         setupTableClassification(classificationTop, elementList, metaElement, exceptCodeSet, conn, sql);
-
-        // save for auto deployment if it is NOT suppressAutoDeploy
-        registerTableClassificationAutoDeploy(classificationTop, elementMap, table, elementList, metaElement);
+        final String classificationName = classificationTop.getClassificationName();
+        _tableClassificationMap.put(classificationName, metaElement); // e.g. for auto-deploy and determination
     }
 
     protected String buildTableClassificationSql(DfClassificationElement element, String table, String where,
@@ -565,18 +594,6 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         } finally {
             new DfClassificationSqlResourceCloser().closeStatement(st, rs);
         }
-    }
-
-    protected void registerTableClassificationAutoDeploy(DfClassificationTop classificationTop, Map<?, ?> elementMap,
-            String table, List<DfClassificationElement> elementList, DfClassificationElement metaElement) {
-        final String classificationName = classificationTop.getClassificationName();
-        if (classificationTop.isSuppressAutoDeploy()) {
-            return;
-        }
-        if (isClassificationSuppressAutoDeploy(elementMap)) { // for compatible
-            return;
-        }
-        _tableClassificationMap.put(classificationName, metaElement);
     }
 
     protected final Map<String, String> _nameFromToMap = newLinkedHashMap();
@@ -920,6 +937,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         initializeClassificationDefinition();
         for (Entry<String, DfClassificationElement> entry : _tableClassificationMap.entrySet()) {
             final DfClassificationElement element = entry.getValue();
+            if (element.getClassificationTop().isSuppressAutoDeploy()) {
+                continue;
+            }
             final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, element.getTable());
             final String classificationName = element.getClassificationName();
             registerColumnClsIfNeeds(columnClsMap, element.getCode(), classificationName);
