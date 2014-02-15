@@ -108,7 +108,7 @@ public class ${glDBFluteModule} implements Extension {
      */
     protected void setupBehaviors(final AfterBeanDiscovery event, final BeanManager beanManager) {
         final List<Class<? extends AbstractBehaviorReadable>> typeList = new ArrayList<Class<? extends AbstractBehaviorReadable>>();
-#foreach ($table in $database.tables)
+#foreach ($table in $database.behaviorTableList)
         typeList.add(${table.extendedBehaviorClassName}.class);
 #end
         doSetupBehaviors(event, beanManager, typeList);

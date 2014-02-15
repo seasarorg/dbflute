@@ -185,9 +185,6 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_BaseConditionBean() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (table.isSuppressDBAccessClass()) {
-                    return null; // delete the class though existing table
-                }
                 return table.getBaseConditionBeanClassName();
             }
         };
@@ -204,9 +201,6 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_AbstractBaseConditionQuery() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (table.isSuppressDBAccessClass()) {
-                    return null; // delete the class though existing table
-                }
                 return table.getAbstractBaseConditionQueryClassName();
             }
         };
@@ -219,9 +213,6 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_BaseConditionQuery() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (table.isSuppressDBAccessClass()) {
-                    return null; // delete the class though existing table
-                }
                 return table.getBaseConditionQueryClassName();
             }
         };
@@ -234,9 +225,6 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_NestSelectSetupper() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (table.isSuppressDBAccessClass()) {
-                    return null; // delete the class though existing table
-                }
                 return table.getNestSelectSetupperClassName();
             }
         };
@@ -252,9 +240,6 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_ExtendedConditionBean() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (table.isSuppressDBAccessClass()) {
-                    return null; // delete the class though existing table
-                }
                 return table.getExtendedConditionBeanClassName();
             }
         };
@@ -267,9 +252,6 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_ExtendedConditionQuery() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (table.isSuppressDBAccessClass()) {
-                    return null; // delete the class though existing table
-                }
                 return table.getExtendedConditionQueryClassName();
             }
         };
@@ -282,9 +264,6 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_ExtendedConditionInlineQuery() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (table.isSuppressDBAccessClass()) {
-                    return null; // delete the class though existing table
-                }
                 return table.getExtendedConditionInlineQueryClassName();
             }
         };

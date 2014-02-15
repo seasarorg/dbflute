@@ -37,7 +37,7 @@
     <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker"/>
 
     <!-- The components of Behavior. -->
-#foreach ($table in $database.tables)
+#foreach ($table in $database.behaviorTableList)
     <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}"/>
 #end
 </components>

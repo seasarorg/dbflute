@@ -31,7 +31,7 @@
     </component>
     
     <!-- The components of Behavior. -->
-#foreach ($table in $database.tables)
+#foreach ($table in $database.behaviorTableList)
 	<component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}">
         <inject method="setBehaviorCommandInvoker">${database.behaviorCommandInvokerComponentName}</inject>
         <inject method="setBehaviorSelector">${database.behaviorSelectorComponentName}</inject>

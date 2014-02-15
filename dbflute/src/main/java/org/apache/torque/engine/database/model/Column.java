@@ -955,37 +955,25 @@ public class Column {
         return "\"" + sb.toString() + "\"";
     }
 
-    /**
-     * Utility method to get the related table of this column if it is a foreign
-     * key or part of a foreign key
-     */
     public String getRelatedTableName() {
         ForeignKey fk = getForeignKey();
         return (fk == null ? null : fk.getForeignTablePureName());
     }
 
-    /**
-     * Utility method to get the related table of this column if it is a foreign
-     * key or part of a foreign key
-     */
     public String getForeignTableName() {
         final ForeignKey fk = getForeignKey();
         return (fk == null ? "" : fk.getForeignTablePureName());
     }
 
-    /**
-     * Adds the foreign key from another table that refers to this column.
-     * @return The determination, true or false.
-     */
     public boolean isSingleKeyForeignKey() {
         final ForeignKey fk = getForeignKey();
         return (fk == null ? false : fk.isSimpleKeyFK());
     }
 
-    /**
-     * Utility method to get the related column of this local column if this
-     * column is a foreign key or part of a foreign key.
-     */
+    public boolean isInScopeAllowedForeignKey() {
+        return isSingleKeyForeignKey() && !getForeignKey().hasFixedCondition();
+    }
+
     public String getRelatedColumnName() {
         ForeignKey fk = getForeignKey();
         if (fk == null) {
@@ -1007,11 +995,6 @@ public class Column {
             }
         }
         return false;
-    }
-
-    public boolean isForeignTableSuppressDBAccessClass() {
-        final ForeignKey fk = getForeignKey();
-        return fk != null && fk.getForeignTable().isSuppressDBAccessClass();
     }
 
     // ===================================================================================
@@ -1079,22 +1062,6 @@ public class Column {
             _singleKeyReferrers.add(referrer);
         }
         return _singleKeyReferrers;
-    }
-
-    protected List<ForeignKey> _generatedDBAccessClassSingleKeyReferrers;
-
-    public List<ForeignKey> getGeneratedDBAccessClassSingleKeyReferrers() {
-        if (_generatedDBAccessClassSingleKeyReferrers != null) {
-            return _generatedDBAccessClassSingleKeyReferrers;
-        }
-        _generatedDBAccessClassSingleKeyReferrers = new ArrayList<ForeignKey>(5);
-        final List<ForeignKey> referrers = getSingleKeyReferrers();
-        for (ForeignKey referrer : referrers) {
-            if (!referrer.getTable().isSuppressDBAccessClass()) {
-                _generatedDBAccessClassSingleKeyReferrers.add(referrer);
-            }
-        }
-        return _generatedDBAccessClassSingleKeyReferrers;
     }
 
     public String getReferrerCommaString() {

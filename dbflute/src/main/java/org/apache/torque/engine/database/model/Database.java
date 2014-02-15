@@ -304,6 +304,17 @@ public class Database {
         return new ArrayList<Table>(tableSet);
     }
 
+    public List<Table> getBehaviorTableList() {
+        final List<Table> tableList = getTableList();
+        final List<Table> filteredList = new ArrayList<Table>();
+        for (Table table : tableList) {
+            if (!table.isSuppressDBAccessClass()) {
+                filteredList.add(table);
+            }
+        }
+        return filteredList;
+    }
+
     /**
      * Get the table by the table DB name.
      * @param tableDbName The DB name of the table to find. (NullAllowed: when e.g. Sql2Entity's related table)

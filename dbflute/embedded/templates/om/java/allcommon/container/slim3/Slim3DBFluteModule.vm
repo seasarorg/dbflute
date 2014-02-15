@@ -62,7 +62,7 @@ public class ${glDBFluteModule} {
         BehaviorCommandInvoker ker = behaviorCommandInvoker;
         BehaviorSelector tor = behaviorSelector;
         CommonColumnAutoSetupper per = commonColumnAutoSetupper;
-#foreach ($table in $database.tables)
+#foreach ($table in $database.behaviorTableList)
         {
             ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
 #if ($table.isWritable())

@@ -141,7 +141,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 #end
 #end
-#if (${col.isSingleKeyForeignKey()} && !${fk.hasFixedCondition()})
+#if (${col.isInScopeAllowedForeignKey()})
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
@@ -176,7 +176,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 #end
 #end
-#if (${col.isSingleKeyForeignKey()} && !${fk.hasFixedCondition()})
+#if (${col.isInScopeAllowedForeignKey()})
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
@@ -319,7 +319,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 #end
 #end
-#if (${col.isSingleKeyForeignKey()} && !${fk.hasFixedCondition()})
+#if (${col.isInScopeAllowedForeignKey()})
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeRelation_${fk.foreignPropertyNameInitCap}")
@@ -354,7 +354,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 #end
 #end
-#if (${col.isSingleKeyForeignKey()} && !${fk.hasFixedCondition()})
+#if (${col.isInScopeAllowedForeignKey()})
 #set ($relatedCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeRelation_${fk.foreignPropertyNameInitCap}")

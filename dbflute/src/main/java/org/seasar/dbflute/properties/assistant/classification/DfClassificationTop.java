@@ -69,7 +69,7 @@ public class DfClassificationTop {
     protected boolean _checkImplicitSet;
     protected boolean _useDocumentOnly;
     protected boolean _suppressAutoDeploy; // no automatic classification deployment
-    protected boolean _suppressDBAccessClass; // no behavior, condition-bean for table classification
+    protected boolean _suppressDBAccessClass; // closet: no DB-access class (e.g. behavior) for table classification
     protected boolean _deprecated;
     protected final Map<String, Map<String, Object>> _groupingMap = new LinkedHashMap<String, Map<String, Object>>();
     protected final Map<String, String> _deprecatedMap = new LinkedHashMap<String, String>();

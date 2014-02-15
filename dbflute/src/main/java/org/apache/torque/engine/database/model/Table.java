@@ -1529,7 +1529,7 @@ public class Table {
     // -----------------------------------------------------
     //                                               Arrange
     //                                               -------
-    protected List<ForeignKey> _singleKeyReferrers = null;
+    protected List<ForeignKey> _singleKeyReferrers;
 
     public boolean hasSingleKeyReferrer() {
         return !getSingleKeyReferrers().isEmpty();
@@ -1553,7 +1553,7 @@ public class Table {
         return _singleKeyReferrers;
     }
 
-    protected java.util.List<ForeignKey> _singleKeyStringOrIntegerReferrers = null;
+    protected List<ForeignKey> _singleKeyStringOrIntegerReferrers;
 
     public boolean hasSingleKeyStringOrIntegerReferrer() {
         return !getSingleKeyStringOrIntegerReferrers().isEmpty();

@@ -439,6 +439,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         setupTableClassification(classificationTop, elementList, metaElement, exceptCodeSet, conn, sql);
         final String classificationName = classificationTop.getClassificationName();
         _tableClassificationMap.put(classificationName, metaElement); // e.g. for auto-deploy and determination
+        metaElement.setClassificationTop(classificationTop);
     }
 
     protected String buildTableClassificationSql(DfClassificationElement element, String table, String where,
