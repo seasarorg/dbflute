@@ -157,6 +157,7 @@ import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties.NonCompilableChecker;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
@@ -2318,6 +2319,10 @@ public class Table {
         return getProperties().getCommonColumnProperties();
     }
 
+    protected DfIncludeQueryProperties getIncludeQueryProperties() {
+        return DfBuildProperties.getInstance().getIncludeQueryProperties();
+    }
+
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return getProperties().getLittleAdjustmentProperties();
     }
@@ -2328,6 +2333,25 @@ public class Table {
 
     protected DfOutsideSqlProperties getOutsideSqlProperties() {
         return getProperties().getOutsideSqlProperties();
+    }
+
+    // ===================================================================================
+    //                                                                       Include Query
+    //                                                                       =============
+    public boolean isAvailableMyselfScalarCondition() {
+        return getIncludeQueryProperties().isAvailableMyselfScalarCondition(getPrimaryKeyAsOne());
+    }
+
+    public boolean isAvailableMyselfMyselfDerived() {
+        return getIncludeQueryProperties().isAvailableMyselfMyselfDerived(getPrimaryKeyAsOne());
+    }
+
+    public boolean isAvailableMyselfMyselfExists() {
+        return getIncludeQueryProperties().isAvailableMyselfMyselfExists(getPrimaryKeyAsOne());
+    }
+
+    public boolean isAvailableMyselfMyselfInScope() {
+        return getIncludeQueryProperties().isAvailableMyselfMyselfInScope(getPrimaryKeyAsOne());
     }
 
     // ===================================================================================

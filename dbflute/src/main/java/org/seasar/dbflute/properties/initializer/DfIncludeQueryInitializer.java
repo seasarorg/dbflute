@@ -27,6 +27,8 @@ import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
+import org.seasar.dbflute.util.DfNameHintUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -73,19 +75,23 @@ public class DfIncludeQueryInitializer {
         final String allMark = DfIncludeQueryProperties.ALL_MARK;
         final String commonColumnMark = DfIncludeQueryProperties.COMMON_COLUMN_MARK;
         final String versionNoMark = DfIncludeQueryProperties.VERSION_NO_MARK;
+        final String typeMark = DfIncludeQueryProperties.TYPE_MARK;
+        final String[] hintMarks = DfNameHintUtil.getMarkList().toArray(new String[] {});
         for (Entry<String, Map<String, Map<String, List<String>>>> entry : map.entrySet()) {
             final String propType = entry.getKey();
             final Map<String, Map<String, List<String>>> ckeyMap = entry.getValue();
             _log.info(propType);
             for (Entry<String, Map<String, List<String>>> ckeyEntry : ckeyMap.entrySet()) {
                 final String ckey = ckeyEntry.getKey();
-                Map<String, List<String>> tableColumnMap = ckeyEntry.getValue();
+                final Map<String, List<String>> tableColumnMap = ckeyEntry.getValue();
                 final Set<String> tableElementKeySet = tableColumnMap.keySet();
                 _log.info("  " + ckey + " -> " + tableElementKeySet);
                 for (String tableName : tableElementKeySet) {
                     final boolean allTable = tableName.equalsIgnoreCase(allMark);
+                    final boolean markTable = Srl.containsAnyIgnoreCase(tableName, hintMarks);
+                    final boolean pureTable = !allTable && !markTable;
                     Table targetTable = null;
-                    if (!allTable) {
+                    if (pureTable) {
                         // check existence
                         targetTable = _tableFinder.findTable(tableName);
                         if (targetTable == null) {
@@ -95,13 +101,16 @@ public class DfIncludeQueryInitializer {
                     List<String> columnNameList = null;
                     try {
                         columnNameList = tableColumnMap.get(tableName);
-                    } catch (ClassCastException e) {
+                    } catch (ClassCastException e) { // also type check
                         throwIncludeQueryNotListColumnSpecificationException(ckey, tableName, map, e);
                     }
-                    for (String columnName : columnNameList) {
-                        if (!allTable) {
-                            if (!columnName.equalsIgnoreCase(commonColumnMark)
-                                    && !columnName.equalsIgnoreCase(versionNoMark)) {
+                    if (pureTable) {
+                        for (String columnName : columnNameList) {
+                            final boolean commonColumn = columnName.equalsIgnoreCase(commonColumnMark);
+                            final boolean versionNo = columnName.equalsIgnoreCase(versionNoMark);
+                            final boolean columnType = Srl.containsAnyIgnoreCase(columnName, typeMark);
+                            final boolean columnHint = Srl.containsAnyIgnoreCase(columnName, hintMarks);
+                            if (!commonColumn && !versionNo && !columnType && !columnHint) {
                                 // check existence
                                 final Column targetColumn = targetTable.getColumn(columnName);
                                 if (targetColumn == null) {

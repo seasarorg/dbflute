@@ -65,36 +65,36 @@ public class ${myClassName} extends AbstractDBMeta {
 #set ($setupperClassName = "Epg${col.javaName}")
 #if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
     public class ${setupperClassName} implements PropertyGateway {
-        public Object read(Entity e) { return ((${myExtendedObjectClassName})e).get${col.javaName}(); }
-        public void write(Entity e, Object v) {
+        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${col.javaName}(); }
+        public void write(Entity et, Object vl) {
             ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
 #if ($col.isCheckSelectedClassification())
-            ccls(col, v);
+            ccls(col, vl);
 #end
-            ((${myExtendedObjectClassName})e).set${col.javaName}As${col.classificationName}((${glCDef}.${col.classificationName})gcls(col, v));
+            ((${myExtendedObjectClassName})et).set${col.javaName}As${col.classificationName}((${glCDef}.${col.classificationName})gcls(col, vl));
         }
 #else
 ## /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## for different type between relation (Integer, Long and BigDecimal are prior)
 ## - - - - - - - - - -/
     public static class ${setupperClassName} implements PropertyGateway {
-        public Object read(Entity e) { return ((${myExtendedObjectClassName})e).get${col.javaName}(); }
+        public Object read(Entity et) { return ((${myExtendedObjectClassName})et).get${col.javaName}(); }
 #if ($col.isJavaNativeNumberObject())
 #if ($col.isJavaNativeInteger())
-        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}(cti(v)); }
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(cti(vl)); }
 #elseif ($col.isJavaNativeLong())
-        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}(ctl(v)); }
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(ctl(vl)); }
 #elseif ($col.isJavaNativeBigDecimal())
-        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}(ctb(v)); }
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(ctb(vl)); }
 #else
-        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}(ctn(v, ${col.javaNative}.class)); }
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}(ctn(vl, ${col.javaNative}.class)); }
 #end
 #else
 #if ($col.isJavaNativeUtilList())
         @SuppressWarnings("unchecked")
-        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}((${col.javaNative})v); }
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl); }
 #else
-        public void write(Entity e, Object v) { ((${myExtendedObjectClassName})e).set${col.javaName}((${col.javaNative})v); }
+        public void write(Entity et, Object vl) { ((${myExtendedObjectClassName})et).set${col.javaName}((${col.javaNative})vl); }
 #end
 #end
 #end
@@ -178,15 +178,15 @@ public class ${myClassName} extends AbstractDBMeta {
 #if ($fk.isSimpleKeyFK())
 #set ($col = $fk.localColumnAsOne)
 #set ($yourCol = ${fk.getForeignColumnByLocalColumn(${col})})
-        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #else
-        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMapSized(4);
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMapSized(4);
 #foreach ($col in $fk.localColumnList)
 #set ($yourCol = ${fk.getForeignColumnByLocalColumn(${col})})
-        map.put(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
+        mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${fk.foreignTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), map, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
+        return cfi("${fk.name}", "${fk.foreignJavaBeansRulePropertyName}", this, ${fk.foreignTableDBMetaClassName}.getInstance(), mp, ${table.resolveForeignIndex($fk)}, ${fk.isOneToOne()}, ${fk.isBizOneToOne()}, false, ${fk.isAdditionalForeignKey()}, ${fk.fixedConditionArg}, ${fk.dynamicFixedConditionDBMetaSetupList}, ${fk.isFixedInline()}, ${fk.foreignReverseRelationPropertyNameArg});
     }
 #end
 #foreach ($referrer in $table.referrerAsOneList)
@@ -195,15 +195,15 @@ public class ${myClassName} extends AbstractDBMeta {
 #if ($referrer.isSimpleKeyFK())
 #set ($col = $referrer.foreignColumnAsOne)
 #set ($yourCol = ${referrer.getLocalColumnByForeignColumn(${col})})
-        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #else
-        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMapSized(4);
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMapSized(4);
 #foreach ($col in $referrer.foreignColumnList)
 #set ($yourCol = ${referrer.getLocalColumnByForeignColumn(${col})})
-        map.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
+        mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourCol.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
+        return cfi("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), mp, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()}, ${referrer.isBizOneToOne()}, true, ${referrer.isAdditionalForeignKey()}, ${referrer.fixedConditionArg}, ${referrer.dynamicFixedConditionDBMetaSetupList}, ${referrer.isFixedInline()}, ${referrer.referrerReverseRelationPropertyNameArg});
     }
 #end
 
@@ -214,14 +214,14 @@ public class ${myClassName} extends AbstractDBMeta {
     public ReferrerInfo referrer${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
 #if ($referrer.isSimpleKeyFK())
 #set ($col = $referrer.foreignColumnAsOne)
-        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMap(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
 #else
-        Map<ColumnInfo, ColumnInfo> map = newLinkedHashMapSized(4);
+        Map<ColumnInfo, ColumnInfo> mp = newLinkedHashMapSized(4);
 #foreach ($col in $referrer.foreignColumnList)
-        map.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
+        mp.put(column${col.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${referrer.getLocalColumnByForeignColumn(${col}).javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cri("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyName}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${referrer.isOneToOne()}, ${referrer.referrerReverseRelationPropertyNameArg});
+        return cri("${referrer.name}", "${referrer.referrerJavaBeansRulePropertyName}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), mp, ${referrer.isOneToOne()}, ${referrer.referrerReverseRelationPropertyNameArg});
     }
 #end
 #if ($database.isMakeFlatExpansion())
@@ -340,10 +340,10 @@ public class ${myClassName} extends AbstractDBMeta {
     // ===================================================================================
     //                                                                   Map Communication
     //                                                                   =================
-    public void acceptPrimaryKeyMap(Entity e, Map<String, ? extends Object> m)
-    { doAcceptPrimaryKeyMap((${myExtendedObjectClassName})e, m); }
-    public void acceptAllColumnMap(Entity e, Map<String, ? extends Object> m)
-    { doAcceptAllColumnMap((${myExtendedObjectClassName})e, m); }
-    public Map<String, Object> extractPrimaryKeyMap(Entity e) { return doExtractPrimaryKeyMap(e); }
-    public Map<String, Object> extractAllColumnMap(Entity e) { return doExtractAllColumnMap(e); }
+    public void acceptPrimaryKeyMap(Entity et, Map<String, ? extends Object> mp)
+    { doAcceptPrimaryKeyMap((${myExtendedObjectClassName})et, mp); }
+    public void acceptAllColumnMap(Entity et, Map<String, ? extends Object> mp)
+    { doAcceptAllColumnMap((${myExtendedObjectClassName})et, mp); }
+    public Map<String, Object> extractPrimaryKeyMap(Entity et) { return doExtractPrimaryKeyMap(et); }
+    public Map<String, Object> extractAllColumnMap(Entity et) { return doExtractAllColumnMap(et); }
 }

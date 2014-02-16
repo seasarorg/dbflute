@@ -616,12 +616,13 @@ public class ${myClassName} extends AbstractConditionBean {
         public HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpPropertyNameInitCap}() {
             assertDerived("${tmpPropertyName}"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
             return new HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _qyCall.qy(), new HpSDRSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
-                public void setup(String function, SubQuery<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName, DerivedReferrerOption option) {
-                    cq.xsderive${referrer.referrerPropertyNameInitCap}(function, subQuery, aliasName, option); } }, _dbmetaProvider);
+                public void setup(String fn, SubQuery<${tmpCBClassName}> sq, ${tmpLocalCQClassName} cq, String al, DerivedReferrerOption op) {
+                    cq.xsderive${referrer.referrerPropertyNameInitCap}(fn, sq, al, op); } }, _dbmetaProvider);
         }
 #end
 #end
 #if ($table.hasSinglePrimaryKey())
+#if ($table.isAvailableMyselfMyselfDerived())
         /**
          * Prepare for (Specify)MyselfDerived (SubQuery).
          * @return The object to set up a function for myself table. (NotNull)
@@ -629,9 +630,10 @@ public class ${myClassName} extends AbstractConditionBean {
         public HpSDRFunction<${myConditionBeanClassName}, ${myConditionQueryClassName}> myselfDerived() {
             assertDerived("myselfDerived"); if (xhasSyncQyCall()) { xsyncQyCall().qy(); } // for sync (for example, this in ColumnQuery)
             return new HpSDRFunction<${myConditionBeanClassName}, ${myConditionQueryClassName}>(_baseCB, _qyCall.qy(), new HpSDRSetupper<${myConditionBeanClassName}, ${myConditionQueryClassName}>() {
-                public void setup(String function, SubQuery<${myConditionBeanClassName}> subQuery, ${myConditionQueryClassName} cq, String aliasName, DerivedReferrerOption option) {
-                    cq.xsmyselfDerive(function, subQuery, aliasName, option); } }, _dbmetaProvider);
+                public void setup(String fn, SubQuery<${myConditionBeanClassName}> sq, ${myConditionQueryClassName} cq, String al, DerivedReferrerOption op) {
+                    cq.xsmyselfDerive(fn, sq, al, op); } }, _dbmetaProvider);
         }
+#end
 #end
     }
 

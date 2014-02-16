@@ -956,31 +956,30 @@ public class Column {
     }
 
     public String getRelatedTableName() {
-        ForeignKey fk = getForeignKey();
-        return (fk == null ? null : fk.getForeignTablePureName());
+        final ForeignKey fk = getForeignKey();
+        return fk != null ? fk.getForeignTablePureName() : null;
     }
 
     public String getForeignTableName() {
         final ForeignKey fk = getForeignKey();
-        return (fk == null ? "" : fk.getForeignTablePureName());
+        return fk != null ? fk.getForeignTablePureName() : "";
     }
 
     public boolean isSingleKeyForeignKey() {
         final ForeignKey fk = getForeignKey();
-        return (fk == null ? false : fk.isSimpleKeyFK());
+        return fk != null ? fk.isSimpleKeyFK() : false;
     }
 
-    public boolean isInScopeAllowedForeignKey() {
+    public boolean isInScopeRelationAllowedForeignKey() {
+        if (!isMakeConditionQueryInScopeRelationToOne()) {
+            return false; // suppress InScopeRelation for many-to-one
+        }
         return isSingleKeyForeignKey() && !getForeignKey().hasFixedCondition();
     }
 
     public String getRelatedColumnName() {
-        ForeignKey fk = getForeignKey();
-        if (fk == null) {
-            return null;
-        } else {
-            return fk.getLocalForeignMapping().get(this._name).toString();
-        }
+        final ForeignKey fk = getForeignKey();
+        return fk != null ? fk.getLocalForeignMapping().get(this._name).toString() : null;
     }
 
     public boolean isDifferentJavaNativeFK() {
@@ -1062,6 +1061,56 @@ public class Column {
             _singleKeyReferrers.add(referrer);
         }
         return _singleKeyReferrers;
+    }
+
+    protected List<ForeignKey> _existsReferrerReferrers;
+
+    public List<ForeignKey> getExistsReferrerReferrers() {
+        if (_existsReferrerReferrers != null) {
+            return _existsReferrerReferrers;
+        }
+        _existsReferrerReferrers = new ArrayList<ForeignKey>(5);
+        if (!hasReferrer()) {
+            return _existsReferrerReferrers;
+        }
+        final List<ForeignKey> singleKeyReferrers = getSingleKeyReferrers();
+        final boolean toOne = isMakeConditionQueryExistsReferrerToOne();
+        for (ForeignKey referrer : singleKeyReferrers) {
+            if (!toOne && referrer.isOneToOne()) {
+                continue;
+            }
+            _existsReferrerReferrers.add(referrer);
+        }
+        return _existsReferrerReferrers;
+    }
+
+    protected List<ForeignKey> _inScopeRelationReferrers;
+
+    public List<ForeignKey> getInScopeRelationReferrers() {
+        if (_inScopeRelationReferrers != null) {
+            return _inScopeRelationReferrers;
+        }
+        _inScopeRelationReferrers = new ArrayList<ForeignKey>(5);
+        if (!hasReferrer()) {
+            return _inScopeRelationReferrers;
+        }
+        final List<ForeignKey> singleKeyReferrers = getSingleKeyReferrers();
+        final boolean toOne = isMakeConditionQueryInScopeRelationToOne();
+        for (ForeignKey referrer : singleKeyReferrers) {
+            if (!toOne && referrer.isOneToOne()) {
+                continue;
+            }
+            _inScopeRelationReferrers.add(referrer);
+        }
+        return _inScopeRelationReferrers;
+    }
+
+    protected boolean isMakeConditionQueryExistsReferrerToOne() {
+        return getLittleAdjustmentProperties().isMakeConditionQueryExistsReferrerToOne();
+    }
+
+    protected boolean isMakeConditionQueryInScopeRelationToOne() {
+        return getLittleAdjustmentProperties().isMakeConditionQueryInScopeRelationToOne();
     }
 
     public String getReferrerCommaString() {
@@ -1704,6 +1753,10 @@ public class Column {
         return getProperties().getClassificationProperties();
     }
 
+    protected DfIncludeQueryProperties getIncludeQueryProperties() {
+        return DfBuildProperties.getInstance().getIncludeQueryProperties();
+    }
+
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return getProperties().getLittleAdjustmentProperties();
     }
@@ -1930,8 +1983,15 @@ public class Column {
         return getIncludeQueryProperties().isAvailableDateNotInScope(this);
     }
 
-    protected DfIncludeQueryProperties getIncludeQueryProperties() {
-        return DfBuildProperties.getInstance().getIncludeQueryProperties();
+    // -----------------------------------------------------
+    //                                               OrderBy
+    //                                               -------
+    public boolean isAvailableOrderByAsc() {
+        return getIncludeQueryProperties().isAvailableOrderByAsc(this);
+    }
+
+    public boolean isAvailableOrderByDesc() {
+        return getIncludeQueryProperties().isAvailableOrderByDesc(this);
     }
 
     // ===================================================================================

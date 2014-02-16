@@ -175,10 +175,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectEntity(cb, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntity(final ${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntity(final ${myConditionBeanClassName} cb, Class<ENTITY> tp) {
         assertCBStateValid(cb);
-        return helpSelectEntityInternally(cb, entityType, new InternalSelectEntityCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return doSelectList(cb, entityType); } });
+        return helpSelectEntityInternally(cb, tp, new InternalSelectEntityCallback<ENTITY, ${myConditionBeanClassName}>() {
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) { return doSelectList(cb, tp); } });
     }
 
     @Override
@@ -204,10 +204,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectEntityWithDeletedCheck(cb, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb, Class<ENTITY> tp) {
         assertCBStateValid(cb);
-        return helpSelectEntityWithDeletedCheckInternally(cb, entityType, new InternalSelectEntityWithDeletedCheckCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return doSelectList(cb, entityType); } });
+        return helpSelectEntityWithDeletedCheckInternally(cb, tp, new InternalSelectEntityWithDeletedCheckCallback<ENTITY, ${myConditionBeanClassName}>() {
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) { return doSelectList(cb, tp); } });
     }
 
     @Override
@@ -277,11 +277,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectList(cb, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ListResultBean<ENTITY> doSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
-        assertCBStateValid(cb); assertObjectNotNull("entityType", entityType);
-        assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
-        return helpSelectListInternally(cb, entityType, new InternalSelectListCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return delegateSelectList(cb, entityType); } });
+    protected <ENTITY extends ${myExtendedObjectClassName}> ListResultBean<ENTITY> doSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+        assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
+        assertSpecifyDerivedReferrerEntityProperty(cb, tp);
+        return helpSelectListInternally(cb, tp, new InternalSelectListCallback<ENTITY, ${myConditionBeanClassName}>() {
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) { return delegateSelectList(cb, tp); } });
     }
 
     @Override
@@ -318,11 +318,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectPage(cb, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> PagingResultBean<ENTITY> doSelectPage(${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
-        assertCBStateValid(cb); assertObjectNotNull("entityType", entityType);
-        return helpSelectPageInternally(cb, entityType, new InternalSelectPageCallback<ENTITY, ${myConditionBeanClassName}>() {
+    protected <ENTITY extends ${myExtendedObjectClassName}> PagingResultBean<ENTITY> doSelectPage(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+        assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
+        return helpSelectPageInternally(cb, tp, new InternalSelectPageCallback<ENTITY, ${myConditionBeanClassName}>() {
             public int callbackSelectCount(${myConditionBeanClassName} cb) { return doSelectCountPlainly(cb); }
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return doSelectList(cb, entityType); }
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) { return doSelectList(cb, tp); }
         });
     }
 
@@ -352,12 +352,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         doSelectCursor(cb, entityRowHandler, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> void doSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
-        assertCBStateValid(cb); assertObjectNotNull("entityRowHandler<${myExtendedObjectClassName}>", entityRowHandler); assertObjectNotNull("entityType", entityType);
-        assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
-        helpSelectCursorInternally(cb, entityRowHandler, entityType, new InternalSelectCursorCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public void callbackSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) { delegateSelectCursor(cb, entityRowHandler, entityType); }
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) { return doSelectList(cb, entityType); }
+    protected <ENTITY extends ${myExtendedObjectClassName}> void doSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> handler, Class<ENTITY> tp) {
+        assertCBStateValid(cb); assertObjectNotNull("entityRowHandler", handler); assertObjectNotNull("entityType", tp);
+        assertSpecifyDerivedReferrerEntityProperty(cb, tp);
+        helpSelectCursorInternally(cb, handler, tp, new InternalSelectCursorCallback<ENTITY, ${myConditionBeanClassName}>() {
+            public void callbackSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> handler, Class<ENTITY> tp) { delegateSelectCursor(cb, handler, tp); }
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) { return doSelectList(cb, tp); }
         });
     }
 
@@ -383,18 +383,18 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doScalarSelect(resultType, newMyConditionBean());
     }
 
-    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> doScalarSelect(Class<RESULT> resultType, CB cb) {
-        assertObjectNotNull("resultType", resultType); assertCBStateValid(cb);
+    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> doScalarSelect(Class<RESULT> tp, CB cb) {
+        assertObjectNotNull("resultType", tp); assertCBStateValid(cb);
         cb.xsetupForScalarSelect(); cb.getSqlClause().disableSelectIndex(); // for when you use union
-        return createSLFunction(cb, resultType);
+        return createSLFunction(cb, tp);
     }
 
-    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> createSLFunction(CB cb, Class<RESULT> resultType) {
-        return new SLFunction<CB, RESULT>(cb, resultType);
+    protected <RESULT, CB extends ${myConditionBeanClassName}> SLFunction<CB, RESULT> createSLFunction(CB cb, Class<RESULT> tp) {
+        return new SLFunction<CB, RESULT>(cb, tp);
     }
 
-    protected <RESULT> SLFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> resultType) {
-        return doScalarSelect(resultType, newMyConditionBean());
+    protected <RESULT> SLFunction<? extends ConditionBean, RESULT> doReadScalar(Class<RESULT> tp) {
+        return doScalarSelect(tp, newMyConditionBean());
     }
 
     // ===================================================================================
@@ -411,8 +411,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectNextVal(${table.sequenceReturnType}.class);
     }
 
-    protected <RESULT> RESULT doSelectNextVal(Class<RESULT> resultType) {
-        return delegateSelectNextVal(resultType);
+    protected <RESULT> RESULT doSelectNextVal(Class<RESULT> tp) {
+        return delegateSelectNextVal(tp);
     }
 
 #end
@@ -513,30 +513,30 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
         helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
-            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} e)
+            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} et)
 #if ($referrer.canImplicitConversion())
-            { if (e.get${localColumn.javaName}() == null) { return null; }
+            { if (et.get${localColumn.javaName}() == null) { return null; }
 #if ($referrer.isConvertToReferrerByToString())
-              return e.get${localColumn.javaName}().toString(); }
+              return et.get${localColumn.javaName}().toString(); }
 #elseif ($referrer.isConvertToReferrerByConstructor())
-              return new ${keyJavaNative}(e.get${localColumn.javaName}().toString()); }
+              return new ${keyJavaNative}(et.get${localColumn.javaName}().toString()); }
 #elseif ($referrer.isConvertToReferrerByValueOf())
-              return ${keyJavaNative}.valueOf(e.get${localColumn.javaName}().toString()); }
+              return ${keyJavaNative}.valueOf(et.get${localColumn.javaName}().toString()); }
 #else
-              return e.get${localColumn.javaName}(); }
+              return et.get${localColumn.javaName}(); }
 #end
 #else
-            { return e.get${localColumn.javaName}(); }
+            { return et.get${localColumn.javaName}(); }
 #end
-            public void setRfLs(${myExtendedObjectClassName} e, List<${referrerEntityClassName}> ls)
-            { e.set${referrer.referrerPropertyNameInitCap}(ls); }
+            public void setRfLs(${myExtendedObjectClassName} et, List<${referrerEntityClassName}> ls)
+            { et.set${referrer.referrerPropertyNameInitCap}(ls); }
             public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
             public void qyFKIn(${referrerCBClassName} cb, List<${keyJavaNative}> ls)
             { cb.query().set${referrerColumn.javaName}_InScope(ls); }
             public void qyOdFKAsc(${referrerCBClassName} cb) { cb.query().addOrderBy_${referrerColumn.javaName}_Asc(); }
             public void spFKCol(${referrerCBClassName} cb) { cb.specify().column${referrerColumn.javaName}(); }
             public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
-            public ${keyJavaNative} getFKVal(${referrerEntityClassName} e) { return e.get${referrerColumn.javaName}(); }
+            public ${keyJavaNative} getFKVal(${referrerEntityClassName} re) { return re.get${referrerColumn.javaName}(); }
             public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le)
             { re.set${referrer.foreignPropertyNameInitCap}(le); }
             public String getRfPrNm() { return "${referrer.referrerPropertyName}"; }
@@ -555,14 +555,14 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
         helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${keyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
-            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} e) {
+            public ${keyJavaNative} getPKVal(${myExtendedObjectClassName} et) {
                 ${keyJavaNative} primaryKeyMap = new java.util.LinkedHashMap<String, Object>();
 #foreach ($col in $referrer.foreignColumnList)
-                primaryKeyMap.put("${col.javaName}", e.get${col.javaName}());
+                primaryKeyMap.put("${col.javaName}", et.get${col.javaName}());
 #end
                 return primaryKeyMap;
             }
-            public void setRfLs(${myExtendedObjectClassName} e, List<${referrerEntityClassName}> ls) { e.set${referrer.referrerPropertyNameInitCap}(ls); }
+            public void setRfLs(${myExtendedObjectClassName} et, List<${referrerEntityClassName}> ls) { et.set${referrer.referrerPropertyNameInitCap}(ls); }
             public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
             public void qyFKIn(${referrerCBClassName} cb, List<${keyJavaNative}> ls) {
                 final String aliasName = cb.getSqlClause().getBasePointAliasName();
@@ -596,11 +596,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
             }
             public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
-            public ${keyJavaNative} getFKVal(${referrerEntityClassName} e) {
+            public ${keyJavaNative} getFKVal(${referrerEntityClassName} re) {
                 ${keyJavaNative} foreignKeyMap = new java.util.LinkedHashMap<String, Object>();
 #foreach ($col in $referrer.localColumnList)
 #set ($foreignColumn = $referrer.getForeignColumnByLocalColumn($col))
-                foreignKeyMap.put("${foreignColumn.javaName}", e.get${col.javaName}());
+                foreignKeyMap.put("${foreignColumn.javaName}", re.get${col.javaName}());
 #end
                 return foreignKeyMap;
             }
@@ -678,18 +678,18 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      */
     public List<${foreignEntityClassName}> pullout${foreignKey.foreignPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
-            public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} e) { return e.get${foreignKey.foreignPropertyNameInitCap}(); }
+            public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} et) { return et.get${foreignKey.foreignPropertyNameInitCap}(); }
             public boolean hasRf() { return ${foreignKey.canBeReferrer()}; }
 #if ($foreignKey.canBeReferrer())
 #if ($foreignKey.isOneToOne())
-            public void setRfLs(${foreignEntityClassName} e, List<${myExtendedObjectClassName}> ls)
-            { if (!ls.isEmpty()) { e.set${foreignKey.referrerPropertyNameInitCapAsOne}(ls.get(0)); } }
+            public void setRfLs(${foreignEntityClassName} et, List<${myExtendedObjectClassName}> ls)
+            { if (!ls.isEmpty()) { et.set${foreignKey.referrerPropertyNameInitCapAsOne}(ls.get(0)); } }
 #else
-            public void setRfLs(${foreignEntityClassName} e, List<${myExtendedObjectClassName}> ls)
-            { e.set${foreignKey.referrerPropertyNameInitCap}(ls); }
+            public void setRfLs(${foreignEntityClassName} et, List<${myExtendedObjectClassName}> ls)
+            { et.set${foreignKey.referrerPropertyNameInitCap}(ls); }
 #end
 #else
-            public void setRfLs(${foreignEntityClassName} e, List<${myExtendedObjectClassName}> ls)
+            public void setRfLs(${foreignEntityClassName} et, List<${myExtendedObjectClassName}> ls)
             { throw new UnsupportedOperationException(); }
 #end
         });
@@ -705,10 +705,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      */
     public List<${referrerEntityClassName}> pullout${referrer.referrerPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}>() {
-            public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} e) { return e.get${referrer.referrerPropertyNameInitCapAsOne}(); }
+            public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} et) { return et.get${referrer.referrerPropertyNameInitCapAsOne}(); }
             public boolean hasRf() { return ${referrer.canBeReferrer()}; }
-            public void setRfLs(${referrerEntityClassName} e, List<${myExtendedObjectClassName}> ls)
-            { if (!ls.isEmpty()) { e.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
+            public void setRfLs(${referrerEntityClassName} et, List<${myExtendedObjectClassName}> ls)
+            { if (!ls.isEmpty()) { et.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
         });
     }
 #end
@@ -725,7 +725,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      */
     public List<${pkCol.javaNative}> extract${pkCol.javaName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${pkCol.javaNative}>() {
-            public ${pkCol.javaNative} getCV(${myExtendedObjectClassName} e) { return e.get${pkCol.javaName}(); }
+            public ${pkCol.javaNative} getCV(${myExtendedObjectClassName} et) { return et.get${pkCol.javaName}(); }
         });
     }
 #end
@@ -738,7 +738,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      */
     public List<${uqCol.javaNative}> extract${uqCol.javaName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpExtractListInternally(${myEntityListVariableName}, new InternalExtractCallback<${myExtendedObjectClassName}, ${uqCol.javaNative}>() {
-            public ${uqCol.javaNative} getCV(${myExtendedObjectClassName} e) { return e.get${uqCol.javaName}(); }
+            public ${uqCol.javaNative} getCV(${myExtendedObjectClassName} et) { return et.get${uqCol.javaName}(); }
         });
     }
 #end
@@ -774,24 +774,24 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
     }
 
-    protected void doInsert(${myExtendedObjectClassName} ${myEntityVariableName}, InsertOption<${myConditionBeanClassName}> option) {
+    protected void doInsert(${myExtendedObjectClassName} ${myEntityVariableName}, InsertOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
-        prepareInsertOption(option);
-        delegateInsert(${myEntityVariableName}, option);
+        prepareInsertOption(op);
+        delegateInsert(${myEntityVariableName}, op);
     }
 
-    protected void prepareInsertOption(InsertOption<${myConditionBeanClassName}> option) {
-        if (option == null) { return; }
-        assertInsertOptionStatus(option);
-        if (option.hasSpecifiedInsertColumn()) {
-            option.resolveInsertColumnSpecification(createCBForSpecifiedUpdate());
+    protected void prepareInsertOption(InsertOption<${myConditionBeanClassName}> op) {
+        if (op == null) { return; }
+        assertInsertOptionStatus(op);
+        if (op.hasSpecifiedInsertColumn()) {
+            op.resolveInsertColumnSpecification(createCBForSpecifiedUpdate());
         }
     }
 
     @Override
-    protected void doCreate(Entity entity, InsertOption<? extends ConditionBean> option) {
-        if (option == null) { insert(downcast(entity)); }
-        else { varyingInsert(downcast(entity), downcast(option)); }
+    protected void doCreate(Entity et, InsertOption<? extends ConditionBean> op) {
+        if (op == null) { insert(downcast(et)); }
+        else { varyingInsert(downcast(et), downcast(op)); }
     }
 
     /**
@@ -828,21 +828,21 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         doUpdate(${myEntityVariableName}, null);
     }
 
-    protected void doUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> option) {
+    protected void doUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
-        prepareUpdateOption(option);
+        prepareUpdateOption(op);
         helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateUpdate(${myExtendedObjectClassName} entity) { return delegateUpdate(entity, option); } });
+            public int callbackDelegateUpdate(${myExtendedObjectClassName} et) { return delegateUpdate(et, op); } });
     }
 
-    protected void prepareUpdateOption(UpdateOption<${myConditionBeanClassName}> option) {
-        if (option == null) { return; }
-        assertUpdateOptionStatus(option);
-        if (option.hasSelfSpecification()) {
-            option.resolveSelfSpecification(createCBForVaryingUpdate());
+    protected void prepareUpdateOption(UpdateOption<${myConditionBeanClassName}> op) {
+        if (op == null) { return; }
+        assertUpdateOptionStatus(op);
+        if (op.hasSelfSpecification()) {
+            op.resolveSelfSpecification(createCBForVaryingUpdate());
         }
-        if (option.hasSpecifiedUpdateColumn()) {
-            option.resolveUpdateColumnSpecification(createCBForSpecifiedUpdate());
+        if (op.hasSpecifiedUpdateColumn()) {
+            op.resolveUpdateColumnSpecification(createCBForSpecifiedUpdate());
         }
     }
 
@@ -859,9 +859,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @Override
-    protected void doModify(Entity entity, UpdateOption<? extends ConditionBean> option) {
-        if (option == null) { update(downcast(entity)); }
-        else { varyingUpdate(downcast(entity), downcast(option)); }
+    protected void doModify(Entity et, UpdateOption<? extends ConditionBean> op) {
+        if (op == null) { update(downcast(et)); }
+        else { varyingUpdate(downcast(et), downcast(op)); }
     }
 #if ($table.hasOptimisticLock())
 
@@ -888,21 +888,21 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         doUpdateNonstrict(${myEntityVariableName}, null);
     }
 
-    protected void doUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> option) {
+    protected void doUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final UpdateOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
-        prepareUpdateOption(option);
+        prepareUpdateOption(op);
         helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateUpdateNonstrict(${myExtendedObjectClassName} entity) { return delegateUpdateNonstrict(entity, option); } });
+            public int callbackDelegateUpdateNonstrict(${myExtendedObjectClassName} et) { return delegateUpdateNonstrict(et, op); } });
     }
 #end
 
     @Override
-    protected void doModifyNonstrict(Entity entity, UpdateOption<? extends ConditionBean> option) {
+    protected void doModifyNonstrict(Entity et, UpdateOption<? extends ConditionBean> op) {
 #if ($table.hasOptimisticLock())
-        if (option == null) { updateNonstrict(downcast(entity)); }
-        else { varyingUpdateNonstrict(downcast(entity), downcast(option)); }
+        if (op == null) { updateNonstrict(downcast(et)); }
+        else { varyingUpdateNonstrict(downcast(et), downcast(op)); }
 #else
-        doModify(entity, option);
+        doModify(et, op);
 #end
     }
 
@@ -927,23 +927,22 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         doInesrtOrUpdate(${myEntityVariableName}, null, null);
     }
 
-    protected void doInesrtOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, final InsertOption<${myConditionBeanClassName}> insertOption, final UpdateOption<${myConditionBeanClassName}> updateOption) {
+    protected void doInesrtOrUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, final InsertOption<${myConditionBeanClassName}> iop, final UpdateOption<${myConditionBeanClassName}> uop) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
-            public void callbackInsert(${myExtendedObjectClassName} entity) { doInsert(entity, insertOption); }
-            public void callbackUpdate(${myExtendedObjectClassName} entity) { doUpdate(entity, updateOption); }
+            public void callbackInsert(${myExtendedObjectClassName} et) { doInsert(et, iop); }
+            public void callbackUpdate(${myExtendedObjectClassName} et) { doUpdate(et, uop); }
             public ${myConditionBeanClassName} callbackNewMyConditionBean() { return newMyConditionBean(); }
             public int callbackSelectCount(${myConditionBeanClassName} cb) { return selectCount(cb); }
         });
     }
 
     @Override
-    protected void doCreateOrModify(Entity entity, InsertOption<? extends ConditionBean> insertOption,
-            UpdateOption<? extends ConditionBean> updateOption) {
-        if (insertOption == null && updateOption == null) { insertOrUpdate(downcast(entity)); }
+    protected void doCreateOrModify(Entity et, InsertOption<? extends ConditionBean> iop, UpdateOption<? extends ConditionBean> uop) {
+        if (iop == null && uop == null) { insertOrUpdate(downcast(et)); }
         else {
-            insertOption = insertOption == null ? new InsertOption<${myConditionBeanClassName}>() : insertOption;
-            updateOption = updateOption == null ? new UpdateOption<${myConditionBeanClassName}>() : updateOption;
-            varyingInsertOrUpdate(downcast(entity), downcast(insertOption), downcast(updateOption));
+            iop = iop != null ? iop : new InsertOption<${myConditionBeanClassName}>();
+            uop = uop != null ? uop : new UpdateOption<${myConditionBeanClassName}>();
+            varyingInsertOrUpdate(downcast(et), downcast(iop), downcast(uop));
         }
     }
 #if ($table.hasOptimisticLock())
@@ -961,26 +960,25 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         doInesrtOrUpdateNonstrict(${myEntityVariableName}, null, null);
     }
 
-    protected void doInesrtOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final InsertOption<${myConditionBeanClassName}> insertOption, final UpdateOption<${myConditionBeanClassName}> updateOption) {
+    protected void doInesrtOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final InsertOption<${myConditionBeanClassName}> iop, final UpdateOption<${myConditionBeanClassName}> uop) {
         helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
-            public void callbackInsert(${myExtendedObjectClassName} entity) { doInsert(entity, insertOption); }
-            public void callbackUpdateNonstrict(${myExtendedObjectClassName} entity) { doUpdateNonstrict(entity, updateOption); }
+            public void callbackInsert(${myExtendedObjectClassName} et) { doInsert(et, iop); }
+            public void callbackUpdateNonstrict(${myExtendedObjectClassName} et) { doUpdateNonstrict(et, uop); }
         });
     }
 #end
 
     @Override
-    protected void doCreateOrModifyNonstrict(Entity entity, InsertOption<? extends ConditionBean> insertOption,
-            UpdateOption<? extends ConditionBean> updateOption) {
+    protected void doCreateOrModifyNonstrict(Entity et, InsertOption<? extends ConditionBean> iop, UpdateOption<? extends ConditionBean> uop) {
 #if ($table.hasOptimisticLock())
-        if (insertOption == null && updateOption == null) { insertOrUpdateNonstrict(downcast(entity)); }
+        if (iop == null && uop == null) { insertOrUpdateNonstrict(downcast(et)); }
         else {
-            insertOption = insertOption == null ? new InsertOption<${myConditionBeanClassName}>() : insertOption;
-            updateOption = updateOption == null ? new UpdateOption<${myConditionBeanClassName}>() : updateOption;
-            varyingInsertOrUpdateNonstrict(downcast(entity), downcast(insertOption), downcast(updateOption));
+            iop = iop != null ? iop : new InsertOption<${myConditionBeanClassName}>();
+            uop = uop != null ? uop : new UpdateOption<${myConditionBeanClassName}>();
+            varyingInsertOrUpdateNonstrict(downcast(et), downcast(iop), downcast(uop));
         }
 #else
-        doCreateOrModify(entity, insertOption, updateOption);
+        doCreateOrModify(et, iop, uop);
 #end
     }
 
@@ -1013,22 +1011,22 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         doDelete(${myEntityVariableName}, null);
     }
 
-    protected void doDelete(${myExtendedObjectClassName} ${myEntityVariableName}, final DeleteOption<${myConditionBeanClassName}> option) {
+    protected void doDelete(${myExtendedObjectClassName} ${myEntityVariableName}, final DeleteOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
-        prepareDeleteOption(option);
+        prepareDeleteOption(op);
         helpDeleteInternally(${myEntityVariableName}, new InternalDeleteCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateDelete(${myExtendedObjectClassName} entity) { return delegateDelete(entity, option); } });
+            public int callbackDelegateDelete(${myExtendedObjectClassName} et) { return delegateDelete(et, op); } });
     }
 
-    protected void prepareDeleteOption(DeleteOption<${myConditionBeanClassName}> option) {
-        if (option == null) { return; }
-        assertDeleteOptionStatus(option);
+    protected void prepareDeleteOption(DeleteOption<${myConditionBeanClassName}> op) {
+        if (op == null) { return; }
+        assertDeleteOptionStatus(op);
     }
 
     @Override
-    protected void doRemove(Entity entity, DeleteOption<? extends ConditionBean> option) {
-        if (option == null) { delete(downcast(entity)); }
-        else { varyingDelete(downcast(entity), downcast(option)); }
+    protected void doRemove(Entity et, DeleteOption<? extends ConditionBean> op) {
+        if (op == null) { delete(downcast(et)); }
+        else { varyingDelete(downcast(et), downcast(op)); }
     }
 #if ($table.hasOptimisticLock())
 
@@ -1050,11 +1048,11 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         doDeleteNonstrict(${myEntityVariableName}, null);
     }
 
-    protected void doDeleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final DeleteOption<${myConditionBeanClassName}> option) {
+    protected void doDeleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}, final DeleteOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
-        prepareDeleteOption(option);
+        prepareDeleteOption(op);
         helpDeleteNonstrictInternally(${myEntityVariableName}, new InternalDeleteNonstrictCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity, option); } });
+            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} et) { return delegateDeleteNonstrict(et, op); } });
     }
 
     /**
@@ -1075,21 +1073,21 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         doDeleteNonstrictIgnoreDeleted(${myEntityVariableName}, null);
     }
 
-    protected void doDeleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}, final DeleteOption<${myConditionBeanClassName}> option) {
+    protected void doDeleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}, final DeleteOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName});
-        prepareDeleteOption(option);
+        prepareDeleteOption(op);
         helpDeleteNonstrictIgnoreDeletedInternally(${myEntityVariableName}, new InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}>() {
-            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity, option); } });
+            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} et) { return delegateDeleteNonstrict(et, op); } });
     }
 #end
 
     @Override
-    protected void doRemoveNonstrict(Entity entity, DeleteOption<? extends ConditionBean> option) {
+    protected void doRemoveNonstrict(Entity et, DeleteOption<? extends ConditionBean> op) {
 #if ($table.hasOptimisticLock())
-        if (option == null) { deleteNonstrict(downcast(entity)); }
-        else { varyingDeleteNonstrict(downcast(entity), downcast(option)); }
+        if (op == null) { deleteNonstrict(downcast(et)); }
+        else { varyingDeleteNonstrict(downcast(et), downcast(op)); }
 #else
-        doRemove(entity, option);
+        doRemove(et, op);
 #end
     }
 
@@ -1121,31 +1119,31 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * @return The array of inserted count. (NotNull, EmptyAllowed)
      */
     public int[] batchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        InsertOption<${myConditionBeanClassName}> option = createInsertUpdateOption();
-        return doBatchInsert(${myEntityListVariableName}, option);
+        InsertOption<${myConditionBeanClassName}> op = createInsertUpdateOption();
+        return doBatchInsert(${myEntityListVariableName}, op);
     }
 
-    protected int[] doBatchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, InsertOption<${myConditionBeanClassName}> option) {
+    protected int[] doBatchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, InsertOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        prepareBatchInsertOption(${myEntityListVariableName}, option);
-        return delegateBatchInsert(${myEntityListVariableName}, option);
+        prepareBatchInsertOption(${myEntityListVariableName}, op);
+        return delegateBatchInsert(${myEntityListVariableName}, op);
     }
 
-    protected void prepareBatchInsertOption(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, InsertOption<${myConditionBeanClassName}> option) {
+    protected void prepareBatchInsertOption(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, InsertOption<${myConditionBeanClassName}> op) {
 #if ($database.isBatchInsertColumnModifiedPropertiesFragmentedAllowed())
-        option.xallowInsertColumnModifiedPropertiesFragmented();
+        op.xallowInsertColumnModifiedPropertiesFragmented();
 #end
 #if ($database.isCompatibleBatchInsertDefaultEveryColumn())
-        option.xtoBeCompatibleBatchInsertDefaultEveryColumn();
+        op.xtoBeCompatibleBatchInsertDefaultEveryColumn();
 #end
-        option.xacceptInsertColumnModifiedPropertiesIfNeeds(${myEntityListVariableName});
-        prepareInsertOption(option);
+        op.xacceptInsertColumnModifiedPropertiesIfNeeds(${myEntityListVariableName});
+        prepareInsertOption(op);
     }
 
     @Override
-    protected int[] doLumpCreate(List<Entity> ls, InsertOption<? extends ConditionBean> option) {
-        if (option == null) { return batchInsert(downcast(ls)); }
-        else { return varyingBatchInsert(downcast(ls), downcast(option)); }
+    protected int[] doLumpCreate(List<Entity> ls, InsertOption<? extends ConditionBean> op) {
+        if (op == null) { return batchInsert(downcast(ls)); }
+        else { return varyingBatchInsert(downcast(ls), downcast(op)); }
     }
 
     /**
@@ -1181,31 +1179,31 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
      */
     public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
-        UpdateOption<${myConditionBeanClassName}> option = createPlainUpdateOption();
-        return doBatchUpdate(${myEntityListVariableName}, option);
+        UpdateOption<${myConditionBeanClassName}> op = createPlainUpdateOption();
+        return doBatchUpdate(${myEntityListVariableName}, op);
     }
 
-    protected int[] doBatchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
+    protected int[] doBatchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        prepareBatchUpdateOption(${myEntityListVariableName}, option);
-        return delegateBatchUpdate(${myEntityListVariableName}, option);
+        prepareBatchUpdateOption(${myEntityListVariableName}, op);
+        return delegateBatchUpdate(${myEntityListVariableName}, op);
     }
 
-    protected void prepareBatchUpdateOption(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
+    protected void prepareBatchUpdateOption(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> op) {
 #if ($database.isBatchUpdateColumnModifiedPropertiesFragmentedAllowed())
-        option.xallowUpdateColumnModifiedPropertiesFragmented();
+        op.xallowUpdateColumnModifiedPropertiesFragmented();
 #end
 #if ($database.isCompatibleBatchUpdateDefaultEveryColumn())
-        option.xtoBeCompatibleBatchUpdateDefaultEveryColumn();
+        op.xtoBeCompatibleBatchUpdateDefaultEveryColumn();
 #end
-        option.xacceptUpdateColumnModifiedPropertiesIfNeeds(${myEntityListVariableName});
-        prepareUpdateOption(option);
+        op.xacceptUpdateColumnModifiedPropertiesIfNeeds(${myEntityListVariableName});
+        prepareUpdateOption(op);
     }
 
     @Override
-    protected int[] doLumpModify(List<Entity> ls, UpdateOption<? extends ConditionBean> option) {
-        if (option == null) { return batchUpdate(downcast(ls)); }
-        else { return varyingBatchUpdate(downcast(ls), downcast(option)); }
+    protected int[] doLumpModify(List<Entity> ls, UpdateOption<? extends ConditionBean> op) {
+        if (op == null) { return batchUpdate(downcast(ls)); }
+        else { return varyingBatchUpdate(downcast(ls), downcast(op)); }
     }
 
     /**
@@ -1278,10 +1276,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doBatchUpdateNonstrict(${myEntityListVariableName}, option);
     }
 
-    protected int[] doBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> option) {
+    protected int[] doBatchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, UpdateOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        prepareBatchUpdateOption(${myEntityListVariableName}, option);
-        return delegateBatchUpdateNonstrict(${myEntityListVariableName}, option);
+        prepareBatchUpdateOption(${myEntityListVariableName}, op);
+        return delegateBatchUpdateNonstrict(${myEntityListVariableName}, op);
     }
 
     /**
@@ -1317,12 +1315,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 #end
 
     @Override
-    protected int[] doLumpModifyNonstrict(List<Entity> ls, UpdateOption<? extends ConditionBean> option) {
+    protected int[] doLumpModifyNonstrict(List<Entity> ls, UpdateOption<? extends ConditionBean> op) {
 #if ($table.hasOptimisticLock())
-        if (option == null) { return batchUpdateNonstrict(downcast(ls)); }
-        else { return varyingBatchUpdateNonstrict(downcast(ls), downcast(option)); }
+        if (op == null) { return batchUpdateNonstrict(downcast(ls)); }
+        else { return varyingBatchUpdateNonstrict(downcast(ls), downcast(op)); }
 #else
-        return doLumpModify(ls, option);
+        return doLumpModify(ls, op);
 #end
     }
 
@@ -1345,16 +1343,16 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doBatchDelete(${myEntityListVariableName}, null);
     }
 
-    protected int[] doBatchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> option) {
+    protected int[] doBatchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        prepareDeleteOption(option);
-        return delegateBatchDelete(${myEntityListVariableName}, option);
+        prepareDeleteOption(op);
+        return delegateBatchDelete(${myEntityListVariableName}, op);
     }
 
     @Override
-    protected int[] doLumpRemove(List<Entity> ls, DeleteOption<? extends ConditionBean> option) {
-        if (option == null) { return batchDelete(downcast(ls)); }
-        else { return varyingBatchDelete(downcast(ls), downcast(option)); }
+    protected int[] doLumpRemove(List<Entity> ls, DeleteOption<? extends ConditionBean> op) {
+        if (op == null) { return batchDelete(downcast(ls)); }
+        else { return varyingBatchDelete(downcast(ls), downcast(op)); }
     }
 #if ($table.hasOptimisticLock())
 
@@ -1369,20 +1367,20 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doBatchDeleteNonstrict(${myEntityListVariableName}, null);
     }
 
-    protected int[] doBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> option) {
+    protected int[] doBatchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, DeleteOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
-        prepareDeleteOption(option);
-        return delegateBatchDeleteNonstrict(${myEntityListVariableName}, option);
+        prepareDeleteOption(op);
+        return delegateBatchDeleteNonstrict(${myEntityListVariableName}, op);
     }
 #end
 
     @Override
-    protected int[] doLumpRemoveNonstrict(List<Entity> ls, DeleteOption<? extends ConditionBean> option) {
+    protected int[] doLumpRemoveNonstrict(List<Entity> ls, DeleteOption<? extends ConditionBean> op) {
 #if ($table.hasOptimisticLock())
-        if (option == null) { return batchDeleteNonstrict(downcast(ls)); }
-        else { return varyingBatchDeleteNonstrict(downcast(ls), downcast(option)); }
+        if (op == null) { return batchDeleteNonstrict(downcast(ls)); }
+        else { return varyingBatchDeleteNonstrict(downcast(ls), downcast(op)); }
 #else
-        return doLumpRemove(ls, option);
+        return doLumpRemove(ls, op);
 #end
     }
 
@@ -1419,13 +1417,12 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doQueryInsert(setupper, null);
     }
 
-    protected int doQueryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> setupper, InsertOption<${myConditionBeanClassName}> option) {
-        assertObjectNotNull("setupper", setupper);
-        prepareInsertOption(option);
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${myConditionBeanClassName} intoCB = createCBForQueryInsert();
-        ConditionBean resourceCB = setupper.setup(entity, intoCB);
-        return delegateQueryInsert(entity, intoCB, resourceCB, option);
+    protected int doQueryInsert(QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> sp, InsertOption<${myConditionBeanClassName}> op) {
+        assertObjectNotNull("setupper", sp);
+        prepareInsertOption(op);
+        ${myExtendedObjectClassName} e = new ${myExtendedObjectClassName}();
+        ${myConditionBeanClassName} cb = createCBForQueryInsert();
+        return delegateQueryInsert(e, cb, sp.setup(e, cb), op);
     }
 
     protected ${myConditionBeanClassName} createCBForQueryInsert() {
@@ -1466,16 +1463,16 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doQueryUpdate(${myEntityVariableName}, cb, null);
     }
 
-    protected int doQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> option) {
+    protected int doQueryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op) {
         assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertCBStateValid(cb);
-        prepareUpdateOption(option);
-        return checkCountBeforeQueryUpdateIfNeeds(cb) ? delegateQueryUpdate(${myEntityVariableName}, cb, option) : 0;
+        prepareUpdateOption(op);
+        return checkCountBeforeQueryUpdateIfNeeds(cb) ? delegateQueryUpdate(${myEntityVariableName}, cb, op) : 0;
     }
 
     @Override
-    protected int doRangeModify(Entity entity, ConditionBean cb, UpdateOption<? extends ConditionBean> option) {
-        if (option == null) { return queryUpdate(downcast(entity), (${myConditionBeanClassName})cb); }
-        else { return varyingQueryUpdate(downcast(entity), (${myConditionBeanClassName})cb, downcast(option)); }
+    protected int doRangeModify(Entity et, ConditionBean cb, UpdateOption<? extends ConditionBean> op) {
+        if (op == null) { return queryUpdate(downcast(et), (${myConditionBeanClassName})cb); }
+        else { return varyingQueryUpdate(downcast(et), (${myConditionBeanClassName})cb, downcast(op)); }
     }
 
     /**
@@ -1493,16 +1490,16 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doQueryDelete(cb, null);
     }
 
-    protected int doQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> option) {
+    protected int doQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> op) {
         assertCBStateValid(cb);
-        prepareDeleteOption(option);
-        return checkCountBeforeQueryUpdateIfNeeds(cb) ? delegateQueryDelete(cb, option) : 0;
+        prepareDeleteOption(op);
+        return checkCountBeforeQueryUpdateIfNeeds(cb) ? delegateQueryDelete(cb, op) : 0;
     }
 
     @Override
-    protected int doRangeRemove(ConditionBean cb, DeleteOption<? extends ConditionBean> option) {
-        if (option == null) { return queryDelete((${myConditionBeanClassName})cb); }
-        else { return varyingQueryDelete((${myConditionBeanClassName})cb, downcast(option)); }
+    protected int doRangeRemove(ConditionBean cb, DeleteOption<? extends ConditionBean> op) {
+        if (op == null) { return queryDelete((${myConditionBeanClassName})cb); }
+        else { return varyingQueryDelete((${myConditionBeanClassName})cb, downcast(op)); }
     }
 
     // ===================================================================================
@@ -2000,45 +1997,45 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                ------
     protected int delegateSelectCountUniquely(${myConditionBeanClassName} cb) { return invoke(createSelectCountCBCommand(cb, true)); }
     protected int delegateSelectCountPlainly(${myConditionBeanClassName} cb) { return invoke(createSelectCountCBCommand(cb, false)); }
-    protected <ENTITY extends ${myExtendedObjectClassName}> void delegateSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> erh, Class<ENTITY> et)
-    { invoke(createSelectCursorCBCommand(cb, erh, et)); }
-    protected <ENTITY extends ${myExtendedObjectClassName}> List<ENTITY> delegateSelectList(${myConditionBeanClassName} cb, Class<ENTITY> et)
-    { return invoke(createSelectListCBCommand(cb, et)); }
+    protected <ENTITY extends ${myExtendedObjectClassName}> void delegateSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> rh, Class<ENTITY> tp)
+    { invoke(createSelectCursorCBCommand(cb, rh, tp)); }
+    protected <ENTITY extends ${myExtendedObjectClassName}> List<ENTITY> delegateSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp)
+    { return invoke(createSelectListCBCommand(cb, tp)); }
 #if ($table.isUseSequence())
-    protected <RESULT> RESULT delegateSelectNextVal(Class<RESULT> rt) { return invoke(createSelectNextValCommand(rt)); }
+    protected <RESULT> RESULT delegateSelectNextVal(Class<RESULT> tp) { return invoke(createSelectNextValCommand(tp)); }
 #end
 #if ($table.isUseSubColumnSequence())
-    protected <RESULT> RESULT delegateSelectNextValSub(Class<RESULT> rt, String col, String seq, Integer inc, Integer cac)
-    { return invoke(createSelectNextValSubCommand(rt, col, seq, inc, cac)); }
+    protected <RESULT> RESULT delegateSelectNextValSub(Class<RESULT> tp, String col, String seq, Integer inc, Integer cac)
+    { return invoke(createSelectNextValSubCommand(tp, col, seq, inc, cac)); }
 #end
 #if ($table.isWritable())
 
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    protected int delegateInsert(${myExtendedObjectClassName} e, InsertOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeInsert(e, op)) { return 0; }
-      return invoke(createInsertEntityCommand(e, op)); }
-    protected int delegateUpdate(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeUpdate(e, op)) { return 0; }
+    protected int delegateInsert(${myExtendedObjectClassName} et, InsertOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeInsert(et, op)) { return 0; }
+      return invoke(createInsertEntityCommand(et, op)); }
+    protected int delegateUpdate(${myExtendedObjectClassName} et, UpdateOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeUpdate(et, op)) { return 0; }
 #if ($table.hasOptimisticLock())
-      return invoke(createUpdateEntityCommand(e, op)); }
+      return invoke(createUpdateEntityCommand(et, op)); }
 #else
-      return delegateUpdateNonstrict(e, op); }
+      return delegateUpdateNonstrict(et, op); }
 #end
-    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e, UpdateOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeUpdate(e, op)) { return 0; }
-      return invoke(createUpdateNonstrictEntityCommand(e, op)); }
-    protected int delegateDelete(${myExtendedObjectClassName} e, DeleteOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeDelete(e, op)) { return 0; }
+    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} et, UpdateOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeUpdate(et, op)) { return 0; }
+      return invoke(createUpdateNonstrictEntityCommand(et, op)); }
+    protected int delegateDelete(${myExtendedObjectClassName} et, DeleteOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeDelete(et, op)) { return 0; }
 #if ($table.hasOptimisticLock())
-      return invoke(createDeleteEntityCommand(e, op)); }
+      return invoke(createDeleteEntityCommand(et, op)); }
 #else
-      return delegateDeleteNonstrict(e, op); }
+      return delegateDeleteNonstrict(et, op); }
 #end
-    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e, DeleteOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeDelete(e, op)) { return 0; }
-      return invoke(createDeleteNonstrictEntityCommand(e, op)); }
+    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} et, DeleteOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeDelete(et, op)) { return 0; }
+      return invoke(createDeleteNonstrictEntityCommand(et, op)); }
 
     protected int[] delegateBatchInsert(List<${myExtendedObjectClassName}> ls, InsertOption<${myConditionBeanClassName}> op)
     { if (ls.isEmpty()) { return new int[]{}; }
@@ -2064,18 +2061,18 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     { if (ls.isEmpty()) { return new int[]{}; }
       return invoke(createBatchDeleteNonstrictCommand(processBatchInternally(ls, op, true), op)); }
 
-    protected int delegateQueryInsert(${myExtendedObjectClassName} e, ${myConditionBeanClassName} inCB, ConditionBean resCB, InsertOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeQueryInsert(e, inCB, resCB, op)) { return 0; } return invoke(createQueryInsertCBCommand(e, inCB, resCB, op));  }
-    protected int delegateQueryUpdate(${myExtendedObjectClassName} e, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op)
-    { if (!processBeforeQueryUpdate(e, cb, op)) { return 0; } return invoke(createQueryUpdateCBCommand(e, cb, op));  }
+    protected int delegateQueryInsert(${myExtendedObjectClassName} et, ${myConditionBeanClassName} inCB, ConditionBean resCB, InsertOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeQueryInsert(et, inCB, resCB, op)) { return 0; } return invoke(createQueryInsertCBCommand(et, inCB, resCB, op));  }
+    protected int delegateQueryUpdate(${myExtendedObjectClassName} et, ${myConditionBeanClassName} cb, UpdateOption<${myConditionBeanClassName}> op)
+    { if (!processBeforeQueryUpdate(et, cb, op)) { return 0; } return invoke(createQueryUpdateCBCommand(et, cb, op));  }
     protected int delegateQueryDelete(${myConditionBeanClassName} cb, DeleteOption<${myConditionBeanClassName}> op)
     { if (!processBeforeQueryDelete(cb, op)) { return 0; } return invoke(createQueryDeleteCBCommand(cb, op));  }
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
-    protected int delegateInsert(${myExtendedObjectClassName} e, InsertOption<${myConditionBeanClassName}> op) {
+    protected int delegateInsert(${myExtendedObjectClassName} et, InsertOption<${myConditionBeanClassName}> op) {
         // only filtering for extension is supported (filtering for common columns is unsupported)
-        assertEntityNotNull(e); filterEntityOfInsert(e, op);
-        return invoke(createInsertEntityCommand(e, op));
+        assertEntityNotNull(et); filterEntityOfInsert(et, op);
+        return invoke(createInsertEntityCommand(et, op));
     }
 #end
 #end
@@ -2086,22 +2083,22 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     //                                                                     ===============
 #if ($table.hasBehaviorFilterBeforeInsertColumn())
     @Override
-    protected void filterEntityOfInsert(Entity targetEntity, InsertOption<? extends ConditionBean> option) {
-        super.filterEntityOfInsert(targetEntity, option);
-        ${myExtendedObjectClassName} entity = downcast(targetEntity);
+    protected void filterEntityOfInsert(Entity tgt, InsertOption<? extends ConditionBean> op) {
+        super.filterEntityOfInsert(tgt, op);
+        ${myExtendedObjectClassName} et = downcast(tgt);
 #foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
-        entity.set${column.javaName}(${column.behaviorFilterBeforeInsertColumnExpression});
+        et.set${column.javaName}(${column.behaviorFilterBeforeInsertColumnExpression});
 #end
     }
 #end
 #if ($table.isWritable())
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
     @Override
-    protected void filterEntityOfUpdate(Entity targetEntity, UpdateOption<? extends ConditionBean> option) {
-        super.filterEntityOfUpdate(targetEntity, option);
-        ${myExtendedObjectClassName} entity = downcast(targetEntity);
+    protected void filterEntityOfUpdate(Entity tgt, UpdateOption<? extends ConditionBean> op) {
+        super.filterEntityOfUpdate(tgt, op);
+        ${myExtendedObjectClassName} et = downcast(tgt);
 #foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
-        entity.set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
+        et.set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
 #end
     }
 #end
@@ -2141,9 +2138,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * {@inheritDoc}
      */
     @Override
-    protected boolean hasVersionNoValue(Entity entity) {
+    protected boolean hasVersionNoValue(Entity et) {
 #if ($table.isUseVersionNo())
-        return !(downcast(entity).get${table.versionNoJavaName}() + "").equals("null");// For primitive type
+        return !(downcast(et).get${table.versionNoJavaName}() + "").equals("null");// For primitive type
 #else
         return false;
 #end
@@ -2153,9 +2150,9 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
      * {@inheritDoc}
      */
     @Override
-    protected boolean hasUpdateDateValue(Entity entity) {
+    protected boolean hasUpdateDateValue(Entity et) {
 #if ($table.isUseUpdateDate())
-        return downcast(entity).get${table.updateDateJavaName}() != null;
+        return downcast(et).get${table.updateDateJavaName}() != null;
 #else
         return false;
 #end
@@ -2164,8 +2161,8 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     // ===================================================================================
     //                                                                     Downcast Helper
     //                                                                     ===============
-    protected ${myExtendedObjectClassName} downcast(Entity entity) {
-        return helpEntityDowncastInternally(entity, ${myExtendedObjectClassName}.class);
+    protected ${myExtendedObjectClassName} downcast(Entity et) {
+        return helpEntityDowncastInternally(et, ${myExtendedObjectClassName}.class);
     }
 
     protected ${myConditionBeanClassName} downcast(ConditionBean cb) {
@@ -2173,29 +2170,29 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     }
 
     @SuppressWarnings("unchecked")
-    protected List<${myExtendedObjectClassName}> downcast(List<? extends Entity> entityList) {
-        return (List<${myExtendedObjectClassName}>)entityList;
+    protected List<${myExtendedObjectClassName}> downcast(List<? extends Entity> ls) {
+        return (List<${myExtendedObjectClassName}>)ls;
     }
 #if ($table.isWritable())
 
     @SuppressWarnings("unchecked")
-    protected InsertOption<${myConditionBeanClassName}> downcast(InsertOption<? extends ConditionBean> option) {
-        return (InsertOption<${myConditionBeanClassName}>)option;
+    protected InsertOption<${myConditionBeanClassName}> downcast(InsertOption<? extends ConditionBean> op) {
+        return (InsertOption<${myConditionBeanClassName}>)op;
     }
 
     @SuppressWarnings("unchecked")
-    protected UpdateOption<${myConditionBeanClassName}> downcast(UpdateOption<? extends ConditionBean> option) {
-        return (UpdateOption<${myConditionBeanClassName}>)option;
+    protected UpdateOption<${myConditionBeanClassName}> downcast(UpdateOption<? extends ConditionBean> op) {
+        return (UpdateOption<${myConditionBeanClassName}>)op;
     }
 
     @SuppressWarnings("unchecked")
-    protected DeleteOption<${myConditionBeanClassName}> downcast(DeleteOption<? extends ConditionBean> option) {
-        return (DeleteOption<${myConditionBeanClassName}>)option;
+    protected DeleteOption<${myConditionBeanClassName}> downcast(DeleteOption<? extends ConditionBean> op) {
+        return (DeleteOption<${myConditionBeanClassName}>)op;
     }
 
     @SuppressWarnings("unchecked")
-    protected QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> downcast(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> option) {
-        return (QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}>)option;
+    protected QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}> downcast(QueryInsertSetupper<? extends Entity, ? extends ConditionBean> sp) {
+        return (QueryInsertSetupper<${myExtendedObjectClassName}, ${myConditionBeanClassName}>)sp;
     }
 #end
 }

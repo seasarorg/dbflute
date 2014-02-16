@@ -160,6 +160,16 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isMakeConditionQueryNotEqualAsStandard() ? "CK_NES" : "CK_NET";
     }
 
+    public boolean isMakeConditionQueryExistsReferrerToOne() { // closet
+        // default is true but it might be false at future...
+        return isProperty("isMakeConditionQueryExistsReferrerToOne", true);
+    }
+
+    public boolean isMakeConditionQueryInScopeRelationToOne() { // closet
+        // default is true but it might be false at future...
+        return isProperty("isMakeConditionQueryInScopeRelationToOne", true);
+    }
+
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============

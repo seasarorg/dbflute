@@ -23,7 +23,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.torque.engine.database.model.Column;
-import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -36,6 +36,12 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public static final String ALL_MARK = "$$ALL$$";
     public static final String COMMON_COLUMN_MARK = "$$CommonColumn$$";
     public static final String VERSION_NO_MARK = "$$VersionNo$$";
+    public static final String TYPE_MARK = "type:";
+    protected static final String PROP_STRING = "String";
+    protected static final String PROP_NUMBER = "Number";
+    protected static final String PROP_DATE = "Date";
+    protected static final String PROP_ORDER_BY = "OrderBy";
+    protected static final String PROP_MYSELF = "Myself";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -108,142 +114,172 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     //                                                String
     //                                                ------
     public boolean isAvailableStringNotEqual(Column column) {
-        return isAvailable("String", "NotEqual", column);
+        return isAvailable(PROP_STRING, "NotEqual", column);
     }
 
     public boolean isAvailableStringGreaterThan(Column column) {
-        return isAvailable("String", "GreaterThan", column);
+        return isAvailable(PROP_STRING, "GreaterThan", column);
     }
 
     public boolean isAvailableStringGreaterEqual(Column column) {
-        return isAvailable("String", "GreaterEqual", column);
+        return isAvailable(PROP_STRING, "GreaterEqual", column);
     }
 
     public boolean isAvailableStringLessThan(Column column) {
-        return isAvailable("String", "LessThan", column);
+        return isAvailable(PROP_STRING, "LessThan", column);
     }
 
     public boolean isAvailableStringLessEqual(Column column) {
-        return isAvailable("String", "LessEqual", column);
+        return isAvailable(PROP_STRING, "LessEqual", column);
     }
 
     public boolean isAvailableStringInScope(Column column) {
-        return isAvailable("String", "InScope", column);
+        return isAvailable(PROP_STRING, "InScope", column);
     }
 
     public boolean isAvailableStringNotInScope(Column column) {
-        return isAvailable("String", "NotInScope", column);
+        return isAvailable(PROP_STRING, "NotInScope", column);
     }
 
     public boolean isAvailableStringPrefixSearch(Column column) {
-        return isAvailable("String", "PrefixSearch", column);
+        return isAvailable(PROP_STRING, "PrefixSearch", column);
     }
 
     public boolean isAvailableStringLikeSearch(Column column) {
-        return isAvailable("String", "LikeSearch", column);
+        return isAvailable(PROP_STRING, "LikeSearch", column);
     }
 
     public boolean isAvailableStringNotLikeSearch(Column column) {
-        return isAvailable("String", "NotLikeSearch", column);
+        return isAvailable(PROP_STRING, "NotLikeSearch", column);
     }
 
     public boolean isAvailableStringEmptyString(Column column) {
-        return isAvailable("String", "EmptyString", column);
+        return isAvailable(PROP_STRING, "EmptyString", column);
     }
 
     // -----------------------------------------------------
     //                                                Number
     //                                                ------
     public boolean isAvailableNumberNotEqual(Column column) {
-        return isAvailable("Number", "NotEqual", column);
+        return isAvailable(PROP_NUMBER, "NotEqual", column);
     }
 
     public boolean isAvailableNumberGreaterThan(Column column) {
-        return isAvailable("Number", "GreaterThan", column);
+        return isAvailable(PROP_NUMBER, "GreaterThan", column);
     }
 
     public boolean isAvailableNumberGreaterEqual(Column column) {
-        return isAvailable("Number", "GreaterEqual", column);
+        return isAvailable(PROP_NUMBER, "GreaterEqual", column);
     }
 
     public boolean isAvailableNumberLessThan(Column column) {
-        return isAvailable("Number", "LessThan", column);
+        return isAvailable(PROP_NUMBER, "LessThan", column);
     }
 
     public boolean isAvailableNumberLessEqual(Column column) {
-        return isAvailable("Number", "LessEqual", column);
+        return isAvailable(PROP_NUMBER, "LessEqual", column);
     }
 
     public boolean isAvailableNumberRangeOf(Column column) {
-        return isAvailable("Number", "RangeOf", column);
+        return isAvailable(PROP_NUMBER, "RangeOf", column);
     }
 
     public boolean isAvailableNumberInScope(Column column) {
-        return isAvailable("Number", "InScope", column);
+        return isAvailable(PROP_NUMBER, "InScope", column);
     }
 
     public boolean isAvailableNumberNotInScope(Column column) {
-        return isAvailable("Number", "NotInScope", column);
+        return isAvailable(PROP_NUMBER, "NotInScope", column);
     }
 
     // -----------------------------------------------------
     //                                                  Date
     //                                                  ----
     public boolean isAvailableDateNotEqual(Column column) {
-        return isAvailable("Date", "NotEqual", column);
+        return isAvailable(PROP_DATE, "NotEqual", column);
     }
 
     public boolean isAvailableDateGreaterThan(Column column) {
-        return isAvailable("Date", "GreaterThan", column);
+        return isAvailable(PROP_DATE, "GreaterThan", column);
     }
 
     public boolean isAvailableDateGreaterEqual(Column column) {
-        return isAvailable("Date", "GreaterEqual", column);
+        return isAvailable(PROP_DATE, "GreaterEqual", column);
     }
 
     public boolean isAvailableDateLessThan(Column column) {
-        return isAvailable("Date", "LessThan", column);
+        return isAvailable(PROP_DATE, "LessThan", column);
     }
 
     public boolean isAvailableDateLessEqual(Column column) {
-        return isAvailable("Date", "LessEqual", column);
+        return isAvailable(PROP_DATE, "LessEqual", column);
     }
 
     public boolean isAvailableDateFromTo(Column column) {
-        return isAvailable("Date", "FromTo", column); // means FromTo of Date type
+        return isAvailable(PROP_DATE, "FromTo", column); // means FromTo of Date type
     }
 
     public boolean isAvailableDateDateFromTo(Column column) {
-        return isAvailable("Date", "DateFromTo", column); // means DateFromTo of Date type
+        return isAvailable(PROP_DATE, "DateFromTo", column); // means DateFromTo of Date type
     }
 
     public boolean isAvailableDateInScope(Column column) {
-        return isAvailable("Date", "InScope", column);
+        return isAvailable(PROP_DATE, "InScope", column);
     }
 
     public boolean isAvailableDateNotInScope(Column column) {
-        return isAvailable("Date", "NotInScope", column);
+        return isAvailable(PROP_DATE, "NotInScope", column);
+    }
+
+    // -----------------------------------------------------
+    //                                               OrderBy
+    //                                               -------
+    public boolean isAvailableOrderByAsc(Column column) {
+        return isAvailable(PROP_ORDER_BY, "Asc", column);
+    }
+
+    public boolean isAvailableOrderByDesc(Column column) {
+        return isAvailable(PROP_ORDER_BY, "Desc", column);
+    }
+
+    // -----------------------------------------------------
+    //                                               Primary
+    //                                               -------
+    public boolean isAvailableMyselfScalarCondition(Column column) {
+        return isAvailable(PROP_MYSELF, "ScalarCondition", column);
+    }
+
+    public boolean isAvailableMyselfMyselfDerived(Column column) {
+        return isAvailable(PROP_MYSELF, "MyselfDerived", column);
+    }
+
+    public boolean isAvailableMyselfMyselfExists(Column column) {
+        return isAvailable(PROP_MYSELF, "MyselfExists", column);
+    }
+
+    public boolean isAvailableMyselfMyselfInScope(Column column) {
+        return isAvailable(PROP_MYSELF, "MyselfInScope", column);
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected boolean isAvailable(String propType, String ckey, Column column) {
-        if (containsQueryTypeIncludeQueryMap(propType, ckey)) {
+        if (hasQueryTypeIncludeQueryMap(propType, ckey)) {
             return containsTableColumnIncludeQueryMap(propType, ckey, column);
         }
-        if (containsQueryTypeExcludeQueryMap(propType, ckey)) {
+        if (hasQueryTypeExcludeQueryMap(propType, ckey)) {
             return !containsTableColumnExcludeQueryMap(propType, ckey, column);
         }
         return true;
     }
 
-    protected boolean containsQueryTypeIncludeQueryMap(String propType, String ckey) {
+    protected boolean hasQueryTypeIncludeQueryMap(String propType, String ckey) {
         final Map<String, Map<String, List<String>>> map = getIncludeQueryMap().get(propType);
         return map != null && map.get(ckey) != null;
     }
 
-    protected boolean containsQueryTypeExcludeQueryMap(String propType, String ckey) {
+    protected boolean hasQueryTypeExcludeQueryMap(String propType, String ckey) {
         final Map<String, Map<String, List<String>>> map = getExcludeQueryMap().get(propType);
         return map != null && map.get(ckey) != null;
     }
@@ -258,6 +294,42 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 
     protected boolean doContainsTableColumnQueryMap(String propType, String ckey, Column column,
             Map<String, Map<String, Map<String, List<String>>>> queryMap) {
+        assertQueryMap(propType, ckey, queryMap);
+        final String tableDbName = column.getTable().getTableDbName();
+        final String columnName = column.getName();
+        final Set<String> columnSet = gatherColumnSet(propType, ckey, queryMap, tableDbName);
+        if (PROP_MYSELF.equalsIgnoreCase(propType)) { // e.g. ScalarCondition, MyselfDerived
+            return columnSet != null; // empty column list means specified
+        } else {
+            if (columnSet == null || columnSet.isEmpty()) {
+                return false;
+            }
+        }
+        // either has a list element
+        if (columnSet.contains(COMMON_COLUMN_MARK) && column.isCommonColumn()) {
+            return true;
+        }
+        if (columnSet.contains(VERSION_NO_MARK) && column.isVersionNo()) {
+            return true;
+        }
+        final String typeMark = TYPE_MARK;
+        for (String columnExp : columnSet) {
+            if (Srl.startsWithIgnoreCase(columnExp, typeMark)) { // e.g. type:LONGVARCHAR
+                final String specifiedType = Srl.substringFirstRear(columnExp, typeMark).trim();
+                final String jdbcType = column.getJdbcType();
+                if (jdbcType != null && jdbcType.equalsIgnoreCase(specifiedType)) {
+                    return true;
+                }
+            }
+            if (isHitByTheHint(columnName, columnExp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void assertQueryMap(String propType, String ckey,
+            Map<String, Map<String, Map<String, List<String>>>> queryMap) {
         if (queryMap.get(propType) == null) {
             String msg = "The propType[" + propType + "] should have the value of queryMap:";
             msg = msg + " " + queryMap;
@@ -268,35 +340,21 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             msg = msg + " " + queryMap;
             throw new IllegalStateException(msg);
         }
-        final String tableDbName = column.getTable().getTableDbName();
-        final String columnName = column.getName();
-        final Map<String, List<String>> map = queryMap.get(propType).get(ckey);
-        final Map<String, List<String>> tableFlexibleMap = StringKeyMap.createAsFlexible();
-        tableFlexibleMap.putAll(map);
-        if (!tableFlexibleMap.containsKey(tableDbName) && !tableFlexibleMap.containsKey(ALL_MARK)) {
-            return false;
-        }
-        // either has a list element
-        final Set<String> columnSet = new HashSet<String>();
-        final List<String> pinpointList = tableFlexibleMap.get(tableDbName);
-        if (pinpointList != null) {
-            columnSet.addAll(pinpointList);
-        }
-        final List<String> allTableList = tableFlexibleMap.get(ALL_MARK);
-        if (allTableList != null) {
-            columnSet.addAll(allTableList);
-        }
-        if (columnSet.contains(COMMON_COLUMN_MARK) && column.isCommonColumn()) {
-            return true;
-        }
-        if (columnSet.contains(VERSION_NO_MARK) && column.isVersionNo()) {
-            return true;
-        }
-        for (String columnExp : columnSet) {
-            if (isHitByTheHint(columnName, columnExp)) {
-                return true;
+    }
+
+    protected Set<String> gatherColumnSet(String propType, String ckey,
+            Map<String, Map<String, Map<String, List<String>>>> queryMap, final String tableDbName) {
+        final Map<String, List<String>> tableColumnMap = queryMap.get(propType).get(ckey);
+        Set<String> columnSet = null;
+        for (Entry<String, List<String>> entry : tableColumnMap.entrySet()) {
+            final String tableHint = entry.getKey();
+            if (ALL_MARK.equalsIgnoreCase(tableHint) || isHitByTheHint(tableDbName, tableHint)) {
+                if (columnSet == null) {
+                    columnSet = new HashSet<String>();
+                }
+                columnSet.addAll(entry.getValue());
             }
         }
-        return false;
+        return columnSet;
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +29,16 @@ public class DfNameHintUtil {
     public static final String PREFIX_MARK = "prefix:";
     public static final String SUFFIX_MARK = "suffix:";
     public static final String CONTAIN_MARK = "contain:";
+    public static final List<String> _markList = new ArrayList<String>();
+    static {
+        _markList.add(PREFIX_MARK);
+        _markList.add(SUFFIX_MARK);
+        _markList.add(CONTAIN_MARK);
+    }
+
+    public static final List<String> getMarkList() {
+        return _markList;
+    }
 
     // ===================================================================================
     //                                                                              Target
