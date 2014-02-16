@@ -96,7 +96,7 @@ public class DfProcedureExecutionMetaExtractor {
         final List<DfProcedureColumnMeta> columnList = procedure.getProcedureColumnList();
         if (!needsToCall(columnList)) {
             final String name = procedure.buildProcedureLoggingName();
-            _log.info("*not needed to call: " + name + " params=" + buildParameterTypeView(columnList));
+            _log.info("...Skipping unneeded call: " + name + " params=" + buildParameterTypeView(columnList));
             return;
         }
         final List<Object> testValueList = DfCollectionUtil.newArrayList();
@@ -203,7 +203,7 @@ public class DfProcedureExecutionMetaExtractor {
             br.addElement(buildTestValueDisp(testValueList));
             br.addItem("Exception Message");
             br.addElement(DfJDBCException.extractMessage(e));
-            SQLException nextEx = e.getNextException();
+            final SQLException nextEx = e.getNextException();
             if (nextEx != null) {
                 br.addElement(DfJDBCException.extractMessage(nextEx));
             }
@@ -213,14 +213,19 @@ public class DfProcedureExecutionMetaExtractor {
                 throw new DfProcedureExecutionMetaGettingFailureException(msg, e);
             } else { // if no specified, it continues
                 _continuedFailureMessageMap.put(procedure.getProcedureFullQualifiedName(), msg);
-                _log.info(msg);
+                _log.info("*Failed to call so read the warning message diplayed later");
             }
         } finally {
             if (cs != null) {
                 cs.close();
             }
             if (conn != null) {
-                conn.rollback();
+                try {
+                    conn.rollback();
+                } catch (SQLException continued) { // one day Oracle suddenly threw it (by socket trouble?)
+                    final String exp = DfJDBCException.extractMessage(continued);
+                    _log.info("*Failed to roll-back the procedure call but continued: " + exp);
+                }
             }
         }
     }
@@ -228,12 +233,17 @@ public class DfProcedureExecutionMetaExtractor {
     protected String buildTestValueDisp(List<Object> testValueList) {
         final StringBuilder sb = new StringBuilder();
         sb.append("{");
+        int index = 0;
         for (Object value : testValueList) {
+            if (index > 0) {
+                sb.append(", ");
+            }
             if (value instanceof String) {
                 sb.append("\"").append(value).append("\"");
             } else {
                 sb.append(value);
             }
+            ++index;
         }
         sb.append("}");
         return sb.toString();

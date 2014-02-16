@@ -90,6 +90,7 @@ public class DfProcedurePmbSetupper {
         _log.info(" ");
         _log.info("...Setting up procedures for generating parameter-beans");
         final List<DfProcedureMeta> procedureList = getAvailableProcedureList();
+        _log.info("");
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         for (DfProcedureMeta procedure : procedureList) {
             final Map<String, String> propertyNameTypeMap = DfCollectionUtil.newLinkedHashMap();

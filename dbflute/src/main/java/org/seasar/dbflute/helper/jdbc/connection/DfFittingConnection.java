@@ -38,7 +38,7 @@ import java.util.Properties;
  */
 public class DfFittingConnection implements Connection {
 
-    protected Connection _realConnection;
+    protected final Connection _realConnection;
 
     public DfFittingConnection(Connection realConnection) {
         _realConnection = realConnection;
