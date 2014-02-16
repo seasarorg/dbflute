@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -55,6 +56,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     //                                                                   =================
     protected Map<String, Map<String, Map<String, List<String>>>> _includeQueryMap;
     protected final Map<String, Map<String, Map<String, List<String>>>> _excludeQueryMap = newLinkedHashMap();
+    protected final Map<String, Map<String, Map<String, List<String>>>> _excludeReviveQueryMap = newLinkedHashMap();
 
     public Map<String, Map<String, Map<String, List<String>>>> getIncludeQueryMap() {
         if (_includeQueryMap != null) {
@@ -62,26 +64,31 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         }
         final Map<String, Map<String, Map<String, List<String>>>> resultMap = newLinkedHashMap();
         final Map<String, Object> targetMap = mapProp("torque.includeQueryMap", DEFAULT_EMPTY_MAP);
-        final Set<String> targetKeySet = targetMap.keySet();
-        for (String propType : targetKeySet) {
-            final Object value = targetMap.get(propType);
+        for (Entry<String, Object> propEntry : targetMap.entrySet()) {
+            final String propType = propEntry.getKey();
+            final Object value = propEntry.getValue();
             if (!(value instanceof Map)) {
                 String msg = "The key[includeQueryMap] should have map value.";
                 msg = msg + " But the value is " + value + ": targetMap=" + targetMap;
-                throw new IllegalStateException(msg);
+                throw new DfIllegalPropertyTypeException(msg);
             }
             final Map<String, Map<String, List<String>>> elementMap = newLinkedHashMap();
             @SuppressWarnings("unchecked")
             final Map<String, Object> queryMap = (Map<String, Object>) value;
-            for (Entry<String, Object> entry : queryMap.entrySet()) {
-                final String ckey = entry.getKey();
-                final Object tableColumnObj = entry.getValue();
+            for (Entry<String, Object> queryEntry : queryMap.entrySet()) {
+                final String ckey = queryEntry.getKey();
+                final Object tableColumnObj = queryEntry.getValue();
                 if (ckey.startsWith("!")) { // means exclude
                     final String filteredKey = ckey.substring("!".length());
                     @SuppressWarnings("unchecked")
                     final Map<String, List<String>> tableColumnMap = (Map<String, List<String>>) tableColumnObj;
                     reflectExcludeQuery(propType, filteredKey, tableColumnMap);
-                } else { // main (include)
+                } else if (ckey.startsWith("%")) { // means exclude-revive
+                    final String filteredKey = ckey.substring("%".length());
+                    @SuppressWarnings("unchecked")
+                    final Map<String, List<String>> tableColumnMap = (Map<String, List<String>>) tableColumnObj;
+                    reflectExcludeReviveQuery(propType, filteredKey, tableColumnMap);
+                } else { // means independent include
                     @SuppressWarnings("unchecked")
                     final Map<String, List<String>> tableColumnMap = (Map<String, List<String>>) tableColumnObj;
                     elementMap.put(ckey, tableColumnMap);
@@ -98,11 +105,25 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return _excludeQueryMap;
     }
 
+    public Map<String, Map<String, Map<String, List<String>>>> getExcludeReviveQueryMap() {
+        getIncludeQueryMap(); // initialize
+        return _excludeReviveQueryMap;
+    }
+
     protected void reflectExcludeQuery(String javaType, String queryType, Map<String, List<String>> tableColumnMap) {
         Map<String, Map<String, List<String>>> elementMap = _excludeQueryMap.get(javaType);
         if (elementMap == null) {
             elementMap = newLinkedHashMap();
             _excludeQueryMap.put(javaType, elementMap);
+        }
+        elementMap.put(queryType, tableColumnMap);
+    }
+
+    protected void reflectExcludeReviveQuery(String javaType, String queryType, Map<String, List<String>> tableColumnMap) {
+        Map<String, Map<String, List<String>>> elementMap = _excludeReviveQueryMap.get(javaType);
+        if (elementMap == null) {
+            elementMap = newLinkedHashMap();
+            _excludeReviveQueryMap.put(javaType, elementMap);
         }
         elementMap.put(queryType, tableColumnMap);
     }
@@ -269,9 +290,20 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             return containsTableColumnIncludeQueryMap(propType, ckey, column);
         }
         if (hasQueryTypeExcludeQueryMap(propType, ckey)) {
-            return !containsTableColumnExcludeQueryMap(propType, ckey, column);
+            final boolean excluded = containsTableColumnExcludeQueryMap(propType, ckey, column);
+            if (excluded) {
+                if (hasQueryTypeExcludeReviveQueryMap(propType, ckey)) {
+                    final boolean revived = containsTableColumnExcludeReviveQueryMap(propType, ckey, column);
+                    if (revived) {
+                        return true; // excluded but revived
+                    }
+                }
+                return false; // excluded
+            } else {
+                return true; // not excluded
+            }
         }
-        return true;
+        return true; // as default
     }
 
     protected boolean hasQueryTypeIncludeQueryMap(String propType, String ckey) {
@@ -284,12 +316,21 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return map != null && map.get(ckey) != null;
     }
 
+    protected boolean hasQueryTypeExcludeReviveQueryMap(String propType, String ckey) {
+        final Map<String, Map<String, List<String>>> map = getExcludeReviveQueryMap().get(propType);
+        return map != null && map.get(ckey) != null;
+    }
+
     protected boolean containsTableColumnIncludeQueryMap(String propType, String ckey, Column column) {
         return doContainsTableColumnQueryMap(propType, ckey, column, getIncludeQueryMap());
     }
 
     protected boolean containsTableColumnExcludeQueryMap(String propType, String ckey, Column column) {
         return doContainsTableColumnQueryMap(propType, ckey, column, getExcludeQueryMap());
+    }
+
+    protected boolean containsTableColumnExcludeReviveQueryMap(String propType, String ckey, Column column) {
+        return doContainsTableColumnQueryMap(propType, ckey, column, getExcludeReviveQueryMap());
     }
 
     protected boolean doContainsTableColumnQueryMap(String propType, String ckey, Column column,
