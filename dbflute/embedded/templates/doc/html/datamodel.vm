@@ -486,11 +486,23 @@ ${database.schemaHtmlJavaScriptEmbedded}
 <script>
 /**
  * Incremental Search contributed by makotot (Thanks!)
+ *
+ * and extended by jflute:
+ *  o style adjustment
+ *  o varying name index
+ *  o prefix search priority
  */
+
+// this index value depends on DBFlute settings
+// so defines it here as global for easy-to-understand
+#if ($isAliasDelimiterInDbCommentValid)
+var NAME_INDEX = 2; // number, alias, name
+#else
+var NAME_INDEX = 1; // number, name
+#end
 
 function Incremental (targetInput, dist) {
 	this.targetInput = targetInput;
-	this.targetParent = this.targetInput.parentNode;
 	this.dist = dist;
 	this.query = '';
 	this.suggestionIdx = 0;
@@ -516,30 +528,39 @@ Incremental.prototype = {
 	 */
 	buildSuggestList: function () {
 		var fragment = document.createDocumentFragment(),
-			ul = document.getElementById('suggestion-list'),
-			li, anchor;
+			ul = document.getElementById('suggestion-list');
 
 		this.ul = ul;
+		this.setupLinkElement(fragment); // for prefix area
+		this.setupLinkElement(fragment); // for contain area
+		ul.appendChild(fragment);
+
+		this.attachSuggestionEvent();
+	},
+
+	/**
+	 * @method setupLinkElement
+	 */
+	setupLinkElement: function (fragment) {
+		var li, anchor;
 		for (var i = 0, max = this.distDataList.length; i < max; i++) {
 			li = document.createElement('li');
 			li.style.display = 'none';
 			anchor = document.createElement('a');
 			anchor.href = this.sectionList[i];
 
+			var distData = this.distDataList[i];
 			if (document.body.dataset) {
-				anchor.dataset.name = this.distDataList[i];
+				anchor.dataset.name = distData;
 			} else {
-				anchor.setAttribute('data-name', this.distDataList[i]);
+				anchor.setAttribute('data-name', distData); // for searching
 			}
 
-			this.util.setElemTxt(anchor, this.distDataList[i]);
+			this.util.setElemTxt(anchor, distData); // for display
 
 			li.appendChild(anchor);
 			fragment.appendChild(li);
 		}
-		ul.appendChild(fragment);
-
-		this.attachSuggestionEvent();
 	},
 
 	/**
@@ -561,19 +582,34 @@ Incremental.prototype = {
 	displaySuggestion: function () {
 		this.query = (this.util.trim(this.targetInput.value)).toLowerCase();
 
-		var judgeList = [],
-			i, j, max;
+		var i, j, max;
 
 		this.resetSuggestion();
 
 		var visibleList;
 
 		if (this.query.length) {
-			for (i = 0, max = this.distDataList.length; i < max; i++) {
-				judgeList.push(this.distDataList[i].indexOf(this.query) > -1);
-			}
-			for (j = 0; j < max; j++) {
-				this.ul.childNodes[j].style.display = judgeList[j] ? '' : 'none';
+			var alreadyCheckedData = {}; // to suppress duplicate check (key only used)
+			var distDataCount = this.distDataList.length; // to determine prefix or contain area
+			var hitCount = 0; // to suppress large result (primitive counter just in case)
+			for (i = 0, max = this.ul.childNodes.length; i < max && hitCount <= 100; i++) {
+				var childNode = this.ul.childNodes[i];
+				var anchor = childNode.getElementsByTagName('a')[0]; // always only one
+				var dataName = anchor.getAttribute('data-name'); // e.g. table name
+				if (alreadyCheckedData[dataName] != null) { // to suppress duplicate check
+					continue;
+				}
+				if (i < distDataCount && dataName.lastIndexOf(this.query, 0) > -1) { // prefix hit
+					childNode.searchDirection = 'prefix';
+					alreadyCheckedData[dataName] = 'dummy';
+					++hitCount;
+				} else if (i >= distDataCount && dataName.indexOf(this.query) > -1) { // contain hit
+					childNode.searchDirection = 'contain';
+					alreadyCheckedData[dataName] = 'dummy';
+					++hitCount;
+				} else {
+					childNode.searchDirection = 'none';
+				}
 			}
 
 			visibleList = this.filterVisibleChild();
@@ -582,8 +618,10 @@ Incremental.prototype = {
 				visibleList[0].style.backgroundColor = '#CCCCCC';
 			}
 		} else {
-			for (i = 0, max = this.distDataList.length; i < max; i++) {
-				this.ul.childNodes[i].style.display = 'none';
+			for (i = 0, max = this.ul.childNodes.length; i < max; i++) {
+				var childNode = this.ul.childNodes[i];
+				childNode.searchDirection = null; // clear
+				childNode.style.display = 'none'; // all none
 			}
 		}
 	},
@@ -596,14 +634,9 @@ Incremental.prototype = {
 			distDataList = [],
 			sectionIdList = [];
 
-#if ($isAliasDelimiterInDbCommentValid)
-        var nameIndex = 2; // number, alias, name
-#else
-        var nameIndex = 1; // number, name
-#end
 		for (var i = 0, max = tr.length; i < max; i++) {
-			distDataList.push(this.util.getElemTxt(tr[i].getElementsByTagName('td')[nameIndex]).toLowerCase());
-			sectionIdList.push(tr[i].getElementsByTagName('td')[nameIndex].getElementsByTagName('a')[0].getAttribute('href'));
+			distDataList.push(this.util.getElemTxt(tr[i].getElementsByTagName('td')[NAME_INDEX]).toLowerCase());
+			sectionIdList.push(tr[i].getElementsByTagName('td')[NAME_INDEX].getElementsByTagName('a')[0].getAttribute('href'));
 		}
 
 		return {
@@ -697,9 +730,17 @@ Incremental.prototype = {
 	filterVisibleChild: function () {
 		var visibleChildNodes = [];
 
+		// ordered by prefix, contain
 		for (var i = 0, max = this.ul.childNodes.length; i < max; i++) {
-			if (this.ul.childNodes[i].style.display !== 'none') {
+			var childNode = this.ul.childNodes[i];
+			if (childNode.searchDirection === 'prefix') {
 				visibleChildNodes.push(this.ul.childNodes[i]);
+				childNode.style.display = 'block';
+			} else if (childNode.searchDirection === 'contain') {
+				visibleChildNodes.push(this.ul.childNodes[i]);
+				childNode.style.display = 'block';
+			} else {
+				childNode.style.display = 'none';
 			}
 		}
 
@@ -726,7 +767,7 @@ Incremental.prototype = {
 	},
 
 	/**
-	 * @method getToSelectedSection
+	 * @method getSelectedSection
 	 * @param suggestionNode {Object}
 	 * @return selectedIdx {Number}
 	 */
@@ -748,7 +789,7 @@ Incremental.prototype = {
 	 * @param idx {Number}
 	 */
 	scrollToSelectedSection: function (idx) {
-		var selectedId = (this.sectionList[idx]).split('#')[1],
+		var selectedId = this.ul.childNodes[idx].getElementsByTagName('a')[0].href.split('#')[1],
 			targetSection = document.getElementById(selectedId);
 
 		window.scrollTo(0, targetSection.offsetTop);
@@ -759,7 +800,7 @@ Incremental.prototype = {
 	 * @method setHash
 	 */
 	setHash: function (idx) {
-		var selectedId = this.sectionList[idx];
+		var selectedId = this.ul.childNodes[idx].getElementsByTagName('a')[0].href.split('#')[1];
 
 		window.location.hash = selectedId;
 	}
