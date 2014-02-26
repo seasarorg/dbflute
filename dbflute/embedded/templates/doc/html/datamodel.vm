@@ -734,10 +734,10 @@ Incremental.prototype = {
 		for (var i = 0, max = this.ul.childNodes.length; i < max; i++) {
 			var childNode = this.ul.childNodes[i];
 			if (childNode.searchDirection === 'prefix') {
-				visibleChildNodes.push(this.ul.childNodes[i]);
+				visibleChildNodes.push(childNode);
 				childNode.style.display = 'block';
 			} else if (childNode.searchDirection === 'contain') {
-				visibleChildNodes.push(this.ul.childNodes[i]);
+				visibleChildNodes.push(childNode);
 				childNode.style.display = 'block';
 			} else {
 				childNode.style.display = 'none';
@@ -752,8 +752,10 @@ Incremental.prototype = {
 	 */
 	clearSuggestion: function () {
 		for (var i = 0, max = this.ul.childNodes.length; i < max; i++) {
-			this.ul.childNodes[i].style.display = 'none';
-			this.ul.childNodes[i].style.backgroundColor = '';
+			var childNode = this.ul.childNodes[i];
+			childNode.searchDirection = null;
+			childNode.style.display = 'none';
+			childNode.style.backgroundColor = '';
 		}
 	},
 
