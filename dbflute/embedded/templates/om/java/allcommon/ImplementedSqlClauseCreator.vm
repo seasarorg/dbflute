@@ -75,7 +75,7 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
             sqlClause = createSqlClauseSqlite(tableDbName);
         } else if (isCurrentDBDef(DBDef.MSAccess)) {
             sqlClause = createSqlClauseMsAccess(tableDbName);
-        } else if (isCurrentDBDef(DBDef.Firebird)) {
+        } else if (isCurrentDBDef(DBDef.FireBird)) {
             sqlClause = createSqlClauseFirebird(tableDbName);
         } else if (isCurrentDBDef(DBDef.Sybase)) {
             sqlClause = createSqlClauseSybase(tableDbName);
