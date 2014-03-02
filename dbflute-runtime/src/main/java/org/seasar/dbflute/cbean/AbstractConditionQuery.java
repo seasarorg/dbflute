@@ -30,8 +30,12 @@ import org.seasar.dbflute.cbean.chelper.HpDerivingSubQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpFixedConditionQueryResolver;
 import org.seasar.dbflute.cbean.chelper.HpInvalidQueryInfo;
 import org.seasar.dbflute.cbean.chelper.HpManualOrderThemeListHandler;
+import org.seasar.dbflute.cbean.chelper.HpQDRFunction;
 import org.seasar.dbflute.cbean.chelper.HpQDRParameter;
+import org.seasar.dbflute.cbean.chelper.HpQDRSetupper;
+import org.seasar.dbflute.cbean.chelper.HpSSQFunction;
 import org.seasar.dbflute.cbean.chelper.HpSSQOption;
+import org.seasar.dbflute.cbean.chelper.HpSSQSetupper;
 import org.seasar.dbflute.cbean.chelper.HpSpecifiedColumn;
 import org.seasar.dbflute.cbean.cipher.ColumnFunctionCipher;
 import org.seasar.dbflute.cbean.cipher.GearedCipherManager;
@@ -1322,6 +1326,20 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 referrerPropertyName, operand, value, parameterPropertyName, resolveMyselfDerivedReferrerOption(option));
     }
 
+    // type argument for cast
+    protected <CB extends ConditionBean> HpQDRFunction<CB> xcreateQDRFunctionMyselfDerived(Class<CB> cbType) {
+        return new HpQDRFunction<CB>(new HpQDRSetupper<CB>() {
+            public void setup(String fn, SubQuery<CB> sq, String rd, Object vl, DerivedReferrerOption op) {
+                xqderiveMyselfDerived(fn, sq, rd, vl, op);
+            }
+        });
+    }
+
+    protected <CB extends ConditionBean> void xqderiveMyselfDerived(String fn, SubQuery<CB> sq, String rd, Object vl,
+            DerivedReferrerOption op) {
+        // overridden by sub-class (not abstract for suppressing option)
+    }
+
     // [DBFlute-0.8.8]
     // -----------------------------------------------------
     //                                       ScalarCondition
@@ -1358,6 +1376,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // no speak about inner-join because of no possible of null revival
         final QueryUsedAliasInfo usedAliasInfo = new QueryUsedAliasInfo(xgetAliasName(), null);
         registerWhereClause(clause, usedAliasInfo);
+    }
+
+    // type argument for cast
+    protected <CB extends ConditionBean> HpSSQFunction<CB> xcreateSSQFunction(final String rd, Class<CB> cbType) {
+        return new HpSSQFunction<CB>(new HpSSQSetupper<CB>() {
+            public void setup(String fn, SubQuery<CB> sq, HpSSQOption<CB> op) {
+                xscalarCondition(fn, sq, rd, op);
+            }
+        });
+    }
+
+    protected <CB extends ConditionBean> void xscalarCondition(String fn, SubQuery<CB> sq, String rd, HpSSQOption<CB> op) {
+        // overridden by sub-class (not abstract for suppressing option)
     }
 
     // -----------------------------------------------------

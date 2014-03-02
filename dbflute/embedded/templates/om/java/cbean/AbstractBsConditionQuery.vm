@@ -1289,7 +1289,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_Equal() {
-        return xcreateSSQFunction(CK_EQ.getOperand());
+        return xcreateSSQFunction(CK_EQ.getOperand(), ${myConditionBeanClassName}.class);
     }
 
     /**
@@ -1306,7 +1306,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_NotEqual() {
-        return xcreateSSQFunction(CK_NES.getOperand());
+        return xcreateSSQFunction(CK_NES.getOperand(), ${myConditionBeanClassName}.class);
     }
 
     /**
@@ -1323,7 +1323,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_GreaterThan() {
-        return xcreateSSQFunction(CK_GT.getOperand());
+        return xcreateSSQFunction(CK_GT.getOperand(), ${myConditionBeanClassName}.class);
     }
 
     /**
@@ -1340,7 +1340,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_LessThan() {
-        return xcreateSSQFunction(CK_LT.getOperand());
+        return xcreateSSQFunction(CK_LT.getOperand(), ${myConditionBeanClassName}.class);
     }
 
     /**
@@ -1357,7 +1357,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_GreaterEqual() {
-        return xcreateSSQFunction(CK_GE.getOperand());
+        return xcreateSSQFunction(CK_GE.getOperand(), ${myConditionBeanClassName}.class);
     }
 
     /**
@@ -1374,36 +1374,25 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function. (NotNull)
      */
     public HpSSQFunction<${myConditionBeanClassName}> scalar_LessEqual() {
-        return xcreateSSQFunction(CK_LE.getOperand());
+        return xcreateSSQFunction(CK_LE.getOperand(), ${myConditionBeanClassName}.class);
     }
 
-    protected HpSSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String rd) {
-        return new HpSSQFunction<${myConditionBeanClassName}>(new HpSSQSetupper<${myConditionBeanClassName}>() {
-            public void setup(String fn, SubQuery<${myConditionBeanClassName}> sq, HpSSQOption<${myConditionBeanClassName}> op) {
-                xscalarCondition(fn, sq, rd, op);
-            }
-        });
-    }
-
-    protected void xscalarCondition(String fn, SubQuery<${myConditionBeanClassName}> sq, String rd, HpSSQOption<${myConditionBeanClassName}> op) {
+    @SuppressWarnings("unchecked")
+    protected <CB extends ConditionBean> void xscalarCondition(String fn, SubQuery<CB> sq, String rd, HpSSQOption<CB> op) {
         assertObjectNotNull("subQuery", sq);
-        ${myConditionBeanClassName} cb = xcreateScalarConditionCB(); sq.query(cb);
+        ${myConditionBeanClassName} cb = xcreateScalarConditionCB(); sq.query((CB)cb);
         String pp = keepScalarCondition(cb.query()); // for saving query-value
-        op.setPartitionByCBean(xcreateScalarConditionPartitionByCB()); // for using partition-by
+        op.setPartitionByCBean((CB)xcreateScalarConditionPartitionByCB()); // for using partition-by
         registerScalarCondition(fn, cb.query(), pp, rd, op);
     }
     public abstract String keepScalarCondition(${myConditionQueryClassName} sq);
 
     protected ${myConditionBeanClassName} xcreateScalarConditionCB() {
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-        cb.xsetupForScalarCondition(this);
-        return cb;
+        ${myConditionBeanClassName} cb = newMyCB(); cb.xsetupForScalarCondition(this); return cb;
     }
 
     protected ${myConditionBeanClassName} xcreateScalarConditionPartitionByCB() {
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
-        cb.xsetupForScalarConditionPartitionBy(this);
-        return cb;
+        ${myConditionBeanClassName} cb = newMyCB(); cb.xsetupForScalarConditionPartitionBy(this); return cb;
     }
 #end
 #if ($table.isAvailableMyselfMyselfDerived())
@@ -1425,18 +1414,12 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @return The object to set up a function for myself table. (NotNull)
      */
     public HpQDRFunction<${myConditionBeanClassName}> myselfDerived() {
-        return xcreateQDRFunctionMyselfDerived();
+        return xcreateQDRFunctionMyselfDerived(${myConditionBeanClassName}.class);
     }
-    protected HpQDRFunction<${myConditionBeanClassName}> xcreateQDRFunctionMyselfDerived() {
-        return new HpQDRFunction<${myConditionBeanClassName}>(new HpQDRSetupper<${myConditionBeanClassName}>() {
-            public void setup(String fn, SubQuery<${myConditionBeanClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
-                xqderiveMyselfDerived(fn, sq, rd, vl, op);
-            }
-        });
-    }
-    public void xqderiveMyselfDerived(String fn, SubQuery<${myConditionBeanClassName}> sq, String rd, Object vl, DerivedReferrerOption op) {
+    @SuppressWarnings("unchecked")
+    protected <CB extends ConditionBean> void xqderiveMyselfDerived(String fn, SubQuery<CB> sq, String rd, Object vl, DerivedReferrerOption op) {
         assertObjectNotNull("subQuery", sq);
-        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this); sq.query(cb);
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForDerivedReferrer(this); sq.query((CB)cb);
         String pk = "${table.primaryKeyAsOne.name}";
         String sqpp = keepQueryMyselfDerived(cb.query()); // for saving query-value.
         String prpp = keepQueryMyselfDerivedParameter(vl);
@@ -1592,8 +1575,10 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     // ===================================================================================
     //                                                                       Very Internal
     //                                                                       =============
+    protected ${myConditionBeanClassName} newMyCB() {
+        return new ${myConditionBeanClassName}();
+    }
     // very internal (for suppressing warn about 'Not Use Import')
-    protected String xabCB() { return ${myConditionBeanClassName}.class.getName(); }
     protected String xabCQ() { return ${myConditionQueryClassName}.class.getName(); }
     protected String xabLSO() { return LikeSearchOption.class.getName(); }
     protected String xabSSQS() { return HpSSQSetupper.class.getName(); }
