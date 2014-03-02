@@ -819,22 +819,58 @@ public interface SqlClause {
      */
     void specifyDerivingSubQuery(HpDerivingSubQueryInfo subQueryInfo);
 
+    /**
+     * Does it have the specified deriving sub-query by the alias name?
+     * @param aliasName The alias name of specified deriving sub-query. (NotNull)
+     * @return the determination, true or false.
+     */
     boolean hasSpecifiedDerivingSubQuery(String aliasName);
 
+    /**
+     * Get the list of alias for specified deriving sub-query.
+     * @return The list of alias. (NotNull: if no deriving, empty list)
+     */
     List<String> getSpecifiedDerivingAliasList();
 
+    /**
+     * Get the info of specified deriving sub-query by the alias name.
+     * @param aliasName The alias name of specified deriving sub-query. (NotNull)
+     * @return The info of specified deriving sub-query. (NullAlowed: if not found)
+     */
     HpDerivingSubQueryInfo getSpecifiedDerivingInfo(String aliasName);
+
+    /**
+     * Get the info of column for specified deriving sub-query by the alias name.
+     * @param aliasName The alias name of specified deriving sub-query. (NotNull)
+     * @return The info of column. (NullAlowed: if not found)
+     */
+    ColumnInfo getSpecifiedDerivingColumnInfo(String aliasName);
+
+    /**
+     * Clear specified deriving sub-query.
+     */
+    void clearSpecifiedDerivingSubQuery();
 
     // -----------------------------------------------------
     //                                       Deriving as One
     //                                       ---------------
+    /**
+     * Get the info of column for specified deriving sub-query as specified one.
+     * @return The info of column. (NullAlowed: if not found or not one)
+     */
     ColumnInfo getSpecifiedDerivingColumnInfoAsOne();
 
+    /**
+     * Get the alias name for specified deriving sub-query as specified one.
+     * @return The string for the alias name. (NullAlowed: if not found or not one)
+     */
     String getSpecifiedDerivingAliasNameAsOne();
 
+    /**
+     * Get the clause of specified deriving sub-query as specified one.
+     * @return The string for the clause. (NullAlowed: if not found or not one)
+     */
     String getSpecifiedDerivingSubQueryAsOne();
-
-    void clearSpecifiedDerivingSubQuery();
 
     // ===================================================================================
     //                                                                  Invalid Query Info
@@ -998,14 +1034,21 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                       Paging Select
     //                                                                       =============
+    /**
+     * Make paging adjustment, e.g. PagingCountLater, PagingCountLeastJoin, effective. <br />
+     * The options might be on by default so the adjustments are off normally.
+     */
     void makePagingAdjustmentEffective();
 
+    /**
+     * Ignore paging adjustment.
+     */
     void ignorePagingAdjustment();
 
     /**
      * Enable paging count-later that means counting after selecting. <br />
-     * You should call this before execution of selectPage(). <br />
-     * And you should also make paging adjustment effective to enable this. 
+     * And you should also make paging adjustment effective to enable this. <br />
+     * This option is copy of condition-bean's one for clause adjustment, e.g. MySQL found_rows().
      */
     void enablePagingCountLater();
 
@@ -1017,7 +1060,6 @@ public interface SqlClause {
 
     /**
      * Enable paging count-least-join, which means least joined on count select. <br />
-     * You should call this before execution of selectPage(). <br />
      * And you should also make paging adjustment effective to enable this.
      */
     void enablePagingCountLeastJoin();
@@ -1027,6 +1069,12 @@ public interface SqlClause {
      * You should call this before execution of selectPage().
      */
     void disablePagingCountLeastJoin();
+
+    /**
+     * Can it be paging count least join?
+     * @return The determination, true or false.
+     */
+    boolean canPagingCountLeastJoin();
 
     // [DBFlute-0.9.9.4C]
     // ===================================================================================

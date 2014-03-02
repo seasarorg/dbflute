@@ -1953,7 +1953,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             String msg = "The deriving column was not found by the property: " + orderByProperty;
             throw new IllegalStateException(msg);
         }
-        final ColumnInfo columnInfo = getSpecifiedDerivingColumnInfo(specifiedDerivingInfo);
+        final ColumnInfo columnInfo = extractSpecifiedDerivingColumnInfo(specifiedDerivingInfo);
         doRegisterOrderBy(orderByProperty, ascOrDesc, columnInfo, true);
     }
 
@@ -2564,7 +2564,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return _specifiedDerivingSubQueryMap.get(aliasName);
     }
 
-    protected ColumnInfo getSpecifiedDerivingColumnInfo(HpDerivingSubQueryInfo derivingInfo) {
+    public ColumnInfo getSpecifiedDerivingColumnInfo(String aliasName) {
+        final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfo(aliasName);
+        return derivingInfo != null ? extractSpecifiedDerivingColumnInfo(derivingInfo) : null;
+    }
+
+    protected ColumnInfo extractSpecifiedDerivingColumnInfo(HpDerivingSubQueryInfo derivingInfo) {
         final SqlClause subQuerySqlClause = derivingInfo.getDerivedReferrer().getSubQuerySqlClause();
         final ColumnInfo columnInfo = subQuerySqlClause.getSpecifiedColumnInfoAsOne();
         if (columnInfo != null) {
@@ -2573,12 +2578,19 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return subQuerySqlClause.getSpecifiedDerivingColumnInfoAsOne(); // nested
     }
 
+    public void clearSpecifiedDerivingSubQuery() {
+        if (_specifiedDerivingSubQueryMap != null) {
+            _specifiedDerivingSubQueryMap.clear();
+            _specifiedDerivingSubQueryMap = null;
+        }
+    }
+
     // -----------------------------------------------------
     //                                       Deriving as One
     //                                       ---------------
     public ColumnInfo getSpecifiedDerivingColumnInfoAsOne() {
         final HpDerivingSubQueryInfo derivingInfo = getSpecifiedDerivingInfoAsOne();
-        return derivingInfo != null ? getSpecifiedDerivingColumnInfo(derivingInfo) : null;
+        return derivingInfo != null ? extractSpecifiedDerivingColumnInfo(derivingInfo) : null;
     }
 
     public String getSpecifiedDerivingAliasNameAsOne() {
@@ -2596,13 +2608,6 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
             return _specifiedDerivingSubQueryMap.values().iterator().next();
         }
         return null;
-    }
-
-    public void clearSpecifiedDerivingSubQuery() {
-        if (_specifiedDerivingSubQueryMap != null) {
-            _specifiedDerivingSubQueryMap.clear();
-            _specifiedDerivingSubQueryMap = null;
-        }
     }
 
     // ===================================================================================
@@ -2876,7 +2881,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         _pagingCountLeastJoin = false;
     }
 
-    protected boolean canPagingCountLeastJoin() {
+    public boolean canPagingCountLeastJoin() {
         return _pagingAdjustment && _pagingCountLeastJoin;
     }
 

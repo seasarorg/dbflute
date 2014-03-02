@@ -437,7 +437,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
             String msg = "Not found the derived info by the argument 'derivedAlias': " + derivedAlias;
             throw new IllegalArgumentException(msg);
         }
-        final ColumnInfo columnInfo = portClause.getSpecifiedDerivingColumnInfoAsOne();
+        final ColumnInfo columnInfo = portClause.getSpecifiedDerivingColumnInfo(derivedAlias);
+        if (columnInfo == null) {
+            String msg = "Not found the derived column by the argument 'derivedAlias': " + derivedAlias;
+            throw new IllegalArgumentException(msg);
+        }
         return new HpSpecifiedColumn(null, columnInfo, this, derivedAlias, true);
     }
 
