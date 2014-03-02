@@ -1016,18 +1016,39 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                       Geared Cipher
     //                                                                       =============
+    /**
+     * Get the manager of geared cipher.
+     * @return The instance of manager. (NullAllowed: when no geared cipher)
+     */
     GearedCipherManager getGearedCipherManager();
 
+    /**
+     * Find the cipher for the column.
+     * @param columnInfo The column info for cipher. (NotNull)
+     * @return The cipher for the column. (NullAllowed: when no geared cipher or the column is not cipher target)
+     */
     ColumnFunctionCipher findColumnFunctionCipher(ColumnInfo columnInfo);
 
-    void makeSelectColumnDecryptionEffective();
+    /**
+     * Make select column cipher effective. <br />
+     * The default is effective so this method is called after suppressing.
+     */
+    void makeSelectColumnCipherEffective();
 
-    void suppressSelectColumnDecryption();
+    /**
+     * Suppress select column cipher effective. <br />
+     * basically for queryInsert().
+     */
+    void suppressSelectColumnCipher();
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================
     //                                                                 ScalarSelect Option
     //                                                                 ===================
+    /**
+     * Accept the option of scalar-select.
+     * @param option The instance of option object. (NullAllowed: if null, also clear existing option)
+     */
     void acceptScalarSelectOption(ScalarSelectOption option);
 
     // [DBFlute-0.9.8.8]
@@ -1080,6 +1101,10 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                      Lazy Reflector
     //                                                                      ==============
+    /**
+     * Register the lazy reflector of clause.
+     * @param clauseLazyReflector The instance of reflector. (NotNull)
+     */
     void registerClauseLazyReflector(ClauseLazyReflector clauseLazyReflector);
 
     // [DBFlute-0.7.5]
@@ -1128,8 +1153,16 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
+    /**
+     * Get the purpose of the condition-bean. e.g. NORMAL_USE, EXISTS_REFERRER
+     * @return The instance of purpose object for condition-bean. (NotNull)
+     */
     HpCBPurpose getPurpose();
 
+    /**
+     * Set the purpose of the condition-bean. e.g. NORMAL_USE, EXISTS_REFERRER
+     * @param purpose The instance of purpose object for condition-bean. (NotNull)
+     */
     void setPurpose(HpCBPurpose purpose);
 
     // [DBFlute-0.9.4]
@@ -1146,17 +1179,29 @@ public interface SqlClause {
     // ===================================================================================
     //                                                               LikeSearch Adjustment
     //                                                               =====================
+    /**
+     * Adjust like-search of DB way.
+     * @param option The option of like-search to adjust. (NotNull)
+     */
     void adjustLikeSearchDBWay(LikeSearchOption option);
 
     // [DBFlute-1.0.3.1]
     // ===================================================================================
     //                                                                 CursorSelect Option
     //                                                                 ===================
+    /**
+     * Is cursor select by paging allowed?
+     * @return The determination, true or false.
+     */
     boolean isCursorSelectByPagingAllowed();
 
     // [DBFlute-0.9.8.4]
     // ===================================================================================
     //                                                                               DBWay
     //                                                                               =====
+    /**
+     * Get the DB way for this SQL clause.
+     * @return The instance of DB way. (NotNull)
+     */
     DBWay dbway();
 }

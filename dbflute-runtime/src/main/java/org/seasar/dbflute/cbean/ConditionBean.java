@@ -462,5 +462,9 @@ public interface ConditionBean extends PagingBean {
     // ===================================================================================
     //                                                                        Purpose Type
     //                                                                        ============
+    /**
+     * Get the purpose of the condition-bean. e.g. NORMAL_USE, EXISTS_REFERRER
+     * @return The instance of purpose object for condition-bean. (NotNull)
+     */
     HpCBPurpose getPurpose();
 }

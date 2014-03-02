@@ -1391,7 +1391,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     public void xsetupForQueryInsert() { // not sub-query (used independently)
         xchangePurposeSqlClause(HpCBPurpose.QUERY_INSERT, null);
-        getSqlClause().suppressSelectColumnDecryption(); // suppress cipher for values from DB to DB
+        getSqlClause().suppressSelectColumnCipher(); // suppress cipher for values from DB to DB
     }
 
     public void xsetupForColumnQuery(ConditionBean mainCB) {

@@ -263,8 +263,8 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     /** The manager of geared cipher. (also for saving) (NullAllowed: lazy-load) */
     protected GearedCipherManager _gearedCipherManager;
 
-    /** Does it suppress description for select columns? */
-    protected boolean _suppressSelectColumnDecryption;
+    /** Does it suppress cipher for select columns? */
+    protected boolean _suppressSelectColumnCipher;
 
     // -----------------------------------------------------
     //                                         Scalar Select
@@ -2807,12 +2807,12 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
         return null;
     }
 
-    public void makeSelectColumnDecryptionEffective() { // after suppressSelectColumnDecryption()
-        _suppressSelectColumnDecryption = false;
+    public void makeSelectColumnCipherEffective() {
+        _suppressSelectColumnCipher = false;
     }
 
-    public void suppressSelectColumnDecryption() { // basically for queryInsert()
-        _suppressSelectColumnDecryption = true;
+    public void suppressSelectColumnCipher() {
+        _suppressSelectColumnCipher = true;
     }
 
     protected String encryptIfNeeds(ColumnInfo columnInfo, String valueExp) {
@@ -2821,7 +2821,7 @@ public abstract class AbstractSqlClause implements SqlClause, Serializable {
     }
 
     protected String decryptSelectColumnIfNeeds(ColumnInfo columnInfo, String valueExp) {
-        if (_suppressSelectColumnDecryption) {
+        if (_suppressSelectColumnCipher) {
             return valueExp;
         }
         return doDecryptIfNeeds(columnInfo, valueExp);
