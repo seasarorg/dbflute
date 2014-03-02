@@ -203,6 +203,7 @@ public class SqlClauseMySql extends AbstractSqlClause {
     // ===================================================================================
     //                                                                      Collate Clause
     //                                                                      ==============
+
     public static class CollateUTF8UnicodeArranger implements QueryClauseArranger {
         public String arrange(ColumnRealName columnRealName, String operand, String bindExpression, String rearOption) {
             return columnRealName + " collate utf8_unicode_ci " + operand + " " + bindExpression + rearOption;
@@ -212,6 +213,12 @@ public class SqlClauseMySql extends AbstractSqlClause {
     public static class CollateUTF8GeneralArranger implements QueryClauseArranger {
         public String arrange(ColumnRealName columnRealName, String operand, String bindExpression, String rearOption) {
             return columnRealName + " collate utf8_general_ci " + operand + " " + bindExpression + rearOption;
+        }
+    }
+
+    public static class CollateUTF8MB4UnicodeArranger implements QueryClauseArranger {
+        public String arrange(ColumnRealName columnRealName, String operand, String bindExpression, String rearOption) {
+            return columnRealName + " collate utf8mb4_unicode_520_ci " + operand + " " + bindExpression + rearOption;
         }
     }
 
