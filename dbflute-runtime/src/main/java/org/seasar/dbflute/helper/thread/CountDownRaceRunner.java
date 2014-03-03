@@ -24,40 +24,108 @@ public class CountDownRaceRunner {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final long _uniformNumber;
-    protected final CountDownRaceLatch _yourLatch;
+    protected final long _threadId;
+    protected final CountDownRaceLatch _ourLatch;
+    protected final int _entryNumber;
     protected final Object _lockObj;
+    protected final int _countOfEntry; // to check
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public CountDownRaceRunner(long uniformNumber, CountDownRaceLatch yourLatch, Object lockObj) {
-        _uniformNumber = uniformNumber;
-        _yourLatch = yourLatch;
+    public CountDownRaceRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber, Object lockObj,
+            int countOfEntry) {
+        _threadId = threadId;
+        _ourLatch = ourLatch;
+        _entryNumber = entryNumber;
         _lockObj = lockObj;
+        _countOfEntry = countOfEntry;
     }
 
     // ===================================================================================
-    //                                                                     Thread Handling
+    //                                                               Basic Thread Handling 
+    //                                                               =====================
+    public void teaBreak(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            String msg = "Failed to have a tea break but I want to...";
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                     CountDown Latch
     //                                                                     ===============
     /**
-     * Await until all threads come here.
+     * All runners restart from here.
+     * <pre>
+     * new CountDownRace(3).readyGo(new CountDownRaceExecution() {
+     *     public void execute(CountDownRaceRunner runner) {
+     *         ...
+     *         // all runners stop and wait for other cars coming here
+     *         runner.restart();
+     *         ...
+     *     }
+     * });
+     * </pre>
      */
-    public void await() {
-        _yourLatch.await();
+    public void restart() {
+        _ourLatch.await();
+    }
+
+    // ===================================================================================
+    //                                                                        Entry Number
+    //                                                                        ============
+    /**
+     * Is this car same as the specified entry number?
+     * @param entryNumber The entry number to compare.
+     * @return The determination, true or false.
+     */
+    public boolean isEntryNumber(int entryNumber) {
+        checkEntryNumber(entryNumber);
+        return _entryNumber == entryNumber;
+    }
+
+    protected void checkEntryNumber(int entryNumber) {
+        if (entryNumber > _countOfEntry) {
+            String msg = "The specified entry number is over count of entries: entryNumber=" + entryNumber
+                    + ", countOfEntry=" + _countOfEntry;
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public long getUniformNumber() {
-        return _uniformNumber;
+    /**
+     * Get the thread ID of the car (current thread).
+     * @return The long value of thread ID.
+     */
+    public long getThreadId() {
+        return _threadId;
     }
 
-    public CountDownRaceLatch getYourLatch() {
-        return _yourLatch;
+    /**
+     * Get the our latch to handle the threads.
+     * @return The instance of our latch for count down race. (NotNull)
+     */
+    public CountDownRaceLatch getOurLatch() {
+        return _ourLatch;
     }
 
+    /**
+     * Get the entry number of the car (current thread).
+     * @return The assigned number. e.g. 1, 2, 3... (NotNull)
+     */
+    public int getEntryNumber() {
+        return _entryNumber;
+    }
+
+    /**
+     * Get the lock object to handle threads as you like it.
+     * @return The common instance for all runners. (NotNull)
+     */
     public Object getLockObj() {
         return _lockObj;
     }

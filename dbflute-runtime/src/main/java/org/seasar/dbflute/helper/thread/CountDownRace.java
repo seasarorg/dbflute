@@ -71,11 +71,13 @@ public class CountDownRace {
         final CountDownLatch ready = new CountDownLatch(_runnerCount);
         final CountDownLatch start = new CountDownLatch(1);
         final CountDownLatch goal = new CountDownLatch(_runnerCount);
-        final CountDownRaceLatch yourLatch = new CountDownRaceLatch(_runnerCount);
-        final List<Future<Void>> futureList = new ArrayList<Future<Void>>();
+        final CountDownRaceLatch ourLatch = new CountDownRaceLatch(_runnerCount);
         final Object lockObj = new Object();
+        final List<Future<Void>> futureList = new ArrayList<Future<Void>>();
         for (int i = 0; i < _runnerCount; i++) { // basically synchronized with parameter size
-            final Callable<Void> callable = createCallable(execution, ready, start, goal, yourLatch, lockObj);
+            final int entryNumber = i + 1;
+            final Callable<Void> callable = createCallable(execution, ready, start, goal, ourLatch, entryNumber,
+                    lockObj);
             final Future<Void> future = service.submit(callable);
             futureList.add(future);
         }
@@ -115,8 +117,8 @@ public class CountDownRace {
     //                                                                            Callable
     //                                                                            ========
     protected Callable<Void> createCallable(final CountDownRaceExecution execution, final CountDownLatch ready,
-            final CountDownLatch start, final CountDownLatch goal, final CountDownRaceLatch yourLatch,
-            final Object lockObj) {
+            final CountDownLatch start, final CountDownLatch goal, final CountDownRaceLatch ourLatch,
+            final int entryNumber, final Object lockObj) {
         return new Callable<Void>() {
             public Void call() { // each thread here
                 final long threadId = Thread.currentThread().getId();
@@ -130,7 +132,7 @@ public class CountDownRace {
                     }
                     RuntimeException cause = null;
                     try {
-                        execution.execute(createRunner(threadId, yourLatch, lockObj));
+                        execution.execute(createRunner(threadId, ourLatch, entryNumber, lockObj));
                     } catch (RuntimeException e) {
                         cause = e;
                     }
@@ -139,14 +141,15 @@ public class CountDownRace {
                     }
                 } finally {
                     goal.countDown();
-                    yourLatch.reset(); // to release waiting threads
+                    ourLatch.reset(); // to release waiting threads
                 }
                 return null;
             }
         };
     }
 
-    protected CountDownRaceRunner createRunner(long threadId, CountDownRaceLatch yourLatch, Object lockObj) {
-        return new CountDownRaceRunner(threadId, yourLatch, lockObj);
+    protected CountDownRaceRunner createRunner(long threadId, CountDownRaceLatch ourLatch, int entryNumber,
+            Object lockObj) {
+        return new CountDownRaceRunner(threadId, ourLatch, entryNumber, lockObj, _runnerCount);
     }
 }

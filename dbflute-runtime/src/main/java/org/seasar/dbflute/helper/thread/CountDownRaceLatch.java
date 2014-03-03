@@ -36,7 +36,7 @@ public class CountDownRaceLatch {
     //                                                                           Attribute
     //                                                                           =========
     protected final int _runnerCount;
-    protected CountDownLatch _yourLatch;
+    protected volatile CountDownLatch _yourLatch;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -53,20 +53,22 @@ public class CountDownRaceLatch {
         final boolean last;
         synchronized (this) {
             latch = prepareLatch();
-            last = (doGetCount(latch) == 1);
+            last = (actuallyGetCount(latch) == 1);
             if (last) {
                 if (_log.isDebugEnabled()) {
                     _log.debug("...Restarting count down race");
                 }
                 clearLatch();
             }
-            doCountDown(latch); // ready go if last
+            actuallyCountDown(latch); // ready go if last
         }
         if (!last) {
-            if (_log.isDebugEnabled()) {
-                _log.debug("...Awaiting all runners coming here");
+            if (isWaitingLatch()) {
+                if (_log.isDebugEnabled()) {
+                    _log.debug("...Awaiting all runners coming here");
+                }
+                actuallyAwait(latch);
             }
-            doAwait(latch);
         }
     }
 
@@ -81,15 +83,19 @@ public class CountDownRaceLatch {
         _yourLatch = null;
     }
 
-    protected long doGetCount(CountDownLatch latch) {
+    protected boolean isWaitingLatch() {
+        return _yourLatch != null;
+    }
+
+    protected long actuallyGetCount(CountDownLatch latch) {
         return latch.getCount();
     }
 
-    protected void doCountDown(CountDownLatch latch) {
+    protected void actuallyCountDown(CountDownLatch latch) {
         latch.countDown();
     }
 
-    protected void doAwait(CountDownLatch latch) {
+    protected void actuallyAwait(CountDownLatch latch) {
         try {
             latch.await();
         } catch (InterruptedException e) {

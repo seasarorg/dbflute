@@ -884,16 +884,6 @@ public class HandyDate implements Serializable {
     // -----------------------------------------------------
     //                                          Move-to Week
     //                                          ------------
-    public HandyDate moveToWeekOfMonth(int weekOfMonth) {
-        DfTypeUtil.moveToCalendarWeekOfMonth(_cal, weekOfMonth);
-        return this;
-    }
-
-    public HandyDate moveToWeekOfYear(int weekOfYear) {
-        DfTypeUtil.moveToCalendarWeekOfYear(_cal, weekOfYear);
-        return this;
-    }
-
     /**
      * Move to the week just (beginning). <br />
      * You can change the beginning of day of week by beginWeek_...(). <br />
@@ -931,6 +921,16 @@ public class HandyDate implements Serializable {
      */
     public HandyDate moveToWeekTerminal() {
         DfTypeUtil.moveToCalendarWeekTerminal(_cal, _weekBeginDay);
+        return this;
+    }
+
+    public HandyDate moveToWeekOfMonth(int weekOfMonth) {
+        DfTypeUtil.moveToCalendarWeekOfMonth(_cal, weekOfMonth);
+        return this;
+    }
+
+    public HandyDate moveToWeekOfYear(int weekOfYear) {
+        DfTypeUtil.moveToCalendarWeekOfYear(_cal, weekOfYear);
         return this;
     }
 
@@ -2901,6 +2901,14 @@ public class HandyDate implements Serializable {
         return _cal.get(Calendar.DAY_OF_WEEK);
     }
 
+    public int getWeekOfMonth() {
+        return _cal.get(Calendar.WEEK_OF_MONTH);
+    }
+
+    public int getWeekOfYear() {
+        return _cal.get(Calendar.WEEK_OF_YEAR);
+    }
+
     public int getFirstDayOfMonth() {
         return _cal.getActualMinimum(Calendar.DAY_OF_MONTH);
     }
@@ -2935,6 +2943,20 @@ public class HandyDate implements Serializable {
         assertArgumentNotNull("timeZone", timeZone);
         final Date date = _cal.getTime();
         final DateFormat dateFormat = createDateFormat(pattern, timeZone, null);
+        return dateFormat.format(date);
+    }
+
+    /**
+     * Convert to the display string of the date for the default time-zone.
+     * @param pattern The pattern of date, which can be used at {@link SimpleDateFormat}. (NotNull)
+     * @param locale The locale for formatting symbols. (NotNull)
+     * @return The display string of the date. (NotNull)
+     */
+    public String toDisp(String pattern, Locale locale) {
+        assertArgumentNotNull("pattern", pattern);
+        assertArgumentNotNull("locale", locale);
+        final Date date = _cal.getTime();
+        final DateFormat dateFormat = createDateFormat(pattern, _cal.getTimeZone(), locale);
         return dateFormat.format(date);
     }
 
