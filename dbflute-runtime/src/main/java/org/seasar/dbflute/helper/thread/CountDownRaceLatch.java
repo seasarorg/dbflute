@@ -36,7 +36,7 @@ public class CountDownRaceLatch {
     //                                                                           Attribute
     //                                                                           =========
     protected final int _runnerCount;
-    protected volatile CountDownLatch _yourLatch;
+    protected volatile CountDownLatch _ourLatch;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -73,18 +73,18 @@ public class CountDownRaceLatch {
     }
 
     protected CountDownLatch prepareLatch() {
-        if (_yourLatch == null) {
-            _yourLatch = new CountDownLatch(_runnerCount);
+        if (_ourLatch == null) {
+            _ourLatch = new CountDownLatch(_runnerCount);
         }
-        return _yourLatch;
+        return _ourLatch;
     }
 
     protected void clearLatch() {
-        _yourLatch = null;
+        _ourLatch = null;
     }
 
     protected boolean isWaitingLatch() {
-        return _yourLatch != null;
+        return _ourLatch != null;
     }
 
     protected long actuallyGetCount(CountDownLatch latch) {
@@ -105,18 +105,18 @@ public class CountDownRaceLatch {
     }
 
     public synchronized void reset() {
-        if (_yourLatch == null) {
+        if (_ourLatch == null) {
             return;
         }
-        final long count = _yourLatch.getCount();
+        final long count = _ourLatch.getCount();
         if (count > 0) {
             if (_log.isDebugEnabled()) {
                 _log.debug("...Resetting your latch: count=" + count);
             }
             for (int i = 0; i < count; i++) {
-                _yourLatch.countDown();
+                _ourLatch.countDown(); // is thread safe and allowed over count down
             }
         }
-        _yourLatch = null;
+        _ourLatch = null;
     }
 }

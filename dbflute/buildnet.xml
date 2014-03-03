@@ -5,9 +5,9 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.8.9.55"/>
+	<property name="version" value="0.8.9.56"/>
 	<property name="build.version" value="${version}"/>
-	<property name="pre.version" value="0.8.9.54"/>
+	<property name="pre.version" value="0.8.9.55"/>
 
 	<!-- Resource Directories -->
 	<property name="workspace.base" value="../.."/>
