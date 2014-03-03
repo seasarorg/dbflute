@@ -238,6 +238,9 @@ public class HandyDateTest extends PlainTestCase {
         }
         assertEquals(handy("2010/12/30 11:34:56.789"), handy(large11).moveToWeekOfYear(1));
         assertEquals(handy("2011/01/06 11:34:56.789"), handy(large11).moveToWeekOfYear(2));
+
+        assertEquals(2, handy(large11).moveToWeekOfMonth(2).getWeekOfMonth());
+        assertEquals(3, handy(large11).moveToWeekOfYear(3).getWeekOfYear());
     }
 
     // -----------------------------------------------------

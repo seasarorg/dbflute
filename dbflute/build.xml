@@ -6,8 +6,8 @@
 
 	<!-- Version -->
 	<property name="version" value="1.0.5C" />
-	<property name="build.version" value="${version}-RC1" />
-	<property name="runtime.version" value="1.0.5C-RC1" />
+	<property name="build.version" value="${version}" />
+	<property name="runtime.version" value="1.0.5C" />
 	<property name="runtime.build.version" value="${runtime.version}" />
 	<property name="example.latest.version" value="1.x" />
 
