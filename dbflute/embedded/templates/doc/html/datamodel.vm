@@ -371,7 +371,11 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationTop = $database.getClassificationTop($classificationName))
 	<tr>
+#if ($classificationTop.isDeprecated())
+		<td><del>${classificationName}</del></td>
+#else
 		<td>${classificationName}</td>
+#end
 		<td class="clstypecell">#if ($classificationTop.isTableClassification())table#else implicit#if ($classificationTop.isCheckImplicitSet())<br />(check)#end#end</td>
 		<td>#if ($classificationTop.hasTopComment())${classificationTop.topCommentForSchemaHtml}#else &nbsp;#end</td>
 		<td>
@@ -396,11 +400,15 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #foreach ($classificationElement in $classificationTop.classificationElementList)
 			<tr>
 				<td>${classificationElement.code}</td>
+#if ($classificationElement.isDeprecated())
+				<td><del>${classificationElement.name}</del></td>
+#else
 				<td>${classificationElement.name}</td>
+#end
 #if ($database.hasClassificationAlias($classificationName))
 				<td>#if ($classificationElement.hasAlias())${classificationElement.alias}#else &nbsp;#end</td>
 #end
-				<td class="commentcell">#if ($classificationElement.hasComment())${classificationElement.commentForSchemaHtml}#else &nbsp;#end</td>
+				<td class="commentcell">#if ($classificationElement.hasCommentDisp())${classificationElement.commentForSchemaHtml}#else &nbsp;#end</td>
 #foreach ($group in $classificationTop.groupList)
 				<td class="flgcell">#if ($classificationElement.isGroup($group.groupName))o#else &nbsp;#end</td>
 #end
