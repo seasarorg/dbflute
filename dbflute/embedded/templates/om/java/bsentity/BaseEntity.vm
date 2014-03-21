@@ -775,12 +775,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
 #if ($col.needsStringClobHandling())
     /** The value type annotation. {${col.columnDefinitionLineDisp}} */
-    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "stringClobType";
+    public static final String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "stringClobType";
 
 #end
 #if ($col.needsBytesOidHandling())
     /** The value type annotation. {${col.columnDefinitionLineDisp}} */
-    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "bytesOidType";
+    public static final String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "bytesOidType";
 
 #end
     /**
