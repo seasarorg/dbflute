@@ -534,12 +534,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return prop.getCommonColumnMap();
     }
 
-    protected String getColumnTorqueType(DfColumnMeta columnMetaInfo) {
-        if (columnMetaInfo.isProcedureParameter() && !_columnHandler.hasMappingJdbcType(columnMetaInfo)) {
+    protected String getColumnTorqueType(DfColumnMeta columnMeta) {
+        if (columnMeta.isProcedureParameter() && !_columnHandler.hasMappingJdbcType(columnMeta)) {
             // unknown type of procedure parameter should be treated as Object
             return TypeMap.OTHER;
         } else {
-            return _columnHandler.getColumnJdbcType(columnMetaInfo);
+            return _columnHandler.getColumnJdbcType(columnMeta);
         }
     }
 

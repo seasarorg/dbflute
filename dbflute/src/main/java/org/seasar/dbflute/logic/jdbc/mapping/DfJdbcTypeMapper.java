@@ -17,8 +17,11 @@ package org.seasar.dbflute.logic.jdbc.mapping;
 
 import java.sql.Types;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.torque.engine.database.model.TypeMap;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
+import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -29,18 +32,21 @@ public class DfJdbcTypeMapper {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Map<String, String> _nameToJdbcTypeMap;
-    protected Resource _resource;
+    protected final Map<String, String> _nameToJdbcTypeMap;
+    protected final Map<String, Map<String, String>> _pointToJdbcTypeMap;
+    protected final DfMapperResource _resource;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    public DfJdbcTypeMapper(Map<String, String> nameToJdbcTypeMap, Resource resource) {
+    public DfJdbcTypeMapper(Map<String, String> nameToJdbcTypeMap, Map<String, Map<String, String>> pointToJdbcTypeMap,
+            DfMapperResource resource) {
         _nameToJdbcTypeMap = nameToJdbcTypeMap;
+        _pointToJdbcTypeMap = pointToJdbcTypeMap;
         _resource = resource;
     }
 
-    public static interface Resource {
+    public static interface DfMapperResource {
         boolean isLangJava();
 
         boolean isDbmsPostgreSQL();
@@ -57,6 +63,50 @@ public class DfJdbcTypeMapper {
     // ===================================================================================
     //                                                                 Torque Type Getting
     //                                                                 ===================
+    /**
+     * Get the JDBC type of the column. (contains point type-mapping) <br />
+     * Look at the java-doc of overload method if you want to know the priority of mapping.
+     * @param columnMeta The meta information of column. (NotNull)
+     * @return The JDBC type of the column. (NotNull)
+     */
+    public String getColumnJdbcType(DfColumnMeta columnMeta) {
+        final String pointMappingType = findPointMappingType(columnMeta);
+        if (pointMappingType != null) {
+            return pointMappingType;
+        }
+        return getColumnJdbcType(columnMeta.getJdbcDefValue(), columnMeta.getDbTypeName());
+    }
+
+    protected String findPointMappingType(DfColumnMeta columnMeta) {
+        final String tableName = columnMeta.getTableName();
+        if (tableName == null) {
+            return null;
+        }
+        Map<String, String> columnTypeMap = _pointToJdbcTypeMap.get(tableName);
+        final String foundType = doFindPointMappingType(columnMeta, columnTypeMap);
+        if (foundType != null) {
+            return foundType;
+        }
+        columnTypeMap = _pointToJdbcTypeMap.get("$$ALL$$");
+        return doFindPointMappingType(columnMeta, columnTypeMap);
+    }
+
+    protected String doFindPointMappingType(DfColumnMeta columnMeta, Map<String, String> columnTypeMap) {
+        if (columnTypeMap != null) {
+            final String columnName = columnMeta.getColumnName();
+            for (Entry<String, String> entry : columnTypeMap.entrySet()) {
+                final String columnHint = entry.getKey();
+                if (DfNameHintUtil.isHitByTheHint(columnName, columnHint)) {
+                    final String value = entry.getValue();
+                    if (value != null) {
+                        return value;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Get the JDBC type of the column. <br /> 
      * The priority of mapping is as follows:

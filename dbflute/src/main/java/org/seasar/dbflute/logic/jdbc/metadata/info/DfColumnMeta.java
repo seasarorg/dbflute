@@ -30,6 +30,7 @@ public class DfColumnMeta {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected String _tableName;
     protected String _columnName;
     protected int _jdbcDefValue;
     protected String _dbTypeName;
@@ -101,13 +102,21 @@ public class DfColumnMeta {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _columnName + ", " + _dbTypeName + "(" + _columnSize + "," + _decimalDigits + "), "
-                + _jdbcDefValue + ", " + _required + ", " + _columnComment + ", " + _defaultValue + "}";
+        return "{" + _tableName + "." + _columnName + ", " + _dbTypeName + "(" + _columnSize + "," + _decimalDigits
+                + "), " + _jdbcDefValue + ", " + _required + ", " + _columnComment + ", " + _defaultValue + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public String getTableName() {
+        return _tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this._tableName = tableName;
+    }
+
     public String getColumnName() {
         return _columnName;
     }

@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
-import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
+import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
@@ -117,7 +117,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
                     continue;
                 }
 
-                // Filter duplicate objects
+                // filter duplicate objects
                 if (columnNameSet.contains(columnName)) {
                     duplicateTableNameSet.add(metaTableName);
                     duplicateColumnNameSet.add(columnName);
@@ -133,17 +133,18 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
                 final String columnComment = rs.getString(12);
                 final String defaultValue = rs.getString(13);
 
-                final DfColumnMeta columnMetaInfo = new DfColumnMeta();
-                columnMetaInfo.setColumnName(columnName);
-                columnMetaInfo.setJdbcDefValue(jdbcTypeCode);
-                columnMetaInfo.setDbTypeName(dbTypeName);
-                columnMetaInfo.setColumnSize(columnSize);
-                columnMetaInfo.setDecimalDigits(decimalDigits);
-                columnMetaInfo.setRequired(nullType == 0);
-                columnMetaInfo.setColumnComment(columnComment);
-                columnMetaInfo.setDefaultValue(filterDefaultValue(defaultValue));
+                final DfColumnMeta columnMeta = new DfColumnMeta();
+                columnMeta.setTableName(metaTableName);
+                columnMeta.setColumnName(columnName);
+                columnMeta.setJdbcDefValue(jdbcTypeCode);
+                columnMeta.setDbTypeName(dbTypeName);
+                columnMeta.setColumnSize(columnSize);
+                columnMeta.setDecimalDigits(decimalDigits);
+                columnMeta.setRequired(nullType == 0);
+                columnMeta.setColumnComment(columnComment);
+                columnMeta.setDefaultValue(filterDefaultValue(defaultValue));
 
-                columnList.add(columnMetaInfo);
+                columnList.add(columnMeta);
             }
         } finally {
             if (rs != null) {
@@ -233,11 +234,11 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     /**
      * Get the JDBC type of the column. <br /> 
      * Look at the java-doc of overload method if you want to know the priority of mapping.
-     * @param columnMetaInfo The meta information of column. (NotNull)
+     * @param columnMeta The meta information of column. (NotNull)
      * @return The JDBC type of the column. (NotNull)
      */
-    public String getColumnJdbcType(DfColumnMeta columnMetaInfo) {
-        return getColumnJdbcType(columnMetaInfo.getJdbcDefValue(), columnMetaInfo.getDbTypeName());
+    public String getColumnJdbcType(DfColumnMeta columnMeta) {
+        return getJdbcTypeMapper().getColumnJdbcType(columnMeta);
     }
 
     /**
@@ -252,11 +253,11 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
 
     /**
      * Does it have a mapping about the type?
-     * @param columnMetaInfo The meta information of column. (NotNull)
+     * @param columnMeta The meta information of column. (NotNull)
      * @return The JDBC type of the column. (NotNull)
      */
-    public boolean hasMappingJdbcType(DfColumnMeta columnMetaInfo) {
-        return hasMappingJdbcType(columnMetaInfo.getJdbcDefValue(), columnMetaInfo.getDbTypeName());
+    public boolean hasMappingJdbcType(DfColumnMeta columnMeta) {
+        return hasMappingJdbcType(columnMeta.getJdbcDefValue(), columnMeta.getDbTypeName());
     }
 
     /**
@@ -279,7 +280,12 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
     protected DfJdbcTypeMapper newJdbcTypeMapper() { // only once
         final DfTypeMappingProperties typeMappingProperties = getProperties().getTypeMappingProperties();
         final Map<String, String> nameToJdbcTypeMap = typeMappingProperties.getNameToJdbcTypeMap();
-        final DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToJdbcTypeMap, new Resource() {
+        final Map<String, Map<String, String>> pointToJdbcTypeMap = typeMappingProperties.getPointToJdbcTypeMap();
+        return new DfJdbcTypeMapper(nameToJdbcTypeMap, pointToJdbcTypeMap, createResource());
+    }
+
+    protected DfMapperResource createResource() {
+        return new DfMapperResource() {
             public boolean isLangJava() {
                 return getLanguageTypeFacadeProp().isTargetLanguageJava();
             }
@@ -308,9 +314,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
             public String toString() {
                 return "{" + isLangJava() + ", " + isDbmsOracle() + ", " + isDbmsPostgreSQL() + "}";
             }
-
-        });
-        return mapper;
+        };
     }
 
     // -----------------------------------------------------

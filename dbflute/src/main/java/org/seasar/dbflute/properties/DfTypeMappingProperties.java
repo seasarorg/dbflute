@@ -15,15 +15,14 @@
  */
 package org.seasar.dbflute.properties;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
-import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -57,41 +56,18 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     //                                 ---------------------
     protected Map<String, Object> getJdbcTypeMappingMap() {
         final Map<String, Object> typeMappingMap = getTypeMappingMap();
-        final Map<String, Object> jdbcTypeMappingMap = DfCollectionUtil.newLinkedHashMap();
-        final Set<String> keySet = typeMappingMap.keySet();
-        for (final String key : keySet) {
-            if (key == null) {
-                String msg = "Invalid typeMappingMap! The key should not be null! But: ";
-                msg = msg + " key=" + key;
-                msg = msg + " typeMappingMap=" + typeMappingMap;
-                throw new IllegalStateException(msg);
+        final Map<String, Object> jdbcTypeMappingMap = newLinkedHashMap();
+        for (Entry<String, Object> entry : typeMappingMap.entrySet()) {
+            final String key = entry.getKey();
+            if (isJdbcTypeMappingKey(key)) {
+                jdbcTypeMappingMap.put(key, (String) entry.getValue());
             }
-            if (isNameTypeMappingKey(key)) {
-                continue; // The element is for nameTypeMapping.
-            }
-            final Object value = typeMappingMap.get(key);
-            if (value == null) {
-                String msg = "Invalid typeMappingMap! The value should not be null! But: ";
-                msg = msg + " key=" + key + " value=" + value;
-                msg = msg + " typeMappingMap=" + typeMappingMap;
-                throw new IllegalStateException(msg);
-            }
-            if (!(value instanceof String)) {
-                String msg = "Invalid typeMappingMap! The type of the value should be String! But: ";
-                msg = msg + " type=" + value.getClass() + " key=" + key + " value=" + value;
-                msg = msg + " typeMappingMap=" + typeMappingMap;
-                throw new IllegalStateException(msg);
-            }
-            final String strVal = (String) value;
-            if (strVal.trim().length() == 0) {
-                String msg = "Invalid typeMappingMap! The value should not be empty! But: ";
-                msg = msg + " key=" + key + " value=" + value;
-                msg = msg + " typeMappingMap=" + typeMappingMap;
-                throw new IllegalStateException(msg);
-            }
-            jdbcTypeMappingMap.put(key, value);
         }
         return jdbcTypeMappingMap;
+    }
+
+    protected static boolean isJdbcTypeMappingKey(String key) {
+        return !isNameTypeMappingKey(key) && !isPointTypeMappingKey(key);
     }
 
     // -----------------------------------------------------
@@ -99,51 +75,55 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     //                                 ---------------------
     protected Map<String, String> getNameTypeMappingMap() {
         final Map<String, Object> typeMappingMap = getTypeMappingMap();
-        final Map<String, String> nameTypeMappingMap = new LinkedHashMap<String, String>();
-        final Set<String> keySet = typeMappingMap.keySet();
-        for (final String key : keySet) {
-            if (key == null) {
-                String msg = "Invalid typeMappingMap! The key should not be null! But: ";
-                msg = msg + " key=" + key;
-                msg = msg + " typeMappingMap=" + typeMappingMap;
-                throw new IllegalStateException(msg);
+        final Map<String, String> nameTypeMappingMap = newLinkedHashMap();
+        for (Entry<String, Object> entry : typeMappingMap.entrySet()) {
+            final String key = entry.getKey();
+            if (isNameTypeMappingKey(key)) {
+                nameTypeMappingMap.put(extractDbTypeName(key), (String) entry.getValue());
             }
-            if (!isNameTypeMappingKey(key)) {
-                continue; // The element is for jdbcTypeMapping.
-            }
-            final Object value = typeMappingMap.get(key);
-            if (value == null) {
-                String msg = "Invalid typeMappingMap! The value should not be null! But: ";
-                msg = msg + " key=" + key + " value=" + value;
-                msg = msg + " typeMappingMap=" + typeMappingMap;
-                throw new IllegalStateException(msg);
-            }
-            if (!(value instanceof String)) {
-                String msg = "Invalid typeMappingMap! The type of the value should be String! But: ";
-                msg = msg + " type=" + value.getClass() + " key=" + key + " value=" + value;
-                msg = msg + " typeMappingMap=" + typeMappingMap;
-                throw new IllegalStateException(msg);
-            }
-            final String strVal = (String) value;
-            if (strVal.trim().length() == 0) {
-                String msg = "Invalid typeMappingMap! The value should not be empty! But: ";
-                msg = msg + " key=" + key + " value=" + value;
-                msg = msg + " typeMappingMap=" + typeMappingMap;
-                throw new IllegalStateException(msg);
-            }
-            nameTypeMappingMap.put(extractDbTypeName(key), strVal);
         }
         return nameTypeMappingMap;
     }
 
-    static boolean isNameTypeMappingKey(String key) {
+    protected static boolean isNameTypeMappingKey(String key) {
+        if (isPointTypeMappingKey(key)) {
+            return false;
+        }
         return key.startsWith("$$") && key.endsWith("$$") && key.length() > "$$$$".length();
     }
 
-    static String extractDbTypeName(String key) {
-        String realKey = key.substring("$$".length());
-        realKey = realKey.substring(0, realKey.length() - "$$".length());
-        return realKey;
+    protected static String extractDbTypeName(String key) {
+        final String realKey = key.substring("$$".length());
+        return realKey.substring(0, realKey.length() - "$$".length());
+    }
+
+    // -----------------------------------------------------
+    //                                Point Type Mapping Map
+    //                                ----------------------
+    protected Map<String, Map<String, String>> getPointTypeMappingMap() {
+        final Map<String, Object> typeMappingMap = getTypeMappingMap();
+        final Map<String, Map<String, String>> pointTypeMappingMap = StringKeyMap.createAsFlexibleOrdered();
+        for (Entry<String, Object> entry : typeMappingMap.entrySet()) {
+            final String key = entry.getKey();
+            if (!isPointTypeMappingKey(key)) {
+                continue;
+            }
+            final Object obj = entry.getValue();
+            @SuppressWarnings("unchecked")
+            final Map<String, Map<String, String>> pointMap = (Map<String, Map<String, String>>) obj;
+            for (Entry<String, Map<String, String>> pointEntry : pointMap.entrySet()) {
+                final String pointKey = pointEntry.getKey();
+                final Map<String, String> pointElementMap = pointEntry.getValue();
+                final Map<String, String> flexibleMap = StringKeyMap.createAsFlexibleOrdered();
+                flexibleMap.putAll(pointElementMap);
+                pointTypeMappingMap.put(pointKey, pointElementMap);
+            }
+        }
+        return pointTypeMappingMap;
+    }
+
+    protected static boolean isPointTypeMappingKey(String key) {
+        return key.startsWith("$$df:point$$");
     }
 
     // ===================================================================================
@@ -155,11 +135,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
         if (_jdbcToJavaNativeMap != null) {
             return _jdbcToJavaNativeMap;
         }
-
         if (getBasicProperties().isTargetLanguageJava()) {
-            // * * *
-            // Java
-            // * * *
             final Map<String, Object> typeMappingMap = getJdbcTypeMappingMap();
             if (typeMappingMap.isEmpty()) {
                 _jdbcToJavaNativeMap = getLanguageMetaData().getJdbcToJavaNativeMap(); // actually empty
@@ -169,16 +145,14 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
             return _jdbcToJavaNativeMap;
         }
 
-        // * * * * *
-        // Not Java
-        // * * * * *
+        // not Java here
         final Map<String, Object> metaMap = getLanguageMetaData().getJdbcToJavaNativeMap();
         if (metaMap.isEmpty()) {
             String msg = "The jdbcToJavaNamtiveMap should not be null: metaData=" + getLanguageMetaData();
             throw new IllegalStateException(msg);
         }
 
-        Map<String, Object> typeMappingMap = getJdbcTypeMappingMap();
+        final Map<String, Object> typeMappingMap = getJdbcTypeMappingMap();
         if (typeMappingMap.isEmpty()) {
             _jdbcToJavaNativeMap = getLanguageMetaData().getJdbcToJavaNativeMap();
         } else {
@@ -189,10 +163,10 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
             return _jdbcToJavaNativeMap;
         }
 
-        // Reflect meta map to native map only difference.
-        final Set<String> keySet = metaMap.keySet();
-        for (String key : keySet) {
-            final Object value = metaMap.get(key);
+        // reflect meta map to native map only difference
+        for (Entry<String, Object> entry : metaMap.entrySet()) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
             if (!_jdbcToJavaNativeMap.containsKey(key)) {
                 _jdbcToJavaNativeMap.put(key, value);
             }
@@ -211,6 +185,19 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
         }
         _nameToJdbcTypeMap = getNameTypeMappingMap();
         return _nameToJdbcTypeMap;
+    }
+
+    // ===================================================================================
+    //                                                                  Point to JDBC Type
+    //                                                                  ==================
+    protected Map<String, Map<String, String>> _pointToJdbcTypeMap;
+
+    public Map<String, Map<String, String>> getPointToJdbcTypeMap() {
+        if (_pointToJdbcTypeMap != null) {
+            return _pointToJdbcTypeMap;
+        }
+        _pointToJdbcTypeMap = getPointTypeMappingMap();
+        return _pointToJdbcTypeMap;
     }
 
     // ===================================================================================

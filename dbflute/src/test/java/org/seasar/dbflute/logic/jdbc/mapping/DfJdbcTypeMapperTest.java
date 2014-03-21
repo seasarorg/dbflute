@@ -15,10 +15,6 @@
  */
 package org.seasar.dbflute.logic.jdbc.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.sql.Types;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,19 +22,20 @@ import java.util.Properties;
 
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.Resource;
+import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
+import org.seasar.dbflute.unit.core.PlainTestCase;
 
 /**
  * @author jflute
  * @since 0.9.5 (2009/04/21 Tuesday)
  */
-public class DfJdbcTypeMapperTest {
+public class DfJdbcTypeMapperTest extends PlainTestCase {
 
     public void test_getColumnTorqueType_NameToTorqueTypeMap() {
         initializeEmptyProperty();
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
         nameToTorqueTypeMap.put("foo", "bar");
-        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+        DfJdbcTypeMapper mapper = createMapperOracle(nameToTorqueTypeMap);
         // ## Act & Assert ##
         assertEquals("bar", mapper.getColumnJdbcType(Types.TIMESTAMP, "foo"));
         assertEquals(TypeMap.TIMESTAMP, mapper.getColumnJdbcType(Types.TIMESTAMP, "bar"));
@@ -47,7 +44,7 @@ public class DfJdbcTypeMapperTest {
     public void test_getColumnTorqueType_Java_Oracle() {
         initializeEmptyProperty();
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
-        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+        DfJdbcTypeMapper mapper = createMapperOracle(nameToTorqueTypeMap);
 
         // ## Act & Assert ##
         assertEquals(TypeMap.TIMESTAMP, mapper.getColumnJdbcType(Types.TIMESTAMP, "timestamp"));
@@ -60,7 +57,7 @@ public class DfJdbcTypeMapperTest {
     public void test_getColumnTorqueType_Java_PostgreSQL() {
         initializeEmptyProperty();
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
-        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().postgreSQL());
+        DfJdbcTypeMapper mapper = createMapperPostgreSQL(nameToTorqueTypeMap);
 
         // ## Act & Assert ##
         assertEquals(TypeMap.TIMESTAMP, mapper.getColumnJdbcType(Types.TIMESTAMP, "timestamp"));
@@ -79,7 +76,7 @@ public class DfJdbcTypeMapperTest {
         initializeTestProperty(prop);
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
         nameToTorqueTypeMap.put("__int4", "FOO");
-        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+        DfJdbcTypeMapper mapper = createMapperOracle(nameToTorqueTypeMap);
 
         // ## Act & Assert ##
         assertEquals("FOO", mapper.getColumnJdbcType(Types.TIMESTAMP, "__int4"));
@@ -91,7 +88,7 @@ public class DfJdbcTypeMapperTest {
         initializeEmptyProperty();
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
         nameToTorqueTypeMap.put("foo", "bar");
-        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+        DfJdbcTypeMapper mapper = createMapperOracle(nameToTorqueTypeMap);
 
         // ## Act & Assert ##
         assertTrue(mapper.isOracleNCharOrNVarchar("NVARCHAR2"));
@@ -108,7 +105,7 @@ public class DfJdbcTypeMapperTest {
         initializeEmptyProperty();
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
         nameToTorqueTypeMap.put("foo", "bar");
-        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+        DfJdbcTypeMapper mapper = createMapperOracle(nameToTorqueTypeMap);
 
         // ## Act & Assert ##
         assertTrue(mapper.isOracleNCharOrNVarcharOrNClob("NVARCHAR2"));
@@ -118,6 +115,16 @@ public class DfJdbcTypeMapperTest {
         assertFalse(mapper.isOracleNCharOrNVarcharOrNClob("VARCHAR2"));
         assertFalse(mapper.isOracleNCharOrNVarcharOrNClob("CHAR"));
         assertFalse(mapper.isOracleNCharOrNVarcharOrNClob("CLOB"));
+    }
+
+    protected DfJdbcTypeMapper createMapperOracle(Map<String, String> nameToTorqueTypeMap) {
+        Map<String, Map<String, String>> pointMap = newHashMap();
+        return new DfJdbcTypeMapper(nameToTorqueTypeMap, pointMap, new TestResource().java().oracle());
+    }
+
+    protected DfJdbcTypeMapper createMapperPostgreSQL(Map<String, String> nameToTorqueTypeMap) {
+        Map<String, Map<String, String>> pointMap = newHashMap();
+        return new DfJdbcTypeMapper(nameToTorqueTypeMap, pointMap, new TestResource().java().postgreSQL());
     }
 
     protected void initializeEmptyProperty() {
@@ -132,7 +139,7 @@ public class DfJdbcTypeMapperTest {
         TypeMap.reload();
     }
 
-    protected static class TestResource implements Resource {
+    protected static class TestResource implements DfMapperResource {
         protected boolean _targetLanguageJava;
         protected boolean _databaseOracle;
         protected boolean _databasePostgreSQL;

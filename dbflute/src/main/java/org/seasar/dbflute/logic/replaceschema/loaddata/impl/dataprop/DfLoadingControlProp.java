@@ -398,20 +398,19 @@ public class DfLoadingControlProp {
         return filtered;
     }
 
+    @SuppressWarnings("unchecked")
     protected String getDateAdjustmentExp(String dataDirectory, String tableName, String columnName) {
         final Map<String, Object> dateAdjustmentMap = getDateAdjustmentMap(dataDirectory);
         if (dateAdjustmentMap == null) {
             return null;
         }
-        @SuppressWarnings("unchecked")
-        final Map<String, String> columnMap = (Map<String, String>) dateAdjustmentMap.get(tableName);
+        Map<String, String> columnMap = (Map<String, String>) dateAdjustmentMap.get(tableName);
         final String foundExp = findAdjustmentExp(tableName, columnName, columnMap);
         if (foundExp != null) {
             return foundExp;
         }
-        @SuppressWarnings("unchecked")
-        final Map<String, String> allTableColumnMap = (Map<String, String>) dateAdjustmentMap.get(KEY_ALL_MARK);
-        return findAdjustmentExp(tableName, columnName, allTableColumnMap);
+        columnMap = (Map<String, String>) dateAdjustmentMap.get(KEY_ALL_MARK);
+        return findAdjustmentExp(tableName, columnName, columnMap);
     }
 
     protected String findAdjustmentExp(String tableName, String columnName, Map<String, String> columnMap) {
