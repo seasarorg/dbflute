@@ -63,12 +63,7 @@ public class DfXlsReader {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    // -----------------------------------------------------
-    //                                          Xls Resource
-    //                                          ------------
-    protected DfDataSet _dataSet;
-    protected HSSFWorkbook _workbook;
-    protected HSSFDataFormat _dataFormat;
+    protected final File _xlsFile;
 
     // -----------------------------------------------------
     //                                           Read Option
@@ -78,42 +73,42 @@ public class DfXlsReader {
     protected final Map<String, List<String>> _emptyStringTableColumnMap;
     protected final Pattern _skipSheetPattern; // not required
 
+    // -----------------------------------------------------
+    //                                          Xls Resource
+    //                                          ------------
+    protected DfDataSet _dataSet;
+    protected HSSFWorkbook _workbook;
+    protected HSSFDataFormat _dataFormat;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfXlsReader(File file // xls file to read
+    public DfXlsReader(File xlsFile // xls file to read
             , Map<String, String> tableNameMap // map for long table name
             , Map<String, List<String>> notTrimTableColumnMap // map for not-trim column
             , Map<String, List<String>> emptyStringTableColumnMap // map for empty-string-allowed column
             , Pattern skipSheetPattern) { // pattern of skipped sheet
-        this(create(file), tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, skipSheetPattern);
-    }
-
-    protected DfXlsReader(InputStream ins // stream for xls file to read
-            , Map<String, String> tableNameMap // map for long table name
-            , Map<String, List<String>> notTrimTableColumnMap // map for not-trim column
-            , Map<String, List<String>> emptyStringTableColumnMap // map for empty-string-allowed column
-            , Pattern skipSheetPattern) { // pattern of skipped sheet
+        _xlsFile = xlsFile;
         if (tableNameMap != null) {
-            this._tableNameMap = tableNameMap;
+            _tableNameMap = tableNameMap;
         } else {
-            this._tableNameMap = StringKeyMap.createAsFlexible();
+            _tableNameMap = StringKeyMap.createAsFlexible();
         }
         if (notTrimTableColumnMap != null) {
-            this._notTrimTableColumnMap = notTrimTableColumnMap;
+            _notTrimTableColumnMap = notTrimTableColumnMap;
         } else {
-            this._notTrimTableColumnMap = StringKeyMap.createAsFlexible();
+            _notTrimTableColumnMap = StringKeyMap.createAsFlexible();
         }
         if (emptyStringTableColumnMap != null) {
-            this._emptyStringTableColumnMap = emptyStringTableColumnMap;
+            _emptyStringTableColumnMap = emptyStringTableColumnMap;
         } else {
-            this._emptyStringTableColumnMap = StringKeyMap.createAsFlexible();
+            _emptyStringTableColumnMap = StringKeyMap.createAsFlexible();
         }
-        this._skipSheetPattern = skipSheetPattern;
-        setupWorkbook(ins);
+        _skipSheetPattern = skipSheetPattern;
+        setupWorkbook(toStream(xlsFile));
     }
 
-    protected static InputStream create(File file) {
+    protected InputStream toStream(File file) {
         try {
             return new FileInputStream(file);
         } catch (FileNotFoundException e) {
@@ -124,9 +119,9 @@ public class DfXlsReader {
     // -----------------------------------------------------
     //                                       Set up Workbook
     //                                       ---------------
-    protected void setupWorkbook(InputStream in) {
+    protected void setupWorkbook(InputStream ins) {
         try {
-            _workbook = new HSSFWorkbook(in);
+            _workbook = new HSSFWorkbook(ins);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -176,6 +171,10 @@ public class DfXlsReader {
     protected void throwXlsReaderMappingTableNotFoundException(String sheetName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The sheetName was not found in the tableNameMap.");
+        br.addItem("Xls File");
+        br.addElement(_xlsFile);
+        br.addItem("Sheet Name");
+        br.addElement(sheetName);
         br.addItem("TableName Map");
         if (!_tableNameMap.isEmpty()) {
             for (Entry<String, String> entry : _tableNameMap.entrySet()) {
@@ -184,8 +183,6 @@ public class DfXlsReader {
         } else {
             br.addElement("*empty");
         }
-        br.addItem("Sheet Name");
-        br.addElement(sheetName);
         final String msg = br.buildExceptionMessage();
         throw new DfXlsReaderReadFailureException(msg);
     }
@@ -193,6 +190,8 @@ public class DfXlsReader {
     protected void throwXlsReaderFirstRowNotColumnDefinitionException(String tableName) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
         br.addNotice("The first row of the sheet was not column definition.");
+        br.addItem("Xls File");
+        br.addElement(_xlsFile);
         br.addItem("Table");
         br.addElement(tableName);
         final String msg = br.buildExceptionMessage();
@@ -252,9 +251,7 @@ public class DfXlsReader {
                     if (cell.getCellType() != HSSFCell.CELL_TYPE_STRING) {
                         throw e;
                     }
-                    String msg = "...Changing the column type to STRING type:";
-                    msg = msg + " name=" + columnName + " value=" + value;
-                    _log.info(msg);
+                    _log.info("...Changing the column type to STRING type: name=" + columnName + " value=" + value);
                     column.setColumnType(DfDtsColumnTypes.STRING);
                     dataRow.addValue(columnName, value);
                 }
@@ -265,48 +262,56 @@ public class DfXlsReader {
     }
 
     protected void throwCellValueHandlingException(DfDataTable table, DfDataColumn column, HSSFRow row, HSSFCell cell,
-            Object value, RuntimeException e) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-        msg = msg + "Failed to handling the cell value!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Table]" + ln() + table.getTableDbName() + ln();
-        msg = msg + ln();
-        msg = msg + "[Column]" + ln() + (column != null ? column.getColumnDbName() : null) + ln();
-        msg = msg + ln();
-        msg = msg + "[Row Number]" + ln() + row.getRowNum() + ln();
-        msg = msg + ln();
-        msg = msg + "[Cell Object]" + ln() + cell + ln();
-        msg = msg + ln();
+            Object value, RuntimeException cause) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Failed to handle the cell value on the xls file.");
+        br.addItem("Advice");
+        br.addElement("Confirm the exception message.");
+        br.addElement("The cell value may be wrong type for the column.");
+        br.addElement("So confirm the value on the xls file.");
+        br.addItem("RuntimeException");
+        br.addElement(cause.getMessage());
+        br.addItem("Xls File");
+        br.addElement(_xlsFile);
+        br.addItem("Table");
+        br.addElement(table.getTableDbName());
+        br.addItem("Column");
+        br.addElement(column != null ? column.getColumnDbName() : null);
+        br.addItem("Mapping Type");
+        final DfDtsColumnType columnType = column.getColumnType();
+        br.addElement(columnType != null ? columnType.getType() : null);
+        br.addItem("Cell Type");
         if (cell != null) {
             switch (cell.getCellType()) {
             case HSSFCell.CELL_TYPE_NUMERIC:
-                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_NUMERIC" + ln();
+                br.addElement("CELL_TYPE_NUMERIC");
                 break;
             case HSSFCell.CELL_TYPE_STRING:
-                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_STRING" + ln();
+                br.addElement("CELL_TYPE_STRING");
                 break;
             case HSSFCell.CELL_TYPE_FORMULA:
-                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_FORMULA" + ln();
+                br.addElement("CELL_TYPE_FORMULA");
                 break;
             case HSSFCell.CELL_TYPE_BLANK:
-                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_BLANK" + ln();
+                br.addElement("CELL_TYPE_BLANK");
                 break;
             case HSSFCell.CELL_TYPE_BOOLEAN:
-                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_BOOLEAN" + ln();
+                br.addElement("CELL_TYPE_BOOLEAN");
                 break;
             case HSSFCell.CELL_TYPE_ERROR:
-                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_ERROR" + ln();
+                br.addElement("CELL_TYPE_ERROR");
                 break;
             default:
-                msg = msg + "[Cell Type]" + ln() + cell.getCellType() + ln();
+                br.addElement(cell.getCellType());
                 break;
             }
         }
-        msg = msg + ln();
-        msg = msg + "[Cell Value]" + ln() + value + ln();
-        msg = msg + "- - - - - - - - - -/";
-        throw new IllegalStateException(msg, e);
+        br.addItem("Cell Value");
+        br.addElement(value);
+        br.addItem("Row Number");
+        br.addElement(column != null ? row.getRowNum() : null);
+        final String msg = br.buildExceptionMessage();
+        throw new DfXlsReaderReadFailureException(msg, cause);
     }
 
     // ===================================================================================

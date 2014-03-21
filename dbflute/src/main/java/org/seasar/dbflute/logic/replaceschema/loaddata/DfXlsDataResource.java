@@ -27,6 +27,14 @@ public class DfXlsDataResource {
     protected String _dataDirectory;
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _envType + ", " + _dataDirectory + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getEnvType() {

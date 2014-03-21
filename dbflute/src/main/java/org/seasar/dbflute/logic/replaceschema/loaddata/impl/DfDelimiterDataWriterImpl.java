@@ -222,7 +222,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                 }
                 final Map<String, Object> columnValueMap = sqlBuilder.setupParameter();
                 final Set<String> sysdateColumnSet = sqlBuilder.getSysdateColumnSet();
-                resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap, sysdateColumnSet);
+                resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap, sysdateColumnSet,
+                        rowNumber);
                 handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
 
                 int bindCount = 1;
@@ -234,7 +235,8 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // /- - - - - - - - - - - - - - - - - -
                     // process Null (against Null Headache)
                     // - - - - - - - - - -/
-                    if (processNull(dataDirectory, tableDbName, columnName, obj, ps, bindCount, columnMetaMap)) {
+                    if (processNull(dataDirectory, tableDbName, columnName, obj, ps, bindCount, columnMetaMap,
+                            rowNumber)) {
                         bindCount++;
                         continue;
                     }
@@ -245,7 +247,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // If the value is not null and the value has the own type except string,
                     // It registers the value to statement by the type.
                     if (processNotNullNotString(dataDirectory, tableDbName, columnName, obj, conn, ps, bindCount,
-                            columnMetaMap)) {
+                            columnMetaMap, rowNumber)) {
                         bindCount++;
                         continue;
                     }
@@ -255,7 +257,7 @@ public class DfDelimiterDataWriterImpl extends DfAbsractDataWriter implements Df
                     // - - - - - - - - - -/
                     final String value = (String) obj;
                     processNotNullString(dataDirectory, dataFile, tableDbName, columnName, value, conn, ps, bindCount,
-                            columnMetaMap);
+                            columnMetaMap, rowNumber);
                     bindCount++;
                 }
                 if (isMergedSuppressBatchUpdate(dataDirectory)) {

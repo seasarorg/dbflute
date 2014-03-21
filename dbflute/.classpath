@@ -16,6 +16,6 @@
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.8.1.jar" sourcepath="lib/sources/junit-4.8.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/commons-compress-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/utflute-core-0.1.8.jar" sourcepath="lib/sources/utflute-core-0.1.8-sources.jar"/>
+	<classpathentry kind="lib" path="lib/utflute-core-0.4.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

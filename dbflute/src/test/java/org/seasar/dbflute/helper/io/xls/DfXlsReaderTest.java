@@ -140,13 +140,17 @@ public class DfXlsReaderTest extends PlainTestCase {
 
         public DfXlsReaderEmpty(Map<String, String> tableNameMap, Map<String, List<String>> notTrimTableColumnMap,
                 Map<String, List<String>> stringEmptyTableColumnMap, Pattern skipSheetPattern) {
-            super(new ByteArrayInputStream(new byte[] {}), tableNameMap, notTrimTableColumnMap,
-                    stringEmptyTableColumnMap, skipSheetPattern);
+            super(null, tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap, skipSheetPattern);
         }
 
         @Override
-        protected void setupWorkbook(InputStream in) {
-            // Nothing!
+        protected InputStream toStream(File xlsFile) {
+            return new ByteArrayInputStream(new byte[] {});
+        }
+
+        @Override
+        protected void setupWorkbook(InputStream ins) {
+            // do nothing
         }
     }
 }

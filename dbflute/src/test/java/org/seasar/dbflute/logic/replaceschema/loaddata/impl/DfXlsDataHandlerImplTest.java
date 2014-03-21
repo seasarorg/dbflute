@@ -67,7 +67,7 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
         columnMetaInfoMap.put("foo", info);
 
         // ## Act ##
-        boolean actual = impl.processBoolean("tbl", "foo", "0", null, null, 0, columnMetaInfoMap);
+        boolean actual = impl.processBoolean("tbl", "foo", "0", null, null, 0, columnMetaInfoMap, 3);
 
         // ## Assert ##
         log("actual=" + actual);
