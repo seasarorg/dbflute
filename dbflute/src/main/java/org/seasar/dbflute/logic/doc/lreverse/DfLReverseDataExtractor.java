@@ -102,7 +102,7 @@ public class DfLReverseDataExtractor {
         final String sql = buildExtractingSql(table);
         if (large) {
             return processLargeData(table, sql);
-        } else { // main
+        } else { // mainly here
             return processNormalData(table, sql);
         }
     }

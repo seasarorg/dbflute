@@ -58,7 +58,7 @@ import org.seasar.dbflute.helper.dataset.states.DfDtsCreatedState;
 import org.seasar.dbflute.helper.dataset.states.DfDtsSqlContext;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
-import org.seasar.dbflute.helper.io.xls.DfXlsReader;
+import org.seasar.dbflute.helper.io.xls.DfTableXlsReader;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfColumnBindTypeProvider;
 import org.seasar.dbflute.logic.replaceschema.loaddata.DfLoadedDataInfo;
@@ -106,7 +106,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final List<File> xlsList = getXlsList(resource);
         final List<DfDataSet> ls = new ArrayList<DfDataSet>();
         for (File file : xlsList) {
-            final DfXlsReader xlsReader = createXlsReader(dataDirectory, file);
+            final DfTableXlsReader xlsReader = createTableXlsReader(dataDirectory, file);
             ls.add(xlsReader.read());
         }
         return ls;
@@ -126,7 +126,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = ");
             _log.info("writeData(" + file + ")");
             _log.info("= = = = = = =/");
-            final DfXlsReader xlsReader = createXlsReader(dataDirectory, file);
+            final DfTableXlsReader xlsReader = createTableXlsReader(dataDirectory, file);
             final DfDataSet dataSet = xlsReader.read();
             filterValidColumn(dataSet);
             setupDefaultValue(dataDirectory, dataSet);
@@ -449,25 +449,23 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             Map<String, DfColumnMeta> columnMetaMap, Connection conn, PreparedStatement ps,
             LoggingInsertType loggingInsertType, boolean suppressBatchUpdate) throws SQLException {
         final String tableDbName = dataTable.getTableDbName();
-        // ColumnValue and ColumnObject
         final ColumnContainer columnContainer = createColumnContainer(dataTable, dataRow);
         final String dataDirectory = resource.getDataDirectory();
         final Map<String, Object> columnValueMap = columnContainer.getColumnValueMap();
         if (columnValueMap.isEmpty()) {
             throwXlsDataColumnDefFailureException(dataDirectory, file, dataTable);
         }
-        if (isColumnValueAllNull(columnValueMap)) { // against Excel Devil
+        if (isColumnValueAllNullOrEmpty(columnValueMap)) { // against Excel Devil
             return false;
         }
         final Set<String> sysdateColumnSet = extractSysdateColumnSet(dataDirectory, columnValueMap);
-        convertColumnValue(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
+        convertColumnValueIfNeeds(dataDirectory, tableDbName, columnValueMap, columnMetaMap);
         final int rowNumber = dataRow.getRowNumber();
         resolveRelativeDate(dataDirectory, tableDbName, columnValueMap, columnMetaMap, sysdateColumnSet, rowNumber);
         handleLoggingInsert(tableDbName, columnValueMap, loggingInsertType, rowNumber);
 
         int bindCount = 1;
-        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
-        for (Entry<String, Object> entry : entrySet) {
+        for (Entry<String, Object> entry : columnValueMap.entrySet()) {
             final String columnName = entry.getKey();
             final Object obj = entry.getValue();
             processBindColumnValue(resource, dataDirectory, file, tableDbName, columnName, obj, conn, ps, bindCount,
@@ -514,13 +512,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return _defaultValueProp.extractSysdateColumnSet(columnValueMap, defaultValueMap);
     }
 
-    protected boolean isColumnValueAllNull(Map<String, Object> plainMap) { // default columns should not be contained
+    protected boolean isColumnValueAllNullOrEmpty(Map<String, Object> plainMap) { // default columns should not be contained
         for (Object value : plainMap.values()) {
-            if (value != null) {
+            if (value != null && !value.equals("")) {
                 return false;
             }
         }
-        return true;
+        return true; // all columns are null or empty so invalid row
     }
 
     protected void processBindColumnValue(DfXlsDataResource resource, String dataDirectory, File file,
@@ -554,13 +552,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                        Xls Handling
     //                                                                        ============
-    protected DfXlsReader createXlsReader(String dataDirectory, File file) {
+    protected DfTableXlsReader createTableXlsReader(String dataDirectory, File file) {
         final Map<String, String> tableNameMap = getTableNameMap(dataDirectory);
         final Map<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectory);
         final Map<String, List<String>> emptyStringTableColumnMap = getEmptyStringTableColumnMap(dataDirectory);
-        final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap,
-                emptyStringTableColumnMap, _skipSheetPattern);
-        return xlsReader;
+        final boolean rtrimCellValue = isRTrimCellValue(dataDirectory);
+        return new DfTableXlsReader(file, tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap,
+                _skipSheetPattern, rtrimCellValue);
     }
 
     protected List<File> getXlsList(DfXlsDataResource resource) {
@@ -606,10 +604,17 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                 Column Value Filter
     //                                                                 ===================
-    protected void convertColumnValue(String dataDirectory, String tableName, Map<String, Object> columnValueMap,
-            Map<String, DfColumnMeta> columnMetaMap) {
+    protected void convertColumnValueIfNeeds(String dataDirectory, String tableName,
+            Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap) {
+        // handling both convertValueMap and defaultValueMap
         final Map<String, Map<String, String>> convertValueMap = getConvertValueMap(dataDirectory);
         final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectory);
+        // empty string has already been converted to null basically
+        // so it does not need to convert here
+        if ((convertValueMap == null || convertValueMap.isEmpty()) // no convert
+                && (defaultValueMap == null || defaultValueMap.isEmpty())) { // and no default
+            return;
+        }
         final DfColumnValueConverter converter = new DfColumnValueConverter(convertValueMap, defaultValueMap,
                 new DfColumnBindTypeProvider() {
                     public Class<?> provide(String tableName, DfColumnMeta columnMeta) {
@@ -631,15 +636,12 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 
                 if (metaMetaMap.containsKey(defaultTargetColumnName) && !table.hasColumn(defaultTargetColumnName)) {
+                    // values are resolved later so resolve type only here
                     final DfDtsColumnType columnType;
-                    // *values are resolved later
-                    //final Object value;
                     if (defaultValue.equalsIgnoreCase("sysdate")) {
                         columnType = DfDtsColumnTypes.TIMESTAMP;
-                        //value = new Timestamp(System.currentTimeMillis());
                     } else {
                         columnType = DfDtsColumnTypes.STRING;
-                        //value = defaultValue;
                     }
                     table.addColumn(defaultTargetColumnName, columnType);
 
@@ -806,39 +808,39 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                    Column Container
     //                                                                    ================
-    protected ColumnContainer createColumnContainer(final DfDataTable dataTable, final DfDataRow dataRow) {
+    protected ColumnContainer createColumnContainer(DfDataTable dataTable, DfDataRow dataRow) {
         final ColumnContainer container = new ColumnContainer();
         for (int i = 0; i < dataTable.getColumnSize(); i++) {
             final DfDataColumn dataColumn = dataTable.getColumn(i);
             if (!dataColumn.isWritable()) {
                 continue;
             }
-            final Object value = dataRow.getValue(i);
+            final Object columnValue = dataRow.getValue(i);
             final String columnName = dataColumn.getColumnDbName();
-            container.addColumnValue(columnName, value);
+            container.addColumnValue(columnName, columnValue);
             container.addColumnObject(columnName, dataColumn);
         }
         return container;
     }
 
     protected static class ColumnContainer {
-        protected Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
-        protected Map<String, DfDataColumn> columnObjectMap = new LinkedHashMap<String, DfDataColumn>();
+        protected final Map<String, Object> _columnValueMap = new LinkedHashMap<String, Object>();
+        protected final Map<String, DfDataColumn> _columnObjectMap = new LinkedHashMap<String, DfDataColumn>();
 
         public Map<String, Object> getColumnValueMap() {
-            return columnValueMap;
+            return _columnValueMap;
         }
 
         public void addColumnValue(String columnName, Object columnValue) {
-            this.columnValueMap.put(columnName, columnValue);
+            _columnValueMap.put(columnName, columnValue);
         }
 
         public Map<String, DfDataColumn> getColumnObjectMap() {
-            return columnObjectMap;
+            return _columnObjectMap;
         }
 
         public void addColumnObject(String columnName, DfDataColumn columnObject) {
-            this.columnObjectMap.put(columnName, columnObject);
+            _columnObjectMap.put(columnName, columnObject);
         }
     }
 

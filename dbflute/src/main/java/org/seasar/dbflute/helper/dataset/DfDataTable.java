@@ -50,7 +50,11 @@ public class DfDataTable {
     protected final List<DfDataColumn> _columnList = new ArrayList<DfDataColumn>();
     protected final List<DfDataRow> _rows = new ArrayList<DfDataRow>();
     protected final List<DfDataRow> _removedRows = new ArrayList<DfDataRow>();
-    protected boolean _hasMetaData = false;
+    protected boolean _hasMetaData;
+
+    // failed to be helper dependencies...
+    protected final DfColumnExtractor _columnExtractor = new DfColumnExtractor();
+    protected final DfUniqueKeyExtractor _uniqueKeyExtractor = new DfUniqueKeyExtractor();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -66,8 +70,8 @@ public class DfDataTable {
         return _rows.size();
     }
 
-    public DfDataRow getRow(int index) {
-        return (DfDataRow) _rows.get(index);
+    public DfDataRow getRow(int rowIndex) {
+        return (DfDataRow) _rows.get(rowIndex);
     }
 
     public DfDataRow addRow() {
@@ -103,8 +107,8 @@ public class DfDataTable {
         return _columnMap.size();
     }
 
-    public DfDataColumn getColumn(int index) {
-        return _columnList.get(index);
+    public DfDataColumn getColumn(int columnIndex) {
+        return _columnList.get(columnIndex);
     }
 
     public DfDataColumn getColumn(String columnName) {
@@ -125,12 +129,12 @@ public class DfDataTable {
         return getColumn0(columnName) != null;
     }
 
-    public String getColumnName(int index) {
-        return getColumn(index).getColumnDbName();
+    public String getColumnName(int columnIndex) {
+        return getColumn(columnIndex).getColumnDbName();
     }
 
-    public DfDtsColumnType getColumnType(int index) {
-        return getColumn(index).getColumnType();
+    public DfDtsColumnType getColumnType(int columnIndex) {
+        return getColumn(columnIndex).getColumnType();
     }
 
     public DfDtsColumnType getColumnType(String columnName) {
@@ -179,8 +183,7 @@ public class DfDataTable {
     //                                                                       =============
     protected Map<String, DfColumnMeta> extractColumnMetaMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
-        final List<DfColumnMeta> metaList = new DfColumnExtractor()
-                .getColumnList(metaData, unifiedSchema, _tableDbName);
+        final List<DfColumnMeta> metaList = _columnExtractor.getColumnList(metaData, unifiedSchema, _tableDbName);
         final Map<String, DfColumnMeta> metaMap = new HashMap<String, DfColumnMeta>();
         for (DfColumnMeta metaInfo : metaList) {
             metaMap.put(metaInfo.getColumnName(), metaInfo);
@@ -190,10 +193,8 @@ public class DfDataTable {
 
     protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, UnifiedSchema unifiedSchema) {
         try {
-            final DfPrimaryKeyMeta pkInfo = new DfUniqueKeyExtractor().getPrimaryKey(metaData, unifiedSchema,
-                    _tableDbName);
-            final List<String> list = pkInfo.getPrimaryKeyList();
-            return new HashSet<String>(list);
+            final DfPrimaryKeyMeta pkInfo = _uniqueKeyExtractor.getPrimaryKey(metaData, unifiedSchema, _tableDbName);
+            return new HashSet<String>(pkInfo.getPrimaryKeyList());
         } catch (SQLException e) {
             String msg = "SQLException occured: unifiedSchema=" + unifiedSchema + " tableName=" + _tableDbName;
             throw new IllegalStateException(msg);
@@ -207,15 +208,15 @@ public class DfDataTable {
     public String toString() {
         final StringBuilder sb = new StringBuilder(100);
         sb.append(_tableDbName);
-        sb.append(":");
-        for (int i = 0; i < _columnMap.size(); ++i) {
-            sb.append(getColumnName(i));
+        sb.append(": ");
+        for (int columnIndex = 0; columnIndex < _columnMap.size(); ++columnIndex) {
+            sb.append(getColumnName(columnIndex));
             sb.append(", ");
         }
         sb.setLength(sb.length() - 2);
         sb.append("\n");
-        for (int i = 0; i < _rows.size(); ++i) {
-            sb.append(getRow(i) + "\n");
+        for (int rowIndex = 0; rowIndex < _rows.size(); ++rowIndex) {
+            sb.append(getRow(rowIndex) + "\n");
         }
         sb.setLength(sb.length() - 1);
         return sb.toString();

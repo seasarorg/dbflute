@@ -24,26 +24,12 @@ import org.seasar.dbflute.util.DfTypeUtil;
  */
 public class DfDtsStringType extends DfDtsObjectType {
 
-    protected boolean trim;
-
     public DfDtsStringType() {
-        this(true);
-    }
-
-    public DfDtsStringType(final boolean trim) {
-        this.trim = trim;
     }
 
     @Override
     public Object convert(Object value, String formatPattern) {
-        String s = DfTypeUtil.toString(value, formatPattern);
-        if (s != null && trim) {
-            s = s.trim();
-        }
-        if ("".equals(s)) {
-            s = null;
-        }
-        return s;
+        return DfTypeUtil.toString(value, formatPattern);
     }
 
     @Override

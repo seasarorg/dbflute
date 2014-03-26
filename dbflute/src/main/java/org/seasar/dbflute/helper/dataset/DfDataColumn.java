@@ -39,9 +39,9 @@ public class DfDataColumn {
     //                                                                         Constructor
     //                                                                         ===========
     public DfDataColumn(String columnDbName, DfDtsColumnType columnType, int columnIndex) {
-        this._columnDbName = columnDbName;
-        this._columnType = columnType;
-        this._columnIndex = columnIndex;
+        _columnDbName = columnDbName;
+        _columnType = columnType;
+        _columnIndex = columnIndex;
     }
 
     // ===================================================================================

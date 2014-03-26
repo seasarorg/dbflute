@@ -29,21 +29,12 @@ import java.util.Map;
 public class DfDtsColumnTypes {
 
     public static final DfDtsColumnType STRING = new DfDtsStringType();
-
-    public static final DfDtsColumnType NOT_TRIM_STRING = new DfDtsStringType(false);
-
     public static final DfDtsColumnType BIGDECIMAL = new DfDtsBigDecimalType();
-
     public static final DfDtsColumnType TIMESTAMP = new DfDtsTimestampType();
-
     public static final DfDtsColumnType BINARY = new DfDtsBinaryType();
-
     public static final DfDtsColumnType OBJECT = new DfDtsObjectType();
-
     public static final DfDtsColumnType BOOLEAN = new DfDtsBooleanType();
-
     private static Map<Class<?>, DfDtsColumnType> typesByClass = new HashMap<Class<?>, DfDtsColumnType>();
-
     private static Map<Integer, DfDtsColumnType> typesBySqlType = new HashMap<Integer, DfDtsColumnType>();
 
     static {

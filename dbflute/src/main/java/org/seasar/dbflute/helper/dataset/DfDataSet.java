@@ -81,12 +81,14 @@ public class DfDataSet {
     //                                                                      Basic Override
     //                                                                      ==============
     public String toString() {
-        StringBuffer buf = new StringBuffer(100);
-        for (int i = 0; i < getTableSize(); ++i) {
-            buf.append(getTable(i));
-            buf.append("\n");
+        final StringBuilder sb = new StringBuilder();
+        for (int tableIndex = 0; tableIndex < getTableSize(); ++tableIndex) {
+            if (tableIndex > 0) {
+                sb.append("\n");
+            }
+            sb.append(getTable(tableIndex));
         }
-        return buf.toString();
+        return sb.toString();
     }
 
     public boolean equals(Object o) {

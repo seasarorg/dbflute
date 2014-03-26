@@ -46,24 +46,37 @@ import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.resource.DBFluteSystem;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.util.Srl.ScopeInfo;
 
 /**
  * @author modified by jflute (originated in Seasar2)
  */
-public class DfXlsReader {
+public class DfTableXlsReader {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DfXlsReader.class);
+    private static final Log _log = LogFactory.getLog(DfTableXlsReader.class);
+    public static final String LDATA_SHEET_NAME = "df$LARGE_DATA";
+    public static final String LDATA_KEY_DELIMITER = "(df:delimiter)";
+    public static final String LDATA_QUOTE_BEGIN = "{";
+    public static final String LDATA_QUOTE_END = "}";
+    public static final String LDATA_REF_PREFIX = "df:refLargeData(";
+    public static final String LDATA_REF_SUFFIX = ")";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                          XLS Resource
+    //                                          ------------
     protected final File _xlsFile;
+    protected DfDataSet _dataSet;
+    protected HSSFWorkbook _workbook;
+    protected HSSFDataFormat _dataFormat;
 
     // -----------------------------------------------------
     //                                           Read Option
@@ -72,22 +85,26 @@ public class DfXlsReader {
     protected final Map<String, List<String>> _notTrimTableColumnMap;
     protected final Map<String, List<String>> _emptyStringTableColumnMap;
     protected final Pattern _skipSheetPattern; // not required
+    protected boolean _rtrimCellValue;
 
     // -----------------------------------------------------
-    //                                          Xls Resource
-    //                                          ------------
-    protected DfDataSet _dataSet;
-    protected HSSFWorkbook _workbook;
-    protected HSSFDataFormat _dataFormat;
+    //                                            Large Data
+    //                                            ----------
+    /** The map for large data table. map:{ table.column = map:{ dataKey = joined-large-string } } (NullAllowed) */
+    protected Map<String, Map<String, String>> _largeDataMap;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfXlsReader(File xlsFile // xls file to read
+    public DfTableXlsReader(File xlsFile // XLS file to read
             , Map<String, String> tableNameMap // map for long table name
             , Map<String, List<String>> notTrimTableColumnMap // map for not-trim column
             , Map<String, List<String>> emptyStringTableColumnMap // map for empty-string-allowed column
-            , Pattern skipSheetPattern) { // pattern of skipped sheet
+            , Pattern skipSheetPattern // pattern of skipped sheet
+            , boolean rtrimCellValue) { // Does it right-trim cell value?
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // actually read in constructor so accept all options here
+        // - - - - - - - - - -/
         _xlsFile = xlsFile;
         if (tableNameMap != null) {
             _tableNameMap = tableNameMap;
@@ -105,6 +122,9 @@ public class DfXlsReader {
             _emptyStringTableColumnMap = StringKeyMap.createAsFlexible();
         }
         _skipSheetPattern = skipSheetPattern;
+        _rtrimCellValue = rtrimCellValue;
+
+        // actually read
         setupWorkbook(toStream(xlsFile));
     }
 
@@ -123,25 +143,124 @@ public class DfXlsReader {
         try {
             _workbook = new HSSFWorkbook(ins);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Failed to create workbook: " + _xlsFile, e);
         }
         _dataFormat = _workbook.createDataFormat();
         _dataSet = new DfDataSet();
+        prepareLargeDataTable();
         for (int i = 0; i < _workbook.getNumberOfSheets(); ++i) {
             final String sheetName = _workbook.getSheetName(i);
-            if (isCommentOutSheet(sheetName)) {// since 0.7.9
+            if (isCommentOutSheet(sheetName)) { // since 0.7.9
                 _log.info("*The sheet has comment-out mark so skip it: " + sheetName);
                 continue;
             }
-            if (isSkipSheet(sheetName)) {// since 0.7.9 for [DBFLUTE-251]
+            if (isSkipSheet(sheetName)) { // since 0.7.9 for [DBFLUTE-251]
                 _log.info("*The sheet name matched skip-sheet specification so skip it: " + sheetName);
                 continue;
             }
-            createTable(sheetName, _workbook.getSheetAt(i));
+            if (isLargeDataSheet(sheetName)) { // already analyzed here
+                continue;
+            }
+            prepareTable(sheetName, _workbook.getSheetAt(i));
         }
     }
 
-    protected DfDataTable createTable(String sheetName, HSSFSheet sheet) {
+    // -----------------------------------------------------
+    //                                            Large Data
+    //                                            ----------
+    protected void prepareLargeDataTable() {
+        for (int i = 0; i < _workbook.getNumberOfSheets(); ++i) {
+            final String sheetName = _workbook.getSheetName(i);
+            if (!isLargeDataSheet(sheetName)) {
+                continue;
+            }
+            final HSSFSheet sheet = _workbook.getSheetAt(i);
+            final String largeTableName = "LARGE_DATA"; // unused
+            final DfDataTable table = setupTable(sheet, largeTableName, new DfDataTable(largeTableName));
+            _largeDataMap = DfCollectionUtil.newLinkedHashMap();
+            final Map<Integer, String> indexColumnTitleMap = DfCollectionUtil.newLinkedHashMap();
+            for (int columnIndex = 0; columnIndex < table.getColumnSize(); columnIndex++) {
+                final DfDataColumn column = table.getColumn(columnIndex);
+                final String columnTitle = column.getColumnDbName();
+                if (!columnTitle.contains(".")) { // should be e.g. MEMBER.MEMBER_NAME
+                    throwLargeDataInvalidColumnTitleException(sheetName, columnTitle);
+                }
+                Map<String, String> dataMap = _largeDataMap.get(columnTitle);
+                if (dataMap == null) {
+                    dataMap = DfCollectionUtil.newLinkedHashMap();
+                }
+                _largeDataMap.put(columnTitle, dataMap);
+                indexColumnTitleMap.put(columnIndex, columnTitle);
+            }
+            for (int rowIndex = 0; rowIndex < table.getRowSize(); rowIndex++) {
+                final DfDataRow row = table.getRow(rowIndex);
+                for (int columnIndex = 0; columnIndex < table.getColumnSize(); ++columnIndex) {
+                    final Object obj = row.getValue(columnIndex);
+                    if (obj == null) {
+                        continue;
+                    }
+                    final String value = obj.toString(); // basically String, but just in case
+                    final String columnTitle = indexColumnTitleMap.get(columnIndex);
+                    final Map<String, String> dataMap = _largeDataMap.get(columnTitle);
+                    if (!value.contains(LDATA_KEY_DELIMITER)) { // should be e.g. key(df:delimiter){value}
+                        throwLargeDataInvalidManagedDataException(sheetName, columnTitle, row, value);
+                    }
+                    final String dataKey = Srl.substringFirstFront(value, LDATA_KEY_DELIMITER);
+                    final String largeValue = Srl.substringFirstRear(value, LDATA_KEY_DELIMITER);
+                    final String unquotedValue = Srl.unquoteAnything(largeValue, LDATA_QUOTE_BEGIN, LDATA_QUOTE_END);
+                    final String existingValue = dataMap.get(dataKey);
+                    final String realValue = existingValue != null ? existingValue + unquotedValue : unquotedValue;
+                    dataMap.put(dataKey, realValue);
+                }
+            }
+            break; // only one
+        }
+    }
+
+    protected boolean isLargeDataSheet(String sheetName) {
+        return sheetName.equals(LDATA_SHEET_NAME);
+    }
+
+    protected void throwLargeDataInvalidColumnTitleException(String sheetName, String columnTitle) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Invalid column title for large data.");
+        br.addItem("Advice");
+        br.addElement("It should be [table].[column] e.g. MEMBER.MEMBER_NAME");
+        br.addItem("Xls File");
+        br.addElement(_xlsFile);
+        br.addItem("Sheet Name");
+        br.addElement(sheetName);
+        br.addItem("Column Title");
+        br.addElement(columnTitle);
+        final String msg = br.buildExceptionMessage();
+        throw new DfXlsReaderReadFailureException(msg);
+    }
+
+    protected void throwLargeDataInvalidManagedDataException(String sheetName, String columnTitle, DfDataRow row,
+            String value) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Invalid managed large data.");
+        br.addItem("Advice");
+        br.addElement("It should be key" + LDATA_KEY_DELIMITER + "{value}");
+        br.addElement(" e.g. foo" + LDATA_KEY_DELIMITER + "{bar}");
+        br.addItem("Xls File");
+        br.addElement(_xlsFile);
+        br.addItem("Sheet Name");
+        br.addElement(sheetName);
+        br.addItem("Column Title");
+        br.addElement(columnTitle);
+        br.addItem("Row Number");
+        br.addElement(row.getRowNumber());
+        br.addItem("Large Data");
+        br.addElement(value);
+        final String msg = br.buildExceptionMessage();
+        throw new DfXlsReaderReadFailureException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                            Data Table
+    //                                            ----------
+    protected DfDataTable prepareTable(String sheetName, HSSFSheet sheet) {
         String tableName = sheetName;
         if (_tableNameMap != null && !_tableNameMap.isEmpty() && sheetName.startsWith("$")) {
             String realTableName = _tableNameMap.get(sheetName);
@@ -154,6 +273,10 @@ public class DfXlsReader {
             tableName = realTableName;
         }
         final DfDataTable table = _dataSet.addTable(tableName);
+        return setupTable(sheet, tableName, table);
+    }
+
+    protected DfDataTable setupTable(HSSFSheet sheet, String tableName, final DfDataTable table) {
         final int rowCount = sheet.getLastRowNum();
         final HSSFRow nameRow = sheet.getRow(0);
         if (nameRow == null) {
@@ -198,6 +321,9 @@ public class DfXlsReader {
         throw new DfXlsReaderReadFailureException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                           Data Column
+    //                                           -----------
     protected void setupColumns(DfDataTable table, HSSFRow nameRow, HSSFRow valueRow) {
         for (int i = 0;; ++i) {
             final HSSFCell nameCell = nameRow.getCell(i);
@@ -224,6 +350,9 @@ public class DfXlsReader {
         }
     }
 
+    // -----------------------------------------------------
+    //                                              Data Row
+    //                                              --------
     protected void setupRows(DfDataTable table, HSSFSheet sheet) {
         for (int i = 1;; ++i) {
             HSSFRow row = sheet.getRow(i);
@@ -240,10 +369,10 @@ public class DfXlsReader {
         Object value = null;
         DfDataColumn column = null;
         try {
-            for (int i = 0; i < table.getColumnSize(); ++i) {
-                cell = row.getCell(i);
-                value = getValue(i, cell, table);
-                column = table.getColumn(i);
+            for (int columnIndex = 0; columnIndex < table.getColumnSize(); ++columnIndex) {
+                cell = row.getCell(columnIndex);
+                value = extractCellValue(table, columnIndex, row, cell);
+                column = table.getColumn(columnIndex);
                 final String columnName = column.getColumnDbName();
                 try {
                     dataRow.addValue(columnName, value);
@@ -315,22 +444,11 @@ public class DfXlsReader {
     }
 
     // ===================================================================================
-    //                                                                                Read
-    //                                                                                ====
-    public DfDataSet read() {
-        return _dataSet;
-    }
-
-    // ===================================================================================
     //                                                                      Value Handling
     //                                                                      ==============
-    public Object getValue(int columnIndex, HSSFCell cell, DfDataTable table) {
+    protected Object extractCellValue(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell) {
         if (cell == null) {
-            if (isEmptyStringTarget(columnIndex, table)) {
-                return "\"\""; // for preventing trimming later
-            } else {
-                return null;
-            }
+            return isEmptyStringTarget(table, columnIndex) ? "" : null;
         }
         switch (cell.getCellType()) {
         case HSSFCell.CELL_TYPE_NUMERIC:
@@ -343,74 +461,125 @@ public class DfXlsReader {
             }
             return new BigDecimal(Double.toString(numericCellValue));
         case HSSFCell.CELL_TYPE_STRING:
-            return processRichStringCellValue(columnIndex, cell, table);
+            return processRichStringCellValue(table, columnIndex, row, cell);
         case HSSFCell.CELL_TYPE_BOOLEAN:
             boolean b = cell.getBooleanCellValue();
             return Boolean.valueOf(b);
         default:
-            if (isEmptyStringTarget(columnIndex, table)) {
-                return "\"\"";
-            } else {
-                return null;
-            }
+            return isEmptyStringTarget(table, columnIndex) ? "" : null;
         }
     }
 
-    protected Object processRichStringCellValue(int columnIndex, HSSFCell cell, DfDataTable table) {
+    protected Object processRichStringCellValue(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell) {
         String str = cell.getRichStringCellValue().getString();
-        if (str != null) {
-            if (isNotTrimTarget(cell, table)) {
-                if (str.length() != str.trim().length()) {
-                    str = "\"" + str + "\""; // for preventing trimming later
-                }
-            } else {
-                str = Srl.rtrim(str);
-            }
-        }
-        if ("".equals(str)) {
-            str = null;
-        }
-        if (isEmptyStringTarget(columnIndex, table) && str == null) {
-            str = "\"\""; // for preventing trimming later
-        }
-
-        // remove CR for LF handling
-        // basically excel treats line separators as LF
-        // so this process cannot be required but just in case
-        str = str != null ? Srl.replace(str, "\r\n", "\n") : null;
-
+        str = rtrimCellValueIfNeeds(table, cell, str); // basically for compatible
+        str = treatEmptyAsNullBasically(str); // empty means null basically
+        str = treatNullAsEmptyIfTarget(table, columnIndex, str); // but empty if target
+        str = treatCrLfAsLf(str); // remove CR
         if (isCellBase64Formatted(cell)) {
-            return DfTypeUtil.decodeAsBase64(str);
+            return decodeAsBase64(str);
+        }
+        // normal cell here
+        return resolveLargeDataIfNeeds(table, columnIndex, row, str);
+    }
+
+    protected String rtrimCellValueIfNeeds(DfDataTable table, HSSFCell cell, String str) {
+        if (str != null && _rtrimCellValue && !isNotTrimTarget(table, cell)) {
+            return Srl.rtrim(str);
         }
         return str;
     }
 
-    public boolean isNotTrimTarget(HSSFCell cell, DfDataTable table) {
+    protected String treatEmptyAsNullBasically(String str) {
+        return "".equals(str) ? null : str;
+    }
+
+    protected String treatNullAsEmptyIfTarget(DfDataTable table, int columnIndex, String str) {
+        return str == null && isEmptyStringTarget(table, columnIndex) ? "" : str;
+    }
+
+    protected String treatCrLfAsLf(String str) {
+        // basically excel treats line separators as LF
+        // so this process cannot be required but just in case
+        return str != null ? Srl.replace(str, "\r\n", "\n") : null;
+    }
+
+    protected Object decodeAsBase64(String str) {
+        return str != null ? DfTypeUtil.decodeAsBase64(str) : null;
+    }
+
+    protected String resolveLargeDataIfNeeds(DfDataTable table, int columnIndex, HSSFRow row, String str) {
+        if (str == null) {
+            return null;
+        }
+        final String refPrefix = LDATA_REF_PREFIX;
+        final String refSuffix = LDATA_REF_SUFFIX;
+        if (_largeDataMap != null && str.startsWith(refPrefix) && str.endsWith(refSuffix)) {
+            final ScopeInfo scopeInfo = Srl.extractScopeFirst(str, refPrefix, refSuffix);
+            final String dataKey = scopeInfo.getContent();
+            final DfDataColumn column = table.getColumn(columnIndex);
+            final String columnTitle = table.getTableDbName() + "." + column.getColumnDbName();
+            final Map<String, String> dataMap = _largeDataMap.get(columnTitle);
+            if (dataMap != null) {
+                final String largeData = dataMap.get(dataKey);
+                if (largeData != null) {
+                    return largeData;
+                } else {
+                    throwLargeDataReferenceDataNotFoundException(table, columnIndex, row, str, dataKey);
+                }
+            } else {
+                throwLargeDataReferenceDataNotFoundException(table, columnIndex, row, str, dataKey);
+            }
+        }
+        return str;
+    }
+
+    protected void throwLargeDataReferenceDataNotFoundException(DfDataTable table, int columnIndex, HSSFRow row,
+            String str, String dataKey) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Not found the reference data of large data for the column.");
+        br.addItem("Xls File");
+        br.addElement(_xlsFile);
+        br.addItem("Table Name");
+        br.addElement(table.getTableDbName());
+        br.addItem("Column");
+        br.addElement(table.getColumnName(columnIndex));
+        br.addItem("Row Number");
+        br.addElement(row.getRowNum());
+        br.addItem("Cell Value");
+        br.addElement(str);
+        br.addItem("Data Key");
+        br.addElement(dataKey);
+        final String msg = br.buildExceptionMessage();
+        throw new DfXlsReaderReadFailureException(msg);
+    }
+
+    public boolean isNotTrimTarget(DfDataTable table, HSSFCell cell) {
         final String tableName = table.getTableDbName();
         if (!_notTrimTableColumnMap.containsKey(tableName)) {
             return false;
         }
         final List<String> notTrimTargetColumnList = _notTrimTableColumnMap.get(tableName);
         final DfDataColumn column = table.getColumn(cell.getColumnIndex());
-        final String targetColumnName = column.getColumnDbName();
-        for (String currentColumnName : notTrimTargetColumnList) {
-            if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
+        final String target = column.getColumnDbName();
+        for (String specified : notTrimTargetColumnList) {
+            if (target.equalsIgnoreCase(specified)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isEmptyStringTarget(int columnIndex, DfDataTable table) {
+    public boolean isEmptyStringTarget(DfDataTable table, int columnIndex) {
         final String tableName = table.getTableDbName();
         if (!_emptyStringTableColumnMap.containsKey(tableName)) {
             return false;
         }
         final List<String> emptyStringTargetColumnList = _emptyStringTableColumnMap.get(tableName);
         final DfDataColumn column = table.getColumn(columnIndex);
-        final String targetColumnName = column.getColumnDbName();
-        for (String currentColumnName : emptyStringTargetColumnList) {
-            if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
+        final String target = column.getColumnDbName();
+        for (String specified : emptyStringTargetColumnList) {
+            if (target.equalsIgnoreCase(specified)) {
                 return true;
             }
         }
@@ -440,15 +609,15 @@ public class DfXlsReader {
     //                                                                       Determination
     //                                                                       =============
     protected boolean isCellBase64Formatted(HSSFCell cell) {
-        HSSFCellStyle cs = cell.getCellStyle();
-        short dfNum = cs.getDataFormat();
+        final HSSFCellStyle cs = cell.getCellStyle();
+        final short dfNum = cs.getDataFormat();
         return DfDataSetConstants.BASE64_FORMAT.equals(_dataFormat.getFormat(dfNum));
     }
 
     protected boolean isCellDateFormatted(HSSFCell cell) {
-        HSSFCellStyle cs = cell.getCellStyle();
-        short dfNum = cs.getDataFormat();
-        String format = _dataFormat.getFormat(dfNum);
+        final HSSFCellStyle cs = cell.getCellStyle();
+        final short dfNum = cs.getDataFormat();
+        final String format = _dataFormat.getFormat(dfNum);
         if (format == null || format.length() == 0) {
             return false;
         }
@@ -467,10 +636,14 @@ public class DfXlsReader {
     }
 
     protected boolean isSkipSheet(String sheetName) {
-        if (_skipSheetPattern == null) {
-            return false;
-        }
-        return _skipSheetPattern.matcher(sheetName).matches();
+        return _skipSheetPattern != null && _skipSheetPattern.matcher(sheetName).matches();
+    }
+
+    // ===================================================================================
+    //                                                                                Read
+    //                                                                                ====
+    public DfDataSet read() { // already read, only returns result
+        return _dataSet;
     }
 
     // ===================================================================================

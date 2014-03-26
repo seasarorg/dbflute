@@ -72,7 +72,7 @@ public class DfDelimiterDataWriteSqlBuilder {
         @SuppressWarnings("unchecked")
         final Map<String, Object> columnValueMap = (Map<String, Object>) ((Object) createBasicColumnValueMap());
         saveSysdateColumnSet(columnValueMap); // for relative date
-        convertColumnValue(columnValueMap);
+        convertColumnValueIfNeeds(columnValueMap);
         return columnValueMap;
     }
 
@@ -80,8 +80,14 @@ public class DfDelimiterDataWriteSqlBuilder {
         _sysdateColumnSet = _defaultValueProp.extractSysdateColumnSet(columnValueMap, _defaultValueMap);
     }
 
-    protected void convertColumnValue(Map<String, Object> columnValueMap) {
+    protected void convertColumnValueIfNeeds(Map<String, Object> columnValueMap) {
+        // because it needs to convert empty string to null
+        //if ((_convertValueMap == null || _convertValueMap.isEmpty()) // no convert
+        //        && (_defaultValueMap == null || _defaultValueMap.isEmpty())) { // and no default
+        //    return;
+        //}
         final DfColumnValueConverter converter = createColumnValueConverter();
+        converter.emptyToNullIfNoConvert(); // e.g. TSV might have empty string (treated as null as default)
         converter.convert(_tableDbName, columnValueMap, _columnMetaMap);
     }
 

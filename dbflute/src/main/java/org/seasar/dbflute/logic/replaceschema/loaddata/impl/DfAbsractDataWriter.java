@@ -275,12 +275,14 @@ public abstract class DfAbsractDataWriter {
     protected void processNotNullString(String dataDirectory, File dataFile, String tableName, String columnName,
             String value, Connection conn, PreparedStatement ps, int bindCount,
             Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
-        if (value == null) {
-            String msg = "This method is only for NotNull and StringExpression:";
-            msg = msg + " value=" + value + " type=" + (value != null ? value.getClass() : "null");
+        if (value == null) { // just in case
+            String msg = "The argument 'value' should not be null.";
             throw new IllegalStateException(msg);
         }
+
+        // treat both-side double quotation as meta control characters
         value = Srl.unquoteDouble(value);
+
         Map<String, StringProcessor> cacheMap = _stringProcessorCacheMap.get(tableName);
         if (cacheMap == null) {
             cacheMap = StringKeyMap.createAsFlexibleOrdered();
@@ -459,8 +461,8 @@ public abstract class DfAbsractDataWriter {
     protected boolean processDate(String dataDirectory, String tableName, String columnName, String value,
             Connection conn, PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber)
             throws SQLException {
-        if (value == null) {
-            return false; // basically no way
+        if (value == null || value.trim().length() == 0) { // cannot be date
+            return false;
         }
         final DfColumnMeta columnMeta = columnInfoMap.get(columnName);
         if (columnMeta != null) {
@@ -505,8 +507,8 @@ public abstract class DfAbsractDataWriter {
     protected boolean processBoolean(String tableName, String columnName, String value, Connection conn,
             PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber)
             throws SQLException {
-        if (value == null) {
-            return false; // basically no way
+        if (value == null || value.trim().length() == 0) { // cannot be boolean
+            return false;
         }
         final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
@@ -535,8 +537,8 @@ public abstract class DfAbsractDataWriter {
     protected boolean processNumber(String tableName, String columnName, String value, Connection conn,
             PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber)
             throws SQLException {
-        if (value == null) {
-            return false; // basically no way
+        if (value == null || value.trim().length() == 0) { // cannot be number
+            return false;
         }
         final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
@@ -600,8 +602,8 @@ public abstract class DfAbsractDataWriter {
     protected boolean processUUID(String tableName, String columnName, String value, Connection conn,
             PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber)
             throws SQLException {
-        if (value == null) {
-            return false; // basically no way
+        if (value == null || value.trim().length() == 0) { // cannot be UUID
+            return false;
         }
         final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
@@ -631,8 +633,8 @@ public abstract class DfAbsractDataWriter {
     //                                                 -----
     protected boolean processArray(String tableName, String columnName, String value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
-        if (value == null) {
-            return false; // basically no way
+        if (value == null || value.trim().length() == 0) { // cannot be array
+            return false;
         }
         final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
@@ -667,8 +669,8 @@ public abstract class DfAbsractDataWriter {
     //                                                   ---
     protected boolean processXml(String tableName, String columnName, String value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber) throws SQLException {
-        if (value == null) {
-            return false; // basically no way
+        if (value == null || value.trim().length() == 0) { // cannot be XML
+            return false;
         }
         final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
@@ -700,8 +702,8 @@ public abstract class DfAbsractDataWriter {
     protected boolean processBinary(File dataFile, String tableName, String columnName, String value,
             PreparedStatement ps, int bindCount, Map<String, DfColumnMeta> columnInfoMap, int rowNumber)
             throws SQLException {
-        if (value == null) {
-            return false; // basically no way
+        if (value == null || value.trim().length() == 0) { // cannot be binary
+            return false;
         }
         final DfColumnMeta columnInfo = columnInfoMap.get(columnName);
         if (columnInfo != null) {
@@ -1119,6 +1121,10 @@ public abstract class DfAbsractDataWriter {
                 return getBindType(tableName, columnMeta);
             }
         };
+    }
+
+    protected boolean isRTrimCellValue(String dataDirectory) {
+        return _loadingControlProp.isRTrimCellValue(dataDirectory);
     }
 
     // ===================================================================================

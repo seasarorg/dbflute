@@ -41,6 +41,7 @@ public class DfColumnValueConverter {
     protected final Map<String, String> _defaultValueMap;
     protected final DfColumnBindTypeProvider _bindTypeProvider;
     protected Map<String, String> _allColumnConvertMap; // derived lazily
+    protected boolean _emptyToNullIfNoConvert;
 
     public DfColumnValueConverter(Map<String, Map<String, String>> convertValueMap,
             Map<String, String> defaultValueMap, DfColumnBindTypeProvider bindTypeProvider) {
@@ -49,15 +50,22 @@ public class DfColumnValueConverter {
         _bindTypeProvider = bindTypeProvider;
     }
 
+    public DfColumnValueConverter emptyToNullIfNoConvert() {
+        _emptyToNullIfNoConvert = true;
+        return this;
+    }
+
     public void convert(String tableName, Map<String, Object> columnValueMap, Map<String, DfColumnMeta> columnMetaMap) {
-        final Map<String, Object> resolvedMap = new LinkedHashMap<String, Object>();
+        final Map<String, Object> resolvedMap = new LinkedHashMap<String, Object>(columnValueMap.size());
         final Set<String> convertedSet = new HashSet<String>(1);
         for (Entry<String, Object> entry : columnValueMap.entrySet()) {
             final String columnName = entry.getKey();
             final Object plainValue = entry.getValue();
             Object resolvedValue = resolveConvertValue(tableName, columnName, plainValue, convertedSet, columnMetaMap);
             if (convertedSet.isEmpty()) { // if no convert
-                resolvedValue = filterEmptyAsNull(resolvedValue); // treated as null if empty string
+                if (_emptyToNullIfNoConvert) {
+                    resolvedValue = filterEmptyAsNull(resolvedValue);
+                }
                 resolvedValue = resolveDefaultValue(columnName, resolvedValue);
             } else {
                 convertedSet.clear(); // recycle
@@ -228,18 +236,21 @@ public class DfColumnValueConverter {
         if (_defaultValueMap == null || _defaultValueMap.isEmpty()) {
             return plainValue;
         }
-        if (plainValue != null) {
-            // empty string has already been resolved here
+        if (plainValue != null && !plainValue.equals("")) {
             return plainValue;
         }
+        // null or empty here
         if (!hasDefaultValue(columnName)) {
             return plainValue;
         }
-        Object resolvedValue = plainValue;
         final String defaultValue = findDefaultValue(columnName);
-        if (Srl.is_Null_or_Empty(defaultValue)) {
-            return null; // empty is treated as null
+        if (defaultValue == null) { // not found
+            return plainValue;
         }
+        if (defaultValue.equals("")) { // default is empty
+            return defaultValue;
+        }
+        Object resolvedValue = plainValue;
         if (defaultValue.equalsIgnoreCase("sysdate")) {
             resolvedValue = DBFluteSystem.currentTimestamp();
         } else {

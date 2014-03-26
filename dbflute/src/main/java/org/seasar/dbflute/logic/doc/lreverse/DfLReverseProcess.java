@@ -44,7 +44,7 @@ import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.io.compress.DfZipArchiver;
-import org.seasar.dbflute.helper.io.xls.DfXlsReader;
+import org.seasar.dbflute.helper.io.xls.DfTableXlsReader;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -314,7 +314,7 @@ public class DfLReverseProcess {
         final String dataDirPath = resolvePath(baseDir);
         final Map<String, String> tableNameMap = _tableNameProp.getTableNameMap(dataDirPath);
         for (File existingXls : existingXlsList) {
-            final DfXlsReader reader = createXlsReader(baseDir, existingXls, tableNameMap);
+            final DfTableXlsReader reader = createTableXlsReader(baseDir, existingXls, tableNameMap);
             final DfDataSet dataSet = reader.read();
             final List<String> tableList = new ArrayList<String>();
             for (int i = 0; i < dataSet.getTableSize(); i++) {
@@ -331,9 +331,9 @@ public class DfLReverseProcess {
         return new DfLReverseExistingXlsInfo(existingXlsTableListMap, tableExistingXlsMap);
     }
 
-    protected DfXlsReader createXlsReader(File baseDir, File existingXls, Map<String, String> tableNameMap) {
+    protected DfTableXlsReader createTableXlsReader(File baseDir, File existingXls, Map<String, String> tableNameMap) {
         try {
-            return new DfXlsReader(existingXls, tableNameMap, null, null, null);
+            return new DfTableXlsReader(existingXls, tableNameMap, null, null, null, false);
         } catch (DfXlsReaderReadFailureException e) {
             final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
             br.addNotice("Failed to create xls reader for LoadDataReverse.");

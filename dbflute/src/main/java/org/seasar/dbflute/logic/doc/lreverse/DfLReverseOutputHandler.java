@@ -36,7 +36,7 @@ import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
-import org.seasar.dbflute.helper.io.xls.DfXlsWriter;
+import org.seasar.dbflute.helper.io.xls.DfTableXlsWriter;
 import org.seasar.dbflute.helper.jdbc.facade.DfJFadCursorCallback;
 import org.seasar.dbflute.helper.jdbc.facade.DfJFadCursorHandler;
 import org.seasar.dbflute.helper.jdbc.facade.DfJFadResultSetWrapper;
@@ -65,10 +65,7 @@ public class DfLReverseOutputHandler {
     protected final DataSource _dataSource;
     protected boolean _containsCommonColumn;
     protected int _xlsLimit = 65000; // as default
-
-    // option for large data
-    protected String _delimiterDataDir;
-
+    protected String _delimiterDataDir; // option for large data
     protected final Map<String, Table> _tableNameMap = new LinkedHashMap<String, Table>();
 
     // ===================================================================================
@@ -143,14 +140,13 @@ public class DfLReverseOutputHandler {
     //                                                                            ========
     protected void setupXlsDataTable(DfDataSet dataSet, Table table, List<Map<String, String>> extractedList,
             int index, List<String> sectionInfoList) {
-        final int xlsLimit = _xlsLimit;
         final List<Map<String, String>> recordList;
         {
             final String tableInfo = "  " + table.getTableDispName() + " (" + extractedList.size() + ")";
             _log.info(tableInfo);
             sectionInfoList.add(tableInfo);
-            if (extractedList.size() > xlsLimit) {
-                recordList = extractedList.subList(0, xlsLimit); // just in case
+            if (extractedList.size() > _xlsLimit) {
+                recordList = extractedList.subList(0, _xlsLimit); // just in case
             } else {
                 recordList = extractedList;
             }
@@ -221,7 +217,7 @@ public class DfLReverseOutputHandler {
     }
 
     protected void writeXlsData(DfDataSet dataSet, File xlsFile) {
-        final DfXlsWriter writer = createXlsWriter(xlsFile);
+        final DfTableXlsWriter writer = createTableXlsWriter(xlsFile);
         try {
             writer.write(dataSet); // flush
         } catch (RuntimeException e) {
@@ -231,9 +227,10 @@ public class DfLReverseOutputHandler {
         }
     }
 
-    protected DfXlsWriter createXlsWriter(File xlsFile) {
-        // The xls file should have all string cell type for replace-schema. 
-        return new DfXlsWriter(xlsFile).stringCellType();
+    protected DfTableXlsWriter createTableXlsWriter(File xlsFile) {
+        // The XLS file should have all string cell type for replace-schema.
+        // and it uses large data handling (large data might exist in database)
+        return new DfTableXlsWriter(xlsFile).stringCellType().largeDataHandling();
     }
 
     // ===================================================================================
@@ -296,10 +293,10 @@ public class DfLReverseOutputHandler {
         });
     }
 
-    protected void handleDelimiterDataFailureException(Table table, String delimiterFilePath, Exception e) {
-        String msg = "Failed to output delimiter data:";
-        msg = msg + " table=" + table.getTableDispName() + " file=" + delimiterFilePath;
-        throw new IllegalStateException(msg, e);
+    protected void handleDelimiterDataFailureException(Table table, String delimiterFilePath, Exception cause) {
+        String tableDispName = table.getTableDispName();
+        String msg = "Failed to output delimiter data: table=" + tableDispName + " file=" + delimiterFilePath;
+        throw new IllegalStateException(msg, cause);
     }
 
     // ===================================================================================

@@ -76,7 +76,7 @@ public class DfLoadingControlProp {
     public LoggingInsertType getLoggingInsertType(String dataDirectory, boolean loggingInsertSql) {
         final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("loggingInsertType");
-        if (isSpecifiedValieProperty(prop)) {
+        if (isSpecifiedValidProperty(prop)) {
             final String trimmed = prop.trim();
             if (trimmed.equalsIgnoreCase("all")) {
                 return LoggingInsertType.ALL;
@@ -103,7 +103,7 @@ public class DfLoadingControlProp {
     public boolean isMergedSuppressBatchUpdate(String dataDirectory, boolean suppressBatchUpdate) {
         final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("isSuppressBatchUpdate");
-        if (isSpecifiedValieProperty(prop)) {
+        if (isSpecifiedValidProperty(prop)) {
             return prop.trim().equalsIgnoreCase("true");
         }
         return suppressBatchUpdate;
@@ -115,7 +115,7 @@ public class DfLoadingControlProp {
     public boolean isCheckColumnDefExistence(String dataDirectory) {
         final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("isSuppressColumnDefCheck");
-        if (isSpecifiedValieProperty(prop) && prop.trim().equalsIgnoreCase("true")) {
+        if (isSpecifiedValidProperty(prop) && prop.trim().equalsIgnoreCase("true")) {
             return false; // suppress
         }
         return true; // default is checked
@@ -446,6 +446,18 @@ public class DfLoadingControlProp {
     }
 
     // ===================================================================================
+    //                                                                    RTrim Cell Value
+    //                                                                    ================
+    public boolean isRTrimCellValue(String dataDirectory) {
+        final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
+        final String prop = (String) loadingControlMap.get("isRTrimCellValue");
+        if (isSpecifiedValidProperty(prop)) {
+            return prop.trim().equalsIgnoreCase("true");
+        }
+        return true; // default is checked
+    }
+
+    // ===================================================================================
     //                                                                 Loading Control Map
     //                                                                 ===================
     protected Map<String, Object> getLoadingControlMap(String dataDirectory) {
@@ -578,7 +590,7 @@ public class DfLoadingControlProp {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected boolean isSpecifiedValieProperty(String prop) {
+    protected boolean isSpecifiedValidProperty(String prop) {
         return prop != null && prop.trim().length() > 0 && !prop.trim().equalsIgnoreCase("null");
     }
 }
