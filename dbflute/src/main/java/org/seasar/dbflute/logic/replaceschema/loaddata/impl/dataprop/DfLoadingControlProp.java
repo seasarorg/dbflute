@@ -448,7 +448,7 @@ public class DfLoadingControlProp {
     // ===================================================================================
     //                                                                    RTrim Cell Value
     //                                                                    ================
-    public boolean isRTrimCellValue(String dataDirectory) {
+    public boolean isRTrimCellValue(String dataDirectory) { // basically for compatible
         final Map<String, Object> loadingControlMap = getLoadingControlMap(dataDirectory);
         final String prop = (String) loadingControlMap.get("isRTrimCellValue");
         if (isSpecifiedValidProperty(prop)) {

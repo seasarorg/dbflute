@@ -269,6 +269,7 @@ public class DfTableXlsWriter implements DfDataSetConstants {
     }
 
     protected void doSetupCellValue(DfDataTable table, int columnIndex, HSSFRow row, HSSFCell cell, Object value) {
+        // value is not null here
         if (_stringCellType) {
             cell.setCellType(HSSFCell.CELL_TYPE_STRING);
         }

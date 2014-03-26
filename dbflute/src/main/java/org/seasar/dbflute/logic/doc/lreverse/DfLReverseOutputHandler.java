@@ -82,7 +82,7 @@ public class DfLReverseOutputHandler {
      * Output data excel templates. (using dataSource)
      * @param tableInfoMap The map of table to extract. (NotNull)
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
-     * @param xlsFile The file of xls. (NotNull)
+     * @param xlsFile The file of XLS. (NotNull)
      * @param sectionInfoList The list of section info. (NotNull)
      */
     public void outputData(Map<String, Table> tableInfoMap, int limit, File xlsFile, List<String> sectionInfoList) {
@@ -111,7 +111,7 @@ public class DfLReverseOutputHandler {
      * @param tableMap The map of table. (NotNull)
      * @param loadDataMap The map of load data. (NotNull)
      * @param limit The limit of extracted record. (MinusAllowed: if minus, no limit)
-     * @param xlsFile The file of xls. (NotNull)
+     * @param xlsFile The file of XLS. (NotNull)
      * @param sectionInfoList The list of section info. (NotNull)
      */
     protected void transferToXls(Map<String, Table> tableMap, Map<String, DfLReverseDataResult> loadDataMap, int limit,
