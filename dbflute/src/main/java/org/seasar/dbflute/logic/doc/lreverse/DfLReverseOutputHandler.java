@@ -65,6 +65,9 @@ public class DfLReverseOutputHandler {
     protected final DataSource _dataSource;
     protected boolean _containsCommonColumn;
     protected int _xlsLimit = 65000; // as default
+    protected boolean _suppressLargeDataHandling; // default is in writer
+    protected boolean _suppressQuoteEmptyString; // default is in writer
+    protected Integer _cellLengthLimit; // default is in writer
     protected String _delimiterDataDir; // option for large data
     protected final Map<String, Table> _tableNameMap = new LinkedHashMap<String, Table>();
 
@@ -221,16 +224,25 @@ public class DfLReverseOutputHandler {
         try {
             writer.write(dataSet); // flush
         } catch (RuntimeException e) {
-            String msg = "Failed to write the xls file: " + xlsFile;
-            msg = msg + " tables=" + dataSet.getTableSize();
+            String msg = "Failed to write the xls file: " + xlsFile + " tables=" + dataSet.getTableSize();
             throw new IllegalStateException(msg, e);
         }
     }
 
     protected DfTableXlsWriter createTableXlsWriter(File xlsFile) {
-        // The XLS file should have all string cell type for replace-schema.
-        // and it uses large data handling (large data might exist in database)
-        return new DfTableXlsWriter(xlsFile).stringCellType().largeDataHandling();
+        // the XLS file should have all string cell type basically for replace-schema
+        final DfTableXlsWriter writer = new DfTableXlsWriter(xlsFile);
+        writer.stringCellType();
+        if (!_suppressLargeDataHandling) {
+            writer.largeDataHandling();
+        }
+        if (!_suppressQuoteEmptyString) {
+            writer.quoteEmptyString();
+        }
+        if (_cellLengthLimit != null) {
+            writer.cellLengthLimit(_cellLengthLimit);
+        }
+        return writer;
     }
 
     // ===================================================================================
@@ -323,6 +335,18 @@ public class DfLReverseOutputHandler {
 
     public void setXlsLimit(int xlsLimit) {
         _xlsLimit = xlsLimit;
+    }
+
+    public void setSuppressLargeDataHandling(boolean suppressLargeDataHandling) {
+        _suppressLargeDataHandling = suppressLargeDataHandling;
+    }
+
+    public void setSuppressQuoteEmptyString(boolean suppressQuoteEmptyString) {
+        _suppressQuoteEmptyString = suppressQuoteEmptyString;
+    }
+
+    public void setCellLengthLimit(int cellLengthLimit) {
+        _cellLengthLimit = cellLengthLimit;
     }
 
     public String getDelimiterDataDir() {

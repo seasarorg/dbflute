@@ -609,6 +609,38 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return getLoadDataReverseRecordLimit() != null;
     }
 
+    // -----------------------------------------------------
+    //                                         File Resource
+    //                                         -------------
+    public String getLoadDataReverseXlsDataDir() {
+        if (isLoadDataReverseReplaceSchemaDirectUse()) {
+            return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseXlsDataDir();
+        } else {
+            final String outputDirectory = getDocumentOutputDirectory();
+            return outputDirectory + "/data";
+        }
+    }
+
+    public String getLoadDataReverseDelimiterDataDir() { // for big data
+        if (isLoadDataReverseReplaceSchemaDirectUse()) {
+            return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseTsvUTF8DataDir();
+        } else {
+            final String templateDir = getLoadDataReverseXlsDataDir();
+            return templateDir + "/big-data";
+        }
+    }
+
+    public String getLoadDataReverseFileTitle() {
+        return isLoadDataReverseReplaceSchemaDirectUse() ? "cyclic-data" : "reverse-data";
+    }
+
+    public String getLoadDataReverseSchemaXml() {
+        return "./schema/project-lreverse-schema.xml";
+    }
+
+    // -----------------------------------------------------
+    //                                          Record Limit
+    //                                          ------------
     public Integer getLoadDataReverseRecordLimit() {
         final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
         String limitExp = null;
@@ -627,39 +659,12 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         }
     }
 
-    public boolean isLoadDataReverseContainsCommonColumn() { // closet
-        return isProperty("isContainsCommonColumn", true, getLoadDataReverseMap());
-    }
-
-    public String getLoadDataReverseXlsDataDir() {
-        if (isLoadDataReverseReplaceSchemaDirectUse()) {
-            return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseXlsDataDir();
-        } else {
-            final String outputDirectory = getDocumentOutputDirectory();
-            return outputDirectory + "/data";
-        }
-    }
-
-    public String getLoadDataReverseDelimiterDataDir() { // for large data
-        if (isLoadDataReverseReplaceSchemaDirectUse()) {
-            return getReplaceSchemaProperties().getMainCurrentLoadTypeReverseTsvUTF8DataDir();
-        } else {
-            final String templateDir = getLoadDataReverseXlsDataDir();
-            return templateDir + "/large-data";
-        }
-    }
-
-    public String getLoadDataReverseFileTitle() {
-        return isLoadDataReverseReplaceSchemaDirectUse() ? "cyclic-data" : "reverse-data";
-    }
-
+    // -----------------------------------------------------
+    //                                          Basic Option
+    //                                          ------------
     public boolean isLoadDataReverseReplaceSchemaDirectUse() {
         final boolean defaultValue = isLoadDataReverseOutputToPlaySql(); // for compatible
         return isProperty("isReplaceSchemaDirectUse", defaultValue, getLoadDataReverseMap());
-    }
-
-    protected boolean isLoadDataReverseOutputToPlaySql() { // old style
-        return isProperty("isOutputToPlaySql", false, getLoadDataReverseMap());
     }
 
     public boolean isLoadDataReverseOverrideExistingDataFile() {
@@ -670,6 +675,18 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return isProperty("isSynchronizeOriginDate", false, getLoadDataReverseMap());
     }
 
+    protected boolean isLoadDataReverseOutputToPlaySql() { // old style
+        return isProperty("isOutputToPlaySql", false, getLoadDataReverseMap());
+    }
+
+    public boolean isLoadDataReverseContainsCommonColumn() { // closet
+        // long long time ago, default was false but common column value also should be reversed...
+        return isProperty("isContainsCommonColumn", true, getLoadDataReverseMap());
+    }
+
+    // -----------------------------------------------------
+    //                                             XLS Limit
+    //                                             ---------
     public Integer getLoadDataReverseXlsLimit() {
         final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
         String limitExp = null;
@@ -683,6 +700,32 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             return Integer.valueOf(limitExp);
         } catch (NumberFormatException e) {
             String msg = "The property 'xlsLimit' of loadDataReverse in " + KEY_documentDefinitionMap;
+            msg = msg + " should be number but: value=" + limitExp;
+            throw new DfIllegalPropertyTypeException(msg, e);
+        }
+    }
+
+    public boolean isLoadDataReverseSuppressLargeDataHandling() {
+        return isProperty("isSuppressLargeDataHandling", false, getLoadDataReverseMap());
+    }
+
+    public boolean isLoadDataReverseSuppressQuoteEmptyString() {
+        return isProperty("isSuppressQuoteEmptyString", false, getLoadDataReverseMap());
+    }
+
+    public Integer getLoadDataReverseCellLengthLimit() {
+        final Map<String, Object> loadDataReverseMap = getLoadDataReverseMap();
+        String limitExp = null;
+        if (!loadDataReverseMap.isEmpty()) {
+            limitExp = (String) loadDataReverseMap.get("cellLengthLimit");
+        }
+        if (limitExp == null) {
+            return null; // if null, default limit
+        }
+        try {
+            return Integer.valueOf(limitExp);
+        } catch (NumberFormatException e) {
+            String msg = "The property 'cellLengthLimit' of loadDataReverse in " + KEY_documentDefinitionMap;
             msg = msg + " should be number but: value=" + limitExp;
             throw new DfIllegalPropertyTypeException(msg, e);
         }

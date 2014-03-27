@@ -130,13 +130,11 @@ package org.apache.torque.task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.AppData;
-import org.apache.torque.engine.database.model.Database;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.exception.DfSchemaSyncCheckGhastlyTragedyException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.logic.doc.lreverse.DfLReverseOutputHandler;
 import org.seasar.dbflute.logic.doc.lreverse.DfLReverseProcess;
 import org.seasar.dbflute.logic.doc.synccheck.DfSchemaSyncChecker;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
@@ -237,6 +235,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return false;
     }
 
+    // -----------------------------------------------------
+    //                                            SchemaHtml
+    //                                            ----------
     protected void processSchemaHtml() {
         _log.info("");
         _log.info("* * * * * * * * * * *");
@@ -250,6 +251,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         fireVelocityProcess();
     }
 
+    // -----------------------------------------------------
+    //                                       LoadDataReverse
+    //                                       ---------------
     protected void processLoadDataReverse() {
         if (!isLoadDataReverseValid()) {
             return;
@@ -262,32 +266,17 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         //_log.info("* Load Data Reverse *");
         //_log.info("*                   *");
         //_log.info("* * * * * * * * * * *");
-        final Database database = _schemaData.getDatabase();
-        outputLoadDataReverse(database);
+        outputLoadDataReverse();
         refreshResources();
     }
 
-    protected void outputLoadDataReverse(Database database) {
+    protected void outputLoadDataReverse() {
         final DfLReverseProcess process = createLReverseProcess();
-        process.execute(database);
+        process.execute();
     }
 
     protected DfLReverseProcess createLReverseProcess() {
-        final DfLReverseOutputHandler handler = createLReverseOutputHandler();
-        return new DfLReverseProcess(handler);
-    }
-
-    protected DfLReverseOutputHandler createLReverseOutputHandler() {
-        final DfLReverseOutputHandler handler = new DfLReverseOutputHandler(getDataSource());
-        handler.setContainsCommonColumn(isLoadDataReverseContainsCommonColumn());
-        final Integer xlsLimit = getLoadDataReverseXlsLimit(); // if null, default limit
-        if (xlsLimit != null) {
-            handler.setXlsLimit(xlsLimit);
-        }
-        handler.setDelimiterDataDir(getLoadDataReverseDelimiterDataDir());
-        // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
-        //handler.setDelimiterDataTypeCsv(true);
-        return handler;
+        return new DfLReverseProcess(getDataSource());
     }
 
     protected void throwLoadDataReversePropertyNotFoundException() {
@@ -305,6 +294,9 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         throw new DfRequiredPropertyNotFoundException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                       SchemaSyncCheck
+    //                                       ---------------
     protected void processSchemaSyncCheck() {
         try {
             doProcessSchemaSyncCheck();
@@ -359,7 +351,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                  ==================
     @Override
     protected void initializeSchemaData() {
-        if (isSchemaSyncCheckOnly()) { // SchemaSyncCheck doesn't use basic schema data
+        if (isLoadDataReverseOnly() || isSchemaSyncCheckOnly()) { // don't use basic schema data
             _schemaData = AppData.createAsEmpty(); // not to depends on JDBC task
         } else { // normally here
             super.initializeSchemaData();
@@ -394,18 +386,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected boolean isLoadDataReverseValid() {
         return getDocumentProperties().isLoadDataReverseValid();
-    }
-
-    protected boolean isLoadDataReverseContainsCommonColumn() {
-        return getDocumentProperties().isLoadDataReverseContainsCommonColumn();
-    }
-
-    protected Integer getLoadDataReverseXlsLimit() {
-        return getDocumentProperties().getLoadDataReverseXlsLimit();
-    }
-
-    protected String getLoadDataReverseDelimiterDataDir() {
-        return getDocumentProperties().getLoadDataReverseDelimiterDataDir();
     }
 
     protected boolean isSchemaSyncCheckValid() {

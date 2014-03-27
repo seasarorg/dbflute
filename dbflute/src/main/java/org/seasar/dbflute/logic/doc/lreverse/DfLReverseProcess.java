@@ -33,6 +33,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
@@ -45,6 +46,9 @@ import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.io.compress.DfZipArchiver;
 import org.seasar.dbflute.helper.io.xls.DfTableXlsReader;
+import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
+import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
+import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlSerializer;
 import org.seasar.dbflute.logic.replaceschema.loaddata.impl.dataprop.DfTableNameProp;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
@@ -68,36 +72,59 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final DfSchemaSource _dataSource;
     protected final DfLReverseOutputHandler _outputHandler;
+    protected final DfTableOrderAnalyzer _tableOrderAnalyzer;
     protected final DfTableNameProp _tableNameProp = new DfTableNameProp();
     protected final List<Table> _skippedTableList = DfCollectionUtil.newArrayList(); // initialize in filter
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfLReverseProcess(DfLReverseOutputHandler outputHandler) {
-        _outputHandler = outputHandler;
+    public DfLReverseProcess(DfSchemaSource dataSource) {
+        _dataSource = dataSource;
+        _outputHandler = createLReverseOutputHandler();
+        _tableOrderAnalyzer = createTableOrderAnalyzer();
+    }
+
+    protected DfLReverseOutputHandler createLReverseOutputHandler() {
+        final DfLReverseOutputHandler handler = new DfLReverseOutputHandler(_dataSource);
+        handler.setContainsCommonColumn(isContainsCommonColumn());
+        final Integer xlsLimit = getXlsLimit(); // if null, default limit
+        if (xlsLimit != null) {
+            handler.setXlsLimit(xlsLimit);
+        }
+        if (isSuppressLargeDataHandling()) {
+            handler.setSuppressLargeDataHandling(true);
+        }
+        if (isSuppressQuoteEmptyString()) {
+            handler.setSuppressQuoteEmptyString(true);
+        }
+        final Integer cellLengthLimit = getCellLengthLimit();
+        if (cellLengthLimit != null) {
+            handler.setCellLengthLimit(cellLengthLimit);
+        }
+        handler.setDelimiterDataDir(getDelimiterDataDir());
+        // changes to TSV for compatibility of copy and paste to excel @since 0.9.8.3
+        //handler.setDelimiterDataTypeCsv(true);
+        return handler;
+    }
+
+    protected DfTableOrderAnalyzer createTableOrderAnalyzer() {
+        return new DfTableOrderAnalyzer();
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    public void execute(Database database) {
+    public void execute() {
+        final Database database = prepareDatabase();
         final List<Table> tableList = filterTableList(database);
         final List<String> sectionInfoList = prepareTitleSection(tableList);
-        final List<List<Table>> orderedList = analyzeOrder(tableList);
         final File baseDir = prepareBaseDir();
-        final Map<File, DfLReverseOutputResource> orderedMap;
-        if (isOverrideExistingDataFile()) {
-            orderedMap = toOverrideReverseOrderedMap(orderedList, baseDir);
-        } else {
-            orderedMap = toReplaceReverseOrderedMap(orderedList);
-        }
+        final Map<File, DfLReverseOutputResource> orderedMap = prepareOrderedMap(tableList, baseDir);
         reverseTableData(orderedMap, baseDir, sectionInfoList);
-        final Map<String, Table> tableNameMap = _outputHandler.getTableNameMap();
-        if (!tableNameMap.isEmpty()) {
-            outputTableNameMap(tableNameMap);
-        }
+        outputTableNameMap();
         synchronizeOriginDateIfNeeds(sectionInfoList);
         outputResultMark(sectionInfoList);
     }
@@ -105,6 +132,23 @@ public class DfLReverseProcess {
     // ===================================================================================
     //                                                                             Prepare
     //                                                                             =======
+    protected Database prepareDatabase() {
+        final String schemaXml = getLoadDataReverseSchemaXml();
+        final DfSchemaXmlSerializer serializer = createSchemaXmlSerializer(schemaXml);
+        serializer.serialize();
+        final DfSchemaXmlReader reader = createSchemaXmlReader(schemaXml);
+        final AppData appData = reader.read();
+        return appData.getDatabase();
+    }
+
+    protected DfSchemaXmlSerializer createSchemaXmlSerializer(String schemaXml) {
+        return DfSchemaXmlSerializer.createAsManage(_dataSource, schemaXml, null);
+    }
+
+    protected DfSchemaXmlReader createSchemaXmlReader(String schemaXml) {
+        return DfSchemaXmlReader.createAsFlexibleToManage(schemaXml);
+    }
+
     protected List<String> prepareTitleSection(final List<Table> tableList) {
         final List<String> sectionInfoList = new ArrayList<String>();
         sectionInfoList.add("...Outputting load data: tables=" + tableList.size());
@@ -123,6 +167,85 @@ public class DfLReverseProcess {
             baseDir.mkdirs();
         }
         return baseDir;
+    }
+
+    protected Map<File, DfLReverseOutputResource> prepareOrderedMap(List<Table> tableList, File baseDir) {
+        final List<List<Table>> orderedList = analyzeOrder(tableList);
+        final Map<File, DfLReverseOutputResource> orderedMap;
+        if (isOverrideExistingDataFile()) {
+            orderedMap = toOverrideReverseOrderedMap(orderedList, baseDir);
+        } else {
+            orderedMap = toReplaceReverseOrderedMap(orderedList);
+        }
+        return orderedMap;
+    }
+
+    protected List<List<Table>> analyzeOrder(List<Table> tableList) {
+        return _tableOrderAnalyzer.analyzeOrder(tableList, _skippedTableList);
+    }
+
+    // ===================================================================================
+    //                                                                          Table List
+    //                                                                          ==========
+    protected List<Table> filterTableList(Database database) {
+        final List<Table> tableList = database.getTableList();
+        final Set<String> commonExistingTableSet = getCommonExistingTableSet();
+        final List<Table> filteredList = DfCollectionUtil.newArrayListSized(tableList.size());
+        _skippedTableList.clear();
+        final List<Table> commonSkippedList = DfCollectionUtil.newArrayList();
+        final List<Table> exceptSkippedList = DfCollectionUtil.newArrayList();
+        _log.info("...Filtering reversed table: " + tableList.size());
+        for (Table table : tableList) {
+            if (table.isTypeView() || table.isAdditionalSchema()) {
+                // fixedly out of target
+                //   view object - view is not an object which has own data
+                //   additional schema - tables on main schema only are target
+                continue;
+            }
+            if (commonExistingTableSet.contains(table.getTableDbName())) {
+                commonSkippedList.add(table);
+                continue;
+            }
+            if (!isTargetTable(table)) {
+                exceptSkippedList.add(table);
+                continue;
+            }
+            filteredList.add(table);
+        }
+        if (!commonSkippedList.isEmpty()) {
+            _log.info("[Common Table] *skipped");
+            for (Table table : commonSkippedList) {
+                _log.info("  " + table.getTableDbName());
+                _skippedTableList.add(table);
+            }
+        }
+        if (!exceptSkippedList.isEmpty()) {
+            _log.info("[Except Table] *skipped");
+            for (Table table : exceptSkippedList) {
+                _log.info("  " + table.getTableDbName());
+                _skippedTableList.add(table);
+            }
+        }
+        return filteredList;
+    }
+
+    protected Set<String> getCommonExistingTableSet() {
+        if (!isReplaceSchemaDirectUse()) {
+            return DfCollectionUtil.emptySet();
+        }
+        final Set<String> tableSet = StringSet.createAsFlexible();
+        tableSet.addAll(extractCommonExistingXlsTableSet(getMainCommonFirstXlsDataDir()));
+        tableSet.addAll(extractCommonExistingXlsTableSet(getMainCommonReverseXlsDataDir()));
+        tableSet.addAll(extractCommonExistingXlsTableSet(getMainCommonXlsDataDir()));
+        return tableSet;
+    }
+
+    protected Set<String> extractCommonExistingXlsTableSet(String dataDir) {
+        return extractExistingXlsInfo(new File(dataDir)).getTableExistingXlsMap().keySet();
+    }
+
+    protected boolean isTargetTable(Table table) {
+        return isReverseTableTarget(table.getTableDbName());
     }
 
     // ===================================================================================
@@ -199,6 +322,10 @@ public class DfLReverseProcess {
                 resource.acceptTableOrder(tableNameList);
             }
         }
+    }
+
+    protected String extractMainName(List<Table> tableList) {
+        return _tableOrderAnalyzer.extractMainName(tableList);
     }
 
     // -----------------------------------------------------
@@ -371,86 +498,16 @@ public class DfLReverseProcess {
     }
 
     // ===================================================================================
-    //                                                                          Table List
-    //                                                                          ==========
-    protected List<Table> filterTableList(Database database) {
-        final List<Table> tableList = database.getTableList();
-        final Set<String> commonExistingTableSet = getCommonExistingTableSet();
-        final List<Table> filteredList = DfCollectionUtil.newArrayListSized(tableList.size());
-        _skippedTableList.clear();
-        final List<Table> commonSkippedList = DfCollectionUtil.newArrayList();
-        final List<Table> exceptSkippedList = DfCollectionUtil.newArrayList();
-        _log.info("...Filtering reversed table: " + tableList.size());
-        for (Table table : tableList) {
-            if (table.isTypeView() || table.isAdditionalSchema()) {
-                // fixedly out of target
-                //   view object - view is not an object which has own data
-                //   additional schema - tables on main schema only are target
-                continue;
-            }
-            if (commonExistingTableSet.contains(table.getTableDbName())) {
-                commonSkippedList.add(table);
-                continue;
-            }
-            if (!isTargetTable(table)) {
-                exceptSkippedList.add(table);
-                continue;
-            }
-            filteredList.add(table);
-        }
-        if (!commonSkippedList.isEmpty()) {
-            _log.info("[Common Table] *skipped");
-            for (Table table : commonSkippedList) {
-                _log.info("  " + table.getTableDbName());
-                _skippedTableList.add(table);
-            }
-        }
-        if (!exceptSkippedList.isEmpty()) {
-            _log.info("[Except Table] *skipped");
-            for (Table table : exceptSkippedList) {
-                _log.info("  " + table.getTableDbName());
-                _skippedTableList.add(table);
-            }
-        }
-        return filteredList;
-    }
-
-    protected Set<String> getCommonExistingTableSet() {
-        if (!isReplaceSchemaDirectUse()) {
-            return DfCollectionUtil.emptySet();
-        }
-        final Set<String> tableSet = StringSet.createAsFlexible();
-        tableSet.addAll(extractCommonExistingXlsTableSet(getMainCommonFirstXlsDataDir()));
-        tableSet.addAll(extractCommonExistingXlsTableSet(getMainCommonReverseXlsDataDir()));
-        tableSet.addAll(extractCommonExistingXlsTableSet(getMainCommonXlsDataDir()));
-        return tableSet;
-    }
-
-    protected Set<String> extractCommonExistingXlsTableSet(String dataDir) {
-        return extractExistingXlsInfo(new File(dataDir)).getTableExistingXlsMap().keySet();
-    }
-
-    protected boolean isTargetTable(Table table) {
-        return isReverseTableTarget(table.getTableDbName());
-    }
-
-    // ===================================================================================
-    //                                                                       Analyze Order
-    //                                                                       =============
-    protected List<List<Table>> analyzeOrder(List<Table> tableList) {
-        final DfTableOrderAnalyzer analyzer = new DfTableOrderAnalyzer();
-        return analyzer.analyzeOrder(tableList, _skippedTableList);
-    }
-
-    protected String extractMainName(List<Table> tableList) {
-        final DfTableOrderAnalyzer analyzer = new DfTableOrderAnalyzer();
-        return analyzer.extractMainName(tableList);
-    }
-
-    // ===================================================================================
     //                                                                      Table Name Map
     //                                                                      ==============
-    protected void outputTableNameMap(Map<String, Table> tableNameMap) {
+    protected void outputTableNameMap() {
+        final Map<String, Table> tableNameMap = _outputHandler.getTableNameMap();
+        if (!tableNameMap.isEmpty()) {
+            doOutputTableNameMap(tableNameMap);
+        }
+    }
+
+    protected void doOutputTableNameMap(Map<String, Table> tableNameMap) {
         _log.info("...Outputting table name map for reversed tables");
         _tableNameProp.outputTableNameMap(getReverseXlsDataDir(), tableNameMap);
     }
@@ -527,8 +584,12 @@ public class DfLReverseProcess {
     }
 
     // -----------------------------------------------------
-    //                                       LoadDataReverse
-    //                                       ---------------
+    //                                         File Resource
+    //                                         -------------
+    protected String getLoadDataReverseSchemaXml() {
+        return getDocumentProperties().getLoadDataReverseSchemaXml();
+    }
+
     protected String getReverseXlsDataDir() {
         return getDocumentProperties().getLoadDataReverseXlsDataDir();
     }
@@ -541,6 +602,9 @@ public class DfLReverseProcess {
         return getDocumentProperties().getLoadDataReverseFileTitle();
     }
 
+    // -----------------------------------------------------
+    //                                          Basic Option
+    //                                          ------------
     protected boolean isReplaceSchemaDirectUse() {
         return getDocumentProperties().isLoadDataReverseReplaceSchemaDirectUse();
     }
@@ -553,8 +617,38 @@ public class DfLReverseProcess {
         return getDocumentProperties().isLoadDataReverseSynchronizeOriginDate();
     }
 
+    // -----------------------------------------------------
+    //                                          Table Except
+    //                                          ------------
     protected boolean isReverseTableTarget(String name) {
         return getDocumentProperties().isLoadDataReverseTableTarget(name);
+    }
+
+    // -----------------------------------------------------
+    //                                        Output Handler
+    //                                        --------------
+    protected boolean isContainsCommonColumn() {
+        return getDocumentProperties().isLoadDataReverseContainsCommonColumn();
+    }
+
+    protected Integer getXlsLimit() {
+        return getDocumentProperties().getLoadDataReverseXlsLimit();
+    }
+
+    protected boolean isSuppressLargeDataHandling() {
+        return getDocumentProperties().isLoadDataReverseSuppressLargeDataHandling();
+    }
+
+    protected boolean isSuppressQuoteEmptyString() {
+        return getDocumentProperties().isLoadDataReverseSuppressQuoteEmptyString();
+    }
+
+    protected Integer getCellLengthLimit() {
+        return getDocumentProperties().getLoadDataReverseCellLengthLimit();
+    }
+
+    protected String getDelimiterDataDir() {
+        return getDocumentProperties().getLoadDataReverseDelimiterDataDir();
     }
 
     // -----------------------------------------------------

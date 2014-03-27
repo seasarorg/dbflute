@@ -63,12 +63,11 @@ public class DfDataRow {
         modify();
     }
 
-    // *unused on DBFlute
-    //public void setValue(int index, Object value) {
-    //    final DataColumn column = _table.getColumn(index);
-    //    _values.set(index, column.convert(value));
-    //     modify();
-    //}
+    public void setValue(int columnIndex, Object value) {
+        final DfDataColumn column = _table.getColumn(columnIndex);
+        _values.set(columnIndex, column.convert(value));
+        modify();
+    }
 
     private void modify() {
         if (_state.equals(DfDtsRowStates.UNCHANGED)) {

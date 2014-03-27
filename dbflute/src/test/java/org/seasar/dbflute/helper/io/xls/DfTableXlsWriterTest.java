@@ -89,6 +89,41 @@ public class DfTableXlsWriterTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                         EmptyString
+    //                                                                         ===========
+    public void test_write_emptyString_quoted() throws Exception {
+        // ## Arrange ##
+        DfTableXlsReader existingReader = createTableXlsReader(prepareTestLargeDataXlsFile());
+        DfDataSet baseSet = existingReader.read();
+        baseSet.getTable(0).getRow(1).setValue(1, "");
+        String baseExp = baseSet.toString();
+        log(ln() + baseExp);
+        assertContains(baseExp, ", ,");
+        assertContains(baseExp, ", null,");
+        String fileName = "output-table-xls-large-data-handling.xls";
+        String path = getTestCaseBuildDir().getCanonicalPath() + "/../" + fileName;
+        File outputFile = new File(path);
+        DfTableXlsWriter writer = new DfTableXlsWriter(new FileOutputStream(outputFile));
+        writer.largeDataHandling().quoteEmptyString().cellLengthLimit(5);
+
+        // ## Act ##
+        writer.write(baseSet);
+
+        // ## Assert ##
+        refresh();
+        DfTableXlsReader outputReader = createTableXlsReader(outputFile);
+        DfDataSet actualSet = outputReader.read();
+        log(ln() + actualSet);
+        String actualExp = actualSet.toString();
+        assertNotSame(baseExp, actualExp);
+        assertContains(actualExp, ", \"\",");
+        assertContains(actualExp, ", null,");
+        assertFalse(actualExp.contains(DfTableXlsReader.LDATA_SHEET_NAME));
+        assertFalse(actualExp.contains(DfTableXlsReader.LDATA_KEY_DELIMITER));
+        assertFalse(actualExp.contains(DfTableXlsReader.LDATA_REF_PREFIX));
+    }
+
+    // ===================================================================================
     //                                                                               Point
     //                                                                               =====
     public void test_toLargeDataSplitList_basic() throws Exception {

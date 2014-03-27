@@ -64,6 +64,7 @@ public class DfTableXlsWriter implements DfDataSetConstants {
     //                                           -----------
     protected boolean _stringCellType;
     protected boolean _largeDataHandling;
+    protected boolean _quoteEmptyString;
     protected int _cellLengthLimit = 30000; // as default, actually 32767 allowed by excel;
 
     // -----------------------------------------------------
@@ -115,6 +116,15 @@ public class DfTableXlsWriter implements DfDataSetConstants {
      */
     public DfTableXlsWriter largeDataHandling() {
         _largeDataHandling = true;
+        return this;
+    }
+
+    /**
+     * Quote empty string by double quotation. (to keep empty string basically for ReplaceSchema)
+     * @return this.
+     */
+    public DfTableXlsWriter quoteEmptyString() {
+        _quoteEmptyString = true;
         return this;
     }
 
@@ -354,7 +364,7 @@ public class DfTableXlsWriter implements DfDataSetConstants {
 
     protected String resolveEmptyStringIfNeeds(String strValue) {
         // empty string from database can be treated as empty string by quoting
-        return strValue.equals("") ? "\"\"" : strValue;
+        return _quoteEmptyString && strValue.equals("") ? "\"\"" : strValue;
     }
 
     protected HSSFRichTextString createRichTextString(String str) {
