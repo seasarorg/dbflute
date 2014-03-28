@@ -635,7 +635,8 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public String getLoadDataReverseSchemaXml() {
-        return "./schema/project-lreverse-schema.xml";
+        final String projectName = getBasicProperties().getProjectName();
+        return "./schema/lreverse-schema-" + projectName + ".xml";
     }
 
     // -----------------------------------------------------
