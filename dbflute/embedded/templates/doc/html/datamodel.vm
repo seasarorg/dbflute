@@ -74,8 +74,14 @@ h4 {
 .mainschema {
 	text-align: right;
 }
-.sublink {
+.navilinkarea {
 	text-align: right;
+}
+.sublink {
+	margin-top: 0.1em;
+}
+.sisterlink {
+	margin-top: 0.5em;
 }
 
 /* keyword search */
@@ -288,6 +294,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #if ($database.hasDatabaseSchema())
 <p class="mainschema">generated from <strong>${database.databaseSchema.catalogSchema}</strong></p>
 #end
+<div class="navilinkarea">
 #if ($database.hasClassificationDefinition())
 <p class="sublink"><a href="#cdef">Classification Definition</a></p>
 #end
@@ -297,6 +304,13 @@ ${database.schemaHtmlJavaScriptEmbedded}
 #if ($database.isSchemaHtmlProcedureValid())
 <p class="sublink"><a href="#procedure">Procedure List</a></p>
 #end
+#if ($selector.isSchemaHtmlToHistoryHtmlLink())
+<p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
+#end
+#if ($selector.isSchemaHtmlToPropertiesHtmlLink())
+<p class="sisterlink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
+#end
+</div>
 
 #set ($hasAdditionalSchema = $database.hasAdditionalSchema())
 #set ($isAliasDelimiterInDbCommentValid = $database.isAliasDelimiterInDbCommentValid())

@@ -72,6 +72,21 @@ h5 {
 	color: #555;
 }
 
+/* total info */
+.updatedate {
+	text-align: right;
+}
+.mainschema {
+	text-align: right;
+}
+.navilinkarea {
+	text-align: right;
+}
+.sisterlink {
+	margin-top: 0.5em;
+}
+
+/* history info */
 .table-content {
 	margin: 0 6em;
 }
@@ -123,6 +138,14 @@ ${selector.historyHtmlJavaScriptEmbedded}
 
 <body>
 <h1>${selector.diffModelBigTitle} for ${database.projectName} (${database.databaseName})</h1>
+<div class="navilinkarea">
+#if ($selector.isHistoryHtmlToSchemaHtmlLink())
+<p class="sisterlink"><a href="./${selector.schemaHtmlFileName}">to SchemaHTML</a></p>
+#end
+#if ($selector.isHistoryHtmlToPropertiesHtmlLink())
+<p class="sisterlink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
+#end
+</div>
 
 #foreach ($schemaDiff in $selector.schemaDiffList)
 <div class="section">

@@ -70,8 +70,14 @@ h4 {
 	font-size: 1.4em;
 	color: #333333;
 }
-.linkarea {
+.navilinkarea {
 	text-align: right;
+}
+.requestlink {
+	margin-top: 0.1em;
+}
+.sisterlink {
+	margin-top: 0.5em;
 }
 
 /* table */
@@ -204,10 +210,15 @@ ${manager.javaScriptEmbedded}
 #else
 <h1>Properties for ${manager.projectName}</h1>
 #end
-
-<div class="linkarea">
+<div class="navilinkarea">
 #foreach ($request in $manager.requestList)
-	<p><a href="#${request.requestLowerName}">${request.requestName}</a></p>
+	<p class="requestlink"><a href="#${request.requestLowerName}">${request.requestName}</a></p>
+#end
+#if ($selector.isPropertiesHtmlToSchemaHtmlLink())
+<p class="sisterlink"><a href="./${selector.schemaHtmlFileName}">to SchemaHTML</a></p>
+#end
+#if ($selector.isPropertiesHtmlToHistoryHtmlLink())
+<p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
 #end
 </div>
 

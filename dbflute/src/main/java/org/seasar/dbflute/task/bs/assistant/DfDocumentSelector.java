@@ -158,7 +158,7 @@ public class DfDocumentSelector {
     }
 
     public boolean existsSchemaHistory() {
-        return _schemaHistory.existsHistory();
+        return _schemaHistory != null && _schemaHistory.existsHistory();
     }
 
     public List<DfSchemaDiff> getSchemaDiffList() {
@@ -178,7 +178,7 @@ public class DfDocumentSelector {
     }
 
     public boolean existsPropertiesHtmlRequest() {
-        return _propHtmlManager.existsRequest();
+        return _propHtmlManager != null && _propHtmlManager.existsRequest();
     }
 
     public DfPropHtmlManager getPropertiesHtmlManager() {
@@ -209,6 +209,33 @@ public class DfDocumentSelector {
     public String getPropertiesHtmlFileName() {
         final String projectName = getProjectName();
         return getDocumentProperties().getPropertiesHtmlFileName(projectName);
+    }
+
+    // ===================================================================================
+    //                                                                         Sister Link
+    //                                                                         ===========
+    public boolean isSchemaHtmlToHistoryHtmlLink() {
+        return !isSuppressSchemaHtmlToSisterLink() && isHistoryHtml() && existsSchemaHistory();
+    }
+
+    public boolean isSchemaHtmlToPropertiesHtmlLink() {
+        return !isSuppressSchemaHtmlToSisterLink() && isPropertiesHtml() && existsPropertiesHtmlRequest();
+    }
+
+    public boolean isHistoryHtmlToSchemaHtmlLink() {
+        return !isSuppressHistoryHtmlToSisterLink() && isSchemaHtml(); // SchemaHtml always exists
+    }
+
+    public boolean isHistoryHtmlToPropertiesHtmlLink() {
+        return !isSuppressHistoryHtmlToSisterLink() && isPropertiesHtml() && existsPropertiesHtmlRequest();
+    }
+
+    public boolean isPropertiesHtmlToSchemaHtmlLink() {
+        return !isSuppressPropertiesHtmlToSisterLink() && isSchemaHtml(); // SchemaHtml always exists
+    }
+
+    public boolean isPropertiesHtmlToHistoryHtmlLink() {
+        return !isSuppressPropertiesHtmlToSisterLink() && isHistoryHtml() && existsSchemaHistory();
     }
 
     // ===================================================================================
@@ -266,6 +293,18 @@ public class DfDocumentSelector {
 
     protected DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
+    }
+
+    protected boolean isSuppressSchemaHtmlToSisterLink() {
+        return getDocumentProperties().isSuppressSchemaHtmlToSisterLink();
+    }
+
+    protected boolean isSuppressHistoryHtmlToSisterLink() {
+        return getDocumentProperties().isSuppressHistoryHtmlToSisterLink();
+    }
+
+    protected boolean isSuppressPropertiesHtmlToSisterLink() {
+        return getDocumentProperties().isSuppressPropertiesHtmlToSisterLink();
     }
 
     protected String getSchemaSyncCheckDiffMapFile() {

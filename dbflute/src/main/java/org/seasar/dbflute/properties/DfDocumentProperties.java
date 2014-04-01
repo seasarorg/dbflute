@@ -409,6 +409,13 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return getProperty("schemaHtmlJavaScript", null, getDocumentDefinitionMap());
     }
 
+    // -----------------------------------------------------
+    //                                           Sister Link
+    //                                           -----------
+    public boolean isSuppressSchemaHtmlToSisterLink() { // closet
+        return isProperty("isSuppressSchemaHtmlToSisterLink", false, getDocumentDefinitionMap());
+    }
+
     // ===================================================================================
     //                                                                         HistoryHtml
     //                                                                         ===========
@@ -583,6 +590,13 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
 
     protected String getHistoryHtmlJavaScript() { // closet
         return getProperty("historyHtmlJavaScript", null, getDocumentDefinitionMap());
+    }
+
+    // -----------------------------------------------------
+    //                                           Sister Link
+    //                                           -----------
+    public boolean isSuppressHistoryHtmlToSisterLink() { // closet
+        return isProperty("isSuppressHistoryHtmlToSisterLink", false, getDocumentDefinitionMap());
     }
 
     // ===================================================================================
@@ -1013,24 +1027,33 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                                Header
     //                                                ------
+    protected Map<String, Object> getPropertiesHtmlHeaderMap() {
+        getPropertiesHtmlMap(); // initialize
+        return _propertiesHtmlHeaderMap;
+    }
+
     public String getPropertiesHtmlHeaderTitle() {
-        final String title = (String) _propertiesHtmlHeaderMap.get("title");
+        final String title = (String) getPropertiesHtmlHeaderMap().get("title");
         return title != null ? title : null;
     }
 
     protected String getPropertiesHtmlHeaderHtmlFileName() {
-        final String fileName = (String) _propertiesHtmlHeaderMap.get("htmlFileName");
+        final String fileName = (String) getPropertiesHtmlHeaderMap().get("htmlFileName");
         return fileName != null ? fileName : null;
     }
 
     protected String getPropertiesHtmlHeaderStyleSheet() {
-        final String sheet = (String) _propertiesHtmlHeaderMap.get("styleSheet");
+        final String sheet = (String) getPropertiesHtmlHeaderMap().get("styleSheet");
         return sheet != null ? sheet : null;
     }
 
     protected String getPropertiesHtmlHeaderJavaScript() {
-        final String sheet = (String) _propertiesHtmlHeaderMap.get("javaScript");
-        return sheet != null ? sheet : null;
+        final String js = (String) getPropertiesHtmlHeaderMap().get("javaScript");
+        return js != null ? js : null;
+    }
+
+    public boolean isSuppressPropertiesHtmlToSisterLink() { // closet
+        return isProperty("isSuppressToSisterLink", false, getPropertiesHtmlHeaderMap());
     }
 
     // -----------------------------------------------------

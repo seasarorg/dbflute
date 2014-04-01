@@ -27,6 +27,18 @@ $database.initializeAdditionalForeignKey()
 $database.initializeClassificationDeployment()
 #end
 
+## - - - - - - - - - - - - - - - - - - - -
+## Loading HTML resource before generation 
+##  o because it might be used others
+##  o but only sister HTMLs
+## - - - - - - - - - - - - - - - - - - - -
+#if ($selector.isHistoryHtml())
+$selector.loadSchemaHistoryAsCore()
+#end
+#if ($selector.isPropertiesHtml())
+$selector.loadPropertiesHtmlRequest()
+#end
+
 ## - - - - - -
 ## Schema HTML
 ## - - - - - -
@@ -42,7 +54,6 @@ $generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
 ## - - - - - - -
 #if ($selector.isHistoryHtml())
 $selector.markHistoryHtml()
-$selector.loadSchemaHistoryAsCore()
 #if ($selector.existsSchemaHistory())
 #set ($outFile = "${selector.historyHtmlFileName}")
 $generator.parse("doc/html/diffmodel.vm", $outFile, "dataModel", $dataModel)
@@ -80,7 +91,6 @@ $database.backToDocumentOutputDirectory()
 ## - - - - - - - -
 #if ($selector.isPropertiesHtml())
 $selector.markPropertiesHtml()
-$selector.loadPropertiesHtmlRequest()
 #if ($selector.existsPropertiesHtmlRequest())
 #set ($outFile = "${selector.propertiesHtmlFileName}")
 $generator.parse("doc/html/propmodel.vm", $outFile, "dataModel", $dataModel)
