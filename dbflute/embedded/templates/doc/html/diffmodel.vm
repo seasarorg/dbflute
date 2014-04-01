@@ -83,7 +83,12 @@ h5 {
 	text-align: right;
 }
 .sisterlink {
-	margin-top: 0.5em;
+	margin-top: 0.6em;
+	font-size: 110%;
+}
+.sistersublink {
+	margin-top: 0.6em;
+	font-size: 80%;
 }
 
 /* history info */
@@ -143,7 +148,7 @@ ${selector.historyHtmlJavaScriptEmbedded}
 <p class="sisterlink"><a href="./${selector.schemaHtmlFileName}">to SchemaHTML</a></p>
 #end
 #if ($selector.isHistoryHtmlToPropertiesHtmlLink())
-<p class="sisterlink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
+<p class="sistersublink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
 #end
 </div>
 

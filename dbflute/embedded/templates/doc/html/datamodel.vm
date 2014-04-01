@@ -81,7 +81,12 @@ h4 {
 	margin-top: 0.1em;
 }
 .sisterlink {
-	margin-top: 0.5em;
+	margin-top: 0.6em;
+	font-size: 110%;
+}
+.sistersublink {
+	margin-top: 0.6em;
+	font-size: 80%;
 }
 
 /* keyword search */
@@ -308,7 +313,7 @@ ${database.schemaHtmlJavaScriptEmbedded}
 <p class="sisterlink"><a href="./${selector.historyHtmlFileName}">to HistoryHTML</a></p>
 #end
 #if ($selector.isSchemaHtmlToPropertiesHtmlLink())
-<p class="sisterlink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
+<p class="sistersublink"><a href="./${selector.propertiesHtmlFileName}">to PropertiesHTML</a></p>
 #end
 </div>
 
