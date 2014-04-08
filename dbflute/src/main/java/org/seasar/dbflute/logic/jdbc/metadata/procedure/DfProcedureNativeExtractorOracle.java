@@ -87,7 +87,7 @@ public class DfProcedureNativeExtractorOracle {
         final StringBuilder sb = new StringBuilder();
         sb.append("select OBJECT_NAME, PROCEDURE_NAME");
         sb.append(" from ALL_PROCEDURES");
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" where OWNER = '").append(unifiedSchema.getPureSchema()).append("'");
         sb.append(" order by OBJECT_NAME, PROCEDURE_NAME");
         return sb.toString();
     }

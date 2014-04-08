@@ -116,7 +116,7 @@ public class DfArrayExtractorOracle {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
         sb.append(" from ALL_COLL_TYPES");
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" where OWNER = '").append(unifiedSchema.getPureSchema()).append("'");
         sb.append(" order by TYPE_NAME");
         return sb.toString();
     }
@@ -252,7 +252,7 @@ public class DfArrayExtractorOracle {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
         sb.append(" from ALL_TYPES");
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" where OWNER = '").append(unifiedSchema.getPureSchema()).append("'");
         sb.append(" and TYPECODE = 'COLLECTION'");
         sb.append(" order by TYPE_NAME");
         return sb.toString();

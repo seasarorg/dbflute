@@ -1206,7 +1206,10 @@ public class Table {
                 continue;
             }
             tableSet.add(name);
-            sb.append(", ").append(name).append(fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
+            sb.append(", ").append(name);
+            if (fk.hasFixedSuffix()) {
+                sb.append("(").append(fk.getFixedSuffix()).append(")");
+            }
         }
         for (ForeignKey referrer : _referrerList) {
             if (!referrer.isOneToOne()) {
@@ -2985,7 +2988,7 @@ public class Table {
             if (index > 0) {
                 sb.append(", ");
             }
-            sb.append(prefix + column.getJavaName() + suffix);
+            sb.append(prefix).append(column.getJavaName()).append(suffix);
             ++index;
         }
         return sb.toString();

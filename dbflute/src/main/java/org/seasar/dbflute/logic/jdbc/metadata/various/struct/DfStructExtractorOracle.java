@@ -137,10 +137,10 @@ public class DfStructExtractorOracle {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
         sb.append(" from ALL_TYPE_ATTRS");
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" where OWNER = '").append(unifiedSchema.getPureSchema()).append("'");
         sb.append(" and TYPE_NAME in (");
         sb.append("select TYPE_NAME from ALL_TYPES");
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "' and TYPECODE = 'OBJECT'");
+        sb.append(" where OWNER = '").append(unifiedSchema.getPureSchema()).append("' and TYPECODE = 'OBJECT'");
         sb.append(")");
         sb.append(" order by TYPE_NAME, ATTR_NO");
         return sb.toString();

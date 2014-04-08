@@ -183,34 +183,34 @@ public class DfTaskControlLogic {
         final DfConnectionMetaInfo metaInfo = getConnectionMetaInfo();
         final String productDisp = metaInfo != null ? " (" + metaInfo.getProductDisp() + ")" : "";
         final String databaseType = getDatabaseTypeFacadeProp().getTargetDatabase() + productDisp;
-        sb.append(ln).append("  DBFLUTE_CLIENT: {" + getBasicProperties().getProjectName() + "}");
+        sb.append(ln).append("  DBFLUTE_CLIENT: {").append(getBasicProperties().getProjectName()).append("}");
         sb.append(ln).append("    database  = " + databaseType);
         sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
         sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
         sb.append(ln).append("    package   = " + getBasicProperties().getPackageBase());
         sb.append(ln);
-        sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + (envType != null ? envType : "") + "}");
+        sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {").append(envType != null ? envType : "").append("}");
         final String driver = _databaseResource.getDriver();
         if (driver != null) { // basically true except cancelled
-            sb.append(ln).append("    driver = " + driver);
-            sb.append(ln).append("    url    = " + _databaseResource.getUrl());
-            sb.append(ln).append("    schema = " + _databaseResource.getMainSchema());
-            sb.append(ln).append("    user   = " + _databaseResource.getUser());
-            sb.append(ln).append("    props  = " + _databaseResource.getConnectionProperties());
+            sb.append(ln).append("    driver = ").append(driver);
+            sb.append(ln).append("    url    = ").append(_databaseResource.getUrl());
+            sb.append(ln).append("    schema = ").append(_databaseResource.getMainSchema());
+            sb.append(ln).append("    user   = ").append(_databaseResource.getUser());
+            sb.append(ln).append("    props  = ").append(_databaseResource.getConnectionProperties());
         }
 
         final String additionalSchemaDisp = buildAdditionalSchemaDisp();
-        sb.append(ln).append("    additionalSchema = " + additionalSchemaDisp);
+        sb.append(ln).append("    additionalSchema = ").append(additionalSchemaDisp);
         final DfReplaceSchemaProperties replaceSchemaProp = getProperties().getReplaceSchemaProperties();
-        sb.append(ln).append("    repsEnvType      = " + replaceSchemaProp.getRepsEnvType());
+        sb.append(ln).append("    repsEnvType      = ").append(replaceSchemaProp.getRepsEnvType());
         final String refreshProjectDisp = buildRefreshProjectDisp();
-        sb.append(ln).append("    refreshProject   = " + refreshProjectDisp);
+        sb.append(ln).append("    refreshProject   = ").append(refreshProjectDisp);
 
         if (finalInformation != null) {
             sb.append(ln).append(ln);
             sb.append(finalInformation);
         }
-        sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + displayTaskName + "}");
+        sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/ {").append(displayTaskName).append("}");
         DfDBFluteTaskUtil.logFinalMessage(sb.toString());
     }
 

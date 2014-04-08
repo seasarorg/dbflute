@@ -78,7 +78,7 @@ public class DfDBLinkNativeExtractorOracle {
         final StringBuilder sb = new StringBuilder();
         sb.append("select *");
         sb.append(" from ALL_DB_LINKS");
-        sb.append(" where OWNER = '" + unifiedSchema.getPureSchema() + "'");
+        sb.append(" where OWNER = '").append(unifiedSchema.getPureSchema()).append("'");
         sb.append(" order by OWNER, DB_LINK");
         return sb.toString();
     }

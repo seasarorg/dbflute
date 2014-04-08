@@ -569,7 +569,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         sb.append("  from USER_CONS_COLUMNS@" + dbLinkName + " cols");
         sb.append("    left outer join USER_CONSTRAINTS@" + dbLinkName + " cons");
         sb.append("      on cols.CONSTRAINT_NAME = cons.CONSTRAINT_NAME");
-        sb.append(" where cols.TABLE_NAME = '" + tableName + "'");
+        sb.append(" where cols.TABLE_NAME = '").append(tableName).append("'");
         sb.append("   and cons.CONSTRAINT_TYPE = 'P'");
         sb.append(" order by cols.POSITION");
         Statement statement = null;
@@ -607,7 +607,7 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
         sb.append("  from USER_CONS_COLUMNS@" + dbLinkName + " cols");
         sb.append("    left outer join USER_CONSTRAINTS@" + dbLinkName + " cons");
         sb.append("      on cols.CONSTRAINT_NAME = cons.CONSTRAINT_NAME");
-        sb.append(" where cols.TABLE_NAME = '" + tableName + "'");
+        sb.append(" where cols.TABLE_NAME = '").append(tableName).append("'");
         sb.append("   and cons.CONSTRAINT_TYPE = 'U'");
         sb.append(" order by cols.CONSTRAINT_NAME, cols.POSITION");
         Statement statement = null;

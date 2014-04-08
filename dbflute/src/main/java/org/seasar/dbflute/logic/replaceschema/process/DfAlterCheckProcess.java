@@ -422,7 +422,7 @@ public class DfAlterCheckProcess extends DfAbstractReplaceSchemaProcess {
             for (File moveToFile : copyToFileList) {
                 sb.append(ln()).append(resolvePath(moveToFile));
             }
-            sb.append(ln()).append("(" + copyToFileList.size() + " files)");
+            sb.append(ln()).append("(").append(copyToFileList.size()).append(" files)");
             sb.append(ln());
             writeNotice(markFile, sb.toString());
         } catch (IOException e) {

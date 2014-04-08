@@ -295,7 +295,7 @@ public class DfCreateSchemaProcess extends DfAbstractReplaceSchemaProcess {
                         }
                         final StringBuilder sb = new StringBuilder();
                         sb.append("...Saying good-bye to the user '").append(_currentUser).append("'");
-                        sb.append(" because of checked: " + argList);
+                        sb.append(" because of checked: ").append(argList);
                         _log.info(sb.toString());
                         final String exmsg = e.getMessage();
                         _log.info(" -> " + (exmsg != null ? exmsg.trim() : null));

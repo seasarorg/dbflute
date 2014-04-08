@@ -809,7 +809,7 @@ public class DfPmbMetaData {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(name)) { // basically normal parameter-bean
             final String alias = getPropertyRefAlias(propertyName, schemaData);
             final String lineDisp = getPropertyRefLineDisp(propertyName, schemaData);
-            sb.append(" :: refers to " + alias + name + ": " + lineDisp);
+            sb.append(" :: refers to ").append(alias).append(name).append(": ").append(lineDisp);
         }
         return sb.toString();
     }

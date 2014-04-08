@@ -725,12 +725,14 @@ public class Column {
         }
         plugDelimiterIfNeeds(sb);
         sb.append(getDbTypeExpression());
-        if (getColumnSize() != null && getColumnSize().trim().length() > 0) {
-            sb.append("(" + getColumnSize() + ")");
+        final String columnSize = getColumnSize();
+        if (columnSize != null && columnSize.trim().length() > 0) {
+            sb.append("(").append(columnSize).append(")");
         }
-        if (getDefaultValue() != null && getDefaultValue().trim().length() > 0 && !isAutoIncrement()) {
+        final String defaultValue = getDefaultValue();
+        if (defaultValue != null && defaultValue.trim().length() > 0 && !isAutoIncrement()) {
             plugDelimiterIfNeeds(sb);
-            sb.append("default=[").append(getDefaultValue() + "]");
+            sb.append("default=[").append(defaultValue).append("]");
         }
         if (isForeignKey()) {
             plugDelimiterIfNeeds(sb);
@@ -738,7 +740,8 @@ public class Column {
         }
         if (hasSql2EntityRelatedTable()) {
             plugDelimiterIfNeeds(sb);
-            sb.append("refers to ").append(getSql2EntityRelatedTable().getTableDbName());
+            final Table sql2EntityRelatedTable = getSql2EntityRelatedTable();
+            sb.append("refers to ").append(sql2EntityRelatedTable.getTableDbName());
             if (hasSql2EntityRelatedColumn()) {
                 sb.append(".").append(getSql2EntityRelatedColumn().getName());
             }
@@ -1255,7 +1258,7 @@ public class Column {
             final String uniqueKeyName = unique.getName();
             sb.append(sb.length() > 0 ? ", " : "");
             if (uniqueKeyName != null && uniqueKeyName.trim().length() > 0) {
-                sb.append(uniqueKeyName + "(");
+                sb.append(uniqueKeyName).append("(");
             } else {
                 sb.append("(");
             }
@@ -1351,7 +1354,7 @@ public class Column {
             final String indexName = index.getName();
             sb.append(sb.length() > 0 ? ", " : "");
             if (indexName != null && indexName.trim().length() > 0) {
-                sb.append(indexName + "(");
+                sb.append(indexName).append("(");
             } else {
                 sb.append("(");
             }

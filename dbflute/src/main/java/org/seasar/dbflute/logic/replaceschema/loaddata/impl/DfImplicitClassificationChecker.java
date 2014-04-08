@@ -73,7 +73,7 @@ public class DfImplicitClassificationChecker {
 
     protected String buildDistinctSql(String tableDbName, String columnDbName, boolean quote, List<String> codeList) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select distinct " + columnDbName + " from ").append(tableDbName);
+        sb.append("select distinct ").append(columnDbName).append(" from ").append(tableDbName);
         sb.append(" where ").append(columnDbName).append(" not in ");
         sb.append("(");
         int index = 0;

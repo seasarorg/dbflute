@@ -69,8 +69,8 @@ public class DfSerialVersionUIDResolver {
                 sb.append(line).append(sourceCodeLn);
                 if (line.startsWith("public class") && line.contains(" extends ") && line.endsWith("{")) {
                     sb.append(sourceCodeLn); // for empty line
-                    sb.append("    " + serialComment).append(sourceCodeLn);
-                    sb.append("    " + serialDefinition).append(sourceCodeLn);
+                    sb.append("    ").append(serialComment).append(sourceCodeLn);
+                    sb.append("    ").append(serialDefinition).append(sourceCodeLn);
                 }
             }
         } catch (IOException e) {

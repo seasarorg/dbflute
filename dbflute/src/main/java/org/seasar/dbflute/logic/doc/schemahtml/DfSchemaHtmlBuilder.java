@@ -57,7 +57,8 @@ public class DfSchemaHtmlBuilder {
                 comma = true;
             }
             final String title = resolveTitle(titleSb.toString());
-            sb.append("<a href=\"#" + tableId + "\" class=\"additionalfk\" title=\"" + title + "\">");
+            sb.append("<a href=\"#").append(tableId);
+            sb.append("\" class=\"additionalfk\" title=\"").append(title).append("\">");
             contentName = tableDispName + (fk.hasFixedSuffix() ? "(" + fk.getFixedSuffix() + ")" : "");
         } else {
             final StringBuilder titleSb = new StringBuilder();
@@ -66,7 +67,7 @@ public class DfSchemaHtmlBuilder {
                 titleSb.append(": comment=").append(comment);
             }
             final String title = resolveTitle(titleSb.toString());
-            sb.append("<a href=\"#" + tableId + "\" title=\"" + title + "\">");
+            sb.append("<a href=\"#").append(tableId).append("\" title=\"").append(title).append("\">");
             contentName = tableDispName;
         }
         sb.append(contentName).append("</a>");

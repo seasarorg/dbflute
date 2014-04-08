@@ -178,7 +178,7 @@ public class DfPmbCommentSetupper {
             final String bhvClassName = pmbMetaData.getBehaviorClassName();
             final String bhvQueryPath = pmbMetaData.getBehaviorQueryPath();
             final String sqlTitle = docprop.resolveTextForJavaDoc(pmbMetaData.getSqlTitle(), indent);
-            sb.append(indent).append("The typed parameter-bean of " + pmbBizName + ". ");
+            sb.append(indent).append("The typed parameter-bean of ").append(pmbBizName).append(". ");
             final String typedDisp = pmbMetaData.buildTypedDisp();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(typedDisp)) {
                 sb.append("<span style=\"color: #AD4747\">").append(typedDisp).append("</span>");
@@ -193,12 +193,14 @@ public class DfPmbCommentSetupper {
             sb.append(".");
         } else if (pmbMetaData.isRelatedToProcedure()) {
             final String procedureName = pmbMetaData.getProcedureName();
-            sb.append(indent).append("The typed parameter-bean of " + pmbBizName + ". <br />").append(lineSep);
+            sb.append(indent).append("The typed parameter-bean of ").append(pmbBizName);
+            sb.append(". <br />").append(lineSep);
             sb.append(indent).append("This is related to \"<span style=\"color: #AD4747\">");
             sb.append(procedureName).append("</span>\".");
         } else {
             if (pmbMetaData.isRelatedToBehaviorQuery()) {
-                sb.append(indent).append("The simple parameter-bean of " + pmbBizName + ". <br />").append(lineSep);
+                sb.append(indent).append("The simple parameter-bean of ").append(pmbBizName);
+                sb.append(". <br />").append(lineSep);
                 final String bhvClassName = pmbMetaData.getBehaviorClassName();
                 final String bhvQueryPath = pmbMetaData.getBehaviorQueryPath();
                 sb.append(indent).append("This is defined at \"<span style=\"color: #AD4747\">");
