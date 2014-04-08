@@ -348,7 +348,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
                         // add line separator before right expression
                         // because of independent format for right query
                         sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " "));
-                        sb.append(ln() + "       ").append(rightExp);
+                        sb.append(ln()).append("       ").append(rightExp);
                     } else { // (sub-query = column)
                         sb.append(reflectToSubQueryEndOnLastLine(leftExp, " " + operand + " " + rightExp));
                     }

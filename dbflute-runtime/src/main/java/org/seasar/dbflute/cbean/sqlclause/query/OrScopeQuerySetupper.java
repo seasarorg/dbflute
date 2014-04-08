@@ -118,7 +118,10 @@ public class OrScopeQuerySetupper {
             ++groupListIndex;
         }
         if (exists) {
-            sb.append(line && validCount > 1 ? ln() + "       " : "").append(")");
+            if (line && validCount > 1) {
+                sb.append(ln()).append("       ");
+            }
+            sb.append(")");
             realList.add(new StringQueryClause(sb.toString()));
         }
     }

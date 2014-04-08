@@ -170,9 +170,9 @@ public class SequenceCacheHandler {
                 }
             }
             allRecordCount = calculatedRecordCount;
-            sb.append(") join_" + (joinIndex + 1));
+            sb.append(") join_").append(joinIndex + 1);
         }
-        sb.append(ln()).append(" where rownum <= " + divided);
+        sb.append(ln()).append(" where rownum <= ").append(divided);
         return sb.toString();
     }
 

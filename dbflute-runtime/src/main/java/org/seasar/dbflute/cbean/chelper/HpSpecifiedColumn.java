@@ -134,7 +134,9 @@ public class HpSpecifiedColumn {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("{").append(_tableAliasName).append(", ");
-        sb.append(_columnDirectName != null ? _columnDirectName + ", " : "");
+        if (_columnDirectName != null) {
+            sb.append(_columnDirectName + ", ");
+        }
         sb.append(_columnInfo).append("}");
         return sb.toString();
     }

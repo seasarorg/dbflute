@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>1.0.5C</version>
+	<version>1.0.5D-RC1</version>
 	<packaging>jar</packaging>
 
 	<name>DBFlute Runtime</name>
@@ -12,7 +12,7 @@
 
 	<properties>
 		<commons.logging.version>1.1.1</commons.logging.version>
-		<utflute.version>0.3.8</utflute.version>
+		<utflute.version>0.4.3</utflute.version>
 		<junit.version>4.8.2</junit.version>
 	</properties>
 
