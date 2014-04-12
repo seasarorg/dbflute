@@ -175,10 +175,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectEntity(cb, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntity(final ${myConditionBeanClassName} cb, Class<ENTITY> tp) {
-        assertCBStateValid(cb);
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntity(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+        assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         return helpSelectEntityInternally(cb, tp, new InternalSelectEntityCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) { return doSelectList(cb, tp); } });
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} lcb, Class<ENTITY> ltp) { return doSelectList(lcb, ltp); } });
     }
 
     @Override
@@ -204,10 +204,10 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         return doSelectEntityWithDeletedCheck(cb, ${myExtendedObjectClassName}.class);
     }
 
-    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb, Class<ENTITY> tp) {
-        assertCBStateValid(cb);
+    protected <ENTITY extends ${myExtendedObjectClassName}> ENTITY doSelectEntityWithDeletedCheck(${myConditionBeanClassName} cb, Class<ENTITY> tp) {
+        assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         return helpSelectEntityWithDeletedCheckInternally(cb, tp, new InternalSelectEntityWithDeletedCheckCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) { return doSelectList(cb, tp); } });
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} lcb, Class<ENTITY> ltp) { return doSelectList(lcb, ltp); } });
     }
 
     @Override
@@ -281,7 +281,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
         assertCBStateValid(cb); assertObjectNotNull("entityType", tp);
         assertSpecifyDerivedReferrerEntityProperty(cb, tp);
         return helpSelectListInternally(cb, tp, new InternalSelectListCallback<ENTITY, ${myConditionBeanClassName}>() {
-            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} cb, Class<ENTITY> tp) { return delegateSelectList(cb, tp); } });
+            public List<ENTITY> callbackSelectList(${myConditionBeanClassName} lcb, Class<ENTITY> ltp) { return delegateSelectList(lcb, ltp); } });
     }
 
     @Override
