@@ -706,7 +706,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsReferrer_${referrer.referrerPropertyNameInitCap}")
 #end
     /**
-     * Set up 'exists-referrer' (co-related sub-query). <br />
+     * Set up ExistsReferrer (correlated sub-query). <br />
      * {exists (select ... from ${referrer.table.tableDbName} where ...)}
      * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'exists'. (NotNull)
      */
@@ -715,6 +715,45 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.query(cb);
         String pp = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
         registerExistsReferrer(cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", pp, "${relationPropertyName}");
+    }
+    protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
+    public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }
+    public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} sq) {
+        if (_${subQueryPropertyName}Map == null) { _${subQueryPropertyName}Map = newLinkedHashMapSized(4); }
+        String ky = "subQueryMapKey" + (_${subQueryPropertyName}Map.size() + 1);
+        _${subQueryPropertyName}Map.put(ky, sq); return "${subQueryPropertyName}." + ky;
+    }
+
+#end
+#end
+#foreach ($referrer in $table.referrerList)
+#if (${referrer.isCompoundFK()})
+#set ($tmpJavaName = "TwoOrMorePk")
+#set ($tmpUncapitalisedJavaName = "twoOrMorePk")
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyName = "${referrer.referrerPropertyName}")
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsReferrer_${referrer.referrerPropertyNameInitCap}")
+#end
+    /**
+     * Set up NotExistsReferrer (correlated sub-query). <br />
+     * {not exists (select ... from ${referrer.table.tableDbName} where ...)}
+     * @param subQuery The sub-query of ${relationPropertyNameInitCap} for 'not exists'. (NotNull)
+     */
+    public void notExists${relationPropertyNameInitCap}(SubQuery<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsReferrer(this); subQuery.query(cb);
+        String pp = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerNotExistsReferrer(cb.query(), "${referrer.foreignColumnNameCommaString}", "${referrer.localColumnNameCommaString}", pp, "${relationPropertyName}");
     }
     protected Map<${subQueryKeepMapGeneric}> _${subQueryPropertyName}Map;
     public Map<${subQueryKeepMapGeneric}> get${subQueryPropertyNameInitCap}() { return _${subQueryPropertyName}Map; }

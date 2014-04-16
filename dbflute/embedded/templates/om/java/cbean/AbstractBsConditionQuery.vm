@@ -364,7 +364,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up ExistsReferrer (co-related sub-query). <br />
+     * Set up ExistsReferrer (correlated sub-query). <br />
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
@@ -402,7 +402,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up NotExistsReferrer (co-related sub-query). <br />
+     * Set up NotExistsReferrer (correlated sub-query). <br />
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
@@ -839,7 +839,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up ExistsReferrer (co-related sub-query). <br />
+     * Set up ExistsReferrer (correlated sub-query). <br />
      * {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
@@ -877,7 +877,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     /**
-     * Set up NotExistsReferrer (co-related sub-query). <br />
+     * Set up NotExistsReferrer (correlated sub-query). <br />
      * {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.tableDbName} where ...)} <br />
      * ${referrer.referrerDispAsOneForJavaDoc}
      * <pre>
