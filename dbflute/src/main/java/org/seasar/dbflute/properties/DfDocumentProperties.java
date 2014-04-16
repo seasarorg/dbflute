@@ -91,15 +91,32 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                                                     ===============
     public boolean isAliasDelimiterInDbCommentValid() {
         final String delimiter = getAliasDelimiterInDbComment();
-        return delimiter != null && delimiter.trim().length() > 0 && !delimiter.trim().equalsIgnoreCase("null");
+        return delimiter != null && !delimiter.trim().equalsIgnoreCase("null");
     }
 
     public String getAliasDelimiterInDbComment() {
         String delimiter = (String) getDocumentDefinitionMap().get("aliasDelimiterInDbComment");
-        if (delimiter == null || delimiter.trim().length() == 0) {
-            delimiter = null;
+        if (delimiter != null && delimiter.trim().length() > 0) {
+            // basically colon but it might be real tab and line (attention on trimming)
+            return resolveControlCharacter(delimiter);
         }
-        return delimiter;
+        return null;
+    }
+
+    protected String resolveControlCharacter(String value) { // based on convertValueMap.dataprop's logic
+        if (value == null) {
+            return null;
+        }
+        final String tmp = "${df:temporaryVariable}";
+        value = Srl.replace(value, "\\\\", tmp); // "\\" to "\" later
+
+        // e.g. pure string "\n" to (real) line separator
+        value = Srl.replace(value, "\\r", "\r");
+        value = Srl.replace(value, "\\n", "\n");
+        value = Srl.replace(value, "\\t", "\t");
+
+        value = Srl.replace(value, tmp, "\\");
+        return value;
     }
 
     public String extractAliasFromDbComment(String comment) { // alias is trimmed
