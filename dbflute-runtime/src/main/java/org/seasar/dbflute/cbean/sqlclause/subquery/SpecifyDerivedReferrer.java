@@ -51,9 +51,20 @@ public class SpecifyDerivedReferrer extends DerivedReferrer {
     //                                                                        Build Clause
     //                                                                        ============
     @Override
-    protected String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
+    protected String doBuildDerivedReferrer(String function, ColumnRealName correlatedColumnRealName,
             ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
             String endIndent) {
+        return buildCompleteClause(subQueryClause, beginMark, endMark, endIndent);
+    }
+
+    @Override
+    protected String doBuildDerivedReferrer(String function, ColumnRealName[] correlatedColumnRealNames,
+            ColumnSqlName[] relatedColumnSqlNames, String subQueryClause, String beginMark, String endMark,
+            String endIndent) {
+        return buildCompleteClause(subQueryClause, beginMark, endMark, endIndent);
+    }
+
+    protected String buildCompleteClause(String subQueryClause, String beginMark, String endMark, String endIndent) {
         final String aliasExp = _aliasName != null ? " as " + _aliasName : "";
         return "(" + beginMark + subQueryClause + ln() + endIndent + ")" + aliasExp + endMark;
     }

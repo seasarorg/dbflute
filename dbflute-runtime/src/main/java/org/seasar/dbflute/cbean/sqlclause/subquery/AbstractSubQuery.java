@@ -140,6 +140,14 @@ public abstract class AbstractSubQuery {
         return new SubQueryClause(_subQueryPath, selectClause, _subQuerySqlClause, localAliasName);
     }
 
+    protected boolean isSinglePrimaryKey(String correlatedColumnDbName, String relatedColumnDbName) {
+        return !isCompoundPrimaryKey(correlatedColumnDbName, relatedColumnDbName);
+    }
+
+    protected boolean isCompoundPrimaryKey(String correlatedColumnDbName, String relatedColumnDbName) {
+        return correlatedColumnDbName.contains(",") && relatedColumnDbName.contains(",");
+    }
+
     // ===================================================================================
     //                                                                     Indent Resolver
     //                                                                     ===============

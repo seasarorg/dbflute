@@ -59,6 +59,17 @@ public class QueryDerivedReferrer extends DerivedReferrer {
     protected String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
             ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
             String endIndent) {
+        return buildCompleteClause(subQueryClause, beginMark, endMark, endIndent);
+    }
+
+    @Override
+    protected String doBuildDerivedReferrer(String function, ColumnRealName[] correlatedColumnRealNames,
+            ColumnSqlName[] relatedColumnSqlNames, String subQueryClause, String beginMark, String endMark,
+            String endIndent) {
+        return buildCompleteClause(subQueryClause, beginMark, endMark, endIndent);
+    }
+
+    protected String buildCompleteClause(String subQueryClause, String beginMark, String endMark, String endIndent) {
         final StringBuilder sb = new StringBuilder();
         sb.append("(").append(beginMark).append(subQueryClause);
         sb.append(ln()).append(endIndent).append(") ");

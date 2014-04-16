@@ -1002,6 +1002,9 @@ public class Column {
     // ===================================================================================
     //                                                                            Referrer
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     /**
      * Adds the foreign key from another table that refers to this column.
      */
@@ -1036,6 +1039,9 @@ public class Column {
         return getReferrerList();
     }
 
+    // -----------------------------------------------------
+    //                                               Arrange
+    //                                               -------
     protected List<ForeignKey> _singleKeyReferrers;
 
     /**
@@ -1116,6 +1122,9 @@ public class Column {
         return getLittleAdjustmentProperties().isMakeConditionQueryInScopeRelationToOne();
     }
 
+    // -----------------------------------------------------
+    //                                          Comma String
+    //                                          ------------
     public String getReferrerCommaString() {
         if (_referrerList == null) {
             _referrerList = new ArrayList<ForeignKey>(5);

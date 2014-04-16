@@ -592,7 +592,7 @@ public class ${myClassName} extends AbstractConditionBean {
             return _${tmpPropertyName};
         }
 #end
-#foreach ($referrer in $table.singleKeyStringOrIntegerReferrers)
+#foreach ($referrer in $table.derivedReferrerReferrers)
 #if (!${referrer.isOneToOne()})
 #set ($tmpPropertyName = "${referrer.referrerPropertyName}")
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")

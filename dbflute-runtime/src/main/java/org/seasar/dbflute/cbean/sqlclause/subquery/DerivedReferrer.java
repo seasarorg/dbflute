@@ -26,6 +26,8 @@ import org.seasar.dbflute.dbmeta.name.ColumnRealName;
 import org.seasar.dbflute.dbmeta.name.ColumnRealNameProvider;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlName;
 import org.seasar.dbflute.dbmeta.name.ColumnSqlNameProvider;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -56,15 +58,35 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
     public String buildDerivedReferrer(String function, String correlatedColumnDbName, String relatedColumnDbName,
             String correlatedFixedCondition, DerivedReferrerOption option) {
         setupOptionAttribute(option);
-        final ColumnRealName correlatedColumnRealName = _localRealNameProvider.provide(correlatedColumnDbName);
-        final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
-        final String subQueryClause = getSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName,
-                correlatedFixedCondition, option);
-        final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
-        final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
-        final String endIndent = "       ";
-        return doBuildDerivedReferrer(function, correlatedColumnRealName, relatedColumnSqlName, subQueryClause,
-                beginMark, endMark, endIndent);
+        if (isSinglePrimaryKey(correlatedColumnDbName, relatedColumnDbName)) {
+            final ColumnRealName correlatedColumnRealName = _localRealNameProvider.provide(correlatedColumnDbName);
+            final ColumnSqlName relatedColumnSqlName = _subQuerySqlNameProvider.provide(relatedColumnDbName);
+            final String subQueryClause = buildSubQueryClause(function, correlatedColumnRealName, relatedColumnSqlName,
+                    correlatedFixedCondition, option);
+            final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
+            final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
+            final String endIndent = "       ";
+            return doBuildDerivedReferrer(function, correlatedColumnRealName, relatedColumnSqlName, subQueryClause,
+                    beginMark, endMark, endIndent);
+        } else {
+            final List<String> columnDbNameSplit = Srl.splitListTrimmed(correlatedColumnDbName, ",");
+            final ColumnRealName[] correlatedColumnRealNames = new ColumnRealName[columnDbNameSplit.size()];
+            for (int i = 0; i < columnDbNameSplit.size(); i++) {
+                correlatedColumnRealNames[i] = _localRealNameProvider.provide(columnDbNameSplit.get(i));
+            }
+            final List<String> relatedColumnSplit = Srl.splitListTrimmed(relatedColumnDbName, ",");
+            final ColumnSqlName[] relatedColumnSqlNames = new ColumnSqlName[relatedColumnSplit.size()];
+            for (int i = 0; i < relatedColumnSplit.size(); i++) {
+                relatedColumnSqlNames[i] = _subQuerySqlNameProvider.provide(relatedColumnSplit.get(i));
+            }
+            final String subQueryClause = getSubQueryClause(function, correlatedColumnRealNames, relatedColumnSqlNames,
+                    correlatedFixedCondition, option);
+            final String beginMark = resolveSubQueryBeginMark(_subQueryIdentity) + ln();
+            final String endMark = resolveSubQueryEndMark(_subQueryIdentity);
+            final String endIndent = "       ";
+            return doBuildDerivedReferrer(function, correlatedColumnRealNames, relatedColumnSqlNames, subQueryClause,
+                    beginMark, endMark, endIndent);
+        }
     }
 
     protected void setupOptionAttribute(DerivedReferrerOption option) {
@@ -76,11 +98,27 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         option.xjudgeDatabase(_subQuerySqlClause);
     }
 
-    protected abstract String doBuildDerivedReferrer(String function, ColumnRealName columnRealName,
+    protected abstract String doBuildDerivedReferrer(String function, ColumnRealName correlatedColumnRealName,
             ColumnSqlName relatedColumnSqlName, String subQueryClause, String beginMark, String endMark,
             String endIndent);
 
-    protected String getSubQueryClause(String function, ColumnRealName correlatedColumnRealName,
+    protected abstract String doBuildDerivedReferrer(String function, ColumnRealName[] correlatedColumnRealNames,
+            ColumnSqlName[] relatedColumnSqlNames, String subQueryClause, String beginMark, String endMark,
+            String endIndent);
+
+    // -----------------------------------------------------
+    //                                       SubQuery Clause
+    //                                       ---------------
+    /**
+     * Build the clause of sub-query by single primary key.
+     * @param function The expression for deriving function. (NotNull)
+     * @param correlatedColumnRealName The real names of correlated column that is main-query table's column. (NotNull)
+     * @param relatedColumnSqlName The real names of related column that is sub-query table's column. (NotNull)
+     * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
+     * @param option The option of DerivedReferrer. (NotNull)
+     * @return The clause of sub-query. (NotNull)
+     */
+    protected String buildSubQueryClause(String function, ColumnRealName correlatedColumnRealName,
             ColumnSqlName relatedColumnSqlName, String correlatedFixedCondition, DerivedReferrerOption option) {
         final String tableAliasName = getSubQueryLocalAliasName();
         final ColumnSqlName derivedColumnSqlName = getDerivedColumnSqlName();
@@ -191,6 +229,42 @@ public abstract class DerivedReferrer extends AbstractSubQuery {
         }
         final String functionExp = function + connector + columnWithEndExp;
         return option.filterFunction(functionExp);
+    }
+
+    /**
+     * Build the clause of sub-query by compound primary key.
+     * @param function The expression for deriving function. (NotNull)
+     * @param correlatedColumnRealNames The real names of correlated column that is main-query table's column. (NotNull)
+     * @param relatedColumnSqlNames The real names of related column that is sub-query table's column. (NotNull)
+     * @param correlatedFixedCondition The fixed condition as correlated condition. (NullAllowed)
+     * @param option The option of DerivedReferrer. (NotNull)
+     * @return The clause of sub-query. (NotNull)
+     */
+    protected String getSubQueryClause(String function, ColumnRealName[] correlatedColumnRealNames,
+            ColumnSqlName[] relatedColumnSqlNames, String correlatedFixedCondition, DerivedReferrerOption option) {
+        final String tableAliasName = getSubQueryLocalAliasName();
+        final ColumnSqlName derivedColumnSqlName = getDerivedColumnSqlName();
+        if (derivedColumnSqlName == null) {
+            throwDerivedReferrerInvalidColumnSpecificationException(function);
+        }
+        final ColumnRealName derivedColumnRealName = getDerivedColumnRealName();
+        final String subQueryClause;
+        if (_subQuerySqlClause.hasUnionQuery()) {
+            String msg = "DerivedReferrer with Union for CompoundPK is unsupported: referrer="
+                    + _subQueryDBMeta.getTableDbName();
+            throw new IllegalConditionBeanOperationException(msg); // for now
+        } else {
+            final String selectClause = "select " + buildFunctionPart(function, derivedColumnRealName, option);
+            final String fromWhereClause;
+            if (option.isSuppressCorrelation()) { // e.g. myselfDerived
+                fromWhereClause = buildPlainFromWhereClause(selectClause, tableAliasName, correlatedFixedCondition);
+            } else { // basically here
+                fromWhereClause = buildCorrelationFromWhereClause(selectClause, tableAliasName,
+                        correlatedColumnRealNames, relatedColumnSqlNames, correlatedFixedCondition);
+            }
+            subQueryClause = selectClause + " " + fromWhereClause;
+        }
+        return resolveSubQueryLevelVariable(subQueryClause);
     }
 
     // ===================================================================================

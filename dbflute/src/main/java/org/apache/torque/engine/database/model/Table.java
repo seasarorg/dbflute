@@ -1557,13 +1557,50 @@ public class Table {
         return _singleKeyReferrers;
     }
 
+    protected List<ForeignKey> _derivedReferrerReferrers;
+
+    public boolean hasDerivedReferrerReferrer() {
+        return !getDerivedReferrerReferrers().isEmpty();
+    }
+
+    public List<ForeignKey> getDerivedReferrerReferrers() {
+        if (_derivedReferrerReferrers != null) {
+            return _derivedReferrerReferrers;
+        }
+        _derivedReferrerReferrers = new ArrayList<ForeignKey>(5);
+        if (!hasReferrer()) {
+            return _derivedReferrerReferrers;
+        }
+        prepareStringOrIntegerForeignKeyList(_derivedReferrerReferrers, false);
+        return _derivedReferrerReferrers;
+    }
+
+    // unused, after all
+    //protected List<ForeignKey> _stringOrIntegerReferrers;
+    //
+    //public boolean hasStringOrIntegerReferrer() {
+    //    return !getStringOrIntegerReferrers().isEmpty();
+    //}
+    //
+    //public List<ForeignKey> getStringOrIntegerReferrers() {
+    //    if (_stringOrIntegerReferrers != null) {
+    //        return _stringOrIntegerReferrers;
+    //    }
+    //    _stringOrIntegerReferrers = new ArrayList<ForeignKey>(5);
+    //    if (!hasReferrer()) {
+    //        return _stringOrIntegerReferrers;
+    //    }
+    //    prepareStringOrIntegerForeignKeyList(_stringOrIntegerReferrers, false);
+    //    return _stringOrIntegerReferrers;
+    //}
+
     protected List<ForeignKey> _singleKeyStringOrIntegerReferrers;
 
     public boolean hasSingleKeyStringOrIntegerReferrer() {
         return !getSingleKeyStringOrIntegerReferrers().isEmpty();
     }
 
-    public List<ForeignKey> getSingleKeyStringOrIntegerReferrers() {
+    public List<ForeignKey> getSingleKeyStringOrIntegerReferrers() { // still used in CSharp's DerivedReferrer
         if (_singleKeyStringOrIntegerReferrers != null) {
             return _singleKeyStringOrIntegerReferrers;
         }
@@ -1571,20 +1608,30 @@ public class Table {
         if (!hasReferrer()) {
             return _singleKeyStringOrIntegerReferrers;
         }
-        final List<ForeignKey> referrerList = getReferrers();
-        for (ForeignKey referrer : referrerList) {
-            if (!referrer.isSimpleKeyFK()) {
-                continue;
-            }
-            Column localColumn = referrer.getLocalColumnAsOne();
-            if (!(localColumn.isJavaNativeStringObject() || localColumn.isJavaNativeNumberObject())) {
-                continue;
-            }
-            _singleKeyStringOrIntegerReferrers.add(referrer);
-        }
+        prepareStringOrIntegerForeignKeyList(_singleKeyStringOrIntegerReferrers, true);
         return _singleKeyStringOrIntegerReferrers;
     }
 
+    protected void prepareStringOrIntegerForeignKeyList(List<ForeignKey> fkList, boolean simpleKey) {
+        final List<ForeignKey> referrerList = getReferrers();
+        fkloop: //
+        for (ForeignKey referrer : referrerList) {
+            if (simpleKey && !referrer.isSimpleKeyFK()) {
+                continue;
+            }
+            final List<Column> localColumnList = referrer.getLocalColumnList();
+            for (Column column : localColumnList) {
+                if (!(column.isJavaNativeStringObject() || column.isJavaNativeNumberObject())) {
+                    continue fkloop;
+                }
+            }
+            fkList.add(referrer);
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                          Comma String
+    //                                          ------------
     public String getReferrerTableNameCommaString() {
         final StringBuilder sb = new StringBuilder();
         final Set<String> tableSet = new HashSet<String>();
