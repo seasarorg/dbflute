@@ -168,22 +168,21 @@ public class ForeignKey implements Constraint {
     //                                                 Basic
     //                                                 -----
     protected String _name; // constraint name (no change because it's used by templates)
-
     protected Table _localTable;
     protected UnifiedSchema _foreignSchema;
     protected String _foreignTablePureName; // as table DB name, may be user input (if additional FK)
-
-    protected String _fixedCondition;
-    protected String _fixedSuffix;
-    protected boolean _fixedInline;
-    protected boolean _fixedReferrer;
-    protected String _comment;
 
     // -----------------------------------------------------
     //                                            Additional
     //                                            ----------
     protected boolean _additionalForeignKey;
+    protected String _fixedCondition;
+    protected String _fixedSuffix;
+    protected boolean _fixedInline;
+    protected boolean _fixedReferrer;
+    protected String _comment;
     protected String _foreignPropertyNamePrefix;
+    protected boolean _implicitReverseForeignKey;
 
     // -----------------------------------------------------
     //                                                Column
@@ -224,10 +223,6 @@ public class ForeignKey implements Constraint {
             _foreignSchema = localTable.getUnifiedSchema();
         }
         _name = attrib.getValue("name"); // constraint name for this FK
-    }
-
-    public void setForeignPropertyNamePrefix(String propertyNamePrefix) {
-        _foreignPropertyNamePrefix = propertyNamePrefix;
     }
 
     /**
@@ -1743,6 +1738,10 @@ public class ForeignKey implements Constraint {
         return _fixedSuffix;
     }
 
+    public String getFixedSuffixExp() {
+        return hasFixedSuffix() ? _fixedSuffix : "";
+    }
+
     public void setFixedSuffix(String fixedSuffix) {
         _fixedSuffix = fixedSuffix;
     }
@@ -1769,5 +1768,17 @@ public class ForeignKey implements Constraint {
 
     public void setComment(String comment) {
         _comment = comment;
+    }
+
+    public void setForeignPropertyNamePrefix(String propertyNamePrefix) {
+        _foreignPropertyNamePrefix = propertyNamePrefix;
+    }
+
+    public boolean isImplicitReverseForeignKey() {
+        return _implicitReverseForeignKey;
+    }
+
+    public void setImplicitReverseForeignKey(boolean implicitReverseForeignKey) {
+        _implicitReverseForeignKey = implicitReverseForeignKey;
     }
 }

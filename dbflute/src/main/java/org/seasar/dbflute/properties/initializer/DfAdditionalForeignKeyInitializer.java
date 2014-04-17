@@ -177,7 +177,9 @@ public class DfAdditionalForeignKeyInitializer {
         // set up implicit reverse foreign key if fixed condition is valid
         // (and if a same-structured FK does not exist)
         // because biz-one-to-one needs reverse foreign key for ConditionBean's Specify
-        // (Oops, I forgot the detail of the reason...)
+        // ...
+        // ...
+        // Sorry, I forgot the detail of the reason...
         if (fk.hasFixedCondition() && !isSuppressImplicitReverseFK(foreignKeyName)) {
             processImplicitReverseForeignKey(table, foreignTable, localColumnNameList, foreignColumnNameList);
         }
@@ -202,8 +204,8 @@ public class DfAdditionalForeignKeyInitializer {
             }
         }
         // here all local columns are elements of primary key
-        if (foreignTable.existsForeignKey(localTableName, foreignColumnNameList, localColumnNameList, null)) {
-            return;
+        if (foreignTable.existsForeignKey(localTableName, foreignColumnNameList, localColumnNameList)) {
+            return; // same-structured FK already exists
         }
         String fixedSuffix = null;
         if (foreignTable.hasForeignTableContainsOne(table)) {
@@ -216,6 +218,7 @@ public class DfAdditionalForeignKeyInitializer {
         }
         final ForeignKey fk = createAdditionalForeignKey(reverseName, localTableName, foreignColumnNameList,
                 localColumnNameList, null, fixedSuffix, null, null, comment);
+        fk.setImplicitReverseForeignKey(true);
         foreignTable.addForeignKey(fk);
         final boolean canBeReferrer = table.addReferrer(fk);
         if (canBeReferrer) { // basically true because foreign columns are PK and no fixed condition

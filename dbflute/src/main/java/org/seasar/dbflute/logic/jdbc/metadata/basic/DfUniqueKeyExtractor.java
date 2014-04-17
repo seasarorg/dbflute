@@ -18,7 +18,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.basic;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
-import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMeta;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
@@ -216,8 +215,6 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
 
     protected Map<String, Map<Integer, String>> doGetUniqueKeyMap(DatabaseMetaData metaData,
             UnifiedSchema unifiedSchema, String tableName, List<String> pkList, boolean retry) throws SQLException { // non primary key only
-        final StringSet pkSet = StringSet.createAsFlexible();
-        pkSet.addAll(pkList);
         final Map<String, Map<Integer, String>> uniqueKeyMap = newTableConstraintMap();
         ResultSet rs = null;
         try {
@@ -255,10 +252,6 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                     continue;
                 }
 
-                if (pkSet.contains(columnName)) {
-                    continue;
-                }
-
                 // check except columns
                 if (isColumnExcept(unifiedSchema, tableName, columnName)) {
                     assertUQColumnNotExcepted(unifiedSchema, tableName, columnName);
@@ -288,11 +281,12 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
                     final Map<Integer, String> uniqueElementMap = uniqueKeyMap.get(indexName);
                     uniqueElementMap.put(ordinalPosition, columnName);
                 } else {
-                    final Map<Integer, String> uniqueElementMap = new LinkedHashMap<Integer, String>();
+                    final Map<Integer, String> uniqueElementMap = newLinkedHashMap();
                     uniqueElementMap.put(ordinalPosition, columnName);
                     uniqueKeyMap.put(indexName, uniqueElementMap);
                 }
             }
+            removePkMatchUniqueKey(pkList, uniqueKeyMap);
         } finally {
             if (rs != null) {
                 rs.close();
@@ -316,6 +310,34 @@ public class DfUniqueKeyExtractor extends DfAbstractMetaDataBasicExtractor {
             msg = msg + " tableName=" + tableName;
             msg = msg + " columnName=" + columnName;
             throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    protected void removePkMatchUniqueKey(List<String> pkList, Map<String, Map<Integer, String>> uniqueKeyMap) {
+        // PK's unique constraint may be returned so remove it if it exists 
+        final List<String> pkMatchIndexList = new ArrayList<String>();
+        uniqueLoop: //
+        for (Entry<String, Map<Integer, String>> entry : uniqueKeyMap.entrySet()) {
+            final String indexName = entry.getKey();
+            final Map<Integer, String> uniqueElementMap = entry.getValue();
+            final List<String> uqList = DfCollectionUtil.newArrayList(uniqueElementMap.values());
+
+            // order match (reverse ordered unique key is normal unique key)
+            // and ignore case to compare with columns
+            if (pkList.size() != uqList.size()) {
+                continue;
+            }
+            for (int i = 0; i < pkList.size(); i++) {
+                final String pk = pkList.get(i);
+                final String uq = uqList.get(i);
+                if (!pk.equalsIgnoreCase(uq)) {
+                    continue uniqueLoop;
+                }
+            }
+            pkMatchIndexList.add(indexName); // PK completely match
+        }
+        for (String indexName : pkMatchIndexList) {
+            uniqueKeyMap.remove(indexName);
         }
     }
 }

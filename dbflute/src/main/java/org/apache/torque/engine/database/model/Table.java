@@ -1271,27 +1271,36 @@ public class Table {
     //                                         Determination
     //                                         -------------
     public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList) {
+        return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, null, false);
+    }
+
+    public boolean existsForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList, String fixedSuffix) {
+        return doExistsForeignKey(foreignTableName, localColumnNameList, foreignColumnNameList, fixedSuffix, true);
+    }
+
+    protected boolean doExistsForeignKey(String foreignTableName, List<String> localColumnNameList,
+            List<String> foreignColumnNameList, String fixedSuffix, boolean compareSuffix) {
         final StringSet localColumnNameSet = StringSet.createAsFlexibleOrdered();
         localColumnNameSet.addAll(localColumnNameList);
         final StringSet foreignColumnNameSet = StringSet.createAsFlexibleOrdered();
         foreignColumnNameSet.addAll(foreignColumnNameList);
 
-        final ForeignKey[] fks = getForeignKeys();
-        for (final ForeignKey key : fks) {
-            if (!Srl.equalsFlexible(foreignTableName, key.getForeignTablePureName())) {
+        for (final ForeignKey fk : getForeignKeys()) {
+            if (!Srl.equalsFlexible(foreignTableName, fk.getForeignTablePureName())) {
                 continue;
             }
-            if (!Srl.equalsFlexible(fixedSuffix, key.getFixedSuffix())) {
+            if (compareSuffix && !Srl.equalsFlexible(fixedSuffix, fk.getFixedSuffix())) {
                 continue;
             }
             final StringSet currentLocalColumnNameSet = StringSet.createAsFlexibleOrdered();
-            currentLocalColumnNameSet.addAll(key.getLocalColumnNameList());
+            currentLocalColumnNameSet.addAll(fk.getLocalColumnNameList());
             if (!localColumnNameSet.equalsUnderCharOption(currentLocalColumnNameSet)) {
                 continue;
             }
             final StringSet currentForeignColumnNameSet = StringSet.createAsFlexibleOrdered();
-            currentForeignColumnNameSet.addAll(key.getForeignColumnNameList());
+            currentForeignColumnNameSet.addAll(fk.getForeignColumnNameList());
             if (!foreignColumnNameSet.equalsUnderCharOption(currentForeignColumnNameSet)) {
                 continue;
             }
@@ -1571,7 +1580,20 @@ public class Table {
         if (!hasReferrer()) {
             return _derivedReferrerReferrers;
         }
-        prepareStringOrIntegerForeignKeyList(_derivedReferrerReferrers, false);
+        final List<ForeignKey> referrerList = getReferrers();
+        fkloop: //
+        for (ForeignKey referrer : referrerList) {
+            if (referrer.isCompoundFK() && referrer.isImplicitReverseForeignKey()) {
+                continue; // too complex so unsupported
+            }
+            final List<Column> localColumnList = referrer.getLocalColumnList();
+            for (Column column : localColumnList) {
+                if (!(column.isJavaNativeStringObject() || column.isJavaNativeNumberObject())) {
+                    continue fkloop;
+                }
+            }
+            _derivedReferrerReferrers.add(referrer);
+        }
         return _derivedReferrerReferrers;
     }
 

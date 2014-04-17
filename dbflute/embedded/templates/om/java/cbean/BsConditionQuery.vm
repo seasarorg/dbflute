@@ -688,7 +688,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                      ExistsReferrer for Compound PK
     //                                                      ==============================
 #foreach ($referrer in $table.referrerList)
-#if (${referrer.isCompoundFK()})
+#if (${referrer.isCompoundFK()} && !${referrer.isImplicitReverseForeignKey()})
 #set ($tmpJavaName = "TwoOrMorePk")
 #set ($tmpUncapitalisedJavaName = "twoOrMorePk")
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -727,7 +727,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 #end
 #foreach ($referrer in $table.referrerList)
-#if (${referrer.isCompoundFK()})
+#if (${referrer.isCompoundFK()} && !${referrer.isImplicitReverseForeignKey()})
 #set ($tmpJavaName = "TwoOrMorePk")
 #set ($tmpUncapitalisedJavaName = "twoOrMorePk")
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -771,7 +771,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                            (Specify)DerivedReferrer for Compound PK
     //                                            ========================================
 #foreach ($referrer in $table.referrerList)
-#if (${referrer.isCompoundFK()})
+#if (${referrer.isCompoundFK()} && !${referrer.isImplicitReverseForeignKey()})
 #set ($tmpJavaName = "TwoOrMorePk")
 #set ($tmpUncapitalisedJavaName = "twoOrMorePk")
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -810,9 +810,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                              (Query)DerivedReferrer for Compound PK
     //                                              ======================================
 #foreach ($referrer in $table.referrerList)
-#if (${referrer.isCompoundFK()})
+#if (${referrer.isCompoundFK()} && !${referrer.isImplicitReverseForeignKey()})
+#if (${referrer.hasFixedSuffix()})
+#set ($tmpJavaName = "TwoOrMorePk${referrer.fixedSuffix}")
+#set ($tmpUncapitalisedJavaName = "twoOrMorePk${referrer.fixedSuffix}")
+#else
 #set ($tmpJavaName = "TwoOrMorePk")
 #set ($tmpUncapitalisedJavaName = "twoOrMorePk")
+#end
 #set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #set ($subQueryKeepMapGeneric = "String, ${relatedCQClassName}")
