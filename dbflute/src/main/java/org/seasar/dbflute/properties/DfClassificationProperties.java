@@ -546,29 +546,29 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             rs = st.executeQuery(sql);
             final Set<String> duplicateCheckSet = StringSet.createAsCaseInsensitive();
             while (rs.next()) {
-                final String currentCode = rs.getString("cls_code");
-                final String currentName = rs.getString("cls_name");
-                final String currentAlias = rs.getString("cls_alias");
-                final String currentComment = rs.getString("cls_comment");
+                final String code = rs.getString("cls_code");
+                final String name = rs.getString("cls_name");
+                final String alias = rs.getString("cls_alias");
+                final String comment = rs.getString("cls_comment");
 
-                if (exceptCodeSet.contains(currentCode)) {
-                    _log.info("  exceptd: " + currentCode);
+                if (exceptCodeSet.contains(code)) {
+                    _log.info("  exceptd: " + code);
                     continue;
                 }
 
-                if (duplicateCheckSet.contains(currentCode)) {
-                    _log.info("  duplicate: " + currentCode);
+                if (duplicateCheckSet.contains(code)) {
+                    _log.info("  duplicate: " + code);
                     continue;
                 } else {
-                    duplicateCheckSet.add(currentCode);
+                    duplicateCheckSet.add(code);
                 }
 
                 final Map<String, Object> selectedMap = newLinkedHashMap();
-                selectedMap.put(DfClassificationElement.KEY_CODE, currentCode);
-                selectedMap.put(DfClassificationElement.KEY_NAME, filterTableClassificationName(currentName));
-                selectedMap.put(DfClassificationElement.KEY_ALIAS, currentAlias); // already adjusted at SQL
-                if (Srl.is_NotNull_and_NotTrimmedEmpty(currentComment)) { // because of not required
-                    selectedMap.put(DfClassificationElement.KEY_COMMENT, currentComment);
+                selectedMap.put(DfClassificationElement.KEY_CODE, code);
+                selectedMap.put(DfClassificationElement.KEY_NAME, filterTableClassificationName(name));
+                selectedMap.put(DfClassificationElement.KEY_ALIAS, filterTableClassificationLiteralOutput(alias));
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(comment)) { // because of not required
+                    selectedMap.put(DfClassificationElement.KEY_COMMENT, comment);
                 }
                 if (subItemPropMap != null && !subItemPropMap.isEmpty()) {
                     final Map<String, Object> subItemMap = new LinkedHashMap<String, Object>();
@@ -577,7 +577,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                         final String subItemValue = rs.getString(clsKey);
                         final String subItemVeloFriendlyValue;
                         if (subItemValue != null) {
-                            subItemVeloFriendlyValue = Srl.replace(subItemValue, "\n", "\\n");
+                            subItemVeloFriendlyValue = filterTableClassificationLiteralOutput(subItemValue);
                         } else {
                             subItemVeloFriendlyValue = "null"; // for determination in templates
                         }
@@ -615,6 +615,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         _nameFromToMap.put("<", "_");
         _nameFromToMap.put(">", "_");
         _nameFromToMap.put("?", "_");
+        _nameFromToMap.put("\n", "_");
+        _nameFromToMap.put("\t", "_");
 
         // basic full-width marks
         _nameFromToMap.put("\uff05", "_PERCENT_");
@@ -637,6 +639,20 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
         name = Srl.replaceBy(name, _nameFromToMap);
         return Srl.camelize(name, " ", "_", "-"); // for method name
+    }
+
+    protected final Map<String, String> _literalOutputFromToMap = newLinkedHashMap();
+    {
+        _literalOutputFromToMap.put("\r", "\\r");
+        _literalOutputFromToMap.put("\n", "\\n");
+        _literalOutputFromToMap.put("\"", "\\\"");
+    }
+
+    protected String filterTableClassificationLiteralOutput(String alias) {
+        if (Srl.is_Null_or_TrimmedEmpty(alias)) {
+            return alias;
+        }
+        return Srl.replaceBy(alias, _literalOutputFromToMap);
     }
 
     // -----------------------------------------------------
