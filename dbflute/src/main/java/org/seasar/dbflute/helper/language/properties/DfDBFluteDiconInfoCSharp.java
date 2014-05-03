@@ -18,25 +18,25 @@ package org.seasar.dbflute.helper.language.properties;
 /**
  * @author jflute
  */
-public class DfDefaultDBFluteDiconJava implements DfDefaultDBFluteDicon {
+public class DfDBFluteDiconInfoCSharp implements DfDBFluteDiconInfo {
 
     public String getDBFluteDiconFileName() {
-        return "dbflute.dicon";
+        return "DBFlute.dicon";
     }
 
     public String getDBFluteDiconNamespace() {
-        return "dbflute";
+        return "DBFlute";
     }
 
     public String getJ2eeDiconResourceName() {
-        return "j2ee.dicon";
+        return "${topNamespace}/Resources/Ado.dicon";
     }
 
     public String getRequiredTxComponentName() {
-        return "requiredTx";
+        return "LocalRequiredTx";
     }
 
     public String getRequiresNewTxComponentName() {
-        return "requiresNewTx";
+        return "LocalRequiresNewTx";
     }
 }

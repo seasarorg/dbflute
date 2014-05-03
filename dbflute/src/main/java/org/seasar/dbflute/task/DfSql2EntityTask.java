@@ -31,7 +31,6 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.exception.DfProcedureSetupFailureException;
@@ -42,6 +41,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
@@ -156,48 +156,20 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected void setupControlTemplate() {
-        final DfLittleAdjustmentProperties littleProp = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
+        final String title;
+        final String controlPath;
         if (littleProp.isAlternateSql2EntityControlValid()) {
-            _log.info("");
-            _log.info("* * * * * * * * * * * * * * *");
-            _log.info("* Process Alternate Control *");
-            _log.info("* * * * * * * * * * * * * * *");
-            final String control = littleProp.getAlternateSql2EntityControl();
-            _log.info("...Using alternate control: " + control);
-            setControlTemplate(control);
-            return;
-        }
-        if (getLanguageTypeFacadeProp().isTargetLanguageMain()) {
-            if (getLanguageTypeFacadeProp().isTargetLanguageJava()) {
-                _log.info("");
-                _log.info("* * * * * * * * *");
-                _log.info("* Process Java  *");
-                _log.info("* * * * * * * * *");
-                final String control = "om/ControlSql2EntityJava.vm";
-                _log.info("...Using Java control: " + control);
-                setControlTemplate(control);
-            } else if (getLanguageTypeFacadeProp().isTargetLanguageCSharp()) {
-                _log.info("");
-                _log.info("* * * * * * * * * *");
-                _log.info("* Process CSharp  *");
-                _log.info("* * * * * * * * * *");
-                final String control = "om/ControlSql2EntityCSharp.vm";
-                _log.info("...Using CSharp control: " + control);
-                setControlTemplate(control);
-            } else {
-                String msg = "Unknown Main Language: " + getLanguageTypeFacadeProp().getTargetLanguage();
-                throw new IllegalStateException(msg);
-            }
+            title = "alternate control";
+            controlPath = littleProp.getAlternateSql2EntityControl();
         } else {
-            final String language = getLanguageTypeFacadeProp().getTargetLanguage();
-            _log.info("");
-            _log.info("* * * * * * * * * *");
-            _log.info("* Process " + language + "    *");
-            _log.info("* * * * * * * * * *");
-            final String control = "om/" + language + "/sql2entity-Control-" + language + ".vm";
-            _log.info("...Using " + language + " control: " + control);
-            setControlTemplate(control);
+            final DfLanguageDependencyInfo lang = getLanguageTypeFacadeProp().getLanguageDependencyInfo();
+            title = lang.getLanguageTitle();
+            controlPath = lang.getSql2EntityControl();
         }
+        _log.info("");
+        _log.info("...Using " + title + " control: " + controlPath);
+        setControlTemplate(controlPath);
     }
 
     protected void setupSchemaInformation() {

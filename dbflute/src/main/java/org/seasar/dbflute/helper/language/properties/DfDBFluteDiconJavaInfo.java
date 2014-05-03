@@ -18,7 +18,7 @@ package org.seasar.dbflute.helper.language.properties;
 /**
  * @author jflute
  */
-public class DfDefaultDBFluteDiconPhp implements DfDefaultDBFluteDicon {
+public class DfDBFluteDiconJavaInfo implements DfDBFluteDiconInfo {
 
     public String getDBFluteDiconFileName() {
         return "dbflute.dicon";
@@ -29,7 +29,7 @@ public class DfDefaultDBFluteDiconPhp implements DfDefaultDBFluteDicon {
     }
 
     public String getJ2eeDiconResourceName() {
-        return "%PDO_DICON%";
+        return "j2ee.dicon";
     }
 
     public String getRequiredTxComponentName() {

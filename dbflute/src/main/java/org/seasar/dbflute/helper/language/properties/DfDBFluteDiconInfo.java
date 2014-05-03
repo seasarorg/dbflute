@@ -18,30 +18,30 @@ package org.seasar.dbflute.helper.language.properties;
 /**
  * @author jflute
  */
-public interface DfDefaultDBFluteDicon {
+public interface DfDBFluteDiconInfo {
 
     /**
      * @return The namespace of dbflute dicon. (NotNull)
      */
-    public String getDBFluteDiconNamespace();
+    String getDBFluteDiconNamespace();
 
     /**
      * @return The file name of dbflute dicon. (NotNull)
      */
-    public String getDBFluteDiconFileName();
+    String getDBFluteDiconFileName();
 
     /**
      * @return The resource name of J2EE dicon. (NotNull)
      */
-    public String getJ2eeDiconResourceName();
+    String getJ2eeDiconResourceName();
 
     /**
      * @return The component name of 'requiredTx'. (NotNull)
      */
-    public String getRequiredTxComponentName();
+    String getRequiredTxComponentName();
 
     /**
      * @return The component name of 'requiresNewTx'. (NotNull)
      */
-    public String getRequiresNewTxComponentName();
+    String getRequiresNewTxComponentName();
 }

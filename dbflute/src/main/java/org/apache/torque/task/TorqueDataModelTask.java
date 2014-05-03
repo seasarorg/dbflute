@@ -76,10 +76,11 @@ package org.apache.torque.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus;
 import org.seasar.dbflute.task.DfDBFluteTaskStatus.TaskType;
@@ -139,83 +140,25 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void setupControlTemplate() {
-        final DfLittleAdjustmentProperties littleProp = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        final DfLittleAdjustmentProperties littleProp = getLittleAdjustmentProperties();
+        final String title;
+        final String control;
+        final DfBasicProperties basicProp = getBasicProperties();
         if (littleProp.isAlternateGenerateControlValid()) {
-            setupControlAlternate(littleProp);
-            return;
-        }
-        if (getLanguageTypeFacadeProp().isTargetLanguageMain()) {
-            if (getLanguageTypeFacadeProp().isTargetLanguageJava()) {
-                if (getBasicProperties().isApplicationBehaviorProject()) {
-                    setupControlApplicationBehaviorJava(littleProp);
-                    return;
-                }
-                _log.info("");
-                _log.info("* * * * * * * * *");
-                _log.info("* Process Java  *");
-                _log.info("* * * * * * * * *");
-                final String control = "om/ControlGenerateJava.vm";
-                _log.info("...Using Java control: " + control);
-                setControlTemplate(control);
-            } else if (getLanguageTypeFacadeProp().isTargetLanguageCSharp()) {
-                if (getBasicProperties().isApplicationBehaviorProject()) {
-                    setupControlApplicationBehaviorCSharp(littleProp);
-                    return;
-                }
-                _log.info("");
-                _log.info("* * * * * * * * * *");
-                _log.info("* Process CSharp  *");
-                _log.info("* * * * * * * * * *");
-                final String control = "om/ControlGenerateCSharp.vm";
-                _log.info("...Using CSharp control: " + control);
-                setControlTemplate(control);
-            } else {
-                String msg = "Unknown main language: " + getLanguageTypeFacadeProp().getTargetLanguage();
-                throw new IllegalStateException(msg);
-            }
+            title = "alternate control";
+            control = littleProp.getAlternateGenerateControl();
         } else {
-            setupControlSubLanguage();
+            final DfLanguageDependencyInfo lang = getLanguageTypeFacadeProp().getLanguageDependencyInfo();
+            if (basicProp.isApplicationBehaviorProject()) {
+                title = lang.getLanguageTitle() + " BhvAp";
+                control = lang.getGenerateControlBhvAp();
+            } else {
+                title = lang.getLanguageTitle();
+                control = lang.getGenerateControl();
+            }
         }
-    }
-
-    protected void setupControlAlternate(DfLittleAdjustmentProperties littleProp) {
         _log.info("");
-        _log.info("* * * * * * * * * * * * * * *");
-        _log.info("* Process Alternate Control *");
-        _log.info("* * * * * * * * * * * * * * *");
-        final String control = littleProp.getAlternateGenerateControl();
-        _log.info("...Using alternate control: " + control);
-        setControlTemplate(control);
-    }
-
-    protected void setupControlApplicationBehaviorJava(DfLittleAdjustmentProperties littleProp) {
-        _log.info("");
-        _log.info("* * * * * * * * * * * * * * * * * * * * * * * *");
-        _log.info("* Process Application Behavior Control (Java) *");
-        _log.info("* * * * * * * * * * * * * * * * * * * * * * * *");
-        final String control = "om/java/plugin/bhvap/ControlBhvApJava.vm";
-        _log.info("...Using application behavior (Java) control: " + control);
-        setControlTemplate(control);
-    }
-
-    protected void setupControlApplicationBehaviorCSharp(DfLittleAdjustmentProperties littleProp) {
-        _log.info("");
-        _log.info("* * * * * * * * * * * * * * * * * * * * * * * * *");
-        _log.info("* Process Application Behavior Control (CSharp) *");
-        _log.info("* * * * * * * * * * * * * * * * * * * * * * * * *");
-        final String control = "om/csharp/plugin/bhvap/ControlBhvApCSharp.vm";
-        _log.info("...Using application behavior (CSharp) control: " + control);
-        setControlTemplate(control);
-    }
-
-    protected void setupControlSubLanguage() {
-        final String language = getLanguageTypeFacadeProp().getTargetLanguage();
-        _log.info("");
-        _log.info("* * * * * * * * * *");
-        _log.info("* Process " + language + "    *");
-        _log.info("* * * * * * * * * *");
-        final String control = "om/" + language + "/Control-" + language + ".vm";
-        _log.info("...Using " + language + " control: " + control);
+        _log.info("...Using " + title + " control: " + control);
         setControlTemplate(control);
     }
 

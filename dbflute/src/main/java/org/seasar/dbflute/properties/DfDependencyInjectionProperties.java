@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
+import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfo;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -145,8 +145,8 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return getBasicProperties().getLanguageDependencyInfo();
     }
 
-    protected DfDefaultDBFluteDicon getDefaultDBFluteDicon() {
-        return getLanguageDependencyInfo().getDefaultDBFluteDicon();
+    protected DfDBFluteDiconInfo getDefaultDBFluteDicon() {
+        return getLanguageDependencyInfo().getDBFluteDiconInfo();
     }
 
     public static final String KEY_dbfluteDiconBeforeJ2eeIncludeDefinitionMap = "dbfluteDiconBeforeJ2eeIncludeDefinitionMap";

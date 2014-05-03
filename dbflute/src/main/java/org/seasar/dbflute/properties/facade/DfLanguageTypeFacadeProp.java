@@ -54,6 +54,10 @@ public class DfLanguageTypeFacadeProp {
         return _basicProp.isTargetLanguagePhp();
     }
 
+    public boolean isTargetSubLanguageScala() {
+        return _basicProp.isTargetSubLanguageScala();
+    }
+
     public DfLanguageDependencyInfo getLanguageDependencyInfo() {
         return _basicProp.getLanguageDependencyInfo();
     }

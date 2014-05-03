@@ -29,6 +29,7 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoScala;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.infra.core.DfDatabaseNameMapping;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
@@ -258,7 +259,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isTargetLanguageMain() {
-        return getBasicProperties().isTargetLanguageJava() || getBasicProperties().isTargetLanguageCSharp();
+        return isTargetLanguageJava() || isTargetLanguageCSharp();
     }
 
     public boolean isTargetLanguageJava() {
@@ -273,10 +274,18 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return PHP_targetLanguage.equals(getTargetLanguage());
     }
 
+    public boolean isTargetSubLanguageScala() {
+        return SCALA_targetLanguage.equals(getTargetLanguage());
+    }
+
     public DfLanguageDependencyInfo getLanguageDependencyInfo() {
         if (_languageDependencyInfo == null) {
             if (isTargetLanguageJava()) {
-                _languageDependencyInfo = new DfLanguageDependencyInfoJava();
+                if (isTargetSubLanguageScala()) { // as sub language
+                    _languageDependencyInfo = new DfLanguageDependencyInfoScala();
+                } else { // pure java
+                    _languageDependencyInfo = new DfLanguageDependencyInfoJava();
+                }
             } else if (isTargetLanguageCSharp()) {
                 _languageDependencyInfo = new DfLanguageDependencyInfoCSharp();
             } else if (isTargetLanguagePhp()) {
@@ -515,7 +524,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         if (property != null) {
             return property;
         }
-        final String defaultDirectory = getLanguageDependencyInfo().getDefaultGenerateOutputDirectory();
+        final String defaultDirectory = getLanguageDependencyInfo().getGenerateOutputDirectory();
         return getProperty("java.dir", defaultDirectory); // old style or default
     }
 
@@ -524,7 +533,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getDefaultResourceOutputDirectory() {
-        return getLanguageDependencyInfo().getDefaultResourceOutputDirectory();
+        return getLanguageDependencyInfo().getResourceOutputDirectory();
     }
 
     // ===================================================================================

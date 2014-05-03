@@ -71,6 +71,7 @@ public abstract class DfAbstractHelperProperties {
     public static final String JAVA_targetLanguage = "java";
     public static final String CSHARP_targetLanguage = "csharp";
     public static final String PHP_targetLanguage = "php";
+    public static final String SCALA_targetLanguage = "scala";
     public static final String CSHARPOLD_targetLanguage = "csharpold";
     public static final String DEFAULT_targetLanguage = JAVA_targetLanguage;
 

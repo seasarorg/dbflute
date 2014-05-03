@@ -21,8 +21,8 @@ import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoCSharp;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaDataCSharp;
-import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
-import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDiconCSharp;
+import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfo;
+import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfoCSharp;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultCSharp;
 import org.seasar.dbflute.util.Srl;
@@ -32,53 +32,49 @@ import org.seasar.dbflute.util.Srl;
  */
 public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo {
 
+    // ===================================================================================
+    //                                                                               Basic
+    //                                                                               =====
+    public String getLanguageTitle() {
+        return "CSharp";
+    }
+
+    // ===================================================================================
+    //                                                                    Program Handling
+    //                                                                    ================
     public DfGrammarInfo getGrammarInfo() {
         return new DfGrammarInfoCSharp();
-    }
-
-    public String getTemplateFileExtension() {
-        return "vmnet";
-    }
-
-    public DfDefaultDBFluteDicon getDefaultDBFluteDicon() {
-        return new DfDefaultDBFluteDiconCSharp();
-    }
-
-    public DfGeneratedClassPackageDefault getGeneratedClassPackageInfo() {
-        return new DfGeneratedClassPackageDefaultCSharp();
-    }
-
-    public LanguageMetaData createLanguageMetaData() {
-        return new LanguageMetaDataCSharp();
-    }
-
-    public String getDefaultMainProgramDirectory() {
-        return "source";
-    }
-
-    public String getDefaultMainResourceDirectory() {
-        return "source";
-    }
-
-    public String getDefaultGenerateOutputDirectory() {
-        return "../source";
-    }
-
-    public String getDefaultResourceOutputDirectory() {
-        return "../source/${topNamespace}/Resources"; // basically unused
     }
 
     public String getIntegerConvertExpression(String value) {
         return "new int?(" + value + ")";
     }
 
-    public String getConditionBeanPackageName() {
-        return "CBean";
+    public String getSequenceType() {
+        return "int?";
+    }
+
+    public DfDBFluteDiconInfo getDBFluteDiconInfo() {
+        return new DfDBFluteDiconInfoCSharp();
+    }
+
+    public LanguageMetaData createLanguageMetaData() {
+        return new LanguageMetaDataCSharp();
+    }
+
+    // ===================================================================================
+    //                                                                 Compile Environment
+    //                                                                 ===================
+    public String getMainProgramDirectory() {
+        return "source";
+    }
+
+    public String getMainResourceDirectory() {
+        return getMainProgramDirectory();
     }
 
     public boolean isCompileTargetFile(File file) {
-        String absolutePath = file.getAbsolutePath();
-        absolutePath = Srl.replace(absolutePath, "\\", "/");
+        final String absolutePath = Srl.replace(file.getAbsolutePath(), "\\", "/");
         if (absolutePath.contains("/bin/") || absolutePath.contains("/obj/")) {
             return false;
         }
@@ -89,7 +85,42 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
         return true;
     }
 
-    public String getDefaultSequenceType() {
-        return "int?";
+    // ===================================================================================
+    //                                                                Generate Environment
+    //                                                                ====================
+    public String getGenerateControl() {
+        return "om/ControlGenerateCSharp.vm";
+    }
+
+    public String getGenerateControlBhvAp() {
+        return "om/csharp/plugin/bhvap/ControlBhvApCSharp.vm";
+    }
+
+    public String getSql2EntityControl() {
+        return "om/ControlSql2EntityCSharp.vm";
+    }
+
+    public String getGenerateOutputDirectory() {
+        return "../" + getMainProgramDirectory();
+    }
+
+    public String getResourceOutputDirectory() {
+        return "../source/${topNamespace}/Resources"; // basically unused
+    }
+
+    public String getOutsideSqlDirectory() {
+        return getMainProgramDirectory();
+    }
+
+    public String convertToSecondaryOutsideSqlDirectory(String sqlDirectory) {
+        return null; // no secondary
+    }
+
+    public String getTemplateFileExtension() {
+        return "vmnet";
+    }
+
+    public DfGeneratedClassPackageDefault getGeneratedClassPackageInfo() {
+        return new DfGeneratedClassPackageDefaultCSharp();
     }
 }

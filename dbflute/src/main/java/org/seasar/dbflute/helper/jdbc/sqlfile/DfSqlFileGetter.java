@@ -17,6 +17,7 @@ package org.seasar.dbflute.helper.jdbc.sqlfile;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,22 +36,22 @@ public class DfSqlFileGetter {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public List<File> getSqlFileList(String sqlDirectory) {
+    public List<File> getSqlFileList(String sqlDirectory) throws FileNotFoundException {
         final List<File> fileList = new ArrayList<File>();
         final File fileDir = toFileDir(sqlDirectory);
         registerFile(fileList, fileDir);
         return fileList;
     }
 
-    protected File toFileDir(String sqlDirectory) {
+    protected File toFileDir(String sqlDirectory) throws FileNotFoundException {
         final File dir = new File(sqlDirectory);
         if (!dir.exists()) {
             String msg = "The sqlDirectory does not exist: " + dir;
-            throw new IllegalStateException(msg);
+            throw new FileNotFoundException(msg);
         }
         if (!dir.isDirectory()) {
             String msg = "The sqlDirectory should be directory. but file...: " + dir;
-            throw new IllegalStateException(msg);
+            throw new FileNotFoundException(msg);
         }
         return dir;
     }

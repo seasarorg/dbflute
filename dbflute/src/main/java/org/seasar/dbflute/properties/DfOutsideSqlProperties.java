@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
+import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlLocation;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -313,8 +314,9 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         final Map<String, Map<String, String>> sqlApMap = (Map<String, Map<String, String>>) obj;
         final Set<Entry<String, Map<String, String>>> entrySet = sqlApMap.entrySet();
 
-        final String defaultSqlDirectory = getBasicProperties().getLanguageDependencyInfo()
-                .getDefaultMainProgramDirectory();
+        final DfLanguageDependencyInfo lang = getBasicProperties().getLanguageDependencyInfo();
+        final String defaultSqlDirectory = lang.getOutsideSqlDirectory();
+        final String defaultMainProgramDirectory = lang.getMainProgramDirectory();
         for (Entry<String, Map<String, String>> entry : entrySet) {
             final String applicationDir = entry.getKey();
             final Map<String, String> elementMap = entry.getValue();
@@ -334,7 +336,6 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             {
                 String plainDir = elementMap.get("sqlDirectory");
                 if (Srl.is_Null_or_TrimmedEmpty(plainDir)) {
-                    // 'src/main/resources' is also contained by resolving later 
                     plainDir = defaultSqlDirectory;
                 }
                 sqlDirectory = doGetSqlDirectory(applicationDir + "/" + plainDir);
@@ -344,7 +345,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             {
                 String plainDir = elementMap.get("sql2EntityOutputDirectory");
                 if (Srl.is_Null_or_TrimmedEmpty(plainDir)) {
-                    plainDir = defaultSqlDirectory;
+                    plainDir = defaultMainProgramDirectory;
                 }
                 sql2EntityOutputDirectory = applicationDir + "/" + plainDir;
             }

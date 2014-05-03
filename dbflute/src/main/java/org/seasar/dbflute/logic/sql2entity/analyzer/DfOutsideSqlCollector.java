@@ -16,6 +16,7 @@
 package org.seasar.dbflute.logic.sql2entity.analyzer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 
@@ -64,34 +64,20 @@ public class DfOutsideSqlCollector {
         for (DfOutsideSqlLocation sqlLocation : sqlDirectoryList) {
             final String sqlDirectory = sqlLocation.getSqlDirectory();
             if (existsSqlDir(sqlDirectory)) {
-                outsideSqlPack.addAll(collectSqlFile(sqlDirectory, sqlLocation));
-                final String srcMainResources = replaceSrcMainJavaToSrcMainResources(sqlDirectory);
-                if (!sqlDirectory.equals(srcMainResources)) {
-                    try {
-                        outsideSqlPack.addAll(collectSqlFile(srcMainResources, sqlLocation));
-                    } catch (Exception e) {
-                        _log.info("Not found sql directory on resources: " + srcMainResources);
-                    }
+                try {
+                    outsideSqlPack.addAll(collectSqlFile(sqlDirectory, sqlLocation));
+                } catch (FileNotFoundException e) {
+                    String msg = "Failed to collect SQL files at the directory: " + sqlDirectory;
+                    throw new IllegalStateException(msg, e);
                 }
+                handleSecondaryDirectory(outsideSqlPack, sqlLocation, sqlDirectory, false);
             } else {
                 final boolean suppressCheck = _suppressDirectoryCheck || sqlLocation.isSuppressDirectoryCheck();
-                if (containsSrcMainJava(sqlDirectory)) {
-                    final String srcMainResources = replaceSrcMainJavaToSrcMainResources(sqlDirectory);
-                    if (!sqlDirectory.equals(srcMainResources)) {
-                        if (existsSqlDir(srcMainResources)) {
-                            outsideSqlPack.addAll(collectSqlFile(srcMainResources, sqlLocation));
-                        } else {
-                            if (!suppressCheck) {
-                                String msg = "The sqlDirectory does not exist: " + srcMainResources;
-                                throw new IllegalStateException(msg);
-                            }
-                        }
-                    }
-                } else {
-                    if (!suppressCheck) {
-                        String msg = "The sqlDirectory does not exist: " + sqlDirectory;
-                        throw new IllegalStateException(msg);
-                    }
+                final boolean foundSecondaryDirectory = handleSecondaryDirectory(outsideSqlPack, sqlLocation,
+                        sqlDirectory, suppressCheck);
+                if (!foundSecondaryDirectory && !suppressCheck) { // means both primary and secondary directory
+                    String msg = "The sqlDirectory does not exist: " + sqlDirectory;
+                    throw new IllegalStateException(msg);
                 }
             }
         }
@@ -107,7 +93,8 @@ public class DfOutsideSqlCollector {
         return new File(sqlDirPath).exists();
     }
 
-    protected List<DfOutsideSqlFile> collectSqlFile(String realSqlDirectory, DfOutsideSqlLocation sqlLocation) {
+    protected List<DfOutsideSqlFile> collectSqlFile(String realSqlDirectory, DfOutsideSqlLocation sqlLocation)
+            throws FileNotFoundException {
         final List<File> sqlFileList = createSqlFileGetter().getSqlFileList(realSqlDirectory);
         final List<DfOutsideSqlFile> outsideSqlList = new ArrayList<DfOutsideSqlFile>();
         for (File sqlFile : sqlFileList) {
@@ -129,12 +116,28 @@ public class DfOutsideSqlCollector {
         };
     }
 
-    protected boolean containsSrcMainJava(String sqlDirectory) {
-        return DfLanguageDependencyInfoJava.containsSrcMainJava(sqlDirectory);
-    }
-
-    protected String replaceSrcMainJavaToSrcMainResources(String sqlDirectory) {
-        return DfLanguageDependencyInfoJava.replaceSrcMainJavaToSrcMainResources(sqlDirectory);
+    protected boolean handleSecondaryDirectory(DfOutsideSqlPack outsideSqlPack, DfOutsideSqlLocation sqlLocation,
+            String sqlDirectory, boolean checkNotFound) {
+        final DfBasicProperties basicProp = getBasicProperties();
+        final DfLanguageDependencyInfo lang = basicProp.getLanguageDependencyInfo();
+        final String secondaryDirectory = lang.convertToSecondaryOutsideSqlDirectory(sqlDirectory);
+        final boolean foundSecondaryDirectory;
+        if (!sqlDirectory.equals(secondaryDirectory)) {
+            try {
+                outsideSqlPack.addAll(collectSqlFile(secondaryDirectory, sqlLocation));
+            } catch (FileNotFoundException e) {
+                if (checkNotFound) {
+                    String msg = "The sqlDirectory does not exist: " + secondaryDirectory;
+                    throw new IllegalStateException(msg);
+                } else {
+                    _log.info("Not found sql directory on resources: " + secondaryDirectory);
+                }
+            }
+            foundSecondaryDirectory = true;
+        } else {
+            foundSecondaryDirectory = false;
+        }
+        return foundSecondaryDirectory;
     }
 
     // ===================================================================================

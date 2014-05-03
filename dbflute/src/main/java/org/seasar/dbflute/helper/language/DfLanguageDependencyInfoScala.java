@@ -15,112 +15,80 @@
  */
 package org.seasar.dbflute.helper.language;
 
-import java.io.File;
-
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoPhp;
+import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoScala;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaDataPhp;
-import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfo;
-import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfoPhp;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultPhp;
+import org.seasar.dbflute.helper.language.metadata.LanguageMetaDataJava;
 
 /**
  * @author jflute
  */
-public class DfLanguageDependencyInfoPhp implements DfLanguageDependencyInfo {
+public class DfLanguageDependencyInfoScala extends DfLanguageDependencyInfoJava {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String PATH_MAVEN_SRC_MAIN_PHP = "src/main/php";
+    protected static final String PATH_MAVEN_SRC_MAIN_SCALA = "src/main/scala";
 
     // ===================================================================================
     //                                                                               Basic
     //                                                                               =====
+    @Override
     public String getLanguageTitle() {
-        return "Php";
+        return "Scala";
     }
 
     // ===================================================================================
     //                                                                    Program Handling
     //                                                                    ================
+    @Override
     public DfGrammarInfo getGrammarInfo() {
-        return new DfGrammarInfoPhp();
+        return new DfGrammarInfoScala();
     }
 
+    @Override
     public String getIntegerConvertExpression(String value) {
-        return value;
+        return "Integer.valueOf(\"" + value + "\")"; // #pending jflute Scala's convert
     }
 
+    @Override
     public String getSequenceType() {
-        return "";
+        return "java.math.BigDecimal"; // #pending jflute Scala's big decimal
     }
 
-    public DfDBFluteDiconInfo getDBFluteDiconInfo() {
-        return new DfDBFluteDiconInfoPhp();
-    }
-
+    @Override
     public LanguageMetaData createLanguageMetaData() {
-        return new LanguageMetaDataPhp();
+        return new LanguageMetaDataJava(); // #pending jflute Scala's type
     }
 
     // ===================================================================================
     //                                                                 Compile Environment
     //                                                                 ===================
+    @Override
     public String getMainProgramDirectory() {
-        return PATH_MAVEN_SRC_MAIN_PHP;
-    }
-
-    public String getMainResourceDirectory() {
-        return getMainProgramDirectory();
-    }
-
-    public boolean isCompileTargetFile(File file) {
-        return true;
-    }
-
-    public boolean isFlatOrOmitDirectorySupported() {
-        return false;
+        return PATH_MAVEN_SRC_MAIN_SCALA;
     }
 
     // ===================================================================================
     //                                                                Generate Environment
     //                                                                ====================
+    @Override
     public String getGenerateControl() {
-        throw new UnsupportedOperationException("Unsupported language Php");
+        return "om/ControlGenerateScala.vm";
     }
 
+    @Override
     public String getGenerateControlBhvAp() {
-        throw new UnsupportedOperationException("Unsupported language Php");
+        throw new UnsupportedOperationException("Unsupported language Scala");
     }
 
+    @Override
     public String getSql2EntityControl() {
-        throw new UnsupportedOperationException("Unsupported language Php");
+        return "om/ControlSql2EntityScala.vm";
     }
 
-    public String getOutsideSqlDirectory() {
-        return getMainProgramDirectory();
-    }
-
-    public String convertToSecondaryOutsideSqlDirectory(String sqlDirectory) {
-        return null; // no secondary
-    }
-
-    public String getGenerateOutputDirectory() {
-        return "../" + getMainProgramDirectory();
-    }
-
-    public String getResourceOutputDirectory() {
-        return "";
-    }
-
+    @Override
     public String getTemplateFileExtension() {
-        return "vmphp";
-    }
-
-    public DfGeneratedClassPackageDefault getGeneratedClassPackageInfo() {
-        return new DfGeneratedClassPackageDefaultPhp();
+        return "vmsca";
     }
 }

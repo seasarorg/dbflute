@@ -187,6 +187,45 @@ $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedSqlClauseCreato
 $database.info("}")
 
 ## ===================================================================================
+##                                                                             Plug-in
+##                                                                             =======
+## -----------------------------------------------------
+##                                                  Buri
+##                                                  ----
+#if ($database.isUseBuri())
+  $database.info("public void parsePluginBuri() {")
+
+  #set ($path = $database.getPackageAsPath(${glPackagePluginBuri}))
+  $database.makeDirectory($path)
+
+  $database.info("    parse('BasicBuriUserDataProvider');")
+  #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glBasicBuriUserDataProvider}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/plugin/buri/BasicBuriUserDataProvider.${glTemplateFileExtension}",$path ,"" ,"")
+
+  $database.info("    parse('BasicParticipantProvider');")
+  #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glBasicParticipantProvider}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/plugin/buri/BasicParticipantProvider.${glTemplateFileExtension}",$path ,"" ,"")
+
+  $database.info("    parse('BehaviorToDataAccessRule');")
+  #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glBehaviorToDataAccessRule}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/plugin/buri/BehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
+
+  $database.info("    parse('BuriDef');")
+  #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glBuriDef}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/plugin/buri/BuriDef.${glTemplateFileExtension}",$path ,"" ,"")
+
+  $database.info("    parse('FixedBuriDataAccessScriptFactoryImpl');")
+  #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glFixedBuriDataAccessScriptFactoryImpl}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/plugin/buri/FixedBuriDataAccessScriptFactoryImpl.${glTemplateFileExtension}",$path ,"" ,"")
+
+  $database.info("    parse('FixedScriptDataAccessUtilKeyImpl');")
+  #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glFixedScriptDataAccessUtilKeyImpl}.${glClassFileExtension}" )
+  $generator.parse("om/${glResourceDirectory}/plugin/buri/FixedScriptDataAccessUtilKeyImpl.${glTemplateFileExtension}",$path ,"" ,"")
+
+  $database.info("}")
+#end
+
+## ===================================================================================
 ##                                                                     ContainerConfig
 ##                                                                     ===============
 $database.info("public void parseContainerConfig() {")
