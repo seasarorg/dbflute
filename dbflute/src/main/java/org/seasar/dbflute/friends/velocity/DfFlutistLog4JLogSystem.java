@@ -21,7 +21,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.velocity.runtime.RuntimeServices;
-import org.apache.velocity.runtime.log.SimpleLog4JLogSystem;
+import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.seasar.dbflute.friends.log4j.DfFlutistRollingFileAppender;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -30,7 +30,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.9.5.1 (2009/06/23 Tuesday)
  */
-public class DfFlutistLog4JLogSystem extends SimpleLog4JLogSystem {
+public class DfFlutistLog4JLogSystem extends Log4JLogChute {
 
     // ===================================================================================
     //                                                                          Definition
@@ -47,6 +47,7 @@ public class DfFlutistLog4JLogSystem extends SimpleLog4JLogSystem {
     // ===================================================================================
     //                                                                 Initialize Override
     //                                                                 ===================
+    @Override
     public void init(RuntimeServices rs) {
         final String logfile = "./log/velocity.log";
         try {
@@ -59,8 +60,8 @@ public class DfFlutistLog4JLogSystem extends SimpleLog4JLogSystem {
             appender.setMaximumFileSize(100000);
             logger.addAppender(appender);
 
-            logVelocityMessage(0, ""); // as begin mark.
-            logVelocityMessage(0, DfTypeUtil.toClassTitle(this) + " initialized using logfile '" + logfile + "'");
+            log(0, ""); // as begin mark.
+            log(0, DfTypeUtil.toClassTitle(this) + " initialized using logfile '" + logfile + "'");
         } catch (Exception e) {
             _log.warn("PANIC : error configuring " + DfTypeUtil.toClassTitle(this) + " : ", e);
         }
