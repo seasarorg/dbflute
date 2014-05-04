@@ -34,13 +34,14 @@ import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityMetaExtractor.DfForcedJavaNativeProvider;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.util.Srl;
@@ -66,7 +67,6 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
 
     protected final DfSql2EntityMarkAnalyzer _outsideSqlMarkAnalyzer = new DfSql2EntityMarkAnalyzer();
     protected final DfOutsideSqlNameResolver _sqlFileNameResolver = new DfOutsideSqlNameResolver();
-    protected final DfPropertyTypePackageResolver _propertyTypePackageResolver = new DfPropertyTypePackageResolver();
     protected final DfBehaviorQueryPathSetupper _bqpSetupper = new DfBehaviorQueryPathSetupper();
 
     // ===================================================================================
@@ -204,7 +204,9 @@ public class DfOutsideSqlAnalyzer extends DfSqlFileRunnerBase {
     }
 
     protected String resolvePackageName(String typeName) { // [DBFLUTE-271]
-        return _propertyTypePackageResolver.resolvePackageName(typeName);
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguagePropertyPackageResolver resolver = lang.getLanguagePropertyPackageResolver();
+        return resolver.resolvePackageName(typeName);
     }
 
     protected DfCustomizeEntityInfo processCustomizeEntity(String sql, Map<String, DfColumnMeta> columnMetaInfoMap) {

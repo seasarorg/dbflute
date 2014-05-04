@@ -15,7 +15,10 @@
  */
 package org.seasar.dbflute.logic.generate.language.grammar;
 
+import java.util.List;
+
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -45,13 +48,25 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
         return "const";
     }
 
+    // ===================================================================================
+    //                                                              Programming Expression
+    //                                                              ======================
+    public String adjustMethodInitialChar(String methodNameResource) {
+        return Srl.initUncap(methodNameResource);
+    }
+
+    public String adjustPropertyInitialChar(String propertyName) {
+        return Srl.initUncap(propertyName);
+    }
+
+    public String buildPropertyGetterCall(String propertyName) {
+        throw new UnsupportedOperationException("Unsupported at Php");
+    }
+
     public String getClassTypeLiteral(String className) {
         throw new UnsupportedOperationException("Unsupported at Php");
     }
 
-    // ===================================================================================
-    //                                                              Programming Expression
-    //                                                              ======================
     public String buildGenericListClassName(String element) {
         throw new UnsupportedOperationException("Unsupported at Php");
     }
@@ -79,5 +94,16 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
     public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
             boolean toBoolean) {
         throw new UnsupportedOperationException("Unsupported at Php");
+    }
+
+    public String buildOneLinerListNewBackStage(List<String> elementList) {
+        throw new UnsupportedOperationException("Unsupported at Php");
+    }
+
+    // ===================================================================================
+    //                                                                    Small Adjustment 
+    //                                                                    ================
+    public boolean isPgReservColumn(String columnName) {
+        return false;
     }
 }

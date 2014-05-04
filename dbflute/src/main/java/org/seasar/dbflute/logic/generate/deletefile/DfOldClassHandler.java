@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -53,7 +53,7 @@ public class DfOldClassHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected DfGenerator _generator;
-    protected DfLanguageGeneratedClassPackage _generatedClassPkg;
+    protected DfLanguageClassPackage _generatedClassPkg;
     protected List<Table> _tableList;
     protected Map<String, Map<String, Table>> _cmentityLocationMap;
     protected Map<String, Map<String, DfPmbMetaData>> _pmbLocationMap;
@@ -61,7 +61,7 @@ public class DfOldClassHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOldClassHandler(DfGenerator generator, DfLanguageGeneratedClassPackage generatedClassPkg, List<Table> tableList) {
+    public DfOldClassHandler(DfGenerator generator, DfLanguageClassPackage generatedClassPkg, List<Table> tableList) {
         _generator = generator;
         _generatedClassPkg = generatedClassPkg;
         _tableList = tableList;

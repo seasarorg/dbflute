@@ -31,7 +31,7 @@ import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyCSharp;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyJava;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyPhp;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyScala;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.seasar.dbflute.util.Srl;
@@ -240,11 +240,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getResourceDirectory() {
-        final String targetLanguage = getTargetLanguage();
-        if (isTargetLanguageJava() && getTargetLanguageVersion().startsWith("1.4")) {
-            return targetLanguage + "j14";
-        }
-        return targetLanguage;
+        return getTargetLanguage(); // same as language
     }
 
     public boolean isTargetLanguageJava() {
@@ -281,20 +277,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             }
         }
         return _languageDependency;
-    }
-
-    public String getTargetLanguageVersion() {
-        return getProperty("targetLanguageVersion", "5.0");
-    }
-
-    public boolean isJavaVersionGreaterEqualTiger() {
-        final String targetLanguageVersion = getBasicProperties().getTargetLanguageVersion();
-        return isTargetLanguageJava() && targetLanguageVersion.compareToIgnoreCase("5.0") >= 0;
-    }
-
-    public boolean isJavaVersionGreaterEqualMustang() {
-        final String targetLanguageVersion = getBasicProperties().getTargetLanguageVersion();
-        return isTargetLanguageJava() && targetLanguageVersion.compareToIgnoreCase("6.0") >= 0;
     }
 
     // ===================================================================================
@@ -496,9 +478,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected DfLanguageGeneratedClassPackage getPackageInfo() {
+    protected DfLanguageClassPackage getPackageInfo() {
         final DfLanguageDependency languageDependencyInfo = getBasicProperties().getLanguageDependency();
-        return languageDependencyInfo.getGeneratedClassPackage();
+        return languageDependencyInfo.getLanguageClassPackage();
     }
 
     // ===================================================================================
@@ -675,15 +657,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
                 throw new DfIllegalPropertySettingException(msg);
             }
         } else { // null
-            final String defaultLineSeparator;
-            if (isTargetLanguageJava()) {
-                defaultLineSeparator = "\n";
-            } else if (isTargetLanguageCSharp()) {
-                defaultLineSeparator = "\r\n";
-            } else {
-                defaultLineSeparator = "\n";
-            }
-            _sourceCodeLineSeparator = defaultLineSeparator; // as default but no convert
+            final String defaultSeparator = getLanguageDependency().getSourceCodeLineSeparator();
+            _sourceCodeLineSeparator = defaultSeparator; // as default but no convert
         }
         return _sourceCodeLineSeparator;
     }

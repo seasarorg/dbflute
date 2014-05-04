@@ -143,7 +143,8 @@ import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -1206,8 +1207,9 @@ public class ForeignKey implements Constraint {
     }
 
     protected String filterDynamicFixedConditionParameterType(String parameterType) {
-        final DfPropertyTypePackageResolver packageResolver = new DfPropertyTypePackageResolver();
-        return packageResolver.resolvePackageName(parameterType);
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguagePropertyPackageResolver resolver = lang.getLanguagePropertyPackageResolver();
+        return resolver.resolvePackageName(parameterType);
     }
 
     // ===================================================================================

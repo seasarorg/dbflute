@@ -17,8 +17,10 @@ package org.seasar.dbflute.logic.generate.language;
 
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarScala;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingJava;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyleScala;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolverScala;
 
 /**
  * @author jflute
@@ -29,6 +31,13 @@ public class DfLanguageDependencyScala extends DfLanguageDependencyJava {
     //                                                                          Definition
     //                                                                          ==========
     protected static final String PATH_MAVEN_SRC_MAIN_SCALA = "src/main/scala";
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfLanguageGrammar _grammarScala = new DfLanguageGrammarScala();
+    protected final DfLanguageImplStyle _implStyleScala = new DfLanguageImplStyleScala();
+    protected final DfLanguagePropertyPackageResolver _packageResolverScala = new DfLanguagePropertyPackageResolverScala();
 
     // ===================================================================================
     //                                                                               Basic
@@ -43,12 +52,12 @@ public class DfLanguageDependencyScala extends DfLanguageDependencyJava {
     //                                                                    ================
     @Override
     public DfLanguageGrammar getLanguageGrammar() {
-        return new DfLanguageGrammarScala();
+        return _grammarScala;
     }
 
     @Override
-    public DfLanguageTypeMapping getLanguageTypeMapping() {
-        return new DfLanguageTypeMappingJava(); // #pending jflute Scala's type
+    public DfLanguageImplStyle getLanguageImplStyle() {
+        return _implStyleScala;
     }
 
     // ===================================================================================
@@ -82,8 +91,8 @@ public class DfLanguageDependencyScala extends DfLanguageDependencyJava {
         return "vmsca";
     }
 
-    // ===================================================================================
-    //                                                                    Small Adjustment
-    //                                                                    ================
-    // #pending jflute Scala's specification
+    @Override
+    public DfLanguagePropertyPackageResolver getLanguagePropertyPackageResolver() {
+        return _packageResolverScala;
+    }
 }

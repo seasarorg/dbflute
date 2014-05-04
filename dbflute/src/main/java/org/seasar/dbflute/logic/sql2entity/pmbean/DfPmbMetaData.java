@@ -25,7 +25,9 @@ import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
@@ -605,32 +607,22 @@ public class DfPmbMetaData {
         }
         final String classificationName = getPropertyOptionSpecifiedClassificationName(propertyName);
         if (isPropertyTypeList(propertyName)) {
-            final String listArg;
+            final List<String> elementList = DfCollectionUtil.newArrayList();
             if (isPropertyOptionClassificationFixedElementList(propertyName)) {
                 final List<String> fixedElementList = getPropertyOptionClassificationFixedElementList(propertyName);
-                final StringBuilder sb = new StringBuilder();
                 for (String fixedElement : fixedElementList) {
-                    if (sb.length() > 0) {
-                        sb.append(", ");
-                    }
                     final String valueExp = buildPropertyOptionClassificationElementValueExp(propertyName,
                             classificationName, fixedElement);
-                    sb.append(valueExp);
+                    elementList.add(valueExp);
                 }
-                listArg = sb.toString();
             } else { // property is list but specified one
                 final String fixedElement = getPropertyOptionClassificationFixedElement(propertyName);
                 final String valueExp = buildPropertyOptionClassificationElementValueExp(propertyName,
                         classificationName, fixedElement);
-                listArg = valueExp;
+                elementList.add(valueExp);
             }
-            if (getBasicProperties().isTargetLanguageJava()) {
-                return "newArrayList(" + listArg + ")";
-            } else if (getBasicProperties().isTargetLanguageCSharp()) {
-                return null; // unsupported yet
-            } else {
-                return null;
-            }
+            final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+            return grammar.buildOneLinerListNewBackStage(elementList);
         } else {
             if (isPropertyOptionClassificationFixedElementList(propertyName)) {
                 final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
@@ -1022,8 +1014,7 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleArrayElementJavaNativeTypeLiteral(String propertyName) {
         final String javaNative = getProcedureParameterOracleArrayElementJavaNative(propertyName);
-        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency()
-                .getLanguageGrammar();
+        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
         return grammarInfo.getClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(javaNative, "<"));
     }
 
@@ -1047,8 +1038,7 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleStructEntityTypeTypeLiteral(String propertyName) {
         final String entityType = getProcedureParameterOracleStructEntityType(propertyName);
-        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency()
-                .getLanguageGrammar();
+        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
         return grammarInfo.getClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(entityType, "<"));
     }
 
@@ -1071,7 +1061,8 @@ public class DfPmbMetaData {
         // basically this adjusts property types for auto-detected properties
         // it should be called after initialization
         // (not called by procedure)
-        final DfPropertyTypePackageResolver packageResolver = new DfPropertyTypePackageResolver();
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguagePropertyPackageResolver packageResolver = lang.getLanguagePropertyPackageResolver();
         final Set<String> autoDetectedPropertyNameSet = getAutoDetectedPropertyNameSet();
         if (autoDetectedPropertyNameSet == null || autoDetectedPropertyNameSet.isEmpty()) {
             return;

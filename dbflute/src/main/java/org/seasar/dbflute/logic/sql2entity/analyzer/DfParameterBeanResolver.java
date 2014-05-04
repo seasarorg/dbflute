@@ -34,12 +34,13 @@ import org.seasar.dbflute.cbean.SimplePagingBean;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
 import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData.DfPagingType;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbPropertyOptionComment;
-import org.seasar.dbflute.logic.sql2entity.pmbean.DfPropertyTypePackageResolver;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -85,7 +86,6 @@ public class DfParameterBeanResolver {
     protected final AppData _schemaData;
     protected final DfSql2EntityMarkAnalyzer _outsideSqlMarkAnalyzer = new DfSql2EntityMarkAnalyzer();
     protected final DfOutsideSqlNameResolver _sqlFileNameResolver = new DfOutsideSqlNameResolver();
-    protected final DfPropertyTypePackageResolver _propertyTypePackageResolver = new DfPropertyTypePackageResolver();
     protected final DfBehaviorQueryPathSetupper _bqpSetupper = new DfBehaviorQueryPathSetupper();
 
     // temporary collection resolved by auto-detect
@@ -263,7 +263,9 @@ public class DfParameterBeanResolver {
     }
 
     protected String resolvePackageNameExceptUtil(String typeName) {
-        return _propertyTypePackageResolver.resolvePackageNameExceptUtil(typeName);
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguagePropertyPackageResolver resolver = lang.getLanguagePropertyPackageResolver();
+        return resolver.resolvePackageNameExceptUtil(typeName);
     }
 
     protected DfOutsideSqlPack createOutsideSqlPackAsOne() {

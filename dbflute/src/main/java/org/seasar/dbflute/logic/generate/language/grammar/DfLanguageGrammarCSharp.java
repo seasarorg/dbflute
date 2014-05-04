@@ -15,13 +15,30 @@
  */
 package org.seasar.dbflute.logic.generate.language.grammar;
 
+import java.util.List;
+import java.util.Set;
+
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
 public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final Set<String> _pgReservColumnSet;
+    static {
+        // likely words only (and only can be checked at examples)
+        final StringSet stringSet = StringSet.createAsCaseInsensitive();
+        final List<String> list = DfCollectionUtil.newArrayList("class");
+        stringSet.addAll(list);
+        _pgReservColumnSet = stringSet;
+    }
 
     // ===================================================================================
     //                                                                       Basic Keyword
@@ -46,13 +63,25 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
         return "public static readonly";
     }
 
+    // ===================================================================================
+    //                                                              Programming Expression
+    //                                                              ======================
+    public String adjustMethodInitialChar(String methodName) {
+        return Srl.initCap(methodName);
+    }
+
+    public String adjustPropertyInitialChar(String propertyName) {
+        return Srl.initCap(propertyName);
+    }
+
+    public String buildPropertyGetterCall(String propertyName) {
+        return propertyName;
+    }
+
     public String getClassTypeLiteral(String className) {
         return "typeof(" + className + ")";
     }
 
-    // ===================================================================================
-    //                                                              Programming Expression
-    //                                                              ======================
     public String buildGenericListClassName(String element) {
         return "IList<" + element + ">";
     }
@@ -89,5 +118,23 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
 
     protected String toValueTypeRemovedCSharpNullable(String valueType) {
         return valueType.endsWith("?") ? Srl.substringLastFront(valueType, "?") : valueType;
+    }
+
+    public String buildOneLinerListNewBackStage(List<String> elementList) {
+        final StringBuilder sb = new StringBuilder();
+        for (String element : elementList) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(element);
+        }
+        return "newArrayList(" + sb.toString() + ")";
+    }
+
+    // ===================================================================================
+    //                                                                    Small Adjustment 
+    //                                                                    ================
+    public boolean isPgReservColumn(String columnName) {
+        return _pgReservColumnSet.contains(columnName);
     }
 }

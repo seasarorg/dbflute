@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.logic.generate.language.grammar;
 
+import java.util.List;
+
 import org.apache.torque.engine.database.model.Column;
 
 /**
@@ -22,7 +24,10 @@ import org.apache.torque.engine.database.model.Column;
  */
 public class DfLanguageGrammarScala implements DfLanguageGrammar {
 
-    protected final DfLanguageGrammarJava _grammarInfoJava = new DfLanguageGrammarJava();
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfLanguageGrammarJava _grammarJava = new DfLanguageGrammarJava();
 
     // ===================================================================================
     //                                                                       Basic Keyword
@@ -47,42 +52,65 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
         return "val";
     }
 
-    public String getClassTypeLiteral(String className) {
-        return "classOf[" + className + "]";
-    }
-
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
     // #pending jflute Scala's collections
     // #pending jflute same as Java for now
 
+    public String adjustMethodInitialChar(String methodName) {
+        return _grammarJava.adjustMethodInitialChar(methodName);
+    }
+
+    public String adjustPropertyInitialChar(String propertyName) {
+        return _grammarJava.adjustPropertyInitialChar(propertyName);
+    }
+
+    public String buildPropertyGetterCall(String propertyName) {
+        return _grammarJava.buildPropertyGetterCall(propertyName);
+    }
+
+    public String getClassTypeLiteral(String className) {
+        return "classOf[" + className + "]";
+    }
+
     public String buildGenericListClassName(String element) {
-        return _grammarInfoJava.buildGenericListClassName(element);
+        return _grammarJava.buildGenericListClassName(element);
     }
 
     public String buildGenericMapListClassName(String key, String value) {
-        return _grammarInfoJava.buildGenericMapListClassName(key, value);
+        return _grammarJava.buildGenericMapListClassName(key, value);
     }
 
     public String buildGenericOneClassHint(String first) {
-        return _grammarInfoJava.buildGenericOneClassHint(first);
+        return _grammarJava.buildGenericOneClassHint(first);
     }
 
     public String buildGenericTwoClassHint(String first, String second) {
-        return _grammarInfoJava.buildGenericTwoClassHint(first, second);
+        return _grammarJava.buildGenericTwoClassHint(first, second);
     }
 
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {
-        return _grammarInfoJava.buildEntityPropertyGetSet(fromCol, toCol);
+        return _grammarJava.buildEntityPropertyGetSet(fromCol, toCol);
     }
 
     public String buildEntityPropertyName(Column col) {
-        return _grammarInfoJava.buildEntityPropertyName(col);
+        return _grammarJava.buildEntityPropertyName(col);
     }
 
     public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
             boolean toBoolean) {
-        return _grammarInfoJava.buildCDefElementValue(cdefBase, propertyName, valueType, toNumber, toBoolean);
+        return _grammarJava.buildCDefElementValue(cdefBase, propertyName, valueType, toNumber, toBoolean);
+    }
+
+    public String buildOneLinerListNewBackStage(List<String> elementList) {
+        return _grammarJava.buildOneLinerListNewBackStage(elementList);
+    }
+
+    // ===================================================================================
+    //                                                                    Small Adjustment 
+    //                                                                    ================
+    public boolean isPgReservColumn(String columnName) {
+        return _grammarJava.isPgReservColumn(columnName);
     }
 }

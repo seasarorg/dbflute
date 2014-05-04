@@ -28,6 +28,7 @@ import org.seasar.dbflute.exception.DfTableColumnNameNonCompilableConnectorExcep
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.Srl;
 
@@ -656,27 +657,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     public boolean isPgReservColumn(String columnName) {
         final List<String> pgReservColumnList = getPgReservColumnList();
         if (pgReservColumnList.isEmpty()) {
-            if (isTargetLanguageJava()) {
-                return Srl.equalsIgnoreCase(columnName, getDefaultJavaPgReservColumn());
-            } else if (isTargetLanguageCSharp()) {
-                return Srl.equalsIgnoreCase(columnName, getDefaultCSharpPgReservColumn());
-            } else {
-                return false;
-            }
+            return getBasicProperties().getLanguageDependency().getLanguageGrammar().isPgReservColumn(columnName);
         } else {
             return Srl.equalsIgnoreCase(columnName, pgReservColumnList.toArray(new String[] {}));
         }
-    }
-
-    protected String[] getDefaultJavaPgReservColumn() {
-        // likely words only (and only can be checked at examples)
-        return new String[] { "class", "case", "package", "default", "new", "native", "void", "public", "protected",
-                "private", "interface", "abstract", "final", "finally", "return", "double", "float", "short" };
-    }
-
-    protected String[] getDefaultCSharpPgReservColumn() {
-        // likely words only (and only can be checked at examples)
-        return new String[] { "class" };
     }
 
     public String resolvePgReservColumn(String columnName) {
@@ -820,24 +804,9 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                               S2Dao
     //                                                                               =====
-    public boolean isMakeDaoInterface() { // closet, CSharp only
-        if (isTargetLanguageCSharp()) {
-            return true; // It is not implemented at CSharp yet
-        }
-        final boolean makeDaoInterface = booleanProp("torque.isMakeDaoInterface", false);
-        if (makeDaoInterface) {
-            String msg = "Dao interfaces are unsupported since DBFlute-0.8.7!";
-            throw new UnsupportedOperationException(msg);
-        }
-        return false;
-    }
-
-    protected boolean isTargetLanguageJava() {
-        return getBasicProperties().isTargetLanguageJava();
-    }
-
-    protected boolean isTargetLanguageCSharp() {
-        return getBasicProperties().isTargetLanguageCSharp();
+    public boolean isMakeDaoInterface() { // closet, basically CSharp only
+        final DfLanguageFramework framework = getBasicProperties().getLanguageDependency().getLanguageFramework();
+        return booleanProp("torque.isMakeDaoInterface", framework.isMakeDaoInterface());
     }
 
     // ===================================================================================

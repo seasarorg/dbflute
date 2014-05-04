@@ -15,12 +15,29 @@
  */
 package org.seasar.dbflute.logic.generate.language.grammar;
 
+import java.util.List;
+import java.util.Set;
+
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
 public class DfLanguageGrammarJava implements DfLanguageGrammar {
+
+    protected static final Set<String> _pgReservColumnSet;
+    static {
+        // likely words only (and only can be checked at examples)
+        final StringSet stringSet = StringSet.createAsCaseInsensitive();
+        final List<String> list = DfCollectionUtil.newArrayList("class", "case", "package", "default", "new", "native",
+                "void", "public", "protected", "private", "interface", "abstract", "final", "finally", "return",
+                "double", "float", "short");
+        stringSet.addAll(list);
+        _pgReservColumnSet = stringSet;
+    }
 
     // ===================================================================================
     //                                                                       Basic Keyword
@@ -45,13 +62,25 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
         return "public static final";
     }
 
+    // ===================================================================================
+    //                                                              Programming Expression
+    //                                                              ======================
+    public String adjustMethodInitialChar(String methodName) {
+        return Srl.initUncap(methodName);
+    }
+
+    public String adjustPropertyInitialChar(String propertyName) {
+        return Srl.initBeansProp(propertyName);
+    }
+
+    public String buildPropertyGetterCall(String propertyName) {
+        return "get" + Srl.initCap(propertyName) + "()";
+    }
+
     public String getClassTypeLiteral(String className) {
         return className + ".class";
     }
 
-    // ===================================================================================
-    //                                                              Programming Expression
-    //                                                              ======================
     public String buildGenericListClassName(String element) {
         return "List<" + element + ">";
     }
@@ -88,5 +117,23 @@ public class DfLanguageGrammarJava implements DfLanguageGrammar {
         } else {
             return cdefCode;
         }
+    }
+
+    public String buildOneLinerListNewBackStage(List<String> elementList) {
+        final StringBuilder sb = new StringBuilder();
+        for (String element : elementList) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(element);
+        }
+        return "newArrayList(" + sb.toString() + ")";
+    }
+
+    // ===================================================================================
+    //                                                                    Small Adjustment 
+    //                                                                    ================
+    public boolean isPgReservColumn(String columnName) {
+        return _pgReservColumnSet.contains(columnName);
     }
 }

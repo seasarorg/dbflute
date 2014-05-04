@@ -94,7 +94,7 @@ public class DfPmbGenerationHandler {
     public String getInterfaceDefinition(String className) {
         assertArgumentPmbMetaDataClassName(className);
         final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
-        if (!lang.isTypedParameterBeanEnabled()) {
+        if (!lang.getLanguageImplStyle().isTypedParameterBeanEnabled()) {
             return "";
         }
         final DfLanguageGrammar grammar = lang.getLanguageGrammar();

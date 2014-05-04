@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
@@ -70,7 +70,7 @@ public class DfBqpOutsideSqlFile {
             }
             final String exbhvName = Srl.substringLastRear(exbhvPackage, ".");
             final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
-            final DfLanguageGeneratedClassPackage pkg = lang.getGeneratedClassPackage();
+            final DfLanguageClassPackage pkg = lang.getLanguageClassPackage();
             final String sqlPackage;
             if (getOutsideSqlProperties().isSqlPackageValid()) {
                 final String pureSqlPackage = getOutsideSqlProperties().getSqlPackage();

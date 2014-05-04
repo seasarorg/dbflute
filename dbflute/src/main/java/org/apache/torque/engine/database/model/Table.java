@@ -148,7 +148,9 @@ import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -2301,8 +2303,7 @@ public class Table {
                 // if there are not related columns, it uses a key order
                 relatedColumn = domain.getPrimaryKey().get(index);
             }
-            final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency()
-                    .getLanguageGrammar();
+            final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency().getLanguageGrammar();
             settingList.add(grammar.buildEntityPropertyGetSet(pk, relatedColumn));
             ++index;
         }
@@ -3030,22 +3031,23 @@ public class Table {
     }
 
     protected String buildCommonColumnListSetupExpression(List<Column> commonColumnList) {
-        final String prefix;
-        final String suffix;
-        if (getBasicProperties().isTargetLanguageCSharp()) {
-            prefix = "Column";
-            suffix = "";
-        } else {
-            prefix = "column";
-            suffix = "()";
-        }
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
+        final DfLanguageImplStyle implStyle = lang.getLanguageImplStyle();
         final StringBuilder sb = new StringBuilder();
         int index = 0;
         for (Column column : commonColumnList) {
             if (index > 0) {
                 sb.append(", ");
             }
-            sb.append(prefix).append(column.getJavaName()).append(suffix);
+            final String resourceName = "column" + column.getJavaName();
+            final String callExp;
+            if (implStyle.isDBMetaColumnGetterProperty()) {
+                callExp = grammar.buildPropertyGetterCall(resourceName);
+            } else { // method style
+                callExp = resourceName + "()";
+            }
+            sb.append(callExp);
             ++index;
         }
         return sb.toString();

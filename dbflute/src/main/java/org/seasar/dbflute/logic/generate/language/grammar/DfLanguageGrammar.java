@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.logic.generate.language.grammar;
 
+import java.util.List;
+
 import org.apache.torque.engine.database.model.Column;
 
 /**
@@ -50,30 +52,55 @@ public interface DfLanguageGrammar {
      */
     String getPublicStaticDefinition();
 
-    /**
-     * @return The type literal of the class. (NotNull)
-     */
-    String getClassTypeLiteral(String className);
-
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
     /**
+     * @param methodName The method name that might not be adjusted. (NotNull)
+     * @return The initial-character-adjusted name for the method. (NotNull)
+     */
+    String adjustMethodInitialChar(String methodName);
+
+    /**
+     * @param propertyName The property name that might not be adjusted. (NotNull)
+     * @return The initial-character-adjusted name for the method. (NotNull)
+     */
+    String adjustPropertyInitialChar(String propertyName);
+
+    /**
+     * @param propertyName The pure (no call expression) property name. (NotNull)
+     * @return The property-suffix-adjusted name for the method. (NotNull)
+     */
+    String buildPropertyGetterCall(String propertyName);
+
+    /**
+     * @param className The name of class. (NotNull)
+     * @return The type literal of the class. (NotNull)
+     */
+    String getClassTypeLiteral(String className);
+
+    /**
+     * @param element The element type for list generic. (NotNull)
      * @return The definition of 'List&lt;element&gt;'. (NotNull)
      */
     String buildGenericListClassName(String element);
 
     /**
+     * @param key The key type for map generic. (NotNull)
+     * @param value The value type for map generic. (NotNull)
      * @return The definition of 'List&lt;Map&lt;key, value&gt;&gt;'. (NotNull)
      */
     String buildGenericMapListClassName(String key, String value);
 
     /**
+     * @param first The only-one type name for the generic. (NotNull)
      * @return The definition of '&lt;first&gt;'. (NotNull)
      */
     String buildGenericOneClassHint(String first);
 
     /**
+     * @param first The first type name for the generic. (NotNull)
+     * @param second The second type name for the generic. (NotNull)
      * @return The definition of '&lt;first, second&gt;'. (NotNull)
      */
     String buildGenericTwoClassHint(String first, String second);
@@ -93,4 +120,17 @@ public interface DfLanguageGrammar {
 
     String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
             boolean toBoolean);
+
+    /**
+     * @return The new expression of list with elements as one liner. (NotNull)
+     */
+    String buildOneLinerListNewBackStage(List<String> elementList);
+
+    // ===================================================================================
+    //                                                                    Small Adjustment 
+    //                                                                    ================
+    /**
+     * @return Is the column name match with program reserved name?
+     */
+    boolean isPgReservColumn(String columnName);
 }

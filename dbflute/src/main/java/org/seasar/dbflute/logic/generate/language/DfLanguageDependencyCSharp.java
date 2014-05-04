@@ -17,12 +17,16 @@ package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
+import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFramework;
+import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFrameworkCSharp;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarCSharp;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDicon;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconCSharp;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageCSharp;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyleCSharp;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackageCSharp;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolverCSharp;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingCSharp;
 import org.seasar.dbflute.util.Srl;
@@ -31,6 +35,16 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  */
 public class DfLanguageDependencyCSharp implements DfLanguageDependency {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfLanguageGrammar _grammar = new DfLanguageGrammarCSharp();
+    protected final DfLanguageTypeMapping _typeMapping = new DfLanguageTypeMappingCSharp();
+    protected final DfLanguageFramework _framework = new DfLanguageFrameworkCSharp();
+    protected final DfLanguageImplStyle _implStyle = new DfLanguageImplStyleCSharp();
+    protected final DfLanguageClassPackage _classPackage = new DfLanguageClassPackageCSharp();
+    protected final DfLanguagePropertyPackageResolver _packageResolver = new DfLanguagePropertyPackageResolverCSharp();
 
     // ===================================================================================
     //                                                                               Basic
@@ -43,15 +57,19 @@ public class DfLanguageDependencyCSharp implements DfLanguageDependency {
     //                                                                    Program Handling
     //                                                                    ================
     public DfLanguageGrammar getLanguageGrammar() {
-        return new DfLanguageGrammarCSharp();
+        return _grammar;
     }
 
     public DfLanguageTypeMapping getLanguageTypeMapping() {
-        return new DfLanguageTypeMappingCSharp();
+        return _typeMapping;
     }
 
-    public DfLanguageDBFluteDicon getLanguageDBFluteDicon() {
-        return new DfLanguageDBFluteDiconCSharp();
+    public DfLanguageFramework getLanguageFramework() {
+        return _framework;
+    }
+
+    public DfLanguageImplStyle getLanguageImplStyle() {
+        return _implStyle;
     }
 
     // ===================================================================================
@@ -112,18 +130,15 @@ public class DfLanguageDependencyCSharp implements DfLanguageDependency {
         return "vmnet";
     }
 
-    public DfLanguageGeneratedClassPackage getGeneratedClassPackage() {
-        return new DfLanguageGeneratedClassPackageCSharp();
+    public String getSourceCodeLineSeparator() {
+        return "\r\n";
     }
 
-    // ===================================================================================
-    //                                                                    Small Adjustment
-    //                                                                    ================
-    public boolean isIfCommentExpressionCheckEnabled() {
-        return false; // different specification for now but new DBFlute.NET ...
+    public DfLanguageClassPackage getLanguageClassPackage() {
+        return _classPackage;
     }
 
-    public boolean isTypedParameterBeanEnabled() {
-        return false; // unsupported for now but new DBFlute.NET ...
+    public DfLanguagePropertyPackageResolver getLanguagePropertyPackageResolver() {
+        return _packageResolver;
     }
 }

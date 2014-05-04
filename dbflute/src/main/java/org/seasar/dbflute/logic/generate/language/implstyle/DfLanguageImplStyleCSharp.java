@@ -13,22 +13,23 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.generate.language.location;
+package org.seasar.dbflute.logic.generate.language.implstyle;
 
 /**
  * @author jflute
+ * @since 1.0.5F (2014/05/04 Sunday)
  */
-public class DfLanguageDBFluteDiconPhp implements DfLanguageDBFluteDicon {
+public class DfLanguageImplStyleCSharp implements DfLanguageImplStyle {
 
-    public String getDBFluteDiconFileName() {
-        return "dbflute.dicon";
+    public boolean isDBMetaColumnGetterProperty() {
+        return true;
     }
 
-    public String getDBFluteDiconNamespace() {
-        return "dbflute";
+    public boolean isIfCommentExpressionCheckEnabled() {
+        return false;
     }
 
-    public String getJ2eeDiconResourceName() {
-        return "%PDO_DICON%";
+    public boolean isTypedParameterBeanEnabled() {
+        return false;
     }
 }

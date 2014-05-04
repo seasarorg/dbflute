@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.sql2entity.pmbean;
+package org.seasar.dbflute.logic.generate.language.pkgstyle;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -26,7 +26,7 @@ import org.seasar.dbflute.util.Srl.ScopeInfo;
  * @author jflute
  * @since 0.8.6 (2008/11/21 Friday)
  */
-public class DfPropertyTypePackageResolver {
+public abstract class DfLanguagePropertyPackageResolver {
 
     // ===================================================================================
     //                                                                          Definition
@@ -39,7 +39,7 @@ public class DfPropertyTypePackageResolver {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfPropertyTypePackageResolver() {
+    public DfLanguagePropertyPackageResolver() {
     }
 
     // ===================================================================================
@@ -57,16 +57,9 @@ public class DfPropertyTypePackageResolver {
         if (typeName == null) {
             return typeName;
         }
-        if (isTargetLanguageJava()) {
-            final String processed = processJavaType(typeName, exceptUtil);
-            if (processed != null) {
-                return processed;
-            }
-        } else if (isTargetLanguageCSharp()) {
-            final String processed = processCSharpType(typeName, exceptUtil);
-            if (processed != null) {
-                return processed;
-            }
+        final String processed = processLanguageType(typeName, exceptUtil);
+        if (processed != null) {
+            return processed;
         }
         if (typeName.contains(VAR_CDEF)) {
             final DfBasicProperties prop = getBasicProperties();
@@ -89,45 +82,7 @@ public class DfPropertyTypePackageResolver {
         return typeName;
     }
 
-    protected String processJavaType(String typeName, boolean exceptUtil) {
-        if (!exceptUtil) {
-            final String listType = processListType(typeName, exceptUtil, "java.util", "List");
-            if (listType != null) {
-                return listType;
-            }
-            final String mapType = processMapType(typeName, exceptUtil, "java.util", "Map");
-            if (mapType != null) {
-                return mapType;
-            }
-        }
-        if (typeName.equals("BigDecimal")) {
-            return "java.math." + typeName;
-        }
-        if (typeName.equals("Time")) {
-            return "java.sql." + typeName;
-        }
-        if (typeName.equals("Timestamp")) {
-            return "java.sql." + typeName;
-        }
-        if (!exceptUtil) {
-            if (typeName.equals("Date")) {
-                return "java.util." + typeName;
-            }
-        }
-        return null;
-    }
-
-    protected String processCSharpType(String typeName, boolean exceptUtil) {
-        final String listType = processListType(typeName, exceptUtil, "System.Collections.Generic", "IList");
-        if (listType != null) {
-            return listType;
-        }
-        final String mapType = processMapType(typeName, exceptUtil, "System.Collections.Generic", "IDictionary");
-        if (mapType != null) {
-            return mapType;
-        }
-        return null;
-    }
+    protected abstract String processLanguageType(String typeName, boolean exceptUtil);
 
     protected String processListType(String typeName, boolean exceptUtil, String listPkg, String listName) {
         final String listBegin = listName + "<";
@@ -155,14 +110,6 @@ public class DfPropertyTypePackageResolver {
         } else {
             return null;
         }
-    }
-
-    protected boolean isTargetLanguageJava() {
-        return getBasicProperties().isTargetLanguageJava();
-    }
-
-    protected boolean isTargetLanguageCSharp() {
-        return getBasicProperties().isTargetLanguageCSharp();
     }
 
     protected DfBasicProperties getBasicProperties() {

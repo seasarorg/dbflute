@@ -17,12 +17,16 @@ package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
+import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFramework;
+import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFrameworkJava;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarJava;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDicon;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconJava;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageJava;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyleJava;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackageJava;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolverJava;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingJava;
 import org.seasar.dbflute.util.Srl;
@@ -39,6 +43,16 @@ public class DfLanguageDependencyJava implements DfLanguageDependency {
     protected static final String PATH_MAVEN_SRC_MAIN_RESOURCES = "src/main/resources";
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfLanguageGrammar _grammar = new DfLanguageGrammarJava();
+    protected final DfLanguageTypeMapping _typeMapping = new DfLanguageTypeMappingJava();
+    protected final DfLanguageFramework _framework = new DfLanguageFrameworkJava();
+    protected final DfLanguageImplStyle _implStyle = new DfLanguageImplStyleJava();
+    protected final DfLanguageClassPackage _classPackage = new DfLanguageClassPackageJava();
+    protected final DfLanguagePropertyPackageResolver _packageResolver = new DfLanguagePropertyPackageResolverJava();
+
+    // ===================================================================================
     //                                                                               Basic
     //                                                                               =====
     public String getLanguageTitle() {
@@ -49,15 +63,19 @@ public class DfLanguageDependencyJava implements DfLanguageDependency {
     //                                                                    Program Handling
     //                                                                    ================
     public DfLanguageGrammar getLanguageGrammar() {
-        return new DfLanguageGrammarJava();
+        return _grammar;
     }
 
     public DfLanguageTypeMapping getLanguageTypeMapping() {
-        return new DfLanguageTypeMappingJava();
+        return _typeMapping;
     }
 
-    public DfLanguageDBFluteDicon getLanguageDBFluteDicon() {
-        return new DfLanguageDBFluteDiconJava();
+    public DfLanguageFramework getLanguageFramework() {
+        return _framework;
+    }
+
+    public DfLanguageImplStyle getLanguageImplStyle() {
+        return _implStyle;
     }
 
     // ===================================================================================
@@ -121,18 +139,15 @@ public class DfLanguageDependencyJava implements DfLanguageDependency {
         return "vm";
     }
 
-    public DfLanguageGeneratedClassPackage getGeneratedClassPackage() {
-        return new DfLanguageGeneratedClassPackageJava();
+    public String getSourceCodeLineSeparator() {
+        return "\n";
     }
 
-    // ===================================================================================
-    //                                                                    Small Adjustment
-    //                                                                    ================
-    public boolean isIfCommentExpressionCheckEnabled() {
-        return true;
+    public DfLanguageClassPackage getLanguageClassPackage() {
+        return _classPackage;
     }
 
-    public boolean isTypedParameterBeanEnabled() {
-        return true;
+    public DfLanguagePropertyPackageResolver getLanguagePropertyPackageResolver() {
+        return _packageResolver;
     }
 }

@@ -9,29 +9,22 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.generate.language.location;
+package org.seasar.dbflute.logic.generate.language.pkgstyle;
 
 /**
  * @author jflute
+ * @since 1.0.5F (2014/05/04 Sunday)
  */
-public interface DfLanguageDBFluteDicon {
+public class DfLanguagePropertyPackageResolverScala extends DfLanguagePropertyPackageResolver {
 
-    /**
-     * @return The name-space of dbflute.dicon. (NotNull)
-     */
-    String getDBFluteDiconNamespace();
+    protected final DfLanguagePropertyPackageResolver _resolverJava = new DfLanguagePropertyPackageResolverJava();
 
-    /**
-     * @return The file name of dbflute.dicon. (NotNull)
-     */
-    String getDBFluteDiconFileName();
-
-    /**
-     * @return The resource name of j2ee.dicon. (NotNull)
-     */
-    String getJ2eeDiconResourceName();
+    protected String processLanguageType(String typeName, boolean exceptUtil) {
+        // #pending jflute same as Java for now
+        return _resolverJava.processLanguageType(typeName, exceptUtil);
+    }
 }

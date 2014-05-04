@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.sql2entity.pmbean;
+package org.seasar.dbflute.logic.generate.language.pkgstyle;
 
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
@@ -24,7 +24,7 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
 
     public void test_doResolvePackageName_Java_Date_basic() throws Exception {
         // ## Arrange ##
-        DfPropertyTypePackageResolver resolver = createJavaTarget();
+        DfLanguagePropertyPackageResolver resolver = createJavaTarget();
 
         // ## Act & Assert ##
         assertEquals("java.util.Date", resolver.doResolvePackageName("Date", false));
@@ -33,7 +33,7 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
 
     public void test_doResolvePackageName_Java_List_basic() throws Exception {
         // ## Arrange ##
-        DfPropertyTypePackageResolver resolver = createJavaTarget();
+        DfLanguagePropertyPackageResolver resolver = createJavaTarget();
 
         // ## Act & Assert ##
         assertEquals("java.util.List<String>", resolver.doResolvePackageName("List<String>", false));
@@ -42,7 +42,7 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
 
     public void test_doResolvePackageName_Java_List_nest() throws Exception {
         // ## Arrange ##
-        DfPropertyTypePackageResolver resolver = createJavaTarget();
+        DfLanguagePropertyPackageResolver resolver = createJavaTarget();
 
         // ## Act ##
         String actual = resolver.doResolvePackageName("List<List<Date>>", false);
@@ -53,7 +53,7 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
 
     public void test_doResolvePackageName_Java_List_nest_Map() throws Exception {
         // ## Arrange ##
-        DfPropertyTypePackageResolver resolver = createJavaTarget();
+        DfLanguagePropertyPackageResolver resolver = createJavaTarget();
 
         // ## Act ##
         String actual = resolver.doResolvePackageName("List<List<Map<Date, Date>>>", false);
@@ -65,7 +65,7 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
 
     public void test_doResolvePackageName_Java_Map_basic() throws Exception {
         // ## Arrange ##
-        DfPropertyTypePackageResolver resolver = createJavaTarget();
+        DfLanguagePropertyPackageResolver resolver = createJavaTarget();
 
         // ## Act & Assert ##
         assertEquals("java.util.Map<String, String>", resolver.doResolvePackageName("Map<String, String>", false));
@@ -74,7 +74,7 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
 
     public void test_doResolvePackageName_Java_Map_nest() throws Exception {
         // ## Arrange ##
-        DfPropertyTypePackageResolver resolver = createJavaTarget();
+        DfLanguagePropertyPackageResolver resolver = createJavaTarget();
 
         // ## Act ##
         String actual = resolver.doResolvePackageName("Map<Date, List<Map<Date, Date>>>", false);
@@ -86,7 +86,7 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
 
     public void test_doResolvePackageName_CSharp_List_nest_Map() throws Exception {
         // ## Arrange ##
-        DfPropertyTypePackageResolver resolver = createCSharpTarget();
+        DfLanguagePropertyPackageResolver resolver = createCSharpTarget();
 
         // ## Act ##
         String actual = resolver.doResolvePackageName("IList<IList<IDictionary<Date, Date>>>", false);
@@ -98,31 +98,11 @@ public class DfPropertyTypePackageResolverTest extends PlainTestCase {
                 actual);
     }
 
-    protected DfPropertyTypePackageResolver createJavaTarget() {
-        return new DfPropertyTypePackageResolver() {
-            @Override
-            protected boolean isTargetLanguageJava() {
-                return true;
-            }
-
-            @Override
-            protected boolean isTargetLanguageCSharp() {
-                return false;
-            }
-        };
+    protected DfLanguagePropertyPackageResolver createJavaTarget() {
+        return new DfLanguagePropertyPackageResolverJava();
     }
 
-    protected DfPropertyTypePackageResolver createCSharpTarget() {
-        return new DfPropertyTypePackageResolver() {
-            @Override
-            protected boolean isTargetLanguageJava() {
-                return false;
-            }
-
-            @Override
-            protected boolean isTargetLanguageCSharp() {
-                return true;
-            }
-        };
+    protected DfLanguagePropertyPackageResolver createCSharpTarget() {
+        return new DfLanguagePropertyPackageResolverCSharp();
     }
 }

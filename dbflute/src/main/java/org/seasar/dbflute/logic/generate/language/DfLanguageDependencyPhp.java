@@ -17,12 +17,16 @@ package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
+import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFramework;
+import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFrameworkPhp;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarPhp;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDicon;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconPhp;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackagePhp;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStylePhp;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackagePhp;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolverPhp;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingPhp;
 
@@ -37,6 +41,16 @@ public class DfLanguageDependencyPhp implements DfLanguageDependency {
     protected static final String PATH_MAVEN_SRC_MAIN_PHP = "src/main/php";
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final DfLanguageGrammar _grammar = new DfLanguageGrammarPhp();
+    protected final DfLanguageTypeMapping _typeMapping = new DfLanguageTypeMappingPhp();
+    protected final DfLanguageFramework _framework = new DfLanguageFrameworkPhp();
+    protected final DfLanguageImplStyle _implStyle = new DfLanguageImplStylePhp();
+    protected final DfLanguageClassPackage _classPackage = new DfLanguageClassPackagePhp();
+    protected final DfLanguagePropertyPackageResolver _packageResolver = new DfLanguagePropertyPackageResolverPhp();
+
+    // ===================================================================================
     //                                                                               Basic
     //                                                                               =====
     public String getLanguageTitle() {
@@ -47,15 +61,19 @@ public class DfLanguageDependencyPhp implements DfLanguageDependency {
     //                                                                    Program Handling
     //                                                                    ================
     public DfLanguageGrammar getLanguageGrammar() {
-        return new DfLanguageGrammarPhp();
+        return _grammar;
     }
 
     public DfLanguageTypeMapping getLanguageTypeMapping() {
-        return new DfLanguageTypeMappingPhp();
+        return _typeMapping;
     }
 
-    public DfLanguageDBFluteDicon getLanguageDBFluteDicon() {
-        return new DfLanguageDBFluteDiconPhp();
+    public DfLanguageFramework getLanguageFramework() {
+        return _framework;
+    }
+
+    public DfLanguageImplStyle getLanguageImplStyle() {
+        return _implStyle;
     }
 
     // ===================================================================================
@@ -112,18 +130,15 @@ public class DfLanguageDependencyPhp implements DfLanguageDependency {
         return "vmphp";
     }
 
-    public DfLanguageGeneratedClassPackage getGeneratedClassPackage() {
-        return new DfLanguageGeneratedClassPackagePhp();
+    public String getSourceCodeLineSeparator() {
+        return "\n";
     }
 
-    // ===================================================================================
-    //                                                                    Small Adjustment
-    //                                                                    ================
-    public boolean isIfCommentExpressionCheckEnabled() {
-        return false;
+    public DfLanguageClassPackage getLanguageClassPackage() {
+        return _classPackage;
     }
 
-    public boolean isTypedParameterBeanEnabled() {
-        return false;
+    public DfLanguagePropertyPackageResolver getLanguagePropertyPackageResolver() {
+        return _packageResolver;
     }
 }

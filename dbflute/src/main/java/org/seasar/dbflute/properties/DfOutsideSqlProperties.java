@@ -522,11 +522,12 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     public String getBaseEntityPackage() {
-        String specifiedPackage = getSpecifiedBaseCustomizeEntityPackage();
+        final String specifiedPackage = getSpecifiedBaseCustomizeEntityPackage();
         if (specifiedPackage != null && specifiedPackage.trim().length() != 0) {
             return specifiedPackage;
         }
-        String defaultPackage = getBasicProperties().getBaseEntityPackage() + "." + getCustomizePackageName();
+        final String baseEntityPackage = getBasicProperties().getBaseEntityPackage();
+        final String defaultPackage = baseEntityPackage + "." + getCustomizeEntitySimplePackage();
         if (defaultPackage != null && defaultPackage.trim().length() != 0) {
             return defaultPackage;
         } else {
@@ -536,19 +537,18 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     public String getDBMetaPackage() {
-        String dbmetaPackage = "dbmeta";
-        if (getBasicProperties().isTargetLanguageCSharp()) {
-            dbmetaPackage = "Dbm";
-        }
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final String dbmetaPackage = lang.getLanguageClassPackage().getDBMetaSimplePackage();
         return getBaseEntityPackage() + "." + dbmetaPackage;
     }
 
     public String getExtendedEntityPackage() {
-        String specifiedPackage = getSpecifiedExtendedCustomizeEntityPackage();
+        final String specifiedPackage = getSpecifiedExtendedCustomizeEntityPackage();
         if (specifiedPackage != null && specifiedPackage.trim().length() != 0) {
             return specifiedPackage;
         }
-        String defaultPackage = getBasicProperties().getExtendedEntityPackage() + "." + getCustomizePackageName();
+        final String extendedEntityPackage = getBasicProperties().getExtendedEntityPackage();
+        final String defaultPackage = extendedEntityPackage + "." + getCustomizeEntitySimplePackage();
         if (defaultPackage != null && defaultPackage.trim().length() != 0) {
             return defaultPackage;
         } else {
@@ -557,40 +557,32 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected String getCustomizePackageName() {
-        String customizePackage = "customize";
-        if (getBasicProperties().isTargetLanguageCSharp()) {
-            customizePackage = "Customize";
-        }
-        return customizePackage;
+    protected String getCustomizeEntitySimplePackage() {
+        return getBasicProperties().getLanguageDependency().getLanguageClassPackage().getCustomizeEntitySimplePackage();
     }
 
     public String getBaseCursorPackage() {
         if (isMakeDaoInterface()) {
-            return getBasicProperties().getBaseDaoPackage() + "." + getCursorPackageName();
+            return getBasicProperties().getBaseDaoPackage() + "." + getCursorSimplePackage();
         } else {
-            return getBasicProperties().getBaseBehaviorPackage() + "." + getCursorPackageName();
+            return getBasicProperties().getBaseBehaviorPackage() + "." + getCursorSimplePackage();
         }
     }
 
     public String getExtendedCursorPackage() {
         if (isMakeDaoInterface()) {
-            return getBasicProperties().getExtendedDaoPackage() + "." + getCursorPackageName();
+            return getBasicProperties().getExtendedDaoPackage() + "." + getCursorSimplePackage();
         } else {
-            return getBasicProperties().getExtendedBehaviorPackage() + "." + getCursorPackageName();
+            return getBasicProperties().getExtendedBehaviorPackage() + "." + getCursorSimplePackage();
         }
     }
 
-    protected String getCursorPackageName() {
-        String pmbeanPackage = "cursor";
-        if (getBasicProperties().isTargetLanguageCSharp()) {
-            pmbeanPackage = "Cursor";
-        }
-        return pmbeanPackage;
+    protected String getCursorSimplePackage() {
+        return getBasicProperties().getLanguageDependency().getLanguageClassPackage().getCursorSimplePackage();
     }
 
     public String getBaseParameterBeanPackage() {
-        String specifiedPackage = getSpecifiedBaseParameterBeanPackage();
+        final String specifiedPackage = getSpecifiedBaseParameterBeanPackage();
         if (specifiedPackage != null && specifiedPackage.trim().length() != 0) {
             return specifiedPackage;
         }
@@ -610,7 +602,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     public String getExtendedParameterBeanPackage() {
-        String specifiedPackage = getSpecifiedExtendedParameterBeanPackage();
+        final String specifiedPackage = getSpecifiedExtendedParameterBeanPackage();
         if (specifiedPackage != null && specifiedPackage.trim().length() != 0) {
             return specifiedPackage;
         }
@@ -629,11 +621,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     protected String getPmbeanPackageName() {
-        String pmbeanPackage = "pmbean";
-        if (getBasicProperties().isTargetLanguageCSharp()) {
-            pmbeanPackage = "PmBean";
-        }
-        return pmbeanPackage;
+        return getBasicProperties().getLanguageDependency().getLanguageClassPackage().getParameterBeanSimplePackage();
     }
 
     protected boolean isMakeDaoInterface() {

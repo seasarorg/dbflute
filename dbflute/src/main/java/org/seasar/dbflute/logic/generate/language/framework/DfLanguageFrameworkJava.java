@@ -13,12 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.generate.language.location;
+package org.seasar.dbflute.logic.generate.language.framework;
 
 /**
  * @author jflute
  */
-public class DfLanguageDBFluteDiconJava implements DfLanguageDBFluteDicon {
+public class DfLanguageFrameworkJava implements DfLanguageFramework {
 
     public String getDBFluteDiconFileName() {
         return "dbflute.dicon";
@@ -30,5 +30,9 @@ public class DfLanguageDBFluteDiconJava implements DfLanguageDBFluteDicon {
 
     public String getJ2eeDiconResourceName() {
         return "j2ee.dicon";
+    }
+
+    public boolean isMakeDaoInterface() {
+        return false;
     }
 }

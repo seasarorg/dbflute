@@ -13,70 +13,69 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.generate.language.location;
-
-import org.seasar.dbflute.util.Srl;
+package org.seasar.dbflute.logic.generate.language.pkgstyle;
 
 /**
  * @author jflute
  */
-public class DfLanguageGeneratedClassPackageJava implements DfLanguageGeneratedClassPackage {
+public class DfLanguageClassPackageCSharp implements DfLanguageClassPackage {
 
     // ===================================================================================
     //                                                                               Basic
     //                                                                               =====
     public String getBaseCommonPackage() {
-        return "allcommon";
+        return "AllCommon";
     }
 
     public String getBaseBehaviorPackage() {
-        return "bsbhv";
+        return "BsBhv";
     }
 
     public String getBaseDaoPackage() {
-        return "bsdao";
+        return "BsDao";
     }
 
     public String getCursorSimplePackage() {
-        return "cursor";
+        return "Cursor";
     }
 
     public String getParameterBeanSimplePackage() {
-        return "pmbean";
+        return "PmBean";
     }
 
     public String getBaseEntityPackage() {
-        return "bsentity";
+        return "BsEntity";
     }
 
     public String getCustomizeEntitySimplePackage() {
-        return "customize";
+        return "Customize";
     }
 
     public String getDBMetaSimplePackage() {
-        return "dbmeta";
+        return "Dbm";
     }
 
     public String getConditionBeanPackage() {
-        return "cbean";
+        return "CBean";
     }
 
     public String getExtendedBehaviorPackage() {
-        return "exbhv";
+        return "ExBhv";
     }
 
     public String getExtendedDaoPackage() {
-        return "exdao";
+        return "ExDao";
     }
 
     public String getExtendedEntityPackage() {
-        return "exentity";
+        return "ExEntity";
     }
 
     // ===================================================================================
     //                                                                             Various
     //                                                                             =======
     public String buildExtendedBehaviorPackageMark(String sqlPackage, String exbhvName) {
-        return Srl.replace(sqlPackage, ".", "/") + "/" + exbhvName + "/";
+        // because C# is allowed to have free directory structure
+        return "/" + exbhvName + "/";
     }
 }

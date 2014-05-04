@@ -17,9 +17,11 @@ package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
+import org.seasar.dbflute.logic.generate.language.framework.DfLanguageFramework;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDicon;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
+import org.seasar.dbflute.logic.generate.language.implstyle.DfLanguageImplStyle;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 
 /**
@@ -49,9 +51,14 @@ public interface DfLanguageDependency {
     DfLanguageTypeMapping getLanguageTypeMapping();
 
     /**
-     * @return The information object of DBFlute dicon. (NotNull)
+     * @return The information object of framework. (NotNull)
      */
-    DfLanguageDBFluteDicon getLanguageDBFluteDicon();
+    DfLanguageFramework getLanguageFramework();
+
+    /**
+     * @return The information object of implementation style. (NotNull)
+     */
+    DfLanguageImplStyle getLanguageImplStyle();
 
     // ===================================================================================
     //                                                                 Compile Environment
@@ -117,19 +124,22 @@ public interface DfLanguageDependency {
     String convertToSecondaryOutsideSqlDirectory(String sqlDirectory);
 
     /**
-     * @return The file extension of a template. (NotNull)
+     * @return The file extension of template. (NotNull)
      */
     String getTemplateFileExtension();
 
     /**
-     * @return The information object of a generated class package. (NotNull)
+     * @return The string of line separator. (NotNull)
      */
-    DfLanguageGeneratedClassPackage getGeneratedClassPackage();
+    String getSourceCodeLineSeparator();
 
-    // ===================================================================================
-    //                                                                    Small Adjustment
-    //                                                                    ================
-    boolean isIfCommentExpressionCheckEnabled();
+    /**
+     * @return The information object of generated class package. (NotNull)
+     */
+    DfLanguageClassPackage getLanguageClassPackage();
 
-    boolean isTypedParameterBeanEnabled();
+    /**
+     * @return The resolver of property type's package. (NotNull)
+     */
+    DfLanguagePropertyPackageResolver getLanguagePropertyPackageResolver();
 }
