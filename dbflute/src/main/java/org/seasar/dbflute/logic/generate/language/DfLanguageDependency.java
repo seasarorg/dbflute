@@ -77,12 +77,12 @@ public interface DfLanguageDependency {
      * @param file The file. (NotNull)
      * @return Is the file compile target?
      */
-    boolean isCompileTargetFile(File file);
+    boolean isCompileTargetFile(File file); // basically for CSharp
 
     /**
      * @return Is the flat or omit directory supported?
      */
-    boolean isFlatOrOmitDirectorySupported();
+    boolean isFlatOrOmitDirectorySupported(); // basically for CSharp
 
     // ===================================================================================
     //                                                                Generate Environment

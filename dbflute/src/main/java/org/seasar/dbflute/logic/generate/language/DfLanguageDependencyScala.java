@@ -78,7 +78,7 @@ public class DfLanguageDependencyScala extends DfLanguageDependencyJava {
 
     @Override
     public String getGenerateControlBhvAp() {
-        throw new UnsupportedOperationException("Unsupported language Scala");
+        throw new UnsupportedOperationException("Unsupported at Scala");
     }
 
     @Override
@@ -88,7 +88,7 @@ public class DfLanguageDependencyScala extends DfLanguageDependencyJava {
 
     @Override
     public String getTemplateFileExtension() {
-        return "vmsca";
+        return "vmcala";
     }
 
     @Override

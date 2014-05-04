@@ -191,8 +191,13 @@
 			<zipfileset prefix="templates/om" dir="${embedded}/templates/om">
 				<include name="ControlGenerateJava.vm" />
 				<include name="ControlSql2EntityJava.vm" />
+				<include name="ControlGenerateScala.vm" />
+				<include name="ControlSql2EntityScala.vm" />
 			</zipfileset>
 			<zipfileset prefix="templates/om/java" dir="${embedded}/templates/om/java">
+				<exclude name="**/*---.txt" />
+			</zipfileset>
+			<zipfileset prefix="templates/om/scala" dir="${embedded}/templates/om/scala">
 				<exclude name="**/*---.txt" />
 			</zipfileset>
 			<zipfileset prefix="ant" dir="${embedded}/ant" />

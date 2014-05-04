@@ -102,7 +102,7 @@ public class DfLanguageTypeMappingCSharp implements DfLanguageTypeMapping {
     }
 
     public String getJdbcTypeOfUUID() {
-        return null; // does C# support it?
+        return null; // does CSharp support it?
     }
 
     public String switchParameterBeanTestValueType(String plainTypeName) {

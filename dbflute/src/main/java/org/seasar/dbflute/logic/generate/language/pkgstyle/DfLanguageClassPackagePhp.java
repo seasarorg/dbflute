@@ -75,7 +75,7 @@ public class DfLanguageClassPackagePhp implements DfLanguageClassPackage {
     //                                                                             Various
     //                                                                             =======
     public String buildExtendedBehaviorPackageMark(String sqlPackage, String exbhvName) {
-        return "/" + exbhvName + "/"; // unknown same as C# for now
+        return "/" + exbhvName + "/"; // unknown same as CSharp for now
     }
 
     public String buildAccessContextFqcn(String baseCommonPackage, String projectPrefix) {

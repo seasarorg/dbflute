@@ -75,7 +75,7 @@ public class DfLanguageClassPackageCSharp implements DfLanguageClassPackage {
     //                                                                             Various
     //                                                                             =======
     public String buildExtendedBehaviorPackageMark(String sqlPackage, String exbhvName) {
-        // because C# is allowed to have free directory structure
+        // because CSharp is allowed to have free directory structure
         return "/" + exbhvName + "/";
     }
 
