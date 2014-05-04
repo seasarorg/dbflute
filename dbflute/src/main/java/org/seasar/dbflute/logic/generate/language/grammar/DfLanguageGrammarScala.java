@@ -20,9 +20,9 @@ import org.apache.torque.engine.database.model.Column;
 /**
  * @author jflute
  */
-public class DfLanguageGrammarInfoScala implements DfLanguageGrammarInfo {
+public class DfLanguageGrammarScala implements DfLanguageGrammar {
 
-    protected final DfLanguageGrammarInfoJava _grammarInfoJava = new DfLanguageGrammarInfoJava();
+    protected final DfLanguageGrammarJava _grammarInfoJava = new DfLanguageGrammarJava();
 
     // ===================================================================================
     //                                                                       Basic Keyword
@@ -51,26 +51,33 @@ public class DfLanguageGrammarInfoScala implements DfLanguageGrammarInfo {
         return "classOf[" + className + "]";
     }
 
-    // #pending jflute Scala's collections
-
-    public String getGenericListClassName(String element) {
-        return "List<" + element + ">";
-    }
-
-    public String getGenericMapListClassName(String key, String value) {
-        return "List<Map<" + key + ", " + value + ">>";
-    }
-
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
+    // #pending jflute Scala's collections
+    // #pending jflute same as Java for now
+
+    public String buildGenericListClassName(String element) {
+        return _grammarInfoJava.buildGenericListClassName(element);
+    }
+
+    public String buildGenericMapListClassName(String key, String value) {
+        return _grammarInfoJava.buildGenericMapListClassName(key, value);
+    }
+
+    public String buildGenericOneClassHint(String first) {
+        return _grammarInfoJava.buildGenericOneClassHint(first);
+    }
+
+    public String buildGenericTwoClassHint(String first, String second) {
+        return _grammarInfoJava.buildGenericTwoClassHint(first, second);
+    }
+
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {
-        // #pending jflute same as Java for now
         return _grammarInfoJava.buildEntityPropertyGetSet(fromCol, toCol);
     }
 
     public String buildEntityPropertyName(Column col) {
-        // #pending jflute same as Java for now
         return _grammarInfoJava.buildEntityPropertyName(col);
     }
 

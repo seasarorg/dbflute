@@ -15,52 +15,35 @@
  */
 package org.seasar.dbflute.logic.generate.language.typemapping;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  */
-public class DfLanguageTypeMappingInfoPhp implements DfLanguageTypeMappingInfo {
+public class DfLanguageTypeMappingJava implements DfLanguageTypeMapping {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final Map<String, Object> _jdbcToJavaNativeMap;
-    static {
-        final Map<String, Object> map = new LinkedHashMap<String, Object>();
-        map.put("CHAR", "string");
-        map.put("VARCHAR", "string");
-        map.put("LONGVARCHAR", "string");
-        map.put("NUMERIC", "integer");
-        map.put("DECIMAL", "double");
-        map.put("BIT", "integer");
-        map.put("TINYINT", "integer");
-        map.put("SMALLINT", "integer");
-        map.put("INTEGER", "integer");
-        map.put("BIGINT", "integer");
-        map.put("REAL", "double");
-        map.put("FLOAT", "double");
-        map.put("DOUBLE", "double");
-        map.put("DATE", "string");
-        map.put("TIME", "string");
-        map.put("TIMESTAMP", "string");
-        _jdbcToJavaNativeMap = map;
-    }
-    protected static final List<String> _stringList = DfCollectionUtil.newArrayList("string");
-    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("integer");
-    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("string");
-    protected static final List<String> _booleanList = DfCollectionUtil.newArrayList("bool?");
+    protected static final Map<String, Object> DEFAULT_EMPTY_MAP = DfCollectionUtil.newLinkedHashMap();
+    protected static final List<String> _stringList = DfCollectionUtil.newArrayList("String");
+    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("Byte", "Short", "Integer", "Long",
+            "Float", "Double", "BigDecimal", "BigInteger");
+    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("Date", "Time", "Timestamp");
+    protected static final List<String> _booleanList = DfCollectionUtil.newArrayList("Boolean");
     protected static final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
 
     // ===================================================================================
     //                                                                        Type Mapping
     //                                                                        ============
     public Map<String, Object> getJdbcToJavaNativeMap() {
-        return _jdbcToJavaNativeMap;
+        // Java's native map is defined at TypeMap
+        // so this returns empty. (special handling)
+        return DEFAULT_EMPTY_MAP;
     }
 
     // ===================================================================================
@@ -90,10 +73,10 @@ public class DfLanguageTypeMappingInfoPhp implements DfLanguageTypeMappingInfo {
     //                                                                JDBC Type Adjustment
     //                                                                ====================
     public String getSequenceType() {
-        return "integer";
+        return "java.math.BigDecimal";
     }
 
     public String getJdbcTypeOfUUID() {
-        return null; // means no mapping
+        return TypeMap.UUID; // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
     }
 }

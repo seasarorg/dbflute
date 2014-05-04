@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.generate.language.typemapping;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,41 +24,41 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public class DfLanguageTypeMappingInfoCSharp implements DfLanguageTypeMappingInfo {
+public class DfLanguageTypeMappingPhp implements DfLanguageTypeMapping {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     protected static final Map<String, Object> _jdbcToJavaNativeMap;
     static {
-        final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
-        map.put("CHAR", "String");
-        map.put("VARCHAR", "String");
-        map.put("LONGVARCHAR", "String");
-        map.put("NUMERIC", "decimal?");
-        map.put("DECIMAL", "decimal?");
-        map.put("BIT", "bool?");
-        map.put("TINYINT", "int?");
-        map.put("SMALLINT", "int?");
-        map.put("INTEGER", "int?");
-        map.put("BIGINT", "long?");
-        map.put("REAL", "decimal?");
-        map.put("FLOAT", "decimal?");
-        map.put("DOUBLE", "decimal?");
-        map.put("DATE", "DateTime?");
-        map.put("TIME", "DateTime?");
-        map.put("TIMESTAMP", "DateTime?");
+        final Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("CHAR", "string");
+        map.put("VARCHAR", "string");
+        map.put("LONGVARCHAR", "string");
+        map.put("NUMERIC", "integer");
+        map.put("DECIMAL", "double");
+        map.put("BIT", "integer");
+        map.put("TINYINT", "integer");
+        map.put("SMALLINT", "integer");
+        map.put("INTEGER", "integer");
+        map.put("BIGINT", "integer");
+        map.put("REAL", "double");
+        map.put("FLOAT", "double");
+        map.put("DOUBLE", "double");
+        map.put("DATE", "string");
+        map.put("TIME", "string");
+        map.put("TIMESTAMP", "string");
         _jdbcToJavaNativeMap = map;
     }
-    protected static final List<String> _stringList = DfCollectionUtil.newArrayList("String");
-    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("decimal?", "int?", "long?");
-    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("DateTime?");
+    protected static final List<String> _stringList = DfCollectionUtil.newArrayList("string");
+    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("integer");
+    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("string");
     protected static final List<String> _booleanList = DfCollectionUtil.newArrayList("bool?");
     protected static final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
 
     // ===================================================================================
-    //                                                                             Mapping
-    //                                                                             =======
+    //                                                                        Type Mapping
+    //                                                                        ============
     public Map<String, Object> getJdbcToJavaNativeMap() {
         return _jdbcToJavaNativeMap;
     }
@@ -89,10 +90,10 @@ public class DfLanguageTypeMappingInfoCSharp implements DfLanguageTypeMappingInf
     //                                                                JDBC Type Adjustment
     //                                                                ====================
     public String getSequenceType() {
-        return "int?"; // #pending jflute long?
+        return "integer";
     }
 
     public String getJdbcTypeOfUUID() {
-        return null; // does C# support it?
+        return null; // means no mapping
     }
 }

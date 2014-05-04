@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.torque.engine.database.model.TypeMap;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
@@ -48,7 +48,7 @@ public class DfJdbcTypeMapper {
     }
 
     public static interface DfMapperResource {
-        DfLanguageDependencyInfo getLang();
+        DfLanguageDependency getLang();
 
         boolean isDbmsPostgreSQL();
 
@@ -204,7 +204,7 @@ public class DfJdbcTypeMapper {
 
     protected String processForcedAdjustment(int jdbcDefValue, String dbTypeName) {
         if (isConceptTypeUUID(dbTypeName)) {
-            final String uuid = _resource.getLang().getLanguageTypeMappingInfo().getJdbcTypeOfUUID();
+            final String uuid = _resource.getLang().getLanguageTypeMapping().getJdbcTypeOfUUID();
             if (uuid != null) { // might be unsupported in any language
                 return uuid;
             }

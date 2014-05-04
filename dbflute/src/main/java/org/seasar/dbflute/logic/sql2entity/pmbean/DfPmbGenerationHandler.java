@@ -25,7 +25,8 @@ import java.util.Set;
 import org.apache.torque.engine.database.model.AppData;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.cbean.SimplePagingBean;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -85,18 +86,18 @@ public class DfPmbGenerationHandler {
         }
         final DfPmbMetaData metaData = findPmbMetaData(className);
         final String superClassName = metaData.getSuperClassName();
-        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        final String extendsStringMark = languageDependencyInfo.getLanguageGrammarInfo().getExtendsStringMark();
+        final DfLanguageDependency languageDependencyInfo = getBasicProperties().getLanguageDependency();
+        final String extendsStringMark = languageDependencyInfo.getLanguageGrammar().getExtendsStringMark();
         return " " + extendsStringMark + " " + superClassName;
     }
 
     public String getInterfaceDefinition(String className) {
         assertArgumentPmbMetaDataClassName(className);
-        if (!getBasicProperties().isTargetLanguageJava()) {
-            // if C#, interfaces are contained to super class definition 
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        if (!lang.isTypedParameterBeanEnabled()) {
             return "";
         }
-        // here Java only
+        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
         final StringBuilder sb = new StringBuilder();
         if (isTypedParameterBean(className)) {
             final String behaviorClassName = getBehaviorClassName(className);
@@ -106,9 +107,9 @@ public class DfPmbGenerationHandler {
             } else {
                 customizeEntityType = null; // no used
             }
-            final String entityGenericDef = "<" + behaviorClassName + ", " + customizeEntityType + ">";
-            final String voidResultGenericDef = "<" + behaviorClassName + ", Void>";
-            final String noResultGenericDef = "<" + behaviorClassName + ">";
+            final String entityGenericDef = grammar.buildGenericTwoClassHint(behaviorClassName, customizeEntityType);
+            final String voidResultGenericDef = grammar.buildGenericTwoClassHint(behaviorClassName, "Void");
+            final String noResultGenericDef = grammar.buildGenericOneClassHint(behaviorClassName);
 
             // several typed interfaces can be implemented
             if (isTypedListHandling(className)) {
@@ -141,8 +142,7 @@ public class DfPmbGenerationHandler {
             sb.append("ParameterBean");
         }
         sb.append(", ").append("FetchBean");
-        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        final String implementsStringMark = languageDependencyInfo.getLanguageGrammarInfo().getImplementsStringMark();
+        final String implementsStringMark = grammar.getImplementsStringMark();
         return " " + implementsStringMark + " " + sb.toString();
     }
 

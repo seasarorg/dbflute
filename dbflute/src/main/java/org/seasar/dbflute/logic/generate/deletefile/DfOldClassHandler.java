@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -53,7 +53,7 @@ public class DfOldClassHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected DfGenerator _generator;
-    protected DfLanguageGeneratedClassPackageInfo _generatedClassPkg;
+    protected DfLanguageGeneratedClassPackage _generatedClassPkg;
     protected List<Table> _tableList;
     protected Map<String, Map<String, Table>> _cmentityLocationMap;
     protected Map<String, Map<String, DfPmbMetaData>> _pmbLocationMap;
@@ -61,7 +61,7 @@ public class DfOldClassHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfOldClassHandler(DfGenerator generator, DfLanguageGeneratedClassPackageInfo generatedClassPkg, List<Table> tableList) {
+    public DfOldClassHandler(DfGenerator generator, DfLanguageGeneratedClassPackage generatedClassPkg, List<Table> tableList) {
         _generator = generator;
         _generatedClassPkg = generatedClassPkg;
         _tableList = tableList;
@@ -415,7 +415,7 @@ public class DfOldClassHandler {
         if (_cmentityLocationMap == null) {
             return;
         }
-        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackageName();
+        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackage();
         final String packagePath = getBaseEntityPackage() + "." + customizePackageName;
         final String classSuffix = null;
 
@@ -432,8 +432,8 @@ public class DfOldClassHandler {
         if (_cmentityLocationMap == null) {
             return;
         }
-        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackageName();
-        final String dbmetaSimplePackageName = _generatedClassPkg.getDBMetaSimplePackageName();
+        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackage();
+        final String dbmetaSimplePackageName = _generatedClassPkg.getDBMetaSimplePackage();
         final String packagePath = getBaseEntityPackage() + "." + customizePackageName + "." + dbmetaSimplePackageName;
         final String classSuffix = "Dbm";
 
@@ -450,7 +450,7 @@ public class DfOldClassHandler {
         if (_cmentityLocationMap == null) {
             return;
         }
-        final String cursorPackageName = _generatedClassPkg.getCursorSimplePackageName();
+        final String cursorPackageName = _generatedClassPkg.getCursorSimplePackage();
         final String packagePath = getBaseBehaviorPackage() + "." + cursorPackageName;
         final String oldStylePackagePath = getBaseDaoPackage() + "." + cursorPackageName;
         final String classSuffix = "Cursor";
@@ -473,7 +473,7 @@ public class DfOldClassHandler {
         if (_cmentityLocationMap == null) {
             return;
         }
-        final String cursorPackageName = _generatedClassPkg.getCursorSimplePackageName();
+        final String cursorPackageName = _generatedClassPkg.getCursorSimplePackage();
         final String packagePath = getBaseBehaviorPackage() + "." + cursorPackageName;
         final String oldStylePackagePath = getBaseDaoPackage() + "." + cursorPackageName;
         final String classSuffix = "CursorHandler";
@@ -530,7 +530,7 @@ public class DfOldClassHandler {
         if (_pmbLocationMap == null) {
             return;
         }
-        final String parameterBeanPackageName = _generatedClassPkg.getParameterBeanSimplePackageName();
+        final String parameterBeanPackageName = _generatedClassPkg.getParameterBeanSimplePackage();
         final String packagePath = getBaseBehaviorPackage() + "." + parameterBeanPackageName;
         final String oldStylePackagePath = getBaseDaoPackage() + "." + parameterBeanPackageName;
         final String classPrefix = getProjectPrefix() + getBasePrefix();
@@ -559,7 +559,7 @@ public class DfOldClassHandler {
         if (!existsDeletedBaseClass(_deletedOldCustomizeBaseEntityListMap)) {
             return;
         }
-        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackageName();
+        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackage();
         final String packagePath = getExtendedEntityPackage() + "." + customizePackageName;
         deleteCustomizeExtendedClass(_deletedOldCustomizeBaseEntityListMap, packagePath);
     }
@@ -568,7 +568,7 @@ public class DfOldClassHandler {
         if (!existsDeletedBaseClass(_deletedOldCustomizeBaseCursorListMap)) {
             return;
         }
-        final String cursorPackageName = _generatedClassPkg.getCursorSimplePackageName();
+        final String cursorPackageName = _generatedClassPkg.getCursorSimplePackage();
         final String packagePath = getExtendedBehaviorPackage() + "." + cursorPackageName;
         final String oldStylePackagePath = getExtendedDaoPackage() + "." + cursorPackageName;
         deleteCustomizeExtendedClass(_deletedOldCustomizeBaseCursorListMap, packagePath, oldStylePackagePath);
@@ -578,7 +578,7 @@ public class DfOldClassHandler {
         if (!existsDeletedBaseClass(_deletedOldCustomizeBaseCursorHandlerListMap)) {
             return;
         }
-        final String cursorPackageName = _generatedClassPkg.getCursorSimplePackageName();
+        final String cursorPackageName = _generatedClassPkg.getCursorSimplePackage();
         final String packagePath = getExtendedBehaviorPackage() + "." + cursorPackageName;
         final String oldStylePackagePath = getExtendedDaoPackage() + "." + cursorPackageName;
         deleteCustomizeExtendedClass(_deletedOldCustomizeBaseCursorHandlerListMap, packagePath, oldStylePackagePath);
@@ -588,7 +588,7 @@ public class DfOldClassHandler {
         if (!existsDeletedBaseClass(_deletedOldCustomizeBaseParameterBeanListMap)) {
             return;
         }
-        final String parameterBeanPackageName = _generatedClassPkg.getParameterBeanSimplePackageName();
+        final String parameterBeanPackageName = _generatedClassPkg.getParameterBeanSimplePackage();
         final String packagePath = getExtendedBehaviorPackage() + "." + parameterBeanPackageName;
         final String oldStylePackagePath = getExtendedDaoPackage() + "." + parameterBeanPackageName;
         deleteCustomizeExtendedClass(_deletedOldCustomizeBaseParameterBeanListMap, packagePath, oldStylePackagePath);
@@ -821,7 +821,7 @@ public class DfOldClassHandler {
         if (!getSimpleDtoProperties().hasSimpleDtoDefinition()) {
             return;
         }
-        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackageName();
+        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackage();
         final String packagePath = getSimpleDtoBaseDtoPackage() + "." + customizePackageName;
         _deletedOldCustomizeSimpleDtoBaseDtoList = doDeleteOldTableClass_for_SimpleDtoBaseDto(packagePath);
     }
@@ -830,7 +830,7 @@ public class DfOldClassHandler {
         if (_deletedOldCustomizeSimpleDtoBaseDtoList == null || _deletedOldCustomizeSimpleDtoBaseDtoList.isEmpty()) {
             return;
         }
-        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackageName();
+        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackage();
         final String packagePath = getSimpleDtoExtendedDtoPackage() + "." + customizePackageName;
         doDeleteOldTableClass_for_SimpleDtoExtendedDto(packagePath, _deletedOldCustomizeSimpleDtoBaseDtoList);
     }
@@ -841,7 +841,7 @@ public class DfOldClassHandler {
         if (!getSimpleDtoProperties().hasSimpleDtoDefinition()) {
             return;
         }
-        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackageName();
+        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackage();
         final String packagePath = getSimpleDtoBaseMapperPackage() + "." + customizePackageName;
         _deletedOldCustomizeSimpleDtoBaseMapperList = doDeleteOldTableClass_for_SimpleDtoBaseMapper(packagePath);
     }
@@ -851,7 +851,7 @@ public class DfOldClassHandler {
                 || _deletedOldCustomizeSimpleDtoBaseMapperList.isEmpty()) {
             return;
         }
-        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackageName();
+        final String customizePackageName = _generatedClassPkg.getCustomizeEntitySimplePackage();
         final String packagePath = getSimpleDtoExtendedMapperPackage() + "." + customizePackageName;
         doDeleteOldTableClass_for_SimpleDtoExtendedMapper(packagePath, _deletedOldCustomizeSimpleDtoBaseMapperList);
     }

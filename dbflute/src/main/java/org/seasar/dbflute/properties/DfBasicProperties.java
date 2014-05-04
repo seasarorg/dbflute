@@ -26,12 +26,12 @@ import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.infra.core.DfDatabaseNameMapping;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfoCSharp;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfoJava;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfoPhp;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfoScala;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyCSharp;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyJava;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyPhp;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyScala;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.seasar.dbflute.util.Srl;
@@ -46,7 +46,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DfLanguageDependencyInfo _languageDependencyInfo;
+    protected DfLanguageDependency _languageDependency;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -263,24 +263,24 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return SCALA_targetLanguage.equals(getTargetLanguage());
     }
 
-    public DfLanguageDependencyInfo getLanguageDependencyInfo() {
-        if (_languageDependencyInfo == null) {
+    public DfLanguageDependency getLanguageDependency() {
+        if (_languageDependency == null) {
             if (isTargetLanguageJava()) {
                 if (isTargetSubLanguageScala()) { // as sub language
-                    _languageDependencyInfo = new DfLanguageDependencyInfoScala();
+                    _languageDependency = new DfLanguageDependencyScala();
                 } else { // pure java
-                    _languageDependencyInfo = new DfLanguageDependencyInfoJava();
+                    _languageDependency = new DfLanguageDependencyJava();
                 }
             } else if (isTargetLanguageCSharp()) {
-                _languageDependencyInfo = new DfLanguageDependencyInfoCSharp();
+                _languageDependency = new DfLanguageDependencyCSharp();
             } else if (isTargetLanguagePhp()) {
-                _languageDependencyInfo = new DfLanguageDependencyInfoPhp();
+                _languageDependency = new DfLanguageDependencyPhp();
             } else {
                 String msg = "The language is supported: " + getTargetLanguage();
                 throw new IllegalStateException(msg);
             }
         }
-        return _languageDependencyInfo;
+        return _languageDependency;
     }
 
     public String getTargetLanguageVersion() {
@@ -383,11 +383,11 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                           Extension
     //                                                                           =========
     public String getTemplateFileExtension() { // It's not property!
-        return getLanguageDependencyInfo().getTemplateFileExtension();
+        return getLanguageDependency().getTemplateFileExtension();
     }
 
     public String getClassFileExtension() { // It's not property!
-        return getLanguageDependencyInfo().getLanguageGrammarInfo().getClassFileExtension();
+        return getLanguageDependency().getLanguageGrammar().getClassFileExtension();
     }
 
     // ===================================================================================
@@ -428,7 +428,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getDBMetaPackage() {
-        return getBaseEntityPackage() + "." + getPackageInfo().getDBMetaSimplePackageName();
+        return getBaseEntityPackage() + "." + getPackageInfo().getDBMetaSimplePackage();
     }
 
     public String getConditionBeanPackage() {
@@ -496,9 +496,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected DfLanguageGeneratedClassPackageInfo getPackageInfo() {
-        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        return languageDependencyInfo.getGeneratedClassPackageInfo();
+    protected DfLanguageGeneratedClassPackage getPackageInfo() {
+        final DfLanguageDependency languageDependencyInfo = getBasicProperties().getLanguageDependency();
+        return languageDependencyInfo.getGeneratedClassPackage();
     }
 
     // ===================================================================================
@@ -509,7 +509,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         if (property != null) {
             return property;
         }
-        final String defaultDirectory = getLanguageDependencyInfo().getGenerateOutputDirectory();
+        final String defaultDirectory = getLanguageDependency().getGenerateOutputDirectory();
         return getProperty("java.dir", defaultDirectory); // old style or default
     }
 
@@ -518,7 +518,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getDefaultResourceOutputDirectory() {
-        return getLanguageDependencyInfo().getResourceOutputDirectory();
+        return getLanguageDependency().getResourceOutputDirectory();
     }
 
     // ===================================================================================
@@ -766,7 +766,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         if (flatDirectoryPackage == null && omitDirectoryPackage == null) {
             return;
         }
-        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
+        final DfLanguageDependency languageDependencyInfo = getBasicProperties().getLanguageDependency();
         if (!languageDependencyInfo.isFlatOrOmitDirectorySupported()) {
             String msg = "The language does not support flatDirectoryPackage or omitDirectoryPackage:";
             msg = msg + " language=" + getBasicProperties().getTargetLanguage();

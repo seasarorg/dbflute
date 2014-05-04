@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 
@@ -104,7 +104,7 @@ public class DfOutsideSqlCollector {
     }
 
     protected DfSqlFileGetter createSqlFileGetter() {
-        final DfLanguageDependencyInfo dependencyInfo = getBasicProperties().getLanguageDependencyInfo();
+        final DfLanguageDependency dependencyInfo = getBasicProperties().getLanguageDependency();
         return new DfSqlFileGetter() {
             @Override
             protected boolean acceptSqlFile(File file) {
@@ -119,7 +119,7 @@ public class DfOutsideSqlCollector {
     protected boolean handleSecondaryDirectory(DfOutsideSqlPack outsideSqlPack, DfOutsideSqlLocation sqlLocation,
             String sqlDirectory, boolean checkNotFound) {
         final DfBasicProperties basicProp = getBasicProperties();
-        final DfLanguageDependencyInfo lang = basicProp.getLanguageDependencyInfo();
+        final DfLanguageDependency lang = basicProp.getLanguageDependency();
         final String secondaryDirectory = lang.convertToSecondaryOutsideSqlDirectory(sqlDirectory);
         final boolean foundSecondaryDirectory;
         if (!sqlDirectory.equals(secondaryDirectory)) {

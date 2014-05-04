@@ -18,32 +18,48 @@ package org.seasar.dbflute.logic.generate.language.typemapping;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  */
-public class DfLanguageTypeMappingInfoJava implements DfLanguageTypeMappingInfo {
+public class DfLanguageTypeMappingCSharp implements DfLanguageTypeMapping {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final Map<String, Object> DEFAULT_EMPTY_MAP = DfCollectionUtil.newLinkedHashMap();
+    protected static final Map<String, Object> _jdbcToJavaNativeMap;
+    static {
+        final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
+        map.put("CHAR", "String");
+        map.put("VARCHAR", "String");
+        map.put("LONGVARCHAR", "String");
+        map.put("NUMERIC", "decimal?");
+        map.put("DECIMAL", "decimal?");
+        map.put("BIT", "bool?");
+        map.put("TINYINT", "int?");
+        map.put("SMALLINT", "int?");
+        map.put("INTEGER", "int?");
+        map.put("BIGINT", "long?");
+        map.put("REAL", "decimal?");
+        map.put("FLOAT", "decimal?");
+        map.put("DOUBLE", "decimal?");
+        map.put("DATE", "DateTime?");
+        map.put("TIME", "DateTime?");
+        map.put("TIMESTAMP", "DateTime?");
+        _jdbcToJavaNativeMap = map;
+    }
     protected static final List<String> _stringList = DfCollectionUtil.newArrayList("String");
-    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("Byte", "Short", "Integer", "Long",
-            "Float", "Double", "BigDecimal", "BigInteger");
-    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("Date", "Time", "Timestamp");
-    protected static final List<String> _booleanList = DfCollectionUtil.newArrayList("Boolean");
+    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("decimal?", "int?", "long?");
+    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("DateTime?");
+    protected static final List<String> _booleanList = DfCollectionUtil.newArrayList("bool?");
     protected static final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
 
     // ===================================================================================
-    //                                                                        Type Mapping
-    //                                                                        ============
+    //                                                                             Mapping
+    //                                                                             =======
     public Map<String, Object> getJdbcToJavaNativeMap() {
-        // Java's native map is defined at TypeMap
-        // so this returns empty. (special handling)
-        return DEFAULT_EMPTY_MAP;
+        return _jdbcToJavaNativeMap;
     }
 
     // ===================================================================================
@@ -73,10 +89,10 @@ public class DfLanguageTypeMappingInfoJava implements DfLanguageTypeMappingInfo 
     //                                                                JDBC Type Adjustment
     //                                                                ====================
     public String getSequenceType() {
-        return "java.math.BigDecimal";
+        return "int?"; // #pending jflute long?
     }
 
     public String getJdbcTypeOfUUID() {
-        return TypeMap.UUID; // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
+        return null; // does C# support it?
     }
 }

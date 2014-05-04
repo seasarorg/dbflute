@@ -20,7 +20,7 @@ import org.apache.torque.engine.database.model.Column;
 /**
  * @author jflute
  */
-public class DfLanguageGrammarInfoJava implements DfLanguageGrammarInfo {
+public class DfLanguageGrammarJava implements DfLanguageGrammar {
 
     // ===================================================================================
     //                                                                       Basic Keyword
@@ -49,17 +49,25 @@ public class DfLanguageGrammarInfoJava implements DfLanguageGrammarInfo {
         return className + ".class";
     }
 
-    public String getGenericListClassName(String element) {
-        return "List<" + element + ">";
-    }
-
-    public String getGenericMapListClassName(String key, String value) {
-        return "List<Map<" + key + ", " + value + ">>";
-    }
-
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
+    public String buildGenericListClassName(String element) {
+        return "List<" + element + ">";
+    }
+
+    public String buildGenericMapListClassName(String key, String value) {
+        return "List<Map<" + key + ", " + value + ">>";
+    }
+
+    public String buildGenericOneClassHint(String first) {
+        return "<" + first + ">";
+    }
+
+    public String buildGenericTwoClassHint(String first, String second) {
+        return "<" + first + ", " + second + ">";
+    }
+
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {
         final String fromPropName = fromCol.getJavaBeansRulePropertyNameInitCap();
         final String toPropName = toCol.getJavaBeansRulePropertyNameInitCap();

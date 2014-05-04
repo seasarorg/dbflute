@@ -22,8 +22,8 @@ import java.util.Properties;
 
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfoJava;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyJava;
 import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
 import org.seasar.dbflute.unit.core.PlainTestCase;
 
@@ -167,8 +167,8 @@ public class DfJdbcTypeMapperTest extends PlainTestCase {
             return this;
         }
 
-        public DfLanguageDependencyInfo getLang() {
-            return new DfLanguageDependencyInfoJava();
+        public DfLanguageDependency getLang() {
+            return new DfLanguageDependencyJava();
         }
 
         public boolean isDbmsOracle() {

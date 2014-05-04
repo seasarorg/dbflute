@@ -157,8 +157,8 @@ import org.seasar.dbflute.infra.core.DfDatabaseNameMapping;
 import org.seasar.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.seasar.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
@@ -1136,8 +1136,8 @@ public class Database {
 
     protected DfOldClassHandler createOldClassHandler() {
         final DfGenerator generator = getGeneratorInstance();
-        final DfLanguageDependencyInfo lang = getBasicProperties().getLanguageDependencyInfo();
-        final DfLanguageGeneratedClassPackageInfo pkg = lang.getGeneratedClassPackageInfo();
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguageGeneratedClassPackage pkg = lang.getGeneratedClassPackage();
         return new DfOldClassHandler(generator, pkg, getTableList());
     }
 

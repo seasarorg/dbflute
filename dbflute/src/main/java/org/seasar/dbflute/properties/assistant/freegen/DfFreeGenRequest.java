@@ -92,7 +92,7 @@ public class DfFreeGenRequest {
 
     public String getGenerateFilePath() {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
-        final String classExt = basicProp.getLanguageDependencyInfo().getLanguageGrammarInfo().getClassFileExtension();
+        final String classExt = basicProp.getLanguageDependency().getLanguageGrammar().getClassFileExtension();
         return getGenerateDirPath() + "/" + _output.getClassName() + "." + classExt;
     }
 

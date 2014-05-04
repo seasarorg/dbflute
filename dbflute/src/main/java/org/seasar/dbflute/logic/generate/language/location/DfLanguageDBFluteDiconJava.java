@@ -18,29 +18,17 @@ package org.seasar.dbflute.logic.generate.language.location;
 /**
  * @author jflute
  */
-public interface DfLanguageGeneratedClassPackageInfo {
+public class DfLanguageDBFluteDiconJava implements DfLanguageDBFluteDicon {
 
-    String getBaseCommonPackage();
+    public String getDBFluteDiconFileName() {
+        return "dbflute.dicon";
+    }
 
-    String getBaseBehaviorPackage();
+    public String getDBFluteDiconNamespace() {
+        return "dbflute";
+    }
 
-    String getBaseDaoPackage();
-
-    String getCursorSimplePackageName();
-
-    String getParameterBeanSimplePackageName();
-
-    String getBaseEntityPackage();
-
-    String getCustomizeEntitySimplePackageName();
-
-    String getDBMetaSimplePackageName();
-
-    String getConditionBeanPackage();
-
-    String getExtendedBehaviorPackage();
-
-    String getExtendedDaoPackage();
-
-    String getExtendedEntityPackage();
+    public String getJ2eeDiconResourceName() {
+        return "j2ee.dicon";
+    }
 }

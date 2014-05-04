@@ -148,7 +148,7 @@ import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -2301,8 +2301,8 @@ public class Table {
                 // if there are not related columns, it uses a key order
                 relatedColumn = domain.getPrimaryKey().get(index);
             }
-            final DfLanguageGrammarInfo grammar = getBasicProperties().getLanguageDependencyInfo()
-                    .getLanguageGrammarInfo();
+            final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency()
+                    .getLanguageGrammar();
             settingList.add(grammar.buildEntityPropertyGetSet(pk, relatedColumn));
             ++index;
         }
@@ -2693,7 +2693,7 @@ public class Table {
     }
 
     protected String getPropertyNameResolvedLanguage(Column col) {
-        return getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo().buildEntityPropertyName(col);
+        return getBasicProperties().getLanguageDependency().getLanguageGrammar().buildEntityPropertyName(col);
     }
 
     protected List<Column> _subColumnSequenceColumnList;

@@ -18,8 +18,11 @@ package org.seasar.dbflute.logic.generate.language.location;
 /**
  * @author jflute
  */
-public class DfLanguageGeneratedClassPackageInfoPhp implements DfLanguageGeneratedClassPackageInfo {
+public class DfLanguageGeneratedClassPackagePhp implements DfLanguageGeneratedClassPackage {
 
+    // ===================================================================================
+    //                                                                               Basic
+    //                                                                               =====
     public String getBaseCommonPackage() {
         return "allcommon";
     }
@@ -32,11 +35,11 @@ public class DfLanguageGeneratedClassPackageInfoPhp implements DfLanguageGenerat
         return "bsdao";
     }
 
-    public String getCursorSimplePackageName() {
+    public String getCursorSimplePackage() {
         return "cursor";
     }
 
-    public String getParameterBeanSimplePackageName() {
+    public String getParameterBeanSimplePackage() {
         return "pmbean";
     }
 
@@ -44,11 +47,11 @@ public class DfLanguageGeneratedClassPackageInfoPhp implements DfLanguageGenerat
         return "bsentity";
     }
 
-    public String getCustomizeEntitySimplePackageName() {
+    public String getCustomizeEntitySimplePackage() {
         return "customize";
     }
 
-    public String getDBMetaSimplePackageName() {
+    public String getDBMetaSimplePackage() {
         return "dbmeta";
     }
 
@@ -66,5 +69,12 @@ public class DfLanguageGeneratedClassPackageInfoPhp implements DfLanguageGenerat
 
     public String getExtendedEntityPackage() {
         return "exentity";
+    }
+
+    // ===================================================================================
+    //                                                                             Various
+    //                                                                             =======
+    public String buildExtendedBehaviorPackageMark(String sqlPackage, String exbhvName) {
+        return "/" + exbhvName + "/"; // unknown same as C# for now
     }
 }

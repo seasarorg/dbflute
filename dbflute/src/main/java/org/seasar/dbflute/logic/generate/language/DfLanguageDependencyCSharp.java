@@ -17,20 +17,20 @@ package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfoCSharp;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfo;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfoCSharp;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfoCSharp;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfoCSharp;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarCSharp;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDicon;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconCSharp;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageCSharp;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingCSharp;
 import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo {
+public class DfLanguageDependencyCSharp implements DfLanguageDependency {
 
     // ===================================================================================
     //                                                                               Basic
@@ -42,16 +42,16 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
     // ===================================================================================
     //                                                                    Program Handling
     //                                                                    ================
-    public DfLanguageGrammarInfo getLanguageGrammarInfo() {
-        return new DfLanguageGrammarInfoCSharp();
+    public DfLanguageGrammar getLanguageGrammar() {
+        return new DfLanguageGrammarCSharp();
     }
 
-    public DfLanguageTypeMappingInfo getLanguageTypeMappingInfo() {
-        return new DfLanguageTypeMappingInfoCSharp();
+    public DfLanguageTypeMapping getLanguageTypeMapping() {
+        return new DfLanguageTypeMappingCSharp();
     }
 
-    public DfLanguageDBFluteDiconInfo getLanguageDBFluteDiconInfo() {
-        return new DfLanguageDBFluteDiconInfoCSharp();
+    public DfLanguageDBFluteDicon getLanguageDBFluteDicon() {
+        return new DfLanguageDBFluteDiconCSharp();
     }
 
     // ===================================================================================
@@ -112,8 +112,8 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
         return "vmnet";
     }
 
-    public DfLanguageGeneratedClassPackageInfo getGeneratedClassPackageInfo() {
-        return new DfLanguageGeneratedClassPackageInfoCSharp();
+    public DfLanguageGeneratedClassPackage getGeneratedClassPackage() {
+        return new DfLanguageGeneratedClassPackageCSharp();
     }
 
     // ===================================================================================
@@ -121,5 +121,9 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
     //                                                                    ================
     public boolean isIfCommentExpressionCheckEnabled() {
         return false; // different specification for now but new DBFlute.NET ...
+    }
+
+    public boolean isTypedParameterBeanEnabled() {
+        return false; // unsupported for now but new DBFlute.NET ...
     }
 }

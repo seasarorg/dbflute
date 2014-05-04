@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * @author jflute
  */
-public interface DfLanguageTypeMappingInfo {
+public interface DfLanguageTypeMapping {
 
     // ===================================================================================
     //                                                                        Type Mapping

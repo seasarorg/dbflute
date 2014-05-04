@@ -20,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
@@ -67,23 +69,20 @@ public class DfBqpOutsideSqlFile {
                 exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
             }
             final String exbhvName = Srl.substringLastRear(exbhvPackage, ".");
-            if (getBasicProperties().isTargetLanguageJava()) {
-                final String sqlPackage;
-                if (getOutsideSqlProperties().isSqlPackageValid()) {
-                    final String pureSqlPackage = getOutsideSqlProperties().getSqlPackage();
-                    if (pureSqlPackage.endsWith(exbhvName)) { // contains 'exbhv'
-                        sqlPackage = Srl.substringLastFront(pureSqlPackage, ".");
-                    } else {
-                        sqlPackage = pureSqlPackage;
-                    }
+            final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+            final DfLanguageGeneratedClassPackage pkg = lang.getGeneratedClassPackage();
+            final String sqlPackage;
+            if (getOutsideSqlProperties().isSqlPackageValid()) {
+                final String pureSqlPackage = getOutsideSqlProperties().getSqlPackage();
+                if (pureSqlPackage.endsWith(exbhvName)) { // contains 'exbhv'
+                    sqlPackage = Srl.substringLastFront(pureSqlPackage, ".");
                 } else {
-                    sqlPackage = Srl.substringLastFront(exbhvPackage, ".");
+                    sqlPackage = pureSqlPackage;
                 }
-                exbhvMark = Srl.replace(sqlPackage, ".", "/") + "/" + exbhvName + "/";
-            } else { // e.g. CSharp
-                // because CSharp is allowed to have free directory structure
-                exbhvMark = "/" + exbhvName + "/";
+            } else {
+                sqlPackage = Srl.substringLastFront(exbhvPackage, ".");
             }
+            exbhvMark = pkg.buildExtendedBehaviorPackageMark(sqlPackage, exbhvName);
         }
 
         // both types are target

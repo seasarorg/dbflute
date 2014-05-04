@@ -138,7 +138,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -1538,7 +1538,7 @@ public class Column {
 
     public String getJavaNativeTypeLiteral() {
         final String javaNative = getJavaNative();
-        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
+        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
         final String pureNative = Srl.substringFirstFront(javaNative, "<"); // for example, List<String>
         return grammarInfo.getClassTypeLiteral(pureNative);
     }

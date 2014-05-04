@@ -17,58 +17,56 @@ package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfoJava;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfo;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfoJava;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfoJava;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfoJava;
-import org.seasar.dbflute.util.Srl;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarPhp;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDicon;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconPhp;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackagePhp;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingPhp;
 
 /**
  * @author jflute
  */
-public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
+public class DfLanguageDependencyPhp implements DfLanguageDependency {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final String PATH_MAVEN_SRC_MAIN_JAVA = "src/main/java";
-    protected static final String PATH_MAVEN_SRC_MAIN_RESOURCES = "src/main/resources";
+    protected static final String PATH_MAVEN_SRC_MAIN_PHP = "src/main/php";
 
     // ===================================================================================
     //                                                                               Basic
     //                                                                               =====
     public String getLanguageTitle() {
-        return "Java";
+        return "Php";
     }
 
     // ===================================================================================
     //                                                                    Program Handling
     //                                                                    ================
-    public DfLanguageGrammarInfo getLanguageGrammarInfo() {
-        return new DfLanguageGrammarInfoJava();
+    public DfLanguageGrammar getLanguageGrammar() {
+        return new DfLanguageGrammarPhp();
     }
 
-    public DfLanguageTypeMappingInfo getLanguageTypeMappingInfo() {
-        return new DfLanguageTypeMappingInfoJava();
+    public DfLanguageTypeMapping getLanguageTypeMapping() {
+        return new DfLanguageTypeMappingPhp();
     }
 
-    public DfLanguageDBFluteDiconInfo getLanguageDBFluteDiconInfo() {
-        return new DfLanguageDBFluteDiconInfoJava();
+    public DfLanguageDBFluteDicon getLanguageDBFluteDicon() {
+        return new DfLanguageDBFluteDiconPhp();
     }
 
     // ===================================================================================
     //                                                                 Compile Environment
     //                                                                 ===================
     public String getMainProgramDirectory() {
-        return PATH_MAVEN_SRC_MAIN_JAVA;
+        return PATH_MAVEN_SRC_MAIN_PHP;
     }
 
     public String getMainResourceDirectory() {
-        return PATH_MAVEN_SRC_MAIN_RESOURCES;
+        return getMainProgramDirectory();
     }
 
     public boolean isCompileTargetFile(File file) {
@@ -83,15 +81,23 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
     //                                                                Generate Environment
     //                                                                ====================
     public String getGenerateControl() {
-        return "om/ControlGenerateJava.vm";
+        throw new UnsupportedOperationException("Unsupported language Php");
     }
 
     public String getGenerateControlBhvAp() {
-        return "om/java/plugin/bhvap/ControlBhvApJava.vm";
+        throw new UnsupportedOperationException("Unsupported language Php");
     }
 
     public String getSql2EntityControl() {
-        return "om/ControlSql2EntityJava.vm";
+        throw new UnsupportedOperationException("Unsupported language Php");
+    }
+
+    public String getOutsideSqlDirectory() {
+        return getMainProgramDirectory();
+    }
+
+    public String convertToSecondaryOutsideSqlDirectory(String sqlDirectory) {
+        return null; // no secondary
     }
 
     public String getGenerateOutputDirectory() {
@@ -99,36 +105,25 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
     }
 
     public String getResourceOutputDirectory() {
-        return "../resources";
-    }
-
-    public String getOutsideSqlDirectory() {
-        // returns program directory
-        // because it is possible that resources directory does not prepared
-        // and resources directory is resolved later
-        return getMainProgramDirectory();
-    }
-
-    public String convertToSecondaryOutsideSqlDirectory(String sqlDirectory) {
-        final String mainProgramDirectory = getMainProgramDirectory();
-        if (!sqlDirectory.contains(mainProgramDirectory)) {
-            return null; // no secondary
-        }
-        return Srl.replace(sqlDirectory, mainProgramDirectory, getMainResourceDirectory());
+        return "";
     }
 
     public String getTemplateFileExtension() {
-        return "vm";
+        return "vmphp";
     }
 
-    public DfLanguageGeneratedClassPackageInfo getGeneratedClassPackageInfo() {
-        return new DfLanguageGeneratedClassPackageInfoJava();
+    public DfLanguageGeneratedClassPackage getGeneratedClassPackage() {
+        return new DfLanguageGeneratedClassPackagePhp();
     }
 
     // ===================================================================================
     //                                                                    Small Adjustment
     //                                                                    ================
     public boolean isIfCommentExpressionCheckEnabled() {
-        return true;
+        return false;
+    }
+
+    public boolean isTypedParameterBeanEnabled() {
+        return false;
     }
 }

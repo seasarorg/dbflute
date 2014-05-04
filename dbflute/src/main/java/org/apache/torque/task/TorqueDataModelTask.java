@@ -76,7 +76,7 @@ package org.apache.torque.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.jdbc.schemaxml.DfSchemaXmlReader;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlPack;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
@@ -148,7 +148,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
             title = "alternate control";
             control = littleProp.getAlternateGenerateControl();
         } else {
-            final DfLanguageDependencyInfo lang = getBasicProperties().getLanguageDependencyInfo();
+            final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
             if (basicProp.isApplicationBehaviorProject()) {
                 title = lang.getLanguageTitle() + " BhvAp";
                 control = lang.getGenerateControlBhvAp();

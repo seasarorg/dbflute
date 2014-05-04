@@ -18,8 +18,11 @@ package org.seasar.dbflute.logic.generate.language.location;
 /**
  * @author jflute
  */
-public class DfLanguageGeneratedClassPackageInfoCSharp implements DfLanguageGeneratedClassPackageInfo {
+public class DfLanguageGeneratedClassPackageCSharp implements DfLanguageGeneratedClassPackage {
 
+    // ===================================================================================
+    //                                                                               Basic
+    //                                                                               =====
     public String getBaseCommonPackage() {
         return "AllCommon";
     }
@@ -32,11 +35,11 @@ public class DfLanguageGeneratedClassPackageInfoCSharp implements DfLanguageGene
         return "BsDao";
     }
 
-    public String getCursorSimplePackageName() {
+    public String getCursorSimplePackage() {
         return "Cursor";
     }
 
-    public String getParameterBeanSimplePackageName() {
+    public String getParameterBeanSimplePackage() {
         return "PmBean";
     }
 
@@ -44,11 +47,11 @@ public class DfLanguageGeneratedClassPackageInfoCSharp implements DfLanguageGene
         return "BsEntity";
     }
 
-    public String getCustomizeEntitySimplePackageName() {
+    public String getCustomizeEntitySimplePackage() {
         return "Customize";
     }
 
-    public String getDBMetaSimplePackageName() {
+    public String getDBMetaSimplePackage() {
         return "Dbm";
     }
 
@@ -66,5 +69,13 @@ public class DfLanguageGeneratedClassPackageInfoCSharp implements DfLanguageGene
 
     public String getExtendedEntityPackage() {
         return "ExEntity";
+    }
+
+    // ===================================================================================
+    //                                                                             Various
+    //                                                                             =======
+    public String buildExtendedBehaviorPackageMark(String sqlPackage, String exbhvName) {
+        // because C# is allowed to have free directory structure
+        return "/" + exbhvName + "/";
     }
 }

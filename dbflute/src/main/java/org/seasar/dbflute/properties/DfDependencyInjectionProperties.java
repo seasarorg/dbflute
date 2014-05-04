@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDicon;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -141,12 +141,12 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return getProperty("j2eeDiconResourceName", getDefaultDBFluteDicon().getJ2eeDiconResourceName());
     }
 
-    protected DfLanguageDependencyInfo getLanguageDependencyInfo() {
-        return getBasicProperties().getLanguageDependencyInfo();
+    protected DfLanguageDependency getLanguageDependencyInfo() {
+        return getBasicProperties().getLanguageDependency();
     }
 
-    protected DfLanguageDBFluteDiconInfo getDefaultDBFluteDicon() {
-        return getLanguageDependencyInfo().getLanguageDBFluteDiconInfo();
+    protected DfLanguageDBFluteDicon getDefaultDBFluteDicon() {
+        return getLanguageDependencyInfo().getLanguageDBFluteDicon();
     }
 
     public static final String KEY_dbfluteDiconBeforeJ2eeIncludeDefinitionMap = "dbfluteDiconBeforeJ2eeIncludeDefinitionMap";

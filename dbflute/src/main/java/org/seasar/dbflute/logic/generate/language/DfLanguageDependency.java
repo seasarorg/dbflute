@@ -17,15 +17,15 @@ package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfo;
-import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDicon;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackage;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 
 /**
  * @author jflute
  */
-public interface DfLanguageDependencyInfo {
+public interface DfLanguageDependency {
 
     // ===================================================================================
     //                                                                               Basic
@@ -41,17 +41,17 @@ public interface DfLanguageDependencyInfo {
     /**
      * @return The information of target language grammar. (NotNull)
      */
-    DfLanguageGrammarInfo getLanguageGrammarInfo();
+    DfLanguageGrammar getLanguageGrammar();
 
     /**
      * @return The information of type mapping. (NotNull)
      */
-    DfLanguageTypeMappingInfo getLanguageTypeMappingInfo();
+    DfLanguageTypeMapping getLanguageTypeMapping();
 
     /**
      * @return The information object of DBFlute dicon. (NotNull)
      */
-    DfLanguageDBFluteDiconInfo getLanguageDBFluteDiconInfo();
+    DfLanguageDBFluteDicon getLanguageDBFluteDicon();
 
     // ===================================================================================
     //                                                                 Compile Environment
@@ -122,12 +122,14 @@ public interface DfLanguageDependencyInfo {
     String getTemplateFileExtension();
 
     /**
-     * @return The information of a generated class package. (NotNull)
+     * @return The information object of a generated class package. (NotNull)
      */
-    DfLanguageGeneratedClassPackageInfo getGeneratedClassPackageInfo();
+    DfLanguageGeneratedClassPackage getGeneratedClassPackage();
 
     // ===================================================================================
     //                                                                    Small Adjustment
     //                                                                    ================
     boolean isIfCommentExpressionCheckEnabled();
+
+    boolean isTypedParameterBeanEnabled();
 }

@@ -237,7 +237,7 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
         if (outsideSqlProp.isRequiredSqlDescription()) {
             checker.enableRequiredDescriptionCheck();
         }
-        if (getBasicProperties().getLanguageDependencyInfo().isIfCommentExpressionCheckEnabled()) {
+        if (getBasicProperties().getLanguageDependency().isIfCommentExpressionCheckEnabled()) {
             checker.enableIfCommentExpressionCheck(); // might be different specification between language
         }
         checker.check(sqlFile.getName(), sql);

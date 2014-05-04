@@ -15,11 +15,16 @@
  */
 package org.seasar.dbflute.logic.generate.language.location;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  */
-public class DfLanguageGeneratedClassPackageInfoJava implements DfLanguageGeneratedClassPackageInfo {
+public class DfLanguageGeneratedClassPackageJava implements DfLanguageGeneratedClassPackage {
 
+    // ===================================================================================
+    //                                                                               Basic
+    //                                                                               =====
     public String getBaseCommonPackage() {
         return "allcommon";
     }
@@ -32,11 +37,11 @@ public class DfLanguageGeneratedClassPackageInfoJava implements DfLanguageGenera
         return "bsdao";
     }
 
-    public String getCursorSimplePackageName() {
+    public String getCursorSimplePackage() {
         return "cursor";
     }
 
-    public String getParameterBeanSimplePackageName() {
+    public String getParameterBeanSimplePackage() {
         return "pmbean";
     }
 
@@ -44,11 +49,11 @@ public class DfLanguageGeneratedClassPackageInfoJava implements DfLanguageGenera
         return "bsentity";
     }
 
-    public String getCustomizeEntitySimplePackageName() {
+    public String getCustomizeEntitySimplePackage() {
         return "customize";
     }
 
-    public String getDBMetaSimplePackageName() {
+    public String getDBMetaSimplePackage() {
         return "dbmeta";
     }
 
@@ -66,5 +71,12 @@ public class DfLanguageGeneratedClassPackageInfoJava implements DfLanguageGenera
 
     public String getExtendedEntityPackage() {
         return "exentity";
+    }
+
+    // ===================================================================================
+    //                                                                             Various
+    //                                                                             =======
+    public String buildExtendedBehaviorPackageMark(String sqlPackage, String exbhvName) {
+        return Srl.replace(sqlPackage, ".", "/") + "/" + exbhvName + "/";
     }
 }

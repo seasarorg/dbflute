@@ -134,8 +134,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -562,8 +562,8 @@ public class TypeMap {
         if (basicProperties.isTargetLanguageJava()) {
             return NUMERIC_NATIVE_TYPE;
         } else {
-            final DfLanguageDependencyInfo languageDependencyInfo = basicProperties.getLanguageDependencyInfo();
-            final DfLanguageTypeMappingInfo languageMetaData = languageDependencyInfo.getLanguageTypeMappingInfo();
+            final DfLanguageDependency languageDependencyInfo = basicProperties.getLanguageDependency();
+            final DfLanguageTypeMapping languageMetaData = languageDependencyInfo.getLanguageTypeMapping();
             final Map<String, Object> jdbcToJavaNativeMap = languageMetaData.getJdbcToJavaNativeMap();
             return (String) jdbcToJavaNativeMap.get(NUMERIC);
         }
@@ -575,8 +575,8 @@ public class TypeMap {
         if (basicProperties.isTargetLanguageJava()) {
             return DECIMAL_NATIVE_TYPE;
         } else {
-            final DfLanguageDependencyInfo languageDependencyInfo = basicProperties.getLanguageDependencyInfo();
-            final DfLanguageTypeMappingInfo languageMetaData = languageDependencyInfo.getLanguageTypeMappingInfo();
+            final DfLanguageDependency languageDependencyInfo = basicProperties.getLanguageDependency();
+            final DfLanguageTypeMapping languageMetaData = languageDependencyInfo.getLanguageTypeMapping();
             final Map<String, Object> jdbcToJavaNativeMap = languageMetaData.getJdbcToJavaNativeMap();
             return (String) jdbcToJavaNativeMap.get(DECIMAL);
         }

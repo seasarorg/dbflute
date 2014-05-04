@@ -16,60 +16,78 @@
 package org.seasar.dbflute.logic.generate.language.grammar;
 
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class DfLanguageGrammarInfoPhp implements DfLanguageGrammarInfo {
+public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
 
     // ===================================================================================
     //                                                                       Basic Keyword
     //                                                                       =============
     public String getClassFileExtension() {
-        return "php";
+        return "cs";
     }
 
     public String getExtendsStringMark() {
-        return "extends";
+        return ":";
     }
 
     public String getImplementsStringMark() {
-        return "implements";
+        return ":";
     }
 
     public String getPublicDefinition() {
-        return "const";
+        return "public readonly";
     }
 
     public String getPublicStaticDefinition() {
-        return "const";
+        return "public static readonly";
     }
 
     public String getClassTypeLiteral(String className) {
-        throw new UnsupportedOperationException("Unsupported at Php");
-    }
-
-    public String getGenericListClassName(String element) {
-        throw new UnsupportedOperationException("Unsupported at Php");
-    }
-
-    public String getGenericMapListClassName(String key, String value) {
-        throw new UnsupportedOperationException("Unsupported at Php");
+        return "typeof(" + className + ")";
     }
 
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
+    public String buildGenericListClassName(String element) {
+        return "IList<" + element + ">";
+    }
+
+    public String buildGenericMapListClassName(String key, String value) {
+        return "IList<IDictionary<" + key + ", " + value + ">>";
+    }
+
+    public String buildGenericOneClassHint(String first) {
+        return "<" + first + ">";
+    }
+
+    public String buildGenericTwoClassHint(String first, String second) {
+        return "<" + first + ", " + second + ">";
+    }
+
     public String buildEntityPropertyGetSet(Column fromCol, Column toCol) {
-        throw new UnsupportedOperationException("Unsupported at Php");
+        return toCol.getJavaName() + " = this." + fromCol.getJavaName();
     }
 
     public String buildEntityPropertyName(Column col) {
-        return col.getUncapitalisedJavaName();
+        return col.getJavaName();
     }
 
     public String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
             boolean toBoolean) {
-        throw new UnsupportedOperationException("Unsupported at Php");
+        final String cdefCode = cdefBase + ".Code";
+        if (toNumber || toBoolean) {
+            return toValueTypeRemovedCSharpNullable(valueType) + ".Parse(" + cdefCode + ")";
+        } else {
+            return cdefCode;
+        }
+    }
+
+    protected String toValueTypeRemovedCSharpNullable(String valueType) {
+        return valueType.endsWith("?") ? Srl.substringLastFront(valueType, "?") : valueType;
     }
 }

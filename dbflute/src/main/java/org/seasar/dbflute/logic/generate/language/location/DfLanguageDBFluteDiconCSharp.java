@@ -18,17 +18,17 @@ package org.seasar.dbflute.logic.generate.language.location;
 /**
  * @author jflute
  */
-public class DfLanguageDBFluteDiconInfoJava implements DfLanguageDBFluteDiconInfo {
+public class DfLanguageDBFluteDiconCSharp implements DfLanguageDBFluteDicon {
 
     public String getDBFluteDiconFileName() {
-        return "dbflute.dicon";
+        return "DBFlute.dicon";
     }
 
     public String getDBFluteDiconNamespace() {
-        return "dbflute";
+        return "DBFlute";
     }
 
     public String getJ2eeDiconResourceName() {
-        return "j2ee.dicon";
+        return "${topNamespace}/Resources/Ado.dicon";
     }
 }

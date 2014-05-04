@@ -20,7 +20,7 @@ import org.apache.torque.engine.database.model.Column;
 /**
  * @author jflute
  */
-public interface DfLanguageGrammarInfo {
+public interface DfLanguageGrammar {
 
     // ===================================================================================
     //                                                                       Basic Keyword
@@ -55,19 +55,29 @@ public interface DfLanguageGrammarInfo {
      */
     String getClassTypeLiteral(String className);
 
-    /**
-     * @return The definition of 'List(element)'. (NotNull)
-     */
-    String getGenericListClassName(String element);
-
-    /**
-     * @return The definition of 'List(Map(key, value))'. (NotNull)
-     */
-    String getGenericMapListClassName(String key, String value);
-
     // ===================================================================================
     //                                                              Programming Expression
     //                                                              ======================
+    /**
+     * @return The definition of 'List&lt;element&gt;'. (NotNull)
+     */
+    String buildGenericListClassName(String element);
+
+    /**
+     * @return The definition of 'List&lt;Map&lt;key, value&gt;&gt;'. (NotNull)
+     */
+    String buildGenericMapListClassName(String key, String value);
+
+    /**
+     * @return The definition of '&lt;first&gt;'. (NotNull)
+     */
+    String buildGenericOneClassHint(String first);
+
+    /**
+     * @return The definition of '&lt;first, second&gt;'. (NotNull)
+     */
+    String buildGenericTwoClassHint(String first, String second);
+
     /**
      * @param fromCol The column object to get. (NotNull)
      * @param toCol The column object to set. (NotNull)

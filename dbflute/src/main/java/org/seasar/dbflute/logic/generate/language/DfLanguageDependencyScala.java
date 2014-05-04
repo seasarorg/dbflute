@@ -15,15 +15,15 @@
  */
 package org.seasar.dbflute.logic.generate.language;
 
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfoScala;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
-import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfoJava;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarScala;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingJava;
 
 /**
  * @author jflute
  */
-public class DfLanguageDependencyInfoScala extends DfLanguageDependencyInfoJava {
+public class DfLanguageDependencyScala extends DfLanguageDependencyJava {
 
     // ===================================================================================
     //                                                                          Definition
@@ -42,13 +42,13 @@ public class DfLanguageDependencyInfoScala extends DfLanguageDependencyInfoJava 
     //                                                                    Program Handling
     //                                                                    ================
     @Override
-    public DfLanguageGrammarInfo getLanguageGrammarInfo() {
-        return new DfLanguageGrammarInfoScala();
+    public DfLanguageGrammar getLanguageGrammar() {
+        return new DfLanguageGrammarScala();
     }
 
     @Override
-    public DfLanguageTypeMappingInfo getLanguageTypeMappingInfo() {
-        return new DfLanguageTypeMappingInfoJava(); // #pending jflute Scala's type
+    public DfLanguageTypeMapping getLanguageTypeMapping() {
+        return new DfLanguageTypeMappingJava(); // #pending jflute Scala's type
     }
 
     // ===================================================================================

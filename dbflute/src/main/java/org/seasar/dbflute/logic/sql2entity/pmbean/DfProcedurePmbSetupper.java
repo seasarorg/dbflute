@@ -27,7 +27,7 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
-import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
@@ -281,8 +281,8 @@ public class DfProcedurePmbSetupper {
     }
 
     protected String getProcedureDefaultResultSetPropertyType() {
-        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
-        return grammarInfo.getGenericMapListClassName("String", "Object"); // Map<String, Object>
+        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+        return grammarInfo.buildGenericMapListClassName("String", "Object"); // Map<String, Object>
     }
 
     // -----------------------------------------------------
@@ -427,8 +427,8 @@ public class DfProcedurePmbSetupper {
     }
 
     protected String getGenericListClassName(String element) {
-        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
-        return grammarInfo.getGenericListClassName(element); // List<ELEMENT>
+        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+        return grammarInfo.buildGenericListClassName(element); // List<ELEMENT>
     }
 
     protected static class ProcedurePropertyInfo {
@@ -490,8 +490,8 @@ public class DfProcedurePmbSetupper {
         // so it adjusts project prefix here
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String propertyType = projectPrefix + entityName;
-        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
-        return grammarInfo.getGenericListClassName(propertyType);
+        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+        return grammarInfo.buildGenericListClassName(propertyType);
     }
 
     protected String convertColumnNameToPropertyName(String columnName) {
