@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.properties;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -638,28 +637,31 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                 PG Reservation Word
     //                                                                 ===================
-    protected List<String> _pgReservColumnList;
+    protected Set<String> _pgReservColumnSet;
 
-    protected List<String> getPgReservColumnList() { // closet
-        if (_pgReservColumnList != null) {
-            return _pgReservColumnList;
+    protected Set<String> getPgReservColumnSet() { // closet
+        if (_pgReservColumnSet != null) {
+            return _pgReservColumnSet;
         }
+        _pgReservColumnSet = StringSet.createAsFlexible();
         final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
         final Object obj = littleAdjustmentMap.get("pgReservColumnList");
+        final List<String> pgReservColumnList;
         if (obj != null) {
-            _pgReservColumnList = castToList(obj, "littleAdjustmentMap.pgReservColumnList");
+            pgReservColumnList = castToList(obj, "littleAdjustmentMap.pgReservColumnList");
         } else {
-            _pgReservColumnList = new ArrayList<String>();
+            pgReservColumnList = DfCollectionUtil.emptyList();
         }
-        return _pgReservColumnList;
+        _pgReservColumnSet.addAll(pgReservColumnList);
+        return _pgReservColumnSet;
     }
 
     public boolean isPgReservColumn(String columnName) {
-        final List<String> pgReservColumnList = getPgReservColumnList();
+        final Set<String> pgReservColumnList = getPgReservColumnSet();
         if (pgReservColumnList.isEmpty()) {
             return getBasicProperties().getLanguageDependency().getLanguageGrammar().isPgReservColumn(columnName);
         } else {
-            return Srl.equalsIgnoreCase(columnName, pgReservColumnList.toArray(new String[] {}));
+            return pgReservColumnList.contains(columnName);
         }
     }
 

@@ -28,9 +28,6 @@ import org.seasar.dbflute.dbmeta.hierarchy.HierarchyBasicRequest;
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyRequest;
 #end
 import org.seasar.dbflute.outsidesql.executor.*;
-#if ($table.isBuriTarget())
-import ${glPackagePluginBuri}.${glBuriDef};
-#end
 #if ($table.hasPrimaryKeyForcedClassificationSetting())
 import ${glPackageBaseCommon}.${glCDef};
 #end
@@ -47,9 +44,6 @@ import ${glPackageCB}.*;
 #end
 /**
  * The behavior of ${table.basicInfoDispString}. <br />
-#if ($table.isBuriInternal())
- * {Buri Internal}
-#end
  * <pre>
  * [primary key]
  *     ${table.primaryKeyNameCommaString}
@@ -611,59 +605,6 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
 #end
 #end
-#end
-#end
-#if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
-#foreach ($processName in $table.tableProcessForMethodNameList)
-#set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
-#set ($referrerBhvClassName = "${glPackageExtendedBhv}.${glProjectPrefix}BuriAllRoundStateHistoryBhv")
-#set ($referrerCBClassName = "${glProjectPrefix}BuriAllRoundStateHistoryCB")
-#set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
-#set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
-#set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
-    public void loadBuriAllRoundStateHistory_${processName}List(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
-        xassLRArg(${myEntityVariableName}, conditionBeanSetupper);
-        loadBuriAllRoundStateHistory_${processName}List(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
-    }
-    public void loadBuriAllRoundStateHistory_${processName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
-        xassLRArg(${myEntityListVariableName}, conditionBeanSetupper);
-        loadBuriAllRoundStateHistory_${processName}List(${myEntityListVariableName}, new org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>().xinit(conditionBeanSetupper));
-    }
-    public void loadBuriAllRoundStateHistory_${processName}List(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
-        xassLRArg(${myEntityVariableName}, loadReferrerOption);
-        loadBuriAllRoundStateHistory_${processName}List(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
-    }
-    public void loadBuriAllRoundStateHistory_${processName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
-        xassLRArg(${myEntityListVariableName}, loadReferrerOption);
-        if (${myEntityListVariableName}.isEmpty()) { return; }
-        final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
-        helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
-            public ${table.getPrimaryKeyJavaNativeAsOne()} getPKVal(${myExtendedObjectClassName} entity)
-            { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
-            public void setRfLs(${myExtendedObjectClassName} entity, List<${referrerEntityClassName}> referrerList)
-            { entity.setBuriAllRoundStateHistory_${processName}List(referrerList); }
-            public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
-            public void qyFKIn(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) {
-                java.util.List<Long> internalPkValueList = new java.util.ArrayList<Long>();
-                for (${table.getPrimaryKeyJavaNativeAsOne()} pk : pkList) {
-                    internalPkValueList.add(Long.valueOf(pk.toString()));
-                }
-                cb.query().setInternalPkValue_InScope(internalPkValueList);
-                cb.query().setInternalDataType_Equal("${glPackageExtendedEntity}.${myExtendedObjectClassName}"); // is a fixed condition!
-            }
-            public void qyOdFKAsc(${referrerCBClassName} cb)
-            { cb.query().addOrderBy_InternalPkValue_Asc(); }
-            public void spFKCol(${referrerCBClassName} cb) { cb.specify().columnInternalPkValue(); }
-            public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb)
-            { return referrerBhv.selectList(cb); }
-            public ${table.getPrimaryKeyJavaNativeAsOne()} getFKVal(${referrerEntityClassName} entity)
-            { return ${table.getPrimaryKeyJavaNativeAsOne()}.valueOf(entity.getInternalPkValue().toString()); }
-            public void setlcEt(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} localEntity)
-            { referrerEntity.set${table.javaName}_${processName}(localEntity); }
-            public String getRfPrNm() { return "${referrer.referrerPropertyName}"; }
-        });
-    }
-
 #end
 #end
     // ===================================================================================
@@ -1881,112 +1822,6 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
     public OutsideSqlBasicExecutor<${myExtendedBhvClassName}> outsideSql() {
         return doOutsideSql();
     }
-#if ($table.isBuriTarget())
-
-    // ===================================================================================
-    //                                                                      Buri Interface
-    //                                                                      ==============
-    public ${myExtendedObjectClassName} xgetEntityForBuri(${table.primaryKeyArgsString}) { // For Buri
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMap(getDBMeta().extractPrimaryKeyMap(entity));
-        return selectEntity(cb);
-    }
-
-    public List<${myExtendedObjectClassName}> xgetEntitiesForBuri(List<${table.primaryKeyJavaNativeAsOne}> ids) { // For Buri
-        ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.query().set${table.primaryKeyAsOne.javaName}_InScope(ids);
-        return selectList(cb);
-    }
-
-    protected org.escafe.buri.engine.processor.BuriAutoSelectProcessor _buriAutoSelectProcessor;
-    public void setBuriAutoSelectProcessor(org.escafe.buri.engine.processor.BuriAutoSelectProcessor buriAutoSelectProcessor) {
-        _buriAutoSelectProcessor = buriAutoSelectProcessor;
-    }
-
-    protected void toNextStatusAction(String processPath, Object entity, Object userData, String action) {
-        try {
-            _buriAutoSelectProcessor.toNextStatusAction(processPath, entity, userData, action);
-        } catch (org.seasar.coffee.script.exception.ScriptExecuteException e) {
-            if (e.getCause() instanceof ognl.MethodFailedException) {
-                ognl.MethodFailedException fail = (ognl.MethodFailedException) e.getCause();
-                Throwable reason = fail.getReason();
-                if (reason instanceof org.seasar.dbflute.exception.EntityAlreadyExistsException) {
-                    throw (org.seasar.dbflute.exception.EntityAlreadyExistsException)reason;
-                } else if (reason instanceof org.seasar.dbflute.exception.EntityAlreadyDeletedException) {
-                    throw (org.seasar.dbflute.exception.EntityAlreadyDeletedException)reason;
-                } else if (reason instanceof org.seasar.dbflute.exception.EntityAlreadyUpdatedException) {
-                    throw (org.seasar.dbflute.exception.EntityAlreadyUpdatedException)reason;
-                }
-            }
-            throw e;
-        }
-    }
-
-    protected ${glBuriDef}.BuriUserDataProvider _buriUserDataProvider;
-    public void setBuriUserDataProvider(${glBuriDef}.BuriUserDataProvider buriUserDataProvider) {
-        _buriUserDataProvider = buriUserDataProvider;
-    }
-#foreach ($processName in $table.tableProcessForMethodNameList)
-
-    public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
-        assertEntityNotNull(${myEntityVariableName});
-        String processPath = ${glBuriDef}.BuriProcess.${processName}.path();
-        Object userData = getUserData_${processName}(${myEntityVariableName}, action);
-        toNextStatusAction(processPath, ${myEntityVariableName}, userData, action.code());
-    }
-
-    protected Object getUserData_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
-        if (_buriUserDataProvider == null) { return null; }
-        return _buriUserDataProvider.provide(${glBuriDef}.BuriProcess.${processName}, ${myEntityVariableName}, action);
-    }
-
-    public ${glBuriDef}.${processName}_Status getStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
-        assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
-        java.util.List<BuriAllRoundState> buriAllRoundStateList = xgetCurrentStateList(${myEntityVariableName}, ${glBuriDef}.BuriProcess.${processName});
-        java.util.List<${glBuriDef}.${processName}_Status> statusList = new java.util.ArrayList<${glBuriDef}.${processName}_Status>();
-        if (buriAllRoundStateList.isEmpty()) { return null; }
-        for (BuriAllRoundState buriAllRoundState : buriAllRoundStateList) {
-            ${glBuriDef}.${processName}_Status status = ${glBuriDef}.${processName}_Status.codeOf(buriAllRoundState.getStatusPathName());
-            if (status != null) { statusList.add(status); }
-        }
-        if (statusList.size() > 1) {
-            String msg = "This method does not support duplicate status: " + statusList;
-            throw new IllegalStateException(msg);
-        }
-        return !statusList.isEmpty() ? statusList.get(0) : null;
-    }
-
-    public java.util.List<${myExtendedObjectClassName}> getEntities(org.seasar.dbflute.bhv.ConditionBeanSetupper<${myConditionBeanClassName}> conditionBeanSetupper
-            , ${glBuriDef}.${processName}_Status... statuses) {
-        assertObjectNotNull("statuses", statuses);
-        ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.setupSelect_BuriAllRoundState_${processName}();
-        conditionBeanSetupper.setup(cb);
-        java.util.List<String> pathNameList = new java.util.ArrayList<String>();
-        for (${glBuriDef}.${processName}_Status status : statuses) {
-            pathNameList.add(status.path());
-        }
-        cb.query().queryBuriAllRoundState_${processName}().setStatusPathName_InScope(pathNameList);
-        return selectList(cb);
-    }
-#end
-
-    private List<BuriAllRoundState> xgetCurrentStateList(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.BuriProcess process) {
-        ${glPackageExtendedBhv}.BuriAllRoundStateBhv bhv = xgetBuriAllRoundStateBhv();
-        BuriAllRoundStateCB cb = bhv.newMyConditionBean();
-        cb.specify().columnStatusPathName();
-        cb.query().setStatusPathName_LikeSearch(process.path() + ".", new org.seasar.dbflute.cbean.coption.LikeSearchOption().likePrefix());
-        cb.query().setInternalPkValue_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
-        cb.query().setInternalDataType_Equal(${myExtendedObjectClassName}.class.getName());
-        return bhv.selectList(cb);
-    }
-
-    private ${glPackageExtendedBhv}.BuriAllRoundStateBhv xgetBuriAllRoundStateBhv() {
-        return getBehaviorSelector().select(${glPackageExtendedBhv}.BuriAllRoundStateBhv.class);
-    }
-#end
 
     // ===================================================================================
     //                                                                     Delegate Method

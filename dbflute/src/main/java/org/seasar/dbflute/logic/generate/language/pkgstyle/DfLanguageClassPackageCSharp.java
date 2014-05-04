@@ -78,4 +78,8 @@ public class DfLanguageClassPackageCSharp implements DfLanguageClassPackage {
         // because C# is allowed to have free directory structure
         return "/" + exbhvName + "/";
     }
+
+    public String buildAccessContextFqcn(String baseCommonPackage, String projectPrefix) {
+        return baseCommonPackage + "." + projectPrefix + "AccessContext";
+    }
 }

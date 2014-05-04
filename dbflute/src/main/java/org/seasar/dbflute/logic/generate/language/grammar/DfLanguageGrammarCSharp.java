@@ -137,4 +137,28 @@ public class DfLanguageGrammarCSharp implements DfLanguageGrammar {
     public boolean isPgReservColumn(String columnName) {
         return _pgReservColumnSet.contains(columnName);
     }
+
+    public String adjustClassElementIndent(String baseIndent) {
+        return baseIndent + "    ";
+    }
+
+    public String escapeJavaDocString(String comment) {
+        return comment; // no adjustment for now
+    }
+
+    public String buildJavaDocCommentWithTitleIndentDirectly(String resolvedTitle, String adjustedIndent) {
+        return adjustedIndent + "/// <summary>" + resolvedTitle + " </summary>";
+    }
+
+    public String buildJavaDocLineAndIndent(String sourceCodeLineSeparator, String baseIndent) {
+        return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustClassElementIndent(baseIndent));
+    }
+
+    public String buildJavaDocLineAndIndentDirectly(String sourceCodeLineSeparator, String adjustedIndent) {
+        return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustedIndent);
+    }
+
+    protected String doBuildJavaDocLineAndIndent(String sourceCodeLineSeparator, String adjustedIndent) {
+        return sourceCodeLineSeparator + adjustedIndent + "/// ";
+    }
 }

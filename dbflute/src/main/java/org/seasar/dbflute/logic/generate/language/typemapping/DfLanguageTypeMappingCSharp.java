@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -28,9 +29,9 @@ public class DfLanguageTypeMappingCSharp implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final Map<String, Object> _jdbcToJavaNativeMap;
+    protected static final Map<String, String> _jdbcToJavaNativeMap;
     static {
-        final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
+        final Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
         map.put("CHAR", "String");
         map.put("VARCHAR", "String");
         map.put("LONGVARCHAR", "String");
@@ -58,7 +59,7 @@ public class DfLanguageTypeMappingCSharp implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                             Mapping
     //                                                                             =======
-    public Map<String, Object> getJdbcToJavaNativeMap() {
+    public Map<String, String> getJdbcToJavaNativeMap() {
         return _jdbcToJavaNativeMap;
     }
 
@@ -88,11 +89,40 @@ public class DfLanguageTypeMappingCSharp implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                JDBC Type Adjustment
     //                                                                ====================
-    public String getSequenceType() {
+    public String getSequenceJavaNativeType() {
         return "int?"; // #pending jflute long?
+    }
+
+    public String getDefaultNumericJavaNativeType() {
+        return "decimal?";
+    }
+
+    public String getDefaultDecimalJavaNativeType() {
+        return "decimal?";
     }
 
     public String getJdbcTypeOfUUID() {
         return null; // does C# support it?
+    }
+
+    public String switchParameterBeanTestValueType(String plainTypeName) {
+        if (Srl.equalsPlain(plainTypeName, "BigDecimal")) {
+            return "decimal?";
+        } else if (Srl.equalsPlain(plainTypeName, "Long")) {
+            return "long?";
+        } else if (Srl.equalsPlain(plainTypeName, "Integer")) {
+            return "int?";
+        } else if (Srl.equalsPlain(plainTypeName, "Date", "Timestamp", "Time")) {
+            return "DateTime?";
+        } else if (Srl.equalsPlain(plainTypeName, "Boolean")) {
+            return "bool?";
+        } else if (Srl.equalsPlain(plainTypeName, "boolean")) {
+            return "bool";
+        } else if (Srl.isQuotedAnything(plainTypeName, "List<", ">")) {
+            final String elementType = Srl.unquoteAnything(plainTypeName, "List<", ">");
+            return "IList<" + switchParameterBeanTestValueType(elementType) + ">";
+        } else {
+            return plainTypeName;
+        }
     }
 }

@@ -141,7 +141,6 @@ import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
@@ -1412,20 +1411,8 @@ public class Column {
             // initial-capitalize only
             _javaName = initCap(resourceName);
         }
-        _javaName = filterJavaNameBuriStyleIfNeeds(_javaName); // for Buri
         _javaName = filterJavaNameNonCompilableConnector(_javaName); // for example, "SPACE EXISTS"
         return _javaName;
-    }
-
-    protected String filterJavaNameBuriStyleIfNeeds(String javaName) { // for Buri
-        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        if (buriProperties.isUseBuri() && getTable().isBuriInternal()) {
-            final String arranged = buriProperties.arrangeBuriColumnJavaName(_javaName);
-            if (arranged != null) {
-                return arranged;
-            }
-        }
-        return javaName;
     }
 
     protected String filterJavaNameNonCompilableConnector(String javaName) {

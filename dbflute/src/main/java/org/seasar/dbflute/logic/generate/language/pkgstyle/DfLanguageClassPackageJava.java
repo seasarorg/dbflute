@@ -79,4 +79,8 @@ public class DfLanguageClassPackageJava implements DfLanguageClassPackage {
     public String buildExtendedBehaviorPackageMark(String sqlPackage, String exbhvName) {
         return Srl.replace(sqlPackage, ".", "/") + "/" + exbhvName + "/";
     }
+
+    public String buildAccessContextFqcn(String baseCommonPackage, String projectPrefix) {
+        return "org.seasar.dbflute.AccessContext";
+    }
 }

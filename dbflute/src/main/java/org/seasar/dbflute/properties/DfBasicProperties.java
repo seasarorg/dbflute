@@ -243,40 +243,41 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getTargetLanguage(); // same as language
     }
 
-    public boolean isTargetLanguageJava() {
+    public DfLanguageDependency getLanguageDependency() {
+        if (_languageDependency != null) {
+            return _languageDependency;
+        }
+        final DfLanguageDependency lang;
+        if (isTargetLanguageJava()) {
+            lang = new DfLanguageDependencyJava();
+        } else if (isTargetLanguageCSharp()) {
+            lang = new DfLanguageDependencyCSharp();
+        } else if (isTargetLanguagePhp()) {
+            lang = new DfLanguageDependencyPhp();
+        } else if (isTargetLanguageScala()) {
+            lang = new DfLanguageDependencyScala();
+        } else {
+            String msg = "The language is supported: " + getTargetLanguage();
+            throw new IllegalStateException(msg);
+        }
+        _languageDependency = lang;
+        return _languageDependency;
+    }
+
+    protected boolean isTargetLanguageJava() {
         return JAVA_targetLanguage.equals(getTargetLanguage());
     }
 
-    public boolean isTargetLanguageCSharp() {
+    protected boolean isTargetLanguageCSharp() {
         return CSHARP_targetLanguage.equals(getTargetLanguage());
     }
 
-    public boolean isTargetLanguagePhp() {
+    protected boolean isTargetLanguagePhp() {
         return PHP_targetLanguage.equals(getTargetLanguage());
     }
 
-    public boolean isTargetSubLanguageScala() {
+    protected boolean isTargetLanguageScala() {
         return SCALA_targetLanguage.equals(getTargetLanguage());
-    }
-
-    public DfLanguageDependency getLanguageDependency() {
-        if (_languageDependency == null) {
-            if (isTargetLanguageJava()) {
-                if (isTargetSubLanguageScala()) { // as sub language
-                    _languageDependency = new DfLanguageDependencyScala();
-                } else { // pure java
-                    _languageDependency = new DfLanguageDependencyJava();
-                }
-            } else if (isTargetLanguageCSharp()) {
-                _languageDependency = new DfLanguageDependencyCSharp();
-            } else if (isTargetLanguagePhp()) {
-                _languageDependency = new DfLanguageDependencyPhp();
-            } else {
-                String msg = "The language is supported: " + getTargetLanguage();
-                throw new IllegalStateException(msg);
-            }
-        }
-        return _languageDependency;
     }
 
     // ===================================================================================
@@ -747,13 +748,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             msg = msg + " language=" + getBasicProperties().getTargetLanguage();
             throw new IllegalStateException(msg);
         }
-    }
-
-    // ===================================================================================
-    //                                                                           HotDeploy
-    //                                                                           =========
-    public boolean isAvailableHotDeploy() { // It's closet! And the Seasar only!
-        return isProperty("isAvailableHotDeploy", false);
     }
 
     // ===================================================================================

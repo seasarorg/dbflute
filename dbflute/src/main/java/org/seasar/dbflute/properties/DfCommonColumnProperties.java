@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguageClassPackage;
 import org.seasar.dbflute.properties.assistant.DfTableListProvider;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.seasar.dbflute.util.DfPropertyUtil;
@@ -341,20 +342,25 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         }
     }
 
+    protected String _accessContextFqcn;
+
     public String getAccessContextFqcn() {
+        if (_accessContextFqcn != null) {
+            return _accessContextFqcn;
+        }
         final DfBasicProperties prop = getBasicProperties();
-        final boolean csharp = prop.isTargetLanguageCSharp();
         final boolean hibernate = prop.isFriendsHibernate();
+        final String baseCommonPackage = prop.getBaseCommonPackage();
+        final String projectPrefix = prop.getProjectPrefix();
         final String accessContext;
-        if (csharp || hibernate) {
-            // DBFlute.NET(C#) or before 0.9.0 (contains for Hibernate)
-            final String baseCommonPackage = prop.getBaseCommonPackage();
-            final String projectPrefix = getBasicProperties().getProjectPrefix();
+        if (hibernate) {
             accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
         } else {
-            accessContext = "org.seasar.dbflute.AccessContext";
+            final DfLanguageClassPackage classPkg = prop.getLanguageDependency().getLanguageClassPackage();
+            accessContext = classPkg.buildAccessContextFqcn(baseCommonPackage, projectPrefix);
         }
-        return accessContext;
+        _accessContextFqcn = accessContext;
+        return _accessContextFqcn;
     }
 
     // -----------------------------------------------------

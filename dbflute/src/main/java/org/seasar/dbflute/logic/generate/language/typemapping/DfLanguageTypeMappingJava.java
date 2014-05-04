@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.generate.language.typemapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,20 +30,28 @@ public class DfLanguageTypeMappingJava implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final Map<String, Object> DEFAULT_EMPTY_MAP = DfCollectionUtil.newLinkedHashMap();
-    protected static final List<String> _stringList = DfCollectionUtil.newArrayList("String");
-    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("Byte", "Short", "Integer", "Long",
-            "Float", "Double", "BigDecimal", "BigInteger");
-    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("Date", "Time", "Timestamp");
-    protected static final List<String> _booleanList = DfCollectionUtil.newArrayList("Boolean");
-    protected static final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
+    protected static final Map<String, String> DEFAULT_EMPTY_MAP = DfCollectionUtil.newLinkedHashMap();
+    protected static final String JAVA_NATIVE_BIGDECIMAL = "java.math.BigDecimal";
+
+    protected static final List<String> _stringList = newArrayList("String");
+    protected static final List<String> _numberList;
+    static {
+        _numberList = newArrayList("Byte", "Short", "Integer", "Long", "Float", "Double", "BigDecimal", "BigInteger");
+    }
+    protected static final List<String> _dateList = newArrayList("Date", "Time", "Timestamp");
+    protected static final List<String> _booleanList = newArrayList("Boolean");
+    protected static final List<String> _binaryList = newArrayList("byte[]");
+
+    protected static <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT... elements) {
+        return DfCollectionUtil.newArrayList(elements);
+    }
 
     // ===================================================================================
     //                                                                        Type Mapping
     //                                                                        ============
-    public Map<String, Object> getJdbcToJavaNativeMap() {
-        // Java's native map is defined at TypeMap
-        // so this returns empty. (special handling)
+    public Map<String, String> getJdbcToJavaNativeMap() {
+        // Java native types are defined in TypeMap as default type
+        // so this returns empty (this is special handling for Java)
         return DEFAULT_EMPTY_MAP;
     }
 
@@ -70,13 +79,25 @@ public class DfLanguageTypeMappingJava implements DfLanguageTypeMapping {
     }
 
     // ===================================================================================
-    //                                                                JDBC Type Adjustment
-    //                                                                ====================
-    public String getSequenceType() {
-        return "java.math.BigDecimal";
+    //                                                                    Small Adjustment
+    //                                                                    ================
+    public String getSequenceJavaNativeType() {
+        return JAVA_NATIVE_BIGDECIMAL;
+    }
+
+    public String getDefaultNumericJavaNativeType() {
+        return JAVA_NATIVE_BIGDECIMAL;
+    }
+
+    public String getDefaultDecimalJavaNativeType() {
+        return JAVA_NATIVE_BIGDECIMAL;
     }
 
     public String getJdbcTypeOfUUID() {
         return TypeMap.UUID; // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
+    }
+
+    public String switchParameterBeanTestValueType(String plainTypeName) {
+        return plainTypeName;
     }
 }

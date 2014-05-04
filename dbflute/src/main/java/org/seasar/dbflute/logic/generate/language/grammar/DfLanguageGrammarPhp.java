@@ -104,6 +104,30 @@ public class DfLanguageGrammarPhp implements DfLanguageGrammar {
     //                                                                    Small Adjustment 
     //                                                                    ================
     public boolean isPgReservColumn(String columnName) {
-        return false;
+        return false; // unknown
+    }
+
+    public String escapeJavaDocString(String comment) {
+        return comment; // unknown
+    }
+
+    public String adjustClassElementIndent(String baseIndent) {
+        return baseIndent; // no adjustment, same as Java
+    }
+
+    public String buildJavaDocCommentWithTitleIndentDirectly(String resolvedTitle, String adjustedIndent) {
+        return adjustedIndent + "/** " + resolvedTitle + " */";
+    }
+
+    public String buildJavaDocLineAndIndent(String sourceCodeLineSeparator, String baseIndent) {
+        return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustClassElementIndent(baseIndent));
+    }
+
+    public String buildJavaDocLineAndIndentDirectly(String sourceCodeLineSeparator, String adjustedIndent) {
+        return doBuildJavaDocLineAndIndent(sourceCodeLineSeparator, adjustedIndent);
+    }
+
+    protected String doBuildJavaDocLineAndIndent(String sourceCodeLineSeparator, String adjustedIndent) {
+        return "<br />" + sourceCodeLineSeparator + adjustedIndent + " * ";
     }
 }

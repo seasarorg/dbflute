@@ -36,6 +36,7 @@ import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.pkgstyle.DfLanguagePropertyPackageResolver;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.cmentity.DfCustomizeEntityInfo;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
@@ -360,7 +361,7 @@ public class DfParameterBeanResolver {
 
     protected String derivePropertyTypeFromTestValue(String testValue) {
         final String plainType = doDerivePropertyTypeFromTestValue(testValue);
-        return resolvePackageNameExceptUtil(switchPlainTypeNameIfCSharp(plainType));
+        return resolvePackageNameExceptUtil(switchPlainTypeName(plainType));
     }
 
     protected String doDerivePropertyTypeFromTestValue(String testValue) { // test point
@@ -458,33 +459,9 @@ public class DfParameterBeanResolver {
         return plainTypeName;
     }
 
-    protected String switchPlainTypeNameIfCSharp(String plainTypeName) {
-        final boolean csharp = getBasicProperties().isTargetLanguageCSharp();
-        if (!csharp) {
-            return plainTypeName;
-        }
-        return doSwitchPlainTypeNameIfCSharp(plainTypeName);
-    }
-
-    protected String doSwitchPlainTypeNameIfCSharp(String plainTypeName) { // test point
-        if (Srl.equalsPlain(plainTypeName, "BigDecimal")) {
-            return "decimal?";
-        } else if (Srl.equalsPlain(plainTypeName, "Long")) {
-            return "long?";
-        } else if (Srl.equalsPlain(plainTypeName, "Integer")) {
-            return "int?";
-        } else if (Srl.equalsPlain(plainTypeName, "Date", "Timestamp", "Time")) {
-            return "DateTime?";
-        } else if (Srl.equalsPlain(plainTypeName, "Boolean")) {
-            return "bool?";
-        } else if (Srl.equalsPlain(plainTypeName, "boolean")) {
-            return "bool";
-        } else if (Srl.isQuotedAnything(plainTypeName, "List<", ">")) {
-            final String elementType = Srl.unquoteAnything(plainTypeName, "List<", ">");
-            return "IList<" + doSwitchPlainTypeNameIfCSharp(elementType) + ">";
-        } else {
-            return plainTypeName;
-        }
+    protected String switchPlainTypeName(String plainTypeName) {
+        final DfLanguageTypeMapping typeMapping = getBasicProperties().getLanguageDependency().getLanguageTypeMapping();
+        return typeMapping.switchParameterBeanTestValueType(plainTypeName);
     }
 
     protected String derivePropertyOptionFromTestValue(String testValue) { // test point
@@ -509,7 +486,7 @@ public class DfParameterBeanResolver {
     //                                            ----------
     protected void doProcessAutoDetectIfNode(String sql, Map<String, String> propertyNameTypeMap,
             Map<String, String> propertyNameOptionMap, IfNode ifNode) {
-        final String ifCommentBooleanType = switchPlainTypeNameIfCSharp("boolean");
+        final String ifCommentBooleanType = switchPlainTypeName("boolean");
         final String expression = ifNode.getExpression().trim(); // trim it just in case
         final List<String> elementList = Srl.splitList(expression, " ");
         for (int i = 0; i < elementList.size(); i++) {
@@ -616,7 +593,7 @@ public class DfParameterBeanResolver {
         }
         final DetectedPropertyInfo detected = analyzeForNodeElementType(forNode, propertyName);
         if (detected != null) {
-            final String propertyType = switchPlainTypeNameIfCSharp(detected.getPropertyType());
+            final String propertyType = switchPlainTypeName(detected.getPropertyType());
             propertyNameTypeMap.put(propertyName, propertyType);
             final String propertyOption = detected.getPropertyOption();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(propertyOption)) {

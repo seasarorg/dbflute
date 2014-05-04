@@ -24,7 +24,6 @@ import org.seasar.dbflute.properties.DfAdditionalUniqueKeyProperties;
 import org.seasar.dbflute.properties.DfAllClassCopyrightProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
-import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -166,13 +165,6 @@ public final class DfBuildProperties {
     //                                       ---------------
     public DfBehaviorFilterProperties getBehaviorFilterProperties() {
         return getHandler().getBehaviorFilterProperties(getProperties());
-    }
-
-    // -----------------------------------------------------
-    //                                                  Buri
-    //                                                  ----
-    public DfBuriProperties getBuriProperties() {
-        return getHandler().getBuriProperties(getProperties());
     }
 
     // -----------------------------------------------------

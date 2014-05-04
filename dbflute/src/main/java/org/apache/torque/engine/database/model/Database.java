@@ -168,7 +168,6 @@ import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbGenerationHandler;
 import org.seasar.dbflute.logic.sql2entity.pmbean.DfPmbMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -988,15 +987,6 @@ public class Database {
      * This is basically for Generate task. (Not Sql2Entity)
      */
     public void initializeAdditionalForeignKey() {
-        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Set up implicit foreign key for Buri before initializing
-        // - - - - - - - - - -/
-        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        buriProperties.setupImplicitAdditionalForeignKey(new DfTableFinder() {
-            public Table findTable(String tableName) {
-                return getTable(tableName);
-            }
-        });
         // /- - - - - - - - - - - - - - - - -
         // Initialize additional foreign key
         // - - - - - - - - - -/
@@ -1525,13 +1515,6 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                            Hot Deploy
-    //                                            ----------
-    public boolean isAvailableHotDeploy() {
-        return getBasicProperties().isAvailableHotDeploy();
-    }
-
-    // -----------------------------------------------------
     //                                        Begin/End Mark
     //                                        --------------
     public String getBehaviorQueryPathBeginMark() {
@@ -1641,6 +1624,10 @@ public class Database {
 
     public List<String> getDBFluteDiconOtherIncludePathList() {
         return getProperties().getDependencyInjectionProperties().getDBFluteDiconOtherIncludePathList();
+    }
+
+    public boolean isSuppressDiconBehaviorDefinition() {
+        return getProperties().getDependencyInjectionProperties().isSuppressDiconBehaviorDefinition();
     }
 
     public String filterDBFluteDiconBhvAp(String filePath) { // as utility for application behavior
@@ -2072,37 +2059,6 @@ public class Database {
 
     public boolean isCompatibleBatchUpdateDefaultEveryColumn() {
         return getLittleAdjustmentProperties().isCompatibleBatchUpdateDefaultEveryColumn();
-    }
-
-    // ===================================================================================
-    //                                                                     Buri Properties
-    //                                                                     ===============
-    public boolean isUseBuri() {
-        return getProperties().getBuriProperties().isUseBuri();
-    }
-
-    public List<String> getBuriPackageList() {
-        return new ArrayList<String>(getProperties().getBuriProperties().getActivityDefinitionMap().keySet());
-    }
-
-    public List<String> getBuriProcessList(String packageName) {
-        return new ArrayList<String>(getProperties().getBuriProperties().getProcessMap(packageName).keySet());
-    }
-
-    public List<String> getBuriStatusList(String packageName, String processName) {
-        return getProperties().getBuriProperties().getStatusList(packageName, processName);
-    }
-
-    public List<String> getBuriActionList(String packageName, String processName) {
-        return getProperties().getBuriProperties().getActionList(packageName, processName);
-    }
-
-    public boolean hasBuriAllRoundStateHistory() {
-        return getProperties().getBuriProperties().hasBuriAllRoundStateHistory(new DfTableFinder() {
-            public Table findTable(String name) {
-                return getTable(name);
-            }
-        });
     }
 
     // ===================================================================================

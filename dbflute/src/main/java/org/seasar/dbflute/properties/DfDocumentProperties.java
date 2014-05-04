@@ -31,6 +31,7 @@ import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfCraftDiffCraftTitleNotFoundException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
@@ -233,42 +234,36 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return text;
     }
 
-    public String resolveTextForJavaDoc(String text, String indent) {
-        if (getBasicProperties().isTargetLanguageCSharp()) {
-            return resolveLineSeparatorForCSharpDoc(text, "    " + indent);
-        }
-        if (text == null || text.trim().length() == 0) {
-            return null;
-        }
-        text = Srl.replace(text, "<", "&lt;");
-        text = Srl.replace(text, ">", "&gt;");
-        text = Srl.replace(text, "*/", "&#42;/"); // avoid JavaDoc breaker
-        text = removeCR(text);
-        final String sourceLineSeparator = getBasicProperties().getSourceCodeLineSeparator();
-        final String javaDocLineSeparator = "<br />" + sourceLineSeparator + indent + " * ";
-        if (text.contains(BASIC_LINE_SEPARATOR)) {
-            text = text.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
-        }
-        if (text.contains(SPECIAL_LINE_SEPARATOR)) {
-            text = text.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
-        }
-        return text;
+    public String resolveTextForJavaDoc(String comment, String indent) {
+        return doResolveTextForJavaDoc(comment, indent, false);
     }
 
-    protected String resolveLineSeparatorForCSharpDoc(String comment, String indent) {
+    public String resolveTextForJavaDocIndentDirectly(String comment, String indent) {
+        return doResolveTextForJavaDoc(comment, indent, true);
+    }
+
+    protected String doResolveTextForJavaDoc(String comment, String indent, boolean directIndent) {
         if (comment == null || comment.trim().length() == 0) {
             return null;
         }
-        comment = removeCR(comment);
-        final String sourceLineSeparator = getBasicProperties().getSourceCodeLineSeparator();
-        final String javaDocLineSeparator = sourceLineSeparator + indent + "/// ";
-        if (comment.contains(BASIC_LINE_SEPARATOR)) {
-            comment = comment.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
+        String work = comment;
+        final DfLanguageGrammar grammar = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+        work = grammar.escapeJavaDocString(work);
+        work = removeCR(work);
+        final String sourceCodeLineSeparator = getBasicProperties().getSourceCodeLineSeparator();
+        final String javaDocLineSeparator;
+        if (directIndent) {
+            javaDocLineSeparator = grammar.buildJavaDocLineAndIndentDirectly(sourceCodeLineSeparator, indent);
+        } else {
+            javaDocLineSeparator = grammar.buildJavaDocLineAndIndent(sourceCodeLineSeparator, indent);
         }
-        if (comment.contains(SPECIAL_LINE_SEPARATOR)) {
-            comment = comment.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
+        if (work.contains(BASIC_LINE_SEPARATOR)) {
+            work = work.replaceAll(BASIC_LINE_SEPARATOR, javaDocLineSeparator);
         }
-        return comment;
+        if (work.contains(SPECIAL_LINE_SEPARATOR)) {
+            work = work.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
+        }
+        return work;
     }
 
     public String resolveTextForSimpleLineHtml(String text) {

@@ -30,6 +30,9 @@ import org.seasar.dbflute.util.DfTypeUtil;
  */
 public final class DfDependencyInjectionProperties extends DfAbstractHelperProperties {
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfDependencyInjectionProperties(Properties prop) {
         super(prop);
     }
@@ -179,6 +182,10 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
 
     public List<String> getDBFluteDiconOtherIncludePathList() {
         return new ArrayList<String>(getDBFluteDiconOtherIncludeDefinitionMap().keySet());
+    }
+
+    public boolean isSuppressDiconBehaviorDefinition() { // closet, Java Only
+        return isProperty("isSuppressDiconBehaviorDefinition", false); // basically for HotDeploy
     }
 
     // ===================================================================================

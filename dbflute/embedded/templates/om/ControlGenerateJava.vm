@@ -83,17 +83,6 @@ $database.checkProperties()
 #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
 #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 
-## -----------------------------------------------------
-##                                               Plug-in
-##                                               -------
-## [Buri]
-#set ($glBasicParticipantProvider = "${glProjectPrefix}BasicParticipantProvider")
-#set ($glBasicBuriUserDataProvider = "${glProjectPrefix}BasicBuriUserDataProvider")
-#set ($glBehaviorToDataAccessRule = "${glProjectPrefix}BehaviorToDataAccessRule")
-#set ($glBuriDef = "${glProjectPrefix}BuriDef")
-#set ($glFixedBuriDataAccessScriptFactoryImpl = "${glProjectPrefix}FixedBuriDataAccessScriptFactoryImpl")
-#set ($glFixedScriptDataAccessUtilKeyImpl = "${glProjectPrefix}FixedScriptDataAccessUtilKeyImpl")
-
 ## ===================================================================================
 ##                                                                            Variable
 ##                                                                            ========
@@ -124,12 +113,6 @@ $database.checkProperties()
 #set ($glPackageNss = "${database.conditionBeanPackage}.nss")
 #set ($glPackageBaseDBMeta = "${glPackageBaseEntity}.dbmeta")
 #set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
-
-## -----------------------------------------------------
-##                                               Plug-in
-##                                               -------
-## [Buri]
-#set ($glPackagePluginBuri = "${database.baseCommonPackage}.plugin.buri")
 
 ## *****************************************************************************************************************
 ##                                                                                                           Parsing
@@ -191,42 +174,14 @@ $database.info("}")
 ##                                                                     ===============
 $database.info("public void parseContainerConfig() {")
 #if ($database.isTargetContainerSeasar())
-  #if ($database.isAvailableHotDeploy())
-  #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
-  #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2Container}))
+#foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+  #set ($path = "${dbfluteDiconPackageName}" )
   $database.makeDirectory($path)
 
-  $database.info("    parse('BehaviorCreator');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Container})}${glBehaviorCreator}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/BehaviorCreator.${glTemplateFileExtension}",$path ,"" ,"")
-
-  #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-    #set ($path = "${dbfluteDiconPackageName}" )
-    $database.makeDirectory($path)
-
-    #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-    $database.info("    parse('${path}')")
-    $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/HotDeployDicon.${glTemplateFileExtension}", $path, "", "")
-
-    #set ($path = "${dbfluteDiconPackageName}/${glCreatorDiconFileName}" )
-    $database.info("    parse('${path}')")
-    $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CreatorDicon.${glTemplateFileExtension}", $path, "", "")
-
-    #set ($path = "${dbfluteDiconPackageName}/${glCustomizerDiconFileName}" )
-    $database.info("    parse('${path}')")
-    $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CustomizerDicon.${glTemplateFileExtension}", $path, "", "")
-  #end
-  #else
-  #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
-    #set ($path = "${dbfluteDiconPackageName}" )
-    $database.makeDirectory($path)
-
-    #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
-    $database.info("    parse('${path}')")
-    $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/DBFluteDicon.${glTemplateFileExtension}", $path, "", "")
-  #end
-  #end
+  #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+  $database.info("    parse('${path}')")
+  $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/DBFluteDicon.${glTemplateFileExtension}", $path, "", "")
+#end
 #end
 #if ($database.isTargetContainerSpring())
   #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)

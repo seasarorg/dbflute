@@ -26,11 +26,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammar;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -111,7 +112,8 @@ public class DfBqpBehaviorFile {
     protected void writeBehaviorQueryPath(Map<String, Map<String, String>> resourceElementMap) {
         final String encoding = getBasicProperties().getSourceFileEncoding();
         final String lineSep = getBasicProperties().getSourceCodeLineSeparator();
-        final DfLanguageGrammar grammarInfo = getBasicProperties().getLanguageDependency().getLanguageGrammar();
+        final DfLanguageDependency lang = getBasicProperties().getLanguageDependency();
+        final DfLanguageGrammar grammar = lang.getLanguageGrammar();
         final String behaviorQueryPathBeginMark = getBasicProperties().getBehaviorQueryPathBeginMark();
         final String behaviorQueryPathEndMark = getBasicProperties().getBehaviorQueryPathEndMark();
         final DfDocumentProperties docprop = getDocumentProperties();
@@ -150,44 +152,38 @@ public class DfBqpBehaviorFile {
                 sb.append(lineString).append(lineSep);
                 if (!done && lineString.contains(behaviorQueryPathBeginMark)) {
                     targetArea = true;
-                    final String indent = lineString.substring(0, lineString.indexOf(behaviorQueryPathBeginMark));
-                    final Set<String> behaviorQueryPathSet = resourceElementMap.keySet();
-                    for (String behaviorQueryPath : behaviorQueryPathSet) {
-                        final Map<String, String> behaviorQueryElementMap = resourceElementMap.get(behaviorQueryPath);
-                        final StringBuilder definitionLineSb = new StringBuilder();
+                    final String adjustedIndent = grammar.adjustClassElementIndent("    ");
+                    for (Entry<String, Map<String, String>> entry : resourceElementMap.entrySet()) {
+                        final String behaviorQueryPath = entry.getKey();
+                        final Map<String, String> behaviorQueryElementMap = entry.getValue();
+                        final StringBuilder defSb = new StringBuilder();
 
                         final String keyTitle = DfBehaviorQueryPathSetupper.KEY_TITLE;
                         final String title = behaviorQueryElementMap.get(keyTitle);
                         if (title != null && title.trim().length() > 0) {
-                            final String resolvedTitle = docprop.resolveTextForJavaDoc(title, indent);
-                            final String commentExp;
-                            if (getBasicProperties().isTargetLanguageCSharp()) {
-                                commentExp = indent + "/// <summary>" + resolvedTitle + " </summary>" + lineSep;
-                            } else {
-                                commentExp = indent + "/** " + resolvedTitle + " */" + lineSep; // basically here
-                            }
-                            definitionLineSb.append(commentExp);
+                            final String comment = buildJavaDocComment(grammar, docprop, title, adjustedIndent);
+                            defSb.append(comment).append(lineSep);
                         }
 
-                        definitionLineSb.append(indent);
-                        definitionLineSb.append(grammarInfo.getPublicStaticDefinition());
+                        defSb.append(adjustedIndent);
+                        defSb.append(grammar.getPublicStaticDefinition());
                         final String keySubDirectoryPath = DfBehaviorQueryPathSetupper.KEY_SUB_DIRECTORY_PATH;
                         final String subDirectoryPath = behaviorQueryElementMap.get(keySubDirectoryPath);
                         if (Srl.is_NotNull_and_NotTrimmedEmpty(subDirectoryPath)) {
                             final String subDirectoryName = Srl.replace(subDirectoryPath, "/", "_");
                             final String subDirectoryValue = Srl.replace(subDirectoryPath, "/", ":");
-                            definitionLineSb.append(" String PATH_");
-                            definitionLineSb.append(subDirectoryName).append("_").append(behaviorQueryPath);
-                            definitionLineSb.append(" = \"");
-                            definitionLineSb.append(subDirectoryValue).append(":").append(behaviorQueryPath);
-                            definitionLineSb.append("\";");
+                            defSb.append(" String PATH_");
+                            defSb.append(subDirectoryName).append("_").append(behaviorQueryPath);
+                            defSb.append(" = \"");
+                            defSb.append(subDirectoryValue).append(":").append(behaviorQueryPath);
+                            defSb.append("\";");
                         } else {
-                            definitionLineSb.append(" String PATH_").append(behaviorQueryPath);
-                            definitionLineSb.append(" = \"").append(behaviorQueryPath).append("\";");
+                            defSb.append(" String PATH_").append(behaviorQueryPath);
+                            defSb.append(" = \"").append(behaviorQueryPath).append("\";");
                         }
 
-                        definitionLineSb.append(lineSep);
-                        sb.append(definitionLineSb);
+                        defSb.append(lineSep);
+                        sb.append(defSb);
                     }
                     done = true;
                 }
@@ -229,6 +225,12 @@ public class DfBqpBehaviorFile {
                 }
             }
         }
+    }
+
+    private String buildJavaDocComment(DfLanguageGrammar grammar, DfDocumentProperties docprop, String title,
+            String adjustedIndent) {
+        final String resolvedTitle = docprop.resolveTextForJavaDocIndentDirectly(title, adjustedIndent);
+        return grammar.buildJavaDocCommentWithTitleIndentDirectly(resolvedTitle, adjustedIndent);
     }
 
     // ===================================================================================

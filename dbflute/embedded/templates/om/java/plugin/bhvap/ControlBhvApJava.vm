@@ -77,12 +77,6 @@ $database.checkProperties()
 #set ($glPackageBaseCommonLib = "${database.libraryAllCommonPackage}")
 #set ($glPackageExtendedBhvLib = "${database.libraryBehaviorPackage}")
 
-## -----------------------------------------------------
-##                                               Plug-in
-##                                               -------
-## [Buri]
-#set ($glPackagePluginBuri = "${database.baseCommonPackage}.plugin.buri")
-
 ## *****************************************************************************************************************
 ##                                                                                                           Parsing
 ##                                                                                                           *******

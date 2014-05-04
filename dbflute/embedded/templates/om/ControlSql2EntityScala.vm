@@ -62,7 +62,6 @@ $database.initializeClassificationDeployment()
 ##                                                                          ==========
 ## [Allcommon]
 #set ($glAccessContext = "${glProjectPrefix}AccessContext")
-#set ($glBuriDef = "${glProjectPrefix}BuriDef")
 #set ($glCDef = "${glProjectPrefix}CDef")
 #set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
 #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")

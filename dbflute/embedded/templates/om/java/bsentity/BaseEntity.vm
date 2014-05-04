@@ -37,9 +37,6 @@ import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
 #if ($table.hasClassification())
 import ${glPackageBaseCommon}.${glCDef};
 #end
-#if ($table.isBuriTarget())
-import ${glPackagePluginBuri}.${glBuriDef};
-#end
 import ${myExtendedEntityPackageName}.*;
 #if ($table.isLoadableCustomizeEntity())
 import ${glPackageExtendedEntity}.*;
@@ -442,23 +439,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
 #end
-#if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
-#foreach ($processName in $table.tableProcessForMethodNameList)
-#set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
-#set ($referrerVariableName = "_buriAllRoundStateHistory_${processName}")
-    protected List<${referrerEntityClassName}> $referrerVariableName;
-
-    public List<${referrerEntityClassName}> getBuriAllRoundStateHistory_${processName}List() {
-        if (${referrerVariableName} == null) { ${referrerVariableName} = newReferrerList(); }
-        return ${referrerVariableName};
-    }
-
-    public void setBuriAllRoundStateHistory_${processName}List(List<${referrerEntityClassName}> buriAllRoundStateHistory_${processName}) {
-        ${referrerVariableName} = buriAllRoundStateHistory_${processName};
-    }
-
-#end
-#end
 #if ($table.isLoadableCustomizeEntity())
 #set ($domain = $table.loadableCustomizeDomain)
     protected ${domain.extendedEntityClassName} __innerDomain;
@@ -582,18 +562,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     public boolean canCommonColumnAutoSetup() {
         return __canCommonColumnAutoSetup;
     }
-#end
-#if ($table.isBuriTarget())
-
-    // ===================================================================================
-    //                                                                      Buri Interface
-    //                                                                      ==============
-#foreach ($processName in $table.tableProcessForMethodNameList)
-    public ${glBuriDef}.${processName}_Status getStatus_${processName}() {
-        if (getBuriAllRoundState_${processName}() == null) { return null; }
-        return ${glBuriDef}.${processName}_Status.codeOf(getBuriAllRoundState_${processName}().getStatusPathName());
-    }
-#end
 #end
 
     // ===================================================================================

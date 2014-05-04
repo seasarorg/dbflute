@@ -129,12 +129,11 @@ package org.apache.torque.engine.database.model;
 
 import java.sql.Types;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -266,14 +265,14 @@ public class TypeMap {
     // ===================================================================================
     //                                                        Property jdbcToJavaNativeMap
     //                                                        ============================
-    protected static Map<String, Object> _propertyJdbcTypeToJavaNativeMap;
+    protected static Map<String, String> _propertyJdbcTypeToJavaNativeMap;
     protected static Map<String, String> _propertyJavaNativeToFlexNativeMap;
     static {
         setupPropertyNativeMap();
     }
 
     protected static void setupPropertyNativeMap() {
-        final DfBuildProperties prop = DfBuildProperties.getInstance();
+        final DfBuildProperties prop = getProperties();
         _propertyJdbcTypeToJavaNativeMap = prop.getTypeMappingProperties().getJdbcToJavaNativeMap();
         _propertyJavaNativeToFlexNativeMap = prop.getFlexDtoProperties().getJavaToFlexNativeMap();
     }
@@ -304,10 +303,11 @@ public class TypeMap {
             return;
         }
 
-        // * * * * * * * * * * * * * * * * * * * 
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         // The map of JDBC Type to Java Native
-        // * * * * * * * * * * * * * * * * * * * 
-        // Default types are for Java.
+        // _/_/_/_/_/_/_/_/_/_/
+        // initialize specified type in property or default type
+        // (default types are for Java so no definition in language dependencies of Java)
         _jdbcTypeToJavaNativeMap.put(CHAR, initializeJavaNative(CHAR, CHAR_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(VARCHAR, initializeJavaNative(VARCHAR, VARCHAR_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(LONGVARCHAR, initializeJavaNative(LONGVARCHAR, LONGVARCHAR_NATIVE_TYPE));
@@ -334,21 +334,18 @@ public class TypeMap {
         _jdbcTypeToJavaNativeMap.put(UUID, initializeJavaNative(UUID, UUID_NATIVE_TYPE));
         _jdbcTypeToJavaNativeMap.put(OTHER, initializeJavaNative(OTHER, OTHER_NATIVE_TYPE));
 
-        // Register new JDBC type from property.
-        {
-            final Set<String> propertyJdbcTypeSet = _propertyJdbcTypeToJavaNativeMap.keySet();
-            for (String propertyJdbcType : propertyJdbcTypeSet) {
-                if (_jdbcTypeToJavaNativeMap.containsKey(propertyJdbcType)) {
-                    continue; // because it does not need to override
-                }
-                String propertyJavaNative = (String) _propertyJdbcTypeToJavaNativeMap.get(propertyJdbcType);
-                _jdbcTypeToJavaNativeMap.put(propertyJdbcType, propertyJavaNative); // as
+        // register new JDBC type from property
+        for (Entry<String, String> entry : _propertyJdbcTypeToJavaNativeMap.entrySet()) {
+            final String propertyJdbcType = entry.getKey();
+            if (_jdbcTypeToJavaNativeMap.containsKey(propertyJdbcType)) {
+                continue; // because only new type needs to be registered here
             }
+            _jdbcTypeToJavaNativeMap.put(propertyJdbcType, entry.getValue());
         }
 
-        // * * * * * * * * * * * * * * * * * * * * * * *
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         // The map of JDBC Definition-Value to JDBC Type
-        // * * * * * * * * * * * * * * * * * * * * * * *
+        // _/_/_/_/_/_/_/_/_/_/
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.CHAR), CHAR);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.VARCHAR), VARCHAR);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.LONGVARCHAR), LONGVARCHAR);
@@ -376,20 +373,18 @@ public class TypeMap {
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.ARRAY), ARRAY);
         _jdbcDefValueToJdbcTypeMap.put(new Integer(Types.OTHER), OTHER);
 
-        // * * * * * * * * * * * * * * * * * * * * * * *
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         // The map of JDBC Type to JDBC Definition-Value
-        // * * * * * * * * * * * * * * * * * * * * * * *
-        {
-            Set<Integer> keySet = _jdbcDefValueToJdbcTypeMap.keySet();
-            for (Integer jdbcDefValue : keySet) {
-                String jdbcType = _jdbcDefValueToJdbcTypeMap.get(jdbcDefValue);
-                _jdbcTypeToJdbcDefValueMap.put(jdbcType, jdbcDefValue);
-            }
+        // _/_/_/_/_/_/_/_/_/_/
+        for (Entry<Integer, String> entry : _jdbcDefValueToJdbcTypeMap.entrySet()) {
+            final Integer jdbcDefValue = entry.getKey();
+            final String jdbcType = entry.getValue();
+            _jdbcTypeToJdbcDefValueMap.put(jdbcType, jdbcDefValue);
         }
 
-        // * * * * * * * * * * * * * * * * * * * 
+        // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         // The map of Java Native to Flex Native
-        // * * * * * * * * * * * * * * * * * * *
+        // _/_/_/_/_/_/_/_/_/_/
         _javaNativeToFlexNativeMap.put("String", initializeFlexNative("String", "String"));
         _javaNativeToFlexNativeMap.put("Short", initializeFlexNative("Short", "int"));
         _javaNativeToFlexNativeMap.put("Integer", initializeFlexNative("Integer", "int"));
@@ -415,11 +410,8 @@ public class TypeMap {
      * @return Java-native. (NotNull: If the key does not have an element, it returns default type.)
      */
     protected static String initializeJavaNative(String jdbcType, String defaultJavaNative) {
-        final String javaNative = (String) _propertyJdbcTypeToJavaNativeMap.get(jdbcType);
-        if (javaNative == null) {
-            return defaultJavaNative;
-        }
-        return javaNative;
+        final String javaNative = _propertyJdbcTypeToJavaNativeMap.get(jdbcType);
+        return javaNative != null ? javaNative : defaultJavaNative;
     }
 
     /**
@@ -428,11 +420,8 @@ public class TypeMap {
      * @return Java-native. (NotNull: If the key does not have an element, it returns default type.)
      */
     protected static String initializeFlexNative(String javaNative, String defaultFlexNative) {
-        final String flexNative = (String) _propertyJavaNativeToFlexNativeMap.get(javaNative);
-        if (flexNative == null) {
-            return defaultFlexNative;
-        }
-        return flexNative;
+        final String flexNative = _propertyJavaNativeToFlexNativeMap.get(javaNative);
+        return flexNative != null ? flexNative : defaultFlexNative;
     }
 
     protected static void initializeIfNeeds() {
@@ -445,7 +434,7 @@ public class TypeMap {
     //                                                                           JDBC Type
     //                                                                           =========
     /**
-     * @param jdbcDefValue The JDBC definition value. (NotNull)
+     * @param jdbcDefValue The JDBC definition value to find. (NotNull)
      * @return The type as JDBC. (NullAllowed: when not found)
      */
     public static String findJdbcTypeByJdbcDefValue(Integer jdbcDefValue) {
@@ -457,6 +446,10 @@ public class TypeMap {
         return jdbcType;
     }
 
+    /**
+     * @param jdbcType The JDBC type to find. (NotNull)
+     * @return The found JDBC definition value. (NotNull: if not found, returns OTHER)
+     */
     public static Integer getJdbcDefValueByJdbcType(String jdbcType) {
         initializeIfNeeds();
         final Integer defValue = _jdbcTypeToJdbcDefValueMap.get(jdbcType);
@@ -507,11 +500,19 @@ public class TypeMap {
     public static String findJavaNativeByJdbcType(String jdbcType, Integer columnSize, Integer decimalDigits) {
         initializeIfNeeds();
         if (Srl.is_Null_or_TrimmedEmpty(jdbcType)) {
-            throw new IllegalArgumentException("The argument 'jdbcType' should not be null!");
+            throw new IllegalArgumentException("The argument 'jdbcType' should not be null.");
         }
-        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
-        final String javaType = getJavaNative(jdbcType);
-        if (isAutoMappingTargetType(jdbcType) && javaType.equalsIgnoreCase("$$AutoMapping$$")) {
+        final String javaType = doFindJavaNativeByJdbcType(jdbcType);
+        final String autoMappingNumber = processAutoMappingNumber(jdbcType, columnSize, decimalDigits, javaType);
+        if (autoMappingNumber != null) {
+            return autoMappingNumber;
+        }
+        return javaType;
+    }
+
+    protected static String processAutoMappingNumber(String jdbcType, Integer columnSize, Integer decimalDigits,
+            String javaType) {
+        if (needsAutoMappingNumber(jdbcType, javaType)) {
             final String defaultJavaNativeType;
             if (NUMERIC.equalsIgnoreCase(jdbcType)) {
                 defaultJavaNativeType = getDefaultNumericJavaNativeType();
@@ -527,62 +528,23 @@ public class TypeMap {
             // columnSize > 0 && (decimalDigits == null || decimalDigits == 0) here
             if (columnSize > 9) {
                 if (columnSize > 18) {
+                    final DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
                     if (prop.isCompatibleAutoMappingOldStyle()) {
-                        return getJavaNative(BIGINT); // old style
+                        return doFindJavaNativeByJdbcType(BIGINT); // old style
                     } else {
                         return defaultJavaNativeType;
                     }
                 } else {
-                    return getJavaNative(BIGINT);
+                    return doFindJavaNativeByJdbcType(BIGINT);
                 }
             } else {
-                return getJavaNative(INTEGER);
+                return doFindJavaNativeByJdbcType(INTEGER);
             }
         }
-        return javaType;
+        return null;
     }
 
-    // -----------------------------------------------------
-    //                                           Flex Native
-    //                                           -----------
-    public static String findFlexNativeByJavaNative(String javaNative) {
-        return getFlexNative(javaNative);
-    }
-
-    // -----------------------------------------------------
-    //                                                Helper
-    //                                                ------
-    protected static boolean isAutoMappingTargetType(String torqueType) {
-        return NUMERIC.equals(torqueType) || DECIMAL.equals(torqueType);
-    }
-
-    protected static String getDefaultNumericJavaNativeType() {
-        final DfBuildProperties prop = DfBuildProperties.getInstance();
-        final DfBasicProperties basicProperties = prop.getBasicProperties();
-        if (basicProperties.isTargetLanguageJava()) {
-            return NUMERIC_NATIVE_TYPE;
-        } else {
-            final DfLanguageDependency languageDependencyInfo = basicProperties.getLanguageDependency();
-            final DfLanguageTypeMapping languageMetaData = languageDependencyInfo.getLanguageTypeMapping();
-            final Map<String, Object> jdbcToJavaNativeMap = languageMetaData.getJdbcToJavaNativeMap();
-            return (String) jdbcToJavaNativeMap.get(NUMERIC);
-        }
-    }
-
-    public static String getDefaultDecimalJavaNativeType() {
-        final DfBuildProperties prop = DfBuildProperties.getInstance();
-        final DfBasicProperties basicProperties = prop.getBasicProperties();
-        if (basicProperties.isTargetLanguageJava()) {
-            return DECIMAL_NATIVE_TYPE;
-        } else {
-            final DfLanguageDependency languageDependencyInfo = basicProperties.getLanguageDependency();
-            final DfLanguageTypeMapping languageMetaData = languageDependencyInfo.getLanguageTypeMapping();
-            final Map<String, Object> jdbcToJavaNativeMap = languageMetaData.getJdbcToJavaNativeMap();
-            return (String) jdbcToJavaNativeMap.get(DECIMAL);
-        }
-    }
-
-    protected static String getJavaNative(String jdbcType) {
+    protected static String doFindJavaNativeByJdbcType(String jdbcType) {
         initializeIfNeeds();
         if (!_jdbcTypeToJavaNativeMap.containsKey(jdbcType)) {
             String msg = "_jdbcTypeToJavaNativeMap doesn't contain the type as key: ";
@@ -593,7 +555,22 @@ public class TypeMap {
         return _jdbcTypeToJavaNativeMap.get(jdbcType);
     }
 
-    protected static String getFlexNative(String javaNative) {
+    protected static boolean needsAutoMappingNumber(String jdbcType, final String javaType) {
+        return isAutoMappingTargetNumberType(jdbcType) && javaType.equalsIgnoreCase("$$AutoMapping$$");
+    }
+
+    protected static boolean isAutoMappingTargetNumberType(String torqueType) {
+        return NUMERIC.equals(torqueType) || DECIMAL.equals(torqueType);
+    }
+
+    // -----------------------------------------------------
+    //                                           FLEX Native
+    //                                           -----------
+    public static String findFlexNativeByJavaNative(String javaNative) {
+        return doFindFlexNativeByJavaNative(javaNative);
+    }
+
+    protected static String doFindFlexNativeByJavaNative(String javaNative) {
         initializeIfNeeds();
         if (!_javaNativeToFlexNativeMap.containsKey(javaNative)) {
             String msg = "_javaNativeToFlexNativeMap doesn't contain the type as key: ";
@@ -602,5 +579,33 @@ public class TypeMap {
             throw new IllegalStateException(msg);
         }
         return _javaNativeToFlexNativeMap.get(javaNative);
+    }
+
+    // -----------------------------------------------------
+    //                                        Default Native
+    //                                        --------------
+    public static String getDefaultNumericJavaNativeType() {
+        final DfLanguageTypeMapping mapping = getBasicProperties().getLanguageDependency().getLanguageTypeMapping();
+        return mapping.getDefaultNumericJavaNativeType();
+    }
+
+    public static String getDefaultDecimalJavaNativeType() {
+        final DfLanguageTypeMapping mapping = getBasicProperties().getLanguageDependency().getLanguageTypeMapping();
+        return mapping.getDefaultDecimalJavaNativeType();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected static DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected static DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
+    protected static DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
+        return getProperties().getLittleAdjustmentProperties();
     }
 }

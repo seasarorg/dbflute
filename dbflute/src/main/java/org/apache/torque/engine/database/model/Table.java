@@ -155,7 +155,6 @@ import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
-import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -1922,20 +1921,8 @@ public class Table {
         } else {
             _javaName = pureName; // for sql2entity mainly
         }
-        _javaName = filterBuriJavaNameIfNeeds(_javaName);
         _javaName = filterJavaNameNonCompilableConnector(_javaName);
         return _javaName;
-    }
-
-    protected String filterBuriJavaNameIfNeeds(String javaName) { // for Buri
-        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        if (buriProperties.isUseBuri() && isBuriInternal()) {
-            final String arranged = buriProperties.arrangeBuriTableJavaName(_javaName);
-            if (arranged != null) {
-                return arranged;
-            }
-        }
-        return javaName;
     }
 
     protected String filterJavaNameNonCompilableConnector(String javaName) {
@@ -2680,10 +2667,6 @@ public class Table {
         return excludedPrefixString.substring(0, endIndex);
     }
 
-    public boolean isAvailableSequenceAssignedIdAnnotation() {
-        return isBuriTarget();
-    }
-
     /**
      * Get the value of assigned property name.
      * @return Assigned property name. (NotNull)
@@ -3223,36 +3206,6 @@ public class Table {
     //                                                                            ========
     public boolean isFlexDtoBindable() {
         return getProperties().getFlexDtoProperties().isBindable(getTableDbName());
-    }
-
-    // ===================================================================================
-    //                                                            Buri(Friendly Framework)
-    //                                                            ========================
-    public boolean isBuriTarget() {
-        if (!hasSinglePrimaryKey()) {
-            return false;
-        }
-        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.isUseBuri() && buriProperties.isTargetTable(getTableDbName()) && hasTableProcess();
-    }
-
-    protected boolean hasTableProcess() {
-        return !getTableProcessForMethodNameList().isEmpty();
-    }
-
-    public boolean isBuriInternal() {
-        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.isUseBuri() && buriProperties.isBuriInternalTable(getJavaName());
-    }
-
-    public List<String> getTableProcessForMethodNameList() {
-        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.getTableProcessForMethodNameList(getTableDbName());
-    }
-
-    public boolean isBuriAllRoundStateHistory() {
-        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        return buriProperties.isBuriAllRoundStateHistory(getTableDbName());
     }
 
     // ===================================================================================

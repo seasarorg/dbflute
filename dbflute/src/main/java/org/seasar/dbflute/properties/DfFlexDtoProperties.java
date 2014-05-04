@@ -15,12 +15,12 @@
  */
 package org.seasar.dbflute.properties;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
+
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -68,37 +68,54 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                          Native Map
     //                                                                          ==========
+    protected Map<String, String> _javaToFlexNativeMap;
+
     public Map<String, String> getJavaToFlexNativeMap() {
+        if (_javaToFlexNativeMap != null) {
+            return _javaToFlexNativeMap;
+        }
         final Map<String, Object> map = getDtoPropertyMap("javaToFlexNativeMap");
-        if (map == null) {
-            return new LinkedHashMap<String, String>();
+        final Map<String, String> resultMap = newLinkedHashMap();
+        if (map != null) {
+            for (Entry<String, Object> entry : map.entrySet()) {
+                resultMap.put(entry.getKey(), (String) entry.getValue());
+            }
         }
-        final Set<String> keySet = map.keySet();
-        final LinkedHashMap<String, String> resultMap = new LinkedHashMap<String, String>();
-        for (String key : keySet) {
-            String value = (String) map.get(key);
-            resultMap.put(key, value);
-        }
-        return resultMap;
+        _javaToFlexNativeMap = resultMap;
+        return _javaToFlexNativeMap;
     }
 
     // ===================================================================================
     //                                                                       Target/Except
     //                                                                       =============
+    protected List<String> _bindableTableTargetList;
+
     public List<String> getBindableTableTargetList() {
-        final List<String> ls = getDtoPropertyList("bindableTableTargetList");
-        if (ls == null) {
-            return new ArrayList<String>();
+        if (_bindableTableTargetList != null) {
+            return _bindableTableTargetList;
         }
-        return ls;
+        final List<String> targetList = getDtoPropertyList("bindableTableTargetList");
+        final List<String> resultList = DfCollectionUtil.newArrayList();
+        if (targetList != null) {
+            resultList.addAll(targetList);
+        }
+        _bindableTableTargetList = resultList;
+        return _bindableTableTargetList;
     }
 
+    protected List<String> _bindableTableExceptList;
+
     public List<String> getBindableTableExceptList() {
-        final List<String> ls = getDtoPropertyList("bindableTableExceptList");
-        if (ls == null) {
-            return new ArrayList<String>();
+        if (_bindableTableExceptList != null) {
+            return _bindableTableExceptList;
         }
-        return ls;
+        final List<String> exceptList = getDtoPropertyList("bindableTableExceptList");
+        final List<String> resultList = DfCollectionUtil.newArrayList();
+        if (exceptList != null) {
+            resultList.addAll(exceptList);
+        }
+        _bindableTableExceptList = resultList;
+        return _bindableTableExceptList;
     }
 
     protected boolean isBindableTableExcept(final String tableName) {

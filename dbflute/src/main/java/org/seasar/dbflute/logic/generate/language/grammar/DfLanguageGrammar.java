@@ -118,6 +118,14 @@ public interface DfLanguageGrammar {
      */
     String buildEntityPropertyName(Column col);
 
+    /**
+     * @param cdefBase The CDef expression, e.g. CDef.MemberStatus.Formalized. (NotNull)
+     * @param propertyName The property name for the CDef. (NotNull)
+     * @param valueType The property type of the value. (NotNull)
+     * @param toNumber Does it convert to number?
+     * @param toBoolean Does it convert to boolean?
+     * @return The CDef element value. e.g. CDef.MemberStatus.Formalized.code() (NotNull)
+     */
     String buildCDefElementValue(String cdefBase, String propertyName, String valueType, boolean toNumber,
             boolean toBoolean);
 
@@ -133,4 +141,37 @@ public interface DfLanguageGrammar {
      * @return Is the column name match with program reserved name?
      */
     boolean isPgReservColumn(String columnName);
+
+    /**
+     * @param baseIndent The base indent, based on Java indent. (NotNull)
+     * @return The adjusted or non-adjusted indent. (NotNull)
+     */
+    String adjustClassElementIndent(String baseIndent);
+
+    /**
+     * @param comment The comment text for JavaDoc. (NotNull)
+     * @return The escaped text. (NotNull)
+     */
+    String escapeJavaDocString(String comment);
+
+    /**
+     * @param resolvedTitle The title already resolved for JavaDoc. (NotNull)
+     * @param adjustedIndent The indent already adjusted, means no adjustment is needed. (NotNull)
+     * @return The string expression of whole JavaDoc comment with title, without rear line separator. (NotNull)
+     */
+    String buildJavaDocCommentWithTitleIndentDirectly(String resolvedTitle, String adjustedIndent);
+
+    /**
+     * @param sourceCodeLineSeparator The line separator for source code. (NotNull)
+     * @param baseIndent The base indent, based on Java indent. (NotNull)
+     * @return The string expression of JavaDoc line and indent, e.g. "&lt;br /&gt;(ln)     * ". (NotNull)
+     */
+    String buildJavaDocLineAndIndent(String sourceCodeLineSeparator, String baseIndent);
+
+    /**
+     * @param sourceCodeLineSeparator The line separator for source code. (NotNull)
+     * @param adjustedIndent The indent already adjusted, means no adjustment is needed. (NotNull)
+     * @return The string expression of JavaDoc line and indent, e.g. "&lt;br /&gt;(ln)     * ". (NotNull)
+     */
+    String buildJavaDocLineAndIndentDirectly(String sourceCodeLineSeparator, String adjustedIndent);
 }

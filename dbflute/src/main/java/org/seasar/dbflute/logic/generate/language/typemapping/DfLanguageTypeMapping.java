@@ -29,7 +29,7 @@ public interface DfLanguageTypeMapping {
     /**
      * @return The map of 'JDBC to Java Native'. (NotNull)
      */
-    Map<String, Object> getJdbcToJavaNativeMap();
+    Map<String, String> getJdbcToJavaNativeMap();
 
     // ===================================================================================
     //                                                                  Native Suffix List
@@ -60,9 +60,31 @@ public interface DfLanguageTypeMapping {
     List<String> getBinaryList();
 
     // ===================================================================================
-    //                                                                JDBC Type Adjustment
-    //                                                                ====================
-    String getSequenceType();
+    //                                                                    Small Adjustment
+    //                                                                    ================
+    /**
+     * @return The java native type as sequence value. (NotNull)
+     */
+    String getSequenceJavaNativeType();
 
+    /**
+     * @return The java native type as default numeric. (NotNull)
+     */
+    String getDefaultNumericJavaNativeType();
+
+    /**
+     * @return The java native type as default decimal. (NotNull)
+     */
+    String getDefaultDecimalJavaNativeType();
+
+    /**
+     * @return The JDBC type of UUID. (NullAllowed: null means unsupported)
+     */
     String getJdbcTypeOfUUID();
+
+    /**
+     * @param plainTypeName The plain native type derived from test value, based on Java. (NotNull)
+     * @return The switched or non-switched type. No switch for Java. (NotNull)
+     */
+    String switchParameterBeanTestValueType(String plainTypeName);
 }

@@ -114,24 +114,6 @@ public class DfParameterBeanResolverTest extends PlainTestCase {
         assertEquals(strType, target.doDerivePropertyTypeFromTestValue("'20110128'"));
     }
 
-    public void test_doSwitchPlainTypeNameIfCSharp() throws Exception {
-        // ## Arrange ##
-        DfParameterBeanResolver target = createTarget();
-
-        // ## Act && Assert ##
-        assertEquals("String", target.doSwitchPlainTypeNameIfCSharp("String"));
-        assertEquals("int?", target.doSwitchPlainTypeNameIfCSharp("Integer"));
-        assertEquals("long?", target.doSwitchPlainTypeNameIfCSharp("Long"));
-        assertEquals("decimal?", target.doSwitchPlainTypeNameIfCSharp("BigDecimal"));
-        assertEquals("DateTime?", target.doSwitchPlainTypeNameIfCSharp("Date"));
-        assertEquals("DateTime?", target.doSwitchPlainTypeNameIfCSharp("Timestamp"));
-        assertEquals("DateTime?", target.doSwitchPlainTypeNameIfCSharp("Time"));
-        assertEquals("IList<String>", target.doSwitchPlainTypeNameIfCSharp("List<String>"));
-        assertEquals("IList<int?>", target.doSwitchPlainTypeNameIfCSharp("List<Integer>"));
-        assertEquals("IList<long?>", target.doSwitchPlainTypeNameIfCSharp("List<Long>"));
-        assertEquals("IList<decimal?>", target.doSwitchPlainTypeNameIfCSharp("List<BigDecimal>"));
-    }
-
     public void test_derivePropertyOptionFromTestValue() throws Exception {
         // ## Arrange ##
         DfParameterBeanResolver target = createTarget();

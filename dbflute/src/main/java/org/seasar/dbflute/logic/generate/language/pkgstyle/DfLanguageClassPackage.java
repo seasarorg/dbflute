@@ -51,4 +51,6 @@ public interface DfLanguageClassPackage {
     //                                                                             Various
     //                                                                             =======
     String buildExtendedBehaviorPackageMark(String sqlPackage, String exbhvName);
+
+    String buildAccessContextFqcn(String baseCommonPackage, String projectPrefix);
 }

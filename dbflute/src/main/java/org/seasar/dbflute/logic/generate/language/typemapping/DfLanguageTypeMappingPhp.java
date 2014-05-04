@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.logic.generate.language.typemapping;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,9 +28,9 @@ public class DfLanguageTypeMappingPhp implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    protected static final Map<String, Object> _jdbcToJavaNativeMap;
+    protected static final Map<String, String> _jdbcToJavaNativeMap;
     static {
-        final Map<String, Object> map = new LinkedHashMap<String, Object>();
+        final Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
         map.put("CHAR", "string");
         map.put("VARCHAR", "string");
         map.put("LONGVARCHAR", "string");
@@ -59,7 +58,7 @@ public class DfLanguageTypeMappingPhp implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                        Type Mapping
     //                                                                        ============
-    public Map<String, Object> getJdbcToJavaNativeMap() {
+    public Map<String, String> getJdbcToJavaNativeMap() {
         return _jdbcToJavaNativeMap;
     }
 
@@ -89,11 +88,23 @@ public class DfLanguageTypeMappingPhp implements DfLanguageTypeMapping {
     // ===================================================================================
     //                                                                JDBC Type Adjustment
     //                                                                ====================
-    public String getSequenceType() {
+    public String getSequenceJavaNativeType() {
         return "integer";
     }
 
+    public String getDefaultNumericJavaNativeType() {
+        return "double";
+    }
+
+    public String getDefaultDecimalJavaNativeType() {
+        return "double";
+    }
+
     public String getJdbcTypeOfUUID() {
-        return null; // means no mapping
+        return null; // unknown, null means no mapping
+    }
+
+    public String switchParameterBeanTestValueType(String plainTypeName) {
+        return plainTypeName; // unknown
     }
 }

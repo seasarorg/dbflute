@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.generate.language.DfLanguageDependency;
 import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMapping;
 import org.seasar.dbflute.util.Srl;
 
@@ -54,16 +53,22 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                 JDBC Type Mapping Map
     //                                 ---------------------
-    protected Map<String, Object> getJdbcTypeMappingMap() {
+    protected Map<String, String> _jdbcTypeMappingMap;
+
+    protected Map<String, String> getJdbcTypeMappingMap() {
+        if (_jdbcTypeMappingMap != null) {
+            return _jdbcTypeMappingMap;
+        }
         final Map<String, Object> typeMappingMap = getTypeMappingMap();
-        final Map<String, Object> jdbcTypeMappingMap = newLinkedHashMap();
+        final Map<String, String> jdbcTypeMappingMap = newLinkedHashMap();
         for (Entry<String, Object> entry : typeMappingMap.entrySet()) {
             final String key = entry.getKey();
             if (isJdbcTypeMappingKey(key)) {
                 jdbcTypeMappingMap.put(key, (String) entry.getValue());
             }
         }
-        return jdbcTypeMappingMap;
+        _jdbcTypeMappingMap = jdbcTypeMappingMap;
+        return _jdbcTypeMappingMap;
     }
 
     protected static boolean isJdbcTypeMappingKey(String key) {
@@ -73,7 +78,12 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                 Name Type Mapping Map
     //                                 ---------------------
+    protected Map<String, String> _nameTypeMappingMap;
+
     protected Map<String, String> getNameTypeMappingMap() {
+        if (_nameTypeMappingMap != null) {
+            return _nameTypeMappingMap;
+        }
         final Map<String, Object> typeMappingMap = getTypeMappingMap();
         final Map<String, String> nameTypeMappingMap = newLinkedHashMap();
         for (Entry<String, Object> entry : typeMappingMap.entrySet()) {
@@ -82,7 +92,8 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
                 nameTypeMappingMap.put(extractDbTypeName(key), (String) entry.getValue());
             }
         }
-        return nameTypeMappingMap;
+        _nameTypeMappingMap = nameTypeMappingMap;
+        return _nameTypeMappingMap;
     }
 
     protected static boolean isNameTypeMappingKey(String key) {
@@ -129,48 +140,18 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                 JDBC to Java Native
     //                                                                 ===================
-    protected Map<String, Object> _jdbcToJavaNativeMap;
+    protected Map<String, String> _jdbcToJavaNativeMap;
 
-    public Map<String, Object> getJdbcToJavaNativeMap() {
+    public Map<String, String> getJdbcToJavaNativeMap() {
         if (_jdbcToJavaNativeMap != null) {
             return _jdbcToJavaNativeMap;
         }
-        if (getBasicProperties().isTargetLanguageJava()) {
-            final Map<String, Object> typeMappingMap = getJdbcTypeMappingMap();
-            if (typeMappingMap.isEmpty()) {
-                _jdbcToJavaNativeMap = getLanguageMetaData().getJdbcToJavaNativeMap(); // actually empty
-            } else {
-                _jdbcToJavaNativeMap = typeMappingMap;
-            }
-            return _jdbcToJavaNativeMap;
+        final Map<String, String> jdbcToJavaNativeMap = newLinkedHashMap();
+        jdbcToJavaNativeMap.putAll(getLanguageTypeMapping().getJdbcToJavaNativeMap()); // language definition at first
+        for (Entry<String, String> entry : getJdbcTypeMappingMap().entrySet()) {
+            jdbcToJavaNativeMap.put(entry.getKey(), entry.getValue()); // override by specified types in property
         }
-
-        // not Java here
-        final Map<String, Object> metaMap = getLanguageMetaData().getJdbcToJavaNativeMap();
-        if (metaMap.isEmpty()) {
-            String msg = "The jdbcToJavaNamtiveMap should not be null: metaData=" + getLanguageMetaData();
-            throw new IllegalStateException(msg);
-        }
-
-        final Map<String, Object> typeMappingMap = getJdbcTypeMappingMap();
-        if (typeMappingMap.isEmpty()) {
-            _jdbcToJavaNativeMap = getLanguageMetaData().getJdbcToJavaNativeMap();
-        } else {
-            _jdbcToJavaNativeMap = typeMappingMap;
-        }
-        if (_jdbcToJavaNativeMap.isEmpty()) {
-            _jdbcToJavaNativeMap = metaMap;
-            return _jdbcToJavaNativeMap;
-        }
-
-        // reflect meta map to native map only difference
-        for (Entry<String, Object> entry : metaMap.entrySet()) {
-            final String key = entry.getKey();
-            final Object value = entry.getValue();
-            if (!_jdbcToJavaNativeMap.containsKey(key)) {
-                _jdbcToJavaNativeMap.put(key, value);
-            }
-        }
+        _jdbcToJavaNativeMap = jdbcToJavaNativeMap;
         return _jdbcToJavaNativeMap;
     }
 
@@ -204,7 +185,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     //                                                               Java Native Type List
     //                                                               =====================
     public List<String> getJavaNativeStringList() { // not property
-        return getLanguageMetaData().getStringList();
+        return getLanguageTypeMapping().getStringList();
     }
 
     public boolean isJavaNativeStringObject(String javaNative) {
@@ -212,7 +193,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     }
 
     public List<String> getJavaNativeNumberList() { // not property
-        return getLanguageMetaData().getNumberList();
+        return getLanguageTypeMapping().getNumberList();
     }
 
     public boolean isJavaNativeNumberObject(String javaNative) {
@@ -220,7 +201,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     }
 
     public List<String> getJavaNativeDateList() { // not property
-        return getLanguageMetaData().getDateList();
+        return getLanguageTypeMapping().getDateList();
     }
 
     public boolean isJavaNativeDateObject(String javaNative) {
@@ -228,7 +209,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     }
 
     public List<String> getJavaNativeBooleanList() { // not property
-        return getLanguageMetaData().getBooleanList();
+        return getLanguageTypeMapping().getBooleanList();
     }
 
     public boolean isJavaNativeBooleanObject(String javaNative) {
@@ -236,7 +217,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     }
 
     public List<String> getJavaNativeBinaryList() { // not property
-        return getLanguageMetaData().getBinaryList();
+        return getLanguageTypeMapping().getBinaryList();
     }
 
     public boolean isJavaNativeBinaryObject(String javaNative) {
@@ -250,14 +231,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                  Language Meta Data
     //                                                                  ==================
-    protected DfLanguageTypeMapping _languageMetaData;
-
-    protected DfLanguageTypeMapping getLanguageMetaData() {
-        if (_languageMetaData != null) {
-            return _languageMetaData;
-        }
-        final DfLanguageDependency languageDependencyInfo = getBasicProperties().getLanguageDependency();
-        _languageMetaData = languageDependencyInfo.getLanguageTypeMapping();
-        return _languageMetaData;
+    protected DfLanguageTypeMapping getLanguageTypeMapping() {
+        return getBasicProperties().getLanguageDependency().getLanguageTypeMapping();
     }
 }

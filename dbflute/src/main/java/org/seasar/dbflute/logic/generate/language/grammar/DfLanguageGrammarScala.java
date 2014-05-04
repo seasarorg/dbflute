@@ -113,4 +113,24 @@ public class DfLanguageGrammarScala implements DfLanguageGrammar {
     public boolean isPgReservColumn(String columnName) {
         return _grammarJava.isPgReservColumn(columnName);
     }
+
+    public String escapeJavaDocString(String comment) {
+        return _grammarJava.escapeJavaDocString(comment);
+    }
+
+    public String adjustClassElementIndent(String baseIndent) {
+        return _grammarJava.adjustClassElementIndent(baseIndent);
+    }
+
+    public String buildJavaDocCommentWithTitleIndentDirectly(String resolvedTitle, String adjustedIndent) {
+        return _grammarJava.buildJavaDocCommentWithTitleIndentDirectly(resolvedTitle, adjustedIndent);
+    }
+
+    public String buildJavaDocLineAndIndent(String sourceCodeLineSeparator, String baseIndent) {
+        return _grammarJava.buildJavaDocLineAndIndent(sourceCodeLineSeparator, baseIndent);
+    }
+
+    public String buildJavaDocLineAndIndentDirectly(String sourceCodeLineSeparator, String adjustedIndent) {
+        return _grammarJava.buildJavaDocLineAndIndentDirectly(sourceCodeLineSeparator, adjustedIndent);
+    }
 }
