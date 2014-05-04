@@ -42,7 +42,7 @@ map:{
     #  The target language.
     #  Your possible choices are:
     #
-    #       java, csharp
+    #       java, csharp, scala
     #
     ; targetLanguage = java
     # - - - - - - - - - -/
