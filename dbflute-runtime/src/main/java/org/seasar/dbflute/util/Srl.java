@@ -1243,12 +1243,35 @@ public class Srl {
     }
 
     // ===================================================================================
-    //                                                                             Connect
-    //                                                                             =======
+    //                                                                    Connect & Remove
+    //                                                                    ================
+    public static String connectByDelimiter(List<String> strList, String delimiter) {
+        assertStringListNotNull(strList);
+        return doConnectByDelimiter(strList, delimiter, null);
+    }
+
+    public static String connectByDelimiterQuoted(List<String> strList, String delimiter, String quotation) {
+        assertStringListNotNull(strList);
+        assertQuotationNotNull(quotation);
+        return doConnectByDelimiter(strList, delimiter, quotation);
+    }
+
+    protected static String doConnectByDelimiter(List<String> strList, String delimiter, String quotation) {
+        assertStringListNotNull(strList);
+        final StringBuilder sb = new StringBuilder();
+        for (String str : strList) {
+            if (sb.length() > 0) {
+                sb.append(delimiter);
+            }
+            sb.append(quotation != null ? quoteAnything(str != null ? str : "null", quotation) : str);
+        }
+        return sb.toString();
+    }
+
     public static String connectPrefix(String str, String prefix, String delimiter) {
         assertStringNotNull(str);
         if (is_NotNull_and_NotTrimmedEmpty(prefix)) {
-            str = prefix + delimiter + str;
+            return prefix + delimiter + str;
         }
         return str;
     }
@@ -1256,7 +1279,39 @@ public class Srl {
     public static String connectSuffix(String str, String suffix, String delimiter) {
         assertStringNotNull(str);
         if (is_NotNull_and_NotTrimmedEmpty(suffix)) {
-            str = str + delimiter + suffix;
+            return str + delimiter + suffix;
+        }
+        return str;
+    }
+
+    public static String removePrefix(String str, String prefix) {
+        assertStringNotNull(str);
+        if (startsWith(str, prefix)) {
+            return substringFirstRear(str, prefix);
+        }
+        return str;
+    }
+
+    public static String removePrefixIgnoreCase(String str, String prefix) {
+        assertStringNotNull(str);
+        if (startsWithIgnoreCase(str, prefix)) {
+            return substringFirstRearIgnoreCase(str, prefix);
+        }
+        return str;
+    }
+
+    public static String removeSuffix(String str, String suffix) {
+        assertStringNotNull(str);
+        if (endsWith(str, suffix)) {
+            return substringLastFront(str, suffix);
+        }
+        return str;
+    }
+
+    public static String removeSuffixIgnoreCase(String str, String suffix) {
+        assertStringNotNull(str);
+        if (endsWithIgnoreCase(str, suffix)) {
+            return substringLastFrontIgnoreCase(str, suffix);
         }
         return str;
     }

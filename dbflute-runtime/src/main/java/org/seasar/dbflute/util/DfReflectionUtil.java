@@ -323,8 +323,9 @@ public class DfReflectionUtil {
 
     /**
      * Get the public method. <br />
-     * And it has the flexibly searching so you can specify types of sub-class to argTypes.
-     * But if overload methods exist, it returns the first-found method.
+     * And it has the flexibly searching so you can specify types of sub-class to argTypes. <br />
+     * But if overload methods exist, it returns the first-found method. <br />
+     * And no cache so you should cache it yourself if you call several times. <br />
      * @param clazz The type of class that defines the method. (NotNull)
      * @param methodName The name of method. (NotNull)
      * @param argTypes The type of argument. (NotNull)
@@ -342,6 +343,7 @@ public class DfReflectionUtil {
      * o target class's methods = all
      * o superclass's methods   = all (also contains private)
      * </pre>
+     * And no cache so you should cache it yourself if you call several times.
      * @param clazz The type of class that defines the method. (NotNull)
      * @param methodName The name of method. (NotNull)
      * @param argTypes The type of argument. (NotNull)
@@ -359,8 +361,9 @@ public class DfReflectionUtil {
      * o target class's methods = all
      * o superclass's methods   = all (also contains private)
      * </pre>
-     * And it has the flexibly searching so you can specify types of sub-class to argTypes.
-     * But if overload methods exist, it returns the first-found method.
+     * And it has the flexibly searching so you can specify types of sub-class to argTypes. <br />
+     * But if overload methods exist, it returns the first-found method. <br />
+     * And no cache so you should cache it yourself if you call several times.
      * @param clazz The type of class that defines the method. (NotNull)
      * @param methodName The name of method. (NotNull)
      * @param argTypes The type of argument. (NotNull)

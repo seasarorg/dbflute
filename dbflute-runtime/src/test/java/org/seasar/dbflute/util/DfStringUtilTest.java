@@ -15,101 +15,7 @@
  */
 package org.seasar.dbflute.util;
 
-import static org.seasar.dbflute.util.Srl.camelize;
-import static org.seasar.dbflute.util.Srl.connectPrefix;
-import static org.seasar.dbflute.util.Srl.connectSuffix;
-import static org.seasar.dbflute.util.Srl.contains;
-import static org.seasar.dbflute.util.Srl.containsAll;
-import static org.seasar.dbflute.util.Srl.containsAllIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsAny;
-import static org.seasar.dbflute.util.Srl.containsAnyIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsElement;
-import static org.seasar.dbflute.util.Srl.containsElementAll;
-import static org.seasar.dbflute.util.Srl.containsElementAllIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsElementAny;
-import static org.seasar.dbflute.util.Srl.containsElementAnyIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsElementIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsKeyword;
-import static org.seasar.dbflute.util.Srl.containsKeywordAll;
-import static org.seasar.dbflute.util.Srl.containsKeywordAllIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsKeywordAny;
-import static org.seasar.dbflute.util.Srl.containsKeywordAnyIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsKeywordIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsPrefixAll;
-import static org.seasar.dbflute.util.Srl.containsPrefixAllIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsPrefixAny;
-import static org.seasar.dbflute.util.Srl.containsPrefixAnyIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsSuffixAll;
-import static org.seasar.dbflute.util.Srl.containsSuffixAllIgnoreCase;
-import static org.seasar.dbflute.util.Srl.containsSuffixAny;
-import static org.seasar.dbflute.util.Srl.containsSuffixAnyIgnoreCase;
-import static org.seasar.dbflute.util.Srl.count;
-import static org.seasar.dbflute.util.Srl.countIgnoreCase;
-import static org.seasar.dbflute.util.Srl.endsWith;
-import static org.seasar.dbflute.util.Srl.endsWithIgnoreCase;
-import static org.seasar.dbflute.util.Srl.equalsFlexible;
-import static org.seasar.dbflute.util.Srl.equalsFlexibleTrimmed;
-import static org.seasar.dbflute.util.Srl.equalsIgnoreCase;
-import static org.seasar.dbflute.util.Srl.equalsPlain;
-import static org.seasar.dbflute.util.Srl.extractDelimiterList;
-import static org.seasar.dbflute.util.Srl.extractScopeFirst;
-import static org.seasar.dbflute.util.Srl.extractScopeList;
-import static org.seasar.dbflute.util.Srl.extractScopeWide;
-import static org.seasar.dbflute.util.Srl.hasKeywordAll;
-import static org.seasar.dbflute.util.Srl.hasKeywordAllIgnoreCase;
-import static org.seasar.dbflute.util.Srl.hasKeywordAny;
-import static org.seasar.dbflute.util.Srl.hasKeywordAnyIgnoreCase;
-import static org.seasar.dbflute.util.Srl.hasPrefixAll;
-import static org.seasar.dbflute.util.Srl.hasPrefixAllIgnoreCase;
-import static org.seasar.dbflute.util.Srl.hasPrefixAny;
-import static org.seasar.dbflute.util.Srl.hasPrefixAnyIgnoreCase;
-import static org.seasar.dbflute.util.Srl.hasSuffixAll;
-import static org.seasar.dbflute.util.Srl.hasSuffixAllIgnoreCase;
-import static org.seasar.dbflute.util.Srl.hasSuffixAny;
-import static org.seasar.dbflute.util.Srl.hasSuffixAnyIgnoreCase;
-import static org.seasar.dbflute.util.Srl.indent;
-import static org.seasar.dbflute.util.Srl.indexOfFirst;
-import static org.seasar.dbflute.util.Srl.indexOfFirstIgnoreCase;
-import static org.seasar.dbflute.util.Srl.indexOfLast;
-import static org.seasar.dbflute.util.Srl.indexOfLastIgnoreCase;
-import static org.seasar.dbflute.util.Srl.initBeansProp;
-import static org.seasar.dbflute.util.Srl.isAlphabetHarf;
-import static org.seasar.dbflute.util.Srl.isAlphabetHarfLower;
-import static org.seasar.dbflute.util.Srl.isAlphabetHarfUpper;
-import static org.seasar.dbflute.util.Srl.isNumberHarf;
-import static org.seasar.dbflute.util.Srl.is_NotNull_and_NotEmpty;
-import static org.seasar.dbflute.util.Srl.is_NotNull_and_NotTrimmedEmpty;
-import static org.seasar.dbflute.util.Srl.is_Null_or_Empty;
-import static org.seasar.dbflute.util.Srl.is_Null_or_TrimmedEmpty;
-import static org.seasar.dbflute.util.Srl.length;
-import static org.seasar.dbflute.util.Srl.ltrim;
-import static org.seasar.dbflute.util.Srl.quoteDouble;
-import static org.seasar.dbflute.util.Srl.quoteSingle;
-import static org.seasar.dbflute.util.Srl.rearstring;
-import static org.seasar.dbflute.util.Srl.removeBlockComment;
-import static org.seasar.dbflute.util.Srl.removeEmptyLine;
-import static org.seasar.dbflute.util.Srl.removeLineComment;
-import static org.seasar.dbflute.util.Srl.replaceScopeContent;
-import static org.seasar.dbflute.util.Srl.replaceScopeInterspace;
-import static org.seasar.dbflute.util.Srl.rtrim;
-import static org.seasar.dbflute.util.Srl.startsWith;
-import static org.seasar.dbflute.util.Srl.startsWithIgnoreCase;
-import static org.seasar.dbflute.util.Srl.substring;
-import static org.seasar.dbflute.util.Srl.substringFirstFront;
-import static org.seasar.dbflute.util.Srl.substringFirstFrontIgnoreCase;
-import static org.seasar.dbflute.util.Srl.substringFirstRear;
-import static org.seasar.dbflute.util.Srl.substringFirstRearIgnoreCase;
-import static org.seasar.dbflute.util.Srl.substringLastFront;
-import static org.seasar.dbflute.util.Srl.substringLastFrontIgnoreCase;
-import static org.seasar.dbflute.util.Srl.substringLastRear;
-import static org.seasar.dbflute.util.Srl.substringLastRearIgnoreCase;
-import static org.seasar.dbflute.util.Srl.toLowerCase;
-import static org.seasar.dbflute.util.Srl.toUpperCase;
-import static org.seasar.dbflute.util.Srl.trim;
-import static org.seasar.dbflute.util.Srl.unquoteAnything;
-import static org.seasar.dbflute.util.Srl.unquoteDouble;
-import static org.seasar.dbflute.util.Srl.unquoteSingle;
+import static org.seasar.dbflute.util.Srl.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1035,8 +941,28 @@ public class DfStringUtilTest extends PlainTestCase {
     }
 
     // ===================================================================================
-    //                                                                             Connect
-    //                                                                             =======
+    //                                                                    Connect & Remove
+    //                                                                    ================
+    public void test_connectByDelimiter_basic() {
+        assertEquals("foo,bar", connectByDelimiter(newArrayList("foo", "bar"), ","));
+        assertEquals("foo, bar", connectByDelimiter(newArrayList("foo", "bar"), ", "));
+        assertEquals("foo bar", connectByDelimiter(newArrayList("foo", "bar"), " "));
+        assertEquals("foo;:bar;:qux", connectByDelimiter(newArrayList("foo", "bar", "qux"), ";:"));
+        assertEquals("foo,,qux", connectByDelimiter(newArrayList("foo", "", "qux"), ","));
+        assertEquals("foo,null,qux", connectByDelimiter(newArrayList("foo", null, "qux"), ","));
+        assertEquals("", connectByDelimiter(new ArrayList<String>(), ","));
+    }
+
+    public void test_connectByDelimiterQuoted_basic() {
+        assertEquals("'foo','bar'", connectByDelimiterQuoted(newArrayList("foo", "bar"), ",", "'"));
+        assertEquals("'foo', 'bar'", connectByDelimiterQuoted(newArrayList("foo", "bar"), ", ", "'"));
+        assertEquals("\"foo\" \"bar\"", connectByDelimiterQuoted(newArrayList("foo", "bar"), " ", "\""));
+        assertEquals("foo;:bar;:qux", connectByDelimiterQuoted(newArrayList("foo", "bar", "qux"), ";:", ""));
+        assertEquals("'foo','','qux'", connectByDelimiterQuoted(newArrayList("foo", "", "qux"), ",", "'"));
+        assertEquals("'foo','null','qux'", connectByDelimiterQuoted(newArrayList("foo", null, "qux"), ",", "'"));
+        assertEquals("", connectByDelimiterQuoted(new ArrayList<String>(), ",", "'"));
+    }
+
     public void test_connectPrefix_basic() {
         assertEquals("foo", connectPrefix("foo", null, "."));
         assertEquals("foo", connectPrefix("foo", "", "."));
@@ -1051,6 +977,40 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("foo", connectSuffix("foo", " ", "."));
         assertEquals("foo.bar", connectSuffix("foo", "bar", "."));
         assertEquals("foo/bar", connectSuffix("foo", "bar", "/"));
+    }
+
+    public void test_removePrefix_basic() {
+        assertEquals("oo", removePrefix("foo", "f"));
+        assertEquals("o", removePrefix("foo", "fo"));
+        assertEquals("", removePrefix("foo", "foo"));
+        assertEquals("foo", removePrefix("foo", "bo"));
+        assertEquals("foo", removePrefix("foo", "Fo"));
+        assertEquals("foo", removePrefix("foo", "o"));
+    }
+
+    public void test_removePrefixIgnoreCase_basic() {
+        assertEquals("oo", removePrefixIgnoreCase("foo", "f"));
+        assertEquals("o", removePrefixIgnoreCase("foo", "fo"));
+        assertEquals("", removePrefixIgnoreCase("foo", "foo"));
+        assertEquals("foo", removePrefixIgnoreCase("foo", "bo"));
+        assertEquals("o", removePrefixIgnoreCase("foo", "Fo"));
+        assertEquals("foo", removePrefixIgnoreCase("foo", "o"));
+    }
+
+    public void test_removeSuffix_basic() {
+        assertEquals("fo", removeSuffix("foo", "o"));
+        assertEquals("f", removeSuffix("foo", "oo"));
+        assertEquals("", removeSuffix("foo", "foo"));
+        assertEquals("foo", removeSuffix("foo", "O"));
+        assertEquals("foo", removeSuffix("foo", "bo"));
+    }
+
+    public void test_removeSuffixIgnoreCase_basic() {
+        assertEquals("fo", removeSuffixIgnoreCase("foo", "o"));
+        assertEquals("f", removeSuffixIgnoreCase("foo", "oo"));
+        assertEquals("", removeSuffixIgnoreCase("foo", "foo"));
+        assertEquals("fo", removeSuffixIgnoreCase("foo", "O"));
+        assertEquals("foo", removeSuffixIgnoreCase("foo", "bo"));
     }
 
     // ===================================================================================
