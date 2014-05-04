@@ -13,36 +13,33 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language.metadata;
+package org.seasar.dbflute.logic.generate.language.typemapping;
 
 import java.util.List;
 import java.util.Map;
 
+import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
  */
-public class LanguageMetaDataJava implements LanguageMetaData {
+public class DfLanguageTypeMappingInfoJava implements DfLanguageTypeMappingInfo {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     protected static final Map<String, Object> DEFAULT_EMPTY_MAP = DfCollectionUtil.newLinkedHashMap();
-
-    // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final List<String> _stringList = DfCollectionUtil.newArrayList("String");
-    protected final List<String> _numberList = DfCollectionUtil.newArrayList("Byte", "Short", "Integer", "Long",
+    protected static final List<String> _stringList = DfCollectionUtil.newArrayList("String");
+    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("Byte", "Short", "Integer", "Long",
             "Float", "Double", "BigDecimal", "BigInteger");
-    protected final List<String> _dateList = DfCollectionUtil.newArrayList("Date", "Time", "Timestamp");
-    protected final List<String> _booleanList = DfCollectionUtil.newArrayList("Boolean");
-    protected final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
+    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("Date", "Time", "Timestamp");
+    protected static final List<String> _booleanList = DfCollectionUtil.newArrayList("Boolean");
+    protected static final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
 
     // ===================================================================================
-    //                                                                             Mapping
-    //                                                                             =======
+    //                                                                        Type Mapping
+    //                                                                        ============
     public Map<String, Object> getJdbcToJavaNativeMap() {
         // Java's native map is defined at TypeMap
         // so this returns empty. (special handling)
@@ -50,8 +47,8 @@ public class LanguageMetaDataJava implements LanguageMetaData {
     }
 
     // ===================================================================================
-    //                                                                         Suffix List
-    //                                                                         ===========
+    //                                                                  Native Suffix List
+    //                                                                  ==================
     public List<String> getStringList() {
         return _stringList;
     }
@@ -70,5 +67,16 @@ public class LanguageMetaDataJava implements LanguageMetaData {
 
     public List<String> getBinaryList() {
         return _binaryList;
+    }
+
+    // ===================================================================================
+    //                                                                JDBC Type Adjustment
+    //                                                                ====================
+    public String getSequenceType() {
+        return "java.math.BigDecimal";
+    }
+
+    public String getJdbcTypeOfUUID() {
+        return TypeMap.UUID; // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
     }
 }

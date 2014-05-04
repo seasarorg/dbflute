@@ -41,7 +41,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
@@ -163,7 +163,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             title = "alternate control";
             controlPath = littleProp.getAlternateSql2EntityControl();
         } else {
-            final DfLanguageDependencyInfo lang = getLanguageTypeFacadeProp().getLanguageDependencyInfo();
+            final DfLanguageDependencyInfo lang = getBasicProperties().getLanguageDependencyInfo();
             title = lang.getLanguageTitle();
             controlPath = lang.getSql2EntityControl();
         }

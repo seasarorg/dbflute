@@ -25,7 +25,7 @@ import java.util.Set;
 import org.apache.torque.engine.database.model.AppData;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.cbean.SimplePagingBean;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -86,7 +86,7 @@ public class DfPmbGenerationHandler {
         final DfPmbMetaData metaData = findPmbMetaData(className);
         final String superClassName = metaData.getSuperClassName();
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        final String extendsStringMark = languageDependencyInfo.getGrammarInfo().getExtendsStringMark();
+        final String extendsStringMark = languageDependencyInfo.getLanguageGrammarInfo().getExtendsStringMark();
         return " " + extendsStringMark + " " + superClassName;
     }
 
@@ -142,7 +142,7 @@ public class DfPmbGenerationHandler {
         }
         sb.append(", ").append("FetchBean");
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        final String implementsStringMark = languageDependencyInfo.getGrammarInfo().getImplementsStringMark();
+        final String implementsStringMark = languageDependencyInfo.getLanguageGrammarInfo().getImplementsStringMark();
         return " " + implementsStringMark + " " + sb.toString();
     }
 

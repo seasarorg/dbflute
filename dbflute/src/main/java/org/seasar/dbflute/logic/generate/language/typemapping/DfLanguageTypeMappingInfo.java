@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language.metadata;
+package org.seasar.dbflute.logic.generate.language.typemapping;
 
 import java.util.List;
 import java.util.Map;
@@ -21,13 +21,19 @@ import java.util.Map;
 /**
  * @author jflute
  */
-public interface LanguageMetaData {
+public interface DfLanguageTypeMappingInfo {
 
+    // ===================================================================================
+    //                                                                        Type Mapping
+    //                                                                        ============
     /**
      * @return The map of 'JDBC to Java Native'. (NotNull)
      */
     Map<String, Object> getJdbcToJavaNativeMap();
 
+    // ===================================================================================
+    //                                                                  Native Suffix List
+    //                                                                  ==================
     /**
      * @return The list of suffix for string native type. (NotNull)
      */
@@ -52,4 +58,11 @@ public interface LanguageMetaData {
      * @return The list of suffix for binary native type. (NotNull)
      */
     List<String> getBinaryList();
+
+    // ===================================================================================
+    //                                                                JDBC Type Adjustment
+    //                                                                ====================
+    String getSequenceType();
+
+    String getJdbcTypeOfUUID();
 }

@@ -43,7 +43,6 @@ import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.util.DfTraceViewUtil;
@@ -331,10 +330,6 @@ public class DfTaskControlLogic {
 
     protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
         return getBasicProperties().getDatabaseTypeFacadeProp();
-    }
-
-    protected DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
-        return getBasicProperties().getLanguageTypeFacadeProp();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {

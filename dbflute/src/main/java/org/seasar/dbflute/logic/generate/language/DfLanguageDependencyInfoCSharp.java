@@ -13,18 +13,18 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language;
+package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoCSharp;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaDataCSharp;
-import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfo;
-import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfoCSharp;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultCSharp;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfoCSharp;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfoCSharp;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfoCSharp;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfoCSharp;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -42,24 +42,16 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
     // ===================================================================================
     //                                                                    Program Handling
     //                                                                    ================
-    public DfGrammarInfo getGrammarInfo() {
-        return new DfGrammarInfoCSharp();
+    public DfLanguageGrammarInfo getLanguageGrammarInfo() {
+        return new DfLanguageGrammarInfoCSharp();
     }
 
-    public String getIntegerConvertExpression(String value) {
-        return "new int?(" + value + ")";
+    public DfLanguageTypeMappingInfo getLanguageTypeMappingInfo() {
+        return new DfLanguageTypeMappingInfoCSharp();
     }
 
-    public String getSequenceType() {
-        return "int?";
-    }
-
-    public DfDBFluteDiconInfo getDBFluteDiconInfo() {
-        return new DfDBFluteDiconInfoCSharp();
-    }
-
-    public LanguageMetaData createLanguageMetaData() {
-        return new LanguageMetaDataCSharp();
+    public DfLanguageDBFluteDiconInfo getLanguageDBFluteDiconInfo() {
+        return new DfLanguageDBFluteDiconInfoCSharp();
     }
 
     // ===================================================================================
@@ -120,7 +112,14 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
         return "vmnet";
     }
 
-    public DfGeneratedClassPackageDefault getGeneratedClassPackageInfo() {
-        return new DfGeneratedClassPackageDefaultCSharp();
+    public DfLanguageGeneratedClassPackageInfo getGeneratedClassPackageInfo() {
+        return new DfLanguageGeneratedClassPackageInfoCSharp();
+    }
+
+    // ===================================================================================
+    //                                                                    Small Adjustment
+    //                                                                    ================
+    public boolean isIfCommentExpressionCheckEnabled() {
+        return false; // different specification for now but new DBFlute.NET ...
     }
 }

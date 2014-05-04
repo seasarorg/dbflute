@@ -137,8 +137,8 @@ import org.apache.torque.engine.database.transform.XmlToAppData.XmlReadingFilter
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfClassificationDeploymentClassificationNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -1538,7 +1538,7 @@ public class Column {
 
     public String getJavaNativeTypeLiteral() {
         final String javaNative = getJavaNative();
-        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
         final String pureNative = Srl.substringFirstFront(javaNative, "<"); // for example, List<String>
         return grammarInfo.getClassTypeLiteral(pureNative);
     }

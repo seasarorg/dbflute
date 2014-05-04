@@ -28,7 +28,6 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 
 /**
  * @author jflute
@@ -139,10 +138,6 @@ public class DfAbstractReplaceSchemaProcess {
 
     protected static DfDocumentProperties getDocumentProperties() {
         return getProperties().getDocumentProperties();
-    }
-
-    protected static DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
-        return getBasicProperties().getLanguageTypeFacadeProp();
     }
 
     // ===================================================================================

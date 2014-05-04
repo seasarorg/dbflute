@@ -22,7 +22,6 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -114,10 +113,6 @@ public abstract class DfAbstractMetaDataExtractor {
 
     protected boolean isForeignKeyExtractingUnsupported() {
         return getDatabaseTypeFacadeProp().isDatabaseAsForeignKeyExtractingUnsupported();
-    }
-
-    protected DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
-        return DfBuildProperties.getInstance().getBasicProperties().getLanguageTypeFacadeProp();
     }
 
     protected boolean checkMetaTableDiffIfNeeds(String tableName, String metaTableName) {

@@ -13,12 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language.properties;
+package org.seasar.dbflute.logic.generate.language.location;
 
 /**
  * @author jflute
  */
-public class DfDBFluteDiconInfoPhp implements DfDBFluteDiconInfo {
+public class DfLanguageDBFluteDiconInfoJava implements DfLanguageDBFluteDiconInfo {
 
     public String getDBFluteDiconFileName() {
         return "dbflute.dicon";
@@ -29,14 +29,6 @@ public class DfDBFluteDiconInfoPhp implements DfDBFluteDiconInfo {
     }
 
     public String getJ2eeDiconResourceName() {
-        return "%PDO_DICON%";
-    }
-
-    public String getRequiredTxComponentName() {
-        return "requiredTx";
-    }
-
-    public String getRequiresNewTxComponentName() {
-        return "requiresNewTx";
+        return "j2ee.dicon";
     }
 }

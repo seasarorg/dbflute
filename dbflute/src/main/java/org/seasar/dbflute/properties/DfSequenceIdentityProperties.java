@@ -223,8 +223,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                Sequence Return Type
     //                                                                ====================
-    public String getSequenceReturnType() { // It's not property!
-        return getBasicProperties().getLanguageDependencyInfo().getSequenceType();
+    public String getSequenceReturnType() { // not property
+        return getBasicProperties().getLanguageDependencyInfo().getLanguageTypeMappingInfo().getSequenceType();
     }
 
     // ===================================================================================

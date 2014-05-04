@@ -148,6 +148,7 @@ import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
 import org.seasar.dbflute.logic.doc.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.logic.generate.column.DfColumnListToStringUtil;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
 import org.seasar.dbflute.logic.sql2entity.analyzer.DfOutsideSqlFile;
 import org.seasar.dbflute.logic.sql2entity.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -2300,16 +2301,9 @@ public class Table {
                 // if there are not related columns, it uses a key order
                 relatedColumn = domain.getPrimaryKey().get(index);
             }
-            if (getBasicProperties().isTargetLanguageJava()) {
-                final String fromPropName = pk.getJavaBeansRulePropertyNameInitCap();
-                final String toPropName = relatedColumn.getJavaBeansRulePropertyNameInitCap();
-                settingList.add("set" + toPropName + "(get" + fromPropName + "())");
-            } else if (getBasicProperties().isTargetLanguageCSharp()) {
-                settingList.add(relatedColumn.getJavaName() + " = this." + pk.getJavaName());
-            } else {
-                String msg = "Unsupported language for this method: " + getBasicProperties().getTargetLanguage();
-                throw new UnsupportedOperationException(msg);
-            }
+            final DfLanguageGrammarInfo grammar = getBasicProperties().getLanguageDependencyInfo()
+                    .getLanguageGrammarInfo();
+            settingList.add(grammar.buildEntityPropertyGetSet(pk, relatedColumn));
             ++index;
         }
         return settingList;
@@ -2699,13 +2693,7 @@ public class Table {
     }
 
     protected String getPropertyNameResolvedLanguage(Column col) {
-        if (getBasicProperties().isTargetLanguageJava()) {
-            return col.getJavaBeansRulePropertyName();
-        } else if (getBasicProperties().isTargetLanguageCSharp()) {
-            return col.getJavaName();
-        } else {
-            return col.getUncapitalisedJavaName();
-        }
+        return getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo().buildEntityPropertyName(col);
     }
 
     protected List<Column> _subColumnSequenceColumnList;

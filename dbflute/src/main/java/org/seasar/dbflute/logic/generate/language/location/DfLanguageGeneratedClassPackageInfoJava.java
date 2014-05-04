@@ -13,12 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language.properties;
+package org.seasar.dbflute.logic.generate.language.location;
 
 /**
  * @author jflute
  */
-public class DfGeneratedClassPackageDefaultJava implements DfGeneratedClassPackageDefault {
+public class DfLanguageGeneratedClassPackageInfoJava implements DfLanguageGeneratedClassPackageInfo {
 
     public String getBaseCommonPackage() {
         return "allcommon";

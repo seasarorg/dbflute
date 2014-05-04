@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper;
 import org.seasar.dbflute.logic.jdbc.mapping.DfJdbcTypeMapper.DfMapperResource;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
@@ -286,8 +287,8 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
 
     protected DfMapperResource createResource() {
         return new DfMapperResource() {
-            public boolean isLangJava() {
-                return getLanguageTypeFacadeProp().isTargetLanguageJava();
+            public DfLanguageDependencyInfo getLang() {
+                return getBasicProperties().getLanguageDependencyInfo();
             }
 
             public boolean isDbmsPostgreSQL() {
@@ -312,7 +313,7 @@ public class DfColumnExtractor extends DfAbstractMetaDataBasicExtractor {
 
             @Override
             public String toString() {
-                return "{" + isLangJava() + ", " + isDbmsOracle() + ", " + isDbmsPostgreSQL() + "}";
+                return "{" + getLang() + ", " + isDbmsOracle() + ", " + isDbmsPostgreSQL() + "}";
             }
         };
     }

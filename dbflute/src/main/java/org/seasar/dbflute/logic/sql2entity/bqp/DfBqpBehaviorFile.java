@@ -31,7 +31,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
@@ -111,7 +111,7 @@ public class DfBqpBehaviorFile {
     protected void writeBehaviorQueryPath(Map<String, Map<String, String>> resourceElementMap) {
         final String encoding = getBasicProperties().getSourceFileEncoding();
         final String lineSep = getBasicProperties().getSourceCodeLineSeparator();
-        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
         final String behaviorQueryPathBeginMark = getBasicProperties().getBehaviorQueryPathBeginMark();
         final String behaviorQueryPathEndMark = getBasicProperties().getBehaviorQueryPathEndMark();
         final DfDocumentProperties docprop = getDocumentProperties();

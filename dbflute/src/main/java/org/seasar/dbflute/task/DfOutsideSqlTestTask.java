@@ -226,24 +226,20 @@ public class DfOutsideSqlTestTask extends DfAbstractTask {
     }
 
     protected void checkParameterComment(File sqlFile, String sql) {
-        if (getOutsideSqlProperties().isSuppressParameterCommentCheck()) {
+        final DfOutsideSqlProperties outsideSqlProp = getOutsideSqlProperties();
+        if (outsideSqlProp.isSuppressParameterCommentCheck()) {
             return;
         }
         final DfOutsideSqlChecker checker = new DfOutsideSqlChecker();
-
-        // the IfCommentExpression check is for Java only
-        if (getLanguageTypeFacadeProp().isTargetLanguageJava()) {
-            checker.enableIfCommentExpressionCheck();
-        }
-
-        if (getOutsideSqlProperties().isRequiredSqlTitle()) {
+        if (outsideSqlProp.isRequiredSqlTitle()) {
             checker.enableRequiredTitleCheck();
         }
-
-        if (getOutsideSqlProperties().isRequiredSqlDescription()) {
+        if (outsideSqlProp.isRequiredSqlDescription()) {
             checker.enableRequiredDescriptionCheck();
         }
-
+        if (getBasicProperties().getLanguageDependencyInfo().isIfCommentExpressionCheckEnabled()) {
+            checker.enableIfCommentExpressionCheck(); // might be different specification between language
+        }
         checker.check(sqlFile.getName(), sql);
     }
 

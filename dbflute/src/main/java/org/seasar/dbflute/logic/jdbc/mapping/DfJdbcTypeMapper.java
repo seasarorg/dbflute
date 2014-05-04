@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.torque.engine.database.model.TypeMap;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.Srl;
@@ -47,7 +48,7 @@ public class DfJdbcTypeMapper {
     }
 
     public static interface DfMapperResource {
-        boolean isLangJava();
+        DfLanguageDependencyInfo getLang();
 
         boolean isDbmsPostgreSQL();
 
@@ -202,12 +203,11 @@ public class DfJdbcTypeMapper {
     }
 
     protected String processForcedAdjustment(int jdbcDefValue, String dbTypeName) {
-        if (isConceptTypeUUID(dbTypeName) && _resource.isLangJava()) {
-            // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            // This is for Java only because the type has not been checked yet on C#.
-            // - - - - - - - - - -/
-            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
-            return TypeMap.UUID;
+        if (isConceptTypeUUID(dbTypeName)) {
+            final String uuid = _resource.getLang().getLanguageTypeMappingInfo().getJdbcTypeOfUUID();
+            if (uuid != null) { // might be unsupported in any language
+                return uuid;
+            }
         }
         if (isConceptTypeBytesOid(dbTypeName)) {
             return getBlobJdbcType();

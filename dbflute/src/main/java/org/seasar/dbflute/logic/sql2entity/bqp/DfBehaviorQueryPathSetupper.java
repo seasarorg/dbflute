@@ -324,7 +324,7 @@ public class DfBehaviorQueryPathSetupper {
     }
 
     protected Map<String, File> createBsBhvFileMap(File bsbhvDir) {
-        final String classFileExtension = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo()
+        final String classFileExtension = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo()
                 .getClassFileExtension();
         final FileFilter filefilter = new FileFilter() {
             public boolean accept(File file) {

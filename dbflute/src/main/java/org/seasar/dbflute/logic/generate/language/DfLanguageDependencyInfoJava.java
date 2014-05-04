@@ -13,18 +13,18 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language;
+package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoJava;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaDataJava;
-import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfo;
-import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconJavaInfo;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultJava;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfoJava;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfoJava;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfoJava;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfoJava;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -48,24 +48,16 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
     // ===================================================================================
     //                                                                    Program Handling
     //                                                                    ================
-    public DfGrammarInfo getGrammarInfo() {
-        return new DfGrammarInfoJava();
+    public DfLanguageGrammarInfo getLanguageGrammarInfo() {
+        return new DfLanguageGrammarInfoJava();
     }
 
-    public String getIntegerConvertExpression(String value) {
-        return "Integer.valueOf(\"" + value + "\")";
+    public DfLanguageTypeMappingInfo getLanguageTypeMappingInfo() {
+        return new DfLanguageTypeMappingInfoJava();
     }
 
-    public String getSequenceType() {
-        return "java.math.BigDecimal";
-    }
-
-    public DfDBFluteDiconInfo getDBFluteDiconInfo() {
-        return new DfDBFluteDiconJavaInfo();
-    }
-
-    public LanguageMetaData createLanguageMetaData() {
-        return new LanguageMetaDataJava();
+    public DfLanguageDBFluteDiconInfo getLanguageDBFluteDiconInfo() {
+        return new DfLanguageDBFluteDiconInfoJava();
     }
 
     // ===================================================================================
@@ -129,7 +121,14 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
         return "vm";
     }
 
-    public DfGeneratedClassPackageDefault getGeneratedClassPackageInfo() {
-        return new DfGeneratedClassPackageDefaultJava();
+    public DfLanguageGeneratedClassPackageInfo getGeneratedClassPackageInfo() {
+        return new DfLanguageGeneratedClassPackageInfoJava();
+    }
+
+    // ===================================================================================
+    //                                                                    Small Adjustment
+    //                                                                    ================
+    public boolean isIfCommentExpressionCheckEnabled() {
+        return true;
     }
 }

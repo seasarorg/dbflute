@@ -13,35 +13,25 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language.properties;
+package org.seasar.dbflute.logic.generate.language.location;
 
 /**
  * @author jflute
  */
-public interface DfDBFluteDiconInfo {
+public interface DfLanguageDBFluteDiconInfo {
 
     /**
-     * @return The namespace of dbflute dicon. (NotNull)
+     * @return The name-space of dbflute.dicon. (NotNull)
      */
     String getDBFluteDiconNamespace();
 
     /**
-     * @return The file name of dbflute dicon. (NotNull)
+     * @return The file name of dbflute.dicon. (NotNull)
      */
     String getDBFluteDiconFileName();
 
     /**
-     * @return The resource name of J2EE dicon. (NotNull)
+     * @return The resource name of j2ee.dicon. (NotNull)
      */
     String getJ2eeDiconResourceName();
-
-    /**
-     * @return The component name of 'requiredTx'. (NotNull)
-     */
-    String getRequiredTxComponentName();
-
-    /**
-     * @return The component name of 'requiresNewTx'. (NotNull)
-     */
-    String getRequiresNewTxComponentName();
 }

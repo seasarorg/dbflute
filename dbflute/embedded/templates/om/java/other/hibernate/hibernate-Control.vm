@@ -134,7 +134,7 @@ $database.info("}")
 ## ===================================================================================
 ##                                                                    Hibernate Entity
 ##                                                                    ================
-#if ($database.hasHibernateDefinition() && $database.isTargetLanguageJava())
+#if ($database.hasHibernateDefinition())
   $database.debug("parseHibernateEntity() {")
   #set ($myBaseEntityPackageName = "${database.hibernateBaseEntityPackage}")
   #set ($myExtendedEntityPackageName = "${database.hibernateExtendedEntityPackage}")

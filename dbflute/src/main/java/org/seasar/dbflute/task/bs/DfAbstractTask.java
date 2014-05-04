@@ -33,7 +33,6 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.task.bs.assistant.DfTaskBasicController;
 import org.seasar.dbflute.task.bs.assistant.DfTaskControlCallback;
 import org.seasar.dbflute.task.bs.assistant.DfTaskControlLogic;
@@ -237,10 +236,6 @@ public abstract class DfAbstractTask extends Task {
 
     protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
         return getBasicProperties().getDatabaseTypeFacadeProp();
-    }
-
-    protected DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
-        return getBasicProperties().getLanguageTypeFacadeProp();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {

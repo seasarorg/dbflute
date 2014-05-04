@@ -252,7 +252,7 @@ $database.backToSql2EntityOutputDirectory()
 ## ===================================================================================
 ##                                                                          Simple Dto
 ##                                                                          ==========
-#if ($database.hasSimpleDtoDefinition() && $database.isTargetLanguageJava())
+#if ($database.hasSimpleDtoDefinition())
   $database.info("parseSimpleDto() {// mapper=$database.isSimpleDtoUseDtoMapper()")
   #set ($myDomainEntityPackageName = "${glPackageExtendedEntity}.customize")
   #set ($myBaseEntityPackageName = "${database.simpleDtoBaseDtoPackage}.customize")
@@ -300,7 +300,7 @@ $database.backToSql2EntityOutputDirectory()
 ## ===================================================================================
 ##                                                                            Flex Dto
 ##                                                                            ========
-#if ($database.hasFlexDtoDefinition() && $database.isTargetLanguageJava())
+#if ($database.hasFlexDtoDefinition())
   $database.enableFlexDtoOutputDirectory()
   $database.info("parseFlexDto() {")
   #set ($myBaseEntityPackageName = "${database.flexDtoBaseDtoPackage}.customize")

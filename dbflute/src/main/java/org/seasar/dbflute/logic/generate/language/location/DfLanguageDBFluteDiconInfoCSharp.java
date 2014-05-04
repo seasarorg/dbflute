@@ -13,34 +13,22 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language.properties;
+package org.seasar.dbflute.logic.generate.language.location;
 
 /**
  * @author jflute
  */
-public interface DfGeneratedClassPackageDefault {
+public class DfLanguageDBFluteDiconInfoCSharp implements DfLanguageDBFluteDiconInfo {
 
-    String getBaseCommonPackage();
+    public String getDBFluteDiconFileName() {
+        return "DBFlute.dicon";
+    }
 
-    String getBaseBehaviorPackage();
+    public String getDBFluteDiconNamespace() {
+        return "DBFlute";
+    }
 
-    String getBaseDaoPackage();
-
-    String getCursorSimplePackageName();
-
-    String getParameterBeanSimplePackageName();
-
-    String getBaseEntityPackage();
-
-    String getCustomizeEntitySimplePackageName();
-
-    String getDBMetaSimplePackageName();
-
-    String getConditionBeanPackage();
-
-    String getExtendedBehaviorPackage();
-
-    String getExtendedDaoPackage();
-
-    String getExtendedEntityPackage();
+    public String getJ2eeDiconResourceName() {
+        return "${topNamespace}/Resources/Ado.dicon";
+    }
 }

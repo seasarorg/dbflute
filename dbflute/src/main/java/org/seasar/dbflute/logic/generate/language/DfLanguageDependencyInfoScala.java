@@ -13,12 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language;
+package org.seasar.dbflute.logic.generate.language;
 
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoScala;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaDataJava;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfoScala;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfoJava;
 
 /**
  * @author jflute
@@ -42,23 +42,13 @@ public class DfLanguageDependencyInfoScala extends DfLanguageDependencyInfoJava 
     //                                                                    Program Handling
     //                                                                    ================
     @Override
-    public DfGrammarInfo getGrammarInfo() {
-        return new DfGrammarInfoScala();
+    public DfLanguageGrammarInfo getLanguageGrammarInfo() {
+        return new DfLanguageGrammarInfoScala();
     }
 
     @Override
-    public String getIntegerConvertExpression(String value) {
-        return "Integer.valueOf(\"" + value + "\")"; // #pending jflute Scala's convert
-    }
-
-    @Override
-    public String getSequenceType() {
-        return "java.math.BigDecimal"; // #pending jflute Scala's big decimal
-    }
-
-    @Override
-    public LanguageMetaData createLanguageMetaData() {
-        return new LanguageMetaDataJava(); // #pending jflute Scala's type
+    public DfLanguageTypeMappingInfo getLanguageTypeMappingInfo() {
+        return new DfLanguageTypeMappingInfoJava(); // #pending jflute Scala's type
     }
 
     // ===================================================================================
@@ -91,4 +81,9 @@ public class DfLanguageDependencyInfoScala extends DfLanguageDependencyInfoJava 
     public String getTemplateFileExtension() {
         return "vmsca";
     }
+
+    // ===================================================================================
+    //                                                                    Small Adjustment
+    //                                                                    ================
+    // #pending jflute Scala's specification
 }

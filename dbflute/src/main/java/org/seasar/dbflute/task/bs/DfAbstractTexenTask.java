@@ -51,7 +51,6 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.task.bs.assistant.DfDocumentSelector;
 import org.seasar.dbflute.task.bs.assistant.DfTaskBasicController;
 import org.seasar.dbflute.task.bs.assistant.DfTaskControlCallback;
@@ -502,10 +501,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     protected DfDatabaseTypeFacadeProp getDatabaseTypeFacadeProp() {
         return getBasicProperties().getDatabaseTypeFacadeProp();
-    }
-
-    protected DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
-        return getBasicProperties().getLanguageTypeFacadeProp();
     }
 
     protected DfDatabaseProperties getDatabaseProperties() {

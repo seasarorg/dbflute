@@ -134,7 +134,7 @@ $database.initializeIncludeQuery()
 ## ===================================================================================
 ##                                                                       S2JDBC Entity
 ##                                                                       =============
-#if ($database.hasS2jdbcDefinition() && $database.isTargetLanguageJava())
+#if ($database.hasS2jdbcDefinition())
   $database.debug("parseS2jdbcEntity() {")
   #set ($myBaseEntityPackageName = "${database.s2jdbcBaseEntityPackage}")
   #set ($myExtendedEntityPackageName = "${database.s2jdbcExtendedEntityPackage}")

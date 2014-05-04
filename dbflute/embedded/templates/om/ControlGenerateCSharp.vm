@@ -1252,29 +1252,27 @@ $generator.parse("om/${glResourceDirectory}/allcommon/DBFluteConfig.${glTemplate
 ## -----------------------------------------------------------------------------------------------------
 ##                                                                                       Parse java like
 ##                                                                                       ---------------
-#if ($database.isTargetLanguageCSharp())
-  $database.info("public void parseJavaLike() {")
+$database.info("public void parseJavaLike() {")
 
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonJavaLike}))
-  $database.makeDirectory($path)
+#set ($path = $database.getPackageAsPath(${glPackageBaseCommonJavaLike}))
+$database.makeDirectory($path)
 
-  $database.info("    parse('JavaBasic');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaBasic}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaBasic.${glTemplateFileExtension}",$path,"", "")
+$database.info("    parse('JavaBasic');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaBasic}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaBasic.${glTemplateFileExtension}",$path,"", "")
 
-  $database.info("    parse('JavaCollection');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaCollection}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaCollection.${glTemplateFileExtension}",$path,"", "")
+$database.info("    parse('JavaCollection');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaCollection}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaCollection.${glTemplateFileExtension}",$path,"", "")
 
-  $database.info("    parse('JavaException');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaException}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaException.${glTemplateFileExtension}",$path,"", "")
+$database.info("    parse('JavaException');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaException}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaException.${glTemplateFileExtension}",$path,"", "")
 
-  $database.info("    parse('JavaReflection');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaReflection}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaReflection.${glTemplateFileExtension}",$path,"", "")
-  $database.info("}")
-#end
+$database.info("    parse('JavaReflection');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonJavaLike})}${glJavaReflection}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/javalike/JavaReflection.${glTemplateFileExtension}",$path,"", "")
+$database.info("}")
 
 ## -----------------------------------------------------------------------------------------------------
 ##                                                                                      Parse jdbc class
@@ -1336,10 +1334,8 @@ $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/ContextStack.${glTem
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glSqlLogRegistryLatestSqlProvider}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/SqlLogRegistryLatestSqlProvider.${glTemplateFileExtension}",$path,"", "")
 
-#if ($database.isTargetLanguageCSharp())
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glFetchNarrowingResultSetFactory}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/FetchNarrowingResultSetFactory.${glTemplateFileExtension}",$path,"", "")
-#end
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glFetchNarrowingResultSetFactory}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/s2dao/FetchNarrowingResultSetFactory.${glTemplateFileExtension}",$path,"", "")
 
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Dao})}${glFetchNarrowingResultSetWrapper}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/FetchNarrowingResultSetWrapper.${glTemplateFileExtension}",$path,"", "")

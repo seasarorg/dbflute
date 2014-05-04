@@ -157,6 +157,8 @@ import org.seasar.dbflute.infra.core.DfDatabaseNameMapping;
 import org.seasar.dbflute.logic.generate.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.generate.exmange.DfCopyrightResolver;
 import org.seasar.dbflute.logic.generate.exmange.DfSerialVersionUIDResolver;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
 import org.seasar.dbflute.logic.generate.packagepath.DfPackagePathHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMeta;
@@ -1133,7 +1135,10 @@ public class Database {
     }
 
     protected DfOldClassHandler createOldClassHandler() {
-        return new DfOldClassHandler(getGeneratorInstance(), getTableList());
+        final DfGenerator generator = getGeneratorInstance();
+        final DfLanguageDependencyInfo lang = getBasicProperties().getLanguageDependencyInfo();
+        final DfLanguageGeneratedClassPackageInfo pkg = lang.getGeneratedClassPackageInfo();
+        return new DfOldClassHandler(generator, pkg, getTableList());
     }
 
     // ===================================================================================
@@ -1335,26 +1340,6 @@ public class Database {
     public String getTargetLanguageInitCap() {
         final String targetLanguage = getBasicProperties().getTargetLanguage();
         return targetLanguage.substring(0, 1).toUpperCase() + targetLanguage.substring(1);
-    }
-
-    public boolean isTargetLanguageJava() {
-        return getBasicProperties().isTargetLanguageJava();
-    }
-
-    public boolean isTargetLanguageCSharp() {
-        return getBasicProperties().isTargetLanguageCSharp();
-    }
-
-    public boolean isTargetLanguagePhp() {
-        return getBasicProperties().isTargetLanguagePhp();
-    }
-
-    public boolean isJavaVersionGreaterEqualTiger() {
-        return getBasicProperties().isJavaVersionGreaterEqualTiger();
-    }
-
-    public boolean isJavaVersionGreaterEqualMustang() {
-        return getBasicProperties().isJavaVersionGreaterEqualMustang();
     }
 
     // -----------------------------------------------------

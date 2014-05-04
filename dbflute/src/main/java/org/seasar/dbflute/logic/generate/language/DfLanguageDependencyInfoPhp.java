@@ -13,18 +13,18 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language;
+package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfoPhp;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaDataPhp;
-import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfo;
-import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfoPhp;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultPhp;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfoPhp;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfoPhp;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfoPhp;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfoPhp;
 
 /**
  * @author jflute
@@ -46,24 +46,16 @@ public class DfLanguageDependencyInfoPhp implements DfLanguageDependencyInfo {
     // ===================================================================================
     //                                                                    Program Handling
     //                                                                    ================
-    public DfGrammarInfo getGrammarInfo() {
-        return new DfGrammarInfoPhp();
+    public DfLanguageGrammarInfo getLanguageGrammarInfo() {
+        return new DfLanguageGrammarInfoPhp();
     }
 
-    public String getIntegerConvertExpression(String value) {
-        return value;
+    public DfLanguageTypeMappingInfo getLanguageTypeMappingInfo() {
+        return new DfLanguageTypeMappingInfoPhp();
     }
 
-    public String getSequenceType() {
-        return "";
-    }
-
-    public DfDBFluteDiconInfo getDBFluteDiconInfo() {
-        return new DfDBFluteDiconInfoPhp();
-    }
-
-    public LanguageMetaData createLanguageMetaData() {
-        return new LanguageMetaDataPhp();
+    public DfLanguageDBFluteDiconInfo getLanguageDBFluteDiconInfo() {
+        return new DfLanguageDBFluteDiconInfoPhp();
     }
 
     // ===================================================================================
@@ -120,7 +112,14 @@ public class DfLanguageDependencyInfoPhp implements DfLanguageDependencyInfo {
         return "vmphp";
     }
 
-    public DfGeneratedClassPackageDefault getGeneratedClassPackageInfo() {
-        return new DfGeneratedClassPackageDefaultPhp();
+    public DfLanguageGeneratedClassPackageInfo getGeneratedClassPackageInfo() {
+        return new DfLanguageGeneratedClassPackageInfoPhp();
+    }
+
+    // ===================================================================================
+    //                                                                    Small Adjustment
+    //                                                                    ================
+    public boolean isIfCommentExpressionCheckEnabled() {
+        return false;
     }
 }

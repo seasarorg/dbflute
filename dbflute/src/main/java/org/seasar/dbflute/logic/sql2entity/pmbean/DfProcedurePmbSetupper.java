@@ -27,7 +27,7 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfSchemaSource;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfProcedureExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMeta;
@@ -281,7 +281,7 @@ public class DfProcedurePmbSetupper {
     }
 
     protected String getProcedureDefaultResultSetPropertyType() {
-        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
         return grammarInfo.getGenericMapListClassName("String", "Object"); // Map<String, Object>
     }
 
@@ -427,7 +427,7 @@ public class DfProcedurePmbSetupper {
     }
 
     protected String getGenericListClassName(String element) {
-        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
         return grammarInfo.getGenericListClassName(element); // List<ELEMENT>
     }
 
@@ -490,7 +490,7 @@ public class DfProcedurePmbSetupper {
         // so it adjusts project prefix here
         final String projectPrefix = getBasicProperties().getProjectPrefix();
         final String propertyType = projectPrefix + entityName;
-        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
         return grammarInfo.getGenericListClassName(propertyType);
     }
 

@@ -51,20 +51,6 @@
 #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
 #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
 #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
-#if ($database.isTargetLanguageCSharp())
-  #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
-  #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.CBean")
-  #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.CBean.COption")
-  #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.Dbm")
-  #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.Dbm.Info")
-  #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.Helper")
-  #set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.JavaLike")
-  #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.Ado")
-  #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
-  #set ($glPackageBaseEntity = "${database.baseEntityPackage}")
-  #set ($glPackageExtendedDao = "${database.extendedDaoPackage}")
-  #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
-#end
 
 ## -----------------------------------------------------------------------------------------------------
 ##                                                                                Parse customize entity

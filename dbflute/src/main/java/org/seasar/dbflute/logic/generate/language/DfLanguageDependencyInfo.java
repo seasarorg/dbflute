@@ -13,14 +13,14 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language;
+package org.seasar.dbflute.logic.generate.language;
 
 import java.io.File;
 
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
-import org.seasar.dbflute.helper.language.properties.DfDBFluteDiconInfo;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageDBFluteDiconInfo;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
 
 /**
  * @author jflute
@@ -30,6 +30,9 @@ public interface DfLanguageDependencyInfo {
     // ===================================================================================
     //                                                                               Basic
     //                                                                               =====
+    /**
+     * @return The title expression for the language. (NotNull)
+     */
     String getLanguageTitle();
 
     // ===================================================================================
@@ -38,30 +41,17 @@ public interface DfLanguageDependencyInfo {
     /**
      * @return The information of target language grammar. (NotNull)
      */
-    DfGrammarInfo getGrammarInfo();
+    DfLanguageGrammarInfo getLanguageGrammarInfo();
 
     /**
-     * This method is for JDK-1.4 that has no AUTO BOXING!
-     * But now DBFlute does not support JDBC-1.4 so that this method is unused.
-     * @param value The integer value. (NotNull)
-     * @return The expression of integer conversion. (NotNull)
+     * @return The information of type mapping. (NotNull)
      */
-    String getIntegerConvertExpression(String value);
-
-    /**
-     * @return The type of sequence. (NotNull)
-     */
-    String getSequenceType();
+    DfLanguageTypeMappingInfo getLanguageTypeMappingInfo();
 
     /**
      * @return The information object of DBFlute dicon. (NotNull)
      */
-    DfDBFluteDiconInfo getDBFluteDiconInfo();
-
-    /**
-     * @return The meta data of the language. (NotNull)
-     */
-    LanguageMetaData createLanguageMetaData();
+    DfLanguageDBFluteDiconInfo getLanguageDBFluteDiconInfo();
 
     // ===================================================================================
     //                                                                 Compile Environment
@@ -134,5 +124,10 @@ public interface DfLanguageDependencyInfo {
     /**
      * @return The information of a generated class package. (NotNull)
      */
-    DfGeneratedClassPackageDefault getGeneratedClassPackageInfo();
+    DfLanguageGeneratedClassPackageInfo getGeneratedClassPackageInfo();
+
+    // ===================================================================================
+    //                                                                    Small Adjustment
+    //                                                                    ================
+    boolean isIfCommentExpressionCheckEnabled();
 }

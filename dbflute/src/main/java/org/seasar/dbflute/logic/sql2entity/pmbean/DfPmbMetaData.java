@@ -25,7 +25,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
-import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
+import org.seasar.dbflute.logic.generate.language.grammar.DfLanguageGrammarInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.basic.DfColumnExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMeta.DfProcedureColumnType;
@@ -677,29 +677,10 @@ public class DfPmbMetaData {
             valueType = getPropertyType(propertyName);
         }
         final String cdefBase = projectPrefix + "CDef." + classificationName + "." + element;
-        if (getBasicProperties().isTargetLanguageJava()) {
-            final String cdefCode = cdefBase + ".code()";
-            if (isPropertyJavaNativeNumberObjectIncludingListElement(propertyName)) {
-                return "toNumber(" + cdefCode + ", " + valueType + ".class)";
-            } else if (isPropertyJavaNativeBooleanObjectIncludingListElement(propertyName)) {
-                return "toBoolean(" + cdefCode + ")";
-            } else {
-                return cdefCode;
-            }
-        } else if (getBasicProperties().isTargetLanguageCSharp()) {
-            final String cdefCode = cdefBase + ".Code";
-            if (isPropertyJavaNativeNumberObjectIncludingListElement(propertyName)) {
-                final String propertyType = getPropertyTypeRemovedCSharpNullable(propertyName);
-                return propertyType + ".Parse(" + cdefCode + ")";
-            } else if (isPropertyJavaNativeBooleanObjectIncludingListElement(propertyName)) {
-                final String propertyType = getPropertyTypeRemovedCSharpNullable(propertyName);
-                return propertyType + ".Parse(" + cdefCode + ")";
-            } else {
-                return cdefCode;
-            }
-        } else {
-            return null;
-        }
+        final DfLanguageGrammarInfo grammar = getBasicProperties().getLanguageDependencyInfo().getLanguageGrammarInfo();
+        final boolean toNumber = isPropertyJavaNativeNumberObjectIncludingListElement(propertyName);
+        final boolean toBoolean = isPropertyJavaNativeBooleanObjectIncludingListElement(propertyName);
+        return grammar.buildCDefElementValue(cdefBase, propertyName, valueType, toNumber, toBoolean);
     }
 
     public DfClassificationTop getPropertyOptionClassificationTop(String propertyName, AppData schemaData) {
@@ -1040,7 +1021,8 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleArrayElementJavaNativeTypeLiteral(String propertyName) {
         final String javaNative = getProcedureParameterOracleArrayElementJavaNative(propertyName);
-        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo()
+                .getLanguageGrammarInfo();
         return grammarInfo.getClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(javaNative, "<"));
     }
 
@@ -1064,7 +1046,8 @@ public class DfPmbMetaData {
 
     public String getProcedureParameterOracleStructEntityTypeTypeLiteral(String propertyName) {
         final String entityType = getProcedureParameterOracleStructEntityType(propertyName);
-        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        final DfLanguageGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo()
+                .getLanguageGrammarInfo();
         return grammarInfo.getClassTypeLiteral(Srl.substringFirstFrontIgnoreCase(entityType, "<"));
     }
 

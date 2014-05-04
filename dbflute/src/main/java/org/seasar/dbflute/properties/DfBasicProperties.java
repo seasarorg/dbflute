@@ -25,15 +25,14 @@ import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.exception.factory.ExceptionMessageBuilder;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoPhp;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoScala;
-import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.infra.core.DfDatabaseNameMapping;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfoCSharp;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfoJava;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfoPhp;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfoScala;
+import org.seasar.dbflute.logic.generate.language.location.DfLanguageGeneratedClassPackageInfo;
 import org.seasar.dbflute.properties.facade.DfDatabaseTypeFacadeProp;
-import org.seasar.dbflute.properties.facade.DfLanguageTypeFacadeProp;
 import org.seasar.dbflute.properties.facade.DfSchemaXmlFacadeProp;
 import org.seasar.dbflute.util.Srl;
 
@@ -236,16 +235,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                            Language
     //                                                                            ========
-    protected DfLanguageTypeFacadeProp _languageTypeFacadeProp;
-
-    public DfLanguageTypeFacadeProp getLanguageTypeFacadeProp() {
-        if (_languageTypeFacadeProp != null) {
-            return _languageTypeFacadeProp;
-        }
-        _languageTypeFacadeProp = new DfLanguageTypeFacadeProp(this);
-        return _languageTypeFacadeProp;
-    }
-
     public String getTargetLanguage() {
         return getProperty("targetLanguage", DEFAULT_targetLanguage);
     }
@@ -256,10 +245,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             return targetLanguage + "j14";
         }
         return targetLanguage;
-    }
-
-    public boolean isTargetLanguageMain() {
-        return isTargetLanguageJava() || isTargetLanguageCSharp();
     }
 
     public boolean isTargetLanguageJava() {
@@ -402,7 +387,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getClassFileExtension() { // It's not property!
-        return getLanguageDependencyInfo().getGrammarInfo().getClassFileExtension();
+        return getLanguageDependencyInfo().getLanguageGrammarInfo().getClassFileExtension();
     }
 
     // ===================================================================================
@@ -511,7 +496,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         }
     }
 
-    protected DfGeneratedClassPackageDefault getPackageInfo() {
+    protected DfLanguageGeneratedClassPackageInfo getPackageInfo() {
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         return languageDependencyInfo.getGeneratedClassPackageInfo();
     }

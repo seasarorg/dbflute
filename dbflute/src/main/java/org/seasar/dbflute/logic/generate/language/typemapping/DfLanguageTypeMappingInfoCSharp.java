@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.language.metadata;
+package org.seasar.dbflute.logic.generate.language.typemapping;
 
 import java.util.List;
 import java.util.Map;
@@ -23,21 +23,13 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 /**
  * @author jflute
  */
-public class LanguageMetaDataCSharp implements LanguageMetaData {
+public class DfLanguageTypeMappingInfoCSharp implements DfLanguageTypeMappingInfo {
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected final List<String> _stringList = DfCollectionUtil.newArrayList("String");
-    protected final List<String> _numberList = DfCollectionUtil.newArrayList("decimal?", "int?", "long?");
-    protected final List<String> _dateList = DfCollectionUtil.newArrayList("DateTime?");
-    protected final List<String> _booleanList = DfCollectionUtil.newArrayList("bool?");
-    protected final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
-
-    // ===================================================================================
-    //                                                                             Mapping
-    //                                                                             =======
-    public Map<String, Object> getJdbcToJavaNativeMap() {
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final Map<String, Object> _jdbcToJavaNativeMap;
+    static {
         final Map<String, Object> map = DfCollectionUtil.newLinkedHashMap();
         map.put("CHAR", "String");
         map.put("VARCHAR", "String");
@@ -55,12 +47,24 @@ public class LanguageMetaDataCSharp implements LanguageMetaData {
         map.put("DATE", "DateTime?");
         map.put("TIME", "DateTime?");
         map.put("TIMESTAMP", "DateTime?");
-        return map;
+        _jdbcToJavaNativeMap = map;
+    }
+    protected static final List<String> _stringList = DfCollectionUtil.newArrayList("String");
+    protected static final List<String> _numberList = DfCollectionUtil.newArrayList("decimal?", "int?", "long?");
+    protected static final List<String> _dateList = DfCollectionUtil.newArrayList("DateTime?");
+    protected static final List<String> _booleanList = DfCollectionUtil.newArrayList("bool?");
+    protected static final List<String> _binaryList = DfCollectionUtil.newArrayList("byte[]");
+
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
+    public Map<String, Object> getJdbcToJavaNativeMap() {
+        return _jdbcToJavaNativeMap;
     }
 
     // ===================================================================================
-    //                                                                         Suffix List
-    //                                                                         ===========
+    //                                                                  Native Suffix List
+    //                                                                  ==================
     public List<String> getStringList() {
         return _stringList;
     }
@@ -79,5 +83,16 @@ public class LanguageMetaDataCSharp implements LanguageMetaData {
 
     public List<String> getBinaryList() {
         return _binaryList;
+    }
+
+    // ===================================================================================
+    //                                                                JDBC Type Adjustment
+    //                                                                ====================
+    public String getSequenceType() {
+        return "int?"; // #pending jflute long?
+    }
+
+    public String getJdbcTypeOfUUID() {
+        return null; // does C# support it?
     }
 }

@@ -21,8 +21,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
-import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
+import org.seasar.dbflute.logic.generate.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.generate.language.typemapping.DfLanguageTypeMappingInfo;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -250,14 +250,14 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                  Language Meta Data
     //                                                                  ==================
-    protected LanguageMetaData _languageMetaData;
+    protected DfLanguageTypeMappingInfo _languageMetaData;
 
-    protected LanguageMetaData getLanguageMetaData() {
+    protected DfLanguageTypeMappingInfo getLanguageMetaData() {
         if (_languageMetaData != null) {
             return _languageMetaData;
         }
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        _languageMetaData = languageDependencyInfo.createLanguageMetaData();
+        _languageMetaData = languageDependencyInfo.getLanguageTypeMappingInfo();
         return _languageMetaData;
     }
 }
